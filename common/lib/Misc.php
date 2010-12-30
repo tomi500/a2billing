@@ -435,7 +435,7 @@ function remove_prefix($phonenumber) {
  * function linkonmonitorfile
  */
 function linkonmonitorfile($value) {
-	$format_list = array ('wav','gsm','mp3','sln','g723','g729');
+	$format_list = array ('WAV','wav','gsm','mp3','sln','g723','g729');
 	$find_record = false;
 	foreach ($format_list as $c_format){
 		$myfile = $value . "." . $c_format;
@@ -456,7 +456,7 @@ function linkonmonitorfile($value) {
  * function linkonmonitorfile_customer
  */
 function linkonmonitorfile_customer($value) {
-	$format_list = array ('wav','gsm','mp3','sln','g723','g729');
+	$format_list = array ('WAV','wav','gsm','mp3','sln','g723','g729');
 	$find_record = false;
 	foreach ($format_list as $c_format){
 		$myfile = $value . "." . $c_format;

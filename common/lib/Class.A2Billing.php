@@ -504,7 +504,7 @@ class A2Billing {
 		define ("LOGFILE_CRONT_CURRENCY_UPDATE",isset($this->config['log-files']['cront_currency_update'])	?$this->config['log-files']['cront_currency_update']:null);
 		define ("LOGFILE_CRONT_INVOICE",		isset($this->config['log-files']['cront_invoice'])			?$this->config['log-files']['cront_invoice']:null);
 		define ("LOGFILE_CRONT_CHECKACCOUNT",	isset($this->config['log-files']['cront_check_account'])	?$this->config['log-files']['cront_check_account']:null);
-
+		define ("MONITOR_PATH", 		isset($this->config['webui']['monitor_path'])			?$this->config['webui']['monitor_path']:null);
 		define ("LOGFILE_API_ECOMMERCE", 		isset($this->config['log-files']['api_ecommerce'])			?$this->config['log-files']['api_ecommerce']:null);
 		define ("LOGFILE_API_CALLBACK", 		isset($this->config['log-files']['api_callback'])			?$this->config['log-files']['api_callback']:null);
 		define ("LOGFILE_PAYPAL", 				isset($this->config['log-files']['paypal'])					?$this->config['log-files']['paypal']:null);
@@ -1124,8 +1124,8 @@ class A2Billing {
 			}
 			if ($this -> CC_TESTING) $this->destination = "kphone";
 
-			if ($this->agiconfig['record_call'] == 1) {
-				$command_mixmonitor = "MixMonitor {$this->uniqueid}.{$this->agiconfig['monitor_formatfile']}|b";
+			if ($A2B->monitor == 1 || $this->agiconfig['record_call'] == 1) {
+				$command_mixmonitor = "MixMonitor ". MONITOR_PATH ."/{$A2B->uniqueid}.{$A2B->agiconfig['monitor_formatfile']}|b";
 				$command_mixmonitor = $this -> format_parameters ($command_mixmonitor);
 				$myres = $agi->exec($command_mixmonitor);
 				$this -> debug( INFO, $agi, __FILE__, __LINE__, $command_mixmonitor);
@@ -1149,7 +1149,7 @@ class A2Billing {
 			$dialstatus = $agi->get_variable("DIALSTATUS");
 			$dialstatus = $dialstatus['data'];
 
-			if ($this->agiconfig['record_call'] == 1) {
+			if ($A2B->monitor == 1 || $this->agiconfig['record_call'] == 1) {
 				// Monitor(wav,kiki,m)
 				$myres = $agi->exec("StopMixMonitor");
 				$this -> debug( INFO, $agi, __FILE__, __LINE__, "EXEC StopMixMonitor (".$this->uniqueid.")");
@@ -1270,8 +1270,8 @@ class A2Billing {
 				if ($inst_listdestination[5]==1) {
 
 					// RUN MIXMONITOR TO RECORD CALL
-					if ($this->agiconfig['record_call'] == 1) {
-						$command_mixmonitor = "MixMonitor {$this->uniqueid}.{$this->agiconfig['monitor_formatfile']}|b";
+					if ($A2B->monitor == 1 || $this->agiconfig['record_call'] == 1) {
+						$command_mixmonitor = "MixMonitor ". MONITOR_PATH ."/{$A2B->uniqueid}.{$A2B->agiconfig['monitor_formatfile']}|b";
 						$command_mixmonitor = $this -> format_parameters ($command_mixmonitor);
 						$myres = $agi->exec($command_mixmonitor);
 						$this -> debug( INFO, $agi, __FILE__, __LINE__, $command_mixmonitor);
@@ -1296,7 +1296,7 @@ class A2Billing {
 					$dialstatus 	= $agi->get_variable("DIALSTATUS");
 					$dialstatus 	= $dialstatus['data'];
 
-					if ($this->agiconfig['record_call'] == 1) {
+					if ($A2B->monitor == 1 || $this->agiconfig['record_call'] == 1) {
 						$myres = $agi->exec("StopMixMonitor");
 						$this -> debug( INFO, $agi, __FILE__, __LINE__, "EXEC StopMixMonitor (".$this->uniqueid.")");
 					}
@@ -1503,8 +1503,8 @@ class A2Billing {
             if ($inst_listdestination[5]==1) {
 				
                 // RUN MIXMONITOR TO RECORD CALL
-                if ($this->agiconfig['record_call'] == 1) {
-					$command_mixmonitor = "MixMonitor {$this->uniqueid}.{$this->agiconfig['monitor_formatfile']}|b";
+		if ($A2B->monitor == 1 || $this->agiconfig['record_call'] == 1) {
+					$command_mixmonitor = "MixMonitor ". MONITOR_PATH ."/{$A2B->uniqueid}.{$A2B->agiconfig['monitor_formatfile']}|b";
 					$command_mixmonitor = $this -> format_parameters ($command_mixmonitor);
 					$myres = $agi->exec($command_mixmonitor);
 					$this -> debug( INFO, $agi, __FILE__, __LINE__, $command_mixmonitor);
@@ -1530,14 +1530,14 @@ class A2Billing {
                     $dialparams = str_replace("%timeout%", min($time2call * 1000, $max_long), $this->agiconfig['dialcommand_param']);
                     $dialparams = str_replace("%timeoutsec%", min($time2call, $max_long), $dialparams);
 
-                    if ($this -> agiconfig['record_call'] == 1) {
-                        $myres = $agi->exec("MixMonitor {$this->uniqueid}.{$this->agiconfig['monitor_formatfile']}|b");
-                        $this -> debug( INFO, $agi, __FILE__, __LINE__, "EXEC MixMonitor {$this->uniqueid}.{$this->agiconfig['monitor_formatfile']}|b");
+		    if ($A2B->monitor == 1 || $this -> agiconfig['record_call'] == 1) {
+                        $myres = $agi->exec("MixMonitor ". MONITOR_PATH ."/{$A2B->uniqueid}.{$A2B->agiconfig['monitor_formatfile']}|b");
+                        $this -> debug( INFO, $agi, __FILE__, __LINE__, "MixMonitor ". MONITOR_PATH ."/{$A2B->uniqueid}.{$A2B->agiconfig['monitor_formatfile']}|b");
                     }
                     $dialstr 	= $inst_listdestination[4].$dialparams;
                     $myres = $this -> run_dial($agi, $dialstr);
                     $this -> debug( INFO, $agi, __FILE__, __LINE__, "DIAL $dialstr");
-                    if ($this -> agiconfig['record_call'] == 1) {
+		    if ($A2B->monitor == 1 || $this -> agiconfig['record_call'] == 1) {
                         $myres = $agi->exec("StopMixMonitor");
                         $this -> debug( INFO, $agi, __FILE__, __LINE__, "EXEC StopMixMonitor (".$this->uniqueid.")");
                     }
@@ -1548,7 +1548,7 @@ class A2Billing {
                 $dialstatus 	= $agi->get_variable("DIALSTATUS");
                 $dialstatus 	= $dialstatus['data'];
 
-                if ($this->agiconfig['record_call'] == 1) {
+		if ($A2B->monitor == 1 || $this -> agiconfig['record_call'] == 1) {
                     $myres = $agi->exec("StopMixMonitor");
                     $this -> debug( INFO, $agi, __FILE__, __LINE__, "EXEC StopMixMonitor (".$this->uniqueid.")");
                 }
@@ -2442,7 +2442,7 @@ class A2Billing {
 	}
 	
 
-	function callingcard_ivr_authenticate($agi)
+	function callingcard_ivr_authenticate($agi,$accountback=0)
 	{
 		$authentication 	= false;
 		$prompt				= '';
@@ -2452,8 +2452,8 @@ class A2Billing {
 		$callerID_enable 	= $this->agiconfig['cid_enable'];
 
 		// 		  -%-%-%-%-%-%-		FIRST TRY WITH THE CALLERID AUTHENTICATION 	-%-%-%-%-%-%-
-		if ($callerID_enable==1 && is_numeric($this->CallerID) && $this->CallerID>0) {
-
+		if ($callerID_enable==1 && !$this->CallerID=="") {
+//		if ($callerID_enable==1 && is_numeric($this->CallerID) && $this->CallerID>0) {
 			$this -> debug( DEBUG, $agi, __FILE__, __LINE__, "[CID_ENABLE - CID_CONTROL - CID:".$this->CallerID."]");
 
 			// NOT USE A LEFT JOIN HERE - In case the callerID is alone without card bound
@@ -2462,7 +2462,7 @@ class A2Billing {
 				    " cc_card.language, cc_card.username, removeinterprefix, cc_card.redial, enableexpire, UNIX_TIMESTAMP(expirationdate), " .
 				    " expiredays, nbused, UNIX_TIMESTAMP(firstusedate), UNIX_TIMESTAMP(cc_card.creationdate), cc_card.currency, " .
 				    " cc_card.lastname, cc_card.firstname, cc_card.email, cc_card.uipass, cc_card.id_campaign, cc_card.id, useralias, " .
-				    " cc_card.status, cc_card.voicemail_permitted, cc_card.voicemail_activated, cc_card.restriction, cc_country.countryprefix".
+				    " cc_card.status, cc_card.voicemail_permitted, cc_card.voicemail_activated, cc_card.restriction, cc_country.countryprefix, cc_card.monitor ".
 				    " FROM cc_callerid ".
 				    " LEFT JOIN cc_card ON cc_callerid.id_cc_card=cc_card.id ".
 				    " LEFT JOIN cc_tariffgroup ON cc_card.tariff=cc_tariffgroup.id ".
@@ -2576,6 +2576,7 @@ class A2Billing {
 				$this->voicemail			= ($result[0][29] && $result[0][30]) ? 1 : 0;
 				$this->restriction			= $result[0][31];
 				$this->countryprefix		= $result[0][32];
+				$this->monitor				= $result[0][33];
 				
 				if (strlen($language)==2 && !($this->languageselected>=1)) {
 
@@ -2677,18 +2678,19 @@ class A2Billing {
 		// 		 -%-%-%-%-%-%-		CHECK IF WE CAN AUTHENTICATE THROUGH THE "ACCOUNTCODE" 	-%-%-%-%-%-%-
 		
 		$prompt_entercardnum= "prepaid-enter-pin-number";
+		if ($accountback>0) $this->accountcode = $accountback;
 		$this -> debug( DEBUG, $agi, __FILE__, __LINE__, ' - Account code ::> '.$this -> accountcode);
 		if (strlen ($this->accountcode)>=1 && !$authentication) {
 			$this->username = $this -> cardnumber = $this->accountcode;
 			for ($i=0;$i<=0;$i++) {
 
-				if ($callerID_enable!=1 || !is_numeric($this->CallerID) || $this->CallerID<=0) {
+				if ($callerID_enable!=1 || !is_numeric($this->CallerID) || $this->CallerID<=0 || $accountback>0) {
 					
 					$QUERY = "SELECT credit, tariff, activated, inuse, simultaccess, typepaid, creditlimit, language, removeinterprefix, " .
 								" redial, enableexpire, UNIX_TIMESTAMP(expirationdate), expiredays, nbused, UNIX_TIMESTAMP(firstusedate), " .
 								" UNIX_TIMESTAMP(cc_card.creationdate), cc_card.currency, cc_card.lastname, cc_card.firstname, cc_card.email, " .
 								" cc_card.uipass, cc_card.id_campaign, cc_card.id, useralias, status, voicemail_permitted, voicemail_activated, " .
-								" cc_card.restriction, cc_country.countryprefix " .
+								" cc_card.restriction, cc_country.countryprefix, cc_card.monitor " .
 								" FROM cc_card " .
 								" LEFT JOIN cc_tariffgroup ON tariff=cc_tariffgroup.id " .
 								" LEFT JOIN cc_country ON cc_card.country=cc_country.countrycode ".
@@ -2751,6 +2753,7 @@ class A2Billing {
 					$this->voicemail			= ($result[0][25] && $result[0][26]) ? 1 : 0;
 					$this->restriction			= $result[0][27];
 					$this->countryprefix		= $result[0][28];
+					$this->monitor 				= $result[0][29];
 					
 					if ($this->typepaid==1) $this->credit = $this->credit + $this->creditlimit;
 				}
@@ -2884,7 +2887,7 @@ class A2Billing {
 							" enableexpire, UNIX_TIMESTAMP(expirationdate), expiredays, nbused, UNIX_TIMESTAMP(firstusedate), " .
 							" UNIX_TIMESTAMP(cc_card.creationdate), cc_card.currency, cc_card.lastname, cc_card.firstname, cc_card.email, " .
 							" cc_card.uipass, cc_card.id, cc_card.id_campaign, cc_card.id, useralias, status, voicemail_permitted, " .
-							" voicemail_activated, cc_card.restriction, cc_country.countryprefix " .
+							" voicemail_activated, cc_card.restriction, cc_country.countryprefix, cc_card.monitor " .
 							" FROM cc_card LEFT JOIN cc_tariffgroup ON tariff=cc_tariffgroup.id " .
 							" LEFT JOIN cc_country ON cc_card.country=cc_country.countrycode ".
 							" WHERE username='".$this->cardnumber."'";
@@ -2949,6 +2952,7 @@ class A2Billing {
 				$this->voicemail 			= ($result[0][26] && $result[0][27]) ? 1 : 0;
 				$this->restriction 			= $result[0][28];
 				$this->countryprefix 		= $result[0][29];
+				$this->monitor 				= $result[0][30];
 				
 				if ($this->typepaid==1) $this->credit = $this->credit + $this->creditlimit;
 				
@@ -3114,7 +3118,7 @@ class A2Billing {
 						" enableexpire, UNIX_TIMESTAMP(expirationdate), expiredays, nbused, UNIX_TIMESTAMP(firstusedate), " .
 						" UNIX_TIMESTAMP(cc_card.creationdate), cc_card.currency, cc_card.lastname, cc_card.firstname, cc_card.email, " .
 						" cc_card.uipass, cc_card.id, cc_card.id_campaign, cc_card.id, useralias, status, voicemail_permitted, voicemail_activated, " .
-						" cc_card.restriction, cc_country.countryprefix " .
+						" cc_card.restriction, cc_country.countryprefix, cc_card.monitor " .
 						" FROM cc_card LEFT JOIN cc_tariffgroup ON tariff=cc_tariffgroup.id " .
 						" LEFT JOIN cc_country ON cc_card.country=cc_country.countrycode ".
 						" WHERE username='".$this->cardnumber."'";
@@ -3157,6 +3161,7 @@ class A2Billing {
 			$this->voicemail = ($result[0][26] && $result[0][27]) ? 1 : 0;
 			$this->restriction = $result[0][28];
 			$this->countryprefix = $result[0][29];
+			$this->monitor = $result[0][30];
 			
 			if ($this->typepaid==1) $this->credit = $this->credit + $this->creditlimit;
 			
@@ -3229,7 +3234,7 @@ class A2Billing {
 		$QUERY = "SELECT credit, tariff, activated, inuse, simultaccess, typepaid, creditlimit, language, removeinterprefix, redial, enableexpire, " .
 					" UNIX_TIMESTAMP(expirationdate), expiredays, nbused, UNIX_TIMESTAMP(firstusedate), UNIX_TIMESTAMP(cc_card.creationdate), " .
 					" cc_card.currency, cc_card.lastname, cc_card.firstname, cc_card.email, cc_card.uipass, cc_card.id_campaign, status, " .
-					" voicemail_permitted, voicemail_activated, cc_card.restriction, cc_country.countryprefix " .
+					" voicemail_permitted, voicemail_activated, cc_card.restriction, cc_country.countryprefix, cc_card.monitor " .
 					" FROM cc_card LEFT JOIN cc_tariffgroup ON tariff=cc_tariffgroup.id " .
 					" LEFT JOIN cc_country ON cc_card.country=cc_country.countrycode ".
 					" WHERE username='".$this->cardnumber."'";
@@ -3270,6 +3275,7 @@ class A2Billing {
 		$this->voicemail 			= ($result[0][23] && $result[0][24]) ? 1 : 0;
 		$this->restriction 			= $result[0][25];
 		$this->countryprefix 		= $result[0][26];
+		$this->monitor 				= $result[0][27];
 		
 		if ($this->typepaid==1)
 			$this->credit = $this->credit + $this->creditlimit;

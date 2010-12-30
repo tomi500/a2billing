@@ -33,7 +33,7 @@
 
 
 
-getpost_ifset(array('id', 'lastname', 'firstname', 'email', 'address','city', 'state', 'country', 'zipcode','id_timezone', 'phone', 'fax','message', 'voicemail_activated'));
+getpost_ifset(array('id', 'lastname', 'firstname', 'email', 'address','city', 'state', 'country', 'zipcode','id_timezone', 'phone', 'fax','message', 'voicemail_activated', 'monitor', 'recalldays', 'recalltime'));
 
 
 $HD_Form = new FormHandler("cc_card","Card");
@@ -138,7 +138,6 @@ $HD_Form -> AddEditElement (gettext("PHONE NUMBER"),
 			   gettext("Insert the phone number of the customers"),
 			   "" , "", "",	"", "", "" , "NO", "");
 
-
 $HD_Form -> AddEditElement (gettext("FAX NUMBER"),
 			   "fax",			
 			   '$value',	
@@ -147,6 +146,33 @@ $HD_Form -> AddEditElement (gettext("FAX NUMBER"),
 			   "",	
 			   gettext("Insert the fax number of the customers"),
 			   "" , "", "",	"", "", "" , "NO", "");
+
+$HD_Form -> AddEditElement (gettext("RECORD CALL"),
+			   "monitor",
+			   '0',
+			   "RADIOBUTTON",
+			   "",
+			   "",
+			   gettext("Enable to monitor the call (to record all the conversations) value : YES - NO"),
+			   "" , "", "", "Yes :1, - No:0", "", "" , "", gettext("Define if you want to record all the conversations"));
+
+$HD_Form -> AddEditElement (gettext("RECALL DAYS"),
+			   "recalldays",
+			   '$value',
+			   "INPUT",
+			   "size=30 maxlength=20",
+			   "",
+			   gettext("Insert the how many days ago you want to search back phone number"),
+			   "" , "", "", "", "", "" , "NO", gettext("Define number of days ago for use back phone number by callers you have called in past this days"));
+			
+$HD_Form -> AddEditElement (gettext("RECALL TIME"),
+			   "recalltime",
+			   '$value',
+			   "INPUT",
+			   "size=30 maxlength=4 readonly",
+			   "",
+			   "",
+			   "" , "", "", "", "", "", "NO", gettext("Max time to recall in seconds. Set '-1' for paritet calls."));
 
 if (ACT_VOICEMAIL) {
 	$HD_Form -> AddEditElement (gettext("ACTIVE VOICEMAIL SERVICE"),
@@ -164,7 +190,7 @@ if (ACT_VOICEMAIL)
 	$add_fields_voicemail = ', voicemail_activated ';
 
 
-$HD_Form -> FieldEditElement ('lastname, firstname, address, city, state, country, zipcode,id_timezone, phone, fax '.$add_fields_voicemail);
+$HD_Form -> FieldEditElement ('lastname, firstname, address, city, state, country, zipcode, id_timezone, phone, fax, monitor, recalldays, recalltime'.$add_fields_voicemail);
 
 $HD_Form -> FG_INTRO_TEXT_ADD = gettext("you can add easily update your information clicking on the button.");
 

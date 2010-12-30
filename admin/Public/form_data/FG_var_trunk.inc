@@ -33,13 +33,14 @@
 
 
 
-getpost_ifset(array('id', 'trunkcode', 'trunkprefix', 'removeprefix', 'providertech', 'providerip', 'addparameter','failover_trunk', 'id_provider', 'popup_select', 'inuse', 'maxuse', 'status', 'if_max_use'));
+getpost_ifset(array('id', 'trunkcode', 'trunkprefix', 'removeprefix', 'providertech', 'providerip', 'addparameter', 'dialprefixmain', 'failover_trunk', 'id_provider', 'popup_select', 'inuse', 'maxuse', 'status', 'if_max_use',
+	'dialprefixa', 'failover_trunka', 'startdatea', 'stopdatea', 'billblockseca', 'perioda', 'periodexpirya', 'timelefta', 'maxsecperperioda', 'periodcounta', 'lastcallstoptimea',
+	'dialprefixb', 'failover_trunkb', 'startdateb', 'stopdateb', 'billblocksecb', 'periodb', 'periodexpiryb', 'timeleftb', 'maxsecperperiodb', 'periodcountb', 'lastcallstoptimeb'));
 
 $DBHandle  = DbConnect();
 $instance_table = new Table();
 
 $HD_Form = new FormHandler("cc_trunk","trunk");
-
 
 $HD_Form ->FG_LIST_ADDING_BUTTON1 = true;
 $HD_Form ->FG_LIST_ADDING_BUTTON_LINK1 = "A2B_entity_trunk.php?form_action=ask-add&section=".$_SESSION["menu_section"];
@@ -52,10 +53,6 @@ $HD_Form -> FG_TABLE_ID = " id_trunk";
 $HD_Form -> FG_TABLE_DEFAULT_ORDER = " id_trunk";
 $HD_Form -> FG_EDITION_CLAUSE = " id_trunk='%id' ";
 $HD_Form -> FG_TABLE_DEFAULT_SENS = "ASC";
-
-$actived_list = array();
-$actived_list["1"] = array( gettext("Active"), "1");
-$actived_list["0"] = array( gettext("Inactive"), "0");
 
 $actived_list = array();
 $actived_list["1"] = array( gettext("Active"), "1");
@@ -76,6 +73,7 @@ if (is_array($res_provider_list)) {
 $maxuse_behaviour_list = array();
 $maxuse_behaviour_list["0"] = array( gettext("Use failover trunk"), "0");
 $maxuse_behaviour_list["1"] = array( gettext("Use next trunk"), "1");
+//$maxuse_behaviour_list["2"] = array( gettext("Use between current and failover trunk randomly"), "2");
 
 // Dependent Tables
 $HD_Form -> FG_FK_DELETE_ALLOWED = true;
@@ -142,9 +140,21 @@ if ($popup_select) {
 
 $def_value_inuse = '';
 $def_value_maxuse = '';
+$def_maxsecperperiod = '';
+$def_timeleft = '';
+$def_billblocksec = '';
 if (isset($form_action) && $form_action=="ask-add"){
 	$def_value_inuse = "value='0'";
 	$def_value_maxuse = "value='-1'";
+	$def_maxsecperperiod = "value='-1'";
+	$def_timeleft = "value='60'";
+	$def_billblocksec = "value='1'";
+	$begin_date = date("Y");
+	$begin_date_plus = date("Y")+20;
+	$end_date = date("-m-d H:i:s");
+	$comp_date = "value='".$begin_date.$end_date."'";
+	$comp_date_plus = "value='".$begin_date_plus.$end_date."'";
+	$tomorrow_date = "value='".date("Y-m-d 00:00:00",mktime(0, 0, 0, date("m"), date("d")+1, date("Y")))."'";
 }
 
 $HD_Form -> AddEditElement (gettext("VOIP-PROVIDER"),
@@ -210,7 +220,17 @@ $HD_Form -> AddEditElement (gettext("ADDITIONAL PARAMETER"),
 	"",
 	gettext("Insert Additional parameters"),
 	"" , "", "", "", "" , "" , "", gettext("Define any additional parameters that will be used when running the Dial Command in Asterisk. Use the following tags as variables  %dialingnumber%, %cardnumber%. ie 'D(ww%cardnumber%wwwwwwwwww%dialingnumber%)'"));
-	
+
+$HD_Form -> AddEditElement(gettext("DIALPREFIX CONDITION"),
+	"dialprefixmain",
+	'$value',
+	"INPUT",
+	"size=50 maxlength=80",
+	"",
+	gettext("Insert the dialing prefix, such as for UK '44' or for US '1' "),
+	"", "", "", "", "", "", "",
+	gettext("Destination prefix condition for FAILOVER TRUNK with respect to ADD+REMOVE PREFIX. This will overrule for Destinations Limited if defined. Leave empty to use FAILOVER TRUNK without condition."));
+
 $HD_Form -> AddEditElement (gettext("FAILOVER TRUNK"),
 	"failover_trunk",
 	'$value',
@@ -246,8 +266,8 @@ $HD_Form -> AddEditElement ("IFMAXUSED",
 	"",
 	"",
 	"",
-	"list" , "", "", "", $maxuse_behaviour_list, "%1" , "", gettext("Specifies which trunk to use when the maximum number of connections is reached"));
-	
+	"list" , "", "", "", $maxuse_behaviour_list, "%1" , "", gettext("Specifies which trunk to use when the maximum number of connections is reached and no once of Destinations Limited was used."));
+
 $HD_Form -> AddEditElement ("STATUS",
 	"status",
 	'$value',
@@ -257,8 +277,262 @@ $HD_Form -> AddEditElement ("STATUS",
 	"",
 	"list" , "", "", "", $actived_list, "%1" , "", gettext("Define if this trunk is active or not"));
 
+$HD_Form -> AddEditElement(gettext("DIALPREFIX")." A",
+	"dialprefixa",
+	'$value',
+	"INPUT",
+	"size=50 maxlength=80",
+	"",
+	gettext("Insert the dialing prefix, such as for UK '44' or for US '1' "),
+	"", "", "", "", "", "", "",
+	gettext("Add destination prefix like for RateCard with respect to ADD+REMOVE PREFIX. Leave empty to disable all rule criterions."),
+	null, null, gettext("First Destination Limited"));
 
-$HD_Form -> FieldEditElement ('id_provider, trunkcode, trunkprefix, removeprefix, providertech, providerip, addparameter, failover_trunk, inuse, maxuse, if_max_use, status');
+$HD_Form -> AddEditElement (gettext("FAILOVER TRUNK")." A",
+	"failover_trunka",
+	'$value',
+	"SELECT",
+	"", "", "",
+	"sql",
+	"cc_trunk",
+	"trunkcode, id_trunk",
+	"", "", "%1", "", gettext("You can define another trunk in case of failover for currend dialprefix"), '', '<OPTION  value="-1" selected>NOT DEFINED</OPTION>');
+
+$HD_Form -> AddEditElement(gettext("START DATE")." A",
+	"startdatea",
+	'$value',
+	"INPUT",
+	"size=40 maxlength=40 $comp_date",
+	"10",
+	gettext("Insert the starting date"),
+	"", "", "", "", "", "", "", gettext("Define the period start when this rule is active. Format YYYY-MM-DD HH:MM:SS. For instance, '2010-12-31 00:00:00'."),
+	null, "res_display_dateformat");
+
+$HD_Form -> AddEditElement(gettext("EXPIRY DATE")." A",
+	"stopdatea",
+	'$value',
+	"INPUT",
+	"size=40 maxlength=40 $comp_date_plus",
+	"10",
+	gettext("Insert the stop date"),
+	"", "", "", "", "", "NO-NULL", "", gettext("Define the period end when this rule is active. Format YYYY-MM-DD HH:MM:SS. For instance, '2010-12-31 00:00:00'."),
+	null, "res_display_dateformat");
+
+$HD_Form -> AddEditElement(gettext("BILLING BLOCK")." A",
+	"billblockseca",
+	'$value',
+	"INPUT",
+	"size=30 $def_billblocksec maxlength=20",
+	"4",
+	gettext("Insert the billing block"),
+	"" , "", "", "", "", "", "NO", gettext("Set the billing increment in seconds"));
+
+$HD_Form -> AddEditElement(gettext("PERIOD")." A",
+	"perioda",
+	'$value',
+	"INPUT",
+	"size=30 $def_billblocksec maxlength=20",
+	"4",
+	gettext("Insert the period")." A",
+	"" , "", "", "", "", "" , "NO", gettext("Define period in days. Set '0' if you want define EXPIRY PERIOD only"));
+
+$HD_Form -> AddEditElement(gettext("EXPIRY PERIOD")." A",
+	"periodexpirya",
+	'$value',
+	"INPUT",
+	"size=40 maxlength=40 $tomorrow_date",
+	"10",
+	gettext("Correct the expiry period"),
+	"", "", "", "", "", "NO-NULL", "", gettext("You can correct current period expiry. Format YYYY-MM-DD HH:MM:SS. This will auto increment in future."),
+	null, "res_display_dateformat");
+
+$HD_Form -> AddEditElement (gettext("MIN TIME LEFT FOR CALL")." A",
+	"timelefta",
+	"",
+	"INPUT",
+	"size=30 $def_timeleft maxlength=30",
+	"12",
+	gettext("Number of time left in seconds"),
+	"" , "", "", "", "", "", "", gettext("Goto selected random trunks if time left less than seconds defined."));
+
+$HD_Form -> AddEditElement(gettext("MAXIMUM SECONDS PER PERIOD")." A",
+	"maxsecperperioda",
+	"",
+	"INPUT",
+	"size=30 $def_maxsecperperiod maxlength=30",
+	"12",
+	gettext("Number of maximum seconds per period"),
+	"" , "", "", "", "", "", "", gettext("Maximum q-ty of seconds allowed for current dial-prefix. Set '-1' for unlimited."));
+
+if ($form_action<>"ask-add") {
+	$HD_Form -> AddEditElement (gettext("USED SECONDS PER PERIOD")." A",
+		"periodcounta",
+		"$value",
+		"INPUT",
+		"size=30 maxlength=20 readonly",
+		"",
+		gettext("period count"),
+		"" , "", "", "", "" , "" , "", gettext("Indicate for used seconds per period"));
+
+	$HD_Form -> AddEditElement (gettext("LAST CALL STOPPED")." A",
+		"lastcallstoptimea",
+		"",
+		"INPUT",
+		"size=40 maxlength=40 readonly",
+		"",
+		gettext("last call stop date"),
+		"" , "" , "", "", "", "", "NO-NULL", "", "", "res_display_dateformat");
+}
+$HD_Form -> AddEditElement(gettext("DIALPREFIX")." B",
+	"dialprefixb",
+	'$value',
+	"INPUT",
+	"size=50 maxlength=80",
+	"",
+	gettext("Insert the dialing prefix, such as for UK '44' or for US '1' "),
+	"", "", "", "", "", "", "",
+	gettext("Add destination prefix like for RateCard with respect to ADD+REMOVE PREFIX. Leave empty to disable all rule criterions."),
+	null, null, gettext("Second Destination Limited"));
+
+$HD_Form -> AddEditElement (gettext("FAILOVER TRUNK")." B",
+	"failover_trunkb",
+	'$value',
+	"SELECT",
+	"", "", "",
+	"sql",
+	"cc_trunk",
+	"trunkcode, id_trunk",
+	"", "", "%1", "", gettext("You can define another trunk in case of failover for currend dialprefix"), '', '<OPTION  value="-1" selected>NOT DEFINED</OPTION>');
+
+$HD_Form -> AddEditElement(gettext("START DATE")." B",
+	"startdateb",
+	'$value',
+	"INPUT",
+	"size=40 maxlength=40 $comp_date",
+	"10",
+	gettext("Insert the starting date"),
+	"" , "", "", "", "", "", "" , gettext("Define the period start when this rule is active. Format YYYY-MM-DD HH:MM:SS. For instance, '2010-12-31 00:00:00'."),
+	null, "res_display_dateformat");
+
+$HD_Form -> AddEditElement(gettext("EXPIRY DATE")." B",
+	"stopdateb",
+	'$value',
+	"INPUT",
+	"size=40 maxlength=40 $comp_date_plus",
+	"10",
+	gettext("Insert the stop date"),
+	"", "", "", "", "", "NO-NULL", "", gettext("Define the period end when this rule is active. Format YYYY-MM-DD HH:MM:SS. For instance, '2010-12-31 00:00:00'."),
+	null, "res_display_dateformat");
+
+$HD_Form -> AddEditElement(gettext("BILLING BLOCK")." B",
+	"billblocksecb",
+	'$value',
+	"INPUT",
+	"size=30 $def_billblocksec maxlength=20",
+	"4",
+	gettext("Insert the billing block"),
+	"" , "", "", "", "", "", "NO", gettext("Set the billing increment in seconds"));
+
+$HD_Form -> AddEditElement(gettext("PERIOD")." B",
+	"periodb",
+	'$value',
+	"INPUT",
+	"size=30 $def_billblocksec maxlength=20",
+	"4",
+	gettext("Insert the period")." B",
+	"" , "", "", "", "", "" , "NO", gettext("Define period in days. Set '0' if you want define EXPIRY PERIOD only"));
+
+$HD_Form -> AddEditElement(gettext("EXPIRY PERIOD")." B",
+	"periodexpiryb",
+	'$value',
+	"INPUT",
+	"size=40 maxlength=40 $tomorrow_date",
+	"10",
+	gettext("Correct the expiry period"),
+	"", "", "", "", "", "NO-NULL", "", gettext("You can correct current period expiry. Format YYYY-MM-DD HH:MM:SS. This will auto increment in future."),
+	null, "res_display_dateformat");
+
+$HD_Form -> AddEditElement (gettext("MIN TIME LEFT FOR CALL")." B",
+	"timeleftb",
+	"",
+	"INPUT",
+	"size=30 $def_timeleft maxlength=30",
+	"12",
+	gettext("Number of time left in seconds"),
+	"" , "", "", "", "", "", "", gettext("Goto selected random trunks if time left less than seconds defined."));
+
+$HD_Form -> AddEditElement (gettext("MAXIMUM SECONDS PER PERIOD")." B",
+	"maxsecperperiodb",
+	"",
+	"INPUT",
+	"size=30 $def_maxsecperperiod maxlength=30",
+	"12",
+	gettext("Number of maximum seconds per period"),
+	"" , "", "", "", "", "", "", gettext("Maximum q-ty of seconds allowed for current dial-prefix. Set '-1' for unlimited."));
+
+if ($form_action<>"ask-add") {
+	$HD_Form -> AddEditElement (gettext("USED SECONDS PER PERIOD")." B",
+		"periodcountb",
+		"$value",
+		"INPUT",
+		"size=30 maxlength=20 readonly",
+		"",
+		gettext("period count"),
+		"" , "", "", "", "" , "" , "", gettext("Indicate for used seconds per period"));
+
+	$HD_Form -> AddEditElement (gettext("LAST CALL STOPPED")." B",
+		"lastcallstoptimeb",
+		"",
+		"INPUT",
+		"size=40 maxlength=40 readonly",
+		"",
+		gettext("last call stop date"),
+		"" , "" , "", "", "", "", "NO-NULL", "", "", "res_display_dateformat");
+}
+
+$DBHandle_maxa  = DbConnect();
+$numrowa = 0;
+$resmaxa = $DBHandle_maxa -> Execute("SELECT * FROM cc_trunk");
+if ( $resmaxa )
+	$numrowa = $resmaxa -> RecordCount( );
+
+if ($numrowa>0) {
+	$HD_Form -> AddEditElement (gettext("RANDOM TRUNKS")." A",
+		"randomtrunksa",
+		'$value',
+		"SELECT",
+		'size="15" multiple="multiple"',
+		"",
+		"",
+		"sql",
+		"cc_trunk_rand_a",
+		"provider_name, ida",
+		"", "", "%1 : (%2)", "", "", "cc_trunk_rand_a:trunk_depend:cc_trunk LEFT JOIN cc_trunk_rand_a ON cc_trunk.id_trunk=cc_trunk_rand_a.trunk_depend:DISTINCT cc_trunk.trunkcode, cc_trunk.id_trunk: cc_trunk_rand_a.trunk_id = %id:trunk_id:%2 - (%1)::::%1:ida='%1'");
+}
+
+$DBHandle_maxb  = DbConnect();
+$numrowb = 0;
+$resmaxb = $DBHandle_maxb -> Execute("SELECT * FROM cc_trunk");
+if ( $resmaxb )
+	$numrowb = $resmaxb -> RecordCount( );
+
+if ($numrowb>0) {
+	$HD_Form -> AddEditElement (gettext("RANDOM TRUNKS")." B",
+		"randomtrunksb",
+		'$value',
+		"SELECT",
+		'size="15" multiple="multiple"',
+		"",
+		"",
+		"sql",
+		"cc_trunk_rand_b",
+		"provider_nameb, idb",
+		"", "", "%1 : (%2)", "", "", "cc_trunk_rand_b:trunk_depend:cc_trunk LEFT JOIN cc_trunk_rand_b ON cc_trunk.id_trunk=cc_trunk_rand_b.trunk_depend:DISTINCT cc_trunk.trunkcode, cc_trunk.id_trunk: cc_trunk_rand_b.trunk_id = %id:trunk_id:%2 - (%1)::::%1:idb='%1'");
+}
+
+$HD_Form -> FieldEditElement ('id_provider, trunkcode, trunkprefix, removeprefix, providertech, providerip, addparameter, dialprefixmain, failover_trunk, inuse, maxuse, if_max_use, status,
+	dialprefixa, failover_trunka, startdatea, stopdatea, billblockseca, perioda, periodexpirya, timelefta, maxsecperperioda, periodcounta, lastcallstoptimea,
+	dialprefixb, failover_trunkb, startdateb, stopdateb, billblocksecb, periodb, periodexpiryb, timeleftb, maxsecperperiodb, periodcountb, lastcallstoptimeb');
 
 
 $HD_Form -> FG_INTRO_TEXT_EDITION= gettext("Modify the properties of the trunk below.");
@@ -274,5 +548,3 @@ $HD_Form -> FG_BUTTON_EDITION_BOTTOM_TEXT = $HD_Form -> FG_BUTTON_ADITION_BOTTOM
 //$HD_Form -> FG_GO_LINK_AFTER_ACTION_ADD = $_SERVER['PHP_SELF']."?atmenu=document&stitle=Document&wh=AC&id=";
 $HD_Form -> FG_GO_LINK_AFTER_ACTION_EDIT = $_SERVER['PHP_SELF']."?atmenu=document&stitle=Document&wh=AC&id=";
 $HD_Form -> FG_GO_LINK_AFTER_ACTION_DELETE = $_SERVER['PHP_SELF']."?atmenu=document&stitle=Document&wh=AC&id=";
-
-

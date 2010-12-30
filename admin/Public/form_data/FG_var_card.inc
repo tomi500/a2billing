@@ -36,7 +36,7 @@
 getpost_ifset(array('id', 'username', 'useralias', 'uipass', 'credit', 'language', 'tariff',
 'id_didgroup','id_campaign', 'callback', 'simultaccess', 'currency','typepaid', 'creditlimit',
 'lastname', 'firstname', 'email', 'address','city', 'state', 'country', 'zipcode', 'phone', 'fax', 'inuse',
-'cid', 'runservice', 'firstusedate','expirationdate', 'enableexpire', 'expiredays', 'sip_buddy',
+'recalldays', 'recalltime', 'cid', 'runservice', 'firstusedate','expirationdate', 'enableexpire', 'expiredays', 'sip_buddy',
 'iax_buddy','popup_select', 'vat', 'autorefill', 'initialbalance', 'mac_addr', 'cardnumberlenght_list',
 'status', 'block', 'lock_pin', 'template_invoice', 'template_outstanding', 'description', 'voicemail_activated', 
 'voicemail_permitted','email_notification','credit_notification','notify_email', 'id_seria',
@@ -798,6 +798,24 @@ if (has_rights (ACX_MODIFY_CUSTOMERS) && !($popup_select>=1)) {
 				   "",
 				   "" , "", "",	"", "", "", "NO", gettext("Updated to show the number of concurrent calls in use by this customer. If there are no currently no calls, and the system shows that there are, manually reset this field back to zero.") );
 	
+	$HD_Form -> AddEditElement (gettext("RECALL DAYS"),
+				   "recalldays",
+				   '$value',
+				   "INPUT",
+				   "size=5 maxlength=4",
+				   "",
+				   "",
+				   "" , "", "",	"", "", "", "NO", gettext("Define number of days ago for use back phone number by callers you have called in past this days") );
+	
+	$HD_Form -> AddEditElement (gettext("RECALL TIME"),
+				   "recalltime",
+				   '$value',
+				   "INPUT",
+				   "size=5 maxlength=4",
+				   "",
+				   "",
+				   "" , "", "",	"", "", "", "NO", gettext("Max time to recall in seconds. Set '-1' for paritet calls.") );
+	
 	$HD_Form -> AddEditElement (gettext("AUTOREFILL"),
 				   "autorefill",
 				   '0',
@@ -957,7 +975,7 @@ if (has_rights (ACX_MODIFY_CUSTOMERS) && !($popup_select>=1)) {
 			$update_field_typepaid.' tariff, id_didgroup, id_timezone, language, currency, status, block, lock_pin, simultaccess,  runservice, creditlimit, ' .
 			' credit_notification, notify_email, email_notification, ' .$add_fields_voicemail.
 			' id_campaign, ' .
-			' firstusedate, enableexpire, expirationdate, expiredays, sip_buddy, iax_buddy, mac_addr, inuse, ' .
+			' firstusedate, enableexpire, expirationdate, expiredays, sip_buddy, iax_buddy, mac_addr, inuse, recalldays, recalltime, ' .
 			' autorefill, initialbalance, invoiceday, vat, vat_rn, discount, traffic, traffic_target, restriction' );
 	
 	
