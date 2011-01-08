@@ -1339,6 +1339,7 @@ class RateEngine
 				# Uncomment this line if you want to save the outbound_cid in the CDR
 				//$A2B -> CallerID = $outcid;
 				$agi -> set_callerid($outcid);
+				$agi -> set_variable('CALLERID(ani)', $outcid);
 				$A2B -> debug( DEBUG, $agi, __FILE__, __LINE__, "[EXEC SetCallerID : $outcid]");
 			}
 			$A2B -> debug( DEBUG, $agi, __FILE__, __LINE__, "app_callingcard: CIDGROUPID='$cidgroupid' OUTBOUND CID SELECTED IS '$outcid'.");
