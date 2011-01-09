@@ -1,5 +1,6 @@
 ALTER TABLE cc_trunk ADD (
   `dialprefixmain` char(30) COLLATE utf8_bin NOT NULL,
+  `outbound_cidgroup_id` int(11) DEFAULT '-1',
   `dialprefixa` char(30) COLLATE utf8_bin NOT NULL,
   `periodcounta` int(11) DEFAULT '0',
   `periodexpirya` timestamp NOT NULL DEFAULT '0000-00-00 00:00:00',

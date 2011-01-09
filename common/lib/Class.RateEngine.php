@@ -153,11 +153,12 @@ class RateEngine
         rt_trunk.trunkprefix AS rc_trunkprefix, rt_trunk.providertech AS rc_providertech,rt_trunk.providerip AS rc_providerip, rt_trunk.removeprefix AS rc_removeprefix, musiconhold,
 		tp_trunk.failover_trunk AS tp_failover_trunk, rt_trunk.failover_trunk AS rt_failover_trunk,tp_trunk.addparameter AS tp_addparameter_trunk, rt_trunk.addparameter AS rt_addparameter_trunk, id_outbound_cidgroup,
         id_cc_package_offer, tp_trunk.status, rt_trunk.status, tp_trunk.inuse, rt_trunk.inuse,
-        tp_trunk.maxuse,  rt_trunk.maxuse,tp_trunk.if_max_use, rt_trunk.if_max_use,cc_ratecard.rounding_calltime AS rounding_calltime,
+        tp_trunk.maxuse, rt_trunk.maxuse, tp_trunk.if_max_use, rt_trunk.if_max_use, cc_ratecard.rounding_calltime AS rounding_calltime,
         cc_ratecard.rounding_threshold AS rounding_threshold, cc_ratecard.additional_block_charge AS additional_block_charge, cc_ratecard.additional_block_charge_time AS additional_block_charge_time,
 		cc_ratecard.additional_grace AS additional_grace, cc_ratecard.minimal_cost AS minimal_cost,disconnectcharge_after,announce_time_correction, rt_trunk.dialprefixmain,
 	rt_trunk.perioda, rt_trunk.maxsecperperioda, rt_trunk.periodcounta, UNIX_TIMESTAMP(rt_trunk.periodexpirya), rt_trunk.failover_trunka, UNIX_TIMESTAMP(rt_trunk.startdatea), UNIX_TIMESTAMP(rt_trunk.stopdatea), rt_trunk.timelefta,
-	rt_trunk.periodb, rt_trunk.maxsecperperiodb, rt_trunk.periodcountb, UNIX_TIMESTAMP(rt_trunk.periodexpiryb), rt_trunk.failover_trunkb, UNIX_TIMESTAMP(rt_trunk.startdateb), UNIX_TIMESTAMP(rt_trunk.stopdateb), rt_trunk.timeleftb
+	rt_trunk.periodb, rt_trunk.maxsecperperiodb, rt_trunk.periodcountb, UNIX_TIMESTAMP(rt_trunk.periodexpiryb), rt_trunk.failover_trunkb, UNIX_TIMESTAMP(rt_trunk.startdateb), UNIX_TIMESTAMP(rt_trunk.stopdateb), rt_trunk.timeleftb,
+	tp_trunk.outbound_cidgroup_id, rt_trunk.outbound_cidgroup_id
 
 		FROM cc_tariffgroup
 		RIGHT JOIN cc_tariffgroup_plan ON cc_tariffgroup_plan.idtariffgroup=cc_tariffgroup.id
@@ -1224,10 +1225,12 @@ class RateEngine
 			$musiconhold		= $this -> ratecard_obj[$k][39];
 			$failover_trunk		= $this -> ratecard_obj[$k][40+$usetrunk_failover];
 			$addparameter		= $this -> ratecard_obj[$k][42+$usetrunk_failover];
-			$cidgroupid		= $this -> ratecard_obj[$k][44];
-			$inuse 			= $this -> ratecard_obj[$k][48+$usetrunk_failover];
+			$cidgroupidrate 	= $this -> ratecard_obj[$k][44];
+			$inuse  		= $this -> ratecard_obj[$k][48+$usetrunk_failover];
 			$maxuse 		= $this -> ratecard_obj[$k][50+$usetrunk_failover];
 			$ifmaxuse 		= $this -> ratecard_obj[$k][52+$usetrunk_failover];
+			$cidgroupid		= $this -> ratecard_obj[$k][79+$usetrunk_failover];
+			if ($cidgroupid == -1) $cidgroupid = $cidgroupidrate;
 
 //			if (preg_match("/^".$removeprefix."/", $destination)) {
 			if (strncmp($destination, $removeprefix, strlen($removeprefix)) == 0){
@@ -1405,7 +1408,7 @@ class RateEngine
 
 				$destination=$old_destination;
 
-				$QUERY = "SELECT trunkprefix, providertech, providerip, removeprefix, failover_trunk, status, inuse, maxuse, if_max_use FROM cc_trunk WHERE id_trunk='$failover_trunk' LIMIT 1";
+				$QUERY = "SELECT trunkprefix, providertech, providerip, removeprefix, failover_trunk, status, inuse, maxuse, if_max_use, outbound_cidgroup_id FROM cc_trunk WHERE id_trunk='$failover_trunk' LIMIT 1";
 				$A2B->instance_table = new Table();
 				$result = $A2B->instance_table -> SQLExec ($A2B -> DBHandle, $QUERY);
 
@@ -1420,6 +1423,8 @@ class RateEngine
 					$inuse			= $result[0][6];
 					$maxuse			= $result[0][7];
 					$ifmaxuse		= $result[0][8];
+					$cidgroupid		= $result[0][9];
+					if ($cidgroupid == -1) $cidgroupid = $cidgroupidrate;
 					
 					if (strncmp($destination, $removeprefix, strlen($removeprefix)) == 0)
 					$destination= substr($destination, strlen($removeprefix));
@@ -1483,6 +1488,7 @@ class RateEngine
 						$A2B -> debug( WARN, $agi, __FILE__, __LINE__, "Failover trunk cannot be used because it is disabled. Now use next trunk\n");
 						continue 2;
 					}
+
 //	$A2B -> debug( ERROR, $agi, __FILE__, __LINE__, "NextTrunk='$failover_trunk'");
 					if (($maxuse!=-1 && $inuse >= $maxuse) || ($timecur < $startdate || $stopdate <= $timecur
 					|| ($maxsecperperiod!=-1 && $periodcount >= $maxsecperperiod - $timeleft && $periodexpiry > $timecur) || ($periodexpiry <= $timecur && $periodcur==0))) {
@@ -1528,6 +1534,21 @@ class RateEngine
 						}
 					}
 					$A2B -> debug( INFO, $agi, __FILE__, __LINE__, "FAILOVER app_callingcard: Dialing '$dialstr' with timeout of '$timeout'.\n");
+
+					$QUERY = "SELECT cid FROM cc_outbound_cid_list WHERE activated = 1 AND outbound_cid_group = $cidgroupid ORDER BY RAND() LIMIT 1";
+					$A2B->instance_table = new Table();
+					$cidresult = $A2B->instance_table -> SQLExec ($A2B -> DBHandle, $QUERY);
+					$outcid = 0;
+					if (is_array($cidresult) && count($cidresult)>0) {
+						$outcid = $cidresult[0][0];
+						# Uncomment this line if you want to save the outbound_cid in the CDR
+						//$A2B -> CallerID = $outcid;
+						$agi -> set_callerid($outcid);
+						$agi -> set_variable('CALLERID(ani)', $outcid);
+						$A2B -> debug( DEBUG, $agi, __FILE__, __LINE__, "[EXEC SetCallerID : $outcid]");
+					}
+					$A2B -> debug( DEBUG, $agi, __FILE__, __LINE__, "app_callingcard: CIDGROUPID='$cidgroupid' OUTBOUND CID SELECTED IS '$outcid'.");
+
 					// Count this call on the trunk
 					$this -> trunk_start_inuse($agi, $A2B, 1);
 					

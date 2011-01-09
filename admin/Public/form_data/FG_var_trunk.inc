@@ -33,7 +33,7 @@
 
 
 
-getpost_ifset(array('id', 'trunkcode', 'trunkprefix', 'removeprefix', 'providertech', 'providerip', 'addparameter', 'dialprefixmain', 'failover_trunk', 'id_provider', 'popup_select', 'inuse', 'maxuse', 'status', 'if_max_use',
+getpost_ifset(array('id', 'trunkcode', 'trunkprefix', 'removeprefix', 'providertech', 'providerip', 'addparameter', 'dialprefixmain', 'failover_trunk', 'id_provider', 'popup_select', 'inuse', 'maxuse', 'status', 'if_max_use', 'outbound_cidgroup_id',
 	'dialprefixa', 'failover_trunka', 'startdatea', 'stopdatea', 'billblockseca', 'perioda', 'periodexpirya', 'timelefta', 'maxsecperperioda', 'periodcounta', 'lastcallstoptimea',
 	'dialprefixb', 'failover_trunkb', 'startdateb', 'stopdateb', 'billblocksecb', 'periodb', 'periodexpiryb', 'timeleftb', 'maxsecperperiodb', 'periodcountb', 'lastcallstoptimeb'));
 
@@ -276,6 +276,16 @@ $HD_Form -> AddEditElement ("STATUS",
 	"",
 	"",
 	"list" , "", "", "", $actived_list, "%1" , "", gettext("Define if this trunk is active or not"));
+
+$HD_Form -> AddEditElement(gettext("CIDGroup"),
+	"outbound_cidgroup_id",
+	'$value',
+	"SELECT",
+	"", "", "",
+	"sql",
+	"cc_outbound_cid_group",
+	"group_name, id",
+	"", "", "%1", "", gettext("Set the Outgoing CID Group to use for this trunk, or RATECARD PRESET to use rate card presetted."), '', '<OPTION  value="-1" selected>'.gettext("RATECARD PRESET").'</OPTION>');
 
 $HD_Form -> AddEditElement(gettext("DIALPREFIX")." A",
 	"dialprefixa",
@@ -530,7 +540,7 @@ if ($numrowb>0) {
 		"", "", "%1 : (%2)", "", "", "cc_trunk_rand_b:trunk_depend:cc_trunk LEFT JOIN cc_trunk_rand_b ON cc_trunk.id_trunk=cc_trunk_rand_b.trunk_depend:DISTINCT cc_trunk.trunkcode, cc_trunk.id_trunk: cc_trunk_rand_b.trunk_id = %id:trunk_id:%2 - (%1)::::%1:idb='%1'");
 }
 
-$HD_Form -> FieldEditElement ('id_provider, trunkcode, trunkprefix, removeprefix, providertech, providerip, addparameter, dialprefixmain, failover_trunk, inuse, maxuse, if_max_use, status,
+$HD_Form -> FieldEditElement ('id_provider, trunkcode, trunkprefix, removeprefix, providertech, providerip, addparameter, dialprefixmain, failover_trunk, inuse, maxuse, if_max_use, status, outbound_cidgroup_id,
 	dialprefixa, failover_trunka, startdatea, stopdatea, billblockseca, perioda, periodexpirya, timelefta, maxsecperperioda, periodcounta, lastcallstoptimea,
 	dialprefixb, failover_trunkb, startdateb, stopdateb, billblocksecb, periodb, periodexpiryb, timeleftb, maxsecperperiodb, periodcountb, lastcallstoptimeb');
 
