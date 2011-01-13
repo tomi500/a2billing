@@ -694,7 +694,31 @@ msgstr "НОМЕР ФАКСА"
 msgid "Insert the fax number of the customers"
 msgstr "Введите номер факса клиентов"
 
-#: form_data/FG_var_card.inc:152
+#: form_data/FG_var_card.inc:150
+msgid "RECORD CALL"
+msgstr "ЗАПИСЬ"
+
+#: form_data/FG_var_card.inc:157
+msgid "Define if you want to record all the conversations"
+msgstr "Вкл/Выкл записи всех разговоров"
+
+#: form_data/FG_var_card.inc:159
+msgid "RECALL DAYS"
+msgstr "ОТЗВОН"
+
+#: form_data/FG_var_card.inc:166
+msgid "Define number of days ago for use back phone number by callers you have called in past this days"
+msgstr "Введите количество последних дней для того чтобы с телефонов, на которые вы звонили за эти дни, могли к вам дозвониться через высветившийся номер. Такой звонок будет переадресован непосредственно на номер, с которого вы набирали."
+
+#: form_data/FG_var_card.inc:168
+msgid "RECALL TIME"
+msgstr "ПРОДОЛЖИТЕЛЬНОСТЬ ОТЗВОНА"
+
+#: form_data/FG_var_card.inc:175
+msgid "Max time to recall in seconds. Set '-1' for paritet calls."
+msgstr "Ограничение продолжительности разговора при отзвоне в секундах. Значение '-1' означает паритетность с продолжительностью исходящих разговоров."
+
+#: form_data/FG_var_card.inc:178
 msgid "ACTIVE VOICEMAIL SERVICE"
 msgstr ""
 
@@ -1062,7 +1086,7 @@ msgstr ""
 
 #: form_data/FG_var_notify.inc:98
 msgid "Choose if you want to enable the notification by email for this card"
-msgstr ""
+msgstr "Отметьте для рассылки уведомлений для этой учётной записи"
 
 #: form_data/FG_var_notify.inc:99
 msgid "Enable Email Notification"
@@ -1661,7 +1685,7 @@ msgstr "выбрано, используйте пункт ниже, если в�
 
 #: lib/Form/Class.SearchHandler.inc.php:356 templates/default/main.tpl:70
 msgid "RATECARD"
-msgstr "RATECARD"
+msgstr "ТАРИФЫ"
 
 #: lib/Form/Class.SearchHandler.inc.php:375
 #, fuzzy
@@ -2563,6 +2587,9 @@ msgstr "На этой странице вы сможете изменить па
 msgid "View Rates"
 msgstr "Просмотр тарифов"
 
+msgid "Rates"
+msgstr "Тарифы"
+
 #: lib/customer.help.php:65
 msgid "Payment history - Record of payments made."
 msgstr "История платежей - журнал проведенных платежей"
@@ -2623,7 +2650,7 @@ msgstr "Вы можете сделать обратный звонок указ�
 
 #: A2B_ticket_view.php:58
 msgid "Ticket updated successfully"
-msgstr "Тикен обновлен успешно"
+msgstr "Тикет обновлен успешно"
 
 #: A2B_ticket_view.php:64
 msgid "Ticket ID not found"
@@ -3015,7 +3042,7 @@ msgstr "Ошибка системы, попробуйте позже!"
 
 #: PP_error.php:47
 msgid "There is an error on this page!"
-msgstr "Обибка на странице!"
+msgstr "Ошибка на странице!"
 
 #: PP_error.php:48
 #, fuzzy
@@ -3146,7 +3173,7 @@ msgstr "Код быстрого набора"
 
 #: A2B_entity_speeddial.php:109 call-history.php:133 A2B_entity_did.php:415
 msgid "Destination"
-msgstr "Номер телефона"
+msgstr "Направление"
 
 #: A2B_entity_speeddial.php:111
 msgid "Name"
@@ -3412,7 +3439,7 @@ msgstr "ВАЛЮТА"
 
 #: call-history.php:416
 msgid "Number of Calls"
-msgstr "Колличество Звонков"
+msgstr "Количество Звонков"
 
 #: call-history.php:538
 msgid "PREVIOUS"
@@ -3566,9 +3593,8 @@ msgid "SUPPORT"
 msgstr "Поддержка"
 
 #: templates/default/main.tpl:94
-#, fuzzy
 msgid "NOTIFICATION"
-msgstr "НАПРАВЛЕНИЕ"
+msgstr "УВЕДОМЛЕНИЯ"
 
 #: templates/default/main.tpl:104
 msgid "AUTO DIALLER"

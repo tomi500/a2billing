@@ -1019,13 +1019,13 @@ msgstr ""
 #: Public/A2B_entity_def_ratecard.php:340
 #: Public/A2B_entity_def_ratecard.php:514
 msgid "RATECARD"
-msgstr ""
+msgstr "ТАРИФ"
 
 #: lib/Form/Class.SearchHandler.inc.php:375
 #: Public/form_data/FG_var_def_ratecard.inc:178
 #: Public/CC_ratecard_merging.php:146
 msgid "BUYRATE"
-msgstr ""
+msgstr "ПОКУПКА"
 
 #: lib/Form/Class.SearchHandler.inc.php:378
 #: lib/Form/Class.SearchHandler.inc.php:393
@@ -1688,7 +1688,7 @@ msgstr "МОЖНО ЗВОНИТЬ ТОЛЬКО НА ЗАПРЕЩЕННЫЕ НО�
 #: Public/A2B_detail_package.php:223 Public/call-dnid.php:345
 #: Public/call-daily-load.php:215 Public/templates/default/main.tpl:65
 msgid "CUSTOMERS"
-msgstr "КЛИЕНТЫ"
+msgstr "АБОНЕНТЫ"
 
 #: lib/interface/constants.php:56 Public/templates/default/main.tpl:96
 msgid "AGENTS"
@@ -1696,7 +1696,7 @@ msgstr "АГЕНТЫ"
 
 #: lib/interface/constants.php:57
 msgid "CUSTOMERS AND AGENTS"
-msgstr "КЛИЕНТЫ И АГЕНТЫ"
+msgstr "АБОНЕНТЫ И АГЕНТЫ"
 
 #: lib/interface/constants.php:63 Public/A2B_entity_card.php:395
 #: Public/call-count-reporting.php:284 Public/A2B_data_archiving.php:130
@@ -1763,7 +1763,7 @@ msgstr "ИНДИВИДУАЛЬНЫЙ ДОСТУП"
 #: Public/form_data/FG_var_card.inc:619 Public/A2B_data_archiving.php:69
 #: Public/A2B_data_archiving.php:73 Public/A2B_entity_card_multi.php:284
 msgid "SIMULTANEOUS ACCESS"
-msgstr ""
+msgstr "МНОЖЕСТВЕННЫЙ ДОСТУП"
 
 #: lib/interface/constants.php:135 Public/A2B_data_archiving.php:115
 #: Public/A2B_entity_card_multi.php:300
@@ -2397,7 +2397,7 @@ msgstr "Провайдер"
 #: Public/A2B_call_archiving.php:223 Public/call-dnid.php:363
 #: Public/call-daily-load.php:233 Public/templates/default/main.tpl:179
 msgid "Trunk"
-msgstr "Транк"
+msgstr "По транкам"
 
 #: Public/call-comp.php:241 Public/call-last-month.php:79
 #: Public/call-log-customers.php:423 Public/call-dnid.php:365
@@ -2630,7 +2630,7 @@ msgstr "перменная"
 #: Public/call-log-customers.php:126 Public/call-count-reporting.php:89
 #: Public/call-dnid.php:114
 msgid "Sell"
-msgstr "Прдажа"
+msgstr "Продано за"
 
 #: Public/modules/calls_counts.php:102 Public/modules/calls_lastmonth.php:154
 #, fuzzy
@@ -3224,7 +3224,7 @@ msgstr "ПАКЕТНОЕ ОБНОВЛЕНИЕ КАРТ"
 
 #: Public/A2B_entity_phonenumber.php:290 Public/form_data/FG_var_card.inc:701
 msgid "CAMPAIGN"
-msgstr ""
+msgstr "КОМПАНИЯ"
 
 #: Public/A2B_entity_phonenumber.php:296 Public/form_data/FG_var_trunk.inc:104
 #: Public/form_data/FG_var_invoice.inc:105
@@ -3308,7 +3308,7 @@ msgstr "ТРАФИК"
 #: Public/call-last-month.php:164 Public/call-last-month.php:170
 #: Public/call-last-month.php:176
 msgid "Stat Graph"
-msgstr "График стистики"
+msgstr "График статистики"
 
 #: Public/call-last-month.php:169 Public/call-log-customers.php:1229
 #: Public/call-dnid.php:854
@@ -3318,15 +3318,15 @@ msgstr "ПРИБЫЛЬ"
 #: Public/call-last-month.php:175 Public/call-log-customers.php:1227
 #: Public/A2B_card_info.php:888 Public/call-dnid.php:852
 msgid "SELL"
-msgstr "ПРДАНО"
+msgstr "ПРОДАНО"
 
 #: Public/CC_ticket_view.php:51
 msgid "Ticket updated successfully"
-msgstr ""
+msgstr "Билет обновлён успешно"
 
 #: Public/CC_ticket_view.php:58
 msgid "Ticket ID not found"
-msgstr ""
+msgstr "ID билета не найдено"
 
 #: Public/CC_ticket_view.php:99
 msgid "TICKET: "
@@ -3434,7 +3434,7 @@ msgstr "ID Карты"
 #: Public/call-dnid.php:108 Public/call-dnid.php:532
 #: Public/templates/default/main.tpl:180
 msgid "DNID"
-msgstr ""
+msgstr "DestNumID"
 
 #: Public/call-log-customers.php:116
 #: Public/form_data/FG_var_phonenumber.inc:93
@@ -3443,11 +3443,11 @@ msgstr "Номер телефона"
 
 #: Public/call-log-customers.php:118 Public/call-dnid.php:378
 msgid "Buy Rate"
-msgstr ""
+msgstr "Покупка, цена"
 
 #: Public/call-log-customers.php:119 Public/call-dnid.php:380
 msgid "Sell Rate"
-msgstr ""
+msgstr "Продажа, цена"
 
 #: Public/call-log-customers.php:121
 #, fuzzy
@@ -3470,16 +3470,16 @@ msgstr "Тип звонка"
 #: Public/call-log-customers.php:125 Public/call-count-reporting.php:90
 #: Public/call-dnid.php:113
 msgid "Buy"
-msgstr "Покупка"
+msgstr "Куплено за"
 
 #: Public/call-log-customers.php:127 Public/call-pnl-report.php:490
 #: Public/call-pnl-report.php:564
 msgid "Margin"
-msgstr ""
+msgstr "Повышение"
 
 #: Public/call-log-customers.php:128
 msgid "Markup"
-msgstr "Отметить"
+msgstr "Маржа"
 
 #: Public/call-log-customers.php:156 Public/call-daily-load.php:89
 msgid " - Call Logs - "
@@ -3643,11 +3643,11 @@ msgstr ""
 #: Public/call-log-customers.php:1228 Public/A2B_card_info.php:885
 #: Public/call-dnid.php:853
 msgid "BUY"
-msgstr ""
+msgstr "ПОКУПКА"
 
 #: Public/call-log-customers.php:1230 Public/call-dnid.php:855
 msgid "MARGIN"
-msgstr ""
+msgstr "МАРЖА"
 
 #: Public/call-log-customers.php:1231 Public/call-dnid.php:856
 msgid "MARKUP"
@@ -4571,13 +4571,17 @@ msgstr ""
 msgid "Define any additional parameters that will be used when running the Dial Command in Asterisk. Use the following tags as variables  %dialingnumber%, %cardnumber%. ie 'D(ww%cardnumber%wwwwwwwwww%dialingnumber%)'"
 msgstr ""
 
+#: Public/form_data/FG_var_trunk.inc
+msgid "Destination prefix condition for FAILOVER TRUNK with respect to ADD+REMOVE PREFIX. This will overrule for Destinations Limited if defined. Leave empty to use FAILOVER TRUNK without condition."
+msgstr "Задайте префикс, с учётом отработки ADD PREFIX и REMOVE PREFIX, как условие срабатывания FAILOVER TRUNK. Использование этой настройки перекрывает остальные DIALPREFIX'ы ниже. Оставьте пустым, чтобы переход на FAILOVER TRUNK срабатывал только, если остальные DIALPREFIX'ы не нашли соответствия."
+
 #: Public/form_data/FG_var_trunk.inc:214
 msgid "FAILOVER TRUNK"
 msgstr ""
 
 #: Public/form_data/FG_var_trunk.inc:222
 msgid "You can define another trunk in case of failover!"
-msgstr ""
+msgstr "Назначьте переход к следующему транку если текущий отключен или превышается MAXIMUM CONNECTIONS"
 
 #: Public/form_data/FG_var_trunk.inc:224
 msgid "CURRENT CONNECTIONS"
@@ -4593,11 +4597,11 @@ msgstr ""
 
 #: Public/form_data/FG_var_trunk.inc:233
 msgid "MAXIMUM CONNECTIONS"
-msgstr "МАКСИМАЛЬНО ЧИСЛО СОЕДИНЕНИЙ"
+msgstr ""
 
 #: Public/form_data/FG_var_trunk.inc:239
 msgid "Number of maximum simultaneous connections"
-msgstr ""
+msgstr "Разрешенное количество одновременных исходящих соединений"
 
 #: Public/form_data/FG_var_trunk.inc:240
 msgid "The maximum number of channels available to this trunk. Set to -1 to have an unlimited number of channels"
@@ -4609,7 +4613,7 @@ msgstr ""
 
 #: Public/form_data/FG_var_trunk.inc:258
 msgid "Define if this trunk is active or not"
-msgstr ""
+msgstr "Установите активность транка"
 
 #: Public/form_data/FG_var_trunk.inc:264
 msgid "Modify the properties of the trunk below."
@@ -4653,6 +4657,50 @@ msgstr ""
 #: Public/form_data/FG_var_callerid.inc:132
 msgid "has been inserted."
 msgstr ""
+
+#: Public/form_data/FG_var_trunk.inc:
+msgid "Set the Outgoing CID Group to use for this trunk, or RATECARD PRESET to use rate card presetted."
+msgstr "Выберите исходящую CID группу или оставьте RATECARD PRESET, чтобы использовать такую же настройка из тарифа, через который будет обработан вызов"
+
+#: Public/form_data/FG_var_trunk.inc:
+msgid "Add destination prefix like for RateCard with respect to ADD+REMOVE PREFIX. Leave empty to disable all rule criterions."
+msgstr "Определите условие-префикс чтобы обрабатывался этот блок правил"
+
+#: Public/form_data/FG_var_trunk.inc:
+msgid "You can define another trunk in case of failover for currend dialprefix"
+msgstr "Выберите транк, к которому перейдёт обработка, в случае невозможности осуществления звонка через этот блок правил"
+
+#: Public/form_data/FG_var_trunk.inc:
+msgid "Define the period start when this rule is active. Format YYYY-MM-DD HH:MM:SS. For instance, '2010-12-31 00:00:00'."
+msgstr "Начало периода использования блока правил"
+
+#: Public/form_data/FG_var_trunk.inc:
+msgid "Define the period end when this rule is active. Format YYYY-MM-DD HH:MM:SS. For instance, '2010-12-31 00:00:00'."
+msgstr "Конец периода использования блока правил"
+
+#: Public/form_data/FG_var_trunk.inc:
+msgid "Set the billing increment in seconds"
+msgstr "Блок тарификации в секундах"
+
+#: Public/form_data/FG_var_trunk.inc:
+msgid "Define period in days. Set '0' if you want define EXPIRY PERIOD only"
+msgstr "Период действия блока правил в днях, после которого EXPIRY PERIOD увеличится на заданное количество дней, а USED SECONDS PER PERIOD обнулится. Установите '0', чтобы не обновлялся EXPIRY PERIOD."
+
+#: Public/form_data/FG_var_trunk.inc:
+msgid "You can correct current period expiry. Format YYYY-MM-DD HH:MM:SS. This will auto increment in future."
+msgstr "Дата и время окончания периода обработки блока правил. Задавать в формате YYYY-MM-DD HH:MM:SS."
+
+#: Public/form_data/FG_var_trunk.inc:
+msgid "Goto selected random trunks if time left less than seconds defined."
+msgstr "Переходим к обработке RANDOM TRUNKS если заданы, иначе к FAILOVER TRUNK, в случае когда указанное тут время в секундах больше оставшегося лимита."
+
+#: Public/form_data/FG_var_trunk.inc:
+msgid "Maximum q-ty of seconds allowed for current dial-prefix. Set '-1' for unlimited."
+msgstr "Количество позволенных секунд, за PERIOD для разговоров. Установите '-1' для безлимита."
+
+#: Public/form_data/FG_var_trunk.inc:
+msgid "Indicate for used seconds per period"
+msgstr "Количество секунд уже использованных за текущий PERIOD"
 
 #: Public/form_data/FG_var_invoice.inc:67
 msgid "Edit invoice items"
@@ -4950,25 +4998,25 @@ msgstr "ИСТОРИЯ ЗВОНКОВ"
 
 #: Public/form_data/FG_var_card_group.inc:85
 msgid "PAYMENT HISTORY"
-msgstr ""
+msgstr "ПЛАТЁЖНАЯ ИСТОРИЯ"
 
 #: Public/form_data/FG_var_card_group.inc:86
 #: Public/form_data/FG_var_voucher.inc:79
 #: Public/form_data/FG_var_voucher.inc:98
 #: Public/form_data/FG_var_voucher.inc:128
 msgid "VOUCHER"
-msgstr ""
+msgstr "ВАУЧЕР"
 
 #: Public/form_data/FG_var_card_group.inc:87
 #: Public/form_data/FG_var_user.inc:89 Public/templates/default/main.tpl:341
 msgid "INVOICES"
-msgstr ""
+msgstr "СЧЕТА"
 
 #: Public/form_data/FG_var_card_group.inc:89
 #: Public/form_data/FG_var_speeddial.inc:59
 #: Public/form_data/FG_var_speeddial.inc:79
 msgid "SPEED DIAL"
-msgstr ""
+msgstr "КОРОТКИЙ НАБОР"
 
 #: Public/form_data/FG_var_card_group.inc:91
 msgid "SIMULATOR"
@@ -5333,7 +5381,7 @@ msgstr ""
 #: Public/form_data/FG_var_alarm.inc:70 Public/form_data/FG_var_alarm.inc:114
 #: Public/form_data/FG_var_service.inc:86
 msgid "PERIOD"
-msgstr "ПЕРИОД"
+msgstr ""
 
 #: Public/form_data/FG_var_alarm.inc:71 Public/form_data/FG_var_alarm.inc:123
 #: Public/form_data/FG_var_remittance_request.inc:71
@@ -6034,6 +6082,22 @@ msgstr "ФОРМАТ: 00-00-74-4C-4F-10"
 msgid "IN USE"
 msgstr "ИСПОЛЬЗУЕТСЯ"
 
+#: form_data/FG_var_card.inc:801
+msgid "RECALL DAYS"
+msgstr "ОТЗВОН"
+
+#: form_data/FG_var_card.inc:808
+msgid "Define number of days ago for use back phone number by callers you have called in past this days"
+msgstr "Введите количество последних дней для того чтобы с телефонов, на которые абонент звонил за эти дни, могли к нему дозвониться через высветившийся номер. Такой вызов будет переадресован непосредственно на номер, с которого абонент звонил."
+
+#: form_data/FG_var_card.inc:810
+msgid "RECALL TIME"
+msgstr "ПРОДОЛЖИТЕЛЬНОСТЬ ОТЗВОНА"
+
+#: form_data/FG_var_card.inc:817
+msgid "Max time to recall in seconds. Set '-1' for paritet calls."
+msgstr "Ограничение продолжительности разговора при отзвоне в секундах. Установите '-1' для паритетности с продолжительностью исходящих разговоров. (Прим.: паритет не реализован ввиду отсутствия надобности и заинтересованности)"
+
 #: Public/form_data/FG_var_card.inc:799
 msgid "Updated to show the number of concurrent calls in use by this customer. If there are no currently no calls, and the system shows that there are, manually reset this field back to zero."
 msgstr ""
@@ -6161,7 +6225,7 @@ msgstr ""
 
 #: Public/form_data/FG_var_user.inc:82 Public/templates/default/main.tpl:468
 msgid "MAINTENANCE"
-msgstr ""
+msgstr "РАЗНОЕ"
 
 #: Public/form_data/FG_var_user.inc:83 Public/templates/default/main.tpl:502
 msgid "MAIL"
@@ -6173,7 +6237,7 @@ msgstr "ИСХОДЯЩИЙ CID"
 
 #: Public/form_data/FG_var_user.inc:87 Public/templates/default/main.tpl:366
 msgid "PACKAGE OFFER"
-msgstr ""
+msgstr "АКЦИИ"
 
 #: Public/form_data/FG_var_user.inc:88
 msgid "PREDICTIVE DIALER"
@@ -6185,7 +6249,7 @@ msgstr ""
 
 #: Public/form_data/FG_var_user.inc:92 Public/templates/default/main.tpl:526
 msgid "SYSTEM SETTINGS"
-msgstr "СИСТЕМНЫЕ НАСТРОЙКИ"
+msgstr "КОНФИГИ"
 
 #: Public/form_data/FG_var_user.inc:93
 msgid "EDIT/DELETE REFILLS"
@@ -11119,19 +11183,19 @@ msgstr ""
 
 #: Public/templates/default/main.tpl:168
 msgid "CALL REPORTS"
-msgstr "ОТЧЕТ О ЗВОНКАХ"
+msgstr "ОТЧЕТЫ О ЗВОНКАХ"
 
 #: Public/templates/default/main.tpl:177
 msgid "CDRs"
-msgstr ""
+msgstr "Детализированный"
 
 #: Public/templates/default/main.tpl:178
 msgid "Call Count"
-msgstr ""
+msgstr "Суммарный"
 
 #: Public/templates/default/main.tpl:181
 msgid "PNL"
-msgstr ""
+msgstr "Общий"
 
 #: Public/templates/default/main.tpl:182
 msgid "Compare Calls"
@@ -11147,19 +11211,19 @@ msgstr "Месячный трафик"
 
 #: Public/templates/default/main.tpl:197
 msgid "RATES"
-msgstr ""
+msgstr "ТАРИФЫ"
 
 #: Public/templates/default/main.tpl:206
 msgid "Call Plan"
-msgstr ""
+msgstr "Планы тарифных групп"
 
 #: Public/templates/default/main.tpl:207
 msgid "RateCards"
-msgstr ""
+msgstr "Тарифные группы"
 
 #: Public/templates/default/main.tpl:209
 msgid "Merge"
-msgstr ""
+msgstr "Слияние"
 
 #: Public/templates/default/main.tpl:210
 msgid "Simulator"
@@ -11167,7 +11231,7 @@ msgstr "Симулятор"
 
 #: Public/templates/default/main.tpl:211
 msgid "Rates"
-msgstr ""
+msgstr "Тарифы"
 
 #: Public/templates/default/main.tpl:224
 msgid "PROVIDERS"
@@ -11273,7 +11337,7 @@ msgstr "Детали"
 
 #: Public/templates/default/main.tpl:390
 msgid "RECUR SERVICE"
-msgstr ""
+msgstr "РЕГУЛЯРНЫЕ ПЛАТЕЖИ"
 
 #: Public/templates/default/main.tpl:399
 msgid "Account Service"
@@ -11306,7 +11370,7 @@ msgstr "Сервер"
 
 #: Public/templates/default/main.tpl:441
 msgid "CAMPAIGNS"
-msgstr ""
+msgstr "КОМПАШКИ"
 
 #: Public/templates/default/main.tpl:451
 msgid "Config"
@@ -11354,11 +11418,11 @@ msgstr ""
 
 #: Public/templates/default/main.tpl:511
 msgid "Mail templates"
-msgstr "Шаблоны почтового сообщения"
+msgstr "Шаблоны уведомлений"
 
 #: Public/templates/default/main.tpl:512
 msgid "Mass Mail"
-msgstr ""
+msgstr "Тотальная рассылка"
 
 #: Public/templates/default/main.tpl:535
 msgid "Global List"
@@ -11370,7 +11434,7 @@ msgstr "Групповой Список"
 
 #: Public/templates/default/main.tpl:537
 msgid "Add agi-conf"
-msgstr ""
+msgstr "Добавить agi-conf"
 
 #: Public/templates/default/main.tpl:538
 msgid "* Config Editor"

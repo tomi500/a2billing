@@ -810,6 +810,13 @@ SPAN.errorText {
 	font-size: 9px;
 	color: #787878;
 }
+.viewhandler_span2
+{
+	text-transform: uppercase;
+	font-weight: bold;
+	font-size: 9px;
+	color: #787878;
+}
 .viewhandler_filter_td1
 {
 	background-color:#E5E5E5;
