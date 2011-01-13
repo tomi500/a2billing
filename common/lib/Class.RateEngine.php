@@ -1397,7 +1397,7 @@ class RateEngine
 			// LOOOOP FOR THE FAILOVER LIMITED TO failover_recursive_limit
 			$loop_failover = 0;
 //	$A2B -> debug( ERROR, $agi, __FILE__, __LINE__, "NextTrunk='$failover_trunk'");
-			while ($loop_failover <= $A2B->agiconfig['failover_recursive_limit'] && is_numeric($failover_trunk) && $failover_trunk>=0 && $this->dialstatus != "ANSWER" && $this->dialstatus != "CANCEL" && time() - $timecur < 10 && ($this->dialstatus == "CHANUNAVAIL"
+			while ($loop_failover < $A2B->agiconfig['failover_recursive_limit'] && is_numeric($failover_trunk) && $failover_trunk>=0 && $this->dialstatus != "ANSWER" && $this->dialstatus != "CANCEL" && time() - $timecur < 10 && ($this->dialstatus == "CHANUNAVAIL"
 			|| $this->dialstatus == "CONGESTION" || $inuse>=$maxuse && $maxuse!=-1 || $timecur < $startdate || $stopdate <= $timecur || ($maxsecperperiod!=-1 && $periodcount >= $maxsecperperiod - $timeleft && $periodexpiry > time()) || $periodexpiry <= time())) {
 //	$A2B -> debug( ERROR, $agi, __FILE__, __LINE__, "NextTrunk='$failover_trunk'");
 				$loop_failover++;
