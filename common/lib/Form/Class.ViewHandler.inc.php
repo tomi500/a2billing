@@ -133,7 +133,7 @@ function openURLFilter(theLINK)
 			<span >
 			<?php if ($this -> FG_FILTER_APPLY){ ?>
 
-				<font class="viewhandler_filter_on"><?php echo gettext("FILTER ON ");?> <?php echo strtoupper($this->FG_FILTERFIELDNAME)?> :</font>
+				<font class="viewhandler_filter_on"><?php echo gettext("FILTER ON ");?> <?php mb_internal_encoding('UTF-8');?><?php echo mb_strtoupper($this->FG_FILTERFIELDNAME)?> :</font>
 				<INPUT type="text" name="filterprefix" value="<?php if(!empty($processed['filterprefix'])) echo $processed['filterprefix']; ?>" class="form_input_text">
 
 				<INPUT type="hidden" name="filterfield"	value="<?php echo $this->FG_FILTERFIELD?>">
