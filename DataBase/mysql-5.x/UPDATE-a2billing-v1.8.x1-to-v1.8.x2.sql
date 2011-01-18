@@ -31,14 +31,10 @@ ALTER TABLE cc_card ADD (
   recalltime int(11) NOT NULL DEFAULT '7200'
 );
 
-CREATE TABLE IF NOT EXISTS `cc_trunk_rand_a` (
+CREATE TABLE IF NOT EXISTS `cc_trunk_rand` (
   `trunk_id` int(11) NOT NULL DEFAULT '0',
-  `trunk_depend` int(11) NOT NULL DEFAULT '0',
-  PRIMARY KEY (`trunk_id`,`trunk_depend`)
-) ENGINE=MyISAM DEFAULT CHARSET=utf8 COLLATE=utf8_bin;
-
-CREATE TABLE IF NOT EXISTS `cc_trunk_rand_b` (
-  `trunk_id` int(11) NOT NULL DEFAULT '0',
-  `trunk_depend` int(11) NOT NULL DEFAULT '0',
-  PRIMARY KEY (`trunk_id`,`trunk_depend`)
+  `trunk_dependa` int(11) NOT NULL DEFAULT '0',
+  `trunk_dependb` int(11) NOT NULL DEFAULT '0',
+  `trunkpercentage` int(11) NOT NULL DEFAULT '0',
+  PRIMARY KEY (`trunk_id`,`trunk_dependa`,`trunk_dependb`)
 ) ENGINE=MyISAM DEFAULT CHARSET=utf8 COLLATE=utf8_bin;

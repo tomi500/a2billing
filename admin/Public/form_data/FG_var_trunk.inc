@@ -500,35 +500,35 @@ if ($form_action<>"ask-add") {
 		"" , "" , "", "", "", "", "NO-NULL", "", "", "res_display_dateformat");
 }
 
-$DBHandle_maxa  = DbConnect();
-$numrowa = 0;
-$resmaxa = $DBHandle_maxa -> Execute("SELECT * FROM cc_trunk");
-if ( $resmaxa )
-	$numrowa = $resmaxa -> RecordCount( );
+$DBHandle_max  = DbConnect();
+$numrow = 0;
+$resmax = $DBHandle_max -> Execute("SELECT * FROM cc_trunk");
+if ( $resmax )
+	$numrow = $resmax -> RecordCount( );
 
-if ($numrowa>0) {
+if ($numrow>0) {
 	$HD_Form -> AddEditElement (gettext("RANDOM TRUNKS")." A",
-		"randomtrunksa",
+		"cc_trunk_rand_a",
 		'$value',
 		"SELECT",
-		'size="15" multiple="multiple"',
+		'size="15" multiple="multiple" align="left"',
 		"",
 		"",
 		"sql",
 		"cc_trunk_rand_a",
-		"provider_name, ida",
-		"", "", "%1 : (%2)", "", "", "cc_trunk_rand_a:trunk_depend:cc_trunk LEFT JOIN cc_trunk_rand_a ON cc_trunk.id_trunk=cc_trunk_rand_a.trunk_depend:DISTINCT cc_trunk.trunkcode, cc_trunk.id_trunk: cc_trunk_rand_a.trunk_id = %id:trunk_id:%2 - (%1)::::%1:ida='%1'");
-}
+		"trunk_dependa, trunk_ida, trunkpercentagea",
+		"", "", "%1 : (%2)", "", "", "cc_trunk_rand:trunk_dependa:cc_trunk LEFT JOIN cc_trunk_rand ON id_trunk=cc_trunk_rand.trunk_dependa:DISTINCT trunkcode, id_trunk, cc_trunk_rand.trunkpercentage:cc_trunk_rand.trunk_id = %id:trunk_id:%2 - (%1)::::::%:3::NOT id_trunk IN (%1)");
+/**}
 
-$DBHandle_maxb  = DbConnect();
-$numrowb = 0;
-$resmaxb = $DBHandle_maxb -> Execute("SELECT * FROM cc_trunk");
-if ( $resmaxb )
-	$numrowb = $resmaxb -> RecordCount( );
+$DBHandle_max  = DbConnect();
+$numrow = 0;
+$resmax = $DBHandle_max -> Execute("SELECT * FROM cc_trunk");
+if ( $resmax )
+	$numrow = $resmax -> RecordCount( );
 
-if ($numrowb>0) {
+if ($numrow>0) {**/
 	$HD_Form -> AddEditElement (gettext("RANDOM TRUNKS")." B",
-		"randomtrunksb",
+		"cc_trunk_rand_b",
 		'$value',
 		"SELECT",
 		'size="15" multiple="multiple"',
@@ -536,8 +536,8 @@ if ($numrowb>0) {
 		"",
 		"sql",
 		"cc_trunk_rand_b",
-		"provider_nameb, idb",
-		"", "", "%1 : (%2)", "", "", "cc_trunk_rand_b:trunk_depend:cc_trunk LEFT JOIN cc_trunk_rand_b ON cc_trunk.id_trunk=cc_trunk_rand_b.trunk_depend:DISTINCT cc_trunk.trunkcode, cc_trunk.id_trunk: cc_trunk_rand_b.trunk_id = %id:trunk_id:%2 - (%1)::::%1:idb='%1'");
+		"trunk_dependb, trunk_idb, trunkpercentageb",
+		"", "", "%1 : (%2)", "", "", "cc_trunk_rand:trunk_dependb:cc_trunk LEFT JOIN cc_trunk_rand ON id_trunk=cc_trunk_rand.trunk_dependb:DISTINCT trunkcode, id_trunk, cc_trunk_rand.trunkpercentage:cc_trunk_rand.trunk_id = %id:trunk_id:%2 - (%1)::::::%:3::NOT id_trunk IN (%1)");
 }
 
 $HD_Form -> FieldEditElement ('id_provider, trunkcode, trunkprefix, removeprefix, providertech, providerip, addparameter, dialprefixmain, failover_trunk, inuse, maxuse, if_max_use, status, outbound_cidgroup_id,

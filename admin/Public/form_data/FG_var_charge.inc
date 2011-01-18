@@ -97,7 +97,7 @@ if ($form_action=='ask-add'){
 		$resmax = $DBHandle_max -> Execute("SELECT id FROM cc_card where username='$username'");
 		$numrow = 0;
 		if ($resmax)
-			$numrow = $resmas -> RecordCount( );
+			$numrow = $resmax -> RecordCount( );
 		if ($numrow!=0) {
 			$db_row [] = $resmax -> fetchRow();
 			$val_default = "value='".$db_row[0][0]."'";
