@@ -1310,8 +1310,6 @@ $A2B -> debug( INFO, $agi, __FILE__, __LINE__, "LISTFailoverTrunk ='$failover_tr
 						$firstrand = true;
 						break;
 					}
-$A2B -> debug( INFO, $agi, __FILE__, __LINE__, "TotalFailoverTrunk='$failover_trunk'\n");
-				
 				}
 				$failover_trunk		= $this -> ratecard_obj[$k][67+$usetrunk_failover];
 				$startdate		= $this -> ratecard_obj[$k][68+$usetrunk_failover];
@@ -1517,36 +1515,35 @@ $A2B -> debug( INFO, $agi, __FILE__, __LINE__, "Failover transfer is success\n")
 						    LEFT JOIN cc_trunk AS bn ON bn.id_trunk=trunk_depend$td AND ($prefixclauseb) AND bn.startdateb<=NOW() AND bn.stopdateb>NOW() AND (((bn.maxsecperperiodb-bn.periodcountb>=bn.timeleftb OR bn.maxsecperperiodb<0) AND bn.periodexpiryb>NOW()) OR bn.periodb>0) AND (bn.maxuse>bn.inuse OR bn.maxuse<0) AND bn.status=1 AND NOT ($prefixclause)
 						    LEFT JOIN cc_trunk AS cn ON cn.id_trunk=trunk_depend$td AND cn.status=1 AND (cn.maxuse>cn.inuse OR cn.maxuse<0) AND NOT (($prefixclausec) OR ($prefixclaused))
 						    WHERE trunk_id=$this->usedtrunk AND trunk_depend$td<>0 ORDER BY IF(duration AND trunkpercentage>0,trunkpercentage,32768)";
-						$result = $A2B->instance_table -> SQLExec ($A2B -> DBHandle, $QUERY);
-						if (is_array($result) && count($result)>0) {
-foreach ($result as $valu_val) $A2B -> debug( INFO, $agi, __FILE__, __LINE__, "Array : ".$valu_val[0]." => ".$valu_val[1]." => ".$valu_val[2]);
+						$resultrand = $A2B->instance_table -> SQLExec ($A2B -> DBHandle, $QUERY);
+						if (is_array($resultrand) && count($resultrand)>0) {
+foreach ($resultrand as $valu_val) $A2B -> debug( INFO, $agi, __FILE__, __LINE__, "Array : ".$valu_val[0]." => ".$valu_val[1]." => ".$valu_val[2]);
 $A2B -> debug( INFO, $agi, __FILE__, __LINE__, "~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~");
 							$sum_percent = 0;
-							foreach ($result as $valu_key => $valu_val)	{
-								if ($valu_val[1]>0 && is_numeric($valu_val[0])) $result[$valu_key][1] = $sum_percent += $valu_val[1];
-								else $result[$valu_key][1] = 0;
+							foreach ($resultrand as $valu_key => $valu_val)	{
+								if ($valu_val[1]>0 && is_numeric($valu_val[0])) $resultrand[$valu_key][1] = $sum_percent += $valu_val[1];
+								else $resultrand[$valu_key][1] = 0;
 							}
 							if ($sum_percent>0) {
 								$randgo = rand(1,$sum_percent);
-								foreach ($result as $valu_val)	{
+								foreach ($resultrand as $valu_val)	{
 									if ($valu_val[1]>=$randgo) {
 										$failover_trunk = $valu_val[2];
-foreach ($result as $valu_val) $A2B -> debug( INFO, $agi, __FILE__, __LINE__, "Array : ".$valu_val[0]." => ".$valu_val[1]." => ".$valu_val[2]);
+foreach ($resultrand as $valu_val) $A2B -> debug( INFO, $agi, __FILE__, __LINE__, "Array : ".$valu_val[0]." => ".$valu_val[1]." => ".$valu_val[2]);
 $A2B -> debug( INFO, $agi, __FILE__, __LINE__, "SecondRANDFailoverTrunk ='$failover_trunk'\n");
 										$firstrand = true;
 										continue 2;
 									}
 								}
 							} else {
-								rsort($result);
-								if ($result[$valu_key][0]>0 || !is_numeric($result[$valu_key][0])) $valu_key=0;
-								$failover_trunk = $result[$valu_key][2];
-foreach ($result as $valu_val) $A2B -> debug( INFO, $agi, __FILE__, __LINE__, "Array : ".$valu_val[0]." => ".$valu_val[1]." => ".$valu_val[2]);
+								rsort($resultrand);
+								if ($resultrand[$valu_key][0]>0 || !is_numeric($resultrand[$valu_key][0])) $valu_key=0;
+								$failover_trunk = $resultrand[$valu_key][2];
+foreach ($resultrand as $valu_val) $A2B -> debug( INFO, $agi, __FILE__, __LINE__, "Array : ".$valu_val[0]." => ".$valu_val[1]." => ".$valu_val[2]);
 $A2B -> debug( INFO, $agi, __FILE__, __LINE__, "SecondLISTFailoverTrunk ='$failover_trunk'\n");
 								$firstrand = true;
 								continue;
 							}
-$A2B -> debug( INFO, $agi, __FILE__, __LINE__, "SecondTotalFailoverTrunk='$failover_trunk'\n");
 						    }
 					    }
 						$next_failover_trunk	= $result[0][3];
