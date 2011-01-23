@@ -308,6 +308,26 @@ $HD_Form -> AddEditElement (gettext("FAILOVER TRUNK")." A",
 	"trunkcode, id_trunk",
 	"", "", "%1", "", gettext("You can define another trunk in case of failover for currend dialprefix"), '', '<OPTION  value="-1" selected>NOT DEFINED</OPTION>');
 
+$DBHandle_max  = DbConnect();
+$numrow = 0;
+$resmax = $DBHandle_max -> Execute("SELECT * FROM cc_trunk");
+if ( $resmax )
+	$numrow = $resmax -> RecordCount( );
+
+if ($numrow>0) {
+	$HD_Form -> AddEditElement (gettext("RANDOM TRUNKS")." A",
+		"cc_trunk_rand_a",
+		'$value',
+		"SELECT",
+		'size="15" multiple="multiple"',
+		"",
+		"",
+		"sql",
+		"cc_trunk_rand_a",
+		"trunk_dependa, trunk_ida, trunkpercentagea",
+		"", "", "%1 : (%2)", "", "", "cc_trunk_rand:trunk_dependa:cc_trunk LEFT JOIN cc_trunk_rand ON id_trunk=cc_trunk_rand.trunk_dependa:DISTINCT trunkcode, id_trunk, cc_trunk_rand.trunkpercentage:cc_trunk_rand.trunk_id = %id:trunk_id:%2 - (%1)::::::%:3::NOT id_trunk IN (%2):trunkpercentage");
+}
+
 $HD_Form -> AddEditElement(gettext("START DATE")." A",
 	"startdatea",
 	'$value',
@@ -414,6 +434,20 @@ $HD_Form -> AddEditElement (gettext("FAILOVER TRUNK")." B",
 	"trunkcode, id_trunk",
 	"", "", "%1", "", gettext("You can define another trunk in case of failover for currend dialprefix"), '', '<OPTION  value="-1" selected>NOT DEFINED</OPTION>');
 
+if ($numrow>0) {
+	$HD_Form -> AddEditElement (gettext("RANDOM TRUNKS")." B",
+		"cc_trunk_rand_b",
+		'$value',
+		"SELECT",
+		'size="15" multiple="multiple"',
+		"",
+		"",
+		"sql",
+		"cc_trunk_rand_b",
+		"trunk_dependb, trunk_idb, trunkpercentageb",
+		"", "", "%1 : (%2)", "", "", "cc_trunk_rand:trunk_dependb:cc_trunk LEFT JOIN cc_trunk_rand ON id_trunk=cc_trunk_rand.trunk_dependb:DISTINCT trunkcode, id_trunk, cc_trunk_rand.trunkpercentage:cc_trunk_rand.trunk_id = %id:trunk_id:%2 - (%1)::::::%:3::NOT id_trunk IN (%2):trunkpercentage");
+}
+
 $HD_Form -> AddEditElement(gettext("START DATE")." B",
 	"startdateb",
 	'$value',
@@ -500,49 +534,9 @@ if ($form_action<>"ask-add") {
 		"" , "" , "", "", "", "", "NO-NULL", "", "", "res_display_dateformat");
 }
 
-$DBHandle_max  = DbConnect();
-$numrow = 0;
-$resmax = $DBHandle_max -> Execute("SELECT * FROM cc_trunk");
-if ( $resmax )
-	$numrow = $resmax -> RecordCount( );
-
-if ($numrow>0) {
-	$HD_Form -> AddEditElement (gettext("RANDOM TRUNKS")." A",
-		"cc_trunk_rand_a",
-		'$value',
-		"SELECT",
-		'size="15" multiple="multiple" align="left"',
-		"",
-		"",
-		"sql",
-		"cc_trunk_rand_a",
-		"trunk_dependa, trunk_ida, trunkpercentagea",
-		"", "", "%1 : (%2)", "", "", "cc_trunk_rand:trunk_dependa:cc_trunk LEFT JOIN cc_trunk_rand ON id_trunk=cc_trunk_rand.trunk_dependa:DISTINCT trunkcode, id_trunk, cc_trunk_rand.trunkpercentage:cc_trunk_rand.trunk_id = %id:trunk_id:%2 - (%1)::::::%:3::NOT id_trunk IN (%1)");
-/**}
-
-$DBHandle_max  = DbConnect();
-$numrow = 0;
-$resmax = $DBHandle_max -> Execute("SELECT * FROM cc_trunk");
-if ( $resmax )
-	$numrow = $resmax -> RecordCount( );
-
-if ($numrow>0) {**/
-	$HD_Form -> AddEditElement (gettext("RANDOM TRUNKS")." B",
-		"cc_trunk_rand_b",
-		'$value',
-		"SELECT",
-		'size="15" multiple="multiple"',
-		"",
-		"",
-		"sql",
-		"cc_trunk_rand_b",
-		"trunk_dependb, trunk_idb, trunkpercentageb",
-		"", "", "%1 : (%2)", "", "", "cc_trunk_rand:trunk_dependb:cc_trunk LEFT JOIN cc_trunk_rand ON id_trunk=cc_trunk_rand.trunk_dependb:DISTINCT trunkcode, id_trunk, cc_trunk_rand.trunkpercentage:cc_trunk_rand.trunk_id = %id:trunk_id:%2 - (%1)::::::%:3::NOT id_trunk IN (%1)");
-}
-
 $HD_Form -> FieldEditElement ('id_provider, trunkcode, trunkprefix, removeprefix, providertech, providerip, addparameter, dialprefixmain, failover_trunk, inuse, maxuse, if_max_use, status, outbound_cidgroup_id,
-	dialprefixa, failover_trunka, startdatea, stopdatea, billblockseca, perioda, periodexpirya, timelefta, maxsecperperioda, periodcounta, lastcallstoptimea,
-	dialprefixb, failover_trunkb, startdateb, stopdateb, billblocksecb, periodb, periodexpiryb, timeleftb, maxsecperperiodb, periodcountb, lastcallstoptimeb');
+	dialprefixa, failover_trunka, secondusedcarrier,  startdatea, stopdatea, billblockseca, perioda, periodexpirya, timelefta, maxsecperperioda, periodcounta, lastcallstoptimea,
+	dialprefixb, failover_trunkb, secondusedratecard, startdateb, stopdateb, billblocksecb, periodb, periodexpiryb, timeleftb, maxsecperperiodb, periodcountb, lastcallstoptimeb');
 
 
 $HD_Form -> FG_INTRO_TEXT_EDITION= gettext("Modify the properties of the trunk below.");

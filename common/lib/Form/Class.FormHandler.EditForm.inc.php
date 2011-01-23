@@ -22,7 +22,32 @@ function sendto(action, record, field_inst, instance){
 function sendtolittle(direction){
   document.myForm.action=direction;
   document.myForm.submit();
+}
 
+function keyDownNumber(e,id_el,record,field_inst,instance)
+{
+ if(e.keyCode==13) {
+   updatecontent(id_el,record,field_inst,instance)
+   return false
+ }
+ var key = (typeof e.charCode == 'undefined' ? e.keyCode : e.charCode);
+   if (e.ctrlKey || e.altKey || key < 58)  {
+     document.getElementById(id_el).style.color = "blue";
+     return true;
+   }
+     else  return false;
+}
+
+function updatecontent(id_el, record, field_inst, instance)
+{
+//  alert (document.getElementById(id_el).value + " is not valid.");
+  document.myForm.percentage.value = document.getElementById(id_el).value;
+  document.myForm.form_action.value = "update-content";
+  document.myForm.sub_action.value = record;
+  if (field_inst != null) document.myForm.elements[field_inst].value = instance;
+  document.myForm.submit();
+  document.getElementById(id_el).style.color = "#BC2222";
+  return false;
 }
 
 //-->
@@ -39,6 +64,7 @@ function sendtolittle(direction){
 		<INPUT type="hidden" name="current_page" value="<?php echo $processed['current_page'];?>">
 		<INPUT type="hidden" name="order" value="<?php echo $processed['order'];?>">
 		<INPUT type="hidden" name="sens" value="<?php echo $processed['sens'];?>">
+		<INPUT type="hidden" name="percentage" value="">
 		
 <?php
 	if (!empty($this->FG_QUERY_EDITION_HIDDEN_FIELDS)){
@@ -274,10 +300,10 @@ function sendtolittle(direction){
                      		<br>
                          
 						 	<!-- Table with list instance already inserted -->
-                        	<table class="editform_table2" cellspacing="0" align=left>
+                        	<table cellspacing="0" align=left class="editform_table2" <?php if (is_numeric($table_split[13])) {?> style=width:auto <?php }?> >
 								<TR class="editform_table2_td1"> 
 								<TD height=16 style="PADDING-LEFT: 5px; PADDING-RIGHT: 3px" class="form_head"> 
-								  <TABLE border=0 cellPadding=0 cellSpacing=0 width="100%">
+								  <TABLE border=0 cellPadding=0 cellSpacing=0 style="width: auto">
 									  <TR> 
 										<TD class="form_head"><?php echo $this->FG_TABLE_EDITION[$i][0]?> <?php echo gettext("LIST");?></TD>
 									  </TR>
@@ -312,15 +338,20 @@ function sendtolittle(direction){
 								
                                   <TR class="" bgcolor="<?php echo $this->FG_TABLE_ALTERNATE_ROW_COLOR[$j%2]?>"  onMouseOver="bgColor='#C4FFD7'" onMouseOut="bgColor='<?php echo $this->FG_TABLE_ALTERNATE_ROW_COLOR[$j%2]?>'"> 
                                   <?php if (isset($split_select_list[$j][$splitcurrent])){?>
-                                    <TD vAlign=top align=right class=tableBody><font face="Verdana" size="2">
-                                      <b><?php echo $split_select_list[$j][$splitcurrent].$table_split[12]?></b>&nbsp;
-                                      </font> </TD>				<?php }?>
+                                    <TD align="center" vAlign=top class=tableBody>
+                                      <INPUT onClick="return updatecontent('<?php echo $table_split[1].$split_select_list[$j][1]?>','<?php echo $i?>','<?php echo $table_split[1]?>_hidden','<?php echo $split_select_list[$j][1]?>')" title="Save this <?php echo $this->FG_TABLE_EDITION[$i][0]?>" alt="Save this <?php echo $this->FG_TABLE_EDITION[$i][0]?>" border=0 height=11 hspace=2 src="<?php echo Images_Path_Main;?>/icon-save.gif" type=image width=33 value="Done" id=submit55 name=submit55\>
+                                    </TD>
+                                    <TD vAlign=top class=tableBody>
+                                      <INPUT TYPE="TEXT" id='<?php echo $table_split[1].$split_select_list[$j][1]?>' class="form_input_text" style=font-weight:bold onkeypress="return keyDownNumber(event,id,'<?php echo $i?>','<?php echo $table_split[1]?>_hidden','<?php echo $split_select_list[$j][1]?>');" size=1 maxlength=3 value='<?php echo $split_select_list[$j][$splitcurrent]?>'\>
+                                      <b><?php echo $table_split[12]?></b>
+                                      &nbsp;
+                                    </TD>				<?php }?>
                                     <TD vAlign=top class=tableBody>
                                       <font face="Verdana" size="2">
 						<?php echo $split_select_list[$j][0]?>
                                       </font> </TD>
                                     <TD align="center" vAlign=top class=tableBodyRight> 
-                                      <input onClick="sendto('del-content','<?php echo $i?>','<?php echo $table_split[1]?>_hidden','<?php echo $split_select_list[$j][1]?>');" title="Remove this <?php echo $this->FG_TABLE_EDITION[$i][0]?>" alt="Remove this <?php echo $this->FG_TABLE_EDITION[$i][0]?>" border=0 height=11 hspace=2 id=submit33 name=submit33 src="<?php echo Images_Path_Main;?>/icon-del.gif" type=image width=33 value="add-split">
+                                      <input onClick="sendto('del-content','<?php echo $i?>','<?php echo $table_split[1]?>_hidden','<?php echo $split_select_list[$j][1]?>');" title="Remove this <?php echo $this->FG_TABLE_EDITION[$i][0]?>" alt="Remove this <?php echo $this->FG_TABLE_EDITION[$i][0]?>" border=0 height=11 hspace=2 id=submit33 name=submit33 src="<?php echo Images_Path_Main;?>/icon-del.gif" type=image width=33 value="add-split"\>
                                     </TD>
                                   </TR>
                                   <?php  
@@ -374,7 +405,7 @@ function sendtolittle(direction){
 											     $SPLIT_CLAUSE .= ','.$split_select_list[$j][1];
 														  }
 												    } else $SPLIT_CLAUSE = 0;
-											 $SUB_TABLE_SPLIT_CLAUSE = str_replace("%1", $SPLIT_CLAUSE, $table_split[15] );
+											 $SUB_TABLE_SPLIT_CLAUSE = str_replace("%2", $SPLIT_CLAUSE, $table_split[15] );
 											 $split_select_list = $instance_sub_table -> Get_list ($this->DBHandle, $SUB_TABLE_SPLIT_CLAUSE, $table_split[13], $table_split[14], null, null, null, null);
 											 if (count($split_select_list)>0) {	
 												 $select_number=0;

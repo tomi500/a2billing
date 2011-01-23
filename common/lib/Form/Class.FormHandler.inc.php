@@ -1191,7 +1191,7 @@ class FormHandler
 		}
 		
 		if ( $form_action == "list" || $form_action == "edit" || $form_action == "ask-delete" ||
-			 $form_action == "ask-edit" || $form_action == "add-content" || $form_action == "del-content" || $form_action == "ask-del-confirm") {
+			 $form_action == "ask-edit" || $form_action == "add-content" || $form_action == "del-content" || $form_action == "update-content" || $form_action == "ask-del-confirm") {
 			include_once (FSROOT."lib/Class.Table.php");
 
 			$this->FG_ORDER = $processed['order'];
@@ -1828,6 +1828,26 @@ class FormHandler
 
 
 	/**
+	* Function to save_content
+	* @public     	 
+	*/
+	function perform_update_content($sub_action,$id,$valcon)
+	{
+		$processed = $this->getProcessed();
+		$table_split = preg_split("/:/", $this->FG_TABLE_EDITION[$sub_action][14]);
+		if(array_key_exists($table_split[1].'_hidden', $processed)){
+			$value = trim($processed[$table_split[1].'_hidden']);
+		} else {
+			$value = trim($processed[$table_split[1]]);
+		}
+		$instance_sub_table = new Table($table_split[0]);
+		$SPLIT_FG_UPDATE_SET = $table_split[16]."='".$valcon."'";
+		$SPLIT_FG_UPDATE_CLAUSE = $table_split[1]."='".$value."' AND ".$table_split[5]."='".trim($id)."'";
+		$instance_sub_table -> Update_table ($this->DBHandle, $SPLIT_FG_UPDATE_SET, $SPLIT_FG_UPDATE_CLAUSE, $func_table = null);
+	}
+	
+	
+	/**
 	* Function to del_content
 	* @public     	 
 	*/
@@ -1854,7 +1874,7 @@ class FormHandler
 	{
 		$processed = $this->getProcessed();
 		if ($form_action=="ask-edit" || $form_action=="edit" || $form_action == "add-content" ||
-			$form_action == "del-content"){ ?>
+			$form_action == "del-content" || $form_action == "update-content"){ ?>
 			<table class="toppage_maintable">
 				<tr><td height="20"  align="center"> 
 						<font class="toppage_maintable_text">						  
@@ -2118,10 +2138,16 @@ class FormHandler
 		$stitle = $processed['stitle'];
 		$ratesort = $processed['ratesort'];
 		$sub_action = $processed['sub_action'];
+		$percentage = $processed['percentage'];
 		
 		switch ($form_action) {
 			case "add-content":
 				$this->perform_add_content($sub_action,$id);
+				include('Class.FormHandler.EditForm.inc.php');
+				break;
+					
+			case "update-content":
+				$this->perform_update_content($sub_action,$id,$percentage);
 				include('Class.FormHandler.EditForm.inc.php');
 				break;
 					
@@ -2140,7 +2166,8 @@ class FormHandler
 				break;
 				
 			case "ask-delete":
-            case "ask-del-confirm":
+				
+			case "ask-del-confirm":
 				if (strlen($this -> FG_ADDITIONAL_FUNCTION_BEFORE_DELETE) > 0)
 			   	$res_funct = call_user_func(array('FormBO', $this->FG_ADDITIONAL_FUNCTION_BEFORE_DELETE));
 				include('Class.FormHandler.DelForm.inc.php');
