@@ -1373,7 +1373,6 @@ $A2B -> debug( INFO, $agi, __FILE__, __LINE__, "FirstListFailoverTrunk =".$resul
 					$dialstr = "$tech/$ipaddress/$prefix$destination".$dialparams;
 				}
 			}
-
 			//ADDITIONAL PARAMETER 			%dialingnumber%,	%cardnumber%
 			if (strlen($addparameter)>0) {
 				$addparameter = str_replace("%cardnumber%", $A2B->cardnumber, $addparameter);
@@ -1463,7 +1462,7 @@ $A2B -> debug( INFO, $agi, __FILE__, __LINE__, "FirstListFailoverTrunk =".$resul
 
 				$destination=$old_destination;
 
-				$QUERY = "SELECT trunkprefix, providertech, providerip, removeprefix, failover_trunk, status, inuse, maxuse, if_max_use, outbound_cidgroup_id FROM cc_trunk WHERE id_trunk='$failover_trunk' LIMIT 1";
+				$QUERY = "SELECT trunkprefix, providertech, providerip, removeprefix, failover_trunk, status, inuse, maxuse, if_max_use, outbound_cidgroup_id, addparameter FROM cc_trunk WHERE id_trunk='$failover_trunk' LIMIT 1";
 				$A2B->instance_table = new Table();
 				$result = $A2B->instance_table -> SQLExec ($A2B -> DBHandle, $QUERY);
 
@@ -1479,6 +1478,7 @@ $A2B -> debug( INFO, $agi, __FILE__, __LINE__, "FirstListFailoverTrunk =".$resul
 					$maxuse			= $result[0][7];
 					$ifmaxuse		= $result[0][8];
 					$cidgroupid		= $result[0][9];
+					$addparameter		= $result[0][10];
 					if ($cidgroupid == -1) $cidgroupid = $cidgroupidrate;
 					
 					if (strncmp($destination, $removeprefix, strlen($removeprefix)) == 0)
@@ -1642,6 +1642,13 @@ $A2B -> debug( INFO, $agi, __FILE__, __LINE__, "SecondListFailoverTrunk =".$resu
 							$dialstr = "$tech/$ipaddress/$prefix$destination".$dialparams;
 						}
 					}
+					//ADDITIONAL PARAMETER 			%dialingnumber%,	%cardnumber%
+					if (strlen($addparameter)>0) {
+						$addparameter = str_replace("%cardnumber%", $A2B->cardnumber, $addparameter);
+						$addparameter = str_replace("%dialingnumber%", $prefix.$destination, $addparameter);
+						$dialstr .= $addparameter;
+					}
+
 					$A2B -> debug( INFO, $agi, __FILE__, __LINE__, "FAILOVER app_callingcard: Dialing '$dialstr' with timeout of '$timeout'.\n");
 
 					$QUERY = "SELECT cid FROM cc_outbound_cid_list WHERE activated = 1 AND outbound_cid_group = $cidgroupid ORDER BY RAND() LIMIT 1";
