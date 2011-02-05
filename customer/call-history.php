@@ -73,7 +73,7 @@ if (($download == "file") && $file && $ACXSEERECORDING) {
 }
 
 
-$QUERY = "SELECT username, credit, lastname, firstname, address, city, state, country, zipcode, phone, email, fax, lastuse, activated, status FROM cc_card WHERE username = '".$_SESSION["pr_login"]."' AND uipass = '".$_SESSION["pr_password"]."'";
+$QUERY = "SELECT username, credit, lastname, firstname, address, city, state, country, zipcode, phone, email, fax, lastuse, activated, status, currency FROM cc_card WHERE username = '".$_SESSION["pr_login"]."' AND uipass = '".$_SESSION["pr_password"]."'";
 
 $DBHandle_max = DbConnect();
 $numrow = 0;
@@ -388,6 +388,7 @@ echo $CC_help_balance_customer;
 					<select NAME="choose_currency" size="1" class="form_input_select" >
 							<?php
 								$currencies_list = get_currencies();
+								if ($choose_currency == "")	$choose_currency = strtoupper($customer_info[15]);
 								foreach($currencies_list as $key => $cur_value) {
 							?>
 								<option value='<?php echo $key ?>' <?php if (($choose_currency==$key) || (!isset($choose_currency) && $key==strtoupper(BASE_CURRENCY))){?>selected<?php } ?>><?php echo $cur_value[1].' ('.$cur_value[2].')' ?>
