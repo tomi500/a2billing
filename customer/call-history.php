@@ -43,7 +43,7 @@ if (! has_rights (ACX_CALL_HISTORY)) {
 	die();
 }
 
-getpost_ifset(array('posted', 'Period', 'frommonth', 'fromstatsmonth', 'tomonth', 'tostatsmonth', 'fromday', 'fromstatsday_sday', 'fromstatsmonth_sday', 'today', 'tostatsday_sday', 'tostatsmonth_sday', 'phonenumbertype', 'sourcetype', 'clidtype', 'channel', 'resulttype', 'stitle', 'atmenu', 'current_page', 'order', 'sens', 'phonenumber', 'src', 'clid', 'choose_currency', 'terminatecauseid', 'choose_calltype', 'download', 'file'));
+getpost_ifset(array('posted', 'Period', 'frommonth', 'fromstatsmonth', 'tomonth', 'tostatsmonth', 'fromday', 'fromstatsday_sday', 'fromstatsmonth_sday', 'today', 'tostatsday_sday', 'tostatsmonth_sday', 'calleridtype', 'phonenumbertype', 'sourcetype', 'clidtype', 'channel', 'resulttype', 'stitle', 'atmenu', 'current_page', 'order', 'sens', 'callerid', 'phonenumber', 'src', 'clid', 'choose_currency', 'terminatecauseid', 'choose_calltype', 'download', 'file'));
 
 
 if (($download == "file") && $file && $ACXSEERECORDING) {
@@ -166,6 +166,7 @@ if ( is_null ($order) || is_null($sens) ){
 if ($posted==1) {
 	$SQLcmd = '';
 	$SQLcmd = do_field($SQLcmd, 'src', 'source');
+	$SQLcmd = do_field($SQLcmd, 'callerid', 'src');
 	$SQLcmd = do_field($SQLcmd, 'phonenumber', 'calledstation');
 }
 
@@ -321,6 +322,19 @@ echo $CC_help_balance_customer;
     		</tr>
 			<tr>
 				<td  align="left" class="bgcolor_004">
+					<font class="fontstyle_003">&nbsp;&nbsp;<?php echo gettext("CALLERID");?></font>
+				</td>
+				<td  align="left" class="bgcolor_005">
+				<table width="100%" border="0" cellspacing="0" cellpadding="0">
+				<tr><td class="fontstyle_searchoptions">&nbsp;&nbsp;<INPUT TYPE="text" NAME="callerid" value="<?php echo $callerid?>" class="form_input_text"></td>
+				<td  align="center" class="fontstyle_searchoptions"><input type="radio" NAME="calleridtype" value="1" <?php if((!isset($calleridtype))||($calleridtype==1)){?>checked<?php }?>><?php echo gettext("Exact");?></td>
+				<td  align="center" class="fontstyle_searchoptions"><input type="radio" NAME="calleridtype" value="2" <?php if($calleridtype==2){?>checked<?php }?>><?php echo gettext("Begins with")?></td>
+				<td  align="center" class="fontstyle_searchoptions"><input type="radio" NAME="calleridtype" value="3" <?php if($calleridtype==3){?>checked<?php }?>><?php echo gettext("Contains");?></td>
+				<td  align="center" class="fontstyle_searchoptions"><input type="radio" NAME="calleridtype" value="4" <?php if($calleridtype==4){?>checked<?php }?>><?php echo gettext("Ends with");?></td>
+				</tr></table></td>
+			</tr>		
+			<tr>
+				<td  align="left" class="bgcolor_004">
 					<font class="fontstyle_003">&nbsp;&nbsp;<?php echo gettext("PHONENUMBER");?></font>
 				</td>
 				<td  align="left" class="bgcolor_005">
@@ -438,7 +452,7 @@ echo $CC_help_balance_customer;
 	                    <center><strong> 
 	                    <?php  if (strtoupper($FG_TABLE_COL[$i][4])=="SORT"){?>
 	                    <a href="<?php  echo $PHP_SELF."?customer=$customer&s=1&t=0&stitle=$stitle&atmenu=$atmenu&current_page=$current_page&order=".$FG_TABLE_COL[$i][1]."&sens="; if ($sens=="ASC"){echo"DESC";}else{echo"ASC";} 
-						echo "&posted=$posted&Period=$Period&frommonth=$frommonth&fromstatsmonth=$fromstatsmonth&tomonth=$tomonth&tostatsmonth=$tostatsmonth&fromday=$fromday&fromstatsday_sday=$fromstatsday_sday&fromstatsmonth_sday=$fromstatsmonth_sday&today=$today&tostatsday_sday=$tostatsday_sday&tostatsmonth_sday=$tostatsmonth_sday&phonenumbertype=$phonenumbertype&sourcetype=$sourcetype&clidtype=$clidtype&channel=$channel&resulttype=$resulttype&phonenumber=$phonenumber&src=$src&clid=$clid&terminatecauseid=$terminatecauseid&choose_calltype=$choose_calltype";?>"> 
+						echo "&posted=$posted&Period=$Period&frommonth=$frommonth&fromstatsmonth=$fromstatsmonth&tomonth=$tomonth&tostatsmonth=$tostatsmonth&fromday=$fromday&fromstatsday_sday=$fromstatsday_sday&fromstatsmonth_sday=$fromstatsmonth_sday&today=$today&tostatsday_sday=$tostatsday_sday&tostatsmonth_sday=$tostatsmonth_sday&calleridtype=$calleridtype&phonenumbertype=$phonenumbertype&sourcetype=$sourcetype&clidtype=$clidtype&channel=$channel&resulttype=$resulttype&callerid=$callerid&phonenumber=$phonenumber&src=$src&clid=$clid&terminatecauseid=$terminatecauseid&choose_calltype=$choose_calltype";?>"> 
 	                    <span class="liens"><?php  } ?>
 	                    <?php echo $FG_TABLE_COL[$i][0]?> 
 	                    <?php if ($order==$FG_TABLE_COL[$i][1] && $sens=="ASC"){?>
@@ -535,13 +549,13 @@ echo $CC_help_balance_customer;
                   <TD align="right"><SPAN style="COLOR: #ffffff; FONT-SIZE: 11px"><B> 
                     <?php if ($current_page>0){?>
                     <img src="<?php echo Images_Path_Main ?>/fleche-g.gif" width="5" height="10"> <a href="<?php echo $PHP_SELF?>?s=1&t=0&order=<?php echo $order?>&sens=<?php echo $sens?>&current_page=<?php  echo ($current_page-1)?><?php  if (!is_null($letter) && ($letter!="")){ echo "&letter=$letter";} 
-					echo "&customer=$customer&posted=$posted&Period=$Period&frommonth=$frommonth&fromstatsmonth=$fromstatsmonth&tomonth=$tomonth&tostatsmonth=$tostatsmonth&fromday=$fromday&fromstatsday_sday=$fromstatsday_sday&fromstatsmonth_sday=$fromstatsmonth_sday&today=$today&tostatsday_sday=$tostatsday_sday&tostatsmonth_sday=$tostatsmonth_sday&phonenumbertype=$phonenumbertype&sourcetype=$sourcetype&clidtype=$clidtype&channel=$channel&resulttype=$resulttype&phonenumber=$phonenumber&src=$src&clid=$clid&terminatecauseid=$terminatecauseid&choose_calltype=$choose_calltype";?>"> 
+					echo "&customer=$customer&posted=$posted&Period=$Period&frommonth=$frommonth&fromstatsmonth=$fromstatsmonth&tomonth=$tomonth&tostatsmonth=$tostatsmonth&fromday=$fromday&fromstatsday_sday=$fromstatsday_sday&fromstatsmonth_sday=$fromstatsmonth_sday&today=$today&tostatsday_sday=$tostatsday_sday&tostatsmonth_sday=$tostatsmonth_sday&calleridtype=$calleridtype&phonenumbertype=$phonenumbertype&sourcetype=$sourcetype&clidtype=$clidtype&channel=$channel&resulttype=$resulttype&callerid=$callerid&phonenumber=$phonenumber&src=$src&clid=$clid&terminatecauseid=$terminatecauseid&choose_calltype=$choose_calltype";?>"> 
                     <?php echo gettext("PREVIOUS");?> </a> -
                     <?php }?>
                     <?php echo ($current_page+1);?> / <?php  echo $nb_record_max;?> 
                     <?php if ($current_page<$nb_record_max-1){?>
                     - <a href="<?php echo $PHP_SELF?>?s=1&t=0&order=<?php echo $order?>&sens=<?php echo $sens?>&current_page=<?php  echo ($current_page+1)?><?php  if (!is_null($letter) && ($letter!="")){ echo "&letter=$letter";} 
-					echo "&customer=$customer&posted=$posted&Period=$Period&frommonth=$frommonth&fromstatsmonth=$fromstatsmonth&tomonth=$tomonth&tostatsmonth=$tostatsmonth&fromday=$fromday&fromstatsday_sday=$fromstatsday_sday&fromstatsmonth_sday=$fromstatsmonth_sday&today=$today&tostatsday_sday=$tostatsday_sday&tostatsmonth_sday=$tostatsmonth_sday&phonenumbertype=$phonenumbertype&sourcetype=$sourcetype&clidtype=$clidtype&channel=$channel&resulttype=$resulttype&phonenumber=$phonenumber&src=$src&clid=$clid&terminatecauseid=$terminatecauseid&choose_calltype=$choose_calltype";?>"> 
+					echo "&customer=$customer&posted=$posted&Period=$Period&frommonth=$frommonth&fromstatsmonth=$fromstatsmonth&tomonth=$tomonth&tostatsmonth=$tostatsmonth&fromday=$fromday&fromstatsday_sday=$fromstatsday_sday&fromstatsmonth_sday=$fromstatsmonth_sday&today=$today&tostatsday_sday=$tostatsday_sday&tostatsmonth_sday=$tostatsmonth_sday&calleridtype=$calleridtype&phonenumbertype=$phonenumbertype&sourcetype=$sourcetype&clidtype=$clidtype&channel=$channel&resulttype=$resulttype&callerid=$callerid&phonenumber=$phonenumber&src=$src&clid=$clid&terminatecauseid=$terminatecauseid&choose_calltype=$choose_calltype";?>"> 
                     <?php echo gettext("NEXT");?> </a> <img src="<?php echo Images_Path_Main ?>/fleche-d.gif" width="5" height="10">
                     </B></SPAN> 
                     <?php }?>
