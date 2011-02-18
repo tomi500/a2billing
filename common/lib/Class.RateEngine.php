@@ -262,8 +262,11 @@ class RateEngine
 			$A2B -> debug( INFO, $agi, __FILE__, __LINE__, "[CC_asterisk_rate-engine: Extracharge DID found: ".$A2B->dnid.", extra fee: ".$fee.", extra buy fee: ".$buyfee."]");
 			for ($i=0; $i<count($this->ratecard_obj); $i++)
 			{
-				$this->ratecard_obj[$i][9] +=$buyfee;
-				$this->ratecard_obj[$i][12]+=$fee;
+				$this->ratecard_obj[$i][9] += $buyfee;
+				$this->ratecard_obj[$i][12] += $fee;
+                $this->ratecard_obj[$i][18] += $fee; //chargea
+                $this->ratecard_obj[$i][22] += $fee; //chargeb
+                $this->ratecard_obj[$i][26] += $fee; //chargec
 			}
 		}
 
@@ -941,7 +944,7 @@ class RateEngine
 		
 		// ****************  PACKAGE PARAMETERS ****************
 		$id_cc_package_offer = $this -> ratecard_obj[$K][45];
-		$additional_grace_time = $this->ratecard_obj[$K][58];
+		$additional_grace_time = $this -> ratecard_obj[$K][58];
 		$id_card_package_offer = null;
 		
 		if ($A2B -> CC_TESTING) {
@@ -1001,7 +1004,7 @@ class RateEngine
 				// rate_engine_calculcost could have change the duration of the call
 				
 				$sessiontime = $this -> answeredtime;
-				if ($sessiontime>0 && $additional_grace_time>0) {
+				if ($sessiontime > 0 && $additional_grace_time > 0) {
 					$sessiontime = $sessiontime + $additional_grace_time;
 				}
 			}
@@ -1037,7 +1040,7 @@ class RateEngine
 
 		$A2B -> debug( DEBUG, $agi, __FILE__, __LINE__, "[CC_RATE_ENGINE_UPDATESYSTEM: usedratecard K=$K - (sessiontime=$sessiontime :: dialstatus=$dialstatus :: buycost=$buycost :: cost=$cost : signe_cc_call=$signe_cc_call: signe=$signe)]");
 
-		if (strlen($this -> dialstatus_rev_list[$dialstatus])>0) {
+		if (strlen($this -> dialstatus_rev_list[$dialstatus]) > 0) {
 			$terminatecauseid = $this -> dialstatus_rev_list[$dialstatus];
         } else {
 			$terminatecauseid = 0;
@@ -1659,8 +1662,8 @@ class RateEngine
 					$myres = $A2B -> run_dial($agi, $dialstr);
 					$A2B -> debug( DEBUG, $agi, __FILE__, __LINE__, "DIAL FAILOVER $dialstr");
 					
-					// check connection after dial(long pause)
-					$A2B -> DbReConnect();
+					// check connection after dial(long pause) 
+					$A2B -> DbReConnect($agi); 
 
 					// Count this call on the trunk
 					$this -> trunk_start_inuse($agi, $A2B, 0);
