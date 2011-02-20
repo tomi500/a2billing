@@ -1124,8 +1124,8 @@ if (!defined('MONITOR_PATH')) define ("MONITOR_PATH",	isset($this->config['webui
 			}
 			if ($this -> CC_TESTING) $this->destination = "kphone";
 
-			if ($A2B->monitor == 1 || $this->agiconfig['record_call'] == 1) {
-				$command_mixmonitor = "MixMonitor ". MONITOR_PATH ."/{$A2B->uniqueid}.{$A2B->agiconfig['monitor_formatfile']}|b";
+			if ($this->monitor == 1 || $this->agiconfig['record_call'] == 1) {
+				$command_mixmonitor = "MixMonitor ". MONITOR_PATH ."/{$this->uniqueid}.{$this->agiconfig['monitor_formatfile']}|b";
 				$command_mixmonitor = $this -> format_parameters ($command_mixmonitor);
 				$myres = $agi->exec($command_mixmonitor);
 				$this -> debug( INFO, $agi, __FILE__, __LINE__, $command_mixmonitor);
@@ -1149,7 +1149,7 @@ if (!defined('MONITOR_PATH')) define ("MONITOR_PATH",	isset($this->config['webui
 			$dialstatus = $agi->get_variable("DIALSTATUS");
 			$dialstatus = $dialstatus['data'];
 
-			if ($A2B->monitor == 1 || $this->agiconfig['record_call'] == 1) {
+			if ($this->monitor == 1 || $this->agiconfig['record_call'] == 1) {
 				// Monitor(wav,kiki,m)
 				$myres = $agi->exec("StopMixMonitor");
 				$this -> debug( INFO, $agi, __FILE__, __LINE__, "EXEC StopMixMonitor (".$this->uniqueid.")");
@@ -1270,8 +1270,8 @@ if (!defined('MONITOR_PATH')) define ("MONITOR_PATH",	isset($this->config['webui
 				if ($inst_listdestination[5]==1) {
 
 					// RUN MIXMONITOR TO RECORD CALL
-					if ($A2B->monitor == 1 || $this->agiconfig['record_call'] == 1) {
-						$command_mixmonitor = "MixMonitor ". MONITOR_PATH ."/{$A2B->uniqueid}.{$A2B->agiconfig['monitor_formatfile']}|b";
+					if ($this->monitor == 1 || $this->agiconfig['record_call'] == 1) {
+						$command_mixmonitor = "MixMonitor ". MONITOR_PATH ."/{$this->uniqueid}.{$this->agiconfig['monitor_formatfile']}|b";
 						$command_mixmonitor = $this -> format_parameters ($command_mixmonitor);
 						$myres = $agi->exec($command_mixmonitor);
 						$this -> debug( INFO, $agi, __FILE__, __LINE__, $command_mixmonitor);
@@ -1296,7 +1296,7 @@ if (!defined('MONITOR_PATH')) define ("MONITOR_PATH",	isset($this->config['webui
 					$dialstatus 	= $agi->get_variable("DIALSTATUS");
 					$dialstatus 	= $dialstatus['data'];
 
-					if ($A2B->monitor == 1 || $this->agiconfig['record_call'] == 1) {
+					if ($this->monitor == 1 || $this->agiconfig['record_call'] == 1) {
 						$myres = $agi->exec("StopMixMonitor");
 						$this -> debug( INFO, $agi, __FILE__, __LINE__, "EXEC StopMixMonitor (".$this->uniqueid.")");
 					}
@@ -1503,8 +1503,8 @@ if (!defined('MONITOR_PATH')) define ("MONITOR_PATH",	isset($this->config['webui
             if ($inst_listdestination[5]==1) {
 				
                 // RUN MIXMONITOR TO RECORD CALL
-		if ($A2B->monitor == 1 || $this->agiconfig['record_call'] == 1) {
-					$command_mixmonitor = "MixMonitor ". MONITOR_PATH ."/{$A2B->uniqueid}.{$A2B->agiconfig['monitor_formatfile']}|b";
+		if ($this->monitor == 1 || $this->agiconfig['record_call'] == 1) {
+					$command_mixmonitor = "MixMonitor ". MONITOR_PATH ."/{$this->uniqueid}.{$this->agiconfig['monitor_formatfile']}|b";
 					$command_mixmonitor = $this -> format_parameters ($command_mixmonitor);
 					$myres = $agi->exec($command_mixmonitor);
 					$this -> debug( INFO, $agi, __FILE__, __LINE__, $command_mixmonitor);
@@ -1530,14 +1530,14 @@ if (!defined('MONITOR_PATH')) define ("MONITOR_PATH",	isset($this->config['webui
                     $dialparams = str_replace("%timeout%", min($time2call * 1000, $max_long), $this->agiconfig['dialcommand_param']);
                     $dialparams = str_replace("%timeoutsec%", min($time2call, $max_long), $dialparams);
 
-		    if ($A2B->monitor == 1 || $this -> agiconfig['record_call'] == 1) {
-                        $myres = $agi->exec("MixMonitor ". MONITOR_PATH ."/{$A2B->uniqueid}.{$A2B->agiconfig['monitor_formatfile']}|b");
-                        $this -> debug( INFO, $agi, __FILE__, __LINE__, "MixMonitor ". MONITOR_PATH ."/{$A2B->uniqueid}.{$A2B->agiconfig['monitor_formatfile']}|b");
+		    if ($this->monitor == 1 || $this -> agiconfig['record_call'] == 1) {
+                        $myres = $agi->exec("MixMonitor ". MONITOR_PATH ."/{$this->uniqueid}.{$this->agiconfig['monitor_formatfile']}|b");
+                        $this -> debug( INFO, $agi, __FILE__, __LINE__, "MixMonitor ". MONITOR_PATH ."/{$this->uniqueid}.{$this->agiconfig['monitor_formatfile']}|b");
                     }
                     $dialstr 	= $inst_listdestination[4].$dialparams;
                     $myres = $this -> run_dial($agi, $dialstr);
                     $this -> debug( INFO, $agi, __FILE__, __LINE__, "DIAL $dialstr");
-		    if ($A2B->monitor == 1 || $this -> agiconfig['record_call'] == 1) {
+		    if ($this->monitor == 1 || $this -> agiconfig['record_call'] == 1) {
                         $myres = $agi->exec("StopMixMonitor");
                         $this -> debug( INFO, $agi, __FILE__, __LINE__, "EXEC StopMixMonitor (".$this->uniqueid.")");
                     }
@@ -1548,7 +1548,7 @@ if (!defined('MONITOR_PATH')) define ("MONITOR_PATH",	isset($this->config['webui
                 $dialstatus 	= $agi->get_variable("DIALSTATUS");
                 $dialstatus 	= $dialstatus['data'];
 
-		if ($A2B->monitor == 1 || $this -> agiconfig['record_call'] == 1) {
+		if ($this->monitor == 1 || $this -> agiconfig['record_call'] == 1) {
                     $myres = $agi->exec("StopMixMonitor");
                     $this -> debug( INFO, $agi, __FILE__, __LINE__, "EXEC StopMixMonitor (".$this->uniqueid.")");
                 }
