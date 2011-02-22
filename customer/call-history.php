@@ -127,23 +127,21 @@ $FG_TABLE_DEFAULT_ORDER = "t1.starttime";
 $FG_TABLE_DEFAULT_SENS = "DESC";
 
 $FG_TABLE_COL = array();
-$FG_TABLE_COL[]=array (gettext("Date"), "starttime", "17%", "center", "SORT", "22", "", "", "", "", "", "");
-$FG_TABLE_COL[]=array (gettext("CallerID"), "src", "14%", "center", "SORT", "30");
-$FG_TABLE_COL[]=array (gettext("PhoneNumber"), "calledstation", "14%", "center", "SORT", "30", "", "", "", "", "", "");
-$FG_TABLE_COL[]=array (gettext("Destination"), "destination", "14%", "center", "SORT", "30", "lie", "cc_prefix", "destination", "prefix='%id'", "%1" );
-$FG_TABLE_COL[]=array (gettext("Duration"), "sessiontime", "10%", "center", "SORT", "30", "", "", "", "", "", "display_minute");
-$FG_TABLE_COL[]=array ('<acronym title="'.gettext("Terminate Cause").'">'.gettext("TC").'</acronym>', "terminatecauseid", "10%", "center", "SORT", "", "list", $dialstatus_list);
-$FG_TABLE_COL[]=array (gettext("CallType"), "sipiax", "12%", "center", "SORT",  "", "list", $list_calltype);
-$FG_TABLE_COL[]=array (gettext("Cost"), "sessionbill", "12%", "center", "SORT", "30", "", "", "", "", "", "display_2bill");
-
-if ($ACXSEERECORDING) {
-	$FG_TABLE_COL [] = array ("", "uniqueid", "1%", "center", "", "30", "", "", "", "", "", "linkonmonitorfile_customer" );
-}
+$FG_TABLE_COL[]=array (gettext("Date"), "starttime", "15%", "center", "SORT", "22", "", "", "", "", "", "");
+$FG_TABLE_COL[]=array (gettext("CallerID"), "src", "12%", "center", "SORT", "30");
+$FG_TABLE_COL[]=array (gettext("PhoneNumber"), "calledstation", "12%", "center", "SORT", "30", "", "", "", "", "", "");
+$FG_TABLE_COL[]=array (gettext("Destination"), "destination", "12%", "center", "SORT", "30", "lie", "cc_prefix", "destination", "prefix='%id'", "%1" );
+$FG_TABLE_COL[]=array (gettext("Duration"), "sessiontime", "7%", "center", "SORT", "30", "", "", "", "", "", "display_minute");
+$FG_TABLE_COL[]=array ('<acronym title="'.gettext("Terminate Cause").'">'.gettext("TC").'</acronym>', "terminatecauseid", "9%", "center", "SORT", "", "list", $dialstatus_list);
+$FG_TABLE_COL[]=array (gettext("CallType"), "sipiax", "10%", "center", "SORT",  "", "list", $list_calltype);
+$FG_TABLE_COL[]=array (gettext("Cost"), "sessionbill", "9%", "center", "SORT", "30", "", "", "", "", "", "display_2bill");
 
 $FG_COL_QUERY = 't1.starttime, t1.src, t1.calledstation, t1.destination, t1.sessiontime, t1.terminatecauseid, t1.sipiax, t1.sessionbill';
 
 if ($ACXSEERECORDING) {
+	$FG_TABLE_COL [] = array ("<font color=\"#CC0000\">" . gettext("Audio") . "</font>", "uniqueid", "14%", "center", "", "30", "", "", "", "", "", "linkonmonitorfile_customer" );
 	$FG_COL_QUERY .= ', t1.uniqueid';
+	$trackid = 1;
 }
 
 $FG_LIMITE_DISPLAY = 25;
@@ -245,8 +243,11 @@ $smarty->display( 'main.tpl');
 // #### HELP SECTION
 echo $CC_help_balance_customer;
 
-?>
-
+if ($ACXSEERECORDING && $nb_record>0){ echo '
+<script src="./javascript/WavPlayer/domready.js"></script>
+<script src="./javascript/WavPlayer/swfobject.js"></script>
+<script src="./javascript/WavPlayer/wavplayer.js"></script>
+';}?>
 
 <!-- ** ** ** ** ** Part for the research ** ** ** ** ** -->
 	<center>
@@ -428,7 +429,7 @@ echo $CC_help_balance_customer;
 
 
 <!-- ** ** ** ** ** Part to display the CDR ** ** ** ** ** -->
-<center><?php echo gettext("Number of Calls");?> : <?php  if (is_array($list) && count($list)>0){ echo $nb_record; }else{echo "0";}?></center>
+<center><?php echo gettext("Number of Calls");?> : <?php if (is_array($list) && count($list)>0){ echo $nb_record . "<h3></h3>";}else{echo "0";}?></center>
      <table width="<?php echo $FG_HTML_TABLE_WIDTH?>" border="0" align="center" cellpadding="0" cellspacing="0">
 		<TR bgcolor="#ffffff"> 
           <TD class="callhistory_td11"> 
@@ -518,7 +519,7 @@ echo $CC_help_balance_customer;
 						 ?></TD>
 				 		 <?php  } ?>
                   
-					</TR>
+			</TR>
 				<?php
 					 }//foreach ($list as $recordset)
 					 if ($ligne_number < $FG_LIMITE_DISPLAY)  $ligne_number_end=$ligne_number +2;
@@ -544,7 +545,7 @@ echo $CC_help_balance_customer;
         </tr>
         <TR bgcolor="#ffffff"> 
           <TD bgColor=#ADBEDE height=16 style="PADDING-LEFT: 5px; PADDING-RIGHT: 3px"> 
-			<TABLE border=0 cellPadding=0 cellSpacing=0 width="100%">
+	    <TABLE border=0 cellPadding=0 cellSpacing=0 width="100%">
                 <TR> 
                   <TD align="right"><SPAN style="COLOR: #ffffff; FONT-SIZE: 11px"><B> 
                     <?php if ($current_page>0){?>
@@ -560,6 +561,7 @@ echo $CC_help_balance_customer;
                     </B></SPAN> 
                     <?php }?>
                   </TD>
+		</TR>
             </TABLE></TD>
         </TR>
       </table>

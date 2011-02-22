@@ -475,10 +475,11 @@ function linkonmonitorfile_customer($value) {
 		}
 	}
 	if (!$find_record) return false;
-	
 	$myfile = base64_encode($myfile);
-	echo "<a target=_blank href=\"call-history.php?download=file&file=" . $myfile . "\">";
-	echo '<img src="' . Images_Path . '/stock-mic.png" height="18" /></a>';
+	echo '<a href="call-history.php?download=file&file=' . $myfile . '&.WAV"></a>';
+	echo '<a target=_blank href="call-history.php?download=file&file=' . $myfile . '">';
+	echo ' <img src="' . Images_Path . '/icoDisk.gif" height="16"/></a>';
+	$trackid++;
 }
 
 /*
