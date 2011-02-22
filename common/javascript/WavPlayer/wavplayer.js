@@ -118,7 +118,7 @@ function WavPlayer(pid, heartext) {
 }
 function WavPlayerSoundLoad() { window.WavPlayer.SoundLoad.apply(window.WavPlayer, arguments); }
 function WavPlayerSoundState() { window.WavPlayer.SoundState.apply(window.WavPlayer, arguments); }
-window.WavPlayer = new WavPlayer('WavPlayerBlock', '<img width="16" height="16" src="./templates/default/images/flv.gif"/> ');
+window.WavPlayer = new WavPlayer('WavPlayerBlock', '<img width="16" height="16" src="./templates/default/images/flv.gif"/>');
 Event.domReady.add(function() {
 	var Player = document.createElement("div");
 	Player.style.display = "block";
