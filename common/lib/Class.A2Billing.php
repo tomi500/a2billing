@@ -1531,8 +1531,11 @@ if (!defined('MONITOR_PATH')) define ("MONITOR_PATH",	isset($this->config['webui
                     $dialparams = str_replace("%timeoutsec%", min($time2call, $max_long), $dialparams);
 
 		    if ($this->monitor == 1 || $this -> agiconfig['record_call'] == 1) {
-                        $myres = $agi->exec("MixMonitor ". MONITOR_PATH ."/{$this->uniqueid}.{$this->agiconfig['monitor_formatfile']}|b");
-                        $this -> debug( INFO, $agi, __FILE__, __LINE__, "MixMonitor ". MONITOR_PATH ."/{$this->uniqueid}.{$this->agiconfig['monitor_formatfile']}|b");
+//				        $command_mixmonitor = "MixMonitor ". MONITOR_PATH ."/{$this->uniqueid}.{$this->agiconfig['monitor_formatfile']}|b";
+				        $command_mixmonitor = "MixMonitor {$this->uniqueid}.{$this->agiconfig['monitor_formatfile']}|b";
+				        $command_mixmonitor = $this -> format_parameters ($command_mixmonitor);
+				        $myres = $agi->exec($command_mixmonitor);
+				        $this -> debug( INFO, $agi, __FILE__, __LINE__, $command_mixmonitor);
                     }
                     $dialstr 	= $inst_listdestination[4].$dialparams;
                     $myres = $this -> run_dial($agi, $dialstr);
