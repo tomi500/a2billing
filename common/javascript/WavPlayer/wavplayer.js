@@ -118,7 +118,7 @@ function WavPlayer(pid, heartext) {
 }
 function WavPlayerSoundLoad() { window.WavPlayer.SoundLoad.apply(window.WavPlayer, arguments); }
 function WavPlayerSoundState() { window.WavPlayer.SoundState.apply(window.WavPlayer, arguments); }
-window.WavPlayer = new WavPlayer('WavPlayerBlock', '<img width="16" height="16" src="templates/default/images/flv.gif"/> ');
+window.WavPlayer = new WavPlayer('WavPlayerBlock', '<img width="16" height="16" src="./templates/default/images/flv.gif"/> ');
 Event.domReady.add(function() {
 	var Player = document.createElement("div");
 	Player.style.display = "block";
@@ -133,6 +133,6 @@ Event.domReady.add(function() {
 	}
 	attachPoint.insertBefore(Player, attachAnchor);
 	var vars = {}; var params = {'scale': 'noscale', 'bgcolor': '#FFFFFF'};
-	swfobject.embedSWF("/javascript/WavPlayer/wavplayer.swf?gui=full&w=600&h=20", "WavPlayerBlock", "600", "20", "10.0.32.18", "/javascript/WavPlayer/expressInstall.swf", vars, params, params);
+	swfobject.embedSWF("./javascript/WavPlayer/wavplayer.swf?gui=full&w=600&h=20", "WavPlayerBlock", "600", "20", "10.0.32.18", "./javascript/WavPlayer/expressInstall.swf", vars, params, params);
 	window.WavPlayer.init();
 });
