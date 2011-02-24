@@ -139,9 +139,8 @@ $FG_TABLE_COL[]=array (gettext("Cost"), "sessionbill", "9%", "center", "SORT", "
 $FG_COL_QUERY = 't1.starttime, t1.src, t1.calledstation, t1.destination, t1.sessiontime, t1.terminatecauseid, t1.sipiax, t1.sessionbill';
 
 if ($ACXSEERECORDING) {
-	$FG_TABLE_COL [] = array ("<font color=\"#CC0000\">" . gettext("Audio") . "</font>", "uniqueid", "14%", "center", "", "30", "", "", "", "", "", "linkonmonitorfile_customer" );
+	$FG_TABLE_COL [] = array ('<span class="liens">' . gettext("Audio") . "</span>", "uniqueid", "14%", "center", "", "30", "", "", "", "", "", "linkonmonitorfile_customer");
 	$FG_COL_QUERY .= ', t1.uniqueid';
-	$trackid = 1;
 }
 
 $FG_LIMITE_DISPLAY = 25;

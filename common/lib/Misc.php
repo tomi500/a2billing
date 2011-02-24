@@ -456,8 +456,7 @@ function linkonmonitorfile($value) {
 	if (!$find_record) return false;
 	
 	$myfile = base64_encode($myfile);
-	echo "<a target=_blank href=\"call-log-customers.php?download=file&file=" . $myfile . "\">";
-	echo '<img src="' . Images_Path . '/stock-mic.png" height="18" /></a>';
+	echo '<a href="call-log-customers.php?download=file&file=' . $myfile . '&.' . $c_format . '"></a>';
 }
 
 /*

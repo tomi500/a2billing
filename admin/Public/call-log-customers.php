@@ -110,25 +110,25 @@ $FG_TABLE_DEFAULT_SENS = "DESC";
 $DBHandle = DbConnect ();
 
 $FG_TABLE_COL = array ();
-$FG_TABLE_COL [] = array (gettext ( "Date" ), "starttime", "10%", "center", "SORT", "19", "", "", "", "", "", "display_dateformat" );
+$FG_TABLE_COL [] = array (gettext ( "Date" ), "starttime", "8%", "center", "SORT", "19", "", "", "", "", "", "display_dateformat" );
 $FG_TABLE_COL [] = array (gettext ( "CallerID" ), "src", "7%", "center", "SORT", "30" );
 $FG_TABLE_COL [] = array (gettext ( "DNID" ), "dnid", "7%", "center", "SORT", "30" );
-$FG_TABLE_COL [] = array (gettext ( "Phone Number" ), "calledstation", "10%", "center", "SORT", "30", "", "", "", "", "", "" );
+$FG_TABLE_COL [] = array (gettext ( "Phone Number" ), "calledstation", "9%", "center", "SORT", "30", "", "", "", "", "", "" );
 $FG_TABLE_COL [] = array (gettext ( "Destination" ), "dest","10%", "center", "SORT", "15", "lie", "cc_prefix", "destination,prefix", "prefix='%id'", "%1" );
-$FG_TABLE_COL [] = array (gettext ( "Buy Rate" ), "buyrate", "6%", "center", "SORT", "30", "", "", "", "", "", "display_2bill" );
-$FG_TABLE_COL [] = array (gettext ( "Sell Rate" ), "rateinitial", "6%", "center", "SORT", "30", "", "", "", "", "", "display_2bill" );
+$FG_TABLE_COL [] = array (gettext ( "Buy Rate" ), "buyrate", "5%", "center", "SORT", "30", "", "", "", "", "", "display_2bill" );
+$FG_TABLE_COL [] = array (gettext ( "Sell Rate" ), "rateinitial", "5%", "center", "SORT", "30", "", "", "", "", "", "display_2bill" );
 $FG_TABLE_COL [] = array (gettext ( "Duration" ), "sessiontime", "5%", "center", "SORT", "30", "", "", "", "", "", "display_minute" );
 $FG_TABLE_COL [] = array (gettext ( "Account" ), "card_id", "6%", "center", "sort", "", "lie_link", "cc_card", "username,id", "id='%id'", "%1", "", "A2B_entity_card.php" );
 $FG_TABLE_COL [] = array (gettext ( "Trunk" ), "trunkcode", "6%", "center", "SORT", "30" );
 $FG_TABLE_COL [] = array ('<acronym title="' . gettext ( "Terminate Cause" ) . '">' . gettext ( "TC" ) . '</acronym>', "terminatecauseid", "7%", "center", "SORT", "", "list", $dialstatus_list );
 $FG_TABLE_COL [] = array (gettext ( "CallType" ), "sipiax", "6%", "center", "SORT", "", "list", $list_calltype );
-$FG_TABLE_COL [] = array (gettext ( "Buy" ), "buycost", "7%", "center", "SORT", "30", "", "", "", "", "", "display_2bill" );
-$FG_TABLE_COL [] = array (gettext ( "Sell" ), "sessionbill", "7%", "center", "SORT", "30", "", "", "", "", "", "display_2bill" );
-$FG_TABLE_COL [] = array (gettext ( "Margin" ), "margin", "7%", "center", "SORT", "30", "", "", "", "", "", "display_2dec_percentage" );
-$FG_TABLE_COL [] = array (gettext ( "Markup" ), "markup", "7%", "center", "SORT", "30", "", "", "", "", "", "display_2dec_percentage" );
+$FG_TABLE_COL [] = array (gettext ( "Buy" ), "buycost", "5%", "center", "SORT", "30", "", "", "", "", "", "display_2bill" );
+$FG_TABLE_COL [] = array (gettext ( "Sell" ), "sessionbill", "5%", "center", "SORT", "30", "", "", "", "", "", "display_2bill" );
+$FG_TABLE_COL [] = array (gettext ( "Margin" ), "margin", "5%", "center", "SORT", "30", "", "", "", "", "", "display_2dec_percentage" );
+$FG_TABLE_COL [] = array (gettext ( "Markup" ), "markup", "5%", "center", "SORT", "30", "", "", "", "", "", "display_2dec_percentage" );
 
 if (LINK_AUDIO_FILE) {
-	$FG_TABLE_COL [] = array ("", "uniqueid", "1%", "center", "", "30", "", "", "", "", "", "linkonmonitorfile" );
+	$FG_TABLE_COL [] = array ("", "uniqueid", "10%", "center", "", "30", "", "", "", "", "", "linkonmonitorfile" );
 }
 
 if (has_rights (ACX_DELETE_CDR)) {
@@ -351,8 +351,11 @@ if ($FG_DEBUG == 3)
 
 $smarty->display ( 'main.tpl' );
 
-?>
-
+if (LINK_AUDIO_FILE && $nb_record){ echo '
+<script src="./javascript/WavPlayer/domready.js"></script>
+<script src="./javascript/WavPlayer/swfobject.js"></script>
+<script src="./javascript/WavPlayer/wavplayer.js"></script>
+';}?>
 
 <!-- ** ** ** ** ** Part for the research ** ** ** ** ** -->
 <center>
@@ -963,7 +966,7 @@ $smarty->display ( 'main.tpl' );
 echo gettext ( "Number of call" );
 ?> : <?php
 if (is_array ( $list ) && count ( $list ) > 0) {
-	echo $nb_record;
+	echo $nb_record . "<h3></h3>";
 } else {
 	echo "0";
 }
