@@ -339,7 +339,12 @@ if ($FG_DEBUG == 3)
 
 $smarty->display ( 'main.tpl' );
 
-?>
+if (LINK_AUDIO_FILE && $nb_record){ echo '
+<script src="./javascript/WavPlayer/domready.js"></script>
+<script src="./javascript/WavPlayer/swfobject.js"></script>
+<script src="./javascript/WavPlayer/wavplayer.js"></script>
+';}?>
+
 <script language="JavaScript" type="text/JavaScript">
 <!--
 function MM_openBrWindow(theURL,winName,features) { //v2.0
@@ -938,7 +943,7 @@ function MM_openBrWindow(theURL,winName,features) { //v2.0
 echo gettext ( "Number of call" );
 ?> : <?php
 if (is_array ( $list ) && count ( $list ) > 0) {
-	echo $nb_record;
+	echo $nb_record . "<h3></h3>";
 } else {
 	echo "0";
 }
