@@ -1407,8 +1407,9 @@ class RateEngine
 						$A2B->uniqueid++;
 						$dl_short = MONITOR_PATH . "/" . $A2B->uniqueid . ".";
 					}
-					$myres = $agi->exec("MixMonitor {$dl_short}{$A2B->agiconfig['monitor_formatfile']},b");
-					$A2B -> debug( INFO, $agi, __FILE__, __LINE__, "EXEC MixMonitor ". MONITOR_PATH ."/{$A2B->uniqueid}.{$A2B->agiconfig['monitor_formatfile']},b");
+					$command_mixmonitor = $A2B -> format_parameters ("MixMonitor {$dl_short}{$A2B->agiconfig['monitor_formatfile']}|b");
+					$myres = $agi->exec($command_mixmonitor);
+					$A2B -> debug( INFO, $agi, __FILE__, __LINE__, "EXEC " . $command_mixmonitor);
 				}
 				// Count this call on the trunk
 				$this -> trunk_start_inuse($agi, $A2B, 1);
@@ -1611,8 +1612,9 @@ class RateEngine
 							$A2B->uniqueid++;
 							$dl_short = MONITOR_PATH . "/" . $A2B->uniqueid . ".";
 						}
-						$myres = $agi->exec("MixMonitor {$dl_short}{$A2B->agiconfig['monitor_formatfile']},b");
-						$A2B -> debug( INFO, $agi, __FILE__, __LINE__, "EXEC MixMonitor ". MONITOR_PATH ."/{$A2B->uniqueid}.{$A2B->agiconfig['monitor_formatfile']},b");
+						$command_mixmonitor = $A2B -> format_parameters ("MixMonitor {$dl_short}{$A2B->agiconfig['monitor_formatfile']}|b");
+						$myres = $agi->exec($command_mixmonitor);
+						$A2B -> debug( INFO, $agi, __FILE__, __LINE__, "EXEC ". $command_mixmonitor);
 					}
 					$pos_dialingnumber = strpos($ipaddress, '%dialingnumber%');
 					$ipaddress = str_replace("%cardnumber%", $A2B->cardnumber, $ipaddress);
