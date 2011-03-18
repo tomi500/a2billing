@@ -54,14 +54,33 @@ $HD_Form -> FG_FILTER_APPLY = false;
 $HD_Form -> FG_LIST_ADDING_BUTTON1 = false;
 $HD_Form -> FG_LIST_ADDING_BUTTON2 = false;
 
-getpost_ifset(array('nb_to_create', 'creditlimit', 'cardnum', 'choose_tariff', 'gen_id', 'cardnum', 'choose_simultaccess', 
+getpost_ifset(array('nb_to_create', 'initial_credit', 'creditlimit', 'cardnum', 'choose_tariff', 'gen_id', 'cardnum', 'choose_simultaccess', 
 	'choose_currency', 'choose_typepaid', 'creditlimit', 'enableexpire', 'expirationdate', 'expiredays', 'runservice', 'sip', 'iax',
 	'cardnumberlenght_list', 'tag', 'id_group', 'discount', 'id_seria'));
 
 
-$HD_Form -> setDBHandler (DbConnect());
+//=============================== Get Balance ====================================
+$QUERY = "SELECT  credit, currency FROM cc_agent WHERE id = '".$_SESSION['agent_id']."'";
+$DBHandle_max = DbConnect();
+$numrow = 0;
+$resmax = $DBHandle_max -> Execute($QUERY);
+if ($resmax)
+        $numrow = $resmax -> RecordCount();
 
+if ($numrow == 0) exit();
+$agent_info =$resmax -> fetchRow();
+if (!isset($currencies_list[strtoupper($agent_info [1])][2]) || !is_numeric($currencies_list[strtoupper($agent_info [1])][2])){
+        $mycur = 1;
+}else{
+        $mycur = $currencies_list[strtoupper($agent_info [1])][2];
+}
+$credit_cur = $agent_info[0] / $mycur;
+$credit_cur = round($credit_cur,3);
+//=============================== Get Balance ====================================
 
+$HD_Form -> setDBHandler ($DBHandle_max);
+
+$initial_credit = ($initial_credit!="") ? $initial_credit : 0;
 $nb_error = 0;
 $msg_error = '';
 $group_error = false;
@@ -100,6 +119,14 @@ if ($action=="generate") {
 		if (!empty ($msg_error))
 			$msg_error .= "<br/>";
 		$msg_error .= gettext("- Choose the number of customers that you want generate!");
+	}
+	
+	if (!is_numeric($initial_credit) || $initial_credit < 0 || $initial_credit * $nb_to_create > $credit_cur) {
+		$nb_error++;
+		$number_error = true;
+		if (!empty ($msg_error))
+			$msg_error .= "<br/>";
+		$msg_error .= gettext("- Choose correct initial amount of credit!");
 	}
 }
 $nbcard = $nb_to_create;
@@ -145,6 +172,7 @@ if ($nbcard>0 && $action=="generate" && $nb_error==0) {
 	$_SESSION["IDfilter"]=$gen_id;
 	
 	$creditlimit = is_numeric($creditlimit) ? $creditlimit : 0;
+	$sub_credit_amount = 0;
 	//initialize refill parameter
 	$description_refill = gettext("CREATION CARD REFILL");
 	$field_insert_refill = " credit,card_id, description";
@@ -154,7 +182,7 @@ if ($nbcard>0 && $action=="generate" && $nb_error==0) {
 		 $arr_card_alias = gen_card_with_alias("cc_card", 0, $cardnumberlenght_list);
 		 $cardnum = $arr_card_alias[0];
 		 $useralias = $arr_card_alias[1];
-		$addcredit=0;
+		$addcredit=$initial_credit;
 		$passui_secret = MDP_NUMERIC(10);
 		$FG_ADITION_SECOND_ADD_VALUE  = "'$cardnum', '$useralias', '$addcredit', '$choose_tariff', 't', '$gen_id', '', '', '', '', '', '', '', '', $choose_simultaccess, '$choose_currency', $choose_typepaid, $creditlimit, $enableexpire, '$expirationdate', $expiredays, '$passui_secret', '$runservice', '$tag', '$id_group', '$discount', '$id_seria'";
 		
@@ -169,6 +197,7 @@ if ($nbcard>0 && $action=="generate" && $nb_error==0) {
 		if($addcredit>0){
 			$value_insert_refill = "'$addcredit', '$id_cc_card', '$description_refill' ";
 			$instance_refill_table -> Add_table ($HD_Form -> DBHandle, $value_insert_refill, null, null);	
+			$sub_credit_amount += $addcredit;
 		}
 		
 		// Insert data for sip_buddy
@@ -192,6 +221,11 @@ if ($nbcard>0 && $action=="generate" && $nb_error==0) {
 			}
 		}
 	}
+
+	// Substract Agent credit
+	$QUERY = "UPDATE cc_agent SET credit=credit - '$sub_credit_amount' WHERE id = '".$_SESSION['agent_id']."'";
+	$DBHandle_max -> Execute($QUERY);
+
 
 	// Save Sip accounts to file
 	if (isset($sip)) {
@@ -368,7 +402,8 @@ $list_group = $instance_table_group  -> Get_list ($HD_Form ->DBHandle, $FG_TABLE
 	<br/>
 	
 	<strong>4)</strong> 
-	<?php echo gettext("Initial amount of credit");?> : 0 
+	<?php echo gettext("Initial amount of credit");?> : 
+	<input class="form_input_text" name="initial_credit" size="5" maxlength="5" value="<?php echo $initial_credit; ?>" >
 	<br/>
 	
 	<strong>5)</strong> 
