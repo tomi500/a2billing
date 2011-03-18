@@ -1489,7 +1489,7 @@ if (!defined('MONITOR_PATH')) define ("MONITOR_PATH",	isset($this->config['webui
 			$this->agiconfig['cid_enable']	= 0;
 			$this->accountcode 				= $inst_listdestination[6];
 			$this->tariff 					= $inst_listdestination[3];
-			$this->destination 				= $inst_listdestination[4];
+			$this->destination 				= $inst_listdestination[10];
 			$this->username 				= $inst_listdestination[6];
 			$this->useralias 				= $inst_listdestination[7];
 			
@@ -1600,7 +1600,7 @@ if (!defined('MONITOR_PATH')) define ("MONITOR_PATH",	isset($this->config['webui
                             " terminatecauseid, stoptime, sessionbill, id_tariffgroup, id_tariffplan, id_ratecard, id_trunk, src, sipiax) VALUES ".
                             "('".$this->uniqueid."', '".$this->channel."',  '".$this->id_card."', '".$this->hostname."',";
                     $QUERY .= " CURRENT_TIMESTAMP - INTERVAL $answeredtime SECOND ";
-                    $QUERY .= ", '$answeredtime', '".$inst_listdestination[4]."', '$terminatecauseid', now(), '0', '0', '0', '0', '0', '$this->CallerID', '3' )";
+                    $QUERY .= ", '$answeredtime', '".$inst_listdestination[10]."', '$terminatecauseid', now(), '0', '0', '0', '0', '0', '$this->CallerID', '3' )";
 
                     $result = $this -> instance_table -> SQLExec ($this->DBHandle, $QUERY, 0);
                     $this -> debug( INFO, $agi, __FILE__, __LINE__, "[DID CALL - LOG CC_CALL: SQL: $QUERY]:[result:$result]");
@@ -1639,7 +1639,8 @@ if (!defined('MONITOR_PATH')) define ("MONITOR_PATH",	isset($this->config['webui
                     $result = $this->instance_table -> SQLExec ($this -> DBHandle, $QUERY, 0);
                     $this -> debug( INFO, $agi, __FILE__, __LINE__, "[UPDATE DID_DESTINATION]:[result:$result]");
                     
-                    $this -> bill_did_aleg ($agi, $listdestination[0], $answeredtime);
+                    #This is a call from user to DID, we dont want to charge the A-leg
+                    //$this -> bill_did_aleg ($agi, $listdestination[0], $answeredtime);
                     
                 }
 
@@ -1713,7 +1714,8 @@ if (!defined('MONITOR_PATH')) define ("MONITOR_PATH",	isset($this->config['webui
                         $this -> debug( INFO, $agi, __FILE__, __LINE__, "[DID CALL - UPDATE CARD: SQL: $QUERY]:[result:$result]");
                     }
                     
-                    $this -> bill_did_aleg ($agi, $listdestination[0], $answeredtime);
+                    #This is a call from user to DID, we dont want to charge the A-leg
+                    //$this -> bill_did_aleg ($agi, $listdestination[0], $answeredtime);
                     
                     break;
                 }
@@ -1837,7 +1839,7 @@ if (!defined('MONITOR_PATH')) define ("MONITOR_PATH",	isset($this->config['webui
                 // update card
                 $QUERY = "UPDATE cc_card SET credit= credit - ".a2b_round($aleg_retail_cost)." WHERE username='".$this->username."'";
                 $result = $this -> instance_table -> SQLExec ($this->DBHandle, $QUERY, 0);
-                $this -> debug( INFO, $agi, __FILE__, __LINE__, "[DID CALL - UPDATE CARD: SQL: $QUERY]:[result:$result]");
+                $this -> debug( INFO, $agi, __FILE__, __LINE__, "[DID CALL - (id_card=".$this->id_card.") UPDATE CARD: SQL: $QUERY]:[result:$result]");
             }
         }
     }
