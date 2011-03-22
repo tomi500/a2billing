@@ -1223,7 +1223,7 @@ class RateEngine
 			$prefix			= $this -> ratecard_obj[$k][$usetrunk+1];
 			$tech 			= $this -> ratecard_obj[$k][$usetrunk+2];
 			$ipaddress 		= $this -> ratecard_obj[$k][$usetrunk+3];
-			$removeprefix		= $this -> ratecard_obj[$k][$usetrunk+4];
+			$removeprefix		= explode(",",$this -> ratecard_obj[$k][$usetrunk+4]);
 			$timeout		= $this -> ratecard_obj[$k]['timeout'];
 			$musiconhold		= $this -> ratecard_obj[$k][39];
 			$failover_trunk		= $this -> ratecard_obj[$k][40+$usetrunk_failover];
@@ -1236,8 +1236,14 @@ class RateEngine
 			if ($cidgroupid == -1) $cidgroupid = $cidgroupidrate;
 
 //			if (preg_match("/^".$removeprefix."/", $destination)) {
-			if (strncmp($destination, $removeprefix, strlen($removeprefix)) == 0){
-				$destination= substr($destination, strlen($removeprefix));
+//			if (strncmp($destination, $removeprefix, strlen($removeprefix)) == 0){
+//				$destination= substr($destination, strlen($removeprefix));
+//			}
+
+			if (is_array($removeprefix) && count($removeprefix)>0) {
+				foreach ($removeprefix as $testprefix) {
+					if (substr($destination,0,strlen($testprefix))==$testprefix) $destination = substr($destination,strlen($testprefix));
+				}
 			}
 
 			$max_len_prefix = min(strlen($destination), 15);
@@ -1469,7 +1475,7 @@ class RateEngine
 					$prefix			= $result[0][0];
 					$tech			= $result[0][1];
 					$ipaddress		= $result[0][2];
-					$removeprefix		= $result[0][3];
+					$removeprefix		= explode(",",$result[0][3]);
 					$next_failover_trunk	= $result[0][4];
 					$status			= $result[0][5];
 					$inuse			= $result[0][6];
@@ -1479,9 +1485,14 @@ class RateEngine
 					$addparameter		= $result[0][10];
 					if ($cidgroupid == -1) $cidgroupid = $cidgroupidrate;
 					
-					if (strncmp($destination, $removeprefix, strlen($removeprefix)) == 0)
-					$destination= substr($destination, strlen($removeprefix));
-					$this -> destination = $destination;
+//					if (strncmp($destination, $removeprefix, strlen($removeprefix)) == 0)
+//					$destination= substr($destination, strlen($removeprefix));
+//					$this -> destination = $destination;
+					if (is_array($removeprefix) && count($removeprefix)>0) {
+						foreach ($removeprefix as $testprefix) {
+							if (substr($destination,0,strlen($testprefix))==$testprefix) $destination = substr($destination,strlen($testprefix));
+						}
+					}
 
 					$max_len_prefix = min(strlen($destination), 15);
 					$this -> prefixclause = '(';
