@@ -1423,10 +1423,9 @@ class RateEngine
 				$agi -> set_variable('__CHANNELCIDNUM', $destination);
 				$agi -> set_variable('__CALACCOUNT', $A2B->cardnumber);
 				$myres = $A2B -> run_dial($agi, $dialstr);
-				//exec('Dial', trim("$type/$identifier|$timeout|$options|$url", '|'));
 
 				$A2B -> debug( INFO, $agi, __FILE__, __LINE__, "DIAL $dialstr");
-				
+
 				// check connection after dial(long pause) 
 				$A2B -> DbReConnect($agi);  
 				

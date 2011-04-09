@@ -1523,6 +1523,12 @@ if (!defined('MONITOR_PATH')) define ("MONITOR_PATH",	isset($this->config['webui
                     // Dial(IAX2/guest@misery.digium.com/s@default)
                     $myres = $this -> run_dial($agi, $dialstr);
                     $this -> debug( INFO, $agi, __FILE__, __LINE__, "DIAL $dialstr");
+		    if (strpos($dialstr,'&')) {
+			$dialedpeernumber = $agi->get_variable("DIALEDPEERNUMBER");
+			$inst_listdestination[10] = $dialedpeernumber['data'];
+			$this -> debug( ERROR, $agi, __FILE__, __LINE__, "Destination = " . $inst_listdestination[10]);
+		    }
+
                 } else {
                     
                     $this -> debug( INFO, $agi, __FILE__, __LINE__, "TIME TO CALL : $time2call");
