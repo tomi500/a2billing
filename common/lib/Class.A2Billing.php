@@ -1339,6 +1339,11 @@ if (!defined('MONITOR_PATH')) define ("MONITOR_PATH",	isset($this->config['webui
 						} else {
 							$terminatecauseid = 0;
 						}
+						if (strpos($dialstr,'&')) {
+							$dialedpeernumber = $agi->get_variable("DIALEDPEERNUMBER");
+							$inst_listdestination[4] = $dialedpeernumber['data'];
+							$this -> debug( INFO, $agi, __FILE__, __LINE__, "Destination: " . $inst_listdestination[4]);
+						}
 						
 						$QUERY = "INSERT INTO cc_call (uniqueid, sessionid, card_id, nasipaddress, starttime, sessiontime, calledstation, ".
 							" terminatecauseid, stoptime, sessionbill, id_tariffgroup, id_tariffplan, id_ratecard, id_trunk, src, sipiax) VALUES ".
@@ -1504,13 +1509,13 @@ if (!defined('MONITOR_PATH')) define ("MONITOR_PATH",	isset($this->config['webui
 				
                 // RUN MIXMONITOR TO RECORD CALL
 		if ($this->monitor == 1 || $this->agiconfig['record_call'] == 1) {
-					$command_mixmonitor = "MixMonitor ". MONITOR_PATH ."/{$this->uniqueid}.{$this->agiconfig['monitor_formatfile']}|b";
+					$command_mixmonitor = "MixMonitor {$this->uniqueid}.{$this->agiconfig['monitor_formatfile']}|b";
 					$command_mixmonitor = $this -> format_parameters ($command_mixmonitor);
 					$myres = $agi->exec($command_mixmonitor);
 					$this -> debug( INFO, $agi, __FILE__, __LINE__, $command_mixmonitor);
-				}
+		}
 				
-				$max_long = 2147483647; //Maximum value for long type in C++. This will be used to avoid overflow when sending large numbers to Asterisk
+		$max_long = 2147483647; //Maximum value for long type in C++. This will be used to avoid overflow when sending large numbers to Asterisk
                 if ($call_did_free) {
                     $this -> fct_say_time_2_call($agi,$time2call,0);
                     $dialparams = $this->agiconfig['dialcommand_param_call_2did'];
@@ -1523,11 +1528,6 @@ if (!defined('MONITOR_PATH')) define ("MONITOR_PATH",	isset($this->config['webui
                     // Dial(IAX2/guest@misery.digium.com/s@default)
                     $myres = $this -> run_dial($agi, $dialstr);
                     $this -> debug( INFO, $agi, __FILE__, __LINE__, "DIAL $dialstr");
-		    if (strpos($dialstr,'&')) {
-			$dialedpeernumber = $agi->get_variable("DIALEDPEERNUMBER");
-			$inst_listdestination[10] = $dialedpeernumber['data'];
-			$this -> debug( ERROR, $agi, __FILE__, __LINE__, "Destination = " . $inst_listdestination[10]);
-		    }
 
                 } else {
                     
@@ -1536,20 +1536,9 @@ if (!defined('MONITOR_PATH')) define ("MONITOR_PATH",	isset($this->config['webui
                     $dialparams = str_replace("%timeout%", min($time2call * 1000, $max_long), $this->agiconfig['dialcommand_param']);
                     $dialparams = str_replace("%timeoutsec%", min($time2call, $max_long), $dialparams);
 
-		    if ($this->monitor == 1 || $this -> agiconfig['record_call'] == 1) {
-//				        $command_mixmonitor = "MixMonitor ". MONITOR_PATH ."/{$this->uniqueid}.{$this->agiconfig['monitor_formatfile']}|b";
-				        $command_mixmonitor = "MixMonitor {$this->uniqueid}.{$this->agiconfig['monitor_formatfile']}|b";
-				        $command_mixmonitor = $this -> format_parameters ($command_mixmonitor);
-				        $myres = $agi->exec($command_mixmonitor);
-				        $this -> debug( INFO, $agi, __FILE__, __LINE__, $command_mixmonitor);
-                    }
                     $dialstr 	= $inst_listdestination[4].$dialparams;
                     $myres = $this -> run_dial($agi, $dialstr);
                     $this -> debug( INFO, $agi, __FILE__, __LINE__, "DIAL $dialstr");
-		    if ($this->monitor == 1 || $this -> agiconfig['record_call'] == 1) {
-                        $myres = $agi->exec("StopMixMonitor");
-                        $this -> debug( INFO, $agi, __FILE__, __LINE__, "EXEC StopMixMonitor (".$this->uniqueid.")");
-                    }
                 }
 
                 $answeredtime 	= $agi->get_variable("ANSWEREDTIME");
@@ -1600,7 +1589,12 @@ if (!defined('MONITOR_PATH')) define ("MONITOR_PATH",	isset($this->config['webui
                     } else {
 						$terminatecauseid = 0;
                     }
-                    
+		    if (strpos($dialstr,'&')) {
+			$dialedpeernumber = $agi->get_variable("DIALEDPEERNUMBER");
+			$inst_listdestination[10] = $dialedpeernumber['data'];
+			$this -> debug( INFO, $agi, __FILE__, __LINE__, "Destination: " . $inst_listdestination[10]);
+		    }
+
                     /* CDR B-LEG OF DID CALL */
                     $QUERY = "INSERT INTO cc_call (uniqueid, sessionid, card_id, nasipaddress, starttime, sessiontime, calledstation, ".
                             " terminatecauseid, stoptime, sessionbill, id_tariffgroup, id_tariffplan, id_ratecard, id_trunk, src, sipiax) VALUES ".
