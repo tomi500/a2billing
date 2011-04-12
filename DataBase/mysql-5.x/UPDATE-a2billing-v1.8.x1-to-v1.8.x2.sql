@@ -38,3 +38,6 @@ CREATE TABLE IF NOT EXISTS `cc_trunk_rand` (
   `trunkpercentage` int(11) NOT NULL DEFAULT '0',
   PRIMARY KEY (`trunk_id`,`trunk_dependa`,`trunk_dependb`)
 ) ENGINE=MyISAM DEFAULT CHARSET=utf8 COLLATE=utf8_bin;
+
+ALTER TABLE cc_invoice_conf CHANGE value value VARCHAR( 250 ) CHARACTER SET utf8 COLLATE utf8_bin NOT NULL;
+INSERT INTO cc_invoice_conf (key_val) VALUES ('comments');

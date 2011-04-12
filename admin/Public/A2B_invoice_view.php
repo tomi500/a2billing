@@ -108,6 +108,10 @@ $conf_clause = "key_val = 'vat'";
 $result = $invoice_conf_table -> Get_list($DBHandle, $conf_clause, 0);
 $vat_invoice = $result[0][0];
 
+$conf_clause = "key_val = 'comments'";
+$result = $invoice_conf_table -> Get_list($DBHandle, $conf_clause, 0);
+$comments = $result[0][0];
+
 $conf_clause = "key_val = 'display_account'";
 $result = $invoice_conf_table -> Get_list($DBHandle, $conf_clause, 0);
 $display_account = $result[0][0];
@@ -176,12 +180,23 @@ if(!$popup_select) {
        <div class="company-name"><?php echo $company_name ?></div>
        <div class="address"><span class="street"><?php echo $address ?></span> </div>
        <div class="zipcode-city"><span class="zipcode"><?php echo $zipcode ?></span> <span class="city"><?php echo $city ?></span></div>
-       <div class="country break"><?php echo $country ?></div>
-       <div class="phone"><?php echo gettext("tel").": ".$phone ?></div>
-       <div class="fax"><?php echo gettext("fax").": ".$fax ?> </div>
-       <div class="email"><?php echo gettext("mail").": ".$email ?></div>
-       <div class="web"><?php echo $web ?></div>
-       <div class="vat-number"><?php echo gettext("VAT nr.")." : ".$vat_invoice; ?></div>
+       <?php if(!empty($country)){ ?>
+           <div class="country break"><?php echo $country ?></div>
+       <?php }
+       if(!empty($phone)){ ?>
+           <div class="phone"><?php echo gettext("tel").": ".$phone ?></div>
+       <?php }
+       if(!empty($fax)){ ?>
+           <div class="fax"><?php echo gettext("fax").": ".$fax ?> </div>
+       <?php }
+       if(!empty($email)){ ?>
+           <div class="email"><?php echo gettext("mail").": ".$email ?></div>
+       <?php } ?>
+           <div class="web"><?php echo $web ?></div>
+       <?php if(!empty($vat_invoice)){ ?>
+           <div class="vat-number"><?php echo gettext("VAT nr.")." : ".$vat_invoice; ?></div>
+       <?php } ?>
+           <pre><div class="comments"><?php echo $comments ?></div></pre>
      </div>
     </td>
   </tr>
