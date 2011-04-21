@@ -1339,7 +1339,7 @@ if (!defined('MONITOR_PATH')) define ("MONITOR_PATH",	isset($this->config['webui
 						} else {
 							$terminatecauseid = 0;
 						}
-						if (strpos($dialstr,'&')) {
+						if (strpos($dialstr,'&') || strpos($dialstr,'@')) {
 							$dialedpeernumber = $agi->get_variable("DIALEDPEERNUMBER");
 							$inst_listdestination[4] = $dialedpeernumber['data'];
 							$this -> debug( INFO, $agi, __FILE__, __LINE__, "Destination: " . $inst_listdestination[4]);
@@ -1589,7 +1589,7 @@ if (!defined('MONITOR_PATH')) define ("MONITOR_PATH",	isset($this->config['webui
                     } else {
 						$terminatecauseid = 0;
                     }
-		    if (strpos($dialstr,'&')) {
+		    if (strpos($dialstr,'&') || strpos($dialstr,'@')) {
 			$dialedpeernumber = $agi->get_variable("DIALEDPEERNUMBER");
 			$inst_listdestination[10] = $dialedpeernumber['data'];
 			$this -> debug( INFO, $agi, __FILE__, __LINE__, "Destination: " . $inst_listdestination[10]);
