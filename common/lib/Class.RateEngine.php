@@ -1316,7 +1316,7 @@ class RateEngine
 								break 2;
 							}
 						}
-						if ($result[$valu_key][0]>0 || !is_numeric($result[$valu_key][0])) $valu_key=0;
+						if ($result[$valu_key][0]>=0 || !is_numeric($result[$valu_key][0])) $valu_key=0;
 						if ($result[$valu_key][2]<>$this->usedtrunk) {
 							$failover_trunk = $result[$valu_key][2];
 							break;
@@ -1562,7 +1562,7 @@ class RateEngine
 										continue 2;
 									}
 								}
-								if ($resultrand[$valu_key][0]>0 || !is_numeric($resultrand[$valu_key][0])) $valu_key=0;
+								if ($resultrand[$valu_key][0]>=0 || !is_numeric($resultrand[$valu_key][0])) $valu_key=0;
 								if ($resultrand[$valu_key][2]<>$this->usedtrunk) {
 									$failover_trunk = $resultrand[$valu_key][2];
 									$loop_failover--;
