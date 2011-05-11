@@ -41,3 +41,15 @@ CREATE TABLE IF NOT EXISTS `cc_trunk_rand` (
 
 ALTER TABLE cc_invoice_conf CHANGE value value VARCHAR( 250 ) CHARACTER SET utf8 COLLATE utf8_bin NOT NULL;
 INSERT INTO cc_invoice_conf (key_val) VALUES ('comments');
+
+ALTER TABLE cc_sip_buddies ADD (
+  `callbackextension` varchar(15) NOT NULL DEFAULT '',
+  `directmedia` varchar(15) NOT NULL DEFAULT 'update,nonat'
+);
+
+ALTER TABLE `cc_sip_buddies`
+  CHANGE `canreinvite` `canreinvite` VARCHAR( 20 ) CHARACTER SET utf8 COLLATE utf8_bin NOT NULL,
+  CHANGE `nat` `nat` CHAR( 3 ) CHARACTER SET utf8 COLLATE utf8_bin NULL DEFAULT NULL,
+  CHANGE `qualify` `qualify` CHAR( 7 ) CHARACTER SET utf8 COLLATE utf8_bin NULL DEFAULT NULL,
+  CHANGE `regseconds` `regseconds` VARCHAR( 15 ) CHARACTER SET utf8 COLLATE utf8_bin NOT NULL,
+  CHANGE `rtpkeepalive` `rtpkeepalive` VARCHAR( 15 ) CHARACTER SET utf8 COLLATE utf8_bin NOT NULL;
