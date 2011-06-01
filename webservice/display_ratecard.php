@@ -152,7 +152,7 @@ if ((substr($page_url, 0, 7) != 'http://') && (substr($page_url, 0, 8) != 'https
 if (!isset ($lcr) || strlen($lcr) == 0)
 	$lcr = 0;
 
-$parameter_to_send = "column_name=$column_name&field_type=$field_type&filter=$filter&resulttitle=$resulttitle";
+$parameter_to_send = "column_name=$column_name&field_type=$field_type&filter=$filter&resulttitle=$resulttitle&";
 if (strpos($page_url, '?') === false) {
     if (strpos($page_url, 'column_name') === false)
         $page_url .= '?'.$parameter_to_send;
@@ -213,14 +213,14 @@ for ($i = 0; $i < count($fltr); $i++) {
 			$FILTER_COUNTRY = true;
 			if (isset ($choose_country) && strlen($choose_country) != 0) {
 				add_clause($FG_TABLE_CLAUSE, "t7.destination REGEXP '^$choose_country'");
-				$current_page = 0;
+				#$current_page = 0;
 			}
 			break;
 		case "prefix" :
 			$FILTER_PREFIX = true;
 			if (isset ($searchpre) && strlen($searchpre) != 0) {
 				add_clause($FG_TABLE_CLAUSE, "t1.dialprefix REGEXP '^$searchpre'");
-				$current_page = 0;
+				#$current_page = 0;
 			}
 			break;
 	}

@@ -8,7 +8,8 @@ such as calling card products, residential and wholesale VoIP termination,
 DID resale and callback services.
 
 A2Billing is commercially supported by Star2Billing S.L, where installation 
-services, consultancy and support is available : 
+services, consultancy and support is available.
+
 see http://www.star2billing.com/ for more details
 
 
@@ -32,7 +33,7 @@ Info
     http://www.asterisk2billing.org/cgi-bin/trac.cgi/report
 
 
-Support 
+Support
 -------
 
 Star2Billing S.L. offers consultancy including installation, training and customisation 
