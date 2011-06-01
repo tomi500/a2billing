@@ -147,6 +147,7 @@ $HD_Form -> AddEditElement (gettext("FAX NUMBER"),
 			   gettext("Insert the fax number of the customers"),
 			   "" , "", "",	"", "", "" , "NO", "");
 
+if ($ACXSEERECORDING){
 $HD_Form -> AddEditElement (gettext("RECORD CALL"),
 			   "monitor",
 			   '0',
@@ -155,6 +156,7 @@ $HD_Form -> AddEditElement (gettext("RECORD CALL"),
 			   "",
 			   gettext("Enable to monitor the call (to record all the conversations) value : YES - NO"),
 			   "" , "", "", "Yes :1, - No:0", "", "" , "", gettext("Define if you want to record all the conversations"));
+}
 
 $HD_Form -> AddEditElement (gettext("RECALL DAYS"),
 			   "recalldays",
@@ -188,9 +190,11 @@ if (ACT_VOICEMAIL) {
 $add_fields_voicemail = '';
 if (ACT_VOICEMAIL)
 	$add_fields_voicemail = ', voicemail_activated ';
+$add_fields_monitor = '';
+if ($ACXSEERECORDING)
+	$add_fields_monitor = ', monitor';
 
-
-$HD_Form -> FieldEditElement ('lastname, firstname, address, city, state, country, zipcode, id_timezone, phone, fax, monitor, recalldays, recalltime'.$add_fields_voicemail);
+$HD_Form -> FieldEditElement ('lastname, firstname, address, city, state, country, zipcode, id_timezone, phone, fax'.$add_fields_monitor.', recalldays, recalltime'.$add_fields_voicemail);
 
 $HD_Form -> FG_INTRO_TEXT_ADD = gettext("you can add easily update your information clicking on the button.");
 

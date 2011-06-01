@@ -95,7 +95,7 @@ if (isset($form_action) && ($form_action=='ask-edit' || $form_action=='edit')) {
 	    
 	} else {
 	    // It's not a Voip call, check if we don't try to inject
-	    $destination = (intval($destination)) ? preg_replace("|[^0-9]|", "", $destination) : 'no valid';
+	    $destination = (intval($destination) > 0) ? preg_replace("|\D|", "", $destination) : 'no valid';
 	    //echo "Validity check ($destination)";
 	}
 	
