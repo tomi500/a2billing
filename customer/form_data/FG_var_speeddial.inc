@@ -39,8 +39,8 @@ $HD_Form = new FormHandler("cc_speeddial","speeddial");
 
 $HD_Form -> FG_DEBUG = 0;
 // FAQ
-$HD_Form -> FG_TABLE_DEFAULT_ORDER = " creationdate";
-$HD_Form -> FG_TABLE_DEFAULT_SENS = "DESC";
+$HD_Form -> FG_TABLE_DEFAULT_ORDER = "speeddial";
+$HD_Form -> FG_TABLE_DEFAULT_SENS = "ASC";
 
 
 $speeddial_list = array();

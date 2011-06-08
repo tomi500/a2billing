@@ -58,7 +58,7 @@
 				<li><a href="card-history.php?section=1">{php} echo gettext("Card History");{/php}</a></li>
 				{/if}
 				{if ($ACXVOIPCONF > 0) }
-				<li><a href="A2B_entity_friend.php?section=1">{php} echo gettext("VOIP Config");{/php}</a></li>
+				<li><a href="A2B_entity_friend.php?atmenu=sip&section=1">{php} echo gettext("VOIP Config");{/php}</a></li>
 				{/if}
 		</ul></li>
 	</ul>

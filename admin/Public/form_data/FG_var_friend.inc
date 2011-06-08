@@ -59,8 +59,8 @@ $yesno = Constants::getYesNoList();
 
 
 $HD_Form -> AddViewElement(gettext("CARDHOLDER"), "id_cc_card", "17%", "center", "sort", "25", "lie", "cc_card", "lastname, firstname", "id='%id'", "%1 %2");
-$HD_Form -> AddViewElement(gettext("USERNAME"), "username", "15%", "center", "sort", "", "30", "", "", "", "", "linktocustomer");
-$HD_Form -> AddViewElement(gettext("ACCOUNTCODE"), "accountcode", "12%", "center", "sort");
+$HD_Form -> AddViewElement(gettext("NAME"), "name", "15%", "center", "sort");
+$HD_Form -> AddViewElement(gettext("ACCOUNTCODE"), "accountcode", "12%", "center", "sort", "", "", "", "", "", "", "linktocustomer");
 $HD_Form -> AddViewElement(gettext("SECRET"), "secret", "12%", "center", "sort");
 $HD_Form -> AddViewElement(gettext("CALLERID"), "callerid", "15%", "center", "sort");
 $HD_Form -> AddViewElement(gettext("CONTEXT"), "context", "10%", "center", "sort");
@@ -79,7 +79,7 @@ $HD_Form ->FG_LIST_ADDING_BUTTON_IMG1 = Images_Path ."/telephone_add.png" ;
 
 
 
-$HD_Form -> FieldViewElement ('id_cc_card, username, accountcode, secret, callerid, context, defaultip');
+$HD_Form -> FieldViewElement ('id_cc_card, name, accountcode, secret, callerid, context, defaultip');
 
 
 $HD_Form -> CV_NO_FIELDS  = gettext("THERE IS NO ".strtoupper($HD_Form->FG_INSTANCE_NAME)." CREATED!"); 
@@ -132,7 +132,7 @@ $HD_Form -> AddEditElement (gettext("ID CARD"),
 							"id_cc_card",
 							'',
 							"POPUPVALUE",
-							"size=30 maxlength=50",
+							"size=30 maxlength=50 readonly",
 							"4",
 							gettext("Insert the Id CardNumber"),
 							"", "", "", "", "",
@@ -155,7 +155,7 @@ $HD_Form -> AddEditElement (gettext("ACCOUNTCODE"),
                            "accountcode",
                            '',
                            "INPUT",
-                           "size=20 $maxi maxlength=50",
+                           "size=20 $maxi maxlength=50 readonly",
                            "",
                            gettext("Insert the accountcode"),
                            "", "", "", "", "", "",	"", "" );
@@ -373,7 +373,7 @@ if ($atmenu=='sip') {
 	                           "username",
 	                           '',
 	                           "INPUT",
-	                           "size=50 $maxi maxlength=40",
+	                           "size=50 maxlength=40",
 	                           "",
 	                           gettext("Insert the username"),
 	                           "", "", "", "", "", "",	"", "" );
@@ -949,7 +949,7 @@ if ($atmenu=='sip') {
 $HD_Form -> FieldEditElement ($field_list_edit);
 
 $HD_Form -> FG_FILTER_APPLY = true;
-$HD_Form -> FG_FILTERFIELD = 'username';
+$HD_Form -> FG_FILTERFIELD = 'name';
 $HD_Form -> FG_FILTERFIELDNAME = gettext('username');
 $HD_Form -> FG_FILTER_FORM_ACTION = 'list';
 

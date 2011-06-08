@@ -571,7 +571,7 @@ echo Display_Login_Button ($DBHandle, $id);
 			   </tr>
                <tr class="form_head">
                 <td class="tableBody"  width="15%" align="center" style="padding: 2px;">
-                 <?php echo gettext("USERNAME"); ?>
+                 <?php echo gettext("NAME"); ?>
                 </td>
                 <td class="tableBody"  width="20%" align="center" style="padding: 2px;">
                 <?php echo gettext("SECRET"); ?>
@@ -585,7 +585,7 @@ echo Display_Login_Button ($DBHandle, $id);
                ?>
                     <tr bgcolor="<?php echo $bg; ?>"  >
                         <td class="tableBodyRight"  background="../Public/templates/default/images/background_cells.gif" width="70%" align="center">
-                          <?php echo $sip_buddies['username']; ?>
+                          <?php echo $sip_buddies['name']; ?>
                         </td>
                         <td class="tableBodyRight"  background="../Public/templates/default/images/background_cells.gif" width="70%"  align="center">
                           <?php echo $sip_buddies['secret']; ?>

@@ -68,14 +68,14 @@ if (DELETE_FK_CARD) {
 	$HD_Form -> FG_FK_DELETE_MESSAGE = gettext("You are going to remove a card that have SIP/IAX accounts and/or CallerIDs attached to it ! Please confirm that you really want to remove this card ? ");
 }
 
-if (has_rights (ACX_GENERATE_CUSTOMER)) { 
+if (!($popup_select>=1) && has_rights (ACX_GENERATE_CUSTOMER)) { 
 	$HD_Form ->FG_LIST_ADDING_BUTTON1 = true;
 	$HD_Form ->FG_LIST_ADDING_BUTTON_LINK1 = "A2B_entity_card_multi.php?stitle=Card&section=".$_SESSION["menu_section"];
 	$HD_Form ->FG_LIST_ADDING_BUTTON_ALT1 = $HD_Form ->FG_LIST_ADDING_BUTTON_MSG1 = gettext("Generate Customers");
 	$HD_Form ->FG_LIST_ADDING_BUTTON_IMG1 = Images_Path ."/user_multi_add.png" ;
 }
 
-if (has_rights (ACX_CREATE_CUSTOMER)) { 
+if (!($popup_select>=1) && has_rights (ACX_CREATE_CUSTOMER)) { 
 	$HD_Form -> FG_ADDITION = true;
 	$HD_Form ->FG_LIST_ADDING_BUTTON2 = true;
 	$HD_Form ->FG_LIST_ADDING_BUTTON_LINK2 = "A2B_entity_card.php?form_action=ask-add&atmenu=card&stitle=Card&section=".$_SESSION["menu_section"];
@@ -173,9 +173,9 @@ $index=0;
 foreach ($show_list as $i => $value) {
 	if (array_key_exists($i,$show_fields)) {
 		$param = $show_fields[$i];
-		$param = $param+array("","","","","","");#expand array to max length
+		$param = $param + array("","","","","","");#expand array to max length
 		$size = "*";
-		$param7=$param[7];
+		$param7 = $param[7];
 		if ($param[6]=="eval"){
 			$param7 = str_replace('%C', '%'.$index, $param7);//because of dynamic nature need set current field for eval
 		};
@@ -201,7 +201,7 @@ if (strlen($FG_COL_QUERY_FIELD)>2){
 }
 $FG_COL_QUERY_COUNT = count(preg_split('/,/',$FG_COL_QUERY_FIELD));
 $FG_COL_QUERY_FIELD=$FG_COL_QUERY_FIELD.', cc_card.id as id_,username as username_,useralias as alias_ ';
-$HD_Form -> FieldViewElement ($FG_COL_QUERY.' '.$FG_COL_QUERY_FIELD);
+//$HD_Form -> FieldViewElement ($FG_COL_QUERY.' '.$FG_COL_QUERY_FIELD);
 $pos = strpos($FG_COL_QUERY_FIELD, "id");
 $FG_COL_QUERY_FIELD=substr_replace($FG_COL_QUERY_FIELD,"cc_card.",$pos,0);
 $HD_Form -> FieldViewElement ($FG_COL_QUERY.' '.$FG_COL_QUERY_FIELD);
@@ -275,6 +275,9 @@ if (($popup_select>=1)) {
 	
 	if (has_rights (ACX_EDIT_CUSTOMER)) {
 		$HD_Form -> FG_EDITION = true;
+		$maxi	= '';
+		$maxi2	= '';
+		$maxi3	= '';
 	}
 	
 	$HD_Form -> FG_INFO = true;
@@ -313,13 +316,6 @@ if (isset($filterprefix)  &&  (strlen($filterprefix)>0)) {
 	if (strlen($HD_Form -> FG_TABLE_CLAUSE)>0) $HD_Form -> FG_TABLE_CLAUSE.=" AND ";
 	$HD_Form -> FG_TABLE_CLAUSE.="username like '$filterprefix%'";
 }
-
-$HD_Form -> FG_EDITION = true;
-$HD_Form -> FG_DELETION = true;
-
-$maxi	= '';
-$maxi2	= '';
-$maxi3	= '';
 
 if (isset($form_action) && $form_action=="ask-add") {
 	if (!is_numeric($cardnumberlenght_list)) 	$cardnumberlenght_list = LEN_CARDNUMBER;

@@ -296,6 +296,8 @@ if ($terminatecauseid == "CANCEL") {
 	$FG_TABLE_CLAUSE .= " (t1.terminatecauseid=4) ";
 }
 
+if (!isset($resulttype)) $resulttype="min";
+
 if (! $nodisplay) {
 	$list = $instance_table->Get_list ( $DBHandle, $FG_TABLE_CLAUSE, $order, $sens, null, null, $FG_LIMITE_DISPLAY, $current_page * $FG_LIMITE_DISPLAY );
 }

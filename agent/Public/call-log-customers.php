@@ -275,6 +275,8 @@ if ($terminatecauseid == "CANCEL") {
 	$FG_TABLE_CLAUSE .= " (t1.terminatecauseid=4) ";
 }
 
+if (!isset($resulttype)) $resulttype="min";
+
 if (isset ($FG_TABLE_CLAUSE) && strlen($FG_TABLE_CLAUSE)>0){
 	$FG_TABLE_CLAUSE .= ' AND';
 }
@@ -875,21 +877,21 @@ function MM_openBrWindow(theURL,winName,features) { //v2.0
 				<td class="fontstyle_searchoptions">
 					<?php
 					echo gettext ( "mins" );
-					?><input type="radio" NAME="resulttype"
+					?> <input type="radio" NAME="resulttype"
 					value="min"
 					<?php
 					if ((! isset ( $resulttype )) || ($resulttype == "min")) {
 						?> checked
 					<?php
 					}
-					?>> - <?php
+					?>/> <?php
 					echo gettext ( "secs" )?> <input type="radio"
 					NAME="resulttype" value="sec" <?php
 					if ($resulttype == "sec") {
 						?>
 					checked <?php
 					}
-					?>></td>
+					?>/></td>
 			</tr>
 			<tr>
 				<td class="fontstyle_searchoptions">

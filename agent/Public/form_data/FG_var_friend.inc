@@ -33,8 +33,8 @@
 
 
 getpost_ifset(array('id_cc_card', 'cardnumber', 'id', 'name', 'amaflags', 'callgroup', 'accountcode', 'callerid', 'canreinvite', 'context', 'defaultip', 'dtmfmode', 
-'fromuser', 'fromdomain', 'host', 'insecure', 'language', 'mailbox', 'md5secret', 'nat', 'permit', 'deny', 'mask', 'pickupgroup', 'port', 'qualify', 
-'restrictcid', 'rtptimeout', 'rtpholdtimeout', 'secret', 'type', 'username', 'disallow', 'allow', 'musiconhold', 'regseconds', 'ipaddr', 'cancallforward', 'regexten','friend_id'));
+'fromuser', 'fromdomain', 'host', 'insecure', 'language', 'mailbox', 'md5secret', 'directmedia', 'nat', 'permit', 'deny', 'mask', 'pickupgroup', 'port', 'qualify', 
+'restrictcid', 'rtptimeout', 'rtpholdtimeout', 'secret', 'type', 'username', 'disallow', 'allow', 'musiconhold', 'regseconds', 'ipaddr', 'cancallforward', 'regexten','friend_id', 'callbackextension'));
 
 getpost_ifset(array('defaultuser', 'subscribemwi', 'vmexten', 'cid_number', 'callingpres', 'usereqphone', 'incominglimit', 'subscribecontext', 'musicclass', 'mohsuggest', 
 'allowtransfer', 'autoframing', 'maxcallbitrate', 'outboundproxy', 'regserver', 'rtpkeepalive', 'dbsecret ', 'regcontext ', 'sourceaddress ', 'mohinterpret ', 
@@ -66,19 +66,22 @@ if ($atmenu=='sip') {
 
 
 $HD_Form -> FG_DEBUG = 0;
+$HD_Form -> FG_TABLE_DEFAULT_ORDER = "name";
+$HD_Form -> FG_TABLE_DEFAULT_SENS = "DESC";
 $typepaid_list = Constants::getPaidTypeList();
 $actived_list =  Constants::getActivationTrueFalseList();
 $yesno = Constants::getYesNoList();
 
 
 
-$HD_Form -> AddViewElement(gettext("CARDHOLDER"), "id_cc_card", "17%", "center", "sort", "25", "lie", "cc_card", "lastname, firstname", "id='%id'", "%1 %2");
-$HD_Form -> AddViewElement(gettext("USERNAME"), "username", "15%", "center", "sort", "", "30", "", "", "", "", "linktocustomer");
-$HD_Form -> AddViewElement(gettext("ACCOUNTCODE"), "accountcode", "12%", "center", "sort");
-$HD_Form -> AddViewElement(gettext("SECRET"), "secret", "12%", "center", "sort");
-$HD_Form -> AddViewElement(gettext("CALLERID"), "callerid", "15%", "center", "sort");
-$HD_Form -> AddViewElement(gettext("CONTEXT"), "context", "10%", "center", "sort");
-$HD_Form -> AddViewElement(gettext("DEFAULTIP"), "defaultip", "10%", "center", "sort");
+$HD_Form -> AddViewElement(gettext("CARDHOLDER"), "id_cc_card", "16%", "center", "sort", "25", "lie", "cc_card", "lastname, firstname", "id='%id'", "%1 %2");
+$HD_Form -> AddViewElement(gettext("NAME"), "name", "10%", "center", "sort");
+$HD_Form -> AddViewElement(gettext("ACCOUNTCODE"), "accountcode", "13%", "center", "sort", "", "", "", "", "", "", "linktocustomer");
+$HD_Form -> AddViewElement(gettext("DEFAULTUSER"), "defaultuser", "11%", "center", "sort");
+$HD_Form -> AddViewElement(gettext("SECRET"), "secret", "11%", "center", "sort");
+$HD_Form -> AddViewElement(gettext("CALLERID"), "callerid", "12%", "center", "sort");
+$HD_Form -> AddViewElement(gettext("CONTEXT"), "context", "16%", "center", "sort");
+//$HD_Form -> AddViewElement(gettext("DEFAULTIP"), "defaultip", "10%", "center", "sort");
 
 $HD_Form ->FG_LIST_ADDING_BUTTON1 = true;
 $HD_Form ->FG_LIST_ADDING_BUTTON_LINK1 = "A2B_entity_friend.php?form_action=ask-add&atmenu=sip&section=1";
@@ -91,7 +94,7 @@ $HD_Form ->FG_LIST_ADDING_BUTTON_IMG1 = Images_Path ."/telephone_add.png" ;
 
 
 
-$HD_Form -> FieldViewElement ("id_cc_card, $table_name.name, accountcode, secret, callerid, context, defaultip");
+$HD_Form -> FieldViewElement ("id_cc_card, $table_name.name, accountcode, defaultuser, secret, callerid, context");
 
 
 $HD_Form -> CV_NO_FIELDS  = gettext("THERE IS NO ".strtoupper($HD_Form->FG_INSTANCE_NAME)." CREATED!"); 
@@ -128,14 +131,15 @@ if ($form_action=="ask-add") {
 if ($form_action=="ask-add" || $form_action == "add_sip" || $form_action == "add_iax") {
 	$AMAFLAGS_default= "value='".$A2B->config["peer_friend"]['amaflag']."'";
 	$TYPE_default= "value='friend'";
-	$NAT_default= "value='yes'";
-	$DTMFMODE_default= "value='RFC2833'";
-	$CANREINVITE_default= "value='yes'";
+	$DIRECTMEDIA_default= "value='update,nonat'";
+	$NAT_default= "value='".$A2B->config["peer_friend"]['nat']."'";
+	$DTMFMODE_default= "value='".$A2B->config["peer_friend"]['dtmfmode']."'";
+	$CANREINVITE_default= "value=''";
 	$DISALLOW_default= "value='all'";
-	$ALLOW_default= "value='ulaw,alaw,gsm,g729'";
+	$ALLOW_default= "value='".$A2B->config["peer_friend"]['allow']."'";
 	$HOST_default= "value='dynamic'";
 	$CONTEXT_default= "value='".$A2B->config["peer_friend"]['context']."'";
-	$REGSECONDS_default= "value='0'";
+	$REGSECONDS_default= "value=''";
 	$CANCALLFORWARD_default= "value='yes'";
 	$TRUNK_default= "value='yes'";
 }
@@ -144,7 +148,7 @@ $HD_Form -> AddEditElement (gettext("ID CARD"),
 							"id_cc_card",
 							'',
 							"POPUPVALUE",
-							"size=30 maxlength=50",
+							"size=30 maxlength=50 readonly",
 							"4",
 							gettext("Insert the Id CardNumber"),
 							"", "", "", "", "",
@@ -385,7 +389,7 @@ if ($atmenu=='sip') {
 	                           "username",
 	                           '',
 	                           "INPUT",
-	                           "size=50 $maxi maxlength=40",
+	                           "size=50 maxlength=40",
 	                           "",
 	                           gettext("Insert the username"),
 	                           "", "", "", "", "", "",	"", "" );
@@ -398,6 +402,16 @@ if ($atmenu=='sip') {
 	                           "",
 	                           gettext("Insert the md5secret"),
 	                           "", "", "", "", "", "",	"", "" );
+	
+	
+	$HD_Form -> AddEditElement (gettext("DIRECTMEDIA"),
+	                           "directmedia",
+	                           '4',
+	                           "INPUT",
+	                           "size=60 maxlength=50 $DIRECTMEDIA_default",
+	                           "",
+	                           gettext("Insert the directmedia"),
+	                           "", "", "", "", "", "",	"", gettext("directmedia = nonat | yes | update ( default : yes )") );
 	
 	
 	$HD_Form -> AddEditElement (gettext("NAT"),
@@ -694,7 +708,16 @@ if ($atmenu=='sip') {
 							   "",	
 							   "",
 							   "", "", "",	"", "", "",	"", "" );
-
+	
+	$HD_Form -> AddEditElement (gettext("CALLBACKEXTENSION"),
+							   "callbackextension",
+							   '',
+							   "INPUT",
+							   "size=15 maxlength=15",
+							   "",
+							   "",
+							   "", "", "", "", "", "", "", "" );
+	
 } else {
 	
 	$HD_Form -> AddEditElement (gettext("TRUNK"),
@@ -899,9 +922,9 @@ if ($atmenu=='sip') {
 $field_list_edit = 'id_cc_card, name, accountcode, regexten, callerid, cid_number, amaflags, secret, qualify, disallow, allow, host, context, defaultip, language, port, regseconds, ipaddr, mohsuggest, auth, setvar, type, deny, permit';
 
 if ($atmenu=='sip') {
-	$field_list_edit .= ', username, md5secret, nat, dtmfmode, canreinvite, callgroup, fromuser, fromdomain, insecure, mailbox, mask, pickupgroup, restrictcid, rtptimeout, rtpholdtimeout, ' .
+	$field_list_edit .= ', username, md5secret, directmedia, nat, dtmfmode, canreinvite, callgroup, fromuser, fromdomain, insecure, mailbox, mask, pickupgroup, restrictcid, rtptimeout, rtpholdtimeout, ' .
 			'musiconhold,  cancallforward, defaultuser, subscribemwi, vmexten, callingpres, usereqphone, incominglimit, subscribecontext, musicclass, allowtransfer, ' .
-			'autoframing, maxcallbitrate, outboundproxy, regserver, rtpkeepalive';
+			'autoframing, maxcallbitrate, outboundproxy, regserver, rtpkeepalive, callbackextension';
 } else {
 	$field_list_edit .= ', trunk, dbsecret, regcontext, sourceaddress, mohinterpret, inkeys, outkey,  sendani, fullname,  maxauthreq, encryption, transfer, jitterbuffer, ' .
 			'forcejitterbuffer, codecpriority, qualifysmoothing, qualifyfreqok, qualifyfreqnotok, timezone, adsi';
@@ -911,8 +934,8 @@ $HD_Form -> FieldEditElement ($field_list_edit);
 
 
 $HD_Form -> FG_FILTER_APPLY = true;
-$HD_Form -> FG_FILTERFIELD = 'username';
-$HD_Form -> FG_FILTERFIELDNAME = 'username';
+$HD_Form -> FG_FILTERFIELD = 'name';
+$HD_Form -> FG_FILTERFIELDNAME = gettext('username');
 $HD_Form -> FG_FILTER_FORM_ACTION = 'list';
 
 
