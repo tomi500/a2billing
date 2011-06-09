@@ -1434,7 +1434,7 @@ msgstr "Удалить эту"
 #: lib/Form/Class.FormHandler.inc.php:620
 #: lib/Form/Class.FormHandler.inc.php:831
 msgid "Edit this "
-msgstr "Редактировать эту"
+msgstr "Редактировать "
 
 #: lib/Form/Class.FormHandler.inc.php:651
 msgid "INSERTED"

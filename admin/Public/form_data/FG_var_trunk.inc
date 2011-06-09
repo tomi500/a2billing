@@ -40,7 +40,7 @@ getpost_ifset(array('id', 'trunkcode', 'trunkprefix', 'removeprefix', 'providert
 $DBHandle  = DbConnect();
 $instance_table = new Table();
 
-$HD_Form = new FormHandler("cc_trunk","trunk");
+$HD_Form = new FormHandler("cc_trunk",gettext("trunk"));
 
 $HD_Form ->FG_LIST_ADDING_BUTTON1 = true;
 $HD_Form ->FG_LIST_ADDING_BUTTON_LINK1 = "A2B_entity_trunk.php?form_action=ask-add&section=".$_SESSION["menu_section"];
