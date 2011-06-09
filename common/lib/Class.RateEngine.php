@@ -1157,18 +1157,30 @@ class RateEngine
 				}
 			}
 			if (is_array($result) && count($result)>0) {
-				$period		= $result[0][0] * 86400;
+				$period		= $result[0][0];
 				$periodexpiry	= $result[0][1];
 				$periodcount	= $result[0][2];
-				if ($period>1) {
+				if ($period == 31) {
+				    if ($periodexpiry <= time()) {
+					while ($periodexpiry <= time()) {
+					    $preperiodexpiry = $periodexpiry;
+					    $periodexpiry = strtotime('1 month', $periodexpiry);
+					    $periodcount = 0;
+					}
+				    } else $preperiodexpiry = strtotime('-1 month', $periodexpiry);
+				    $tqr .= $tqrperiod . "FROM_UNIXTIME($periodexpiry) ";
+				} else {
+				    $period *= 86400;
+				    if ($period>1) {
 					if ($periodexpiry <= time()) {
-						while ($periodexpiry <= time()) $periodexpiry = $periodexpiry + 86400;
-						$periodexpiry = $periodexpiry + $period - 86400;
-						$periodcount = 0;
+					    while ($periodexpiry <= time()) $periodexpiry += 86400;
+					    $periodexpiry += $period - 86400;
+					    $periodcount = 0;
 					}
 					$tqr .= $tqrperiod . "FROM_UNIXTIME($periodexpiry) ";
-				}
+				    }
 				$preperiodexpiry = $periodexpiry - $period;
+				}
 				if (time()-$sessiontime <= $preperiodexpiry && $period > 1 ) {
 					$limitsessiontime = time() - $preperiodexpiry;
 				} else {

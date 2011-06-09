@@ -4737,8 +4737,8 @@ msgid "Set the billing increment in seconds"
 msgstr "Блок тарификации в секундах"
 
 #: Public/form_data/FG_var_trunk.inc:
-msgid "Define period in days. Set '0' if you want define EXPIRY PERIOD only"
-msgstr "Период действия блока правил в днях, после которого EXPIRY PERIOD увеличится на заданное количество дней, а USED SECONDS PER PERIOD обнулится. Установите '0', чтобы не обновлялся EXPIRY PERIOD."
+msgid "Define period in days. Set '0' if you want define EXPIRY PERIOD only. Set '31' for per month period."
+msgstr "Период действия блока правил в днях, после которого EXPIRY PERIOD увеличится на заданное количество дней, а USED SECONDS PER PERIOD обнулится. Установите '0', чтобы не обновлялся EXPIRY PERIOD. Введите '31' для помесячного режима."
 
 #: Public/form_data/FG_var_trunk.inc:
 msgid "You can correct current period expiry. Format YYYY-MM-DD HH:MM:SS. This will auto increment in future."
@@ -4909,7 +4909,7 @@ msgstr ""
 #: Public/form_data/FG_var_ticket.inc:173
 #: Public/form_data/FG_var_ticket_agent.inc:150
 msgid "Insert the description"
-msgstr ""
+msgstr "Вставьте описание"
 
 #: Public/form_data/FG_var_invoice.inc:200
 #: Public/form_data/FG_var_logrefill_agent.inc:150
@@ -4960,7 +4960,7 @@ msgstr "Ваш новый"
 #: Public/form_data/FG_var_payment_agent.inc:183
 #: Public/form_data/FG_var_currencies.inc:125
 msgid "Click 'Confirm Data' to continue."
-msgstr "Щелкните 'Пдтвердить данные' для продолжения"
+msgstr "Щёлкните 'Пoдтвердить данные' для продолжения"
 
 #: Public/form_data/FG_var_log_viewer.inc:81
 msgid "LOGLEVEL"

@@ -364,7 +364,7 @@ $HD_Form -> AddEditElement(gettext("PERIOD")." A",
 	"size=30 $def_billblocksec maxlength=20",
 	"4",
 	gettext("Insert the period")." A",
-	"" , "", "", "", "", "" , "NO", gettext("Define period in days. Set '0' if you want define EXPIRY PERIOD only"));
+	"" , "", "", "", "", "" , "NO", gettext("Define period in days. Set '0' if you want define EXPIRY PERIOD only. Set '31' for per month period."));
 
 $HD_Form -> AddEditElement(gettext("EXPIRY PERIOD")." A",
 	"periodexpirya",
