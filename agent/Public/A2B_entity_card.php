@@ -260,8 +260,11 @@ if ($popup_select) {
 ?>
 <SCRIPT LANGUAGE="javascript">
 <!-- Begin
-function sendValue(selvalue){
+function sendValue(selvalue, othervalue){
 	window.opener.document.<?php echo $popup_formname ?>.<?php echo $popup_fieldname ?>.value = selvalue;
+	if(othervalue && window.opener.document.<?php echo $popup_formname ?>.accountcode){
+	        window.opener.document.<?php echo $popup_formname ?>.accountcode.value = othervalue;
+	}
 	window.close();
 }
 // End -->

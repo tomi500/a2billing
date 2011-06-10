@@ -264,7 +264,7 @@ if (($popup_select>=1)) {
 	$HD_Form -> FG_OTHER_BUTTON1_IMG = '';
 
 	if ($popup_select==1) {
-		$HD_Form -> FG_OTHER_BUTTON1_LINK = "javascript:sendValue('|param|');";
+		$HD_Form -> FG_OTHER_BUTTON1_LINK = "javascript:sendValue('|param|', '|col1|');";
 		//echo"<a title=\"Select Card\" href=\"javascript:sendValue('".$recordset[$FG_NB_TABLE_COL]."');\">&lt;Select Card&gt;</a>";
 	} elseif ($popup_select==2) {
 		$HD_Form -> FG_OTHER_BUTTON1_LINK = "javascript:sendValue('|col1|');";
@@ -308,7 +308,7 @@ if (($popup_select>=1)) {
 
 $HD_Form -> FG_FILTER_APPLY = true;
 $HD_Form -> FG_FILTERFIELD = 'cardnumber';
-$HD_Form -> FG_FILTERFIELDNAME = 'account number';
+$HD_Form -> FG_FILTERFIELDNAME = gettext('Account Number');
 $HD_Form -> FG_FILTER_FORM_ACTION = 'list';
 
 
