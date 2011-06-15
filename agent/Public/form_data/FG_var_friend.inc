@@ -84,7 +84,7 @@ $HD_Form -> AddViewElement(gettext("CONTEXT"), "context", "16%", "center", "sort
 //$HD_Form -> AddViewElement(gettext("DEFAULTIP"), "defaultip", "10%", "center", "sort");
 
 $HD_Form ->FG_LIST_ADDING_BUTTON1 = true;
-$HD_Form ->FG_LIST_ADDING_BUTTON_LINK1 = "A2B_entity_friend.php?form_action=ask-add&atmenu=sip&section=1";
+$HD_Form ->FG_LIST_ADDING_BUTTON_LINK1 = "A2B_entity_friend.php?form_action=ask-add&atmenu=$atmenu&section=1";
 if ($atmenu=='sip') {
 	$HD_Form ->FG_LIST_ADDING_BUTTON_ALT1 = $HD_Form ->FG_LIST_ADDING_BUTTON_MSG1 = gettext("Add SIP Friend");
 } else {
@@ -217,6 +217,34 @@ $HD_Form -> AddEditElement (gettext("AMAFLAGS"),
 						   "", "", "",	"", "", "",	"", "(default : billing)" );
 
 
+$HD_Form -> AddEditElement (gettext("CONTEXT"),
+						   "context",		
+						   '',	
+						   "INPUT",	
+						   "size=40 maxlength=40 $CONTEXT_default",	
+						   "",	
+						   gettext("Insert the context"),
+						   "", "", "",	"", "", "",	"", gettext("set the context for this user (default : a2billing )"));
+						   
+
+$HD_Form -> AddEditElement (gettext("TYPE"),
+                           "type",
+                           '',
+                           "INPUT",
+                           "size=10 maxlength=6 $TYPE_default",
+                           "",
+                           gettext("Insert the type"),
+                           "", "", "", "", "", "", "", gettext("type = friend | peer | user ( default : friend )"));
+if ($atmenu=='sip') {
+	$HD_Form -> AddEditElement (gettext("DEFAULTUSER"),
+			   "defaultuser",
+			   '',
+			   "INPUT",
+			   "size=10 maxlength=10",
+			   "",
+			   "",
+			   "", "", "", "", "", "", "", "" );
+}
 $HD_Form -> AddEditElement (gettext("SECRET"),
                            "secret",
                            '',
@@ -225,8 +253,55 @@ $HD_Form -> AddEditElement (gettext("SECRET"),
                            "",
                            gettext("Insert the secret"),
                            "", "", "", "", "", "",	"", "" );
+if ($atmenu=='sip') {
+	$HD_Form -> AddEditElement (gettext("USERNAME"),
+	                   "username",
+	                   '',
+	                   "INPUT",
+	                   "size=50 maxlength=40",
+	                   "",
+	                   gettext("Insert the username"),
+	                   "", "", "", "", "", "", "", "" );
 
-
+	$HD_Form -> AddEditElement (gettext("FROMUSER"),
+							   "fromuser",		
+							   '',	
+							   "INPUT",	
+							   "size=40 maxlength=40",	
+							   "",	
+							   gettext("Insert the fromuser"),
+							   "", "", "",	"", "", "",	"", "" );
+	
+	
+	$HD_Form -> AddEditElement (gettext("FROMDOMAIN"),
+							   "fromdomain",		
+							   '',	
+							   "INPUT",	
+							   "size=40 maxlength=40",	
+							   "",	
+							   gettext("Insert the fromdomain"),
+							   "", "", "",	"", "", "",	"", "" );
+	
+	
+	$HD_Form -> AddEditElement (gettext("INSECURE"),
+							   "insecure",		
+							   '',	
+							   "INPUT",	
+							   "size=20 maxlength=30",	
+							   "",	
+							   gettext("Insert the insecure"),
+							   "", "", "",	"", "", "",	"", "" );
+	
+	
+	$HD_Form -> AddEditElement (gettext("MAILBOX"),
+							   "mailbox",		
+							   '',	
+							   "INPUT",	
+							   "size=60 maxlength=50",	
+							   "",	
+							   gettext("Insert the mailbox"),
+							   "", "", "",	"", "", "",	"", "" );
+}
 $HD_Form -> AddEditElement (gettext("QUALIFY"),
                            "qualify",
                            '',
@@ -267,16 +342,6 @@ $HD_Form -> AddEditElement (gettext("HOST"),
                            "", "", "", "", "", "",	"", gettext("Use dynamic or set an IP ( default : dynamic )"));
 
 
-$HD_Form -> AddEditElement (gettext("CONTEXT"),
-						   "context",		
-						   '',	
-						   "INPUT",	
-						   "size=40 maxlength=40 $CONTEXT_default",	
-						   "",	
-						   gettext("Insert the context"),
-						   "", "", "",	"", "", "",	"", gettext("set the context for this user (default : a2billing )"));
-						   
-
 $HD_Form -> AddEditElement (gettext("DEFAULTIP"),
 						   "defaultip",		
 						   '',	
@@ -286,6 +351,51 @@ $HD_Form -> AddEditElement (gettext("DEFAULTIP"),
 						   gettext("Insert the defaultip"),
 						   "", "", "",	"", "", "",	"", "" );
 						   
+
+if ($atmenu=='sip') {
+
+	$HD_Form -> AddEditElement (gettext("DIRECTMEDIA"),
+	                           "directmedia",
+	                           '4',
+	                           "INPUT",
+	                           "size=60 maxlength=50 $DIRECTMEDIA_default",
+	                           "",
+	                           gettext("Insert the directmedia"),
+	                           "", "", "", "", "", "", "", gettext("directmedia = nonat | yes | update ( default : yes )") );
+	
+	
+	$HD_Form -> AddEditElement (gettext("NAT"),
+	                           "nat",
+	                           '4',
+	                           "INPUT",
+	                           "size=60 maxlength=50 $NAT_default",
+	                           "",
+	                           gettext("Insert the nat"),
+	                           "", "", "", "", "", "", "", gettext("nat = yes | no | never | route ( default : yes )") );
+	
+	
+	$HD_Form -> AddEditElement (gettext("DTMFMODE"),
+	                           "dtmfmode",
+	                           '',
+	                           "INPUT",
+	                           "size=10 maxlength=7 $DTMFMODE_default",
+	                           "",
+	                           gettext("Insert the dtmfmode"),
+	                           "", "", "", "", "", "", "", gettext("dtmfmode = RFC2833 | INFO | INBAND | AUTO ( default : RFC2833 )"));
+	
+	
+	
+	$HD_Form -> AddEditElement (gettext("CANCALLFORWARD"),
+				   "cancallforward",
+				   '',
+				   "INPUT",
+				   "size=7 maxlength=3 $CANCALLFORWARD_default",
+				   "",
+				   gettext("Insert the cancallforward"),
+				   "", "", "", "", "", "", "", gettext("cancallforward = yes | no ( default : yes )"));
+	
+	
+}
 
 $HD_Form -> AddEditElement (gettext("LANGUAGE"),
 						   "language",		
@@ -355,15 +465,6 @@ $HD_Form -> AddEditElement (gettext("SETVAR"),
 						   gettext("Insert the setvar"),
 						   "", "", "",	"", "", "",	"", "" );
 
-$HD_Form -> AddEditElement (gettext("TYPE"),
-                           "type",
-                           '',
-                           "INPUT",
-                           "size=10 maxlength=6 $TYPE_default",
-                           "",
-                           gettext("Insert the type"),
-                           "", "", "", "", "", "", "", gettext("type = friend | peer | user ( default : friend )"));
-
 $HD_Form -> AddEditElement (gettext("DENY"),
 						   "deny",		
 						   '',	
@@ -385,15 +486,6 @@ $HD_Form -> AddEditElement (gettext("PERMIT"),
 
 if ($atmenu=='sip') {
 	
-	$HD_Form -> AddEditElement (gettext("USERNAME"),
-	                           "username",
-	                           '',
-	                           "INPUT",
-	                           "size=50 maxlength=40",
-	                           "",
-	                           gettext("Insert the username"),
-	                           "", "", "", "", "", "",	"", "" );
-	
 	$HD_Form -> AddEditElement (gettext("MD5SECRET"),
 	                           "md5secret",
 	                           '',
@@ -402,37 +494,6 @@ if ($atmenu=='sip') {
 	                           "",
 	                           gettext("Insert the md5secret"),
 	                           "", "", "", "", "", "",	"", "" );
-	
-	
-	$HD_Form -> AddEditElement (gettext("DIRECTMEDIA"),
-	                           "directmedia",
-	                           '4',
-	                           "INPUT",
-	                           "size=60 maxlength=50 $DIRECTMEDIA_default",
-	                           "",
-	                           gettext("Insert the directmedia"),
-	                           "", "", "", "", "", "",	"", gettext("directmedia = nonat | yes | update ( default : yes )") );
-	
-	
-	$HD_Form -> AddEditElement (gettext("NAT"),
-	                           "nat",
-	                           '4',
-	                           "INPUT",
-	                           "size=60 maxlength=50 $NAT_default",
-	                           "",
-	                           gettext("Insert the nat"),
-	                           "", "", "", "", "", "",	"", gettext("nat = yes | no | never | route ( default : yes )") );
-	
-	
-	$HD_Form -> AddEditElement (gettext("DTMFMODE"),
-	                           "dtmfmode",
-	                           '',
-	                           "INPUT",
-	                           "size=10 maxlength=7 $DTMFMODE_default",
-	                           "",
-	                           gettext("Insert the dtmfmode"),
-	                           "", "", "", "", "", "",	"", gettext("dtmfmode = RFC2833 | INFO | INBAND | AUTO ( default : RFC2833 )"));
-	
 	
 	
 	$HD_Form -> AddEditElement (gettext("CANREINVITE"),
@@ -456,47 +517,6 @@ if ($atmenu=='sip') {
 							   gettext("Insert the callgroup"),
 							   "", "", "",	"", "", "",	"", "" );
 	
-	
-	
-	
-	$HD_Form -> AddEditElement (gettext("FROMUSER"),
-							   "fromuser",		
-							   '',	
-							   "INPUT",	
-							   "size=40 maxlength=40",	
-							   "",	
-							   gettext("Insert the fromuser"),
-							   "", "", "",	"", "", "",	"", "" );
-	
-	
-	$HD_Form -> AddEditElement (gettext("FROMDOMAIN"),
-							   "fromdomain",		
-							   '',	
-							   "INPUT",	
-							   "size=40 maxlength=40",	
-							   "",	
-							   gettext("Insert the fromdomain"),
-							   "", "", "",	"", "", "",	"", "" );
-	
-	
-	$HD_Form -> AddEditElement (gettext("INSECURE"),
-							   "insecure",		
-							   '',	
-							   "INPUT",	
-							   "size=20 maxlength=30",	
-							   "",	
-							   gettext("Insert the insecure"),
-							   "", "", "",	"", "", "",	"", "" );
-	
-	
-	$HD_Form -> AddEditElement (gettext("MAILBOX"),
-							   "mailbox",		
-							   '',	
-							   "INPUT",	
-							   "size=60 maxlength=50",	
-							   "",	
-							   gettext("Insert the mailbox"),
-							   "", "", "",	"", "", "",	"", "" );
 	
 	
 	
@@ -559,26 +579,6 @@ if ($atmenu=='sip') {
 							   gettext("Insert the musiconhold"),
 							   "", "", "",	"", "", "",	"", "" );
 	
-	
-	$HD_Form -> AddEditElement (gettext("CANCALLFORWARD"),
-							   "cancallforward",		
-							   '',	
-							   "INPUT",	
-							   "size=7 maxlength=3 $CANCALLFORWARD_default",	
-							   "",	
-							   gettext("Insert the cancallforward"),
-							   "", "", "",	"", "", "",	"", gettext("cancallforward = yes | no ( default : yes )"));
-	
-	
-	$HD_Form -> AddEditElement (gettext("DEFAULTUSER"),
-							   "defaultuser",		
-							   '',	
-							   "INPUT",	
-							   "size=10 maxlength=10",	
-							   "",	
-							   "",
-							   "", "", "",	"", "", "",	"", "" );
-							   
 	
 	$HD_Form -> AddEditElement (gettext("SUBSCRIBEMWI"),
 							   "subscribemwi",		
@@ -919,15 +919,17 @@ if ($atmenu=='sip') {
 }
 
 
-$field_list_edit = 'id_cc_card, name, accountcode, regexten, callerid, cid_number, amaflags, secret, qualify, disallow, allow, host, context, defaultip, language, port, regseconds, ipaddr, mohsuggest, auth, setvar, type, deny, permit';
-
 if ($atmenu=='sip') {
-	$field_list_edit .= ', username, md5secret, directmedia, nat, dtmfmode, canreinvite, callgroup, fromuser, fromdomain, insecure, mailbox, mask, pickupgroup, restrictcid, rtptimeout, rtpholdtimeout, ' .
-			'musiconhold,  cancallforward, defaultuser, subscribemwi, vmexten, callingpres, usereqphone, incominglimit, subscribecontext, musicclass, allowtransfer, ' .
-			'autoframing, maxcallbitrate, outboundproxy, regserver, rtpkeepalive, callbackextension';
+	$field_list_edit = 'id_cc_card, name, accountcode, regexten, callerid, cid_number, amaflags, context, type, defaultuser, secret, username, fromuser,
+			fromdomain, insecure, mailbox, qualify, disallow, allow, host, defaultip, directmedia, nat, dtmfmode, cancallforward, language, port,
+			regseconds, ipaddr, mohsuggest, auth, setvar, deny, permit, md5secret, canreinvite, callgroup, mask, pickupgroup, restrictcid, rtptimeout,
+			rtpholdtimeout, musiconhold,  subscribemwi, vmexten, callingpres, usereqphone, incominglimit, subscribecontext, musicclass, allowtransfer,
+			autoframing, maxcallbitrate, outboundproxy, regserver, rtpkeepalive, callbackextension';
 } else {
-	$field_list_edit .= ', trunk, dbsecret, regcontext, sourceaddress, mohinterpret, inkeys, outkey,  sendani, fullname,  maxauthreq, encryption, transfer, jitterbuffer, ' .
-			'forcejitterbuffer, codecpriority, qualifysmoothing, qualifyfreqok, qualifyfreqnotok, timezone, adsi';
+	$field_list_edit = 'id_cc_card, name, accountcode, regexten, callerid, cid_number, amaflags, secret, qualify, disallow, allow, host, context, defaultip,
+			language, port, regseconds, ipaddr, mohsuggest, auth, setvar, type, deny, permit, trunk, dbsecret, regcontext, sourceaddress, mohinterpret,
+			inkeys, outkey,  sendani, fullname,  maxauthreq, encryption, transfer, jitterbuffer,
+			forcejitterbuffer, codecpriority, qualifysmoothing, qualifyfreqok, qualifyfreqnotok, timezone, adsi';
 }
 
 $HD_Form -> FieldEditElement ($field_list_edit);

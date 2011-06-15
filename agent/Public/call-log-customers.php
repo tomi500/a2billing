@@ -226,8 +226,8 @@ if (isset ( $customer ) && ($customer > 0)) {
 		$FG_TABLE_CLAUSE .= "t1.id_ratecard = '$enterratecard'";
 	}
 
-
-if (isset ( $choose_calltype ) && ($choose_calltype != - 1)) {
+if (!isset($choose_calltype)) $choose_calltype = -1;
+elseif ($choose_calltype != - 1) {
 	if (strlen ( $FG_TABLE_CLAUSE ) > 0)
 		$FG_TABLE_CLAUSE .= " AND ";
 	$FG_TABLE_CLAUSE .= " t1.sipiax='$choose_calltype' ";

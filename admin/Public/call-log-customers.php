@@ -247,8 +247,8 @@ if (isset ( $enterratecard ) && $enterratecard > 0) {
 
 
 
-
-if (isset ( $choose_calltype ) && ($choose_calltype != - 1)) {
+if (!isset($choose_calltype)) $choose_calltype = -1;
+elseif ($choose_calltype != - 1) {
 	if (strlen ( $FG_TABLE_CLAUSE ) > 0)
 		$FG_TABLE_CLAUSE .= " AND ";
 	$FG_TABLE_CLAUSE .= " t1.sipiax='$choose_calltype' ";
@@ -900,7 +900,7 @@ if (LINK_AUDIO_FILE && $nb_record){ echo '
 				<td class="fontstyle_searchoptions">
 					<?php
 					echo gettext ( "mins" );
-					?><input type="radio" NAME="resulttype"
+					?> <input type="radio" NAME="resulttype"
 					value="min"
 					<?php
 					if ((! isset ( $resulttype )) || ($resulttype == "min")) {

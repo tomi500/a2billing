@@ -2747,13 +2747,12 @@ msgid "You can initiate the callback by entering your phonenumber and the number
 msgstr "Вы можете сделать обратный звонок указав свой номер телефона и номер по которому хотите позвонить"
 
 #: callback.php:217
-#, fuzzy
 msgid "Your Phone Number"
-msgstr "Ваш номер телефона / Нахождение"
+msgstr "Номер Вашего телефона"
 
 #: callback.php:220
 msgid "The number you wish to call"
-msgstr "Кому звонить"
+msgstr "Номер кому звонить"
 
 #: callback.php:225
 #, fuzzy

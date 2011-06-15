@@ -155,7 +155,7 @@ $HD_Form -> AddEditElement (gettext("ACCOUNTCODE"),
                            "accountcode",
                            '',
                            "INPUT",
-                           "size=20 $maxi maxlength=50 readonly",
+                           "size=20 $maxi maxlength=50",
                            "",
                            gettext("Insert the accountcode"),
                            "", "", "", "", "", "",	"", "" );
