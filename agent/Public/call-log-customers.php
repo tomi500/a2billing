@@ -120,7 +120,7 @@ $FG_TABLE_COL [] = array (gettext ( "Phone Number" ), "calledstation", "13%", "c
 $FG_TABLE_COL [] = array (gettext ( "Destination" ), "dest","10%", "center", "SORT", "15", "lie", "cc_prefix", "destination,prefix", "prefix='%id'", "%1" );
 $FG_TABLE_COL [] = array (gettext ( "Sell Rate" ), "rateinitial", "8%", "center", "SORT", "30", "", "", "", "", "", "display_2bill" );
 $FG_TABLE_COL [] = array (gettext ( "Duration" ), "sessiontime", "8%", "center", "SORT", "30", "", "", "", "", "", "display_minute" );
-$FG_TABLE_COL [] = array (gettext ( "Account" ), "card_id", "10%", "center", "sort", "", "lie", "cc_card", "username,id", "id='%id'", "%1", "", "A2B_entity_card.php" );
+$FG_TABLE_COL [] = array (gettext ( "Account" ), "card_id", "10%", "center", "sort", "", "lie_link", "cc_card", "username,id", "id='%id'", "%1", "", "A2B_entity_card.php" );
 $FG_TABLE_COL [] = array ('<acronym title="' . gettext ( "Terminate Cause" ) . '">' . gettext ( "TC" ) . '</acronym>', "terminatecauseid", "7%", "center", "SORT", "", "list", $dialstatus_list );
 $FG_TABLE_COL [] = array (gettext ( "CallType" ), "sipiax", "10%", "center", "SORT", "", "list", $list_calltype );
 $FG_TABLE_COL [] = array (gettext ( "Sell" ), "sessionbill", "10%", "center", "SORT", "30", "", "", "", "", "", "display_2bill" );
@@ -1036,6 +1036,22 @@ class=tableBody><?php echo $ligne_number + $current_page * $FG_LIMITE_DISPLAY . 
 					
 					for($l = 1; $l <= count ( $field_list_sun ); $l ++) {
 						$record_display = str_replace ( "%$l", $select_list [0] [$l - 1], $record_display );
+					}
+				
+				} elseif($FG_TABLE_COL[$i][6]=="lie_link") {
+					$instance_sub_table = new Table($FG_TABLE_COL[$i][7], $FG_TABLE_COL[$i][8]);
+					$sub_clause = str_replace ( "%id", $recordset [$i], $FG_TABLE_COL [$i] [9] );
+					$select_list = $instance_sub_table -> Get_list ($DBHandle, $sub_clause, null, null, null, null, null, null, null, 10);
+					if(is_array($select_list)){
+						$field_list_sun = preg_split('/,/',$FG_TABLE_COL[$i][8]);
+						$record_display = $FG_TABLE_COL[$i][10];
+						$link = $FG_TABLE_COL[$i][12]."?form_action=ask-edit&id=".$select_list[0][1];
+						for ($l=1;$l<=count($field_list_sun);$l++){
+							$val = str_replace("%$l", $select_list[0][$l-1], $record_display);
+							$record_display = "<a href='$link'>$val</a>";
+						}
+					}else{
+						$record_display="";
 					}
 				
 				} elseif ($FG_TABLE_COL [$i] [6] == "list") {
