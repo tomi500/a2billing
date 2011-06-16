@@ -40,9 +40,9 @@ function SetLocalLanguage()
 	switch (LANGUAGE)
 	{
 		case "arabic":
-			$languageEncoding = "en_US.iso88591";
+			$languageEncoding = "en_US.UTF-8";
 			$slectedLanguage = "en_US";
-			$charEncoding = "iso88591";
+			$charEncoding = "UTF-8";
 			break;
 		case "brazilian":
 			$languageEncoding = "pt_BR.UTF-8";
@@ -55,39 +55,39 @@ function SetLocalLanguage()
 			$charEncoding = "UTF-8";
 			break;
 		case "english":
-			$languageEncoding = "en_US.iso88591";
+			$languageEncoding = "en_US.UTF-8";
 			$slectedLanguage = "en_US";
-			$charEncoding = "iso88591";
+			$charEncoding = "UTF-8";
 			break;
 		case "spanish":
-			$languageEncoding = "es_ES.iso88591";
+			$languageEncoding = "es_ES.UTF-8";
 			$slectedLanguage = "es_ES";
 			$charEncoding = "UTF-8";
 			break;
 		case "french":
-			$languageEncoding = "fr_FR.iso88591";
+			$languageEncoding = "fr_FR.UTF-8";
 			$slectedLanguage = "fr_FR";
-			$charEncoding = "iso-8859-1";
+			$charEncoding = "UTF-8";
 			break;
 		case "german":
-			$languageEncoding = "de_DE.iso88591";
+			$languageEncoding = "de_DE.UTF-8";
 			$slectedLanguage = "de_DE";
-			$charEncoding = "iso-8859-1";
+			$charEncoding = "UTF-8";
 			break;
 		case "italian":
-			$languageEncoding = "it_IT.iso8859-1";
+			$languageEncoding = "it_IT.UTF-8";
 			$slectedLanguage = "it_IT";
-			$charEncoding = "iso88591";
+			$charEncoding = "UTF-8";
 			break;
 		case "polish":
-			$languageEncoding = "pt_PT.iso88591";
+			$languageEncoding = "pt_PT.UTF-8";
 			$slectedLanguage = "pl_PL";
-			$charEncoding = "iso88591";
+			$charEncoding = "UTF-8";
 			break;
 		case "romanian":
-			$languageEncoding = "ro_RO.iso88591";
+			$languageEncoding = "ro_RO.UTF-8";
 			$slectedLanguage = "ro_RO";
-			$charEncoding = "iso88591";
+			$charEncoding = "UTF-8";
 			break;
 		case "russian":
 			$languageEncoding = "ru_RU.UTF-8";
@@ -108,9 +108,9 @@ function SetLocalLanguage()
 			$charEncoding = "UTF-8";
 			break;
 		case "ukrainian": // provided by Oleh Miniv  email: oleg-min@ukr.net
-			$languageEncoding = "uk_UA.UTF8";
+			$languageEncoding = "uk_UA.UTF-8";
 			$slectedLanguage = "uk_UA";
-			$charEncoding = "UTF8";
+			$charEncoding = "UTF-8";
 			break;
         case "farsi":
             $languageEncoding = "fa_IR.UTF-8";
@@ -123,14 +123,14 @@ function SetLocalLanguage()
             $charEncoding = "UTF-8";
             break;
         case "indonesian":
-			$languageEncoding = "id_ID.iso88591";
+			$languageEncoding = "id_ID.UTF-8";
 			$slectedLanguage = "id_ID";
-			$charEncoding = "iso88591";
+			$charEncoding = "UTF-8";
 			break;
 		default:
-			$languageEncoding = "en_US.iso88591";
+			$languageEncoding = "en_US.UTF-8";
 			$slectedLanguage = "en_US";
-			$charEncoding = "iso88591";
+			$charEncoding = "UTF-8";
 			break;
 	}
 	
