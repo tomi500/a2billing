@@ -189,7 +189,7 @@ $HD_Form -> AddEditElement (gettext("REMOVE PREFIX"),
 	"removeprefix",
 	"$value",
 	"INPUT",
-	"size=30 maxlength=20",
+	"size=30 maxlength=30",
 	"",
 	gettext("Insert the removeprefix"),
 	"" , "", "", "", "" , "" , "", gettext("Remove prefix from the dialed digits."));

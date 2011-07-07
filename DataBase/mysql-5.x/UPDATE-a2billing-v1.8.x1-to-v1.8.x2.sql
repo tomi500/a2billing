@@ -53,3 +53,5 @@ ALTER TABLE `cc_sip_buddies`
   CHANGE `qualify` `qualify` CHAR( 7 ) CHARACTER SET utf8 COLLATE utf8_bin NULL DEFAULT NULL,
   CHANGE `regseconds` `regseconds` VARCHAR( 15 ) CHARACTER SET utf8 COLLATE utf8_bin NOT NULL,
   CHANGE `rtpkeepalive` `rtpkeepalive` VARCHAR( 15 ) CHARACTER SET utf8 COLLATE utf8_bin NOT NULL;
+
+ALTER TABLE cc_trunk CHANGE removeprefix removeprefix CHAR( 30 ) CHARACTER SET utf8 COLLATE utf8_bin NULL DEFAULT NULL;

@@ -97,66 +97,25 @@ if ($callback) {
 			if ($resfindrate!=0) {				
 				$res_all_calcultimeout = $RateEngine->rate_engine_all_calcultimeout($A2B, $A2B->credit);
 				if ($res_all_calcultimeout) {						
-					
-					// MAKE THE CALL
-					if ($RateEngine -> ratecard_obj[0][34]!='-1') {
-						$usetrunk = 34; 
-						$usetrunk_failover = 1;
-						$RateEngine -> usedtrunk = $RateEngine -> ratecard_obj[0][34];
-					} else {
-						$usetrunk = 29;
-						$RateEngine -> usedtrunk = $RateEngine -> ratecard_obj[0][29];
-						$usetrunk_failover = 0;
-					}
-					
-					$prefix			= $RateEngine -> ratecard_obj[0][$usetrunk+1];
-					$tech 			= $RateEngine -> ratecard_obj[0][$usetrunk+2];
-					$ipaddress 		= $RateEngine -> ratecard_obj[0][$usetrunk+3];
-					$removeprefix 	= $RateEngine -> ratecard_obj[0][$usetrunk+4];
-					$timeout		= $RateEngine -> ratecard_obj[0]['timeout'];	
-					$failover_trunk	= $RateEngine -> ratecard_obj[0][40+$usetrunk_failover];
-					$addparameter	= $RateEngine -> ratecard_obj[0][42+$usetrunk_failover];
-					
-					$destination = $called;
-					if (strncmp($destination, $removeprefix, strlen($removeprefix)) == 0) $destination= substr($destination, strlen($removeprefix));
-					
-					$pos_dialingnumber = strpos($ipaddress, '%dialingnumber%' );
-					$ipaddress = str_replace("%cardnumber%", $A2B->cardnumber, $ipaddress);
-					$ipaddress = str_replace("%dialingnumber%", $prefix.$destination, $ipaddress);
-					
-					$dialparams = '';
-					if ($pos_dialingnumber !== false) {					   
-						$dialstr = "$tech/$ipaddress".$dialparams;
-					} else {
-						if ($A2B->agiconfig['switchdialcommand'] == 1){
-							$dialstr = "$tech/$prefix$destination@$ipaddress".$dialparams;
-						} else {
-							$dialstr = "$tech/$ipaddress/$prefix$destination".$dialparams;
-						}
-					}	
-					
-					//ADDITIONAL PARAMETER 			%dialingnumber%,	%cardnumber%	
-					if (strlen($addparameter)>0) {
-						$addparameter = str_replace("%cardnumber%", $A2B->cardnumber, $addparameter);
-						$addparameter = str_replace("%dialingnumber%", $prefix.$destination, $addparameter);
-						$dialstr .= $addparameter;
-					}
-					
-					$channel= $dialstr;
+
+				    // MAKE THE CALL
+				    $channeloutcid = $RateEngine->rate_engine_performcall(false, $A2B->destination, $A2B);
+				    if ($channeloutcid) {
+					$channel = $channeloutcid[0];
 					$exten = $calling;
 					$context = $A2B -> config["callback"]['context_callback'];
 					$id_server_group = $A2B -> config["callback"]['id_server_group'];
 					$priority=1;
 					$timeout = $A2B -> config["callback"]['timeout']*1000;
 					$application='';
-					$callerid = $A2B -> config["callback"]['callerid'];
+					if ($channeloutcid[1]) $callerid = $channeloutcid[1];
+					    else $callerid = $A2B -> config["callback"]['callerid'];
 					$account = $_SESSION["pr_login"];
 					
 					$uniqueid 	=  MDP_NUMERIC(5).'-'.MDP_STRING(7);
 					$status = 'PENDING';
 					$server_ip = 'localhost';
 					$num_attempt = 0;
-					
 					if ($A2B->config['global']['asterisk_version'] == "1_6") {
 						$variable = "CALLED=$called,CALLING=$calling,CBID=$uniqueid,LEG=".$A2B->cardnumber;
 					} else {
@@ -175,20 +134,13 @@ if ($callback) {
 						$error_msg = gettext("Your callback request has been queued correctly!");
 						$color_msg = 'green';
 					}
-					
-				} else {
-					$error_msg = gettext("Error : You don t have enough credit to call you back!");
-				}
-			} else {
-				$error_msg = gettext("Error : There is no route to call back your phonenumber!");
-			}
+				    } else $error_msg = gettext("Error : Sorry, not enough free trunk for make call. Try again later!");
+				} else $error_msg = gettext("Error : You don t have enough credit to call you back!");
+			} else $error_msg = gettext("Error : There is no route to call back your phonenumber!");
 		} else {
 			// ERROR MESSAGE IS CONFIGURE BY THE callingcard_ivr_authenticate_light
 		}
-	} else {
-		$error_msg = gettext("Error : You have to specify your phonenumber and the number you wish to call!");
-	
-	}
+	} else $error_msg = gettext("Error : You have to specify your phonenumber and the number you wish to call!");
 }
 $customer = $_SESSION["pr_login"];
 
