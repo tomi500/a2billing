@@ -1322,7 +1322,7 @@ class RateEngine
 				    $this -> td = $td;
 				    $this -> prefixclause = $prefixclause;
 				    if (!$firstrand) {
-					if ($intellect_count == 0) {
+					if ($intellect_count == -1) {
 					    $prefixclausea = preg_replace('/dialprefixa/','an.dialprefixa',$prefixclausemain);
 					    $prefixclauseb = preg_replace('/dialprefixa/','bn.dialprefixb',$prefixclausemain);
 					    $prefixclause  = preg_replace('/dialprefixa/','bn.dialprefixa',$prefixclausemain);
@@ -1340,11 +1340,13 @@ class RateEngine
 						$intellecttrunks = $resultrand;
 						$firstrand = true;
 						$sum_percent = 0;
-						foreach ($resultrand as $valu_key => $valu_val)	{
-							if ($valu_val[1]>0 && is_numeric($valu_val[0])) $resultrand[$valu_key][1] = $sum_percent += $valu_val[1];
+						$count_minus = 0;
+						foreach ($resultrand as $valu_key => $valu_val) {
+							if (is_numeric($valu_val[0]) && $valu_val[1]>0) $resultrand[$valu_key][1] = $sum_percent += $valu_val[1];
 							else $resultrand[$valu_key][1] = 0;
+							if (!is_numeric($valu_val[0])) $count_minus++;
 						}
-						if ($intellect_count == -1) $intellect_count = $valu_key;
+						if ($intellect_count == -1) $intellect_count = $valu_key - $count_minus;
 						else $intellect_count--;
 
 						if ($sum_percent>0) {
