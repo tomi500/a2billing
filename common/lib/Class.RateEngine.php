@@ -1139,7 +1139,6 @@ class RateEngine
 			$result = $A2B->instance_table -> SQLExec ($A2B -> DBHandle, $QUERY, 0);
 
 			$QUERY = "SELECT period$this->td, UNIX_TIMESTAMP(periodexpiry$this->td), periodcount$this->td FROM cc_trunk WHERE id_trunk='".$this -> usedtrunk."' AND ($this->prefixclause) LIMIT 1";
-//$A2B -> debug( ERROR, $agi, __FILE__, __LINE__, $QUERY);
 			$result = $A2B->instance_table -> SQLExec ($A2B -> DBHandle, $QUERY);
 			if (is_array($result) && count($result)>0) {
 				$QUERY = "UPDATE cc_trunk SET secondusedreal = secondusedreal + $sessiontime, periodcount$this->td = ";
@@ -1215,7 +1214,7 @@ class RateEngine
 			$loop_failover = 0;
 			$destination = $old_destination;
 			$firstrand = false;
-			$intellect_count = 0;
+			$intellect_count = -1;
 			$status = 1;
 			
 			//$this->answeredtime='60';
@@ -1230,7 +1229,7 @@ class RateEngine
 				$this -> real_answeredtime = $this -> answeredtime = 0;
 				$destination=$old_destination;
 
-				if ($loop_failover == 0 && $intellect_count == 0) {
+				if ($loop_failover == 0 && $intellect_count == -1) {
 				    if ($this -> ratecard_obj[$k][34]!='-1') {
 					$usetrunk=35;
 					$this -> usedtrunk = $this -> ratecard_obj[$k][34];
@@ -1345,7 +1344,7 @@ class RateEngine
 							if ($valu_val[1]>0 && is_numeric($valu_val[0])) $resultrand[$valu_key][1] = $sum_percent += $valu_val[1];
 							else $resultrand[$valu_key][1] = 0;
 						}
-						if ($intellect_count == 0) $intellect_count = $valu_key;
+						if ($intellect_count == -1) $intellect_count = $valu_key;
 						else $intellect_count--;
 
 						if ($sum_percent>0) {
@@ -1365,7 +1364,7 @@ class RateEngine
 							$intellectmarker = true;
 							foreach ($resultrand as $intellect_key => $valu_val)	{
 								if ($valu_val[0]<-1 && is_numeric($valu_val[0])) {
-									$intellecttrunks[$intellect_key][0] = -1;
+									$intellecttrunks[$intellect_key][0] = 0;
 									$intellectmarker = false;
 									if ($valu_val[2]<>$this->usedtrunk) {
 									    $failover_trunk = $valu_val[2];
@@ -1375,7 +1374,7 @@ class RateEngine
 							}
 							if ($intellectmarker) {
 							    if ($resultrand[$valu_key][0]>=0 || !is_numeric($resultrand[$valu_key][0])) $valu_key=0;
-							    $intellecttrunks[$valu_key][0] = -1;
+							    $intellecttrunks[$valu_key][0] = 0;
 							    if ($resultrand[$valu_key][2]<>$this->usedtrunk) {
 								$failover_trunk = $resultrand[$valu_key][2];
 								continue;
@@ -1384,7 +1383,7 @@ class RateEngine
 						}
 					}
 				    }
-				    if ($loop_failover == 0 && $failover_trunk == $this->usedtrunk) {
+				    if ($loop_failover == 0 && $intellect_count == -1) {
 					$next_failover_trunk	= $this -> ratecard_obj[$k][67+$usetrunk_failover];
 					$startdate		= $this -> ratecard_obj[$k][68+$usetrunk_failover];
 					$stopdate		= $this -> ratecard_obj[$k][69+$usetrunk_failover];
@@ -1444,6 +1443,7 @@ class RateEngine
 						    $firstrand = false;
 						} elseif ($next_failover_trunk == $failover_trunk) break;
 						    else {
+							$intellect_count = -1;
 							$loop_failover++;
 							$failover_trunk = $next_failover_trunk;
 						    }
@@ -1552,6 +1552,7 @@ class RateEngine
 				// IF THE FAILOVER TRUNK IS SAME AS THE ACTUAL TRUNK WE BREAK
 				if ($next_failover_trunk == $failover_trunk) break;
 				else $failover_trunk = $next_failover_trunk;
+				$intellect_count = -1;
 				$loop_failover++;
 
 			} // END FOR LOOP FAILOVER
