@@ -714,6 +714,7 @@ if (!defined('MONITOR_PATH')) define ("MONITOR_PATH",	isset($this->config['webui
 		
 		//Call function to find the cid number
 		$this -> isolate_cid();
+		$this -> realdestination = $this -> dnid;
 
 		$this -> debug( INFO, $agi, __FILE__, __LINE__, ' get_agi_request_parameter = '.$this->CallerID.' ; '.$this->channel.' ; '.$this->uniqueid.' ; '.$this->accountcode.' ; '.$this->dnid);
 	}
@@ -1318,7 +1319,8 @@ if (!defined('MONITOR_PATH')) define ("MONITOR_PATH",	isset($this->config['webui
 							continue;
 					} elseif ($dialstatus == "CANCEL") {
 						// Call cancelled, no need to follow-me
-						return 1;
+//						return 1;
+						$answeredtime = 0;
 					} elseif ($dialstatus == "ANSWER") {
 						$this -> debug( DEBUG, $agi, __FILE__, __LINE__,
 										"[A2Billing] DID call friend: dialstatus : $dialstatus, answered time is ".$answeredtime." \n");
@@ -1330,7 +1332,7 @@ if (!defined('MONITOR_PATH')) define ("MONITOR_PATH",	isset($this->config['webui
 						if (count($listdestination) > $callcount) continue;
 					}
 					
-					if ($answeredtime >0) {
+					if ($answeredtime >=0) {
 
 						$this -> debug( INFO, $agi, __FILE__, __LINE__, "[DID CALL - LOG CC_CALL: FOLLOWME=$callcount - (answeredtime=$answeredtime :: dialstatus=$dialstatus)]");
 						
@@ -1339,7 +1341,8 @@ if (!defined('MONITOR_PATH')) define ("MONITOR_PATH",	isset($this->config['webui
 						} else {
 							$terminatecauseid = 0;
 						}
-						if (strpos($dialstr,'&') || strpos($dialstr,'@')) {
+						if ($answeredtime == 0) $inst_listdestination[4] = $this -> realdestination;
+						elseif (strpos($dialstr,'&') || strpos($dialstr,'@')) {
 							$dialedpeernumber = $agi->get_variable("DIALEDPEERNUMBER");
 							$inst_listdestination[4] = preg_replace("|\D|", "", $dialedpeernumber['data']);
 							$this -> debug( INFO, $agi, __FILE__, __LINE__, "Destination: " . $inst_listdestination[4]);
@@ -1384,16 +1387,19 @@ if (!defined('MONITOR_PATH')) define ("MONITOR_PATH",	isset($this->config['webui
 						if (!$result_callperf) {
 							$prompt="prepaid-callfollowme";
 							$agi-> stream_file($prompt, '#');
-							continue;
+							if (count($listdestination) > $callcount) continue;
 						}
 						
 						$dialstatus = $RateEngine->dialstatus;
-						if (($RateEngine->dialstatus == "NOANSWER") || ($RateEngine->dialstatus == "BUSY") || 
-							($RateEngine->dialstatus == "CHANUNAVAIL") || ($RateEngine->dialstatus == "CONGESTION")) continue;
+//$this -> debug( DEBUG, $agi, __FILE__, __LINE__, "====================" . (count($listdestination)) . " > " . ($callcount));
+						if ((($RateEngine->dialstatus == "NOANSWER") || ($RateEngine->dialstatus == "BUSY") || 
+							($RateEngine->dialstatus == "CHANUNAVAIL") || ($RateEngine->dialstatus == "CONGESTION")) && count($listdestination) > $callcount) continue;
 						
-						if ($RateEngine->dialstatus == "CANCEL")
-							break;
-
+//						if ($RateEngine->dialstatus == "CANCEL")
+//							break;
+						if ($RateEngine->dialstatus != "ANSWER") $this -> destination = $this -> realdestination;
+//$this -> debug( DEBUG, $agi, __FILE__, __LINE__, "==================== this -> destination = $this->destination");
+						
 						// INSERT CDR  & UPDATE SYSTEM
 						$RateEngine->rate_engine_updatesystem($this, $agi, $this->destination, $doibill, 1);
 						// CC_DID & CC_DID_DESTINATION - cc_did.id, cc_did_destination.id
@@ -1568,7 +1574,8 @@ if (!defined('MONITOR_PATH')) define ("MONITOR_PATH",	isset($this->config['webui
 						continue;
                 } elseif ($dialstatus == "CANCEL") {
 					// Call cancelled, no need to follow-me
-					return 1;
+//					return 1;
+					$answeredtime = 0;
                 } elseif ($dialstatus == "ANSWER") {
 					$this -> debug( DEBUG, $agi, __FILE__, __LINE__,
 									"[A2Billing] DID call friend: dialstatus : $dialstatus, answered time is ".$answeredtime." \n");
@@ -1580,7 +1587,7 @@ if (!defined('MONITOR_PATH')) define ("MONITOR_PATH",	isset($this->config['webui
                     if (count($listdestination)>$callcount) continue;
                 }
 
-                if ($answeredtime > 0) {
+                if ($answeredtime >= 0) {
 
                     $this -> debug( INFO, $agi, __FILE__, __LINE__, "[DID CALL - LOG CC_CALL: FOLLOWME=$callcount - (answeredtime=$answeredtime :: dialstatus=$dialstatus :: cost=$cost)]");
 
@@ -1589,7 +1596,8 @@ if (!defined('MONITOR_PATH')) define ("MONITOR_PATH",	isset($this->config['webui
                     } else {
 						$terminatecauseid = 0;
                     }
-		    if (strpos($dialstr,'&') || strpos($dialstr,'@')) {
+		    if ($answeredtime == 0) $inst_listdestination[10] = $this -> realdestination;
+		    elseif (strpos($dialstr,'&') || strpos($dialstr,'@')) {
 			$dialedpeernumber = $agi->get_variable("DIALEDPEERNUMBER");
 			$inst_listdestination[10] = preg_replace("|\D|", "", $dialedpeernumber['data']);
 			$this -> debug( INFO, $agi, __FILE__, __LINE__, "Destination: " . $inst_listdestination[10]);
@@ -1670,11 +1678,12 @@ if (!defined('MONITOR_PATH')) define ("MONITOR_PATH",	isset($this->config['webui
                     }
 
                     $dialstatus = $RateEngine->dialstatus;
-                    if (($RateEngine->dialstatus == "NOANSWER") || ($RateEngine->dialstatus == "BUSY") ||
-                            ($RateEngine->dialstatus == "CHANUNAVAIL") || ($RateEngine->dialstatus == "CONGESTION")) continue;
+                    if ((($RateEngine->dialstatus == "NOANSWER") || ($RateEngine->dialstatus == "BUSY") ||
+                            ($RateEngine->dialstatus == "CHANUNAVAIL") || ($RateEngine->dialstatus == "CONGESTION")) && count($listdestination) > $callcount) continue;
 
-                    if ($RateEngine->dialstatus == "CANCEL")
-						break;
+//                    if ($RateEngine->dialstatus == "CANCEL")
+//						break;
+		    if ($RateEngine->dialstatus != "ANSWER") $this -> destination = $this -> realdestination;
 					
                     // INSERT CDR  & UPDATE SYSTEM
                     $RateEngine->rate_engine_updatesystem($this, $agi, $this-> destination, $doibill, 1);
