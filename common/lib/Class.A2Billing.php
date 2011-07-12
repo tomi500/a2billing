@@ -1331,8 +1331,8 @@ if (!defined('MONITOR_PATH')) define ("MONITOR_PATH",	isset($this->config['webui
 						$agi-> stream_file('prepaid-callfollowme', '#');
 						if (count($listdestination) > $callcount) continue;
 					}
-					
-					if ($answeredtime >=0) {
+
+//					if ($answeredtime >= 0) {
 
 						$this -> debug( INFO, $agi, __FILE__, __LINE__, "[DID CALL - LOG CC_CALL: FOLLOWME=$callcount - (answeredtime=$answeredtime :: dialstatus=$dialstatus)]");
 						
@@ -1356,7 +1356,10 @@ if (!defined('MONITOR_PATH')) define ("MONITOR_PATH",	isset($this->config['webui
 						
 						$result = $this -> instance_table -> SQLExec ($this->DBHandle, $QUERY, 0);
 						$this -> debug( INFO, $agi, __FILE__, __LINE__, "[DID CALL - LOG CC_CALL: SQL: $QUERY]:[result:$result]");
-						
+//					}
+
+					if ($answeredtime > 0) {
+
 						// CC_DID & CC_DID_DESTINATION - cc_did.id, cc_did_destination.id
 						$QUERY = "UPDATE cc_did SET secondusedreal = secondusedreal + $answeredtime WHERE id='".$inst_listdestination[0]."'";
 						$result = $this->instance_table -> SQLExec ($this -> DBHandle, $QUERY, 0);
@@ -1567,7 +1570,7 @@ if (!defined('MONITOR_PATH')) define ("MONITOR_PATH",	isset($this->config['webui
 					$agi-> stream_file('prepaid-isbusy', '#');
 					if (count($listdestination)>$callcount)
 						continue;
-                } elseif ($this->dialstatus == "NOANSWER") {
+                } elseif ($dialstatus == "NOANSWER") {
 					$answeredtime = 0;
 					$agi-> stream_file('prepaid-callfollowme', '#');
 					if (count($listdestination) > $callcount)
@@ -1671,22 +1674,21 @@ if (!defined('MONITOR_PATH')) define ("MONITOR_PATH",	isset($this->config['webui
                     
                     // PERFORM THE CALL
                     $result_callperf = $RateEngine->rate_engine_performcall ($agi, $this -> destination, $this);
-                    if (!$result_callperf) {
+                    if (!$result_callperf && count($listdestination) == $callcount) {
 	                    $prompt="prepaid-callfollowme";
 	                    $agi-> stream_file($prompt, '#');
-	                    continue;
+//	                    continue;
                     }
 
                     $dialstatus = $RateEngine->dialstatus;
-                    if ((($RateEngine->dialstatus == "NOANSWER") || ($RateEngine->dialstatus == "BUSY") ||
-                            ($RateEngine->dialstatus == "CHANUNAVAIL") || ($RateEngine->dialstatus == "CONGESTION")) && count($listdestination) > $callcount) continue;
-
-//                    if ($RateEngine->dialstatus == "CANCEL")
-//						break;
-		    if ($RateEngine->dialstatus != "ANSWER") $this -> destination = $this -> realdestination;
+                    if ((($dialstatus == "NOANSWER") || ($dialstatus == "BUSY") ||
+                            ($dialstatus == "CHANUNAVAIL") || ($dialstatus == "CONGESTION")) && count($listdestination) > $callcount) continue;
+		    if ($dialstatus != "ANSWER") $this -> destination = $this -> realdestination;
 					
                     // INSERT CDR  & UPDATE SYSTEM
                     $RateEngine->rate_engine_updatesystem($this, $agi, $this-> destination, $doibill, 1);
+                    if ($dialstatus == "CANCEL") break;
+                    if (!$result_callperf) continue;
                     
                     // CC_DID & CC_DID_DESTINATION - cc_did.id, cc_did_destination.id
                     $QUERY = "UPDATE cc_did SET secondusedreal = secondusedreal + ".$RateEngine->answeredtime." WHERE id='".$inst_listdestination[0]."'";
