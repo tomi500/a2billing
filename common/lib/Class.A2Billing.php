@@ -1388,23 +1388,22 @@ if (!defined('MONITOR_PATH')) define ("MONITOR_PATH",	isset($this->config['webui
 						// PERFORM THE CALL
 						$result_callperf = $RateEngine->rate_engine_performcall ($agi, $this -> destination, $this);
 						if (!$result_callperf) {
-							$prompt="prepaid-callfollowme";
-							$agi-> stream_file($prompt, '#');
-							if (count($listdestination) > $callcount) continue;
+							if (count($listdestination) == $callcount) {
+							    $prompt="prepaid-callfollowme";
+							    $agi-> stream_file($prompt, '#');
+							} else continue;
 						}
 						
 						$dialstatus = $RateEngine->dialstatus;
-//$this -> debug( DEBUG, $agi, __FILE__, __LINE__, "====================" . (count($listdestination)) . " > " . ($callcount));
 						if ((($RateEngine->dialstatus == "NOANSWER") || ($RateEngine->dialstatus == "BUSY") || 
 							($RateEngine->dialstatus == "CHANUNAVAIL") || ($RateEngine->dialstatus == "CONGESTION")) && count($listdestination) > $callcount) continue;
 						
-//						if ($RateEngine->dialstatus == "CANCEL")
-//							break;
 						if ($RateEngine->dialstatus != "ANSWER") $this -> destination = $this -> realdestination;
-//$this -> debug( DEBUG, $agi, __FILE__, __LINE__, "==================== this -> destination = $this->destination");
 						
 						// INSERT CDR  & UPDATE SYSTEM
 						$RateEngine->rate_engine_updatesystem($this, $agi, $this->destination, $doibill, 1);
+						if ($RateEngine->dialstatus == "CANCEL") break;
+
 						// CC_DID & CC_DID_DESTINATION - cc_did.id, cc_did_destination.id
 						$QUERY = "UPDATE cc_did SET secondusedreal = secondusedreal + ".$RateEngine->answeredtime." WHERE id='".$inst_listdestination[0]."'";
 						$result = $this->instance_table -> SQLExec ($this -> DBHandle, $QUERY, 0);
@@ -1590,8 +1589,6 @@ if (!defined('MONITOR_PATH')) define ("MONITOR_PATH",	isset($this->config['webui
                     if (count($listdestination)>$callcount) continue;
                 }
 
-                if ($answeredtime >= 0) {
-
                     $this -> debug( INFO, $agi, __FILE__, __LINE__, "[DID CALL - LOG CC_CALL: FOLLOWME=$callcount - (answeredtime=$answeredtime :: dialstatus=$dialstatus :: cost=$cost)]");
 
                     if (strlen($this -> dialstatus_rev_list[$dialstatus])>0) {
@@ -1616,6 +1613,7 @@ if (!defined('MONITOR_PATH')) define ("MONITOR_PATH",	isset($this->config['webui
                     $result = $this -> instance_table -> SQLExec ($this->DBHandle, $QUERY, 0);
                     $this -> debug( INFO, $agi, __FILE__, __LINE__, "[DID CALL - LOG CC_CALL: SQL: $QUERY]:[result:$result]");
 
+                if ($answeredtime > 0) {
                     //CALL2DID CDR if not free
                     if (!$call_did_free) {
                         $cost = ($answeredtime/60) * abs($selling_rate) + abs($connection_charge);
