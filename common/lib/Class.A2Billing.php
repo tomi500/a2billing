@@ -1401,7 +1401,7 @@ if (!defined('MONITOR_PATH')) define ("MONITOR_PATH",	isset($this->config['webui
 						if ($RateEngine->dialstatus != "ANSWER") $this -> destination = $this -> realdestination;
 						
 						// INSERT CDR  & UPDATE SYSTEM
-						$RateEngine->rate_engine_updatesystem($this, $agi, $this->destination, $doibill, 1);
+						$RateEngine->rate_engine_updatesystem($this, $agi, $this->destination, $doibill, 2);
 						if ($RateEngine->dialstatus == "CANCEL") break;
 
 						// CC_DID & CC_DID_DESTINATION - cc_did.id, cc_did_destination.id
@@ -1679,21 +1679,22 @@ if (!defined('MONITOR_PATH')) define ("MONITOR_PATH",	isset($this->config['webui
                     }
 
                     $dialstatus = $RateEngine->dialstatus;
+                    $answeredtime = $RateEngine->answeredtime;
                     if ((($dialstatus == "NOANSWER") || ($dialstatus == "BUSY") ||
                             ($dialstatus == "CHANUNAVAIL") || ($dialstatus == "CONGESTION")) && count($listdestination) > $callcount) continue;
 		    if ($dialstatus != "ANSWER") $this -> destination = $this -> realdestination;
 					
                     // INSERT CDR  & UPDATE SYSTEM
-                    $RateEngine->rate_engine_updatesystem($this, $agi, $this-> destination, $doibill, 1);
+                    $RateEngine->rate_engine_updatesystem($this, $agi, $this-> destination, $doibill, 2);
                     if ($dialstatus == "CANCEL") break;
                     if (!$result_callperf) continue;
                     
                     // CC_DID & CC_DID_DESTINATION - cc_did.id, cc_did_destination.id
-                    $QUERY = "UPDATE cc_did SET secondusedreal = secondusedreal + ".$RateEngine->answeredtime." WHERE id='".$inst_listdestination[0]."'";
+                    $QUERY = "UPDATE cc_did SET secondusedreal = secondusedreal + ".$answeredtime." WHERE id='".$inst_listdestination[0]."'";
                     $result = $this->instance_table -> SQLExec ($this -> DBHandle, $QUERY, 0);
                     $this -> debug( DEBUG, $agi, __FILE__, __LINE__, "[UPDATE DID]:[result:$result]");
 
-                    $QUERY = "UPDATE cc_did_destination SET secondusedreal = secondusedreal + ".$RateEngine->answeredtime." WHERE id='".$inst_listdestination[1]."'";
+                    $QUERY = "UPDATE cc_did_destination SET secondusedreal = secondusedreal + ".$answeredtime." WHERE id='".$inst_listdestination[1]."'";
                     $result = $this->instance_table -> SQLExec ($this -> DBHandle, $QUERY, 0);
                     $this -> debug( DEBUG, $agi, __FILE__, __LINE__, "[UPDATE DID_DESTINATION]:[result:$result]");
 
@@ -1701,15 +1702,10 @@ if (!defined('MONITOR_PATH')) define ("MONITOR_PATH",	isset($this->config['webui
                     // ADD CDR
                      //CALL2DID CDR if not free
                     if (!$call_did_free) {
-                        $answeredtime = $RateEngine->answeredtime;
-                        $cost = ($answeredtime/60) * abs($selling_rate) + abs($connection_charge);
+                        $cost = a2b_round(abs(($answeredtime/60) * abs($selling_rate) + abs($connection_charge)));
 
                         //update card
-                        $QUERY = "INSERT INTO cc_call (uniqueid, sessionid, card_id, nasipaddress, starttime, sessiontime, calledstation, ".
-                                " terminatecauseid, stoptime, sessionbill, id_tariffgroup, id_tariffplan, id_ratecard, id_trunk, src, sipiax) VALUES ".
-                                "('".$this->uniqueid."', '".$this->channel."',  '".$this->id_card."', '".$this->hostname."',";
-                        $QUERY .= " CURRENT_TIMESTAMP - INTERVAL $answeredtime SECOND ";
-                        $QUERY .= ", '$answeredtime', '". $listdestination[0][10]."', '$terminatecauseid', now(), '$cost', '0', '0', '0', '0', '$this->CallerID', '3' )";
+                        $QUERY = "UPDATE cc_call SET sessionbill = sessionbill + $cost, calledstation = ".$listdestination[0][10]." WHERE uniqueid=$this->uniqueid";
 
                         $result = $this -> instance_table -> SQLExec ($this->DBHandle, $QUERY, 0);
                         $this -> debug( INFO, $agi, __FILE__, __LINE__, "[DID CALL - LOG CC_CALL: SQL: $QUERY]:[result:$result]");
@@ -1718,7 +1714,7 @@ if (!defined('MONITOR_PATH')) define ("MONITOR_PATH",	isset($this->config['webui
                         } else {
                                $firstuse= "firstusedate=now(),";
                         }
-                        $QUERY = "UPDATE cc_card SET credit= credit - ".a2b_round(abs($cost))." ,  lastuse=now(),$firstuse nbused=nbused+1 WHERE username='".$card_number."'";
+                        $QUERY = "UPDATE cc_card SET credit= credit - $cost, lastuse=now(),$firstuse nbused=nbused+1 WHERE username='".$card_number."'";
                         $result = $this -> instance_table -> SQLExec ($this->DBHandle, $QUERY, 0);
                         $this -> debug( INFO, $agi, __FILE__, __LINE__, "[DID CALL - UPDATE CARD: SQL: $QUERY]:[result:$result]");
                     }

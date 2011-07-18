@@ -1052,7 +1052,9 @@ class RateEngine
         }
 
         // CALLTYPE -  0 = NORMAL CALL ; 1 = VOIP CALL (SIP/IAX) ; 2= DIDCALL + TRUNK ; 3 = VOIP CALL DID ; 4 = CALLBACK call
-		if ($didcall) {
+		if ($didcall == 3) {
+			$calltype = $didcall;
+	} elseif ($didcall) {
 			$calltype = 2;
         } elseif ($callback) {
 			$calltype = 4;
