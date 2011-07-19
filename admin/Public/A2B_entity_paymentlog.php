@@ -43,8 +43,8 @@ if (! has_rights (ACX_BILLING)) {
 	Header ("Location: PP_error.php?c=accessdenied");
 	die();
 }
-
-$HD_Form -> setDBHandler (DbConnect());
+$DBHandle = DbConnect();
+$HD_Form -> setDBHandler ($DBHandle);
 $HD_Form -> init();
 
 if ($id!="" || !is_null($id)){
@@ -209,19 +209,156 @@ if ($form_action=='list' && !($popup_select>=1)) {
 				</select>
 				</td>
 			</tr>			
-			<tr>
-        		<td class="bgcolor_004" align="left" > </td>
+			<tr> 
+                                <td class="bgcolor_004" align="left"> 
+                                        <font class="fontstyle_003">&nbsp;&nbsp;<?php echo gettext("PAYMENT METHOD");?></font> 
+                                </td> 
+<?php 
+        $pmtable = new Table(); 
+        $result = $pmtable -> SQLExec($DBHandle, "select id, payment_method from `cc_payment_methods`"); 
+        //print_r($result); 
+?> 
+                                <td class="bgcolor_005" align="left"> 
+                                <select name="pmethod" style="width:100px;"> 
+                                <option value="all" <?php if ($pmethod == 'all') echo "selected";?>>All</option> 
+<?php 
+        foreach ($result as $row){ 
+?> 
+                                <option value="<?php echo $row['payment_method'];?>" <?php if ($pmethod == $row['payment_method']) echo "selected"?>><?php echo $row['payment_method'];?></option> 
+<?php 
+        } 
 
-				<td class="bgcolor_005" align="center" >
-					<input type="image"  name="image16" align="top" border="0" src="<?php echo Images_Path;?>/button-search.gif" />
-					
-	  			</td>
-    		</tr>
+?> 
+                                </select> 
+                                </td> 
+                        </tr> 
+                        <tr> 
+                        <td class="bgcolor_002" align="left" > </td> 
+
+                                <td class="bgcolor_003" align="center" > 
+                                        <input type="image"  name="image16" align="top" border="0" src="<?php echo Images_Path;?>/button-search.gif" /> 
+
+                                </td> 
+                </tr>
 		</tbody></table>
 </FORM>
 <?php
 }
 $HD_Form -> create_form ($form_action, $list, $id=null) ;
+
+$FG_TABLE_ALTERNATE_ROW_COLOR [] = "#FFFFFF";
+$FG_TABLE_ALTERNATE_ROW_COLOR [] = "#F2F8FF";
+
+$QUERY = "SELECT paymentmethod, count(*), sum(amount) FROM cc_epayment_log"
+	.($HD_Form -> FG_TABLE_CLAUSE?" WHERE ".$HD_Form -> FG_TABLE_CLAUSE:"")
+	." GROUP BY paymentmethod ORDER BY paymentmethod ASC";
+
+$list_total_day = $pmtable -> SQLExec($DBHandle, $QUERY);
+
+if (is_array ( $list_total_day ) && count ( $list_total_day ) > 0) {
+
+        $mmax = 0;
+        $totalcall == 0;
+        $totalminutes = 0;
+        $totalsuccess = 0;
+        $totalfail = 0;
+        foreach ( $list_total_day as $data ) {
+                if ($mmax < $data [2])
+                        $mmax = $data [2];
+                $totalsum += $data [2];
+                $totalcount += $data [1];
+        }
+        $max_fail = 0;
+
+?>
+<br>
+<center>
+<table border="0" cellspacing="0" cellpadding="0" width="700px">
+	<tbody>
+		<tr>
+			<td bgcolor="#000000">
+			<table border="0" cellspacing="1" cellpadding="2" width="100%">
+				<tbody>
+					<tr>
+						<td align="center" class="bgcolor_019"></td>
+						<td class="bgcolor_020" align="center" colspan="3"><font
+							class="fontstyle_003"><?php echo gettext ( "PAYMENT SUMMARY" ); ?></font></td>
+					</tr>
+					<tr class="bgcolor_019">
+						<td align="center" class="bgcolor_020"><font class="fontstyle_003"><?php echo gettext ( "PAYMENT METHOD" ); ?></font></td>
+						<td align="center"><font class="fontstyle_003"><?php echo gettext ( "AMOUNT" );	?></font></td>
+						<td align="center"><font class="fontstyle_003"><?php echo gettext ( "GRAPHIC" ); ?></font></td>
+						<td align="center"><font class="fontstyle_003"><?php echo gettext ( "COUNT" ); ?></font></td>
+
+						<!-- LOOP -->
+	<?php
+	$i = 0;
+	$j = 0;
+	foreach ( $list_total_day as $data ) {
+		$i = ($i + 1) % 2;
+		
+		if ($mmax > 0)
+			$widthbar = intval ( ($data [2] / $mmax) * 150 );
+		?>
+		</tr>
+					<tr>
+						<td align="right" class="sidenav" nowrap="nowrap"><font
+							class="fontstyle_003"><?php
+		echo $data [0]?></font></td>
+						<td bgcolor="<?php
+		echo $FG_TABLE_ALTERNATE_ROW_COLOR [$i]?>"
+							align="right" nowrap="nowrap"><font class="fontstyle_006"><?php
+		echo display_2dec($data[2])?> </font></td>
+						<td bgcolor="<?php
+		echo $FG_TABLE_ALTERNATE_ROW_COLOR [$i]?>"
+							align="left" nowrap="nowrap" width="<?php
+		echo $widthbar + 40?>">
+						<table cellspacing="0" cellpadding="0">
+							<tbody>
+								<tr>
+									<td bgcolor="#e22424"><img
+										src="<?php
+		echo Images_Path;
+		?>/spacer.gif"
+										width="<?php echo $widthbar?>" height="6"></td>
+								</tr>
+							</tbody>
+						</table>
+						</td>
+						<td bgcolor="<?php echo $FG_TABLE_ALTERNATE_ROW_COLOR [$i]?>"
+							align="right" nowrap="nowrap"><font class="fontstyle_006"><?php echo $data [1]?></font></td>
+				     <?php
+					$j ++;
+				}
+				
+				?>                   	
+				</tr>
+					<tr bgcolor="bgcolor_019">
+						<td align="right" nowrap="nowrap"><font class="fontstyle_003"><?php
+						echo gettext ( "TOTAL" );
+						?></font></td>
+						<td align="center" nowrap="nowrap" colspan="2"><font
+							class="fontstyle_003"><?php echo display_2dec($totalsum)?> </font></td>
+						<td align="center" nowrap="nowrap"><font class="fontstyle_003"><?php echo $totalcount?></font></td>
+					</tr>
+					<!-- END TOTAL -->
+
+				</tbody>
+			</table>
+			<!-- END ARRAY GLOBAL //--></td>
+		</tr>
+	</tbody>
+</table>
+</center>
+<br>
+<?php } else { ?>
+<center>
+<h3><?php echo gettext ( "No calls in your selection");?>.</h3>
+<?php  } ?>
+</center>
+
+<?
+
 
 // #### FOOTER SECTION
 $smarty->display('footer.tpl');

@@ -33,7 +33,7 @@
 
 
 
-getpost_ifset(array('id', 'status', 'Period', 'frommonth', 'fromstatsmonth', 'tomonth', 'tostatsmonth', 'fromday', 'fromstatsday_sday', 'fromstatsmonth_sday', 'today', 'tostatsday_sday', 'tostatsmonth_sday', 'stitle', 'atmenu', 'current_page', 'order', 'sens','popup_select'));
+getpost_ifset(array('id', 'status', 'Period', 'frommonth', 'fromstatsmonth', 'tomonth', 'tostatsmonth', 'fromday', 'fromstatsday_sday', 'fromstatsmonth_sday', 'today', 'tostatsday_sday', 'tostatsmonth_sday', 'stitle', 'atmenu', 'current_page', 'order', 'sens','popup_select', 'pmethod'));
 
 $HD_Form = new FormHandler("cc_epayment_log");
 
@@ -88,7 +88,11 @@ if($date_clause != "")
 	if (strlen($HD_Form -> FG_TABLE_CLAUSE)>0) $date_clause =" AND ".$date_clause;
 	$HD_Form -> FG_TABLE_CLAUSE.=" ".$date_clause;
 }
-
+if ($pmethod == '') $pmethod = 'all'; 
+if ($pmethod != 'all') { 
+        $HD_Form -> FG_TABLE_CLAUSE.=" AND UPPER(paymentmethod)=UPPER('$pmethod')"; 
+        print_r($HD_Form -> FG_TABLE_CLAUSE); 
+} 
 
 $status_list = Constants::getPaymentStateList();
 
