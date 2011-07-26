@@ -55,3 +55,7 @@ ALTER TABLE `cc_sip_buddies`
   CHANGE `rtpkeepalive` `rtpkeepalive` VARCHAR( 15 ) CHARACTER SET utf8 COLLATE utf8_bin NOT NULL;
 
 ALTER TABLE cc_trunk CHANGE removeprefix removeprefix CHAR( 30 ) CHARACTER SET utf8 COLLATE utf8_bin NULL DEFAULT NULL;
+
+INSERT INTO cc_config (config_title, config_key, config_value, config_description, config_valuetype, config_listvalues, config_group_title)
+    VALUES ('System startup time', 'startup_time', '0',
+            'Numbers in seconds since 1970-01-01 (Unix epoch)', 0, NULL, 'global');

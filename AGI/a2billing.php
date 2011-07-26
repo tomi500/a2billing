@@ -137,6 +137,19 @@ define ("WRITELOG_QUERY", true);
 $instance_table = new Table();
 $A2B -> set_instance_table ($instance_table);
 
+$startupsystem = exec('date +%s -d "`cut -f1 -d. /proc/uptime` seconds ago"');
+$startuptime = 10 + $A2B->config['global']['startup_time'];
+if ($startuptime == 0) {
+	$QUERY = "UPDATE cc_config SET config_value=$startupsystem WHERE config_key='startup_time' AND config_group_title='global'";
+	$A2B -> DBHandle -> Execute($QUERY);
+} elseif ($startupsystem > $startuptime) {
+	$QUERY = "UPDATE cc_config SET config_value=$startupsystem WHERE config_key='startup_time' AND config_group_title='global'";
+	$A2B -> DBHandle -> Execute($QUERY);
+	$QUERY = "UPDATE cc_card,cc_trunk SET cc_card.inuse=0, cc_trunk.inuse=0";
+	$A2B -> DBHandle -> Execute($QUERY);
+$A2B -> debug( ERROR, $agi, __FILE__, __LINE__, "[StartupSystem::> ".$startupsystem."]");
+}
+
 //GET CURRENCIES FROM DATABASE
 $QUERY =  "SELECT id, currency, name, value FROM cc_currencies ORDER BY id";
 $result = $A2B -> instance_table -> SQLExec ($A2B->DBHandle, $QUERY, 1, 300);
