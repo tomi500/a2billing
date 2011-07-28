@@ -1218,7 +1218,7 @@ class RateEngine
 			$firstrand = false;
 			$intellect_count = -1;
 			$status = 1;
-			
+			$outcid = 0;
 			//$this->answeredtime='60';
 			//$this->dialstatus='ANSWERED';
 			// LOOOOP FOR THE FAILOVER LIMITED TO failover_recursive_limit

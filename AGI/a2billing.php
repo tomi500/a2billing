@@ -137,16 +137,28 @@ define ("WRITELOG_QUERY", true);
 $instance_table = new Table();
 $A2B -> set_instance_table ($instance_table);
 
-$startupsystem = exec('date +%s -d "`cut -f1 -d. /proc/uptime` seconds ago"');
-$startuptime = $A2B->config['global']['startup_time'];
-if ($startuptime == 0) {
-	$QUERY = "UPDATE cc_config SET config_value=$startupsystem+2 WHERE config_key='startup_time' AND config_group_title='global'";
-	$A2B -> DBHandle -> Execute($QUERY);
-} elseif ($startupsystem > $startuptime) {
-	$QUERY = "UPDATE cc_config SET config_value=$startupsystem+2 WHERE config_key='startup_time' AND config_group_title='global'";
-	$A2B -> DBHandle -> Execute($QUERY);
-	$QUERY = "UPDATE cc_card,cc_trunk SET cc_card.inuse=0, cc_trunk.inuse=0";
-	$A2B -> DBHandle -> Execute($QUERY);
+//preg_match("/up (.+), (\\d+) user/", `uptime`, $matches);
+//$uptime = $matches[1];
+//$A2B -> debug( ERROR, $agi, __FILE__, __LINE__, 'uptimeFreeBSD='.$uptime);
+$uptime = exec("cat /proc/uptime");
+if ($uptime == '') {
+	$uptime = explode(" ", exec("/sbin/sysctl -n kern.boottime"));
+	$startUpSystem = str_replace( ",", "", $uptime[3]);
+} else {
+	$uptime = split(" ",$uptime);
+	$startUpSystem = time() - $uptime[0];
+}
+if ($startUpSystem) {
+	$startUpTime = $A2B->config['global']['startup_time'];
+	if ($startUpTime == 0) {
+		$QUERY = "UPDATE cc_config SET config_value=$startUpSystem WHERE config_key='startup_time' AND config_group_title='global'";
+		$A2B -> DBHandle -> Execute($QUERY);
+	} elseif ($startUpSystem > $startUpTime+30) {
+		$QUERY = "UPDATE cc_config SET config_value=$startUpSystem WHERE config_key='startup_time' AND config_group_title='global'";
+		$A2B -> DBHandle -> Execute($QUERY);
+		$QUERY = "UPDATE cc_card,cc_trunk SET cc_card.inuse=0, cc_trunk.inuse=0";
+		$A2B -> DBHandle -> Execute($QUERY);
+	}
 }
 
 //GET CURRENCIES FROM DATABASE
