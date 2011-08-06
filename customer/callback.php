@@ -160,25 +160,27 @@ echo $CC_help_callback;
   <?php echo gettext("You can initiate the callback by entering your phonenumber and the number you wish to call!");?>
   </font>
   </center>
-   <table align="center" class="callback_maintable">
+  <center>
+   <table class="callback_maintable" align="center">
 	<form name="theForm" action=<?php echo $PHP_SELF;?> method="POST" >
 	<INPUT type="hidden" name="callback" value="1">
 	<tr class="bgcolor_001">
-	<td align="left" valign="bottom">
+	<td align="right" valign="bottom">
 			<br/>
 			<font class="fontstyle_007"><?php echo gettext("Your Phone Number");?> :</font>
-			<input class="form_input_text" name="called" value="<?php echo $called; ?>" size="30" maxlength="40" >
+			<input class="form_input_text" name="called" value="<?php echo $called; ?>" size="30" maxlength="40">&nbsp;
 			<br/><br/>
 			<font class="fontstyle_007"><?php echo gettext("The number you wish to call");?> :</font>
-			<input class="form_input_text" name="calling" value="<?php echo $calling; ?>" size="30" maxlength="40">
+			<input class="form_input_text" name="calling" value="<?php echo $calling; ?>" size="30" maxlength="40">&nbsp;
 			<br/><br/>
 		</td>	
 		<td align="center" valign="middle"> 
 		<input class="form_input_button"  value="[ <?php echo gettext("Click here to Place Call");?> ]" type="submit"> 
 		</td>
-    </tr>
+	</tr>
 	</form>
-  </table>
+   </table>
+  </center>
   <br>
 <br></br><br></br>
 <?php

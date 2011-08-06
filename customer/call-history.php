@@ -336,10 +336,10 @@ if ($ACXSEERECORDING && $nb_record>0){ echo '
 				</tr></table></td>
 			</tr>		
 			<tr>
-				<td  align="left" class="bgcolor_004">
+				<td  align="left" class="bgcolor_002">
 					<font class="fontstyle_003">&nbsp;&nbsp;<?php echo gettext("PHONENUMBER");?></font>
 				</td>
-				<td  align="left" class="bgcolor_005">
+				<td  align="left" class="bgcolor_003">
 				<table width="100%" border="0" cellspacing="0" cellpadding="0">
 				<tr><td class="fontstyle_searchoptions">&nbsp;&nbsp;<INPUT TYPE="text" NAME="phonenumber" value="<?php echo $phonenumber?>" class="form_input_text"></td>
 				<td  align="center" class="fontstyle_searchoptions"><input type="radio" NAME="phonenumbertype" value="1" <?php if((!isset($phonenumbertype))||($phonenumbertype==1)){?>checked<?php }?>><?php echo gettext("Exact");?></td>
@@ -350,11 +350,11 @@ if ($ACXSEERECORDING && $nb_record>0){ echo '
 			</tr>		
 			<!-- Select Calltype: -->
 			<tr>
-			  <td class="bgcolor_002" align="left" ><font class="fontstyle_003">&nbsp;&nbsp;<?php echo gettext("CALL TYPE"); ?></font></td>
-			  <td class="bgcolor_003" align="center">
+			  <td class="bgcolor_004" align="left" ><font class="fontstyle_003">&nbsp;&nbsp;<?php echo gettext("CALL TYPE"); ?></font></td>
+			  <td class="bgcolor_005" align="center">
 			  <table width="100%" border="0" cellspacing="0" cellpadding="0">
 								<tr>
-					<td  class="fontstyle_searchoptions">
+					<td  class="fontstyle_searchoptions">&nbsp;
 					<select NAME="choose_calltype" size="1" class="form_input_select" >
 						<option value='-1' <?php if (($choose_calltype==-1) || (!isset($choose_calltype))){?>selected<?php } ?>><?php echo gettext('ALL CALLS') ?>
 								</option>

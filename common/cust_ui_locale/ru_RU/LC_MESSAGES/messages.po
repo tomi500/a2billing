@@ -231,14 +231,12 @@ msgid "Error card !!!"
 msgstr "Неправильная карта"
 
 #: simulator.php:146
-#, fuzzy
 msgid "Simulator"
 msgstr "Симулятор Звонков"
 
 #: simulator.php:152
-#, fuzzy
 msgid "Enter the number you wish to call"
-msgstr "Enter the number which you wish to assign to the code here"
+msgstr "Введите номер для проверки"
 
 #: simulator.php:157
 #, fuzzy
@@ -249,6 +247,10 @@ msgstr "Ваш Баланс"
 #, fuzzy
 msgid "SEARCH"
 msgstr "МАРТ"
+
+#: simulator.php:176
+msgid "Cost per minute"
+msgstr "Стоимость полной минуты разговора"
 
 #: simulator.php:185
 msgid "Simulator found a rate for your destination"
@@ -265,11 +267,11 @@ msgstr "НАПРАВЛЕНИЕ"
 
 #: simulator.php:214
 msgid "CallTime available"
-msgstr "Время доступное для разговора"
+msgstr "Время, доступное для разговора"
 
 #: simulator.php:216 call-history.php:380
 msgid "Minutes"
-msgstr "Минуты"
+msgstr "мин"
 
 #: simulator.php:245
 msgid "The number, you have entered, is not correct!"
@@ -562,7 +564,7 @@ msgstr "Часовой пояс"
 #: form_data/FG_var_signup.inc:268 form_data/FG_var_phonenumber.inc:61
 #: call-history.php:324
 msgid "PHONENUMBER"
-msgstr "НОМЕР ТЕЛЕФОНА"
+msgstr "НОМЕР НАЗНАЧЕНИЯ"
 
 #: form_data/FG_var_signup.inc:272
 msgid "Insert your phone number"
@@ -1186,14 +1188,12 @@ msgid "Your new phone number has been inserted."
 msgstr "зарегистрирован"
 
 #: form_data/FG_var_callerid.inc:39 call-history.php:131
-#, fuzzy
 msgid "CallerID"
-msgstr "Статистика звонков"
+msgstr "Номер звонящего"
 
 #: form_data/FG_var_callerid.inc:48 form_data/FG_var_callerid.inc:81
-#, fuzzy
 msgid "CALLERID"
-msgstr "CALL"
+msgstr "НОМЕР ЗВОНЯЩЕГО"
 
 #: form_data/FG_var_callerid.inc:54
 msgid "CallerID list"
@@ -2573,7 +2573,7 @@ msgstr "Вы можете обновить настройки уведомлен
 
 #: lib/customer.help.php:57
 msgid "Simulate the calling process to discover the cost per minute of a call, and the number of minutes you can call that number with your current credit."
-msgstr "Симулируйте процесс звонка для того. чтобы узнать цену звонка, и количество минут, которые может длиться звонок с текущим кредитом"
+msgstr "Симулируйте процесс звонка для того. чтобы узнать цену звонка, и количество минут, которые сможет длиться звонок с текущим кредитом"
 
 #: lib/customer.help.php:59
 msgid "Configuration information for SIP and IAX Client. You can simply copy and paste it in your configuration files and do necessary modifications."
@@ -2644,9 +2644,8 @@ msgid "Map single digit to your most dialed numbers."
 msgstr "Назначьте 1 цифру на ваши самые используемые номера"
 
 #: lib/customer.help.php:89
-#, fuzzy
 msgid "Callback : Entre your phone number and the phone number you wish to call."
-msgstr "Вы можете сделать обратный звонок указав свой номер телефона и номер по которому хотите позвонить"
+msgstr "Вы можете назначить обратный звонок, чтобы не платить за исходящую связь!"
 
 #: A2B_ticket_view.php:58
 msgid "Ticket updated successfully"
@@ -2738,13 +2737,12 @@ msgid "Error : There is no route to call back your phonenumber!"
 msgstr "Ошибка: отсутствует маршрут для осуществления звонка на  ваш номер"
 
 #: callback.php:189
-#, fuzzy
 msgid "Error : You have to specify your phonenumber and the number you wish to call!"
-msgstr "Вы можете сделать обратный звонок указав свой номер телефона и номер по которому хотите позвонить"
+msgstr "Ошибка : Оба номера должны быть существующими!"
 
 #: callback.php:208
 msgid "You can initiate the callback by entering your phonenumber and the number you wish to call!"
-msgstr "Вы можете сделать обратный звонок указав свой номер телефона и номер по которому хотите позвонить"
+msgstr "Чтобы соединиться с нужным абонентом введите свой номер телефона и номер по которому хотите позвонить"
 
 #: callback.php:217
 msgid "Your Phone Number"
@@ -3260,7 +3258,7 @@ msgstr "БАЛАНС"
 #: userinfo.php:152
 #, fuzzy
 msgid "CALLING PACKAGE"
-msgstr "Колличество времени"
+msgstr "Количество времени"
 
 #: userinfo.php:158
 #, fuzzy
@@ -3378,7 +3376,7 @@ msgstr "ОТКЛЮЧИТЬ"
 
 #: call-history.php:132
 msgid "PhoneNumber"
-msgstr "Номер телефона"
+msgstr "Номер назначения"
 
 #: call-history.php:134
 msgid "Duration"
@@ -3450,11 +3448,11 @@ msgstr "ДАЛЬШЕ"
 
 #: call-history.php:577
 msgid "SUMMARY"
-msgstr "ИТОГ"
+msgstr "СВОДНАЯ ТАБЛИЦА"
 
 #: call-history.php:589
 msgid "CALLING CARD MINUTES"
-msgstr "Колличество времени"
+msgstr "Количество времени"
 
 #: call-history.php:593
 msgid "DURATION"
@@ -3474,11 +3472,11 @@ msgstr "СРЕДНЯЯ ДЛИТЕЛЬНОСТЬ ЗВОНКА"
 
 #: call-history.php:596
 msgid "ALOC"
-msgstr ""
+msgstr "УСРЕДНЁННО"
 
 #: call-history.php:597
 msgid "TOTAL COST"
-msgstr "ИТОГО"
+msgstr "ВСЕГО"
 
 #: call-history.php:646
 msgid "TOTAL"
