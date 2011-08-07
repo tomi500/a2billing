@@ -39,11 +39,12 @@ if (!has_rights(ACX_DASHBOARD)) {
 	die();
 }
 
-exec("lsb_release -d 2> /dev/null", $output);
+exec("env PATH=/usr/bin:$PATH lsb_release -d 2> /dev/null", $output);
 
 $distro_info = $output[0];
 $info_tmp = preg_split('/:/', $distro_info, 2);
 $OS = trim($info_tmp[1]);
+if (!$OS) $OS = exec("env PATH=/usr/bin:$PATH uname -ro");
 $OS_img = preg_split('/ /', $OS);
 
 $info_tmp = preg_split("/ - /", COPYRIGHT);
