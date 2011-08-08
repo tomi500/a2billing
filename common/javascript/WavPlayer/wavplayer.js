@@ -74,7 +74,7 @@ function WavPlayer(pid, heartext) {
 			this.obj.onclick = (function(obj){ return function(){ window.WavPlayer.doPlay(obj); return false; } })(this.obj);
 			this.Last = undefined;
 		} else {
-			this.obj.innerHTML = this.SoundPos.toFixed(2)+"/"+this.SoundReady.toFixed(2)+"/"+this.SoundLen.toFixed(2);
+			this.obj.innerHTML = this.SoundPos.toFixed(2)+"/"+this.SoundReady.toFixed(2);
 		}
 	}
 	this.SoundState = function (state, position) {
