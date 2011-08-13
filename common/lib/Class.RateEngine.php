@@ -761,10 +761,12 @@ class RateEngine
 		$num_sec_WR = intval($num_min_WR * 60);
 		$this -> ratecard_obj[$K]['timeout_without_rules'] = $num_sec_WR + $this -> freetimetocall_left[$K];
 		
-		$this -> ratecard_obj[$K]['timeout'] = $TIMEOUT + $this -> freetimetocall_left[$K];
+		$TIMEOUT = $TIMEOUT + $this -> freetimetocall_left[$K];
+		if ($TIMEOUT > $A2B->agiconfig['maxtime_tounlimited_calls']) $TIMEOUT = $A2B->agiconfig['maxtime_tounlimited_calls'];
+		$this -> ratecard_obj[$K]['timeout'] = $TIMEOUT;
 		if ($this -> debug_st) print_r($this -> ratecard_obj[$K]);
 		
-		return $TIMEOUT + $this -> freetimetocall_left[$K];
+		return $TIMEOUT;
 	}
 
 	/*
