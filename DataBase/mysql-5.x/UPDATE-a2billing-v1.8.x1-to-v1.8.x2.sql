@@ -44,7 +44,8 @@ INSERT INTO cc_invoice_conf (key_val) VALUES ('comments');
 
 ALTER TABLE cc_sip_buddies ADD (
   `callbackextension` varchar(15) NOT NULL DEFAULT '',
-  `directmedia` varchar(15) NOT NULL DEFAULT 'update,nonat'
+  `directmedia` varchar(15) NOT NULL DEFAULT 'update,nonat',
+  `encryption` varchar(20) COLLATE utf8_bin NOT NULL
 );
 
 ALTER TABLE `cc_sip_buddies`
@@ -59,3 +60,7 @@ ALTER TABLE cc_trunk CHANGE removeprefix removeprefix CHAR( 30 ) CHARACTER SET u
 INSERT INTO cc_config (config_title, config_key, config_value, config_description, config_valuetype, config_listvalues, config_group_title)
     VALUES ('System startup time', 'startup_time', '0',
             'Numbers in seconds since 1970-01-01 (Unix epoch)', 0, NULL, 'global');
+
+ALTER TABLE cc_iax_buddies ADD (
+  `forceencryption` varchar(20) COLLATE utf8_bin NOT NULL
+);
