@@ -45,7 +45,8 @@ INSERT INTO cc_invoice_conf (key_val) VALUES ('comments');
 ALTER TABLE cc_sip_buddies ADD (
   `callbackextension` varchar(15) NOT NULL DEFAULT '',
   `directmedia` varchar(15) NOT NULL DEFAULT 'update,nonat',
-  `encryption` varchar(20) COLLATE utf8_bin NOT NULL
+  `encryption` varchar(20) COLLATE utf8_bin NOT NULL,
+  `transport` varchar(20) COLLATE utf8_bin NOT NULL
 );
 
 ALTER TABLE `cc_sip_buddies`
