@@ -139,7 +139,7 @@ class RateEngine
 		// POSIX equivalents, and test each of them against the dialed number
 		$prefixclause .= " OR (dialprefix LIKE '&_%' ESCAPE '&' AND '$phonenumber' ";
 		$prefixclause .= "REGEXP REPLACE(REPLACE(REPLACE(REPLACE(REPLACE(CONCAT('^', dialprefix, '$'), ";
-		$prefixclause .= "'X', '[0-9]'), 'Z', '[1-9]'), 'N', '[2-9]'), '.', '.+'), '_', ''))";
+		$prefixclause .= "'X', '[[:digit:]]'), 'Z', '[1-9]'), 'N', '[2-9]'), '.', '.+'), '_', ''))";
 
         // select group by 5 ... more easy to count
 		$QUERY = "SELECT
@@ -1195,7 +1195,7 @@ class RateEngine
 			$A2B -> debug( INFO, $agi, __FILE__, __LINE__, "[CC_asterisk_stop : SQL: DONE : result=".$result."]");
 			$A2B -> debug( DEBUG, $agi, __FILE__, __LINE__, "[CC_asterisk_stop : SQL: $QUERY]");
 		}
-
+		monitor_recognize($A2B);
 		if ($sessiontime>0) {
 			
 			if ($didcall==0 && $callback==0) {
@@ -1377,7 +1377,7 @@ class RateEngine
 				$prefixclausemain .= "dialprefixa='defaultprefix')";
 				$prefixclausemain .= " OR (dialprefixa LIKE '&_%' ESCAPE '&' AND '$destination' ";
 				$prefixclausemain .= "REGEXP REPLACE(REPLACE(REPLACE(REPLACE(REPLACE(CONCAT('^', dialprefixa, '$'), ";
-				$prefixclausemain .= "'X', '[0-9]'), 'Z', '[1-9]'), 'N', '[2-9]'), '.', '.+'), '_', ''))";
+				$prefixclausemain .= "'X', '[[:digit:]]'), 'Z', '[1-9]'), 'N', '[2-9]'), '.', '.+'), '_', ''))";
 				$prefixclause = $prefixclausemain;
 				$periodexpiry = 0;
 				$maxsecperperiod = -1;

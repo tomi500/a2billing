@@ -50,24 +50,32 @@ if (($download == "file") && $file) {
 	if (strpos($file, '/') !== false) exit;
 	
 	$value_de = base64_decode ( $file );
-	$dl_full = MONITOR_PATH . "/" . $value_de;
-	$dl_name = $value_de;
-	
-	if (! file_exists ( $dl_full )) {
-		echo gettext ( "ERROR: Cannot download file " . $dl_full . ", it does not exist.<br>" );
+	$parts = pathinfo($value_de);
+	$value = $parts['filename'];
+	$handle = DbConnect();
+	$instance_table = new Table();
+	$QUERY = "SELECT YEAR(starttime), MONTH(starttime), DAYOFMONTH(starttime), cc_card.username FROM cc_call LEFT JOIN cc_card ON cc_card.id=card_id WHERE uniqueid='$value' AND real_sessiontime>0 ORDER BY cc_call.id DESC LIMIT 1";
+	$result = $instance_table -> SQLExec ($handle, $QUERY);
+	if (is_array($result) && count($result)>0) {
+	    $dl_full = MONITOR_PATH . "/" . $result[0][3] . "/" . $result[0][0] . "/" . $result[0][1] . "/" . $result[0][2] . "/" . $value_de;
+	    $dl_name = $value_de;
+
+	    if (! file_exists ( $dl_full )) {
+		echo gettext ( "ERROR: Cannot download file " . $dl_name . ", it does not exist.<br>" );
 		exit ();
+	    }
+
+	    header ( "Content-Type: application/octet-stream" );
+	    header ( "Content-Disposition: attachment; filename=$dl_name" );
+	    header ( "Content-Length: " . filesize ( $dl_full ) );
+	    header ( "Accept-Ranges: bytes" );
+	    header ( "Pragma: no-cache" );
+	    header ( "Expires: 0" );
+	    header ( "Cache-Control: must-revalidate, post-check=0, pre-check=0" );
+	    header ( "Content-transfer-encoding: binary" );
+
+	    @readfile ( $dl_full );
 	}
-	
-	header ( "Content-Type: application/octet-stream" );
-	header ( "Content-Disposition: attachment; filename=$dl_name" );
-	header ( "Content-Length: " . filesize ( $dl_full ) );
-	header ( "Accept-Ranges: bytes" );
-	header ( "Pragma: no-cache" );
-	header ( "Expires: 0" );
-	header ( "Cache-Control: must-revalidate, post-check=0, pre-check=0" );
-	header ( "Content-transfer-encoding: binary" );
-	
-	@readfile ( $dl_full );
 	exit ();
 }
 
@@ -111,22 +119,22 @@ $FG_TABLE_DEFAULT_SENS = "DESC";
 $DBHandle = DbConnect ();
 
 $FG_TABLE_COL = array ();
-$FG_TABLE_COL [] = array (gettext ( "Date" ), "starttime", "15%", "center", "SORT", "19", "", "", "", "", "", "display_dateformat" );
+$FG_TABLE_COL [] = array (gettext ( "Date" ), "starttime", "11%", "center", "SORT", "19", "", "", "", "", "", "display_dateformat" );
 if ( has_rights ( ACX_SEE_CUSTOMERS_CALLERID )) {
-	$FG_TABLE_COL [] = array (gettext ( "CallerID" ), "src", "7%", "center", "SORT", "30" );
+	$FG_TABLE_COL [] = array (gettext ( "CallerID" ), "src", "9%", "center", "SORT", "30" );
 }
-$FG_TABLE_COL [] = array (gettext ( "DNID" ), "dnid", "7%", "center", "SORT", "30" );
-$FG_TABLE_COL [] = array (gettext ( "Phone Number" ), "calledstation", "13%", "center", "SORT", "30", "", "", "", "", "", "" );
-$FG_TABLE_COL [] = array (gettext ( "Destination" ), "dest","10%", "center", "SORT", "15", "lie", "cc_prefix", "destination,prefix", "prefix='%id'", "%1" );
+$FG_TABLE_COL [] = array (gettext ( "DNID" ), "dnid", "9%", "center", "SORT", "30" );
+$FG_TABLE_COL [] = array (gettext ( "Phone Number" ), "calledstation", "9%", "center", "SORT", "30", "", "", "", "", "", "" );
+$FG_TABLE_COL [] = array (gettext ( "Destination" ), "dest","9%", "center", "SORT", "15", "lie", "cc_prefix", "destination,prefix", "prefix='%id'", "%1" );
 $FG_TABLE_COL [] = array (gettext ( "Sell Rate" ), "rateinitial", "8%", "center", "SORT", "30", "", "", "", "", "", "display_2bill" );
-$FG_TABLE_COL [] = array (gettext ( "Duration" ), "sessiontime", "8%", "center", "SORT", "30", "", "", "", "", "", "display_minute" );
-$FG_TABLE_COL [] = array (gettext ( "Account" ), "card_id", "10%", "center", "sort", "", "lie_link", "cc_card", "username,id", "id='%id'", "%1", "", "A2B_entity_card.php" );
+$FG_TABLE_COL [] = array (gettext ( "Duration" ), "sessiontime", "5%", "center", "SORT", "30", "", "", "", "", "", "display_minute" );
+$FG_TABLE_COL [] = array (gettext ( "Account" ), "card_id", "8%", "center", "sort", "", "lie_link", "cc_card", "username,id", "id='%id'", "%1", "", "A2B_entity_card.php" );
 $FG_TABLE_COL [] = array ('<acronym title="' . gettext ( "Terminate Cause" ) . '">' . gettext ( "TC" ) . '</acronym>', "terminatecauseid", "1%", "center", "SORT", "", "list", $dialstatus_list );
-$FG_TABLE_COL [] = array (gettext ( "CallType" ), "sipiax", "10%", "center", "SORT", "", "list", $list_calltype );
-$FG_TABLE_COL [] = array (gettext ( "Sell" ), "sessionbill", "10%", "center", "SORT", "30", "", "", "", "", "", "display_2bill" );
+$FG_TABLE_COL [] = array (gettext ( "CallType" ), "sipiax", "7%", "center", "SORT", "", "list", $list_calltype );
+$FG_TABLE_COL [] = array (gettext ( "Sell" ), "sessionbill", "7%", "center", "SORT", "30", "", "", "", "", "", "display_2bill" );
 
 if (LINK_AUDIO_FILE) {
-	$FG_TABLE_COL [] = array ("", "uniqueid", "7%", "center", "", "30", "", "", "", "", "", "linkonmonitorfile" );
+	$FG_TABLE_COL [] = array ("", "uniqueid", "13%", "center", "", "30", "", "", "", "", "", "linkonmonitorfile" );
 }
 
 if ( has_rights ( ACX_SEE_CUSTOMERS_CALLERID )) {

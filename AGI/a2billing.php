@@ -153,6 +153,33 @@ if ($startUpSystem) {
 	if ($startUpTime == 0) {
 		$QUERY = "UPDATE cc_config SET config_value=$startUpSystem WHERE config_key='startup_time' AND config_group_title='global'";
 		$A2B -> DBHandle -> Execute($QUERY);
+		if (is_dir(MONITOR_PATH)) {
+		    if ($dh = opendir(MONITOR_PATH)) {
+			while (($value_de = readdir($dh)) != false) {
+			    $dl_short = MONITOR_PATH . "/" . $value_de;
+			    if (is_dir($dl_short)) {
+				$A2B -> debug( ERROR, $agi, __FILE__, __LINE__, $dl_short);
+				continue;
+			    }
+			    $parts = pathinfo($value_de);
+			    $value = $parts['filename'];
+			    $QUERY = "SELECT YEAR(starttime), MONTH(starttime), DAYOFMONTH(starttime), cc_card.username FROM cc_call LEFT JOIN cc_card ON cc_card.id=card_id WHERE uniqueid='$value' ORDER BY cc_call.id DESC LIMIT 1";
+			    $result = $A2B -> instance_table -> SQLExec ($A2B->DBHandle, $QUERY);
+			    if (is_array($result) && count($result)>0) {
+				$dl_full = MONITOR_PATH . "/" . $result[0][3];
+				if (!file_exists($dl_full)) mkdir($dl_full);
+				$dl_full .= "/" . $result[0][0];
+				if (!file_exists($dl_full)) mkdir($dl_full);
+				$dl_full .= "/" . $result[0][1];
+				if (!file_exists($dl_full)) mkdir($dl_full);
+				$dl_full .= "/" . $result[0][2];
+				if (!file_exists($dl_full)) mkdir($dl_full);
+				rename($dl_short, $dl_full . "/" . $value_de);
+			    }
+			}
+			closedir($dh);
+		    }
+		}
 	} elseif ($startUpSystem > $startUpTime+30) {
 		$QUERY = "UPDATE cc_config SET config_value=$startUpSystem WHERE config_key='startup_time' AND config_group_title='global'";
 		$A2B -> DBHandle -> Execute($QUERY);

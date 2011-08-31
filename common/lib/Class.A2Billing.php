@@ -1371,7 +1371,7 @@ if (!defined('MONITOR_PATH')) define ("MONITOR_PATH",	isset($this->config['webui
 						$this -> debug( INFO, $agi, __FILE__, __LINE__, "[UPDATE DID_DESTINATION]:[result:$result]");
 						
 						$this -> bill_did_aleg ($agi, $inst_listdestination, $answeredtime);
-						
+						monitor_recognize($this);
 						return 1;
 					}
 					
@@ -1641,6 +1641,7 @@ if (!defined('MONITOR_PATH')) define ("MONITOR_PATH",	isset($this->config['webui
                         $result = $this -> instance_table -> SQLExec ($this->DBHandle, $QUERY, 0);
                         $this -> debug( INFO, $agi, __FILE__, __LINE__, "[DID CALL - UPDATE CARD: SQL: $QUERY]:[result:$result]");
                     }
+                    monitor_recognize($this);
                     
                     // CC_DID & CC_DID_DESTINATION - cc_did.id, cc_did_destination.id
                     $QUERY = "UPDATE cc_did SET secondusedreal = secondusedreal + $answeredtime WHERE id='".$inst_listdestination[0]."'";

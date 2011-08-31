@@ -51,24 +51,32 @@ if (($download == "file") && $file && $ACXSEERECORDING) {
 	if (strpos($file, '/') !== false) exit;
 	
 	$value_de = base64_decode ( $file );
-	$dl_full = MONITOR_PATH . "/" . $value_de;
-	$dl_name = $value_de;
+	$parts = pathinfo($value_de);
+	$value = $parts['filename'];
+	$handle = DbConnect();
+	$instance_table = new Table();
+	$QUERY = "SELECT YEAR(starttime), MONTH(starttime), DAYOFMONTH(starttime), cc_card.username FROM cc_call LEFT JOIN cc_card ON cc_card.id=card_id WHERE uniqueid='$value' AND real_sessiontime>0 ORDER BY cc_call.id DESC LIMIT 1";
+	$result = $instance_table -> SQLExec ($handle, $QUERY);
+	if (is_array($result) && count($result)>0) {
+	    $dl_full = MONITOR_PATH . "/" . $result[0][3] . "/" . $result[0][0] . "/" . $result[0][1] . "/" . $result[0][2] . "/" . $value_de;
+	    $dl_name = $value_de;
 	
-	if (! file_exists ( $dl_full )) {
-		echo gettext ( "ERROR: Cannot download file " . $dl_full . ", it does not exist.<br>" );
+	    if (! file_exists ( $dl_full )) {
+		echo gettext ( "ERROR: Cannot download file " . $dl_name . ", it does not exist.<br>" );
 		exit ();
+	    }
+	
+	    header ( "Content-Type: application/octet-stream" );
+	    header ( "Content-Disposition: attachment; filename=$dl_name" );
+	    header ( "Content-Length: " . filesize ( $dl_full ) );
+	    header ( "Accept-Ranges: bytes" );
+	    header ( "Pragma: no-cache" );
+	    header ( "Expires: 0" );
+	    header ( "Cache-Control: must-revalidate, post-check=0, pre-check=0" );
+	    header ( "Content-transfer-encoding: binary" );
+	
+	    @readfile ( $dl_full );
 	}
-	
-	header ( "Content-Type: application/octet-stream" );
-	header ( "Content-Disposition: attachment; filename=$dl_name" );
-	header ( "Content-Length: " . filesize ( $dl_full ) );
-	header ( "Accept-Ranges: bytes" );
-	header ( "Pragma: no-cache" );
-	header ( "Expires: 0" );
-	header ( "Cache-Control: must-revalidate, post-check=0, pre-check=0" );
-	header ( "Content-transfer-encoding: binary" );
-	
-	@readfile ( $dl_full );
 	exit ();
 }
 

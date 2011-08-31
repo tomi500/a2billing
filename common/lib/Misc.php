@@ -32,6 +32,32 @@
 **/
 
 
+
+function monitor_recognize($handle = null) {
+	if (empty ($handle)) return false;
+	if ($handle->monitor == 1 || $handle -> agiconfig['record_call'] == 1) {
+	    $dl_short = MONITOR_PATH . "/" . $handle->uniqueid . ".";
+	    if (file_exists($dl_short . "WAV")	|| file_exists($dl_short . "wav") || file_exists($dl_short . "gsm")  || file_exists($dl_short . "mp3")
+						|| file_exists($dl_short . "sln") || file_exists($dl_short . "g723") || file_exists($dl_short . "g729")) {
+		if (preg_match("/wav/i", $handle->agiconfig['monitor_formatfile'])) $monitor_ext = "WAV";
+		else $monitor_ext = $handle->agiconfig['monitor_formatfile'];
+		$QUERY = "SELECT YEAR(starttime), MONTH(starttime), DAYOFMONTH(starttime) FROM cc_call WHERE uniqueid='$handle->uniqueid' ORDER BY id DESC LIMIT 1";
+		$result = $handle->instance_table -> SQLExec ($handle -> DBHandle, $QUERY);
+		$dl_full = MONITOR_PATH . "/" . $handle->username;
+		if (!file_exists($dl_full)) mkdir($dl_full);
+		$dl_full .= "/" . $result[0][0];
+		if (!file_exists($dl_full)) mkdir($dl_full);
+		$dl_full .= "/" . $result[0][1];
+		if (!file_exists($dl_full)) mkdir($dl_full);
+		$dl_full .= "/" . $result[0][2];
+		if (!file_exists($dl_full)) mkdir($dl_full);
+		$dl_full .= "/" . $handle->uniqueid . "." . $monitor_ext;
+		rename($dl_short . $monitor_ext, $dl_full);
+	    }
+	}
+	return true;
+}
+
 /*
  * a2b_round: specific function to use the same precision everywhere
  */
@@ -443,41 +469,54 @@ function remove_prefix($phonenumber) {
  * function linkonmonitorfile
  */
 function linkonmonitorfile($value) {
-	$format_list = array ('WAV','wav','gsm','mp3','sln','g723','g729');
-	$find_record = false;
-	foreach ($format_list as $c_format){
+	$handle = DbConnect();
+	$instance_table = new Table();
+	$QUERY = "SELECT YEAR(starttime), MONTH(starttime), DAYOFMONTH(starttime), cc_card.username FROM cc_call LEFT JOIN cc_card ON cc_card.id=card_id WHERE uniqueid='$value' AND real_sessiontime>0 ORDER BY cc_call.id DESC LIMIT 1";
+	$result = $instance_table -> SQLExec ($handle, $QUERY);
+	if (is_array($result) && count($result)>0) {
+	    $dl_short = MONITOR_PATH . "/" . $result[0][3] . "/" . $result[0][0] . "/" . $result[0][1] . "/" . $result[0][2];
+	    $format_list = array ('WAV','wav','gsm','mp3','sln','g723','g729');
+	    $find_record = false;
+	    foreach ($format_list as $c_format){
 		$myfile = $value . "." . $c_format;
-		$dl_full = MONITOR_PATH . "/" . $myfile;
+		$dl_full = $dl_short . "/" . $myfile;
 		if (file_exists($dl_full)) {
 			$find_record = true;
 			break;
 		}
-	}
-	if (!$find_record) return false;
-	
-	$myfile = base64_encode($myfile);
-	echo '<a href="call-log-customers.php?download=file&file=' . $myfile . '&.' . $c_format . '"></a>';
-	echo '<a target=_blank href="call-log-customers.php?download=file&file=' . $myfile . '"><img src="' . Images_Path . '/icoDisk.gif" height="16"/></a>';
+	    }
+	    if (!$find_record) return false;
+	    $myfile = base64_encode($myfile);
+	    echo '<a href="call-log-customers.php?download=file&file=' . $myfile . '&.' . $c_format . '"></a>';
+	    echo '<a target=_blank href="call-log-customers.php?download=file&file=' . $myfile . '"><img src="' . Images_Path . '/icoDisk.gif" height="16"/></a>';
+	} else return false;
 }
 
 /*
  * function linkonmonitorfile_customer
  */
 function linkonmonitorfile_customer($value) {
-	$format_list = array ('WAV','wav','gsm','mp3','sln','g723','g729');
-	$find_record = false;
-	foreach ($format_list as $c_format){
+	$handle = DbConnect();
+	$instance_table = new Table();
+	$QUERY = "SELECT YEAR(starttime), MONTH(starttime), DAYOFMONTH(starttime), cc_card.username FROM cc_call LEFT JOIN cc_card ON cc_card.id=card_id WHERE uniqueid='$value' AND real_sessiontime>0 ORDER BY cc_call.id DESC LIMIT 1";
+	$result = $instance_table -> SQLExec ($handle, $QUERY);
+	if (is_array($result) && count($result)>0) {
+	    $dl_short = MONITOR_PATH . "/" . $result[0][3] . "/" . $result[0][0] . "/" . $result[0][1] . "/" . $result[0][2];
+	    $format_list = array ('WAV','wav','gsm','mp3','sln','g723','g729');
+	    $find_record = false;
+	    foreach ($format_list as $c_format){
 		$myfile = $value . "." . $c_format;
-		$dl_full = MONITOR_PATH . "/" . $myfile;
+		$dl_full = $dl_short . "/" . $myfile;
 		if (file_exists($dl_full)) {
 			$find_record = true;
 			break;
 		}
-	}
-	if (!$find_record) return false;
-	$myfile = base64_encode($myfile);
-	echo '<a href="call-history.php?download=file&file=' . $myfile . '&.' . $c_format . '"></a> ';
-	echo '<a target=_blank href="call-history.php?download=file&file=' . $myfile . '"><img src="' . Images_Path . '/icoDisk.gif" height="16"/></a>';
+	    }
+	    if (!$find_record) return false;
+	    $myfile = base64_encode($myfile);
+	    echo '<a href="call-history.php?download=file&file=' . $myfile . '&.' . $c_format . '"></a> ';
+	    echo '<a target=_blank href="call-history.php?download=file&file=' . $myfile . '"><img src="' . Images_Path . '/icoDisk.gif" height="16"/></a>';
+	} else return false;
 }
 
 /*
