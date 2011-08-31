@@ -163,17 +163,14 @@ if ($startUpSystem) {
 			    }
 			    $parts = pathinfo($value_de);
 			    $value = $parts['filename'];
-			    $QUERY = "SELECT YEAR(starttime), MONTH(starttime), DAYOFMONTH(starttime), cc_card.username FROM cc_call LEFT JOIN cc_card ON cc_card.id=card_id WHERE uniqueid='$value' ORDER BY cc_call.id DESC LIMIT 1";
+			    $QUERY = "SELECT cc_card.username, YEAR(starttime), MONTH(starttime), DAYOFMONTH(starttime) FROM cc_call LEFT JOIN cc_card ON cc_card.id=card_id WHERE uniqueid='$value' ORDER BY cc_call.id DESC LIMIT 1";
 			    $result = $A2B -> instance_table -> SQLExec ($A2B->DBHandle, $QUERY);
 			    if (is_array($result) && count($result)>0) {
-				$dl_full = MONITOR_PATH . "/" . $result[0][3];
-				if (!file_exists($dl_full)) mkdir($dl_full);
-				$dl_full .= "/" . $result[0][0];
-				if (!file_exists($dl_full)) mkdir($dl_full);
-				$dl_full .= "/" . $result[0][1];
-				if (!file_exists($dl_full)) mkdir($dl_full);
-				$dl_full .= "/" . $result[0][2];
-				if (!file_exists($dl_full)) mkdir($dl_full);
+				$dl_full = MONITOR_PATH;
+				for ($i = 0; $i < 4; $i++) {
+				    $dl_full .= "/" . $result[0][$i];
+				    if (!file_exists($dl_full)) mkdir($dl_full);
+				}
 				rename($dl_short, $dl_full . "/" . $value_de);
 			    }
 			}

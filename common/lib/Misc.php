@@ -41,16 +41,13 @@ function monitor_recognize($handle = null) {
 						|| file_exists($dl_short . "sln") || file_exists($dl_short . "g723") || file_exists($dl_short . "g729")) {
 		if (preg_match("/wav/i", $handle->agiconfig['monitor_formatfile'])) $monitor_ext = "WAV";
 		else $monitor_ext = $handle->agiconfig['monitor_formatfile'];
-		$QUERY = "SELECT YEAR(starttime), MONTH(starttime), DAYOFMONTH(starttime) FROM cc_call WHERE uniqueid='$handle->uniqueid' ORDER BY id DESC LIMIT 1";
+		$QUERY = "SELECT cc_card.username, YEAR(starttime), MONTH(starttime), DAYOFMONTH(starttime) FROM cc_call LEFT JOIN cc_card ON cc_card.id=card_id WHERE uniqueid='$handle->uniqueid' ORDER BY cc_call.id DESC LIMIT 1";
 		$result = $handle->instance_table -> SQLExec ($handle -> DBHandle, $QUERY);
-		$dl_full = MONITOR_PATH . "/" . $handle->username;
-		if (!file_exists($dl_full)) mkdir($dl_full);
-		$dl_full .= "/" . $result[0][0];
-		if (!file_exists($dl_full)) mkdir($dl_full);
-		$dl_full .= "/" . $result[0][1];
-		if (!file_exists($dl_full)) mkdir($dl_full);
-		$dl_full .= "/" . $result[0][2];
-		if (!file_exists($dl_full)) mkdir($dl_full);
+		$dl_full = MONITOR_PATH;
+		for ($i = 0; $i < 4; $i++) {
+		    $dl_full .= "/" . $result[0][$i];
+		    if (!file_exists($dl_full)) mkdir($dl_full);
+		}
 		$dl_full .= "/" . $handle->uniqueid . "." . $monitor_ext;
 		rename($dl_short . $monitor_ext, $dl_full);
 	    }
