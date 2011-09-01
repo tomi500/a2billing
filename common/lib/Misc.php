@@ -33,24 +33,27 @@
 
 
 
-function monitor_recognize($handle = null) {
-	if (empty ($handle)) return false;
-	if ($handle->monitor == 1 || $handle -> agiconfig['record_call'] == 1) {
-	    $dl_short = MONITOR_PATH . "/" . $handle->uniqueid . ".";
-	    if (file_exists($dl_short . "WAV")	|| file_exists($dl_short . "wav") || file_exists($dl_short . "gsm")  || file_exists($dl_short . "mp3")
-						|| file_exists($dl_short . "sln") || file_exists($dl_short . "g723") || file_exists($dl_short . "g729")) {
-		if (preg_match("/wav/i", $handle->agiconfig['monitor_formatfile'])) $monitor_ext = "WAV";
-		else $monitor_ext = $handle->agiconfig['monitor_formatfile'];
-		$QUERY = "SELECT cc_card.username, YEAR(starttime), MONTH(starttime), DAYOFMONTH(starttime) FROM cc_call LEFT JOIN cc_card ON cc_card.id=card_id WHERE uniqueid='$handle->uniqueid' ORDER BY cc_call.id DESC LIMIT 1";
-		$result = $handle->instance_table -> SQLExec ($handle -> DBHandle, $QUERY);
-		$dl_full = MONITOR_PATH;
+function monitor_recognize(&$ipointer) {
+	if ($ipointer->monitor == 1 || $ipointer->agiconfig['record_call'] == 1) {
+	    $dl_short = $ipointer->dl_short . $ipointer->uniqueid . ".";
+	    $QUERY = "SELECT cc_card.username, YEAR(starttime), MONTH(starttime), DAYOFMONTH(starttime) FROM cc_call LEFT JOIN cc_card ON cc_card.id=card_id WHERE uniqueid='$ipointer->uniqueid' ORDER BY cc_call.id DESC LIMIT 1";
+	    $result = $ipointer->instance_table -> SQLExec ($ipointer -> DBHandle, $QUERY);
+	    if (is_array($result) && count($result)>0) {
+		$dl_full = MONITOR_PATH . "/";
 		for ($i = 0; $i < 4; $i++) {
-		    $dl_full .= "/" . $result[0][$i];
 		    if (!file_exists($dl_full)) mkdir($dl_full);
+		    $dl_full .= $result[0][$i] . "/";
 		}
-		$dl_full .= "/" . $handle->uniqueid . "." . $monitor_ext;
-		rename($dl_short . $monitor_ext, $dl_full);
-	    }
+		if ($ipointer->dl_short != $dl_full) {
+		    if (file_exists($dl_short . "WAV")	|| file_exists($dl_short . "wav") || file_exists($dl_short . "gsm")  || file_exists($dl_short . "mp3")
+							|| file_exists($dl_short . "sln") || file_exists($dl_short . "g723") || file_exists($dl_short . "g729")) {
+			if (preg_match("/wav/i", $ipointer->agiconfig['monitor_formatfile'])) $monitor_ext = "WAV";
+			    else $monitor_ext = $ipointer->agiconfig['monitor_formatfile'];
+			$dl_full .= $ipointer->uniqueid . "." . $monitor_ext;
+			rename($dl_short . $monitor_ext, $dl_full);
+		    }
+		}
+	    } else return false;
 	}
 	return true;
 }

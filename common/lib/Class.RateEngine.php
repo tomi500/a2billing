@@ -1195,7 +1195,6 @@ class RateEngine
 			$A2B -> debug( INFO, $agi, __FILE__, __LINE__, "[CC_asterisk_stop : SQL: DONE : result=".$result."]");
 			$A2B -> debug( DEBUG, $agi, __FILE__, __LINE__, "[CC_asterisk_stop : SQL: $QUERY]");
 		}
-		monitor_recognize($A2B);
 		if ($sessiontime>0) {
 			
 			if ($didcall==0 && $callback==0) {
@@ -1264,6 +1263,7 @@ class RateEngine
 			$A2B -> debug( DEBUG, $agi, __FILE__, __LINE__, $QUERY);
 			$result = $A2B->instance_table -> SQLExec ($A2B -> DBHandle, $QUERY, 0);
 		}
+		monitor_recognize($A2B);
 	}
 	
 	/*
@@ -1594,11 +1594,12 @@ class RateEngine
 				$A2B -> debug( DEBUG, $agi, __FILE__, __LINE__, "app_callingcard: CIDGROUPID='$cidgroupid' OUTBOUND CID SELECTED IS '$outcid'.");
 
 				if ($A2B->monitor == 1 || $A2B -> agiconfig['record_call'] == 1) {
-					$dl_short = MONITOR_PATH . "/" . $A2B->uniqueid . ".";
+					$A2B->dl_short = MONITOR_PATH . "/" . $A2B->username . "/" . date('Y') . "/" . date('n') . "/" . date('j') . "/";
+					$dl_short = $A2B->dl_short . $A2B->uniqueid . ".";
 					while (file_exists($dl_short . "WAV") || file_exists($dl_short . "wav") || file_exists($dl_short . "gsm") || file_exists($dl_short . "mp3")
 					|| file_exists($dl_short . "sln") || file_exists($dl_short . "g723") || file_exists($dl_short . "g729")) {
 						$A2B->uniqueid++;
-						$dl_short = MONITOR_PATH . "/" . $A2B->uniqueid . ".";
+						$dl_short = $A2B->dl_short . $A2B->uniqueid . ".";
 					}
 					$command_mixmonitor = $A2B -> format_parameters ("MixMonitor {$dl_short}{$A2B->agiconfig['monitor_formatfile']}|b");
 					$myres = $agi->exec($command_mixmonitor);

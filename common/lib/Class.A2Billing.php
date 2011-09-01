@@ -1127,7 +1127,8 @@ if (!defined('MONITOR_PATH')) define ("MONITOR_PATH",	isset($this->config['webui
 			if ($this -> CC_TESTING) $this->destination = "kphone";
 
 			if ($this->monitor == 1 || $this->agiconfig['record_call'] == 1) {
-				$command_mixmonitor = "MixMonitor ". MONITOR_PATH ."/{$this->uniqueid}.{$this->agiconfig['monitor_formatfile']}|b";
+				$this->dl_short = MONITOR_PATH . "/" . $this->username . "/" . date('Y') . "/" . date('n') . "/" . date('j') . "/";
+				$command_mixmonitor = "MixMonitor ". $this->dl_short ."{$this->uniqueid}.{$this->agiconfig['monitor_formatfile']}|b";
 				$command_mixmonitor = $this -> format_parameters ($command_mixmonitor);
 				$myres = $agi->exec($command_mixmonitor);
 				$this -> debug( INFO, $agi, __FILE__, __LINE__, $command_mixmonitor);
@@ -1194,6 +1195,7 @@ if (!defined('MONITOR_PATH')) define ("MONITOR_PATH",	isset($this->config['webui
 				$QUERY .= ", '$answeredtime', '".$card_alias."', '$terminatecauseid', now(), '0', '0', '0', '0', '$this->CallerID', '1' )";
 				
 				$result = $this -> instance_table -> SQLExec ($this->DBHandle, $QUERY, 0);
+				monitor_recognize($this);
 				return 1;
 			}
 		}
@@ -1273,7 +1275,8 @@ if (!defined('MONITOR_PATH')) define ("MONITOR_PATH",	isset($this->config['webui
 
 					// RUN MIXMONITOR TO RECORD CALL
 					if ($this->monitor == 1 || $this->agiconfig['record_call'] == 1) {
-						$command_mixmonitor = "MixMonitor ". MONITOR_PATH ."/{$this->uniqueid}.{$this->agiconfig['monitor_formatfile']}|b";
+						$this->dl_short = MONITOR_PATH . "/" . $this->username . "/" . date('Y') . "/" . date('n') . "/" . date('j') . "/";
+						$command_mixmonitor = "MixMonitor ". $this->dl_short ."{$this->uniqueid}.{$this->agiconfig['monitor_formatfile']}|b";
 						$command_mixmonitor = $this -> format_parameters ($command_mixmonitor);
 						$myres = $agi->exec($command_mixmonitor);
 						$this -> debug( INFO, $agi, __FILE__, __LINE__, $command_mixmonitor);
@@ -1323,8 +1326,7 @@ if (!defined('MONITOR_PATH')) define ("MONITOR_PATH",	isset($this->config['webui
 //						return 1;
 						$answeredtime = 0;
 					} elseif ($dialstatus == "ANSWER") {
-						$this -> debug( DEBUG, $agi, __FILE__, __LINE__,
-										"[A2Billing] DID call friend: dialstatus : $dialstatus, answered time is ".$answeredtime." \n");
+						$this -> debug( DEBUG, $agi, __FILE__, __LINE__,"[A2Billing] DID call friend: dialstatus : $dialstatus, answered time is ".$answeredtime." \n");
 					} elseif (($dialstatus  == "CHANUNAVAIL") || ($dialstatus  == "CONGESTION")) {
 						$answeredtime = 0;
 						if (count($listdestination)>$callcount) continue;
@@ -1333,34 +1335,30 @@ if (!defined('MONITOR_PATH')) define ("MONITOR_PATH",	isset($this->config['webui
 						if (count($listdestination) > $callcount) continue;
 					}
 
-//					if ($answeredtime >= 0) {
-
-						$this -> debug( INFO, $agi, __FILE__, __LINE__, "[DID CALL - LOG CC_CALL: FOLLOWME=$callcount - (answeredtime=$answeredtime :: dialstatus=$dialstatus)]");
-						
-						if (strlen($this -> dialstatus_rev_list[$dialstatus])>0) {
-							$terminatecauseid = $this -> dialstatus_rev_list[$dialstatus];
-						} else {
-							$terminatecauseid = 0;
-						}
-						if ($answeredtime == 0) $inst_listdestination[4] = $this -> realdestination;
-						elseif (strpos($dialstr,'&') || strpos($dialstr,'@')) {
-							$dialedpeernumber = $agi->get_variable("DIALEDPEERNUMBER");
-							$inst_listdestination[4] = preg_replace("|\D|", "", $dialedpeernumber['data']);
-							$this -> debug( INFO, $agi, __FILE__, __LINE__, "Destination: " . $inst_listdestination[4]);
-						}
-						
-						$QUERY = "INSERT INTO cc_call (uniqueid, sessionid, card_id, nasipaddress, starttime, sessiontime, calledstation, ".
-							" terminatecauseid, stoptime, sessionbill, id_tariffgroup, id_tariffplan, id_ratecard, id_trunk, src, sipiax) VALUES ".
-							"('".$this->uniqueid."', '".$this->channel."',  '".$this->id_card."', '".$this->hostname."',";
-						$QUERY .= " CURRENT_TIMESTAMP - INTERVAL $answeredtime SECOND ";
-						$QUERY .= ", '$answeredtime', '".$inst_listdestination[4]."', '$terminatecauseid', now(), '0', '0', '0', '0', '0', '$this->CallerID', '3' )";
-						
-						$result = $this -> instance_table -> SQLExec ($this->DBHandle, $QUERY, 0);
-						$this -> debug( INFO, $agi, __FILE__, __LINE__, "[DID CALL - LOG CC_CALL: SQL: $QUERY]:[result:$result]");
-//					}
+					$this -> debug( INFO, $agi, __FILE__, __LINE__, "[DID CALL - LOG CC_CALL: FOLLOWME=$callcount - (answeredtime=$answeredtime :: dialstatus=$dialstatus)]");
+					
+					if (strlen($this -> dialstatus_rev_list[$dialstatus])>0) {
+						$terminatecauseid = $this -> dialstatus_rev_list[$dialstatus];
+					} else {
+						$terminatecauseid = 0;
+					}
+					if ($answeredtime == 0) $inst_listdestination[4] = $this -> realdestination;
+					elseif (strpos($dialstr,'&') || strpos($dialstr,'@')) {
+						$dialedpeernumber = $agi->get_variable("DIALEDPEERNUMBER");
+						$inst_listdestination[4] = preg_replace("|\D|", "", $dialedpeernumber['data']);
+						$this -> debug( INFO, $agi, __FILE__, __LINE__, "Destination: " . $inst_listdestination[4]);
+					}
+					
+					$QUERY = "INSERT INTO cc_call (uniqueid, sessionid, card_id, nasipaddress, starttime, sessiontime, calledstation, ".
+						" terminatecauseid, stoptime, sessionbill, id_tariffgroup, id_tariffplan, id_ratecard, id_trunk, src, sipiax) VALUES ".
+						"('".$this->uniqueid."', '".$this->channel."',  '".$this->id_card."', '".$this->hostname."',";
+					$QUERY .= " CURRENT_TIMESTAMP - INTERVAL $answeredtime SECOND ";
+					$QUERY .= ", '$answeredtime', '".$inst_listdestination[4]."', '$terminatecauseid', now(), '0', '0', '0', '0', '0', '$this->CallerID', '3' )";
+					
+					$result = $this -> instance_table -> SQLExec ($this->DBHandle, $QUERY, 0);
+					$this -> debug( INFO, $agi, __FILE__, __LINE__, "[DID CALL - LOG CC_CALL: SQL: $QUERY]:[result:$result]");
 
 					if ($answeredtime > 0) {
-
 						// CC_DID & CC_DID_DESTINATION - cc_did.id, cc_did_destination.id
 						$QUERY = "UPDATE cc_did SET secondusedreal = secondusedreal + $answeredtime WHERE id='".$inst_listdestination[0]."'";
 						$result = $this->instance_table -> SQLExec ($this -> DBHandle, $QUERY, 0);
@@ -1374,7 +1372,7 @@ if (!defined('MONITOR_PATH')) define ("MONITOR_PATH",	isset($this->config['webui
 						monitor_recognize($this);
 						return 1;
 					}
-					
+
 				// ELSEIF NOT VOIP CALL
 				} else {
 
@@ -1520,7 +1518,8 @@ if (!defined('MONITOR_PATH')) define ("MONITOR_PATH",	isset($this->config['webui
 				
                 // RUN MIXMONITOR TO RECORD CALL
 		if ($this->monitor == 1 || $this->agiconfig['record_call'] == 1) {
-					$command_mixmonitor = "MixMonitor {$this->uniqueid}.{$this->agiconfig['monitor_formatfile']}|b";
+					$this->dl_short = MONITOR_PATH . "/" . $this->username . "/" . date('Y') . "/" . date('n') . "/" . date('j') . "/";
+					$command_mixmonitor = "MixMonitor ". $this->dl_short ."{$this->uniqueid}.{$this->agiconfig['monitor_formatfile']}|b";
 					$command_mixmonitor = $this -> format_parameters ($command_mixmonitor);
 					$myres = $agi->exec($command_mixmonitor);
 					$this -> debug( INFO, $agi, __FILE__, __LINE__, $command_mixmonitor);
@@ -1641,7 +1640,6 @@ if (!defined('MONITOR_PATH')) define ("MONITOR_PATH",	isset($this->config['webui
                         $result = $this -> instance_table -> SQLExec ($this->DBHandle, $QUERY, 0);
                         $this -> debug( INFO, $agi, __FILE__, __LINE__, "[DID CALL - UPDATE CARD: SQL: $QUERY]:[result:$result]");
                     }
-                    monitor_recognize($this);
                     
                     // CC_DID & CC_DID_DESTINATION - cc_did.id, cc_did_destination.id
                     $QUERY = "UPDATE cc_did SET secondusedreal = secondusedreal + $answeredtime WHERE id='".$inst_listdestination[0]."'";
@@ -1651,6 +1649,8 @@ if (!defined('MONITOR_PATH')) define ("MONITOR_PATH",	isset($this->config['webui
                     $QUERY = "UPDATE cc_did_destination SET secondusedreal = secondusedreal + $answeredtime WHERE id='".$inst_listdestination[1]."'";
                     $result = $this->instance_table -> SQLExec ($this -> DBHandle, $QUERY, 0);
                     $this -> debug( INFO, $agi, __FILE__, __LINE__, "[UPDATE DID_DESTINATION]:[result:$result]");
+
+                    monitor_recognize($this);
                     
                     #This is a call from user to DID, we dont want to charge the A-leg
                     //$this -> bill_did_aleg ($agi, $listdestination[0], $answeredtime);
