@@ -1540,8 +1540,9 @@ class RateEngine
 						continue 2;
 					}
 				}
-				$pos_dialingnumber = strpos($ipaddress, '%dialingnumber%');
+				$pos_dialingnumber = max(strpos($ipaddress, '%dialingnumber%'),strpos($ipaddress, '%none%'));
 				$ipaddress = str_replace("%cardnumber%", $A2B->cardnumber, $ipaddress);
+				$ipaddress = str_replace("%none%", '', $ipaddress);
 				if (strncmp($destination, $prefix, strlen($prefix)) == 0) $prefix="";
 				$ipaddress = str_replace("%dialingnumber%", $prefix.$destination, $ipaddress);
 
@@ -1555,7 +1556,7 @@ class RateEngine
 					$A2B -> debug( DEBUG, $agi, __FILE__, __LINE__, "EXEC SETMUSICONHOLD $musiconhold");
 				}
 
-				if ($pos_dialingnumber !== false) $channel = "$tech/$ipaddress";
+				if ($pos_dialingnumber != false) $channel = "$tech/$ipaddress";
 				elseif ($A2B->agiconfig['switchdialcommand'] == 1) $channel = "$tech/$prefix$destination@$ipaddress";
 					else $channel = "$tech/$ipaddress/$prefix$destination";
 
