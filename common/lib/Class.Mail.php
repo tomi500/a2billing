@@ -117,6 +117,7 @@ class Mail {
 	static public $CUSTOMER_LASTNAME_KEY = '$lastname$';
 	static public $CUSTOMER_CREDIT_BASE_CURRENCY_KEY = '$credit$';
 	static public $CUSTOMER_CREDIT_IN_OWN_CURRENCY_KEY = '$creditcurrency$';
+	static public $CUSTOMER_BALANCE_IN_OWN_CURRENCY_KEY = '$balancecurrency$';
 	static public $CUSTOMER_CURRENCY = '$currency$';
 	static public $CUSTOMER_CARDNUMBER_KEY = '$cardnumber$';
 	static public $CUSTOMER_PASSWORD_KEY = '$password$';
@@ -206,6 +207,7 @@ class Mail {
 				$this->replaceInEmail(self :: $CUSTOMER_LOGINKEY, $card['loginkey']);
 				$this->replaceInEmail(self :: $CUSTOMER_PASSWORD_KEY, $card['uipass']);
 				$this->replaceInEmail(self :: $CUSTOMER_CREDIT_IN_OWN_CURRENCY_KEY, $credit_currency);
+				$this->replaceInEmail(self :: $CUSTOMER_BALANCE_IN_OWN_CURRENCY_KEY, round($card['credit'] / $mycur, 3));
 				$this->replaceInEmail(self :: $CUSTOMER_CREDIT_BASE_CURRENCY_KEY, $credit);
 				$this->replaceInEmail(self :: $CUSTOMER_CURRENCY, $currency);
 				$this->replaceInEmail(self :: $CUSTOMER_CREDIT_NOTIFICATION, $card['credit_notification']);

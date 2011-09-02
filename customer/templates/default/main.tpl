@@ -11,6 +11,10 @@
 
 	<div class="toggle_menu"><li><a href="userinfo.php"><strong>{php} echo gettext("ACCOUNT INFO");{/php}</strong></a></li></div>
 	
+	{if ACX_PERSONALINFO >0 }
+	<div class="toggle_menu"><li><a href="A2B_entity_card.php?atmenu=password&form_action=ask-edit&stitle=Personal+Information"><strong>{php} echo gettext("MY PROFILE");{/php}</strong></a></li></div>
+	{/if}
+	
 	{if $ACXVOICEMAIL>0 }
 	<div class="toggle_menu"><li><a href="A2B_entity_voicemail.php"><strong>{php} echo gettext("VOICEMAIL");{/php}</strong></a></li></div>
 	{/if}

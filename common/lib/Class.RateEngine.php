@@ -1556,7 +1556,7 @@ class RateEngine
 					$A2B -> debug( DEBUG, $agi, __FILE__, __LINE__, "EXEC SETMUSICONHOLD $musiconhold");
 				}
 
-				if ($pos_dialingnumber != false) $channel = "$tech/$ipaddress";
+				if ($pos_dialingnumber !== false) $channel = "$tech/$ipaddress";
 				elseif ($A2B->agiconfig['switchdialcommand'] == 1) $channel = "$tech/$prefix$destination@$ipaddress";
 					else $channel = "$tech/$ipaddress/$prefix$destination";
 

@@ -148,7 +148,7 @@ $HD_Form -> AddEditElement (gettext("FROM EMAIL"),
 	"fromemail",
 	'',
 	"INPUT",
-	"size=30 maxlength=60",
+	"size=70 maxlength=70",
 	"1",
 	gettext("Insert the user fromemail"),
 	"" , "", "", "", "" , "", "", "");
@@ -157,7 +157,7 @@ $HD_Form -> AddEditElement (gettext("FROM NAME"),
 	"fromname",
 	'',
 	"INPUT",
-	"size=30 maxlength=60",
+	"size=70 maxlength=70",
 	"",
 	gettext("Insert the user fromname"),
 	"" , "", "", "", "" , "", "", "");
@@ -166,7 +166,7 @@ $HD_Form -> AddEditElement (gettext("SUBJECT"),
 	"subject",
 	'',
 	"INPUT",
-	"size=30 maxlength=80",
+	"size=70 maxlength=130",
 	"",
 	gettext("Insert the user subject"),
 	"" , "", "", "", "" , "", "", "");
@@ -239,6 +239,7 @@ $HD_Form -> FG_BUTTON_ADITION_BOTTOM_TEXT .= '<u>'.gettext('Tags used in all ema
 		'<b>$lastname$</b>: '.gettext('lastname of the customer').'<br/>' .
 		'<b>$credit$</b>: '.gettext('credit of the customer in the system currency').'<br/>' .
 		'<b>$creditcurrency$</b>: '.gettext('credit of the customer in the own currency').'<br/>' .
+		'<b>$balancecurrency$</b>: '.gettext('balance of the customer in the own currency').'<br/>' .
 		'<b>$currency$</b>: '.gettext('currency of the customer').'<br/>' .
 		'<b>$cardnumber$</b>: '.gettext('card number of the customer').'<br/>' .
 		'<b>$password$</b>: '.gettext('password of the customer').'<br/>' .

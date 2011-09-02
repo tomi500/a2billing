@@ -181,6 +181,7 @@ $tags_help .= '<b>$firstname$</b>: '.gettext('firstname of the customer').' <br/
 $tags_help .=  '<b>$lastname$</b>: '.gettext('lastname of the customer').' <br/>';
 $tags_help .=   '<b>$credit$</b>: '.gettext('credit of the customer in the system currency').' <br/>';
 $tags_help .= '<b>$creditcurrency$</b>: '.gettext('credit of the customer in the own currency').' <br/>';
+$tags_help .= '<b>$balancecurrency$</b>: '.gettext('balance of the customer in the own currency').' <br/>';
 $tags_help .= '<b>$currency$</b>: '.gettext('currency of the customer').' <br/>';
 $tags_help .= '<b>$cardnumber$</b>: '.gettext('card number of the customer').' <br/>';
 $tags_help .= '<b>$password$</b>: '.gettext('password of the customer').' <br/>';
