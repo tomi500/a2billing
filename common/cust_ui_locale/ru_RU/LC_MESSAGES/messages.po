@@ -291,12 +291,11 @@ msgstr "Простите, возникла проблема при создан�
 
 #: A2B_support.php:130
 msgid "Create support ticket"
-msgstr "Создать тикет"
+msgstr "Заполните все поля и подробно сформулируйте Ваш запрос в техподдержку"
 
 #: A2B_support.php:138
-#, fuzzy
 msgid "Title"
-msgstr "ИТОГО"
+msgstr "Заголовок"
 
 #: A2B_support.php:146
 msgid "Priority"
@@ -311,13 +310,12 @@ msgstr "НЕТ"
 #: A2B_support.php:151 lib/interface/constants.php:268
 #: lib/Class.Notification.php:109
 msgid "LOW"
-msgstr "НИЗКИЙ"
+msgstr "ОБЫЧНЫЙ"
 
 #: A2B_support.php:152 lib/interface/constants.php:269
 #: lib/Class.Notification.php:106
-#, fuzzy
 msgid "MEDIUM"
-msgstr "РЕДАКТИРОВАТЬ"
+msgstr "СРЕДНИЙ"
 
 #: A2B_support.php:153 lib/interface/constants.php:270
 #: lib/Class.Notification.php:104
@@ -335,9 +333,8 @@ msgid "Description"
 msgstr "Описание"
 
 #: A2B_support.php:187
-#, fuzzy
 msgid "CREATE"
-msgstr "СОЗДАН!"
+msgstr "ОТПРАВИТЬ"
 
 #: iridium_threed.php:331 checkout_process.php:365
 msgid "Refill ONLINE"
@@ -488,9 +485,8 @@ msgid "No Call Plan id are defined"
 msgstr ""
 
 #: form_data/FG_var_signup.inc:155
-#, fuzzy
 msgid "LANGUAGE"
-msgstr "ФАМИЛИЯ"
+msgstr "ЯЗЫК"
 
 #: form_data/FG_var_signup.inc:163
 #, fuzzy
@@ -498,7 +494,6 @@ msgid "CALL PLAN"
 msgstr "ЗВОНКИ ПО НАПРАВЛЕНИЯМ"
 
 #: form_data/FG_var_signup.inc:175 form_data/FG_var_card.inc:53
-#, fuzzy
 msgid "LASTNAME"
 msgstr "ФАМИЛИЯ"
 
@@ -525,7 +520,7 @@ msgstr "Введите уьфшд"
 
 #: form_data/FG_var_signup.inc:199 form_data/FG_var_card.inc:72
 #: userinfo.php:112
-msgid "ADDRESS"
+msgid "ADRESS"
 msgstr "АДРЕС"
 
 #: form_data/FG_var_signup.inc:204
@@ -551,11 +546,11 @@ msgstr "Введите область"
 
 #: form_data/FG_var_signup.inc:239 form_data/FG_var_card.inc:113
 msgid "ZIP/POSTAL CODE"
-msgstr "Индекс"
+msgstr "ПОЧТОВЫЙ ИНДЕКС"
 
 #: form_data/FG_var_signup.inc:239
 msgid "Insert your zipcode"
-msgstr "Введите индекс"
+msgstr "Введите индекс предприятия связи"
 
 #: form_data/FG_var_signup.inc:257 form_data/FG_var_card.inc:122
 msgid "TIMEZONE"
@@ -914,9 +909,8 @@ msgstr ""
 
 #: form_data/FG_var_campaign.inc:249 form_data/FG_var_payment.inc:53
 #: form_data/FG_var_phonebook.inc:66 form_data/FG_var_phonebook.inc:90
-#, fuzzy
 msgid "DESCRIPTION"
-msgstr "НАПРАВЛЕНИЕ"
+msgstr "ОПИСАНИЕ"
 
 #: form_data/FG_var_campaign.inc:255 form_data/FG_var_phonebook.inc:96
 #, fuzzy
@@ -1066,7 +1060,7 @@ msgstr "Нажмите 'Подтвердить данные' для продол
 
 #: form_data/FG_var_notify.inc:82
 msgid "LIMIT CREDIT NOTIFICATION"
-msgstr ""
+msgstr "ПОРОГ ПРЕДУПРЕЖДЕНИЯ"
 
 #: form_data/FG_var_notify.inc:88
 #, fuzzy
@@ -1074,17 +1068,16 @@ msgid "Insert the number of credit when the customer receive a notification"
 msgstr "Добавьте email webmaster'а"
 
 #: form_data/FG_var_notify.inc:89
-#, fuzzy
 msgid "currency : "
-msgstr "Валюта"
+msgstr "валюта: "
 
 #: form_data/FG_var_notify.inc:89
 msgid "NOT DEFINED"
-msgstr ""
+msgstr "НЕ ЗАДАН"
 
 #: form_data/FG_var_notify.inc:92
 msgid "PERMITTED NOTIFICATIONS BY MAIL"
-msgstr ""
+msgstr "ОТПРАВКА ПРЕДУПРЕЖДЕНИЯ"
 
 #: form_data/FG_var_notify.inc:98
 msgid "Choose if you want to enable the notification by email for this card"
@@ -1092,11 +1085,11 @@ msgstr "Отметьте для рассылки уведомлений для �
 
 #: form_data/FG_var_notify.inc:99
 msgid "Enable Email Notification"
-msgstr ""
+msgstr "Отправлять уведомления на E-mail"
 
 #: form_data/FG_var_notify.inc:102
 msgid "EMAIL NOTIFICATION"
-msgstr "ОПОВЕЩЕНИЕ ПО ЕМЕЙЛ"
+msgstr "ОПОВЕЩАТЬ НА EMAIL"
 
 #: form_data/FG_var_notify.inc:108
 #, fuzzy
@@ -3237,7 +3230,7 @@ msgstr "FAX"
 
 #: userinfo.php:113
 msgid "ZIP CODE"
-msgstr "ZIP КОД"
+msgstr "ПОЧТОВЫЙ ИНДЕКС"
 
 #: userinfo.php:115
 msgid "STATE"
@@ -3364,11 +3357,6 @@ msgstr "ОБРАТНЫЙ ЗВОНОК"
 msgid "PREDICT"
 msgstr "КРЕДИТ"
 
-#: call-history.php:121
-#, fuzzy
-msgid "AUTO DIALER"
-msgstr "Автодозвон"
-
 #: call-history.php:122
 #, fuzzy
 msgid "DID-ALEG"
@@ -3412,7 +3400,7 @@ msgstr "ДОПОЛНИТЕЛЬНО"
 
 #: call-history.php:365
 msgid "SHOW"
-msgstr "ОТОБРАЖАТЬ"
+msgstr "ПОКАЗЫВАТЬ"
 
 #: call-history.php:368
 msgid "Answered Calls"
@@ -3424,11 +3412,11 @@ msgstr "Все Вызовы"
 
 #: call-history.php:377
 msgid "RESULT"
-msgstr "РЕЗУЛЬТАТА"
+msgstr "ОТОБРАЖАТЬ В"
 
 #: call-history.php:380
 msgid "Seconds"
-msgstr "Секунды"
+msgstr "- сек"
 
 #: call-history.php:385
 msgid "CURRENCY"
@@ -3534,80 +3522,84 @@ msgid "ACCOUNT INFO"
 msgstr "ИНФОРМАЦИЯ О СЧЕТЕ"
 
 #: templates/default/main.tpl:15
+msgid "MY PROFILE"
+msgstr "ПРОФИЛЬ"
+
+#: templates/default/main.tpl:19
 msgid "VOICEMAIL"
 msgstr "ГОЛОСОВАЯ ПОЧТА"
 
-#: templates/default/main.tpl:19
-msgid "SIP/IAX INFO"
-msgstr "Параметры SIP/IAX"
-
 #: templates/default/main.tpl:23
+msgid "SIP/IAX INFO"
+msgstr "ПАРАМЕТРЫ SIP/IAX"
+
+#: templates/default/main.tpl:27
 msgid "CALL HISTORY"
 msgstr "ИСТОРИЯ ЗВОНКОВ"
 
-#: templates/default/main.tpl:27
+#: templates/default/main.tpl:32
 msgid "PAYMENT HISTORY"
 msgstr "ИСТОРИЯ ПЛАТЕЖЕЙ"
 
-#: templates/default/main.tpl:32
+#: templates/default/main.tpl:37
 msgid "VOUCHERS"
 msgstr "ВАУЧЕРЫ"
 
-#: templates/default/main.tpl:43
+#: templates/default/main.tpl:46
 msgid "INVOICES"
 msgstr "СЧЕТА"
 
-#: templates/default/main.tpl:52
+#: templates/default/main.tpl:55
 msgid "View Receipts"
-msgstr "Просмотр счетов"
+msgstr "ПРОСМОТР СЧЕТОВ"
 
-#: templates/default/main.tpl:53
+#: templates/default/main.tpl:56
 msgid "View Invoices"
-msgstr "Просмотр инвойстов"
+msgstr "ПРОСМОТР ИНВОЙСОВ"
 
-#: templates/default/main.tpl:54
+#: templates/default/main.tpl:57
 msgid "Preview Next Billing"
-msgstr "Предполагаемый биллинг"
+msgstr "ПРЕДПОЛАГАЕМЫЙ БИЛИНГ"
 
-#: templates/default/main.tpl:66
+#: templates/default/main.tpl:69
 msgid "SPEED DIAL"
 msgstr "БЫСТРЫЙ НАБОР"
 
-#: templates/default/main.tpl:74
+#: templates/default/main.tpl:77
 msgid "SIMULATOR"
 msgstr "СИМУЛЯТОР"
 
-#: templates/default/main.tpl:82
+#: templates/default/main.tpl:90
 msgid "ADD CALLER ID"
 msgstr "ДОБАВИТЬ CALLER ID"
 
-#: templates/default/main.tpl:86
-msgid "PASSWORD"
-msgstr "Пароль"
-
-#: templates/default/main.tpl:90
-msgid "SUPPORT"
-msgstr "Поддержка"
-
 #: templates/default/main.tpl:94
+msgid "PASSWORD"
+msgstr "ПАРОЛЬ"
+
+#: templates/default/main.tpl:98
+msgid "SUPPORT"
+msgstr "ПОДДЕРЖКА"
+
+#: templates/default/main.tpl:102
 msgid "NOTIFICATION"
 msgstr "УВЕДОМЛЕНИЯ"
 
-#: templates/default/main.tpl:104
-msgid "AUTO DIALLER"
-msgstr "Автодозвон"
+#: templates/default/main.tpl:112
+msgid "AUTO DIALER"
+msgstr "АВТООБЗВОН"
 
-#: templates/default/main.tpl:113
+#: templates/default/main.tpl:121
 msgid "Campaign's"
-msgstr "Кампании"
+msgstr "КАМПАНИИ"
 
-#: templates/default/main.tpl:116
+#: templates/default/main.tpl:124
 msgid "Import Phone List"
 msgstr "Импорт списка телефонов"
 
-#: templates/default/main.tpl:126
+#: templates/default/main.tpl:134
 msgid "LOGOUT"
-msgstr "Выход"
+msgstr "ВЫХОД"
 
 #: templates/default/index.tpl:49
 #, fuzzy

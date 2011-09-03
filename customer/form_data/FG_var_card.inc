@@ -69,7 +69,7 @@ $HD_Form -> AddEditElement (gettext("FIRSTNAME"),
 			   "" , "", "",	"", "", "" , "NO", "");
 
 
-$HD_Form -> AddEditElement (gettext("ADDRESS"),
+$HD_Form -> AddEditElement (gettext("ADRESS"),
 			   "address",
 			   '$value',
 			   "INPUT",
