@@ -1606,9 +1606,9 @@ if (!defined('MONITOR_PATH')) define ("MONITOR_PATH",	isset($this->config['webui
 		    }
 
                     /* CDR B-LEG OF DID CALL */
-                    $QUERY = "INSERT INTO cc_call (uniqueid, sessionid, card_id, nasipaddress, starttime, sessiontime, calledstation, ".
+                    $QUERY = "INSERT INTO cc_call (uniqueid, sessionid, card_id, card_caller, nasipaddress, starttime, sessiontime, calledstation, ".
                             " terminatecauseid, stoptime, sessionbill, id_tariffgroup, id_tariffplan, id_ratecard, id_trunk, src, sipiax) VALUES ".
-                            "('".$this->uniqueid."', '".$this->channel."',  '".$this->id_card."', '".$this->hostname."',";
+                            "('".$this->uniqueid."', '".$this->channel."',  '".$this->id_card."',  '".$this->card_caller."', '".$this->hostname."',";
                     $QUERY .= " CURRENT_TIMESTAMP - INTERVAL $answeredtime SECOND ";
                     $QUERY .= ", '$answeredtime', '".$inst_listdestination[10]."', '$terminatecauseid', now(), '0', '0', '0', '0', '0', '$this->CallerID', '3' )";
 

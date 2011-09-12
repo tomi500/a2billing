@@ -129,25 +129,28 @@ $list_calltype["5"]  = array( gettext("PREDICT"), "5");
 $list_calltype ["6"] = array (gettext("AUTO DIALER"), "6" );
 $list_calltype ["7"] = array (gettext("DID-ALEG"), "7" );
 
+if ($ACXSEERECORDING) $p = .85;
+else $p = 1;
+
 $DBHandle  = DbConnect();
 
 $FG_TABLE_DEFAULT_ORDER = "t1.starttime";
 $FG_TABLE_DEFAULT_SENS = "DESC";
 
 $FG_TABLE_COL = array();
-$FG_TABLE_COL[]=array (gettext("Date"), "starttime", "17%", "center", "SORT", "22", "", "", "", "", "", "");
-$FG_TABLE_COL[]=array (gettext("CallerID"), "src", "11%", "center", "SORT", "30");
-$FG_TABLE_COL[]=array (gettext("PhoneNumber"), "calledstation", "11%", "center", "SORT", "30", "", "", "", "", "", "");
-$FG_TABLE_COL[]=array (gettext("Destination"), "destination", "14%", "center", "SORT", "30", "lie", "cc_prefix", "destination", "prefix='%id'", "%1" );
-$FG_TABLE_COL[]=array (gettext("Duration"), "sessiontime", "7%", "center", "SORT", "30", "", "", "", "", "", "display_minute");
-$FG_TABLE_COL[]=array ('<acronym title="'.gettext("Terminate Cause").'">'.gettext("TC").'</acronym>', "terminatecauseid", "7%", "center", "SORT", "", "list", $dialstatus_list);
-$FG_TABLE_COL[]=array (gettext("CallType"), "sipiax", "10%", "center", "SORT",  "", "list", $list_calltype);
-$FG_TABLE_COL[]=array (gettext("Cost"), "sessionbill", "11%", "center", "SORT", "30", "", "", "", "", "", "display_2bill");
+$FG_TABLE_COL[]=array (gettext("Date"), "starttime", 18*$p ."%", "center", "SORT", "22", "", "", "", "", "", "");
+$FG_TABLE_COL[]=array (gettext("CallerID"), "src", 12*$p ."%", "center", "SORT", "30");
+$FG_TABLE_COL[]=array (gettext("PhoneNumber"), "calledstation", 12*$p ."%", "center", "SORT", "30", "", "", "", "", "", "");
+$FG_TABLE_COL[]=array (gettext("Destination"), "destination", 22*$p ."%", "center", "SORT", "30", "lie", "cc_prefix", "destination", "prefix='%id'", "%1" );
+$FG_TABLE_COL[]=array (gettext("Duration"), "sessiontime", 8*$p ."%", "center", "SORT", "30", "", "", "", "", "", "display_minute");
+$FG_TABLE_COL[]=array ('<acronym title="'.gettext("Terminate Cause").'">'.gettext("TC").'</acronym>', "terminatecauseid", 7*$p ."%", "center", "SORT", "", "list", $dialstatus_list);
+$FG_TABLE_COL[]=array (gettext("CallType"), "sipiax", 10*$p ."%", "center", "SORT",  "", "list", $list_calltype);
+$FG_TABLE_COL[]=array (gettext("Cost"), "sessionbill", 11*$p ."%", "center", "SORT", "30", "", "", "", "", "", "display_2bill");
 
 $FG_COL_QUERY = 't1.starttime, t1.src, t1.calledstation, t1.destination, t1.sessiontime, t1.terminatecauseid, t1.sipiax, t1.sessionbill';
 
 if ($ACXSEERECORDING) {
-	$FG_TABLE_COL [] = array ('<span class="liens">' . gettext("Audio") . "</span>", "uniqueid", "12%", "center", "", "30", "", "", "", "", "", "linkonmonitorfile_customer");
+	$FG_TABLE_COL [] = array ('<span class="liens">' . gettext("Audio") . "</span>", "uniqueid", 100*(1-$p) ."%", "center", "", "30", "", "", "", "", "", "linkonmonitorfile_customer");
 	$FG_COL_QUERY .= ', t1.uniqueid';
 }
 
@@ -198,7 +201,7 @@ if (!isset ($FG_TABLE_CLAUSE) || strlen($FG_TABLE_CLAUSE)==0) {
 
 
 if (strlen($FG_TABLE_CLAUSE)>0) $FG_TABLE_CLAUSE.=" AND ";
-$FG_TABLE_CLAUSE.="t1.card_id='$customer'";
+$FG_TABLE_CLAUSE.="(t1.card_id='$customer' OR t1.card_caller='$customer')";
 
 if (!isset($choose_calltype)) $choose_calltype = -1;
 elseif ($choose_calltype != - 1) {
@@ -402,7 +405,7 @@ if ($ACXSEERECORDING && $nb_record>0){ echo '
 				   </td>
 				   <td  class="fontstyle_searchoptions">
 					<?php echo gettext("Minutes");?> <input type="radio" NAME="resulttype" value="min" <?php if(!isset($resulttype)||$resulttype=="min"){?>checked<?php }?> />
-					<?php echo gettext("Seconds");?> <input type="radio" NAME="resulttype" value="sec" <?php if($resulttype=="sec"){?>checked<?php }?>/>
+					<?php echo "- ".gettext("Seconds");?> <input type="radio" NAME="resulttype" value="sec" <?php if($resulttype=="sec"){?>checked<?php }?>/>
 					</td>
 				</tr>
 				<tr>

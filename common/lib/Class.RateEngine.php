@@ -1154,11 +1154,11 @@ class RateEngine
 		$id_card_package_offer = (!is_numeric($id_card_package_offer)) ? 'NULL' : "'$id_card_package_offer'";
 		$calldestination = (!is_numeric($calldestination)) ? 'DEFAULT' : "'$calldestination'";
 
-		$QUERY_COLUMN = "uniqueid, sessionid, card_id, nasipaddress, starttime, sessiontime, real_sessiontime, calledstation, ".
+		$QUERY_COLUMN = "uniqueid, sessionid, card_id, card_caller, nasipaddress, starttime, sessiontime, real_sessiontime, calledstation, ".
 			" terminatecauseid, stoptime, sessionbill, id_tariffgroup, id_tariffplan, id_ratecard, " .
 			" id_trunk, src, sipiax, buycost, id_card_package_offer, dnid, destination";
 		$QUERY = "INSERT INTO cc_call ($QUERY_COLUMN) VALUES ('".$A2B->uniqueid."', '".$A2B->channel."', ".
-			"$card_id, '".$A2B->hostname."', ";
+			"$card_id, '".$A2B->card_caller."', '".$A2B->hostname."', ";
 
 		if ($A2B->config["global"]['cache_enabled']) {
 			$QUERY .= " datetime( strftime('%s','now') - $sessiontime, 'unixepoch','localtime')";	

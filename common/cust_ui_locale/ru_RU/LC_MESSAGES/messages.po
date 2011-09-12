@@ -1203,7 +1203,7 @@ msgstr "Insert a new"
 
 #: form_data/FG_var_callerid.inc:122
 msgid "You can add your home phone or cellphone number below to allow you to call in, be automatically recognized, and use your telephony services without having to enter your PIN."
-msgstr "Вы можете добавить ваш мобильный либо домашний телефон ниже, чтобы быть автоматически распознаным системой, и использовать телефонные сервисы без ввода  PIN"
+msgstr "Вы можете добавить ваш мобильный либо домашний телефон ниже, чтобы быть автоматически распознанным системой, и использовать телефонные сервисы без ввода  PIN"
 
 #: form_data/FG_var_callerid.inc:126
 msgid "Made your change to edit this callerid."
@@ -1211,7 +1211,7 @@ msgstr ""
 
 #: lib/customer.defines.php:114
 msgid "The expiry date entered for the credit card is invalid."
-msgstr "Срок годности карты неверен"
+msgstr "Срок годности кредитной карты неверен"
 
 #: lib/customer.defines.php:114
 #, fuzzy
@@ -1220,7 +1220,7 @@ msgstr "Не могу подключиться к asterisk manager'у!<br>Пож
 
 #: lib/customer.defines.php:115
 msgid "The credit card number entered is invalid."
-msgstr "Введеный номер кредитной карты неверный"
+msgstr "Введенный номер кредитной карты неверный"
 
 #: lib/customer.defines.php:115
 #, fuzzy
@@ -2872,7 +2872,7 @@ msgstr ""
 #: A2B_receipt_preview_detail.php:217 call-history.php:137
 #: A2B_receipt_view.php:202
 msgid "Cost"
-msgstr "Стоимость звонка"
+msgstr "Стоимость"
 
 #: A2B_receipt_detail.php:175 A2B_receipt_preview_detail.php:254
 msgid "Total Page"
@@ -3416,7 +3416,7 @@ msgstr "ОТОБРАЖАТЬ В"
 
 #: call-history.php:380
 msgid "Seconds"
-msgstr "- сек"
+msgstr "сек"
 
 #: call-history.php:385
 msgid "CURRENCY"

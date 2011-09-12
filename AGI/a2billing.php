@@ -225,6 +225,8 @@ if ($mode == 'standard') {
 	$cia_res = $A2B -> callingcard_ivr_authenticate($agi);
 	$A2B -> debug( DEBUG, $agi, __FILE__, __LINE__, "[TRY : callingcard_ivr_authenticate]");
 	
+	$A2B->card_caller = $A2B->id_card;
+	
 	// CALL AUTHENTICATE AND WE HAVE ENOUGH CREDIT TO GO AHEAD
 	if ($cia_res==0) {
 

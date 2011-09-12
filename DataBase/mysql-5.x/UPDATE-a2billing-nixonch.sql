@@ -58,3 +58,5 @@ INSERT INTO cc_config (config_title, config_key, config_value, config_descriptio
   VALUES ('System startup time', 'startup_time', '0', 'Numbers in seconds since 1970-01-01 (Unix epoch)', 0, NULL, 'global');
 
 ALTER TABLE cc_iax_buddies ADD forceencryption varchar(20) COLLATE utf8_bin NOT NULL;
+
+ALTER TABLE `cc_call` ADD `card_caller` BIGINT( 20 ) NOT NULL AFTER `card_id`;
