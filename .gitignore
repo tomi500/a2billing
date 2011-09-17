@@ -4,5 +4,5 @@
 *nbproject*
 *devserver*
 .gitconfig
-/addons/sounds
 /update.sh
+#/addons/sounds
