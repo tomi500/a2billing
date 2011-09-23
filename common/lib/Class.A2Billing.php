@@ -1344,8 +1344,9 @@ if (!defined('MONITOR_PATH')) define ("MONITOR_PATH",	isset($this->config['webui
 					}
 					if ($answeredtime == 0) $inst_listdestination[4] = $this -> realdestination;
 					elseif (strpos($dialstr,'&') || strpos($dialstr,'@')) {
-						$dialedpeernumber = $agi->get_variable("DIALEDPEERNUMBER");
-						$inst_listdestination[4] = preg_replace("|\D|", "", $dialedpeernumber['data']);
+						$dialedpeernumber = $agi -> get_variable('QUEUEDNID',true);
+						if (!$dialedpeernumber) $dialedpeernumber = $agi->get_variable('DIALEDPEERNUMBER',true);
+						$inst_listdestination[4] = preg_replace("|\D|", "", $dialedpeernumber);
 						$this -> debug( INFO, $agi, __FILE__, __LINE__, "Destination: " . $inst_listdestination[4]);
 					}
 					
@@ -1600,8 +1601,9 @@ if (!defined('MONITOR_PATH')) define ("MONITOR_PATH",	isset($this->config['webui
                     }
 		    if ($answeredtime == 0) $inst_listdestination[10] = $this -> realdestination;
 		    elseif (strpos($dialstr,'&') || strpos($dialstr,'@')) {
-			$dialedpeernumber = $agi->get_variable("DIALEDPEERNUMBER");
-			$inst_listdestination[10] = preg_replace("|\D|", "", $dialedpeernumber['data']);
+			$dialedpeernumber = $agi -> get_variable('QUEUEDNID',true);
+			if (!$dialedpeernumber) $dialedpeernumber = $agi -> get_variable('DIALEDPEERNUMBER',true);
+			$inst_listdestination[10] = preg_replace("|\D|", "", $dialedpeernumber);
 			$this -> debug( INFO, $agi, __FILE__, __LINE__, "Destination: " . $inst_listdestination[10]);
 		    }
 
