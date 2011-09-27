@@ -1530,6 +1530,7 @@ class RateEngine
 						    $firstrand = false;
 						} elseif ($next_failover_trunk == $failover_trunk) break;
 						    else {
+							if ($next_failover_trunk == -1 && $ifmaxuse == 1) continue 2;
 							$intellect_count = -1;
 							$loop_failover++;
 							$failover_trunk = $next_failover_trunk;
@@ -1660,7 +1661,7 @@ class RateEngine
 			} elseif (($this->dialstatus  == "CHANUNAVAIL") || ($this->dialstatus  == "CONGESTION")) {
 				$this -> real_answeredtime = $this -> answeredtime = 0;
 				// Check if we will failover for LCR/LCD prefix - better false for an exact billing on resell
-				if ($A2B->agiconfig['failover_lc_prefix']) {
+				if ($A2B->agiconfig['failover_lc_prefix'] || $ifmaxuse == 1) {
 					continue;
 				}
 				return false;
