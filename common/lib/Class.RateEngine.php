@@ -1621,7 +1621,7 @@ class RateEngine
 				$this -> trunk_start_inuse($agi, $A2B, 0);
 
 				if ($A2B->monitor == 1 || $A2B -> agiconfig['record_call'] == 1) {
-					$myres = $agi->exec("StopMixMonitor");
+					$myres = $agi->exec($A2B -> format_parameters ("StopMixMonitor"));
 					$A2B -> debug( INFO, $agi, __FILE__, __LINE__, "EXEC StopMixMonitor (".$A2B->uniqueid.")");
 				}
 
