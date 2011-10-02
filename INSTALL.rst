@@ -346,6 +346,7 @@ A2BILLING INSTALLATION GUIDE
 
         The daemon is written in Python. Install the python-setuptools and use easy_install to install the callback_daemon
             - apt-get install python-setuptools python-mysqldb python-psycopg2 python-sqlalchemy
+            - yum install python-setuptools MySQL-python python-psycopg2 python-sqlalchemy
             - cd /usr/local/src/a2billing/CallBack
             - easy_install callback-daemon-py/dist/callback_daemon-1.0.prod_r1527-py2.5.egg
 
