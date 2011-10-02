@@ -1019,14 +1019,21 @@ if ($mode == 'standard') {
 					$prefix			= $RateEngine -> ratecard_obj[0][$usetrunk+1];
 					$tech 			= $RateEngine -> ratecard_obj[0][$usetrunk+2];
 					$ipaddress 		= $RateEngine -> ratecard_obj[0][$usetrunk+3];
-					$removeprefix 	= $RateEngine -> ratecard_obj[0][$usetrunk+4];
+					$removeprefix 	= explode(",", $RateEngine -> ratecard_obj[0][$usetrunk+4]);
 					$timeout		= $RateEngine -> ratecard_obj[0]['timeout'];
 					$callbackrate	= $RateEngine -> ratecard_obj[0]['callbackrate'];
 					$failover_trunk	= $RateEngine -> ratecard_obj[0][40+$usetrunk_failover];
 					$addparameter	= $RateEngine -> ratecard_obj[0][42+$usetrunk_failover];
 
 					$destination = $A2B ->destination;
-					if (strncmp($destination, $removeprefix, strlen($removeprefix)) == 0) $destination= substr($destination, strlen($removeprefix));
+					if (is_array($removeprefix) && count($removeprefix)>0) {
+						foreach ($removeprefix as $testprefix) {
+							if (substr($destination,0,strlen($testprefix))==$testprefix) {
+								$destination = substr($destination,strlen($testprefix));
+								break;
+							}
+						}
+					}
 
 					$pos_dialingnumber = strpos($ipaddress, '%dialingnumber%' );
 
