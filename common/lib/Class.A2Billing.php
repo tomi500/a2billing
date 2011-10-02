@@ -1396,14 +1396,13 @@ if (!defined('MONITOR_PATH')) define ("MONITOR_PATH",	isset($this->config['webui
 						}
 						
 						$dialstatus = $RateEngine->dialstatus;
-						if ((($RateEngine->dialstatus == "NOANSWER") || ($RateEngine->dialstatus == "BUSY") || 
-							($RateEngine->dialstatus == "CHANUNAVAIL") || ($RateEngine->dialstatus == "CONGESTION")) && count($listdestination) > $callcount) continue;
+						if ((($dialstatus == "NOANSWER") || ($dialstatus == "BUSY") || ($dialstatus == "CHANUNAVAIL") || ($dialstatus == "CONGESTION")) && count($listdestination) > $callcount) continue;
 						
-						if ($RateEngine->dialstatus != "ANSWER") $this -> destination = $this -> realdestination;
+						if ($dialstatus != "ANSWER") $this -> destination = $this -> realdestination;
 						
 						// INSERT CDR  & UPDATE SYSTEM
 						$RateEngine->rate_engine_updatesystem($this, $agi, $this->destination, $doibill, 2);
-						if ($RateEngine->dialstatus == "CANCEL") break;
+						if ($dialstatus == "CANCEL") break;
 
 						// CC_DID & CC_DID_DESTINATION - cc_did.id, cc_did_destination.id
 						$QUERY = "UPDATE cc_did SET secondusedreal = secondusedreal + ".$RateEngine->answeredtime." WHERE id='".$inst_listdestination[0]."'";
