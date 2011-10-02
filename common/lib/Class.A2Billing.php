@@ -1896,7 +1896,7 @@ if (!defined('MONITOR_PATH')) define ("MONITOR_PATH",	isset($this->config['webui
         	$this -> fct_say_rate ($agi, $rate);
         }
 		
-        if ($this->agiconfig['say_timetocall']==1) {
+        if ($this->agiconfig['say_timetocall']==1 && $minutes*60<$this->agiconfig['maxtime_tounlimited_calls']) {
             $agi-> stream_file('prepaid-you-have', '#');
             if ($minutes>0) {
                 if ($minutes==1) {
