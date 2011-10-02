@@ -363,26 +363,26 @@ class RateEngine
 	function rate_engine_all_calcultimeout (&$A2B, $credit)
 	{
 		global $agi;
-
+		$addtimeout = 0;
 		if ($this->webui) $A2B -> debug( DEBUG, $agi, __FILE__, __LINE__, "[CC_RATE_ENGINE_ALL_CALCULTIMEOUT ($credit)]");
 		if (!is_array($this -> ratecard_obj) || count($this -> ratecard_obj)==0) return false;
 
 		for ($k=0;$k<count($this -> ratecard_obj);$k++) {
-			$res_calcultimeout = $this -> rate_engine_calcultimeout ($A2B,$credit,$k);
+			$res_calcultimeout = $this -> rate_engine_calcultimeout ($A2B,$credit,$k,$addtimeout);
 			if ($this->webui)
 				$A2B -> debug( DEBUG, $agi, __FILE__, __LINE__, "[CC_RATE_ENGINE_ALL_CALCULTIMEOUT: k=$k - res_calcultimeout:$res_calcultimeout]");
 
 			if (substr($res_calcultimeout,0,5)=='ERROR')	return false;
 		}
 
-		return true;
+		return $addtimeout;
 	}
 
 	/*
 		RATE ENGINE - CALCUL TIMEOUT
 		* CALCUL THE DURATION ALLOWED FOR THE CALLER TO THIS NUMBER
 	*/
-	function rate_engine_calcultimeout (&$A2B, $credit, $K=0)
+	function rate_engine_calcultimeout (&$A2B, $credit, $K=0, &$addtimeout=0)
 	{
 		global $agi;
 
@@ -762,7 +762,10 @@ class RateEngine
 		$this -> ratecard_obj[$K]['timeout_without_rules'] = $num_sec_WR + $this -> freetimetocall_left[$K];
 		
 		$TIMEOUT = $TIMEOUT + $this -> freetimetocall_left[$K];
-		if ($TIMEOUT > $A2B->agiconfig['maxtime_tounlimited_calls']) $TIMEOUT = $A2B->agiconfig['maxtime_tounlimited_calls'];
+		if ($TIMEOUT > $A2B->agiconfig['maxtime_tounlimited_calls']) {
+		    $addtimeout = $TIMEOUT - $A2B->agiconfig['maxtime_tounlimited_calls'];
+		    $TIMEOUT = $A2B->agiconfig['maxtime_tounlimited_calls'];
+		}
 		$this -> ratecard_obj[$K]['timeout'] = $TIMEOUT;
 		if ($this -> debug_st) print_r($this -> ratecard_obj[$K]);
 		

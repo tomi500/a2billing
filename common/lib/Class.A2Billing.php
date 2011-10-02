@@ -1043,12 +1043,13 @@ if (!defined('MONITOR_PATH')) define ("MONITOR_PATH",	isset($this->config['webui
 	        $this->timeout = $RateEngine-> ratecard_obj[0]['timeout'];
 	        $timeout = $this->timeout;
 	        if ($this->agiconfig['cheat_on_announcement_time']==1) {
+	        	$res_all_calcultimeout = 0;
 	        	$timeout = $RateEngine-> ratecard_obj[0]['timeout_without_rules'];
 	        }
 				
 	        $announce_time_correction = $RateEngine->ratecard_obj[0][61];
 	        $timeout = $timeout * $announce_time_correction;
-	        $this -> fct_say_time_2_call($agi,$timeout,$RateEngine->ratecard_obj[0][12]);
+	        $this -> fct_say_time_2_call($agi,$timeout,$RateEngine->ratecard_obj[0][12],$res_all_calcultimeout);
 	      
 			return 1;
 	    } else {  //END if is not a call to DID
@@ -1878,10 +1879,11 @@ if (!defined('MONITOR_PATH')) define ("MONITOR_PATH",	isset($this->config['webui
     }
 
 
-    function fct_say_time_2_call($agi,$timeout,$rate=0)
+    function fct_say_time_2_call($agi,$timeout,$rate=0,$addtimeout=0)
     {
          // set destination and timeout
         // say 'you have x minutes and x seconds'
+        $timeout = $timeout + $addtimeout;
         $minutes = intval($timeout / 60);
         $seconds = $timeout % 60;
 		
@@ -1896,7 +1898,7 @@ if (!defined('MONITOR_PATH')) define ("MONITOR_PATH",	isset($this->config['webui
         	$this -> fct_say_rate ($agi, $rate);
         }
 		
-        if ($this->agiconfig['say_timetocall']==1 && $minutes*60<$this->agiconfig['maxtime_tounlimited_calls']) {
+        if ($this->agiconfig['say_timetocall']==1) {
             $agi-> stream_file('prepaid-you-have', '#');
             if ($minutes>0) {
                 if ($minutes==1) {
