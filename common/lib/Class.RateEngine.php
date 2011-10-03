@@ -375,7 +375,7 @@ class RateEngine
 			if (substr($res_calcultimeout,0,5)=='ERROR')	return false;
 		}
 
-		return $addtimeout;
+		return (!$addtimeout)?true:$addtimeout;
 	}
 
 	/*
