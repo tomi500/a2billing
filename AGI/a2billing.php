@@ -1005,59 +1005,10 @@ if ($mode == 'standard') {
                         $CALLING_VAR = "CALLING=".$outbound_destination;
                     } // if ($mode == 'cid-prompt-callback')
                     
-					// MAKE THE CALL
-					if ($RateEngine -> ratecard_obj[0][34]!='-1') {
-						$usetrunk = 34;
-						$usetrunk_failover = 1;
-						$RateEngine -> usedtrunk = $RateEngine -> ratecard_obj[0][34];
-					} else {
-						$usetrunk = 29;
-						$RateEngine -> usedtrunk = $RateEngine -> ratecard_obj[0][29];
-						$usetrunk_failover = 0;
-					}
-
-					$prefix			= $RateEngine -> ratecard_obj[0][$usetrunk+1];
-					$tech 			= $RateEngine -> ratecard_obj[0][$usetrunk+2];
-					$ipaddress 		= $RateEngine -> ratecard_obj[0][$usetrunk+3];
-					$removeprefix 	= explode(",", $RateEngine -> ratecard_obj[0][$usetrunk+4]);
-					$timeout		= $RateEngine -> ratecard_obj[0]['timeout'];
-					$callbackrate	= $RateEngine -> ratecard_obj[0]['callbackrate'];
-					$failover_trunk	= $RateEngine -> ratecard_obj[0][40+$usetrunk_failover];
-					$addparameter	= $RateEngine -> ratecard_obj[0][42+$usetrunk_failover];
-
-					$destination = $A2B ->destination;
-					if (is_array($removeprefix) && count($removeprefix)>0) {
-						foreach ($removeprefix as $testprefix) {
-							if (substr($destination,0,strlen($testprefix))==$testprefix) {
-								$destination = substr($destination,strlen($testprefix));
-								break;
-							}
-						}
-					}
-
-					$pos_dialingnumber = strpos($ipaddress, '%dialingnumber%' );
-
-					$ipaddress = str_replace("%cardnumber%", $A2B->cardnumber, $ipaddress);
-					$ipaddress = str_replace("%dialingnumber%", $prefix.$destination, $ipaddress);
-
-					if ($pos_dialingnumber !== false){
-						   $dialstr = "$tech/$ipaddress";
-					}else{
-						if ($A2B -> agiconfig['switchdialcommand'] == 1){
-							$dialstr = "$tech/$prefix$destination@$ipaddress";
-						}else{
-							$dialstr = "$tech/$ipaddress/$prefix$destination";
-						}
-					}
-                    
-					//ADDITIONAL PARAMETER      %dialingnumber%, %cardnumber%
-					if (strlen($addparameter)>0) {
-						$addparameter = str_replace("%cardnumber%", $A2B->cardnumber, $addparameter);
-						$addparameter = str_replace("%dialingnumber%", $prefix.$destination, $addparameter);
-						$dialstr .= $addparameter;
-					}
-                    
-					$channel = $dialstr;
+				    // MAKE THE CALL
+				    $channeloutcid = $RateEngine->rate_engine_performcall(false, $A2B->destination, $A2B);
+				    if ($channeloutcid) {
+					$channel = $channeloutcid[0];
 					$exten = $A2B -> config["callback"]['extension'];
 					if ($argc > 4 && strlen($argv[4]) > 0)
                         $exten = $argv[4];
@@ -1066,7 +1017,8 @@ if ($mode == 'standard') {
 					$priority = 1;
 					$timeout = $A2B -> config["callback"]['timeout']*1000;
 					//$callerid = $A2B -> config["callback"]['callerid'];
-					$callerid = $A2B -> CallerID;
+					if ($channeloutcid[1]) $callerid = $channeloutcid[1];
+					else $callerid =  $A2B -> CallerID;
 					$application = '';
 					$account = $A2B -> accountcode;
 
@@ -1103,6 +1055,8 @@ if ($mode == 'standard') {
 						$error_msg= "Cannot insert the callback request in the spool!";
 						$A2B -> debug( DEBUG, $agi, __FILE__, __LINE__, "[CALLBACK-ALL : CALLED=".$A2B ->destination." | $error_msg]");
 					}
+
+				    } else $error_msg = gettext("Error : Sorry, not enough free trunk for make call. Try again later!");
 
 				}else{
 					$error_msg = 'Error : You don t have enough credit to call you back !!!';
