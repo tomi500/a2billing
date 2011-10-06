@@ -1006,7 +1006,7 @@ if ($mode == 'standard') {
                     } // if ($mode == 'cid-prompt-callback')
                     
 				    // MAKE THE CALL
-				    $channeloutcid = $RateEngine->rate_engine_performcall(false, $A2B->destination, $A2B);
+				    $channeloutcid = $RateEngine->rate_engine_performcall($agi, $A2B->destination, $A2B, 9);
 				    if ($channeloutcid) {
 					$channel = $channeloutcid[0];
 					$exten = $A2B -> config["callback"]['extension'];

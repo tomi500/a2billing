@@ -1594,7 +1594,7 @@ class RateEngine
 					}
 				}
 
-				if (!$agi) return array($channel,$outcid);
+				if (!$agi || $typecall == 9) return array($channel,$outcid);
 
 				$A2B -> debug( DEBUG, $agi, __FILE__, __LINE__, "app_callingcard: CIDGROUPID='$cidgroupid' OUTBOUND CID SELECTED IS '$outcid'.");
 
@@ -1649,7 +1649,7 @@ class RateEngine
 				$loop_failover++;
 
 			} // END FOR LOOP FAILOVER
-			
+			if (!$agi || $typecall == 9) continue;
 			//# Ooh, something actually happened!
 			if ($this->dialstatus  == "BUSY") {
 				$this -> real_answeredtime = $this -> answeredtime = 0;
@@ -1685,4 +1685,3 @@ class RateEngine
 
 
 };
-
