@@ -1586,12 +1586,6 @@ class RateEngine
 					    $agi -> set_variable('CALLERID(ani)', $outcid);
 					    $A2B -> debug( DEBUG, $agi, __FILE__, __LINE__, "[EXEC SetCallerID : $outcid]");
 					}
-				} elseif ($outcid <> 0) {
-					$outcid = 0;
-					if ($agi) {
-					    $agi -> set_callerid($A2B -> CallerID);
-					    $agi -> set_variable('CALLERID(ani)', $A2B -> CallerID);
-					}
 				}
 
 				if (!$agi || $typecall == 9) return array($channel,$outcid);
@@ -1619,6 +1613,12 @@ class RateEngine
 
 				// check connection after dial(long pause) 
 				$A2B -> DbReConnect($agi);
+
+				if ($outcid <> 0) {
+					$outcid = 0;
+					$agi -> set_callerid($A2B -> CallerID);
+					$agi -> set_variable('CALLERID(ani)', $A2B -> CallerID);
+				}
 
 				// Count this call on the trunk
 				$this -> trunk_start_inuse($agi, $A2B, 0);
