@@ -391,10 +391,9 @@ msgstr "АКТИВИРОВАН"
 msgid "There are no destinations created"
 msgstr "Не создано ни одного направления"
 
-#: form_data/FG_var_did.inc:129
-#, fuzzy
-msgid "Enter here the phonenumber you want to call or the SIP/IAX/H323 peer to reach (ie: 347894999 or SIP/jeremy@182.212.1.45). To call SIP/IAX/H323 peer, you need to enable the voip_call bellow (voip_call = Yes) "
-msgstr "Введите здесь номер по которому хотите позвонить или SIP/IAX/H323 пользователя (напримет: 347894999 or SIP/jeremy@182.212.1.45). Чтобы позвонить SIP/IAX/H323 пользователю, нужно включить the voip_call  (voip_call = Yes)"
+#: form_data/FG_var_did.inc:139
+msgid "Enter here the phonenumber you wish to call or the SIP/IAX/H323 peer to reach (ie: 347894999 or SIP/jeremy@182.212.1.45). To call SIP/IAX/H323 peer, you need to enable the voip_call bellow (voip_call = Yes)"
+msgstr "Введите здесь номер, на который хотите перенаправить звонок, или SIP/IAX2/H323 пользователя (напримет: 347894999 or SIP/taras@182.212.1.45). Чтобы задать SIP/IAX2/H323 направление, нужно включить VOIP ЗВОНОК = 'Да'"
 
 #: form_data/FG_var_did.inc:138 form_data/FG_var_callerid.inc:97
 msgid "Choose if you want to activate this card"
@@ -407,6 +406,10 @@ msgstr "VOIP звонок"
 #: form_data/FG_var_did.inc:157
 msgid "Choose if you want to not use the trunk and let the asterisk call directly the destination (ie, Destination : SIP/jeremy@182.212.1.45)"
 msgstr "Выберите, если выхотите использовать транк и позволить системе звонить напряму (Например SIP/taras@182.212.1.42)"
+
+#: form_data/FG_var_did.inc:166
+msgid "Choose 'Yes' if you want to answer on the call"
+msgstr "Выберите 'Да' если нужно поднимать трубку в момент поступления входящего вызова"
 
 #: form_data/FG_var_did.inc:169 form_data/FG_var_campaign.inc:295
 #: form_data/FG_var_speeddial.inc:118 form_data/FG_var_phonebook.inc:109
@@ -451,6 +454,18 @@ msgstr "Новый"
 #, fuzzy
 msgid "has been inserted."
 msgstr "зарегистрирован"
+
+#: form_data/FG_var_did.inc:167
+msgid "Choose if you want to answer on the call before playing PLAY_SOUND"
+msgstr "Инициировать ответ на входящий звонок перед проигрыванием PLAY_SOUND"
+
+#: form_data/FG_var_did.inc:175
+msgid "Insert the path and name of sound file"
+msgstr "Введите путь и имя к звуковому файлу"
+
+#: form_data/FG_var_did.inc:176
+msgid "Play sound before calling DESTINATION. ie 'ivr/wait-please'"
+msgstr "Если хотите проиграть приветствие перед перенаправлением звонка введите путь и название звукового файла, например 'ivr/wait-please'"
 
 #: form_data/FG_var_did.inc:178
 msgid "Setup those values to create or edit the "
@@ -1180,6 +1195,18 @@ msgstr "Your PhoneNumber / Location"
 msgid "Your new phone number has been inserted."
 msgstr "зарегистрирован"
 
+#: form_data/FG_var_callerid.inc:108
+msgid "Enter the phone"
+msgstr "Введите номер назначения"
+
+#: form_data/FG_var_callerid.inc:109
+msgid "Enter the phone number for immediatly dial instead prompt to dial"
+msgstr "Задайте моментальный номер дозвона. Услуга интерактивного донабора временно отключится."
+
+#: form_data/FG_var_callerid.inc:117
+msgid "Choose 'Yes' if you want to callback to this CallerID"
+msgstr "Выберите 'Да' чтобы выполнять обратный звонок"
+
 #: form_data/FG_var_callerid.inc:39 call-history.php:131
 msgid "CallerID"
 msgstr "Номер звонящего"
@@ -1197,9 +1224,8 @@ msgid "There are no Caller IDs created"
 msgstr "Ни одного  CallerID не создано"
 
 #: form_data/FG_var_callerid.inc:87
-#, fuzzy
 msgid "Insert the CallerID"
-msgstr "Insert a new"
+msgstr "Введите номер звонящего"
 
 #: form_data/FG_var_callerid.inc:122
 msgid "You can add your home phone or cellphone number below to allow you to call in, be automatically recognized, and use your telephony services without having to enter your PIN."
@@ -1942,6 +1968,10 @@ msgstr "Вым необходимо написать что-либо"
 msgid "8 characters alphanumeric"
 msgstr "8 символов"
 
+#: lib/Form/Class.FormHandler.inc.php:1048
+msgid "(Phone Number format)"
+msgstr "(телефон в формате числа)"
+
 #: lib/Form/Class.FormHandler.inc.php:1051
 msgid "(at least 6 Alphanumeric characters)"
 msgstr "(как минимум 6 символов)"
@@ -1969,7 +1999,6 @@ msgid "Export Call Plan with LCR"
 msgstr "Экспортировать тарифный план с LCR"
 
 #: lib/Form/Class.FormHandler.inc.php:1996
-#, fuzzy
 msgid "Choose a call plan"
 msgstr "Выбирите тарифный план"
 
@@ -1998,7 +2027,6 @@ msgid "First"
 msgstr "Первый"
 
 #: lib/Misc.php:723 A2B_entity_did.php:459
-#, fuzzy
 msgid "Prev"
 msgstr "Назад"
 
@@ -2624,9 +2652,8 @@ msgid "Phonebook are set of phone numbers. You can add, remove and edit the phon
 msgstr "Телефонные книги - это наборы телефонов. Можно добавлять, удалять и редактировать телефонную книгу. Также можно прикрепить телефонную книгу к кампании в разделе Кампании"
 
 #: lib/customer.help.php:83
-#, fuzzy
 msgid "Select the country below where you would like a DID, select a DID from the list and enter the destination you would like to assign it to."
-msgstr "Select below the country where to find a DID and then select a DID and enter the destination you would like to assign to it."
+msgstr "Выберите страну, в которой Вам нужен местный номер, затем в списке ниже выберите сам номер, и ещё ниже задайте направление-номер на который будут переводиться все входящие звонки. Для редактирования уже купленных DID номеров нажмите на 'карандаш' в таблице."
 
 #: lib/customer.help.php:85
 msgid "After confirmation, the release of the did will be done immediately and you will not be monthly charged any more."
@@ -3705,9 +3732,8 @@ msgid "Select Country"
 msgstr "Выбирите Страну"
 
 #: A2B_entity_did.php:390
-#, fuzzy
 msgid "Select Virtual Phone Number"
-msgstr "Выбирите Виртуальный Номер Телефона"
+msgstr "Выбирите себе виртуальный Номер"
 
 #: A2B_entity_did.php:395
 #, fuzzy
@@ -3739,9 +3765,8 @@ msgid "NO"
 msgstr "НЕТ"
 
 #: A2B_entity_did.php:418
-#, fuzzy
 msgid "Enter the phone number you wish to call, or the SIP/IAX client to reach  (ie: 347894999 or SIP/jeremy@182.212.1.45). In order to call a VoIP number, you will need to enable voip_call"
-msgstr "Введите здесь номер по которому хотите позвонить или SIP/IAX/H323 пользователя (напримет: 347894999 or SIP/jeremy@182.212.1.45). Чтобы позвонить SIP/IAX/H323 пользователю, нужно включить the voip_call  (voip_call = Yes)"
+msgstr "Введите здесь номер, на который хотите перенаправить звонок, или SIP/IAX2/H323 пользователя (напримет: 347894999 or SIP/taras@182.212.1.45). Чтобы задать SIP/IAX2/H323 направление, нужно включить VOIP ЗВОНОК = 'Да'"
 
 #: A2B_entity_did.php:422
 msgid "If you release the did you will not be monthly charged any more."
@@ -3762,12 +3787,11 @@ msgstr "Подтвердите покупку НОМЕРА"
 
 #: A2B_entity_did.php:454
 msgid "A monthly fee of "
-msgstr "Месячная оплата"
+msgstr "Месячная оплата "
 
 #: A2B_entity_did.php:454
-#, fuzzy
 msgid " will be carried out from your acount"
-msgstr "на ваш счет!"
+msgstr "будет сразу списана с Вашего счёта!"
 
 #: A2B_entity_did.php:473
 msgid "The purchase of the DID is done "

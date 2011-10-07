@@ -1271,6 +1271,12 @@ if (!defined('MONITOR_PATH')) define ("MONITOR_PATH",	isset($this->config['webui
 				// CHECK IF DESTINATION IS SET
 				if (strlen($inst_listdestination[4])==0) continue;
 
+				if ($inst_listdestination[28]) $agi -> answer();
+				if ($inst_listdestination[29] != "") {
+					sleep(1);
+					$agi -> evaluate("STREAM FILE $inst_listdestination[29] \"#\" 0");
+				}
+
 				// IF VOIP CALL
 				if ($inst_listdestination[5]==1) {
 
@@ -1501,17 +1507,17 @@ if (!defined('MONITOR_PATH')) define ("MONITOR_PATH",	isset($this->config['webui
 			$this -> debug( INFO, $agi, __FILE__, __LINE__, "[A2Billing] DID call friend: FOLLOWME=$callcount (cardnumber:".$inst_listdestination[6]."|destination:".$inst_listdestination[4]."|tariff:".$inst_listdestination[3].")\n");
 
 			$this->agiconfig['cid_enable']	= 0;
-			$this->accountcode 				= $inst_listdestination[6];
+			$this->accountcode=$this->username=$new_username= $inst_listdestination[6];
 			$this->tariff 					= $inst_listdestination[3];
 			$this->destination 				= $inst_listdestination[10];
-			$new_username 				    = $inst_listdestination[6];
+//			$new_username 				    = $inst_listdestination[6];
 			$this->useralias 				= $inst_listdestination[7];
-			$this->id_card 				    = $inst_listdestination[28];
+			$this->id_card					= $inst_listdestination[28];
 			
             // CHECK IF DESTINATION IS SET
             if (strlen($inst_listdestination[4])==0)
             	continue;
-			
+
             // IF call on did is not free calculate time to call
             
             // IF VOIP CALL
@@ -1623,9 +1629,9 @@ if (!defined('MONITOR_PATH')) define ("MONITOR_PATH",	isset($this->config['webui
                         $cost = ($answeredtime/60) * abs($selling_rate) + abs($connection_charge);
                         
                         /* CDR B-LEG OF DID CALL */
-                        $QUERY = "INSERT INTO cc_call (uniqueid, sessionid, card_id, nasipaddress, starttime, sessiontime, calledstation, ".
+                        $QUERY = "INSERT INTO cc_call (uniqueid, sessionid, card_id, card_caller, nasipaddress, starttime, sessiontime, calledstation, ".
                                 " terminatecauseid, stoptime, sessionbill, id_tariffgroup, id_tariffplan, id_ratecard, id_trunk, src, sipiax) VALUES ".
-                                "('".$this->uniqueid."', '".$this->channel."',  '".$this->id_card."', '".$this->hostname."',";
+                                "('".$this->uniqueid."', '".$this->channel."',  '".$this->id_card."', '".$this->card_caller."', '".$this->hostname."',";
                         $QUERY .= " CURRENT_TIMESTAMP - INTERVAL $answeredtime SECOND ";
                         $QUERY .= ", '$answeredtime', '". $listdestination[0][10]."', '$terminatecauseid', now(), '$cost', '0', '0', '0', '0', '$this->CallerID', '3' )";
 
@@ -2536,7 +2542,7 @@ if (!defined('MONITOR_PATH')) define ("MONITOR_PATH",	isset($this->config['webui
 				    " cc_card.language, cc_card.username, removeinterprefix, cc_card.redial, enableexpire, UNIX_TIMESTAMP(expirationdate), " .
 				    " expiredays, nbused, UNIX_TIMESTAMP(firstusedate), UNIX_TIMESTAMP(cc_card.creationdate), cc_card.currency, " .
 				    " cc_card.lastname, cc_card.firstname, cc_card.email, cc_card.uipass, cc_card.id_campaign, cc_card.id, useralias, " .
-				    " cc_card.status, cc_card.voicemail_permitted, cc_card.voicemail_activated, cc_card.restriction, cc_country.countryprefix, cc_card.monitor ".
+				    " cc_card.status, cc_card.voicemail_permitted, cc_card.voicemail_activated, cc_card.restriction, cc_country.countryprefix, cc_card.monitor, phonenumber ".
 				    " FROM cc_callerid ".
 				    " LEFT JOIN cc_card ON cc_callerid.id_cc_card=cc_card.id ".
 				    " LEFT JOIN cc_tariffgroup ON cc_card.tariff=cc_tariffgroup.id ".
@@ -2653,6 +2659,7 @@ if (!defined('MONITOR_PATH')) define ("MONITOR_PATH",	isset($this->config['webui
 				$this->restriction			= $result[0][31];
 				$this->countryprefix		= $result[0][32];
 				$this->monitor				= $result[0][33];
+				$this->cidphonenumber			= $result[0][34];
 				
 				if (strlen($language)==2 && !($this->languageselected>=1)) {
 

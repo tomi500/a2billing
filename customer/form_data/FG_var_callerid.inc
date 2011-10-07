@@ -46,10 +46,12 @@ $yesno = Constants::getYesNoList();
 
 
 $HD_Form -> AddViewElement(gettext("CALLERID"), "cid", "25%", "center", "sort");
-$HD_Form -> AddViewElement(gettext("ACTIVATED"), "activated", "25%", "center", "sort", "26");
+$HD_Form -> AddViewElement(gettext("PHONE NUMBER"), "phonenumber", "25%", "center", "sort", "26");
+$HD_Form -> AddViewElement(gettext("CALLBACK"), "callback", "20%", "center", "SORT", "", "list", $yesno);
+$HD_Form -> AddViewElement(gettext("ACTIVATED"), "activated", "20%", "center", "sort", "26", "list", $actived_list);
 
 
-$HD_Form -> FieldViewElement ('cid, activated');
+$HD_Form -> FieldViewElement ('cid, phonenumber, callback, activated');
 
 $HD_Form -> CV_TITLE_TEXT = gettext("CallerID list");
 $HD_Form -> CV_NO_FIELDS  = gettext("There are no Caller IDs created");
@@ -95,11 +97,27 @@ $HD_Form -> AddEditElement (gettext("ACTIVATED"),
 			   "",
 			   "",
 			   gettext("Choose if you want to activate this card"),
-			   "" , "", "", "Yes :t, - No:f", "", "", "", "" );
+			   "" , "", "", gettext("Yes").":t, - ".gettext("No").":f", "", "", "", "" );
 
+$HD_Form -> AddEditElement (gettext("PHONE NUMBER"),
+			    "phonenumber",
+			    '$value',
+			    "INPUT",
+			    "size=50 maxlength=50",
+			    "4",
+			    gettext("Enter the phone"),
+			    "" , "", "", "", "", "", "", gettext("Enter the phone number for immediatly dial instead prompt to dial"));
 
+$HD_Form -> AddEditElement (gettext("CALLBACK"),
+			   "callback",
+			   '0',
+			   "RADIOBUTTON",
+			   "",
+			   "",
+			   gettext("Choose 'Yes' if you want to callback to this CallerID"),
+			   "" , "", "", gettext("Yes").":1, - ".gettext("No").":0", "", "", "", gettext("Choose 'Yes' if you want to callback to this CallerID"));
 
-$HD_Form -> FieldEditElement ('cid, activated');
+$HD_Form -> FieldEditElement ('cid, activated, phonenumber, callback');
 
 
 

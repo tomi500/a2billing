@@ -410,7 +410,7 @@ function CheckCountry(Source){
 
 		<?php if ($assign<=2) {
 
-			echo gettext("VOIP CALL : ");?> <?php echo gettext("Yes");?><input class="form_enter" name="voip_call" value="1" type="radio" <?php if ((isset($voip_call)) && ($voip_call == 1)) echo "checked" ?>> - <?php echo gettext("NO");?> <input class="form_enter" name="voip_call" value="0" type="radio" <?php if (!isset($voip_call)) { echo "checked";} else  {if ($voip_call == 0) echo "checked"; }?>>
+			echo gettext("VOIP CALL : ");?> <?php echo gettext("Yes");?> <input class="form_enter" name="voip_call" value="1" type="radio" <?php if ((isset($voip_call)) && ($voip_call == 1)) echo "checked" ?>> - <?php echo gettext("NO");?> <input class="form_enter" name="voip_call" value="0" type="radio" <?php if (!isset($voip_call)) { echo "checked";} else  {if ($voip_call == 0) echo "checked"; }?>>
 				<br>
 				<?php echo gettext("Destination");?> :
 

@@ -50,7 +50,7 @@ $HD_Form ->FG_LIST_ADDING_BUTTON_IMG1 = Images_Path ."/add.png" ;
 
 $HD_Form -> FG_DEBUG = 0;
 $HD_Form -> FG_TABLE_ID = " id_trunk";
-$HD_Form -> FG_TABLE_DEFAULT_ORDER = " id_trunk";
+$HD_Form -> FG_TABLE_DEFAULT_ORDER = " trunkcode";
 $HD_Form -> FG_EDITION_CLAUSE = " id_trunk='%id' ";
 $HD_Form -> FG_TABLE_DEFAULT_SENS = "ASC";
 
@@ -120,7 +120,7 @@ $HD_Form -> CV_DISPLAY_FILTER_ABOVE_TABLE = false;
 
 
 if ($popup_select) {
-	$HD_Form -> FG_LIMITE_DISPLAY = 7;
+	$HD_Form -> FG_LIMITE_DISPLAY = 10;
 	$HD_Form -> CV_FOLLOWPARAMETERS = "&popup_select=" . $popup_select . "&popup_formname=" . $popup_formname . "&popup_fieldname=" . $popup_fieldname;
 
 	$HD_Form -> FG_OTHER_BUTTON1 = true;
@@ -133,6 +133,7 @@ if ($popup_select) {
 	elseif ($popup_select == 2)
 		$HD_Form -> FG_OTHER_BUTTON1_LINK = "javascript:sendValue('|col0|');";
 } else {
+	$HD_Form -> FG_LIMITE_DISPLAY = 20;
 	$HD_Form -> FG_EDITION = true;
 	$HD_Form -> FG_DELETION = true;
 	$HD_Form -> FG_ADDITION = true;

@@ -128,13 +128,13 @@ foreach ($show_list_temp as $i => $value) {
 $show_fields = array();
 $show_fields['id'] = array(gettext("ID"), "id", "3%", "center", "sort","", "", "", "", "", "", "");
 
-$show_fields['username'] = array(gettext("Account Number"), "username", "14%", "center", "sort", "", "30", "", "", "", "", "linktocustomer");
+$show_fields['username'] = array(gettext("Account Number"), "username", "9%", "center", "sort", "", "30", "", "", "", "", "linktocustomer");
 if (!($popup_select>=1)) 
- $show_fields['useralias'] = array("<acronym title=\"WEB UI LOGIN\">".gettext("LOGIN")."</acronym>", "useralias", "12%", "center", "sort","", "", "", "", "", "", "");
+ $show_fields['useralias'] = array("<acronym title=\"WEB UI LOGIN\">".gettext("LOGIN")."</acronym>", "useralias", "7%", "center", "sort","", "", "", "", "", "", "");
 
-$show_fields['lastname'] = array(gettext("LASTNAME"), "lastname", "7%", "center", "sort", "20","", "", "", "", "", "");
+$show_fields['lastname'] = array(gettext("LASTNAME"), "lastname", "9%", "center", "sort", "20","", "", "", "", "", "");
 $show_fields['id_group'] = array(gettext("GROUP"), "id_group", "6%", "center", "sort", "20", "lie", "cc_card_group", "name", "id='%id'", "%1","");
-$show_fields['credit'] = array("<acronym title=\"".gettext("BALANCE")."\">".gettext("BA")."</acronym>", "credit", "5%", "center", "sort", "", "", "", "", "", "", "display_2bill");
+$show_fields['credit'] = array("<acronym title=\"".gettext("BALANCE")."\">".gettext("BA")."</acronym>", "credit", "9%", "center", "sort", "", "", "", "", "", "", "display_2bill");
 
 if (!($popup_select>=1)) {
 	$serial_pad_length = $A2B->config["webui"]['card_serial_length'];
@@ -202,7 +202,7 @@ $HD_Form -> CV_NO_FIELDS  = gettext("NO CARDS HAVE BEEN CREATED!");
 $HD_Form -> CV_DISPLAY_LINE_TITLE_ABOVE_TABLE = false;
 $HD_Form -> CV_TEXT_TITLE_ABOVE_TABLE = '';
 $HD_Form -> CV_DISPLAY_FILTER_ABOVE_TABLE = false;
-$HD_Form -> FG_LIMITE_DISPLAY = 10;
+$HD_Form -> FG_LIMITE_DISPLAY = 20;
 
 
 // Code here for adding the fields in the Export File
@@ -212,7 +212,7 @@ if (!($popup_select>=1)) $HD_Form -> FG_EXPORT_XML = true;
 $HD_Form -> FG_EXPORT_SESSION_VAR = "pr_export_entity_card";
 
 
-if (($popup_select>=1))	$HD_Form ->FG_LIMITE_DISPLAY = 7;
+if (($popup_select>=1))	$HD_Form ->FG_LIMITE_DISPLAY = 10;
 
 
 $HD_Form -> CV_FOLLOWPARAMETERS= "&popup_select=".$popup_select."&popup_formname=".$popup_formname."&popup_fieldname=".$popup_fieldname;

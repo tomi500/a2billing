@@ -39,8 +39,8 @@ getpost_ifset(array('id', 'billingtype', 'did', 'startingdate', 'expirationdate'
 $HD_Form = new FormHandler("cc_did_destination","destination");
 
 $HD_Form -> FG_DEBUG = 0;
-$HD_Form -> FG_TABLE_DEFAULT_ORDER = "did";
-$HD_Form -> FG_TABLE_DEFAULT_SENS = "DESC";
+$HD_Form -> FG_TABLE_DEFAULT_ORDER = "did DESC, priority";
+$HD_Form -> FG_TABLE_DEFAULT_SENS = "ASC";
 
 $HD_Form -> FG_EDITION = true;
 $HD_Form -> FG_DELETION = true;
@@ -64,10 +64,10 @@ $validated_list = array();
 $validated_list["0"] = array( gettext("Pending"), "0");
 $validated_list["1"] = array( gettext("Validated"), "1");
 
-$HD_Form -> AddViewElement(gettext("DESTINATION"), "destination", "20%", "center", "sort");
 $HD_Form -> AddViewElement(gettext("DID"), "id_cc_did", "15%", "center", "sort", "15", "lie", "cc_did", "did", "id='%id'", "%1");
 $HD_Form -> AddViewElement(gettext("ACTIVATED"), "t1.activated", "10%", "center", "sort", "", "list", $actived_list);
 $HD_Form -> AddViewElement(gettext("PRIORITY"), "priority", "10%", "center", "sort", "", "list", $priority_list);
+$HD_Form -> AddViewElement(gettext("DESTINATION"), "destination", "20%", "center", "sort");
 $HD_Form -> AddViewElement(gettext("USED MINUTE"), "t1.secondusedreal", "10%", "center", "SORT", "30", "", "", "", "", "", "display_minute");
 $HD_Form -> AddViewElement(gettext("COUNTRY"), "id_cc_country", "15%", "center", "sort", "15", "lie", "cc_country", "countryname", "id='%id'", "%1");
 $HD_Form -> AddViewElement(gettext("VALIDATED"), "validated", "10%", "center", "sort", "", "list", $validated_list);
@@ -77,22 +77,29 @@ if (isset($form_action) && ($form_action=='ask-edit' || $form_action=='edit')) {
 	$HD_Form -> FG_TABLE_NAME = "cc_did_destination AS t1";
 	$country_field = '';
 	$validated = 1;
+	$DBHandle_max = DbConnect();
+	$resmax = $DBHandle_max -> Execute("SELECT destination, validated, voip_call FROM cc_did_destination WHERE id='$id'");
+	$row = $resmax->fetchRow();
 	
 	if ($voip_call == 1) {
 	    // It's a Voip Call
-	    $DBHandle_max = DbConnect();
-	    $numrow = 0;
-	    $resmax = $DBHandle_max -> Execute("SELECT * FROM cc_did_destination WHERE id='$id' AND destination='$destination' AND validated=1");
-	    
-	    if ( $resmax )
-		    $numrow = $resmax -> RecordCount( );
-        $validated = ($numrow == 1) ? 1 : 0;
+	    if (!(strpos(substr($destination, strpos($destination, '/')),'.') && (stripos($destination,'SIP/') === 0 || stripos($destination,'IAX2/') === 0 || stripos($destination,'H323/') === 0) && stripos($row[0],'Local/') === false)) {
+		$destination = $row[0];
+		$validated = $row[1];
+		$voip_call = $row[2];
+	    } else {
+		$numrow = 0;
+		$resmax = $DBHandle_max -> Execute("SELECT * FROM cc_did_destination WHERE id='$id' AND destination='$destination' AND validated=1");
 	
-	    if ($validated)
-	        NotificationsDAO::AddNotification("did_destination_edited_cust", Notification::$LOW, Notification::$CUST, $_SESSION['card_id'], Notification::$LINK_DID_DESTINATION, $id);
-	    
-	    //$HD_Form->_processed['destination'] = intval($destination);
-	    
+		if ( $resmax )
+		    $numrow = $resmax -> RecordCount( );
+		$validated = ($numrow == 1) ? 1 : 0;
+	
+		if ($validated)
+		    NotificationsDAO::AddNotification("did_destination_edited_cust", Notification::$LOW, Notification::$CUST, $_SESSION['card_id'], Notification::$LINK_DID_DESTINATION, $id);
+	
+		//$HD_Form->_processed['destination'] = intval($destination);
+	    }
 	} else {
 	    // It's not a Voip call, check if we don't try to inject
 	    $destination = (intval($destination) > 0) ? preg_replace("|\D|", "", $destination) : 'no valid';
@@ -106,7 +113,7 @@ if (isset($form_action) && ($form_action=='ask-edit' || $form_action=='edit')) {
 	$validated = 0;
 }
 
-$HD_Form -> FG_COL_QUERY = 'destination, id_cc_did, t1.activated, priority, t1.secondusedreal,'. $country_field .'  t1.validated, t1.id ';
+$HD_Form -> FG_COL_QUERY = 'id_cc_did, t1.activated, priority, destination, t1.secondusedreal,'. $country_field .'  t1.validated, t1.id ';
 
 $HD_Form -> CV_NO_FIELDS  = gettext("There are no destinations created");
 $HD_Form -> CV_DISPLAY_LINE_TITLE_ABOVE_TABLE = false;
@@ -117,6 +124,16 @@ $HD_Form -> FG_EDITION = true;
 $HD_Form -> FG_DELETION = true;
 $HD_Form -> FG_VIEW_TABLE_WITDH = '80%';
 
+$HD_Form -> AddEditElement (gettext("ACTIVATED"),
+	"activated",
+	'1',
+	"RADIOBUTTON",
+	"",
+	"",
+	gettext("Choose if you want to activate this card"),
+	"" , "", "", gettext("Yes").":1, - ".gettext("No").":0", "", "", "", "");
+	
+
 if (isset($form_action) && ($form_action=='ask-edit')) {
 
     $HD_Form -> AddEditElement (gettext("DESTINATION"),
@@ -126,18 +143,18 @@ if (isset($form_action) && ($form_action=='ask-edit')) {
 	    "size=50 maxlength=120",
 	    "0",
 	    "Insert the Destination",
-	    "" , "", "", "", "" , "", "", gettext("Enter here the phonenumber you want to call or the SIP/IAX/H323 peer to reach (ie: 347894999 or SIP/jeremy@182.212.1.45). To call SIP/IAX/H323 peer, you need to enable the voip_call bellow (voip_call = Yes) "));
+	    "" , "", "", "", "" , "", "", gettext("Enter here the phonenumber you wish to call or the SIP/IAX/H323 peer to reach (ie: 347894999 or SIP/jeremy@182.212.1.45). To call SIP/IAX/H323 peer, you need to enable the voip_call bellow (voip_call = Yes)"));
 }
 
-$HD_Form -> AddEditElement (gettext("ACTIVATED"),
-	"activated",
+$HD_Form -> AddEditElement (gettext("VOIP_CALL"),
+	"voip_call",
 	'1',
 	"RADIOBUTTON",
 	"",
 	"",
-	gettext("Choose if you want to activate this card"),
-	"" , "", "", "Yes :1, - No:0",   "", "" , "", "");
-	
+	gettext("Choose if you want to not use the trunk and let the asterisk call directly the destination (ie, Destination : SIP/jeremy@182.212.1.45)"),
+	"" , "",  "", gettext("Yes").":1, - ".gettext("No").":0",  "", "" , "" , "");
+
 $HD_Form -> AddEditElement (gettext("PRIORITY"),
 	"priority",
 	"",
@@ -147,22 +164,30 @@ $HD_Form -> AddEditElement (gettext("PRIORITY"),
 	"",
 	"list" , "", "",  "", $priority_list, "%1" , "" , "");
 
-
-$HD_Form -> AddEditElement (gettext("VOIP_CALL"),
-	"voip_call",
-	'1',
+$HD_Form -> AddEditElement (gettext("ANSWER"),
+	"answer",
+	'0',
 	"RADIOBUTTON",
 	"",
 	"",
-	gettext("Choose if you want to not use the trunk and let the asterisk call directly the destination (ie, Destination : SIP/jeremy@182.212.1.45)"),
-	"" , "",  "", "Yes :1, - No:0",  "", "" , "" , "");
+	gettext("Choose 'Yes' if you want to answer on the call"),
+	"" , "", "", gettext("Yes").":1, - ".gettext("No").":0", "", "", "", gettext("Choose if you want to answer on the call before playing PLAY_SOUND"));
+
+$HD_Form -> AddEditElement (gettext("PLAY_SOUND"),
+	"playsound",
+	'$value',
+	"INPUT",
+	"size=50 maxlength=50",
+	"",
+	gettext("Insert the path and name of sound file"),
+	"" , "", "", "", "", "", "", gettext("Play sound before calling DESTINATION. ie 'ivr/wait-please'"));
 
 
 if (isset($form_action) && ($form_action=='ask-edit')) {
-    $HD_Form -> FieldEditElement ('destination, activated, priority, voip_call');
+    $HD_Form -> FieldEditElement ('activated, destination, voip_call, priority, answer, playsound');
 } else {
-    $HD_Form -> FG_QUERY_EDITION_HIDDEN_FIELDS = "destination, validated";
-    $HD_Form -> FG_QUERY_EDITION_HIDDEN_VALUE = "$destination, $validated";
+    $HD_Form -> FG_QUERY_EDITION_HIDDEN_FIELDS = "destination, validated, voip_call";
+    $HD_Form -> FG_QUERY_EDITION_HIDDEN_VALUE = "$destination, $validated, $voip_call";
 }
 
 $HD_Form -> FG_INTRO_TEXT_EDITION= '';

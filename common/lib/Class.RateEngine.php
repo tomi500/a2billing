@@ -1026,7 +1026,7 @@ class RateEngine
 	 * RATE ENGINE - UPDATE SYSTEM (DURATIONCALL)
 	 * Calcul the duration allowed for the caller to this number
 	 */
-	function rate_engine_updatesystem (&$A2B, &$agi, $calledstation, $doibill = 1, $didcall=0, $callback=0)
+	function rate_engine_updatesystem (&$A2B, &$agi, $calledstation, $doibill = 1, $didcall=0, $callback=0, $trunk_id=0, $td=0)
 	{
 		$K = $this->usedratecard;
 		
@@ -1153,7 +1153,7 @@ class RateEngine
 		$id_tariffgroup = (!is_numeric($id_tariffgroup)) ? 'NULL' : "'$id_tariffgroup'";
 		$id_tariffplan = (!is_numeric($id_tariffplan)) ? 'NULL' : "'$id_tariffplan'";
 		$id_ratecard = (!is_numeric($id_ratecard)) ? 'NULL' : "'$id_ratecard'";
-		$trunk_id =  (!is_numeric( $this -> usedtrunk)) ? 'NULL' : "'". $this->usedtrunk ."'";
+		$trunk_id =  ($trunk_id) ? "'". $trunk_id ."'" : "'". $this->usedtrunk ."'";
 		$id_card_package_offer = (!is_numeric($id_card_package_offer)) ? 'NULL' : "'$id_card_package_offer'";
 		$calldestination = (!is_numeric($calldestination)) ? 'DEFAULT' : "'$calldestination'";
 
@@ -1177,7 +1177,7 @@ class RateEngine
 		}
 
 		$QUERY .= " , '$signe_cc_call".a2b_round(abs($cost))."', ".
-					" $id_tariffgroup, $id_tariffplan, $id_ratecard, '".$this -> usedtrunk."', '".$A2B->CallerID."', '$calltype', ".
+					" $id_tariffgroup, $id_tariffplan, $id_ratecard, $trunk_id, '".$A2B->CallerID."', '$calltype', ".
 					" '$buycost', $id_card_package_offer, '".$A2B->dnid."', $calldestination)";
 
 		if ($A2B->config["global"]['cache_enabled']) {
@@ -1200,6 +1200,7 @@ class RateEngine
 		}
 		if ($sessiontime>0) {
 			
+			if (!$td) $td = $this->td;
 			if ($didcall==0 && $callback==0) {
 				$myclause_nodidcall = " , redial='".$calledstation."' ";
 			} else {
@@ -1222,12 +1223,12 @@ class RateEngine
 			$A2B -> debug( DEBUG, $agi, __FILE__, __LINE__, "[CC_asterisk_stop 1.2: SQL: $QUERY]");
 			$result = $A2B->instance_table -> SQLExec ($A2B -> DBHandle, $QUERY, 0);
 
-			$QUERY = "SELECT period$this->td, UNIX_TIMESTAMP(periodexpiry$this->td), periodcount$this->td FROM cc_trunk WHERE id_trunk='".$this -> usedtrunk."' AND ($this->prefixclause) LIMIT 1";
+			$QUERY = "SELECT period$td, UNIX_TIMESTAMP(periodexpiry$td), periodcount$td FROM cc_trunk WHERE id_trunk=$trunk_id AND ($this->prefixclause) LIMIT 1";
 			$result = $A2B->instance_table -> SQLExec ($A2B -> DBHandle, $QUERY);
 			if (is_array($result) && count($result)>0) {
-				$QUERY = "UPDATE cc_trunk SET secondusedreal = secondusedreal + $sessiontime, periodcount$this->td = ";
-				$tqr = " / billblocksec$this->td) * billblocksec$this->td, lastcallstoptime$this->td=now()";
-				$tqrperiod = ", periodexpiry$this->td = ";
+				$QUERY = "UPDATE cc_trunk SET secondusedreal = secondusedreal + $sessiontime, periodcount$td = ";
+				$tqr = " / billblocksec$td) * billblocksec$td, lastcallstoptime$td=now()";
+				$tqrperiod = ", periodexpiry$td = ";
 				$period		= $result[0][0];
 				$periodexpiry	= $result[0][1];
 				$periodcount	= $result[0][2];
@@ -1257,8 +1258,8 @@ class RateEngine
 				} else {
 					$limitsessiontime = $sessiontime;
 				}
-				$QUERY .= "$periodcount + ceil($limitsessiontime" . $tqr . "WHERE id_trunk='".$this -> usedtrunk."'";
-			} else $QUERY = "UPDATE cc_trunk SET secondusedreal = secondusedreal + $sessiontime WHERE id_trunk='".$this -> usedtrunk."'";
+				$QUERY .= "$periodcount + ceil($limitsessiontime" . $tqr . "WHERE id_trunk=$trunk_id";
+			} else $QUERY = "UPDATE cc_trunk SET secondusedreal = secondusedreal + $sessiontime WHERE id_trunk=$trunk_id";
 			$A2B -> debug( DEBUG, $agi, __FILE__, __LINE__, $QUERY);
 			$result = $A2B->instance_table -> SQLExec ($A2B -> DBHandle, $QUERY, 0);
 
@@ -1295,6 +1296,7 @@ class RateEngine
 		$max_long = 2147483647; //Maximum value for long type in C++. This will be used to avoid overflow when sending large numbers to Asterisk
 		$old_destination = $destination;
 
+		$A2B -> debug( INFO, $agi, __FILE__, __LINE__, "Count of ratecard_obj = ".count($this -> ratecard_obj));
 		for ($k=0;$k<count($this -> ratecard_obj);$k++) {
 			$loop_failover = 0;
 			$destination = $old_destination;
@@ -1550,29 +1552,9 @@ class RateEngine
 				if (strncmp($destination, $prefix, strlen($prefix)) == 0) $prefix="";
 				$ipaddress = str_replace("%dialingnumber%", $prefix.$destination, $ipaddress);
 
-				if ($trunktimeout < 0)  $trunktimeout = $timeout;
-				if ($A2B->recalltime) $dialparams = str_replace("%timeout%", min($timeout * 1000, $max_long, $trunktimeout * 1000, $A2B->recalltime * 1000), $A2B->agiconfig['dialcommand_param']);
-					else $dialparams = str_replace("%timeout%", min($timeout * 1000, $max_long, $trunktimeout * 1000), $A2B->agiconfig['dialcommand_param']);
-
-				if (strlen($musiconhold)>0 && $musiconhold!="selected" && $agi) {
-					$dialparams.= "m";
-					$myres = $agi->exec("SETMUSICONHOLD $musiconhold");
-					$A2B -> debug( DEBUG, $agi, __FILE__, __LINE__, "EXEC SETMUSICONHOLD $musiconhold");
-				}
-
 				if ($pos_dialingnumber !== false) $channel = "$tech/$ipaddress";
 				elseif ($A2B->agiconfig['switchdialcommand'] == 1) $channel = "$tech/$prefix$destination@$ipaddress";
 					else $channel = "$tech/$ipaddress/$prefix$destination";
-
-				$dialstr = $channel.$dialparams;
-				//ADDITIONAL PARAMETER 			%dialingnumber%,	%cardnumber%
-				if (strlen($addparameter)>0) {
-					$addparameter = str_replace("%cardnumber%", $A2B->cardnumber, $addparameter);
-					$addparameter = str_replace("%dialingnumber%", $prefix.$destination, $addparameter);
-					$dialstr .= $addparameter;
-				}
-
-				if ($agi) $A2B -> debug( INFO, $agi, __FILE__, __LINE__, "FAILOVER app_callingcard: Dialing '$dialstr' with timeout of '$timeout'.\n");
 
 				$QUERY = "SELECT cid FROM cc_outbound_cid_list WHERE activated = 1 AND outbound_cid_group = $cidgroupid ORDER BY RAND() LIMIT 1";
 				$A2B->instance_table = new Table();
@@ -1588,9 +1570,30 @@ class RateEngine
 					}
 				}
 
-				if (!$agi || $typecall == 9) return array($channel,$outcid);
+				if (!$agi || $typecall == 9) return array($channel,$outcid,$this -> usedtrunk,$this -> td);
 
 				$A2B -> debug( DEBUG, $agi, __FILE__, __LINE__, "app_callingcard: CIDGROUPID='$cidgroupid' OUTBOUND CID SELECTED IS '$outcid'.");
+
+				if ($trunktimeout < 0)  $trunktimeout = $timeout;
+				if ($A2B->recalltime) $dialparams = str_replace("%timeout%", min($timeout * 1000, $max_long, $trunktimeout * 1000, $A2B->recalltime * 1000), $A2B->agiconfig['dialcommand_param']);
+					else $dialparams = str_replace("%timeout%", min($timeout * 1000, $max_long, $trunktimeout * 1000), $A2B->agiconfig['dialcommand_param']);
+
+				if (strlen($musiconhold)>0 && $musiconhold!="selected") {
+					$dialparams.= "m";
+//					$myres = $agi->exec("SETMUSICONHOLD $musiconhold");
+					$agi -> set_variable('CHANNEL(musicclass)', $musiconhold);
+					$A2B -> debug( DEBUG, $agi, __FILE__, __LINE__, "EXEC SETMUSICONHOLD $musiconhold");
+				}
+
+				$dialstr = $channel.$dialparams;
+				//ADDITIONAL PARAMETER 			%dialingnumber%,	%cardnumber%
+				if (strlen($addparameter)>0) {
+					$addparameter = str_replace("%cardnumber%", $A2B->cardnumber, $addparameter);
+					$addparameter = str_replace("%dialingnumber%", $prefix.$destination, $addparameter);
+					$dialstr .= $addparameter;
+				}
+
+				$A2B -> debug( INFO, $agi, __FILE__, __LINE__, "FAILOVER app_callingcard: Dialing '$dialstr' with timeout of '$timeout'.\n");
 
 				if ($A2B->monitor == 1 || $A2B -> agiconfig['record_call'] == 1) {
 					$A2B->dl_short = MONITOR_PATH . "/" . $A2B->username . "/" . date('Y') . "/" . date('n') . "/" . date('j') . "/";

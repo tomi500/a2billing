@@ -53,12 +53,14 @@ $HD_Form ->FG_LIST_ADDING_BUTTON_IMG2 = Images_Path ."/page_white_add.png" ;
 $actived_list = Constants::getActivationTrueFalseList();
 $yesno = Constants::getYesNoList();
 
-$HD_Form -> AddViewElement(gettext("CALLERID"), "cid", "20%", "center", "sort");
-$HD_Form -> AddViewElement(gettext("ACCOUNT NUMBER"), "id_cc_card", "25%", "center", "sort", "", "lie_link", "cc_card", "username, id", "id='%id'", "%1", "", "A2B_entity_card.php");
-$HD_Form -> AddViewElement(gettext("CUSTOMER NAME"), "id_cc_card", "25%", "center", "sort", "", "lie_link", "cc_card", "lastname, id, firstname", "id='%id'", "%1 %3", "", "A2B_entity_card.php");
-$HD_Form -> AddViewElement(gettext("ACTIVATED"), "activated", "15%", "center", "sort", "", "list", $actived_list);
+$HD_Form -> AddViewElement(gettext("CALLERID"), "cid", "15%", "center", "sort");
+$HD_Form -> AddViewElement(gettext("PHONE NUMBER"), "phonenumber", "15%", "center", "sort", "26");
+$HD_Form -> AddViewElement(gettext("CALLBACK"), "callback", "10%", "center", "SORT", "", "list", $yesno);
+$HD_Form -> AddViewElement(gettext("ACCOUNT NUMBER"), "id_cc_card", "12%", "center", "sort", "", "lie_link", "cc_card", "username, id", "id='%id'", "%1", "", "A2B_entity_card.php");
+$HD_Form -> AddViewElement(gettext("CUSTOMER NAME"), "id_cc_card", "20%", "center", "sort", "", "lie_link", "cc_card", "lastname, id, firstname", "id='%id'", "%1 %3", "", "A2B_entity_card.php");
+$HD_Form -> AddViewElement(gettext("ACTIVATED"), "activated", "10%", "center", "sort", "", "list", $actived_list);
 
-$HD_Form -> FieldViewElement ('cid, id_cc_card, id_cc_card, cc_callerid.activated, cc_callerid.id');
+$HD_Form -> FieldViewElement ('cid, phonenumber, callback, id_cc_card, id_cc_card, cc_callerid.activated, cc_callerid.id');
 
 
 $HD_Form -> CV_NO_FIELDS  = gettext("THERE IS NO ").strtoupper($HD_Form->FG_INSTANCE_NAME).gettext(" CREATED!");
@@ -102,8 +104,25 @@ $HD_Form -> AddEditElement (gettext("ID CARD"),
 				, ", 'CardNumberSelection','width=550,height=330,top=20,left=100,scrollbars=1'" ,
 				gettext("Define the card number ID to use."));
 
+$HD_Form -> AddEditElement (gettext("PHONE NUMBER"),
+			    "phonenumber",
+			    '$value',
+			    "INPUT",
+			    "size=50 maxlength=50",
+			    "",
+			    gettext("Insert the phone"),
+			    "" , "", "", "", "", "", "", gettext("Enter the phone number for immediatly dial instead prompt to dial"));
 
-$HD_Form -> FieldEditElement ('cid, activated, id_cc_card');
+$HD_Form -> AddEditElement (gettext("CALLBACK"),
+			    "callback",
+			    '0',
+			    "RADIOBUTTON",
+			    "",
+			    "",
+			    gettext("Choose if you want to callback to this CallerID"),
+			    "" , "", "", "Yes:1, - No:0", "", "", "", gettext("Choose if you want to callback to this CallerID"));
+
+$HD_Form -> FieldEditElement ('cid, activated, id_cc_card, phonenumber, callback');
 
 
 // Set the filter variables

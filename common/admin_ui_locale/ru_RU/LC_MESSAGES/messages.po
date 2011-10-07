@@ -4034,6 +4034,14 @@ msgstr ""
 msgid "Choose if you want to activate this card"
 msgstr ""
 
+#: Public/form_data/FG_var_did.inc:123
+msgid "You can associate trunk for selective routing incoming calls through that DID. View word of word help for parameter 'RECALL DAYS' in customer account."
+msgstr "Нужно ассоциировать с транком для корректной работы функции возврата звонков через этот DID. Не забудьте установить параметр 'RECALL DAYS' в настройках аккаунта абонента."
+
+#: Public/form_data/FG_var_did.inc:132
+msgid "Allow for all active CallerIDs at system to use that DID for direct access (DISA), rather than just for active CallerIDs of customer."
+msgstr "Позволять всем активным CallerID в системе использовать этот DID для прямого доступа (DISA), а не только для активных CallerID клиента."
+
 #: Public/form_data/FG_var_did.inc:177
 msgid "Insert the monthly rate"
 msgstr ""
@@ -4308,9 +4316,25 @@ msgstr "ДАТА ЗВОНКА"
 msgid "NO DID DESTINATIONS HAVE BEEN CREATED!"
 msgstr ""
 
-#: Public/form_data/FG_var_did_destination.inc:118
+#: Public/form_data/FG_var_did_destination.inc:126
 msgid "Enter the phone number you wish to call, or the VoIP client to reach. (ie: 347894999 or SIP/jeremy@182.212.1.45). If the call is VoIP, the VoIP_Call must be set to yes."
-msgstr ""
+msgstr "Введите здесь номер, на который хотите перенаправить звонок, или SIP/IAX2/H323 пользователя (напримет: 347894999 or SIP/taras@182.212.1.45). Чтобы задать SIP/IAX2/H323 направление, нужно включить VOIP ЗВОНОК = 'Да'"
+
+#: Public/form_data/FG_var_did_destination.inc:135
+msgid "If the call is VoIP, that must be set to 'Yes'"
+msgstr "Если НАПРАВЛЕНИЕ задано как VoIP, выберите 'Да'"
+
+#: Public/form_data/FG_var_did_destination.inc:140
+msgid "Choose if you want to answer on the call before playing PLAY_SOUND"
+msgstr "Инициировать ответ на входящий звонок перед проигрыванием PLAY_SOUND"
+
+#: Public/form_data/FG_var_did_destination.inc:156
+msgid "Insert the path and name of sound file"
+msgstr "Введите путь и имя к звуковому файлу"
+
+#: Public/form_data/FG_var_did_destination.inc:167
+msgid "Play sound before calling DESTINATION. ie 'ivr/wait-please'"
+msgstr "Если хотите проиграть приветствие перед перенаправлением звонка введите путь и название звукового файла, например 'ivr/wait-please'"
 
 #: Public/form_data/FG_var_did_destination.inc:122
 #: Public/form_data/FG_var_card.inc:237
@@ -9353,6 +9377,14 @@ msgstr ""
 #: Public/form_data/FG_var_callerid.inc:119
 msgid "Modify via the form below, the properties of the callerID"
 msgstr ""
+
+#: Public/form_data/FG_var_callerid.inc:119
+msgid "Enter the phone number for immediatly dial instead prompt to dial"
+msgstr "Задайте моментальный номер дозвона. Услуга интерактивного донабора временно отключится."
+
+#: Public/form_data/FG_var_callerid.inc:119
+msgid "Choose 'Yes' if you want to callback to this CallerID"
+msgstr "Выберите 'Да' чтобы выполнять обратный звонок"
 
 #: Public/A2B_payment_info_agent.php:72 Public/A2B_payment_info.php:72
 msgid "PAYMENT INFO"

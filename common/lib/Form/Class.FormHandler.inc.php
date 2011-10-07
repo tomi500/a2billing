@@ -1045,7 +1045,7 @@ class FormHandler
 		
 		// 18 - CALLERID - PhoneNumber
 		$this -> FG_regular[]  = array(    "^(\+|[0-9]{1})[0-9]+$"   ,
-		                        "Phone Number format");
+		                        gettext("(Phone Number format)"));
 		// 19 - CAPTCHAIMAGE - Alpahnumeric
 		$this -> FG_regular[]  = array("^(".strtoupper($_SESSION["captcha_code"]).")|(".strtolower($_SESSION["captcha_code"]).")$",
 						gettext("(at least 6 Alphanumeric characters)"));

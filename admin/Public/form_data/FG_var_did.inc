@@ -32,7 +32,7 @@
 **/
 
 
-getpost_ifset(array('id', 'billingtype', 'did', 'startingdate', 'expirationdate', 'id_cc_didgroup', 'id_cc_country', 'activated', 'fixrate', 'id_trunk','connection_charge','selling_rate', 'aleg_timeinterval', 'aleg_carrier_connect_charge', 'aleg_carrier_cost_min', 'aleg_carrier_initblock', 'aleg_carrier_increment', 'aleg_retail_connect_charge', 'aleg_retail_cost_min', 'aleg_retail_initblock', 'aleg_retail_increment', 'aleg_carrier_connect_charge_offp', 'aleg_carrier_cost_min_offp', 'aleg_carrier_initblock_offp', 'aleg_carrier_increment_offp', 'aleg_retail_connect_charge_offp', 'aleg_retail_cost_min_offp', 'aleg_retail_initblock_offp', 'aleg_retail_increment_offp'));
+getpost_ifset(array('id', 'billingtype', 'did', 'id_trunk', 'startingdate', 'expirationdate', 'id_cc_didgroup', 'id_cc_country', 'activated', 'fixrate', 'id_trunk','connection_charge','selling_rate', 'aleg_timeinterval', 'aleg_carrier_connect_charge', 'aleg_carrier_cost_min', 'aleg_carrier_initblock', 'aleg_carrier_increment', 'aleg_retail_connect_charge', 'aleg_retail_cost_min', 'aleg_retail_initblock', 'aleg_retail_increment', 'aleg_carrier_connect_charge_offp', 'aleg_carrier_cost_min_offp', 'aleg_carrier_initblock_offp', 'aleg_carrier_increment_offp', 'aleg_retail_connect_charge_offp', 'aleg_retail_cost_min_offp', 'aleg_retail_initblock_offp', 'aleg_retail_increment_offp'));
 
 
 $HD_Form = new FormHandler("cc_did","did");
@@ -56,20 +56,21 @@ $billingtype_list_short = Constants::getBillingTypeShortList();
 $yesno = Constants::getYesNoList();
 
 
-$HD_Form -> AddViewElement(gettext("DID"), "did", "15%", "center", "sort");
-$HD_Form -> AddViewElement(gettext("CUSTOMER"), "iduser", "10%", "center", "sort", "", "lie_link", "cc_card", "lastname, id, firstname", "id='%id'", "%1 %3", "", "A2B_entity_card.php");
-$HD_Form -> AddViewElement(gettext("BILLING"), "billingtype", "10%", "center", "sort", "", "list", $billingtype_list_short);
-$HD_Form -> AddViewElement(gettext("START DATE"), "startingdate", "14%", "center", "sort", "19", "", "", "", "",  "display_dateformat");
-$HD_Form -> AddViewElement(gettext("DIDGROUP"), "id_cc_didgroup", "12%", "center", "sort", "15", "lie", "cc_didgroup", "didgroupname", "id='%id'", "%1");
-$HD_Form -> AddViewElement(gettext("COUNTRY"), "id_cc_country", "12%", "center", "sort", "15", "lie", "cc_country", "countryname", "id='%id'", "%1");
+$HD_Form -> AddViewElement(gettext("DID"), "did", "13%", "center", "sort");
+$HD_Form -> AddViewElement(gettext("CUSTOMER"), "iduser", "15%", "center", "sort", "", "lie_link", "cc_card", "lastname, id, firstname", "id='%id'", "%1 %3", "", "A2B_entity_card.php");
+$HD_Form -> AddViewElement(gettext("BILLING"), "billingtype", "5%", "center", "sort", "", "list", $billingtype_list_short);
+$HD_Form -> AddViewElement(gettext("START DATE"), "startingdate", "16%", "center", "sort", "19", "", "", "", "",  "display_dateformat");
+$HD_Form -> AddViewElement(gettext("DIDGROUP"), "id_cc_didgroup", "10%", "center", "sort", "15", "lie", "cc_didgroup", "didgroupname", "id='%id'", "%1");
+$HD_Form -> AddViewElement(gettext("COUNTRY"), "id_cc_country", "10%", "center", "sort", "15", "lie", "cc_country", "countryname", "id='%id'", "%1");
 $HD_Form -> AddViewElement("<acronym title=\"".gettext("ACTIVATED")."\">".gettext("ACT")."</acronym>", "activated", "5%", "center", "sort", "", "list", $actived_list);
 $HD_Form -> AddViewElement("<acronym title=\"".gettext("MINUTES USED")."\">".gettext("MU")."</acronym>", "secondusedreal", "5%", "center", "SORT", "30", "", "", "", "", "", "display_minute");
 $HD_Form -> AddViewElement("<acronym title=\"".gettext("RESERVED")."\">".gettext("RES")."</acronym>", "reserved", "5%", "center", "SORT", "", "list", $yesno);
-$HD_Form -> AddViewElement("<acronym title=\"".gettext("MONTHLY RATE")."\">".gettext("MR")."</acronym>", "fixrate", "5%", "center", "SORT", "30");
+$HD_Form -> AddViewElement("<acronym title=\"".gettext("MONTHLY RATE")."\">".gettext("MR")."</acronym>", "fixrate", "3%", "center", "SORT", "30");
 $HD_Form -> AddViewElement("<acronym title=\"".gettext("SELLING RATE")."\">".gettext("SR")."</acronym>", "selling_rate", "5%", "center", "SORT", "30");
 
 $HD_Form -> FieldViewElement ('did, iduser, billingtype, startingdate, id_cc_didgroup, id_cc_country, activated, secondusedreal, reserved, fixrate, selling_rate');
 
+//$HD_Form -> FG_ACTION_SIZE_COLUMN = '10%';
 
 $HD_Form -> CV_NO_FIELDS  = gettext("THERE ARE NO ".strtoupper($HD_Form->FG_INSTANCE_NAME)." CREATED!");
 $HD_Form -> CV_DISPLAY_LINE_TITLE_ABOVE_TABLE = false;
@@ -110,6 +111,25 @@ $HD_Form -> AddEditElement (gettext("DID"),
 	gettext("Insert the DID"),
 	"" , "", "", "", "" , "", "" ,
 	gettext("Define the DID's. If you ADD a new DID, NOT an EDIT, you can define a range of DID. <br>80412340210-80412340218 would add all DID's between the range, whereas DIDs separated by a comma e.g. 80412340210,80412340212,80412340214 would only add the individual DID listed."));
+
+$HD_Form -> AddEditElement (gettext("ASSOCIATE TRUNK"),
+	"id_trunk",
+	'$value',
+	"SELECT",
+	"", "", "",
+	"sql",
+	"cc_trunk",
+	"trunkcode, id_trunk",
+	"", "", "%1", "", gettext("You can associate trunk for selective routing incoming calls through that DID. View word of word help for parameter 'RECALL DAYS' in customer account."), '', '<OPTION  value="-1" selected>NOT DEFINED</OPTION>');
+
+$HD_Form -> AddEditElement (gettext("SUPER CID USE"),
+	"allciduse",
+	'0',
+	"RADIOBUTTON",
+	"",
+	"",
+	"",
+	"" , "", "", gettext("Yes").":1, - ".gettext("No").":0", "", "", "" , gettext("Allow for all active CallerIDs at system to use that DID for direct access (DISA), rather than just for active CallerIDs of customer."));
 
 $HD_Form -> AddEditElement (gettext("BILLING"),
 	"billingtype",
@@ -158,7 +178,6 @@ $HD_Form -> AddEditElement (gettext("COUNTRY"),
 	"countryname, id",
 	"", "", "%1", "", "");
 
-
 $HD_Form -> AddEditElement (gettext("ACTIVATED"),
 	"activated",
 	'1',
@@ -166,7 +185,7 @@ $HD_Form -> AddEditElement (gettext("ACTIVATED"),
 	"",
 	"",
 	gettext("Choose if you want to activate this card"),
-	"" , "", "", "Yes :1, - No:0", "", "", "" , "" );
+	"" , "", "", gettext("Yes").":1, - ".gettext("No").":0", "", "", "" , "" );
 
 $HD_Form -> AddEditElement (gettext("MONTHLY RATE"),
 	"fixrate",
@@ -365,7 +384,7 @@ $HD_Form -> AddEditElement(gettext("RETAIL BILLING BLOCK OFF PEAK"),
 
 
 
-$HD_Form -> FieldEditElement ('did, billingtype, startingdate, expirationdate, id_cc_didgroup, id_cc_country, activated, fixrate, connection_charge, selling_rate, aleg_timeinterval, aleg_carrier_connect_charge, aleg_carrier_cost_min, aleg_carrier_initblock, aleg_carrier_increment, aleg_retail_connect_charge, aleg_retail_cost_min, aleg_retail_initblock, aleg_retail_increment, aleg_carrier_connect_charge_offp, aleg_carrier_cost_min_offp, aleg_carrier_initblock_offp, aleg_carrier_increment_offp, aleg_retail_connect_charge_offp, aleg_retail_cost_min_offp, aleg_retail_initblock_offp, aleg_retail_increment_offp');
+$HD_Form -> FieldEditElement ('did, id_trunk, allciduse, billingtype, startingdate, expirationdate, id_cc_didgroup, id_cc_country, activated, fixrate, connection_charge, selling_rate, aleg_timeinterval, aleg_carrier_connect_charge, aleg_carrier_cost_min, aleg_carrier_initblock, aleg_carrier_increment, aleg_retail_connect_charge, aleg_retail_cost_min, aleg_retail_initblock, aleg_retail_increment, aleg_carrier_connect_charge_offp, aleg_carrier_cost_min_offp, aleg_carrier_initblock_offp, aleg_carrier_increment_offp, aleg_retail_connect_charge_offp, aleg_retail_cost_min_offp, aleg_retail_initblock_offp, aleg_retail_increment_offp');
 
 
 // Set the filter variables
