@@ -104,7 +104,7 @@ $HD_Form -> AddEditElement (gettext("PHONE NUMBER"),
 			    '$value',
 			    "INPUT",
 			    "size=50 maxlength=50",
-			    "4",
+			    "",
 			    gettext("Enter the phone"),
 			    "" , "", "", "", "", "", "", gettext("Enter the phone number for immediatly dial instead prompt to dial"));
 
