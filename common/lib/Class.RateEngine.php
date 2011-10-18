@@ -1223,7 +1223,7 @@ class RateEngine
 			$A2B -> debug( DEBUG, $agi, __FILE__, __LINE__, "[CC_asterisk_stop 1.2: SQL: $QUERY]");
 			$result = $A2B->instance_table -> SQLExec ($A2B -> DBHandle, $QUERY, 0);
 
-			$QUERY = "SELECT period$td, UNIX_TIMESTAMP(periodexpiry$td), periodcount$td FROM cc_trunk WHERE id_trunk=$trunk_id AND ($this->prefixclause) LIMIT 1";
+			$QUERY = "SELECT period$td, UNIX_TIMESTAMP(periodexpiry$td), periodcount$td FROM cc_trunk WHERE id_trunk=$trunk_id LIMIT 1";
 			$result = $A2B->instance_table -> SQLExec ($A2B -> DBHandle, $QUERY);
 			if (is_array($result) && count($result)>0) {
 				$QUERY = "UPDATE cc_trunk SET secondusedreal = secondusedreal + $sessiontime, periodcount$td = ";
