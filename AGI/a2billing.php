@@ -977,10 +977,11 @@ if ($mode == 'standard') {
 
 	$A2B -> debug( DEBUG, $agi, __FILE__, __LINE__, '[MODE : '.strtoupper($mode).' - '.$A2B->CallerID.']');
 	
-	if ($A2B -> agiconfig['answer_call'] == 1 && $mode == 'cid-callback') {
-		$A2B -> debug( DEBUG, $agi, __FILE__, __LINE__, '[HANGUP CLI CALLBACK TRIGGER]');
+	if ($mode == 'cid-callback') {
+		$A2B -> debug( ERROR, $agi, __FILE__, __LINE__, '[HANGUP CLI CALLBACK TRIGGER]');
+		$agi -> exec('Congestion');
 		$agi -> hangup();
-    } elseif ($mode == 'cid-prompt-callback') {
+	} elseif ($mode == 'cid-prompt-callback') {
 		$agi -> answer();
 	} else {
 		$A2B -> debug( DEBUG, $agi, __FILE__, __LINE__, '[CLI CALLBACK TRIGGER RINGING]');
@@ -1126,7 +1127,7 @@ if ($mode == 'standard') {
 
 					if (is_numeric($A2B -> config["callback"]['sec_wait_before_callback']) && $A2B -> config["callback"]['sec_wait_before_callback']>=1){
 						$sec_wait_before_callback = $A2B -> config["callback"]['sec_wait_before_callback'];
-					}else{
+					} else {
 						$sec_wait_before_callback = 1;
 					}
 
@@ -1134,9 +1135,12 @@ if ($mode == 'standard') {
 					$res = $A2B -> DBHandle -> Execute($QUERY);
 					$A2B -> debug( DEBUG, $agi, __FILE__, __LINE__, "[CALLBACK-ALL : INSERT CALLBACK REQUEST IN SPOOL : QUERY=$QUERY]");
 
-					if (!$res){
-						$error_msg= "Cannot insert the callback request in the spool!";
-						$A2B -> debug( DEBUG, $agi, __FILE__, __LINE__, "[CALLBACK-ALL : CALLED=".$A2B ->destination." | $error_msg]");
+					if ($res && !$A2B->CC_TESTING) {
+					    $QUERY = "UPDATE cc_trunk SET inuse=inuse+1 WHERE id_trunk=".$channeloutcid[2];
+					    $res = $A2B -> DBHandle -> Execute($QUERY);
+					    sleep(10);
+					    $QUERY = "UPDATE cc_trunk SET inuse=inuse-1 WHERE id_trunk=".$channeloutcid[2];
+					    $res = $A2B -> DBHandle -> Execute($QUERY);
 					}
 
 				    } else $error_msg = gettext("Error : Sorry, not enough free trunk for make call. Try again later!");
@@ -1164,12 +1168,9 @@ if ($mode == 'standard') {
 	$A2B -> debug( DEBUG, $agi, __FILE__, __LINE__, '[MODE : ALL-CALLBACK - '.$A2B->CallerID.']');
 
 	// END
-	if ($A2B -> agiconfig['answer_call'] == 1) {
-		$A2B -> debug( DEBUG, $agi, __FILE__, __LINE__, '[HANGUP ALL CALLBACK TRIGGER]');
-		$agi -> hangup();
-	} else {
-		$A2B -> debug( DEBUG, $agi, __FILE__, __LINE__, '[ALL CALLBACK TRIGGER RINGING]');
-	}
+	$A2B -> debug( DEBUG, $agi, __FILE__, __LINE__, '[HANGUP ALL CALLBACK TRIGGER]');
+	$agi -> exec('Congestion');
+	$agi -> hangup();
 
 	$A2B ->credit = 1000;
 	$A2B ->tariff = $A2B -> config["callback"]['all_callback_tariff'];
@@ -1237,9 +1238,12 @@ if ($mode == 'standard') {
 					$res = $A2B -> DBHandle -> Execute($QUERY);
 					$A2B -> debug( DEBUG, $agi, __FILE__, __LINE__, "[CALLBACK-ALL : INSERT CALLBACK REQUEST IN SPOOL : QUERY=$QUERY]");
 
-					if (!$res){
-						$error_msg= "Cannot insert the callback request in the spool!";
-						$A2B -> debug( DEBUG, $agi, __FILE__, __LINE__, "[CALLBACK-ALL : CALLED=".$A2B ->destination." | $error_msg]");
+					if ($res && !$A2B->CC_TESTING) {
+					    $QUERY = "UPDATE cc_trunk SET inuse=inuse+1 WHERE id_trunk=".$channeloutcid[2];
+					    $res = $A2B -> DBHandle -> Execute($QUERY);
+					    sleep(10);
+					    $QUERY = "UPDATE cc_trunk SET inuse=inuse-1 WHERE id_trunk=".$channeloutcid[2];
+					    $res = $A2B -> DBHandle -> Execute($QUERY);
 					}
 
 				    } else $error_msg = gettext("Error : Sorry, not enough free trunk for make call. Try again later!");
@@ -1404,6 +1408,7 @@ if ($mode == 'standard') {
 } elseif ($mode == 'conference-moderator') {
 
 	$callback_been_connected = 0;
+//	$endinuse = false;
 	
 	$A2B -> debug( DEBUG, $agi, __FILE__, __LINE__, '[CALLBACK]:[MODE : CONFERENCE MODERATOR]');
 	
@@ -1585,12 +1590,13 @@ if ($mode == 'standard') {
                         $QUERY = " INSERT INTO cc_callback_spool (uniqueid, status, server_ip, num_attempt, channel, exten, context, priority, variable, id_server_group, callback_time, account, callerid, timeout ) VALUES ('$uniqueid', '$status', '$server_ip', '$num_attempt', '$channel', '$exten', '$context', '$priority', '$variable', '$id_server_group', ADDDATE( CURRENT_TIMESTAMP, INTERVAL $sec_wait_before_callback SECOND ), '$account', '$callerid', '$timeout')";
                         $res = $A2B -> DBHandle -> Execute($QUERY);
                         $A2B -> debug( DEBUG, $agi, __FILE__, __LINE__, "[CALLBACK-ALL : INSERT CALLBACK REQUEST IN SPOOL : QUERY=$QUERY]");
-
-                        if (!$res) {
-                            $error_msg= "Cannot insert the callback request in the spool!";
-                            $A2B -> debug( DEBUG, $agi, __FILE__, __LINE__, "[CALLBACK-ALL : CALLED=".$A2B ->destination." | $error_msg]");
-                        }
-
+/**
+			if ($res && !$A2B->CC_TESTING) {
+			    $endinuse = true;
+			    $QUERY = "UPDATE cc_trunk SET inuse=inuse+1 WHERE id_trunk='".$channeloutcid[2]."'";
+			    $res = $A2B -> DBHandle -> Execute($QUERY);
+			}
+**/
                     } else {
                         $error_msg = 'Error : You don t have enough credit to call you back !!!';
                         $A2B -> debug( DEBUG, $agi, __FILE__, __LINE__, "[CALLBACK-CALLERID : CALLED=".$A2B ->destination." | $error_msg]");
@@ -1608,7 +1614,12 @@ if ($mode == 'standard') {
             $myres = $A2B -> run_dial($agi, $dialstr);
             
             $charge_callback = 1;
-			
+/**
+	    if ($endinuse) {
+		$QUERY = "UPDATE cc_trunk SET inuse=inuse-1 WHERE id_trunk='".$channeloutcid[2]."'";
+		$res = $A2B -> DBHandle -> Execute($QUERY);
+	    }
+**/
 		}//END FOR
 
 		if ($A2B->set_inuse==1) {
@@ -1797,7 +1808,7 @@ if ($charge_callback) {
 
 // END
 if ($mode != 'cid-callback' && $mode != 'all-callback' && $mode != 'did' && $mode != 'standard') {
-	$agi->hangup();
+	$agi -> hangup();
 } elseif ($A2B -> agiconfig['answer_call'] == 1) {
 	$agi -> hangup();
 }

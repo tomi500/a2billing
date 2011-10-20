@@ -51,7 +51,7 @@ if (! has_rights (ACX_CALL_BACK)) {
 
 $FG_DEBUG = 0;
 $color_msg = 'red';
-
+$endinuse = false;
 
 $QUERY = "SELECT username, credit, lastname, firstname, address, city, state, country, zipcode, phone, email, fax, lastuse, activated, status FROM cc_card WHERE username = '".$_SESSION["pr_login"]."' AND uipass = '".$_SESSION["pr_password"]."'";
 
@@ -69,7 +69,6 @@ if ($customer_info[14] != "1" && $customer_info[14] != "8") {
 	Header("Location: PP_error.php?c=accessdenied");
 	die();
 }
-
 
 if ($callback) {
 	
@@ -133,6 +132,11 @@ if ($callback) {
 					} else {
 						$error_msg = gettext("Your callback request has been queued correctly!");
 						$color_msg = 'green';
+						if (!$A2B -> CC_TESTING) {
+							$QUERY = "UPDATE cc_trunk SET inuse=inuse+1 WHERE id_trunk=".$channeloutcid[2];
+							$res = $A2B -> DBHandle -> Execute($QUERY);
+							if ($res) $endinuse = true;
+						}
 					}
 				    } else $error_msg = gettext("Error : Sorry, not enough free trunk for make call. Try again later!");
 				} else $error_msg = gettext("Error : You don t have enough credit to call you back!");
@@ -142,6 +146,11 @@ if ($callback) {
 		}
 	} else $error_msg = gettext("Error : You have to specify your phonenumber and the number you wish to call!");
 }
+
+set_time_limit(0);
+ignore_user_abort(true);
+ob_start();
+
 $customer = $_SESSION["pr_login"];
 
 
@@ -187,3 +196,16 @@ echo $CC_help_callback;
 
 $smarty->display( 'footer.tpl');
 
+$length = ob_get_length();
+if ($endinuse) {
+    header("Connection: close");
+    header("Content-Length: " . $length);
+    header("Content-Encoding: none");
+    header("Accept-Ranges: bytes");
+    ob_end_flush();
+    ob_flush();
+    flush();
+    sleep(15);
+    $QUERY = "UPDATE cc_trunk SET inuse=inuse-1 WHERE id_trunk=".$channeloutcid[2];
+    $res = $A2B -> DBHandle -> Execute($QUERY);
+}

@@ -1272,11 +1272,19 @@ if (!defined('MONITOR_PATH')) define ("MONITOR_PATH",	isset($this->config['webui
 				if (strlen($inst_listdestination[4])==0) continue;
 
 				if ($inst_listdestination[28]) $agi -> answer();
-				if ($inst_listdestination[29] != "") {
-					sleep(1);
+				if ($inst_listdestination[29]) {
+/**				    $format_list = array ('','.alaw','.wav','.mp3','.WAV','.MP3','.gsm','.sln','.g723','.g729');
+				    $find_record = false;
+				    foreach ($format_list as $c_format)
+					if (file_exists("/var/lib/asterisk/sounds/" . $inst_listdestination[29] . $c_format)) {
+						$find_record = true;
+						break;
+					}
+				    if ($find_record) {
+**/					sleep(0.5);
 					$agi -> evaluate("STREAM FILE $inst_listdestination[29] \"#\" 0");
+//				    }
 				}
-
 				// IF VOIP CALL
 				if ($inst_listdestination[5]==1) {
 
