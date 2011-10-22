@@ -286,7 +286,8 @@ if ($mode == 'auto') {
 				}
 			}
 
-		} else {
+		} elseif ($caller_areacode == 'didless') break;
+		  else {
 		    $A2B -> mode = $mode = 'did';
 		    $A2B -> agiconfig['play_audio']=0;
 		    $A2B -> agiconfig['answer_call']=0;

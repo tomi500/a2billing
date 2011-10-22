@@ -1281,7 +1281,7 @@ if (!defined('MONITOR_PATH')) define ("MONITOR_PATH",	isset($this->config['webui
 						break;
 					}
 				    if ($find_record) {
-**/					sleep(0.5);
+**/
 					$agi -> evaluate("STREAM FILE $inst_listdestination[29] \"#\" 0");
 //				    }
 				}
