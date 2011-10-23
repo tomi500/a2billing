@@ -217,30 +217,17 @@ if ($mode == 'auto') {
 	    // if MYSQL
 	    if ($A2B->config["database"]['dbtype'] != "postgres") $QUERY .= " OR cc_did.expirationdate = '0000-00-00 00:00:00'";
 	    $QUERY .= ") AND cid IS NULL LIMIT 1";
-
-//$A2B -> debug( ERROR, $agi, __FILE__, __LINE__, $QUERY);
-
 	    $result = $A2B -> instance_table -> SQLExec ($A2B->DBHandle, $QUERY);
 
-//$A2B -> debug( ERROR, $agi, __FILE__, __LINE__, "========================================= DID? = ".$result);
-
-	    if (is_array($result)) {
+	    if (is_array($result) && $caller_areacode != 'recalldidless') {
 		$QUERY = "SELECT src, cc_card.username, cc_card.recalltime FROM cc_card, cc_call
 			LEFT JOIN cc_did ON cc_did.id_trunk=cc_call.id_trunk
 			WHERE cc_card.id=card_id AND did='$mydnid' AND DATEDIFF(NOW(),stoptime) < cc_card.recalldays
 			AND ('$A2B->CallerID' LIKE CONCAT('%',SUBSTRING(calledstation,2)) OR calledstation LIKE CONCAT('%','$A2B->CallerID'))
 			AND LENGTH(calledstation) > 6 AND LENGTH(TRIM(LEADING '+' FROM '$A2B->CallerID'))-LENGTH(calledstation) < 3 ORDER BY cc_call.id DESC LIMIT 1";
-
-//$A2B -> debug( ERROR, $agi, __FILE__, __LINE__, $QUERY);
-
 		$result = $A2B -> instance_table -> SQLExec ($A2B->DBHandle, $QUERY);
 
-//$A2B -> debug( ERROR, $agi, __FILE__, __LINE__, "========================================= Transfer? = ".$result);
-
 		if (is_array($result)) {
-
-//$A2B -> debug( ERROR, $agi, __FILE__, __LINE__, "========================================= Known call");
-
 			$A2B -> agiconfig['answer_call'] = 0;
 			$A2B -> agiconfig['play_audio'] = 0;
 			$A2B -> agiconfig['use_dnid'] = 1;
@@ -254,8 +241,6 @@ if ($mode == 'auto') {
 
 				// Feature to switch the Callplan from a customer : callplan_deck_minute_threshold 
 				$A2B-> deck_switch($agi);
-
-//$A2B -> debug( ERROR, $agi, __FILE__, __LINE__,  "TARIFF ID -> ". $A2B->tariff);
 
 				if (!$A2B -> enough_credit_to_call()) break;
 
@@ -294,17 +279,10 @@ if ($mode == 'auto') {
 		    $A2B -> agiconfig['cid_enable']=0;
 		    $A2B -> agiconfig['use_dnid']=1;
 		    $A2B -> agiconfig['number_try']=1;
-
-//$A2B -> debug( ERROR, $agi, __FILE__, __LINE__, "========================================= ".$mode);
-
 		}
 	    } else {
 		$QUERY = "SELECT callback, phonenumber FROM cc_callerid, cc_card WHERE cid='$A2B->CallerID' AND cc_callerid.activated='t' AND status=1 AND cc_card.id=id_cc_card LIMIT 1";
-
-//$A2B -> debug( ERROR, $agi, __FILE__, __LINE__, $QUERY);
-
 		$result = $A2B -> instance_table -> SQLExec ($A2B->DBHandle, $QUERY);
-//		$A2B -> debug( ERROR, $agi, __FILE__, __LINE__, "========================================= CallBack = ".$result);
 		if (is_array($result)) {
 		    $A2B -> agiconfig['cid_enable']=1;
 		    if ($result[0][0] == 1) $A2B -> mode = $mode = 'cid-callback';
@@ -315,25 +293,11 @@ if ($mode == 'auto') {
 //			    $agi -> set_extension(preg_replace('/\+/','',$result[0][1]));
 			    $A2B -> agiconfig['use_dnid']=1;
 			    $A2B -> agiconfig['number_try']=1;
-
-//$A2B -> debug( ERROR, $agi, __FILE__, __LINE__, "========================================= ".$mode." - CID detected. Call to ".$result[0][1]);
-
 			} else {
 			    $A2B -> agiconfig['use_dnid']=0;
-
-//$A2B -> debug( ERROR, $agi, __FILE__, __LINE__, "========================================= ".$mode." - CID detected. Play prompt...");
-
 			}
 		    }
 		} else {
-/**		    $A2B -> mode = $mode = 'standard';
-		    $A2B -> agiconfig['answer_call']=0;
-		    $A2B -> agiconfig['cid_enable']=1;
-//		    $A2B -> agiconfig['cid_askpincode_ifnot_callerid']=0;
-//		    $A2B -> agiconfig['say_balance_after_auth']=0;
-		    $A2B -> agiconfig['use_dnid']=0;
-		    $A2B -> agiconfig['number_try']=1;
-**/
 		    $A2B -> debug( ERROR, $agi, __FILE__, __LINE__, "UNREAL !!! Set right your settings DID and/or CallerID");
 		    break;
 		}
