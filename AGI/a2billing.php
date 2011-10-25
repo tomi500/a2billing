@@ -219,7 +219,8 @@ if ($mode == 'auto') {
 	    $QUERY .= ") AND cid IS NULL LIMIT 1";
 	    $result = $A2B -> instance_table -> SQLExec ($A2B->DBHandle, $QUERY);
 
-	    if (is_array($result) && $caller_areacode != 'recalldidless') {
+	    if (is_array($result)) {
+		if ($caller_areacode == 'recalldidless') break;
 		$QUERY = "SELECT src, cc_card.username, cc_card.recalltime FROM cc_card, cc_call
 			LEFT JOIN cc_did ON cc_did.id_trunk=cc_call.id_trunk
 			WHERE cc_card.id=card_id AND did='$mydnid' AND DATEDIFF(NOW(),stoptime) < cc_card.recalldays
