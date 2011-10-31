@@ -1078,6 +1078,7 @@ if ($mode == 'standard') {
 					
 					$variable .= "CALLED=".$A2B ->destination.$sep.$CALLING_VAR.$sep."CBID=$uniqueid".$sep."LEG=".$A2B -> username.$sep."TRUNK=".$channeloutcid[2].$sep."TD=".$channeloutcid[3];
 					
+					$callbackrate = $RateEngine -> ratecard_obj[$channeloutcid[4]]['callbackrate'];
 					foreach($callbackrate as $key => $value){
 						$variable .= $sep.strtoupper($key).'='.$value;
 					}

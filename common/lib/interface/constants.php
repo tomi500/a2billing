@@ -307,6 +307,7 @@ class Constants
 	public static function getDialStatus_Revert_List(){
 		$dialstatus_rev_list = array();
 		$dialstatus_rev_list["ANSWER"] 		= 1;
+		$dialstatus_rev_list["ANSWERED"]	= 1;
 		$dialstatus_rev_list["BUSY"] 		= 2;
 		$dialstatus_rev_list["NOANSWER"] 	= 3;
 		$dialstatus_rev_list["CANCEL"] 		= 4;

@@ -1571,7 +1571,7 @@ class RateEngine
 					}
 				}
 
-				if (!$agi || $typecall == 9) return array($channel,$outcid,$this -> usedtrunk,$this -> td);
+				if (!$agi || $typecall == 9) return array( $channel, $outcid, $this -> usedtrunk, $this -> td, $k );
 
 				$A2B -> debug( DEBUG, $agi, __FILE__, __LINE__, "app_callingcard: CIDGROUPID='$cidgroupid' OUTBOUND CID SELECTED IS '$outcid'.");
 

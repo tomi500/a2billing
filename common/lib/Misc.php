@@ -34,6 +34,7 @@
 
 
 function monitor_recognize(&$ipointer) {
+	if (!isset($ipointer->dl_short)) $ipointer->dl_short="";
 	if ($ipointer->monitor == 1 || $ipointer->agiconfig['record_call'] == 1) {
 	    $dl_short = $ipointer->dl_short . $ipointer->uniqueid . ".";
 	    $QUERY = "SELECT cc_card.username, YEAR(starttime), MONTH(starttime), DAYOFMONTH(starttime) FROM cc_call LEFT JOIN cc_card ON cc_card.id=card_id WHERE uniqueid='$ipointer->uniqueid' ORDER BY cc_call.id DESC LIMIT 1";

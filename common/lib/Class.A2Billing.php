@@ -1608,7 +1608,7 @@ if (!defined('MONITOR_PATH')) define ("MONITOR_PATH",	isset($this->config['webui
                     if (count($listdestination)>$callcount) continue;
                 }
 
-                    $this -> debug( INFO, $agi, __FILE__, __LINE__, "[DID CALL - LOG CC_CALL: FOLLOWME=$callcount - (answeredtime=$answeredtime :: dialstatus=$dialstatus :: cost=$cost)]");
+                    $this -> debug( INFO, $agi, __FILE__, __LINE__, "[DID CALL - LOG CC_CALL: FOLLOWME=$callcount - (answeredtime=$answeredtime :: dialstatus=$dialstatus)]");
 
                     if (strlen($this -> dialstatus_rev_list[$dialstatus])>0) {
 						$terminatecauseid = $this -> dialstatus_rev_list[$dialstatus];
