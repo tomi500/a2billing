@@ -1161,7 +1161,7 @@ class RateEngine
 			" terminatecauseid, stoptime, sessionbill, id_tariffgroup, id_tariffplan, id_ratecard, " .
 			" id_trunk, src, sipiax, buycost, id_card_package_offer, dnid, destination";
 		$QUERY = "INSERT INTO cc_call ($QUERY_COLUMN) VALUES ('".$A2B->uniqueid."', '".$A2B->channel."', ".
-			"$card_id, '".$A2B->card_caller."', '".$A2B->hostname."', ";
+			"$card_id, '". isset($A2B->card_caller)?$A2B->card_caller:0 ."', '".$A2B->hostname."', ";
 
 		if ($A2B->config["global"]['cache_enabled']) {
 			$QUERY .= " datetime( strftime('%s','now') - $sessiontime, 'unixepoch','localtime')";	

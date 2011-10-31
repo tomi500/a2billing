@@ -86,7 +86,7 @@ else											$mode = 'standard';
 // get the area code for the cid-callback, all-callback and cid-prompt-callback
 if ($argc > 3 && strlen($argv[3]) > 0) {
 	$caller_areacode = $argv[3];
-}
+} else $caller_areacode = "";
 
 if ($argc > 4 && strlen($argv[4]) > 0) {
 	$groupid = $argv[4];
@@ -96,7 +96,7 @@ if ($argc > 4 && strlen($argv[4]) > 0) {
 
 if ($argc > 5 && strlen($argv[5]) > 0) {
 	$cid_1st_leg_tariff_id = $argv[5];
-}
+} else $cid_1st_leg_tariff_id = "";
 
 $A2B = new A2Billing();
 $A2B -> load_conf($agi, NULL, 0, $idconfig);
