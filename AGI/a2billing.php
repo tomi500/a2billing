@@ -286,8 +286,10 @@ if ($mode == 'auto') {
 		$result = $A2B -> instance_table -> SQLExec ($A2B->DBHandle, $QUERY);
 		if (is_array($result)) {
 		    $A2B -> agiconfig['cid_enable']=1;
-		    if ($result[0][0] == 1) $A2B -> mode = $mode = 'cid-callback';
-		    else {
+		    if ($result[0][0] == 1) {
+			$A2B -> mode = $mode = 'cid-callback';
+			$caller_areacode = "";
+		    } else {
 			$A2B -> mode = $mode = 'standard';
 			if ($result[0][1] != "") {
 			    $agi -> request['agi_extension'] = preg_replace('/\+/','',$result[0][1]);
