@@ -577,7 +577,7 @@ if ($atmenu=='sip') {
 							   "defaultuser",		
 							   '',	
 							   "INPUT",	
-							   "size=10 maxlength=10",	
+							   "size=50 maxlength=40",	
 							   "",	
 							   "",
 							   "", "", "",	"", "", "",	"", "" );

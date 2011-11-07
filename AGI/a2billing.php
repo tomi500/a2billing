@@ -206,7 +206,6 @@ if ($A2B -> CC_TESTING) {
 
 if ($mode == 'auto') {
 
-	$RateEngine->Reinit();
 	$A2B-> Reinit();
 	
 	$mydnid = $agi -> request['agi_extension'];
@@ -229,6 +228,7 @@ if ($mode == 'auto') {
 		$result = $A2B -> instance_table -> SQLExec ($A2B->DBHandle, $QUERY);
 
 		if (is_array($result)) {
+			$RateEngine->Reinit();
 			$A2B -> agiconfig['answer_call'] = 0;
 			$A2B -> agiconfig['play_audio'] = 0;
 			$A2B -> agiconfig['use_dnid'] = 1;
@@ -301,7 +301,7 @@ if ($mode == 'auto') {
 			}
 		    }
 		} else {
-		    $A2B -> debug( ERROR, $agi, __FILE__, __LINE__, "UNREAL !!! Set right your settings DID and/or CallerID");
+		    $A2B -> debug( INFO, $agi, __FILE__, __LINE__, '[No DID or CallerID found for this call]');
 		    break;
 		}
 	    }
@@ -946,9 +946,9 @@ if ($mode == 'standard') {
 	$A2B -> debug( DEBUG, $agi, __FILE__, __LINE__, '[MODE : '.strtoupper($mode).' - '.$A2B->CallerID.']');
 	
 	if ($mode == 'cid-callback') {
-		$A2B -> debug( ERROR, $agi, __FILE__, __LINE__, '[HANGUP CLI CALLBACK TRIGGER]');
 		$agi -> exec('Congestion');
 		$agi -> hangup();
+		$A2B -> debug( DEBUG, $agi, __FILE__, __LINE__, '[HANGUP CLI CALLBACK TRIGGER]');
 	} elseif ($mode == 'cid-prompt-callback') {
 		$agi -> answer();
 	} else {
