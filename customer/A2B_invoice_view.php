@@ -301,7 +301,8 @@ if(!$popup_select){
     <tr>
     <td colspan="3" class="additional-information">
       <div class="invoice-description">
-      <?php echo $invoice->getDescription() ?>
+      <?php echo $invoice->getDescription();
+            if (file_exists("templates/default/images/stamp.png")) echo '<img src="templates/default/images/stamp.png" align="right">' ?>
      </div></td>
     </tr>
   </tbody>
