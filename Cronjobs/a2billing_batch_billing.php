@@ -200,8 +200,8 @@ for ($page = 0; $page < $nbpagemax; $page++) {
 			}
 
 			// INSERT CUSTOMER BILLING
-			$field_insert = "id_card";
-			$value_insert = " '$card_id'";
+			$field_insert = "id_card, date";
+			$value_insert = " '$card_id', '$date_now'";
 			if (!empty ($start_date)) {
 				$field_insert .= ", start_date";
 				$value_insert .= ", '".$start_date."'";
