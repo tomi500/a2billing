@@ -392,7 +392,7 @@ msgid "There are no destinations created"
 msgstr "Не создано ни одного направления"
 
 #: form_data/FG_var_did.inc:139
-msgid "Enter here the phonenumber you wish to call or the SIP/IAX/H323 peer to reach (ie: 347894999 or SIP/jeremy@182.212.1.45). To call SIP/IAX/H323 peer, you need to enable the voip_call bellow (voip_call = Yes)"
+msgid "Enter here the phonenumber you wish to call or the SIP/IAX/H323 peer to reach (ie: 347894999 or SIP/jeremy@182.212.1.45). To call SIP/IAX/H323 peer, you need to enable the voip_call below (voip_call = Yes) "
 msgstr "Введите здесь номер, на который хотите перенаправить звонок, или SIP/IAX2/H323 пользователя (напримет: 347894999 or SIP/taras@182.212.1.45). Чтобы задать SIP/IAX2/H323 направление, нужно включить VOIP ЗВОНОК = 'Да'"
 
 #: form_data/FG_var_did.inc:138 form_data/FG_var_callerid.inc:97

@@ -1294,7 +1294,7 @@ class RateEngine
 	*/
 	function rate_engine_performcall ($agi, $destination, &$A2B, $typecall=0) {
 
-		$max_long = 2147483647; //Maximum value for long type in C++. This will be used to avoid overflow when sending large numbers to Asterisk
+		$max_long = 36000000; //Maximum 10 hours
 		$old_destination = $destination;
 
 		$A2B -> debug( INFO, $agi, __FILE__, __LINE__, "Count of ratecard_obj = ".count($this -> ratecard_obj));
@@ -1610,8 +1610,8 @@ class RateEngine
 				}
 				// Count this call on the trunk
 				$this -> trunk_start_inuse($agi, $A2B, 1);
-				$agi -> set_variable('__CHANNELCIDNUM', $destination);
-				$agi -> set_variable('__CALACCOUNT', $A2B->cardnumber);
+				$agi -> set_variable('_CHANNELCIDNUM', $destination);
+				$agi -> set_variable('_CALACCOUNT', $A2B->cardnumber);
 				$myres = $A2B -> run_dial($agi, $dialstr);
 				$A2B -> debug( DEBUG, $agi, __FILE__, __LINE__, "DIAL FAILOVER $dialstr");
 
@@ -1666,7 +1666,8 @@ class RateEngine
 				$agi-> stream_file('prepaid-noanswer', '#');
 			} elseif ($this->dialstatus == "CANCEL") {
 				$this -> real_answeredtime = $this -> answeredtime = 0;
-			} elseif ($this->dialstatus  == "CHANUNAVAIL" || $this->dialstatus  == "CONGESTION") {
+			} elseif (($this->dialstatus  == "CHANUNAVAIL") || 
+					  ($this->dialstatus  == "CONGESTION")) {
 				$this -> real_answeredtime = $this -> answeredtime = 0;
 				// Check if we will failover for LCR/LCD prefix - better false for an exact billing on resell
 				if ($A2B->agiconfig['failover_lc_prefix'] || $ifmaxuse == 1) {

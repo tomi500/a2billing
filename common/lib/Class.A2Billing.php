@@ -74,6 +74,14 @@ class A2Billing {
     */
 	var $idconfig=1;
 
+	/**
+    * hangupdetected variables
+    *
+    * @var interger
+    * @access public
+    */
+	var $hangupdetected = false;
+
 
 	/**
     * cardnumber & CallerID variables
@@ -224,6 +232,10 @@ class A2Billing {
 		// $this -> DBHandle = $DBHandle;
 		
 		$this -> dialstatus_rev_list = Constants::getDialStatus_Revert_List();
+
+		if (function_exists('pcntl_signal')) {
+			pcntl_signal(SIGHUP, array(&$this,"Hangupsignal"));
+		}
 	}
 
 
@@ -234,6 +246,14 @@ class A2Billing {
 		$this -> ipaddress='';
 		$this -> rate='';
 		$this -> destination='';
+	}
+
+
+	/* Hangupsignal */
+	function Hangupsignal()
+	{
+		$this -> hangupdetected = true;
+		$this -> debug( INFO, null, __FILE__, __LINE__, "HANGUP DETECTED!\n");
 	}
 
 
@@ -257,9 +277,6 @@ class A2Billing {
 		}
 	}
 	
-	
-	
-
 	/*
 	 * Write log into file
 	 */
@@ -577,7 +594,6 @@ if (!defined('MONITOR_PATH')) define ("MONITOR_PATH",	isset($this->config['webui
 			$this->config["agi-conf$idconfig"]['currency_association_internal'][$cur_val[0]]=$cur_val[1];
 		}
 		
-		//if (!isset($this->config["agi-conf$idconfig"]['currency_cents_association']))	$this->config["agi-conf$idconfig"]['currency_cents_association'] = '';
 		if (isset($this->config["agi-conf$idconfig"]['currency_cents_association']) && strlen($this->config["agi-conf$idconfig"]['currency_cents_association']) > 0) {
 			$this->config["agi-conf$idconfig"]['currency_cents_association'] = explode(",",$this->config["agi-conf$idconfig"]['currency_cents_association']);
 			foreach($this->config["agi-conf$idconfig"]['currency_cents_association'] as $cur_val) {
@@ -1184,10 +1200,11 @@ if (!defined('MONITOR_PATH')) define ("MONITOR_PATH",	isset($this->config['webui
 			if (($dialstatus  == "CHANUNAVAIL") || ($dialstatus  == "CONGESTION"))
 				continue;
 			
-			if (strlen($this -> dialstatus_rev_list[$dialstatus])>0)
+			if (strlen($this -> dialstatus_rev_list[$dialstatus])>0) {
 				$terminatecauseid = $this -> dialstatus_rev_list[$dialstatus];
-			else
+			} else {
 				$terminatecauseid = 0;
+			}
 			
 			if ($answeredtime > 0) {
 				$this -> debug( DEBUG, $agi, __FILE__, __LINE__, "[CC_RATE_ENGINE_UPDATESYSTEM: usedratecard K=$K - (answeredtime=$answeredtime :: dialstatus=$dialstatus :: cost=$cost)]");
@@ -1205,8 +1222,11 @@ if (!defined('MONITOR_PATH')) define ("MONITOR_PATH",	isset($this->config['webui
 		
 		if ($this->voicemail) {
 			
-			if (($dialstatus =="CHANUNAVAIL") || ($dialstatus == "CONGESTION") ||($dialstatus == "NOANSWER")) {
-				// The following section will send the caller to VoiceMail with the unavailable priority.
+			if (($dialstatus =="CHANUNAVAIL") || 
+				($dialstatus == "CONGESTION") ||
+				($dialstatus == "NOANSWER")) {
+				// The following section will send the caller to VoiceMail 
+				// with the unavailable priority.
 				$this -> debug( INFO, $agi, __FILE__, __LINE__, "[STATUS] CHANNEL UNAVAILABLE - GOTO VOICEMAIL ($dest_username)");
 				
 				$vm_parameters = $this -> format_parameters ($dest_username.'|u');
@@ -1299,7 +1319,7 @@ if (!defined('MONITOR_PATH')) define ("MONITOR_PATH",	isset($this->config['webui
 						$this -> debug( INFO, $agi, __FILE__, __LINE__, $command_mixmonitor);
 					}
 					
-					$max_long = 2147483647;
+					$max_long = 36000000; //Maximum 10 hours
 					$time2call = $this->agiconfig['max_call_call_2_did'];
 					$dialparams = $this->agiconfig['dialcommand_param_call_2did'];
 					$dialparams = str_replace("%timeout%", min($time2call * 1000, $max_long), $dialparams);
@@ -1331,7 +1351,7 @@ if (!defined('MONITOR_PATH')) define ("MONITOR_PATH",	isset($this->config['webui
 						if ($this->agiconfig['busy_timeout'] > 0)
 							$res_busy = $agi->exec("Busy ".$this->agiconfig['busy_timeout']);
 						$agi-> stream_file('prepaid-isbusy', '#');
-						if (count($listdestination)>$callcount)
+						if (count($listdestination) > $callcount)
 							continue;
 					} elseif ($dialstatus == "NOANSWER") {
 						$answeredtime = 0;
@@ -1346,10 +1366,12 @@ if (!defined('MONITOR_PATH')) define ("MONITOR_PATH",	isset($this->config['webui
 						$this -> debug( DEBUG, $agi, __FILE__, __LINE__,"[A2Billing] DID call friend: dialstatus : $dialstatus, answered time is ".$answeredtime." \n");
 					} elseif (($dialstatus  == "CHANUNAVAIL") || ($dialstatus  == "CONGESTION")) {
 						$answeredtime = 0;
-						if (count($listdestination)>$callcount) continue;
+						if (count($listdestination)>$callcount)
+							continue;
 					} else {
 						$agi-> stream_file('prepaid-callfollowme', '#');
-						if (count($listdestination) > $callcount) continue;
+						if (count($listdestination) > $callcount)
+							continue;
 					}
 
 					$this -> debug( INFO, $agi, __FILE__, __LINE__, "[DID CALL - LOG CC_CALL: FOLLOWME=$callcount - (answeredtime=$answeredtime :: dialstatus=$dialstatus)]");
@@ -1412,7 +1434,12 @@ if (!defined('MONITOR_PATH')) define ("MONITOR_PATH",	isset($this->config['webui
 						}
 						
 						$dialstatus = $RateEngine->dialstatus;
-						if ((($dialstatus == "NOANSWER") || ($dialstatus == "BUSY") || ($dialstatus == "CHANUNAVAIL") || ($dialstatus == "CONGESTION")) && count($listdestination) > $callcount) continue;
+						if ((($dialstatus == "NOANSWER") || 
+							($dialstatus == "BUSY") || 
+							($dialstatus == "CHANUNAVAIL") || 
+							($dialstatus == "CONGESTION")) && 
+						    count($listdestination) > $callcount) 
+						    continue;
 						
 						if ($dialstatus != "ANSWER") $this -> destination = $this -> realdestination;
 						
@@ -1542,7 +1569,7 @@ if (!defined('MONITOR_PATH')) define ("MONITOR_PATH",	isset($this->config['webui
 					$this -> debug( INFO, $agi, __FILE__, __LINE__, $command_mixmonitor);
 		}
 				
-		$max_long = 2147483647; //Maximum value for long type in C++. This will be used to avoid overflow when sending large numbers to Asterisk
+		$max_long = 36000000; //Maximum 10 hours
                 if ($call_did_free) {
                     $this -> fct_say_time_2_call($agi,$time2call,0);
                     $dialparams = $this->agiconfig['dialcommand_param_call_2did'];
@@ -1608,7 +1635,7 @@ if (!defined('MONITOR_PATH')) define ("MONITOR_PATH",	isset($this->config['webui
                     if (count($listdestination)>$callcount) continue;
                 }
 
-                    $this -> debug( INFO, $agi, __FILE__, __LINE__, "[DID CALL - LOG CC_CALL: FOLLOWME=$callcount - (answeredtime=$answeredtime :: dialstatus=$dialstatus)]");
+                    $this -> debug( INFO, $agi, __FILE__, __LINE__, "[DID CALL - LOG CC_CALL: FOLLOWME=$callcount - (answeredtime=$answeredtime :: dialstatus=$dialstatus :: call_did_free=$call_did_free)]");
 
                     if (strlen($this -> dialstatus_rev_list[$dialstatus])>0) {
 						$terminatecauseid = $this -> dialstatus_rev_list[$dialstatus];
@@ -1623,31 +1650,35 @@ if (!defined('MONITOR_PATH')) define ("MONITOR_PATH",	isset($this->config['webui
 			$this -> debug( INFO, $agi, __FILE__, __LINE__, "Destination: " . $inst_listdestination[10]);
 		    }
 
-                    /* CDR B-LEG OF DID CALL */
-                    $QUERY = "INSERT INTO cc_call (uniqueid, sessionid, card_id, card_caller, nasipaddress, starttime, sessiontime, calledstation, ".
-                            " terminatecauseid, stoptime, sessionbill, id_tariffgroup, id_tariffplan, id_ratecard, id_trunk, src, sipiax) VALUES ".
-                            "('".$this->uniqueid."', '".$this->channel."',  '".$this->id_card."',  '".$this->card_caller."', '".$this->hostname."',";
-                    $QUERY .= " CURRENT_TIMESTAMP - INTERVAL $answeredtime SECOND ";
-                    $QUERY .= ", '$answeredtime', '".$inst_listdestination[10]."', '$terminatecauseid', now(), '0', '0', '0', '0', '0', '$this->CallerID', '3' )";
+                    // User ONNet use $this->id_card
 
-                    $result = $this -> instance_table -> SQLExec ($this->DBHandle, $QUERY, 0);
-                    $this -> debug( INFO, $agi, __FILE__, __LINE__, "[DID CALL - LOG CC_CALL: SQL: $QUERY]:[result:$result]");
+                    // A-LEG below to the owner of the DID
+                    if ($call_did_free || $answeredtime == 0) {
+                    	//CALL2DID CDR is free
+	                    /* CDR A-LEG OF DID CALL */
+	                    $QUERY = "INSERT INTO cc_call (uniqueid, sessionid, card_id, card_caller, nasipaddress, starttime, sessiontime, calledstation, ".
+	                            " terminatecauseid, stoptime, sessionbill, id_tariffgroup, id_tariffplan, id_ratecard, id_trunk, src, sipiax) VALUES ".
+	                            "('".$this->uniqueid."', '".$this->channel."',  '".$my_id_card."',  '".$this->card_caller."', '".$this->hostname."',";
+	                    $QUERY .= " CURRENT_TIMESTAMP - INTERVAL $answeredtime SECOND ";
+	                    $QUERY .= ", '$answeredtime', '".$inst_listdestination[10]."', '$terminatecauseid', now(), '0', '0', '0', '0', '0', '$this->CallerID', '3' )";
 
-                if ($answeredtime > 0) {
-                    //CALL2DID CDR if not free
-                    if (!$call_did_free) {
+	                    $result = $this -> instance_table -> SQLExec ($this->DBHandle, $QUERY, 0);
+	                    $this -> debug( INFO, $agi, __FILE__, __LINE__, "[DID CALL - LOG CC_CALL: SQL: $QUERY]:[result:$result]");
+	                    
+                    } else {
+                    	//CALL2DID CDR is not free
                         $cost = ($answeredtime/60) * abs($selling_rate) + abs($connection_charge);
                         
-                        /* CDR B-LEG OF DID CALL */
+                        /* CDR A-LEG OF DID CALL */
                         $QUERY = "INSERT INTO cc_call (uniqueid, sessionid, card_id, card_caller, nasipaddress, starttime, sessiontime, calledstation, ".
                                 " terminatecauseid, stoptime, sessionbill, id_tariffgroup, id_tariffplan, id_ratecard, id_trunk, src, sipiax) VALUES ".
-                                "('".$this->uniqueid."', '".$this->channel."',  '".$this->id_card."', '".$this->card_caller."', '".$this->hostname."',";
+                                "('".$this->uniqueid."', '".$this->channel."',  '".$my_id_card."', '".$this->card_caller."', '".$this->hostname."',";
                         $QUERY .= " CURRENT_TIMESTAMP - INTERVAL $answeredtime SECOND ";
                         $QUERY .= ", '$answeredtime', '". $listdestination[0][10]."', '$terminatecauseid', now(), '$cost', '0', '0', '0', '0', '$this->CallerID', '3' )";
 
                         $result = $this -> instance_table -> SQLExec ($this->DBHandle, $QUERY, 0);
                         $this -> debug( INFO, $agi, __FILE__, __LINE__, "[DID CALL - LOG CC_CALL: SQL: $QUERY]:[result:$result]");
-                        
+
                         // Update the account
                         if ($nbused > 0) {
                             $firstuse = "";
@@ -1670,10 +1701,11 @@ if (!defined('MONITOR_PATH')) define ("MONITOR_PATH",	isset($this->config['webui
 
                     monitor_recognize($this);
                     
-                    #This is a call from user to DID, we dont want to charge the A-leg
-                    //$this -> bill_did_aleg ($agi, $listdestination[0], $answeredtime);
+                    #This is a call from user to DID
+                    #we will change the B-Leb using the did bill_did_aleg function
+                    $this -> bill_did_aleg ($agi, $listdestination[0], $answeredtime);
                     
-                }
+//                }
 
             // ELSEIF NOT VOIP CALL
             } else {
@@ -1721,8 +1753,13 @@ if (!defined('MONITOR_PATH')) define ("MONITOR_PATH",	isset($this->config['webui
                     $this -> debug( DEBUG, $agi, __FILE__, __LINE__, "[UPDATE DID_DESTINATION]:[result:$result]");
 
                     // THEN STATUS IS ANSWER
-                    // ADD CDR
-                     //CALL2DID CDR if not free
+                    // UPDATE CDR
+                     //CALL2DID CDR is not free
+		    if ($nbused>0) {
+                            $firstuse= "";
+                    } else {
+                           $firstuse= "firstusedate=now(),";
+                    }
                     if (!$call_did_free) {
                         $cost = a2b_round(abs(($answeredtime/60) * abs($selling_rate) + abs($connection_charge)));
 
@@ -1731,18 +1768,18 @@ if (!defined('MONITOR_PATH')) define ("MONITOR_PATH",	isset($this->config['webui
 
                         $result = $this -> instance_table -> SQLExec ($this->DBHandle, $QUERY, 0);
                         $this -> debug( INFO, $agi, __FILE__, __LINE__, "[DID CALL - LOG CC_CALL: SQL: $QUERY]:[result:$result]");
-                        if ($nbused>0) {
-                                $firstuse= "";
-                        } else {
-                               $firstuse= "firstusedate=now(),";
-                        }
                         $QUERY = "UPDATE cc_card SET credit= credit - $cost, lastuse=now(),$firstuse nbused=nbused+1 WHERE username='".$card_number."'";
                         $result = $this -> instance_table -> SQLExec ($this->DBHandle, $QUERY, 0);
                         $this -> debug( INFO, $agi, __FILE__, __LINE__, "[DID CALL - UPDATE CARD: SQL: $QUERY]:[result:$result]");
                     }
+
+                    $QUERY = "UPDATE cc_card SET credit= credit - ".a2b_round(abs($cost))." ,  lastuse=now(),$firstuse nbused=nbused+1 WHERE username='".$card_number."'";
+                    $result = $this -> instance_table -> SQLExec ($this->DBHandle, $QUERY, 0);
+                    $this -> debug( INFO, $agi, __FILE__, __LINE__, "[DID CALL - UPDATE CARD: SQL: $QUERY]:[result:$result]");
+                    
                     
                     #This is a call from user to DID, we dont want to charge the A-leg
-                    //$this -> bill_did_aleg ($agi, $listdestination[0], $answeredtime);
+                    $this -> bill_did_aleg ($agi, $listdestination[0], $answeredtime);
                     
                     break;
                 }
@@ -1772,38 +1809,44 @@ if (!defined('MONITOR_PATH')) define ("MONITOR_PATH",	isset($this->config['webui
 	 */
 	function bill_did_aleg ($agi, $inst_listdestination, $b_leg_answeredtime = 0)
 	{
-	$start_time=$this -> G_startime;
-	$stop_time=time();
-	$timeinterval=$inst_listdestination[19];
-	$this -> debug( DEBUG, $agi, __FILE__, __LINE__, "[bill_did_aleg]: START TIME peak=".$this -> calculate_time_condition($start_time,$timeinterval, "peak")." ,offpeak=".$this -> calculate_time_condition($start_time,$timeinterval, "offpeak")." ");
-	$this -> debug( DEBUG, $agi, __FILE__, __LINE__, "[bill_did_aleg]: STOP TIME peak=".$this -> calculate_time_condition($stop_time,$timeinterval, "peak")." ,offpeak=".$this -> calculate_time_condition($stop_time,$timeinterval, "offpeak")." ");
-	//TO DO - for now we use peak values only if whole call duration is inside a peak time interval. Should be devided in two parts - peek and off peak duration. May be later.
-        if ((($this -> calculate_time_condition($start_time,$timeinterval, "peak")) && !($this -> calculate_time_condition($start_time,$timeinterval, "offpeak"))) && (($this -> calculate_time_condition($stop_time,$timeinterval, "peak")) && !($this -> calculate_time_condition($stop_time,$timeinterval, "offpeak"))))
-	{
-		$this -> debug( INFO, $agi, __FILE__, __LINE__, "[bill_did_aleg]: We have PEAK time.");
-		$aleg_carrier_connect_charge = $inst_listdestination[11];
-		$aleg_carrier_cost_min = $inst_listdestination[12];
-		$aleg_retail_connect_charge = $inst_listdestination[13];
-		$aleg_retail_cost_min = $inst_listdestination[14];
+	    
+	    $start_time = $this -> G_startime;
+	    $stop_time = time();
+	    $timeinterval = $inst_listdestination[19];
+	    $this -> debug( DEBUG, $agi, __FILE__, __LINE__, "[bill_did_aleg]: START TIME peak=".$this -> calculate_time_condition($start_time,$timeinterval, "peak")." ,offpeak=".$this -> calculate_time_condition($start_time,$timeinterval, "offpeak")." ");
+	    $this -> debug( DEBUG, $agi, __FILE__, __LINE__, "[bill_did_aleg]: STOP TIME peak=".$this -> calculate_time_condition($stop_time,$timeinterval, "peak")." ,offpeak=".$this -> calculate_time_condition($stop_time,$timeinterval, "offpeak")." ");
+	    
+	    //TO DO - for now we use peak values only if whole call duration is inside a peak time interval. Should be devided in two parts - peek and off peak duration. May be later.
+        if ((($this -> calculate_time_condition($start_time,$timeinterval, "peak")) && 
+                !($this -> calculate_time_condition($start_time,$timeinterval, "offpeak"))) && 
+                (($this -> calculate_time_condition($stop_time,$timeinterval, "peak")) && 
+                !($this -> calculate_time_condition($stop_time,$timeinterval, "offpeak")))) {
+            # We have PEAK time
+		    $this -> debug( INFO, $agi, __FILE__, __LINE__, "[bill_did_aleg]: We have PEAK time.");
+		    $aleg_carrier_connect_charge = $inst_listdestination[11];
+		    $aleg_carrier_cost_min = $inst_listdestination[12];
+		    $aleg_retail_connect_charge = $inst_listdestination[13];
+		    $aleg_retail_cost_min = $inst_listdestination[14];
 		
-		$aleg_carrier_initblock = $inst_listdestination[15];
-		$aleg_carrier_increment = $inst_listdestination[16];
-		$aleg_retail_initblock = $inst_listdestination[17];
-		$aleg_retail_increment = $inst_listdestination[18];
-		#TODO use the above variables to define the time2call
-	} else {
-		$this -> debug( INFO, $agi, __FILE__, __LINE__, "[bill_did_aleg]: We have OFF-PEAK time.");
-		$aleg_carrier_connect_charge = $inst_listdestination[20];
-		$aleg_carrier_cost_min = $inst_listdestination[21];
-		$aleg_retail_connect_charge = $inst_listdestination[22];
-		$aleg_retail_cost_min = $inst_listdestination[23];
+		    $aleg_carrier_initblock = $inst_listdestination[15];
+		    $aleg_carrier_increment = $inst_listdestination[16];
+		    $aleg_retail_initblock = $inst_listdestination[17];
+		    $aleg_retail_increment = $inst_listdestination[18];
+		    #TODO use the above variables to define the time2call
+	    } else {
+	        #We have OFF-PEAK time
+		    $this -> debug( INFO, $agi, __FILE__, __LINE__, "[bill_did_aleg]: We have OFF-PEAK time.");
+		    $aleg_carrier_connect_charge = $inst_listdestination[20];
+		    $aleg_carrier_cost_min = $inst_listdestination[21];
+		    $aleg_retail_connect_charge = $inst_listdestination[22];
+		    $aleg_retail_cost_min = $inst_listdestination[23];
 		
-		$aleg_carrier_initblock = $inst_listdestination[24];
-		$aleg_carrier_increment = $inst_listdestination[25];
-		$aleg_retail_initblock = $inst_listdestination[26];
-		$aleg_retail_increment = $inst_listdestination[27];
-		#TODO use the above variables to define the time2call
-	}	
+		    $aleg_carrier_initblock = $inst_listdestination[24];
+		    $aleg_carrier_increment = $inst_listdestination[25];
+		    $aleg_retail_initblock = $inst_listdestination[26];
+		    $aleg_retail_increment = $inst_listdestination[27];
+		    #TODO use the above variables to define the time2call
+	    }	
 
         $this -> debug( INFO, $agi, __FILE__, __LINE__, "[bill_did_aleg]:[aleg_carrier_connect_charge=$aleg_carrier_connect_charge;\
                                                                           aleg_carrier_cost_min=$aleg_carrier_cost_min;\
@@ -1812,12 +1855,12 @@ if (!defined('MONITOR_PATH')) define ("MONITOR_PATH",	isset($this->config['webui
                                                                           aleg_carrier_initblock=$aleg_carrier_initblock;\
                                                                           aleg_carrier_increment=$aleg_carrier_increment;\
                                                                           aleg_retail_initblock=$aleg_retail_initblock;\
-                                                                          aleg_retail_increment=$aleg_retail_increment]");
+                                                                          aleg_retail_increment=$aleg_retail_increment - b_leg_answeredtime=$b_leg_answeredtime]");
         
         $this -> dnid = $inst_listdestination[10];
         
         # if we add a new CDR for A-Leg
-        if (($aleg_carrier_connect_charge != 0) || ($aleg_carrier_cost_min != 0) || ($aleg_retail_connect_charge != 0) || ($aleg_retail_cost_min != 0)){
+        if (($aleg_carrier_connect_charge != 0) || ($aleg_carrier_cost_min != 0) || ($aleg_retail_connect_charge != 0) || ($aleg_retail_cost_min != 0)) {
             # duration of the call for the A-Leg is since the start date
             
             // SET CORRECTLY THE CALLTIME FOR THE 1st LEG
@@ -1833,7 +1876,11 @@ if (!defined('MONITOR_PATH')) define ("MONITOR_PATH",	isset($this->config['webui
             
 		    # Carrier Minimum Duration and Billing Increment
 		    $aleg_carrier_callduration = $aleg_answeredtime;
-		    if ($aleg_carrier_callduration < $aleg_carrier_initblock) $aleg_carrier_callduration = $aleg_carrier_initblock;
+		    
+		    if ($aleg_carrier_callduration < $aleg_carrier_initblock) {
+		        $aleg_carrier_callduration = $aleg_carrier_initblock;
+		    }
+		    
 		    if (($aleg_carrier_increment > 0) && ($aleg_carrier_callduration > $aleg_carrier_initblock)) {
 			    $mod_sec = $aleg_carrier_callduration % $aleg_carrier_increment; // 12 = 30 % 18
 			    if ($mod_sec > 0) $aleg_carrier_callduration += ($aleg_carrier_increment - $mod_sec); // 30 += 18 - 12
@@ -1841,10 +1888,14 @@ if (!defined('MONITOR_PATH')) define ("MONITOR_PATH",	isset($this->config['webui
 		    
 		    # Retail Minimum Duration and Billing Increment
 		    $aleg_retail_callduration = $aleg_answeredtime;
-		    if ($aleg_retail_callduration < $aleg_retail_initblock) $aleg_retail_callduration = $aleg_retail_initblock;
+		    
+		    if ($aleg_retail_callduration < $aleg_retail_initblock) {
+		        $aleg_retail_callduration = $aleg_retail_initblock;
+		    }
+		    
 		    if (($aleg_retail_increment > 0) && ($aleg_retail_callduration > $aleg_retail_initblock)) {
 			    $mod_sec = $aleg_retail_callduration % $aleg_retail_increment; // 12 = 30 % 18
-			    if ($mod_sec > 0) $aleg_retail_callduration += ($aleg_carrier_increment - $mod_sec); // 30 += 18 - 12
+			    if ($mod_sec > 0) $aleg_retail_callduration += ($aleg_retail_increment - $mod_sec); // 30 += 18 - 12
 		    }
 	        
             $aleg_carrier_cost = 0;
@@ -1934,8 +1985,9 @@ if (!defined('MONITOR_PATH')) define ("MONITOR_PATH",	isset($this->config['webui
                 }
             }
             if ($seconds>0 && ($this->agiconfig['disable_announcement_seconds']==0)) {
-                if ($minutes>0) $agi-> stream_file('vm-and', '#');
-
+                if ($minutes>0) {
+                	$agi-> stream_file('vm-and', '#');
+                }
                 if ($seconds==1) {
                     if ((strtolower($this ->current_language)=='ru')) {
 						$agi-> stream_file('digits/1f', '#');
@@ -1973,10 +2025,13 @@ if (!defined('MONITOR_PATH')) define ("MONITOR_PATH",	isset($this->config['webui
 		}
 
 		$this -> debug( DEBUG, $agi, __FILE__, __LINE__, "[CURRENCY : $this->currency]");
-		if (!isset($currencies_list[strtoupper($this->currency)][2]) || !is_numeric($currencies_list[strtoupper($this->currency)][2])) $mycur = 1;
-		else $mycur = $currencies_list[strtoupper($this->currency)][2];
-		$credit_cur = $credit / $mycur;
+		if (!isset($currencies_list[strtoupper($this->currency)][2]) || !is_numeric($currencies_list[strtoupper($this->currency)][2])) {
+			$mycur = 1;
+		} else {
+			$mycur = $currencies_list[strtoupper($this->currency)][2];
+		}
 
+		$credit_cur = $credit / $mycur;
 		list($units, $cents)=preg_split('/[.]/', sprintf('%01.2f', $credit_cur));
 
 		$this -> debug( DEBUG, $agi, __FILE__, __LINE__, "[BEFORE: $credit_cur SPRINTF : ".sprintf('%01.2f', $credit_cur)."]");
@@ -3629,7 +3684,7 @@ if (!defined('MONITOR_PATH')) define ("MONITOR_PATH",	isset($this->config['webui
 			$parameters = str_replace("MixMonitor ", "Monitor " . $this -> agiconfig['monitor_formatfile'] . "|", $parameters);
 			$parameters = str_replace("StopMixMonitor", "StopMonitor", $parameters);
 		}
-		if ($this->agiconfig['asterisk_version'] == "1_6") {
+		if ($this->agiconfig['asterisk_version'] == "1_6" || $this->agiconfig['asterisk_version'] == "1_8") {
 			$parameters = str_replace("|", ',', $parameters);
 		}
 		return $parameters;

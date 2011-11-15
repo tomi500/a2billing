@@ -61,7 +61,22 @@ if ($argc > 1 && ($argv[1] == '--version' || $argv[1] == '-v')) {
 $agi = new AGI();
 
 
-if ($argc > 1 && is_numeric($argv[1]) && $argv[1] >= 0) {
+$optconfig = array();
+if ($argc > 1 && strstr($argv[1], "+")) {
+    /*
+    This change allows some configuration overrides on the AGI command-line by allowing the user to add them after the configuration number, like so:
+    exten => 0312345678,3,AGI(a2billing.php,"1+use_dnid=0&extracharge_did=12345")
+    */
+    //check for configuration overrides in the first argument
+    $idconfig = substr($argv[1], 0, strpos($argv[1],"+"));
+    $configstring = substr($argv[1], strpos($argv[1],"+")+1);
+    
+    foreach (explode("&",$configstring) as $conf) {
+        $var = substr($conf, 0, strpos($conf,"="));
+        $val = substr($conf, strpos($conf,"=")+1);
+        $optconfig[$var]=$val;
+    }
+}elseif ($argc > 1 && is_numeric($argv[1]) && $argv[1] >= 0) {
 	$idconfig = $argv[1];
 } else {
 	$idconfig = 1;
@@ -99,7 +114,7 @@ if ($argc > 5 && strlen($argv[5]) > 0) {
 } else $cid_1st_leg_tariff_id = "";
 
 $A2B = new A2Billing();
-$A2B -> load_conf($agi, NULL, 0, $idconfig);
+$A2B -> load_conf($agi, NULL, 0, $idconfig, $optconfig);
 $A2B -> mode = $mode;
 $A2B -> G_startime = $G_startime;
 
@@ -1057,7 +1072,7 @@ if ($mode == 'standard') {
 				    $channeloutcid = $RateEngine->rate_engine_performcall($agi, $A2B->destination, $A2B, 9);
 				    if ($channeloutcid) {
 					$channel = $channeloutcid[0];
-					$sep = ($A2B->config['global']['asterisk_version'] == "1_6")?',':'|';
+					$sep = ($A2B->config['global']['asterisk_version'] == "1_6" || $A2B->config['global']['asterisk_version'] == "1_8")?',':'|';
 					if ($A2B -> cidphonenumber) {
 					    $exten = $A2B -> cidphonenumber;
 					    $variable = '';
@@ -1170,7 +1185,7 @@ if ($mode == 'standard') {
 				    $channeloutcid = $RateEngine->rate_engine_performcall($agi, $A2B->destination, $A2B, 9);
 				    if ($channeloutcid) {
 					$channel = $channeloutcid[0];
-					$sep = ($A2B->config['global']['asterisk_version'] == "1_6")?',':'|';
+					$sep = ($A2B->config['global']['asterisk_version'] == "1_6" || $A2B->config['global']['asterisk_version'] == "1_8")?',':'|';
 					if ($A2B -> cidphonenumber) {
 					    $exten = $A2B -> cidphonenumber;
 					    $variable = '';
@@ -1540,8 +1555,8 @@ if ($mode == 'standard') {
                         $application = '';
                         $account = $A2B -> accountcode;
                         $uniqueid = $callback_uniqueid.'-'.MDP_NUMERIC(5);
-
-                        $sep = ($A2B->config['global']['asterisk_version'] == "1_6")?',':'|';
+                        
+                        $sep = ($A2B->config['global']['asterisk_version'] == "1_6" || $A2B->config['global']['asterisk_version'] == "1_8")?',':'|';
 
                         $variable = "CALLED=$inst_pn_member".$sep."CALLING=$inst_pn_member".$sep."CBID=$callback_uniqueid".$sep."TARIFF=$callback_tariff".$sep.
                                     "LEG=".$A2B -> accountcode.$sep."ACCOUNTCODE=".$A2B -> accountcode.$sep."ROOMNUMBER=".$room_number;
