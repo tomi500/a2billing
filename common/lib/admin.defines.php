@@ -176,6 +176,9 @@ define ("IAX_ADDITIONAL_PARAMETERS",isset($A2B->config['sip-iax-info']['iax_addi
 define ("SIP_ADDITIONAL_PARAMETERS",isset($A2B->config['sip-iax-info']['sip_additional_parameters'])?$A2B->config['sip-iax-info']['sip_additional_parameters']:null);
 
 
+// GLOBAL POST/GET VARIABLE
+getpost_ifset(array('form_action', 'atmenu', 'action', 'stitle', 'sub_action', 'IDmanager', 'current_page', 'order', 'sens', 'mydisplaylimit', 'filterprefix', 'cssname', 'popup_select', 'popup_formname', 'popup_fieldname', 'ui_language', 'msg', 'section'));
+
 // Language Selection
 if (isset($ui_language)) {
 	$_SESSION["ui_language"] = $ui_language;
@@ -245,9 +248,6 @@ if((stripos($URI, "Public/index.php") === FALSE) && isset($_SESSION["admin_id"])
 //SQLi
 $DBHandle  = DbConnect();
 include (dirname(__FILE__)."/protect_sqli.php");
-
-// GLOBAL POST/GET VARIABLE
-getpost_ifset(array('form_action', 'atmenu', 'action', 'stitle', 'sub_action', 'IDmanager', 'current_page', 'order', 'sens', 'mydisplaylimit', 'filterprefix', 'cssname', 'popup_select', 'popup_formname', 'popup_fieldname', 'ui_language', 'msg', 'section'));
 
 
 

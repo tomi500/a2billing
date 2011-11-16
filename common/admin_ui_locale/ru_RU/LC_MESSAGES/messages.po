@@ -1242,7 +1242,7 @@ msgstr "Один"
 
 #: lib/Form/Class.FormHandler.inc.php:555
 msgid "has been deleted!"
-msgstr "был удале!"
+msgstr "был удалён!"
 
 #: lib/Form/Class.FormHandler.inc.php:557 Public/form_data/FG_var_did.inc:296
 #: Public/form_data/FG_var_did_destination.inc:201
@@ -1339,7 +1339,7 @@ msgstr "вы легко можете добавить новый"
 #: Public/form_data/FG_var_restore.inc:101
 #: Public/form_data/FG_var_callerid.inc:121
 msgid "Fill the following fields and confirm by clicking on the button add."
-msgstr ""
+msgstr "Заполните следующие поля и подтвердите нажатием на кнопку 'добавить'"
 
 #: lib/Form/Class.FormHandler.inc.php:558
 #: Public/form_data/FG_var_service_details.inc:75
@@ -3613,8 +3613,8 @@ msgid "Thanks to A2Billing, you have made a profit of over 500 euro !"
 msgstr ""
 
 #: Public/call-log-customers.php:1186
-msgid "Support A2Billing by clicking on the Donate button bellow :"
-msgstr ""
+msgid "Support A2Billing by clicking on the Donate button below :"
+msgstr "Поддержите A2Billing кликнув по кнопке Donate :"
 
 #: Public/call-log-customers.php:1215 Public/call-dnid.php:843
 msgid "TRAFFIC SUMMARY"

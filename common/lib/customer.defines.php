@@ -187,6 +187,8 @@ define ("RETURN_URL_DISTANT_LOGIN", isset($A2B->config["webcustomerui"]['return_
 define ("RETURN_URL_DISTANT_FORGETPASSWORD", isset($A2B->config["webcustomerui"]['return_url_distant_forgetpassword'])?$A2B->config["webcustomerui"]['return_url_distant_forgetpassword']:null);
 
 
+// GLOBAL POST/GET VARIABLE
+getpost_ifset (array('form_action', 'atmenu', 'action', 'stitle', 'sub_action', 'IDmanager', 'current_page', 'order', 'sens', 'mydisplaylimit', 'filterprefix', 'ui_language', 'cssname', 'popup_select', 'popup_formname', 'popup_fieldname', 'exporttype', 'msg'));
 
 if (!isset($_SESSION)) {
 	session_start();
@@ -263,7 +265,3 @@ define ("ENABLE_LOG", 0);
 //SQLi
 $DBHandle  = DbConnect();
 include (dirname(__FILE__)."/protect_sqli.php");
-
-// GLOBAL POST/GET VARIABLE
-getpost_ifset (array('form_action', 'atmenu', 'action', 'stitle', 'sub_action', 'IDmanager', 'current_page', 'order', 'sens', 'mydisplaylimit', 'filterprefix', 'ui_language', 'cssname', 'popup_select', 'popup_formname', 'popup_fieldname', 'exporttype', 'msg'));
-
