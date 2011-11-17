@@ -273,6 +273,18 @@ msgstr "Время, доступное для разговора"
 msgid "Minutes"
 msgstr "мин"
 
+#: simulator.php:220
+msgid "UAH"
+msgstr "грн"
+
+#: simulator.php:260
+msgid "Billing block"
+msgstr "Интервал тарификации"
+
+#: simulator.php:269
+msgid "Connection fee"
+msgstr "Плата за соединение"
+
 #: simulator.php:245
 msgid "The number, you have entered, is not correct!"
 msgstr "Введен неправильный номер"

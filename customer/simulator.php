@@ -43,7 +43,7 @@ if (!has_rights(ACX_SIMULATOR)) {
 	die();
 }
 
-$QUERY = "SELECT  username, credit, lastname, firstname, address, city, state, country, zipcode, phone, email, fax, lastuse, activated, status, id, tariff FROM cc_card WHERE username = '" . $_SESSION["pr_login"] . "' AND uipass = '" . $_SESSION["pr_password"] . "'";
+$QUERY = "SELECT  username, credit, lastname, firstname, address, city, state, country, zipcode, phone, email, fax, lastuse, activated, status, id, tariff, currency FROM cc_card WHERE username = '" . $_SESSION["pr_login"] . "' AND uipass = '" . $_SESSION["pr_password"] . "'";
 
 $DBHandle_max = DbConnect();
 $numrow = 0;
@@ -128,6 +128,14 @@ $instance_table_tariffname = new Table("cc_tariffplan", "id, tariffname");
 $FG_TABLE_CLAUSE = "";
 $list_tariffname = $instance_table_tariffname->Get_list($DBHandle, $FG_TABLE_CLAUSE, "tariffname", "ASC", null, null, null, null);
 $nb_tariffname = count($list_tariffname);
+$currency = $customer_info[17];
+$currencies_list = get_currencies();
+if (!isset($currencies_list[strtoupper($currency)][2]) || !is_numeric($currencies_list[strtoupper($currency)][2])) {
+	$mycur = 1;
+} else {
+	$mycur = $currencies_list[strtoupper($currency)][2];
+}
+
 
 $smarty->display('main.tpl');
 
@@ -187,7 +195,7 @@ $FG_TABLE_ALTERNATE_ROW_COLOR[1]='#EEE9E9';
 
 		<?php if (count($RateEngine->ratecard_obj)>1){ ?>
 		<TR>
-          <td height="15" class="bgcolor_010" style="padding-left: 5px; padding-right: 3px;" colspan="2">
+          <td height="15" class="bgcolor_005" style="padding-left: 5px; padding-right: 3px;" colspan="2">
 					<b><?php echo gettext("We found several destinations:");?></b></td>
         </TR>
 		<?php } ?>
@@ -206,32 +214,49 @@ $FG_TABLE_ALTERNATE_ROW_COLOR[1]='#EEE9E9';
         	</TR>
 			<TR>
           	<td height="15" class="bgcolor_011" style="padding-left: 5px; padding-right: 3px;" colspan="2">
-					<b><?php echo gettext("DESTINATION");?>&nbsp;:#<?php echo $j+1;?></b>
+					<b><?php echo gettext("DESTINATION");?>&nbsp;:#<?php echo $j+1; $k=1;?></b>
 			</td>
         	</TR>
 			<tr>
-				<td height="15" bgcolor="<?php echo $FG_TABLE_ALTERNATE_ROW_COLOR[1]?>" style="padding-left: 5px; padding-right: 3px;">
+				<td height="15" bgcolor="<?php echo $FG_TABLE_ALTERNATE_ROW_COLOR[$k]?>" style="padding-left: 5px; padding-right: 3px;">
 						<font color="blue"><b><?php echo gettext("CallTime available");?></b></font>				</td>
-				<td height="15" bgcolor="<?php echo $FG_TABLE_ALTERNATE_ROW_COLOR[1]?>" style="padding-left: 5px; padding-right: 3px;">
+				<td height="15" bgcolor="<?php echo $FG_TABLE_ALTERNATE_ROW_COLOR[$k]?>" style="padding-left: 5px; padding-right: 3px;">
 						<font color="blue"><i><?php echo display_minute($RateEngine->ratecard_obj[$j]['timeout']);?> <?php echo gettext("Minutes");?> </i></font>
-				</td>
+				</td><?php $k=($k)?0:1;?>
 			</tr>
 				
 			<tr>			
-				<td height="15" bgcolor="<?php echo $FG_TABLE_ALTERNATE_ROW_COLOR[0]?>" style="padding-left: 5px; padding-right: 3px;"><b><?php echo $arr_ratecard[3];?></b></td>
-				<td height="15" bgcolor="<?php echo $FG_TABLE_ALTERNATE_ROW_COLOR[0]?>" style="padding-left: 5px; padding-right: 3px;">
+				<td height="15" bgcolor="<?php echo $FG_TABLE_ALTERNATE_ROW_COLOR[$k]?>" style="padding-left: 5px; padding-right: 3px;"><b><?php echo $arr_ratecard[3];?></b></td>
+				<td height="15" bgcolor="<?php echo $FG_TABLE_ALTERNATE_ROW_COLOR[$k]?>" style="padding-left: 5px; padding-right: 3px;">
 						<i><?php echo $destination;?></i>
-				</td>
+				</td><?php $k=($k)?0:1;?>
 			</tr>
 			
 			<tr>			
-				<td height="15" bgcolor="<?php echo $FG_TABLE_ALTERNATE_ROW_COLOR[1]?>" style="padding-left: 5px; padding-right: 3px;">
+				<td height="15" bgcolor="<?php echo $FG_TABLE_ALTERNATE_ROW_COLOR[$k]?>" style="padding-left: 5px; padding-right: 3px;">
 						<b><?php echo $arr_ratecard[10];?></b>				</td>
-				<td height="15" bgcolor="<?php echo $FG_TABLE_ALTERNATE_ROW_COLOR[1]?>" style="padding-left: 5px; padding-right: 3px;">
-						<i><?php echo $RateEngine->ratecard_obj[$j][12] ;?></i>
+				<td height="15" bgcolor="<?php echo $FG_TABLE_ALTERNATE_ROW_COLOR[$k]?>" style="padding-left: 5px; padding-right: 3px;">
+						<i><?php echo round($RateEngine->ratecard_obj[$j][12] / $mycur, 3); ?> <?php echo gettext($currency); ?></i>
+				</td><?php $k=($k)?0:1;?>
+			</tr>
+			<?php if ($RateEngine->ratecard_obj[$j][14]) { ?>
+			<tr>
+				<td height="15" bgcolor="<?php echo $FG_TABLE_ALTERNATE_ROW_COLOR[$k]?>" style="padding-left: 5px; padding-right: 3px;">
+						<b><?php echo gettext("Billing block");?></b>			</td>
+				<td height="15" bgcolor="<?php echo $FG_TABLE_ALTERNATE_ROW_COLOR[$k]?>" style="padding-left: 5px; padding-right: 3px;">
+						<i><?php echo display_minute($RateEngine->ratecard_obj[$j][14]);?> <?php echo gettext("Minutes");?></i>
+				</td><?php $k=($k)?0:1;?>
+			</tr>
+			<?php }
+			if ($RateEngine->ratecard_obj[$j][15]>0) { ?>
+			<tr>
+				<td height="15" bgcolor="<?php echo $FG_TABLE_ALTERNATE_ROW_COLOR[$k]?>" style="padding-left: 5px; padding-right: 3px;">
+						<b><?php echo gettext("Connection fee");?></b>			</td>
+				<td height="15" bgcolor="<?php echo $FG_TABLE_ALTERNATE_ROW_COLOR[$k]?>" style="padding-left: 5px; padding-right: 3px;">
+						<i><?php echo round($RateEngine->ratecard_obj[$j][15] / $mycur, 3); ?> <?php echo gettext($currency); ?></i>
 				</td>
 			</tr>
-			
+			<?php } ?>
 		<?php } ?>
 		
 	  </table>

@@ -142,7 +142,7 @@ $smarty->display('main.tpl');
 			<br><br>
 			</td>
 			<td width="50%">
-			<br><font class="fontstyle_002"><?php echo gettext("BALANCE REMAINING");?> :</font><font class="fontstyle_007"> <?php echo $credit_cur.' '.$customer_info[22]; ?> </font>
+			<br><font class="fontstyle_002"><?php echo gettext("BALANCE REMAINING");?> :</font><font class="fontstyle_007"> <?php echo $credit_cur.' '.gettext($customer_info[22]); ?> </font>
 			<br><br>
 			</td>
 			<?php
