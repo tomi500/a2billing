@@ -1295,17 +1295,7 @@ if (!defined('MONITOR_PATH')) define ("MONITOR_PATH",	isset($this->config['webui
 
 				if ($inst_listdestination[28]) $agi -> answer();
 				if ($inst_listdestination[29]) {
-/**				    $format_list = array ('','.alaw','.wav','.mp3','.WAV','.MP3','.gsm','.sln','.g723','.g729');
-				    $find_record = false;
-				    foreach ($format_list as $c_format)
-					if (file_exists("/var/lib/asterisk/sounds/" . $inst_listdestination[29] . $c_format)) {
-						$find_record = true;
-						break;
-					}
-				    if ($find_record) {
-**/
 					$agi -> evaluate("STREAM FILE $inst_listdestination[29] \"#\" 0");
-//				    }
 				}
 				// IF VOIP CALL
 				if ($inst_listdestination[5]==1) {
@@ -1355,7 +1345,7 @@ if (!defined('MONITOR_PATH')) define ("MONITOR_PATH",	isset($this->config['webui
 							continue;
 					} elseif ($dialstatus == "NOANSWER") {
 						$answeredtime = 0;
-						$agi-> stream_file('prepaid-callfollowme', '#');
+						$agi-> stream_file('prepaid-noanswer', '#');
 						if (count($listdestination) > $callcount)
 							continue;
 					} elseif ($dialstatus == "CANCEL") {
@@ -1554,6 +1544,9 @@ if (!defined('MONITOR_PATH')) define ("MONITOR_PATH",	isset($this->config['webui
             // CHECK IF DESTINATION IS SET
             if (strlen($inst_listdestination[4])==0)
             	continue;
+	    if ($inst_listdestination[29]) {
+		$agi -> evaluate("STREAM FILE $inst_listdestination[29] \"#\" 0");
+	    }
 
             // IF call on did is not free calculate time to call
             
@@ -1617,7 +1610,7 @@ if (!defined('MONITOR_PATH')) define ("MONITOR_PATH",	isset($this->config['webui
 						continue;
                 } elseif ($dialstatus == "NOANSWER") {
 					$answeredtime = 0;
-					$agi-> stream_file('prepaid-callfollowme', '#');
+					$agi-> stream_file('prepaid-noanswer', '#');
 					if (count($listdestination) > $callcount)
 						continue;
                 } elseif ($dialstatus == "CANCEL") {
