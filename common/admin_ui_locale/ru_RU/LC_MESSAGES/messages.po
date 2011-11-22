@@ -4651,8 +4651,8 @@ msgid "Define any additional parameters that will be used when running the Dial 
 msgstr ""
 
 #: Public/form_data/FG_var_trunk.inc
-msgid "Destination prefix condition for FAILOVER TRUNK with respect to ADD+REMOVE PREFIX. This will overrule for Destinations Limited if defined. Leave empty to use FAILOVER TRUNK without condition."
-msgstr "Задайте префикс, с учётом отработки ADD PREFIX и REMOVE PREFIX, как условие срабатывания FAILOVER TRUNK. Использование этой настройки перекрывает остальные DIALPREFIX'ы ниже. Оставьте пустым, чтобы переход на FAILOVER TRUNK срабатывал только, если остальные DIALPREFIX'ы не нашли соответствия."
+msgid "Destination prefix condition for FAILOVER TRUNK with respect to REMOVE PREFIX. This will overrule for Destinations Limited if defined. Leave empty to use FAILOVER TRUNK without condition."
+msgstr "Задайте префикс, с учётом отработки REMOVE PREFIX, как условие срабатывания FAILOVER TRUNK. Использование этой настройки перекрывает остальные DIALPREFIX'ы ниже. Оставьте пустым, чтобы переход на FAILOVER TRUNK срабатывал только, если остальные DIALPREFIX'ы не нашли соответствия."
 
 #: Public/form_data/FG_var_trunk.inc:214
 msgid "FAILOVER TRUNK"
@@ -4742,8 +4742,8 @@ msgid "Set the Outgoing CID Group to use for this trunk, or RATECARD PRESET to u
 msgstr "Выберите исходящую CID группу или оставьте RATECARD PRESET, чтобы использовать такую же настройка из тарифа, через который будет обработан вызов"
 
 #: Public/form_data/FG_var_trunk.inc:
-msgid "Add destination prefix like for RateCard with respect to ADD+REMOVE PREFIX. Leave empty to disable all rule criterions."
-msgstr "Определите условие-префикс чтобы обрабатывался этот блок правил"
+msgid "Add destination prefix like for RateCard with respect to REMOVE PREFIX. Leave empty to disable all rule criterions."
+msgstr "Определите условие-префикс, с учётом отработки REMOVE PREFIX, чтобы обрабатывался этот блок правил"
 
 #: Public/form_data/FG_var_trunk.inc:
 msgid "You can define another trunk in case of failover for currend dialprefix"

@@ -230,7 +230,7 @@ $HD_Form -> AddEditElement(gettext("DIALPREFIX CONDITION"),
 	"",
 	gettext("Insert the dialing prefix, such as for UK '44' or for US '1' "),
 	"", "", "", "", "", "", "",
-	gettext("Destination prefix condition for FAILOVER TRUNK with respect to ADD+REMOVE PREFIX. This will overrule for Destinations Limited if defined. Leave empty to use FAILOVER TRUNK without condition."));
+	gettext("Destination prefix condition for FAILOVER TRUNK with respect to REMOVE PREFIX. This will overrule for Destinations Limited if defined. Leave empty to use FAILOVER TRUNK without condition."));
 
 $HD_Form -> AddEditElement (gettext("FAILOVER TRUNK"),
 	"failover_trunk",
@@ -296,7 +296,7 @@ $HD_Form -> AddEditElement(gettext("DIALPREFIX")." A",
 	"",
 	gettext("Insert the dialing prefix, such as for UK '44' or for US '1' "),
 	"", "", "", "", "", "", "",
-	gettext("Add destination prefix like for RateCard with respect to ADD+REMOVE PREFIX. Leave empty to disable all rule criterions."),
+	gettext("Add destination prefix like for RateCard with respect to REMOVE PREFIX. Leave empty to disable all rule criterions."),
 	null, null, gettext("First Destination Limited"));
 
 $HD_Form -> AddEditElement (gettext("FAILOVER TRUNK")." A",
@@ -422,7 +422,7 @@ $HD_Form -> AddEditElement(gettext("DIALPREFIX")." B",
 	"",
 	gettext("Insert the dialing prefix, such as for UK '44' or for US '1' "),
 	"", "", "", "", "", "", "",
-	gettext("Add destination prefix like for RateCard with respect to ADD+REMOVE PREFIX. Leave empty to disable all rule criterions."),
+	gettext("Add destination prefix like for RateCard with respect to REMOVE PREFIX. Leave empty to disable all rule criterions."),
 	null, null, gettext("Second Destination Limited"));
 
 $HD_Form -> AddEditElement (gettext("FAILOVER TRUNK")." B",
