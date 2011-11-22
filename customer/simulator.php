@@ -102,6 +102,7 @@ if ($called && $id_cc_card) {
 			$A2B->agiconfig['accountcode'] = $A2B->cardnumber;
 			$A2B->agiconfig['use_dnid'] = 1;
 			$A2B->agiconfig['say_timetocall'] = 0;
+			$A2B->agiconfig['lcr_mode'] = 1;
 			$A2B->dnid = $A2B->destination = $calling;
 			if ($A2B->removeinterprefix)
 				$A2B->destination = $A2B->apply_rules($A2B->destination);
@@ -165,7 +166,7 @@ echo $CC_help_simulator_rateengine;
 				<font color="white"><b><?php echo gettext("YOUR BALANCE");?>&nbsp;:</b></font>
 				<INPUT type="text" name="balance" value="<?php if (!isset($balance)) echo "10"; else echo $balance;?>" class="form_input_text">
 				<?php } ?>
-				<br><br>
+				<br>
 	
 		</td>
 		<td height="31" class="bgcolor_009" style="padding-left: 5px; padding-right: 3px;">
@@ -177,7 +178,7 @@ echo $CC_help_simulator_rateengine;
 </table>
 
 
-<?php if ( (is_array($RateEngine->ratecard_obj)) && (!empty($RateEngine->ratecard_obj)) ){
+<?php if ( (is_array($RateEngine->ratecard_obj)) && (!empty($RateEngine->ratecard_obj)) && ($RateEngine->ratecard_obj[0][12]<100)){
 
 if ($FG_DEBUG == 1) print_r($RateEngine->ratecard_obj);
 
@@ -202,7 +203,7 @@ $FG_TABLE_ALTERNATE_ROW_COLOR[1]='#EEE9E9';
 		<?php 
 		
 		for($j=0;$j<count($RateEngine->ratecard_obj);$j++){ 
-			
+		    if ($RateEngine->ratecard_obj[$j][12]<100) {
 			$result = $A2B->instance_table -> SQLExec ($A2B -> DBHandle, "SELECT destination FROM cc_prefix where prefix='".$RateEngine->ratecard_obj[$j][5]."'");
 			if (is_array($result))	$destination = $result[0][0];
 				
@@ -213,8 +214,11 @@ $FG_TABLE_ALTERNATE_ROW_COLOR[1]='#EEE9E9';
 			</td>
         	</TR>
 			<TR>
-          	<td height="15" class="bgcolor_011" style="padding-left: 5px; padding-right: 3px;" colspan="2">
-					<b><?php echo gettext("DESTINATION");?>&nbsp;:#<?php echo $j+1; $k=1;?></b>
+          	<td height="15" class="bgcolor_011" style="padding-left: 5px; padding-right: 3px;">
+					<b><?php echo gettext("DESTINATION");?>&nbsp;№<?php echo $RateEngine->ratecard_obj[$j][6]; $k=1;?></b>
+			</td>
+          	<td height="15" class="bgcolor_011" style="padding-left: 5px; padding-right: 3px;">
+					<b><?php echo gettext("PREFIX");?>&nbsp;: <?php echo $RateEngine->ratecard_obj[$j][7];?></b>
 			</td>
         	</TR>
 			<tr>
@@ -231,15 +235,16 @@ $FG_TABLE_ALTERNATE_ROW_COLOR[1]='#EEE9E9';
 						<i><?php echo $destination;?></i>
 				</td><?php $k=($k)?0:1;?>
 			</tr>
-			
-			<tr>			
+			<?php if ($RateEngine->ratecard_obj[$j][15]>0) { ?>
+			<tr>
 				<td height="15" bgcolor="<?php echo $FG_TABLE_ALTERNATE_ROW_COLOR[$k]?>" style="padding-left: 5px; padding-right: 3px;">
-						<b><?php echo $arr_ratecard[10];?></b>				</td>
+						<b><?php echo gettext("Connection fee");?></b>			</td>
 				<td height="15" bgcolor="<?php echo $FG_TABLE_ALTERNATE_ROW_COLOR[$k]?>" style="padding-left: 5px; padding-right: 3px;">
-						<i><?php echo round($RateEngine->ratecard_obj[$j][12] / $mycur, 3); ?> <?php echo gettext($currency); ?></i>
+						<i><?php echo round($RateEngine->ratecard_obj[$j][15] / $mycur, 3); ?> <?php echo gettext($currency); ?></i>
 				</td><?php $k=($k)?0:1;?>
 			</tr>
-			<?php if ($RateEngine->ratecard_obj[$j][14]) { ?>
+			<?php }
+			if ($RateEngine->ratecard_obj[$j][14]) { ?>
 			<tr>
 				<td height="15" bgcolor="<?php echo $FG_TABLE_ALTERNATE_ROW_COLOR[$k]?>" style="padding-left: 5px; padding-right: 3px;">
 						<b><?php echo gettext("Billing block");?></b>			</td>
@@ -247,17 +252,16 @@ $FG_TABLE_ALTERNATE_ROW_COLOR[1]='#EEE9E9';
 						<i><?php echo display_minute($RateEngine->ratecard_obj[$j][14]);?> <?php echo gettext("Minutes");?></i>
 				</td><?php $k=($k)?0:1;?>
 			</tr>
-			<?php }
-			if ($RateEngine->ratecard_obj[$j][15]>0) { ?>
-			<tr>
+			<?php } ?>
+			
+			<tr>			
 				<td height="15" bgcolor="<?php echo $FG_TABLE_ALTERNATE_ROW_COLOR[$k]?>" style="padding-left: 5px; padding-right: 3px;">
-						<b><?php echo gettext("Connection fee");?></b>			</td>
+						<b><?php echo $arr_ratecard[10];?></b>				</td>
 				<td height="15" bgcolor="<?php echo $FG_TABLE_ALTERNATE_ROW_COLOR[$k]?>" style="padding-left: 5px; padding-right: 3px;">
-						<i><?php echo round($RateEngine->ratecard_obj[$j][15] / $mycur, 3); ?> <?php echo gettext($currency); ?></i>
+						<i><?php echo round($RateEngine->ratecard_obj[$j][12] / $mycur, 3); ?> <?php echo gettext($currency); ?></i>
 				</td>
 			</tr>
-			<?php } ?>
-		<?php } ?>
+		<?php }} ?>
 		
 	  </table>
       <div align="center">

@@ -251,7 +251,7 @@ class RateEngine
                         }
                     } //end foreach
                     $myresult = array_values($myresult);
-                    $A2B -> debug( DEBUG, $agi, __FILE__, __LINE__, "[rate-engine: MYRESULT  after foreach \n".print_r($myresult, true));
+                    if ($this->webui) $A2B -> debug( DEBUG, $agi, __FILE__, __LINE__, "[rate-engine: MYRESULT  after foreach \n".print_r($myresult, true));
                     $resultcount++;
                     if ($this->webui) {
                         $A2B -> debug( DEBUG, $agi, __FILE__, __LINE__, "[rate-engine: Count MYRESULT after foreach=".count($myresult)."]");

@@ -254,7 +254,7 @@ msgstr "Стоимость полной минуты разговора"
 
 #: simulator.php:185
 msgid "Simulator found a rate for your destination"
-msgstr "Симулятор нашел цену для указанного направления"
+msgstr "Симулятор нашел цену для указанного номера"
 
 #: simulator.php:191
 msgid "We found several destinations:"

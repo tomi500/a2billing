@@ -3725,7 +3725,7 @@ msgstr "Выберите телефонную книгу"
 #: Public/A2B_phonelist_import.php:243 Public/A2B_entity_did_import.php:269
 #: Public/CC_ratecard_import.php:250 Public/CC_card_import.php:231
 msgid "These fields are mandatory"
-msgstr ""
+msgstr "Эти поля обязательны"
 
 #: Public/A2B_phonelist_import.php:246
 msgid "number"
@@ -4465,6 +4465,7 @@ msgid "Use failover trunk"
 msgstr ""
 
 #: Public/form_data/FG_var_trunk.inc:78
+#, fuzzy
 msgid "Use next trunk"
 msgstr "Использовать следующий транк"
 
@@ -10624,7 +10625,7 @@ msgstr "Не выбран транк !"
 
 #: Public/CC_ratecard_import_analyse.php:354
 msgid "new rates have been imported"
-msgstr ""
+msgstr "новых тарифов было импортировано"
 
 #: Public/CC_ratecard_import.php:72
 msgid "Please, you must first select a ratecard !"
@@ -10636,7 +10637,7 @@ msgstr ""
 
 #: Public/CC_ratecard_import.php:227
 msgid "Choose the ratecard to import"
-msgstr ""
+msgstr "Отметьте в какую тарифную группу импортировать"
 
 #: Public/CC_ratecard_import.php:238
 msgid "Choose the trunk to use"
