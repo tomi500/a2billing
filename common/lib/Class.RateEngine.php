@@ -216,8 +216,8 @@ class RateEngine
             $myresult = $result;
             $mysearchvalue = array();
             if ($this->webui) $A2B -> debug( DEBUG, $agi, __FILE__, __LINE__, "[rate-engine: MYRESULT before sort \n".print_r($myresult, true));
-            // 3 - tariff plan, 5 - dialprefix
-            $myresult = $this -> array_csort($myresult,'3',SORT_NUMERIC,'5',SORT_NUMERIC,SORT_DESC);
+            // 3 - tariff plan, 7 - dialprefix
+            $myresult = $this -> array_csort($myresult,'3',SORT_NUMERIC,'7',SORT_NUMERIC,SORT_DESC);
             if ($this->webui) $A2B -> debug( DEBUG, $agi, __FILE__, __LINE__, "[rate-engine: MYRESULT  after sort \n".print_r($myresult, true));
             $countdelete = 0;
             $resultcount = 0;
@@ -294,14 +294,11 @@ class RateEngine
 
 		$LCtype = $result[0][1];
 
-		// Thanks for the fix from the wiki :D next time email me, lol
-		if ($LCtype==0) {
-			//$result = $this -> array_csort($result,'6',SORT_ASC); GOTTYA!
-			$result = $this -> array_csort($result,'9',SORT_ASC); //1
-		} else {
-			//$result = $this -> array_csort($result,'9',SORT_ASC); GOTTYA!
-			$result = $this -> array_csort($result,'12',SORT_ASC); //1
+		foreach ($result as $key => $row) {
+		    $strprefix[$key]  = (is_numeric($row[7]))?0:($row[12]<100)?strlen($row[7]):0;
+		    $lcrsort[$key] = ($LCtype==0)?$row[9]:$row[12];
 		}
+		array_multisort($strprefix, SORT_DESC, $lcrsort, $result);
 		
 		// WE ADD THE DEFAULTPREFIX WE REMOVE BEFORE
 		if ($ind_stop_default > 0) {

@@ -94,6 +94,7 @@ if ($called  && ($id_cc_card > 0 || $username > 0)) {
 			$A2B ->agiconfig['accountcode'] = $A2B -> cardnumber ;
 			$A2B ->agiconfig['use_dnid']=1;
 			$A2B ->agiconfig['say_timetocall']=0;						
+			$A2B ->agiconfig['lcr_mode']=1;
 			$A2B ->dnid = $A2B ->destination = $calling;
 			
 			if ($A2B->removeinterprefix) $A2B->destination = $A2B -> apply_rules ($A2B->destination);			
