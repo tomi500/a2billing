@@ -216,8 +216,8 @@ class RateEngine
             $myresult = $result;
             $mysearchvalue = array();
             if ($this->webui) $A2B -> debug( DEBUG, $agi, __FILE__, __LINE__, "[rate-engine: MYRESULT before sort \n".print_r($myresult, true));
-            // 3 - tariff plan, 7 - dialprefix
-            $myresult = $this -> array_csort($myresult,'3',SORT_NUMERIC,'7',SORT_NUMERIC,SORT_DESC);
+            // 3 - tariff plan, 5 - dialprefix
+            $myresult = $this -> array_csort($myresult,'3',SORT_NUMERIC,'5',SORT_NUMERIC,SORT_DESC);
             if ($this->webui) $A2B -> debug( DEBUG, $agi, __FILE__, __LINE__, "[rate-engine: MYRESULT  after sort \n".print_r($myresult, true));
             $countdelete = 0;
             $resultcount = 0;
