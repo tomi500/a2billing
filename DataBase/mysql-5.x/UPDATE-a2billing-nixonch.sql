@@ -54,13 +54,6 @@ ALTER TABLE cc_sip_buddies
 
 ALTER TABLE cc_trunk CHANGE removeprefix removeprefix CHAR( 30 ) CHARACTER SET utf8 COLLATE utf8_bin NULL DEFAULT NULL;
 
-INSERT INTO cc_config (id, config_title, config_key, config_value, config_description, config_valuetype, config_listvalues, config_group_title)
-    VALUES (NULL, 'System startup time', 'startup_time', '0', 'Numbers in seconds since 1970-01-01 (Unix epoch)', 0, NULL, 'global');
-INSERT INTO cc_config (id, config_title, config_key, config_value, config_description, config_valuetype, config_listvalues, config_group_title)
-    VALUES (NULL, 'Conversion MixMonitor to Monitor', 'monitor_conversion', '0', 'Use Asterisk command Monitor instead MixMonitor to right sync in/out channels', '1', 'yes,no', 'webui');
-INSERT INTO cc_config (id, config_title, config_key, config_value, config_description, config_valuetype, config_listvalues, config_group_title)
-    VALUES (NULL , 'Time Zone', 'date_timezone', 'Europe/Moscow', 'Defines the default timezone used by the date functions, eg Europe/Kiev', '0', NULL , 'global');
-
 ALTER TABLE cc_iax_buddies ADD forceencryption varchar(20) COLLATE utf8_bin NOT NULL;
 
 ALTER TABLE cc_call ADD card_caller BIGINT( 20 ) NOT NULL AFTER `card_id`;
@@ -73,3 +66,68 @@ ALTER TABLE cc_did_destination ADD playsound VARCHAR( 100 ) CHARACTER SET utf8 C
 
 ALTER TABLE cc_did ADD id_trunk INT( 11 ) NOT NULL DEFAULT '-1';
 ALTER TABLE cc_did ADD allciduse INT( 11 ) NOT NULL DEFAULT '0';
+
+drop procedure if exists a2b_trf_check;
+
+delimiter //
+
+create procedure a2b_trf_check()
+begin
+    declare a int;
+    select count(*) into a from cc_config where config_key='date_timezone';
+    if a=0 then
+	INSERT INTO cc_config (id, config_title, config_key, config_value, config_description, config_valuetype, config_listvalues, config_group_title)
+	VALUES (NULL , 'Time Zone', 'date_timezone', 'Europe/Moscow', 'Defines the default timezone used by the date functions, eg Europe/Kiev', '0', NULL , 'global');
+    elseif a>1 then
+	select id into a from cc_config where config_key='date_timezone' order by id limit 0,1;
+	delete from cc_config where config_key='date_timezone' and id>a;
+    end if;
+end //
+
+delimiter ;
+
+call a2b_trf_check;
+
+drop procedure if exists a2b_trf_check;
+
+delimiter //
+
+create procedure a2b_trf_check()
+begin
+    declare a int;
+    select count(*) into a from cc_config where config_key='monitor_conversion';
+    if a=0 then
+	INSERT INTO cc_config (id, config_title, config_key, config_value, config_description, config_valuetype, config_listvalues, config_group_title)
+	VALUES (NULL, 'Conversion MixMonitor to Monitor', 'monitor_conversion', '0', 'Use Asterisk command Monitor instead MixMonitor to right sync in/out channels', '1', 'yes,no', 'webui');
+    elseif a>1 then
+	select id into a from cc_config where config_key='monitor_conversion' order by id limit 0,1;
+	delete from cc_config where config_key='monitor_conversion' and id>a;
+    end if;
+end //
+
+delimiter ;
+
+call a2b_trf_check;
+
+drop procedure if exists a2b_trf_check;
+
+delimiter //
+
+create procedure a2b_trf_check()
+begin
+    declare a int;
+    select count(*) into a from cc_config where config_key='startup_time';
+    if a=0 then
+	INSERT INTO cc_config (id, config_title, config_key, config_value, config_description, config_valuetype, config_listvalues, config_group_title)
+	VALUES (NULL, 'System startup time', 'startup_time', '0', 'Numbers in seconds since 1970-01-01 (Unix epoch)', 0, NULL, 'global');
+    elseif a>1 then
+	select id into a from cc_config where config_key='startup_time' order by id limit 0,1;
+	delete from cc_config where config_key='startup_time' and id>a;
+    end if;
+end //
+
+delimiter ;
+
+call a2b_trf_check;
+
+drop procedure if exists a2b_trf_check;
