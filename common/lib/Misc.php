@@ -281,7 +281,7 @@ function sanitize_data($input) {
 		$input = str_ireplace('SCRIPT', '', $input);
 		$input = str_ireplace('ROW_COUNT', '', $input);
 		$input = str_ireplace('SELECT', '', $input);
-		$input = str_ireplace('UPDATE', '', $input);
+		#$input = str_ireplace('UPDATE', '', $input);
 		#$input = str_ireplace('DELETE', '', $input);
 		
 		if (!(stripos($input, ' or 1') === FALSE)) {
