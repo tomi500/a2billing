@@ -199,7 +199,7 @@ function plot_graph_refills(data,max){
 				  });
 
 	}
- $('#refills_count').click();
+ $('#refills_amount').click();
  
    function showTooltip(x, y, contents) {
         $('<div id="tooltip">' + contents + '</div>').css( {

@@ -148,7 +148,7 @@ $smarty->display('header.tpl');
 	<table width="100%" cellspacing="6">
         <tr>
 		<td class="login-title">
-			 FORGOT YOUR PASSWORD?
+			 <?php echo gettext("FORGOT YOUR PASSWORD?")?>
 		</td>
 	    </tr>
         <tr>
