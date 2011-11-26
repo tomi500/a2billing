@@ -591,6 +591,7 @@
 </div>
 
 <div id="main-content">
+	<div id="inside">
 <br/>
 {else}
 <div>

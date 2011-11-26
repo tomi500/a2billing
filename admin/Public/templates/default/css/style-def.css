@@ -38,11 +38,9 @@ table {
 
 body {
 	font-family: Arial,Verdana;
-	color: #666666;
-	background: #FCFCFC;
+	color: #666;
+	background: #F9F9F9 url(../images/baseline-bg.png);
 }
-
-
 
 .upload_textfield {
 	font-family: Arial,Verdana;

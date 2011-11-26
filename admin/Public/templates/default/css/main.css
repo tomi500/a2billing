@@ -14,12 +14,17 @@
 #main-content {
 	padding-left: 230px;
 	padding-right: 20px;
+	background: url(../images/grid-bg.png);
+}
+	
+#main-content #inside {
+	background: url(../images/baseline-bg.png);
 }
 	
 #left-sidebar {
 	width: 200px;
 	float: left;
-	padding-top: 20px;
+	padding-top: 0;
 }
 
 #menutitlesection {

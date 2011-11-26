@@ -36,32 +36,6 @@
 	<div class="toggle_menu"><li><a href="A2B_entity_voucher.php?form_action=list"><strong>{php} echo gettext("VOUCHERS");{/php}</strong></a></li></div>
 	{/if}
 
-
-	{if $ACXINVOICES >0 }
-	<div class="toggle_menu"><li>
-	<a href="javascript:;" class="toggle_menu" target="_self"> <div> <div id="menutitlebutton"> <img id="img5"
-	{if ($section == "5")}
-	src="templates/{$SKIN_NAME}/images/minus.gif"
-	{else}
-	src="templates/{$SKIN_NAME}/images/plus.gif"
-	{/if} onmouseover="this.style.cursor='hand';" ></div> <div id="menutitlesection"><strong>{php} echo gettext("INVOICES");{/php}</strong></div></div></a></li></div>
-		<div class="tohide"
-	{if ($section =="5")}
-		style="">
-	{else}
-	style="display:none;">
-	{/if}
-	<ul>
-		<li><ul>
-				<li><a href="A2B_entity_receipt.php?section=5"><strong>{php} echo gettext("View Receipts");{/php}</strong></a></li>
-				<li><a href="A2B_entity_invoice.php?section=5"><strong>{php} echo gettext("View Invoices");{/php}</strong></a></li>
-				<li><a href="A2B_billing_preview.php?section=5"><strong>{php} echo gettext("Preview Next Billing");{/php}</strong></a></li>
-		</ul></li>
-	</ul>
-	</div>
-	{/if}
-
-
 	{if $ACXDID >0 }
 	<div class="toggle_menu"><li><a href="A2B_entity_did.php?form_action=list"><strong>{php} echo gettext("DID");{/php}</strong></a></li></div>
 	{/if}
@@ -97,7 +71,31 @@
 	{if $ACXNOTIFICATION >0 }
 	<div class="toggle_menu"><li><a href="A2B_notification.php?form_action=ask-edit"><strong>{php} echo gettext("NOTIFICATION");{/php}</strong></a></li></div>
 	{/if}
-	
+
+	{if $ACXINVOICES >0 }
+	<div class="toggle_menu"><li>
+	<a href="javascript:;" class="toggle_menu" target="_self"> <div> <div id="menutitlebutton"> <img id="img5"
+	{if ($section == "5")}
+	src="templates/{$SKIN_NAME}/images/minus.gif"
+	{else}
+	src="templates/{$SKIN_NAME}/images/plus.gif"
+	{/if} onmouseover="this.style.cursor='hand';" ></div> <div id="menutitlesection"><strong>{php} echo gettext("INVOICES");{/php}</strong></div></div></a></li></div>
+		<div class="tohide"
+	{if ($section =="5")}
+		style="">
+	{else}
+	style="display:none;">
+	{/if}
+	<ul>
+		<li><ul>
+				<li><a href="A2B_entity_receipt.php?section=5"><strong>{php} echo gettext("View Receipts");{/php}</strong></a></li>
+				<li><a href="A2B_entity_invoice.php?section=5"><strong>{php} echo gettext("View Invoices");{/php}</strong></a></li>
+				<li><a href="A2B_billing_preview.php?section=5"><strong>{php} echo gettext("Preview Next Billing");{/php}</strong></a></li>
+		</ul></li>
+	</ul>
+	</div>
+	{/if}
+
 	{if $ACXAUTODIALER>0 }
 	<div class="toggle_menu"><li>
 	<a href="javascript:;" class="toggle_menu" target="_self"> <div> <div id="menutitlebutton"> <img id="img10"
@@ -167,6 +165,7 @@
 </div>
 
 <div id="main-content">
+	<div id="inside">
 <br/>
 {else}
 <div>
