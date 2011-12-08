@@ -1562,6 +1562,7 @@ class RateEngine
 					//Uncomment this line if you want to save the outbound_cid in the CDR
 					//$A2B -> CallerID = $outcid;
 					if ($agi) {
+					    $calleridname = $agi -> get_variable('CALLERID(name)', true);
 					    $agi -> set_callerid($outcid);
 					    $agi -> set_variable('CALLERID(ani)', $outcid);
 					    $A2B -> debug( DEBUG, $agi, __FILE__, __LINE__, "[EXEC SetCallerID : $outcid]");
@@ -1619,6 +1620,7 @@ class RateEngine
 					$outcid = 0;
 					$agi -> set_callerid($A2B -> CallerID);
 					$agi -> set_variable('CALLERID(ani)', $A2B -> CallerID);
+					$agi -> set_variable('CALLERID(name)', $calleridname);
 				}
 
 				// Count this call on the trunk

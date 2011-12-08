@@ -1403,6 +1403,8 @@ if (!defined('MONITOR_PATH')) define ("MONITOR_PATH",	isset($this->config['webui
 						return 1;
 					}
 
+					if ($dialstatus == "CANCEL") return 1;
+
 				// ELSEIF NOT VOIP CALL
 				} else {
 
@@ -1657,7 +1659,8 @@ if (!defined('MONITOR_PATH')) define ("MONITOR_PATH",	isset($this->config['webui
 
 	                    $result = $this -> instance_table -> SQLExec ($this->DBHandle, $QUERY, 0);
 	                    $this -> debug( INFO, $agi, __FILE__, __LINE__, "[DID CALL - LOG CC_CALL: SQL: $QUERY]:[result:$result]");
-	                    
+
+	                    if ($dialstatus == "CANCEL") return 1;
                     } else {
                     	//CALL2DID CDR is not free
                         $cost = ($answeredtime/60) * abs($selling_rate) + abs($connection_charge);
