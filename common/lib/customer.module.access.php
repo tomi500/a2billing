@@ -204,6 +204,7 @@ $ACXSUPPORT 				= has_rights (ACX_SUPPORT);
 $ACXNOTIFICATION 			= has_rights (ACX_NOTIFICATION);
 $ACXAUTODIALER 				= has_rights (ACX_AUTODIALER);
 $ACXSEERECORDING 			= has_rights (ACX_SEERECORDING);
+$ACX_PERSONALINFO 			= has_rights (ACX_PERSONALINFO);
 
 if (ACT_VOICEMAIL) {
     $ACXVOICEMAIL 				= $_SESSION["voicemail"];
