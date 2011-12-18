@@ -216,8 +216,13 @@ class RateEngine
             $myresult = $result;
             $mysearchvalue = array();
             if ($this->webui) $A2B -> debug( DEBUG, $agi, __FILE__, __LINE__, "[rate-engine: MYRESULT before sort \n".print_r($myresult, true));
-            // 3 - tariff plan, 5 - dialprefix
-            $myresult = $this -> array_csort($myresult,'3',SORT_NUMERIC,'5',SORT_NUMERIC,SORT_DESC);
+            // 3 - tariff plan, 7 - dialprefix, 12 - rateinitial
+            foreach ($myresult as $key => $row) {
+                $sorttariffplan[$key]    = $row[3];
+                $sortdialprefixstr[$key] = (ctype_digit($row[7]))?1:(($row[12]<100)?strlen($row[7]):0);
+                $sortdialprefixnum[$key] = $row[7];
+            }
+            array_multisort($sorttariffplan,SORT_NUMERIC,$sortdialprefixstr,SORT_NUMERIC,SORT_DESC,$sortdialprefixnum,SORT_NUMERIC,SORT_DESC,$myresult);
             if ($this->webui) $A2B -> debug( DEBUG, $agi, __FILE__, __LINE__, "[rate-engine: MYRESULT  after sort \n".print_r($myresult, true));
             $countdelete = 0;
             $resultcount = 0;
@@ -295,7 +300,7 @@ class RateEngine
 		$LCtype = $result[0][1];
 
 		foreach ($result as $key => $row) {
-		    $strprefix[$key]  = (is_numeric($row[7]))?0:($row[12]<100)?strlen($row[7]):0;
+		    $strprefix[$key]  = (ctype_digit($row[7]))?0:(($row[12]<100)?strlen($row[7]):0);
 		    $lcrsort[$key] = ($LCtype==0)?$row[9]:$row[12];
 		}
 		array_multisort($strprefix, SORT_DESC, $lcrsort, $result);
