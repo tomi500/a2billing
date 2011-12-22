@@ -6,6 +6,6 @@
 .gitconfig
 /update.sh
 #/addons/sounds
-admin/Public/templates/default/footer.tpl
-admin/Public/templates/default/index.tpl
-customer/templates/default/index.tpl
+/admin/Public/templates/default/footer.tpl
+/admin/Public/templates/default/index.tpl
+/customer/templates/default/index.tpl

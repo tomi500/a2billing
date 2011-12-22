@@ -294,8 +294,8 @@ class RateEngine
         }
 		
 		//2) TAKE THE VALUE OF LCTYPE
-		//LCR : According to the buyer price	-0 	buyrate [col 6]
-		//LCD : According to the seller price	-1  rateinitial	[col 9]
+		//LCR : According to the buyer price	-0 	buyrate [col 9]
+		//LCD : According to the seller price	-1  rateinitial	[col 12]
 
 		$LCtype = $result[0][1];
 
