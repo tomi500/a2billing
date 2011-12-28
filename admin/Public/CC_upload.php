@@ -69,7 +69,7 @@ $file_size_ind = MY_MAX_FILE_SIZE_AUDIO;
 # upload_max_filesize = 8M
 
 # the images directory
-$dir_img = "images";
+$dir_img = "templates/default/images";
 
 // -------------------------------- //
 //     SCRIPT UNDER THIS LINE!      //
