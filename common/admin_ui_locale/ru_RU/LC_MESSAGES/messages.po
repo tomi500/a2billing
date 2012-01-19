@@ -4036,7 +4036,7 @@ msgstr ""
 
 #: Public/form_data/FG_var_did.inc:123
 msgid "You can associate trunk for selective routing incoming calls through that DID. View word of word help for parameter 'RECALL DAYS' in customer account."
-msgstr "Нужно ассоциировать с транком для корректной работы функции возврата звонков через этот DID. Не забудьте установить параметр 'RECALL DAYS' в настройках аккаунта абонента."
+msgstr "Нужно ассоциировать с транком для корректной работы функции возврата звонков через этот DID. Не забудьте установить параметр 'OTЗBOH' в настройках аккаунта абонента."
 
 #: Public/form_data/FG_var_did.inc:132
 msgid "Allow for all active CallerIDs at system to use that DID for direct access (DISA), rather than just for active CallerIDs of customer."

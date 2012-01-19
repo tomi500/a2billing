@@ -195,8 +195,8 @@ $arr_ratecard=array('tariffgroupname', 'lcrtype', 'idtariffgroup', 'cc_tariffgro
 		 'connectcharge', 'disconnectcharge','disconnectcharge_after', 'stepchargea', 'chargea', 
 		'timechargea', 'billingblocka', 'stepchargeb', 'chargeb', 'timechargeb', 
 		'billingblockb', 'stepchargec', 'chargec', 'timechargec', 'billingblockc', 
-		'tp_id_trunk', 'tp_trunk', 'providertech', 'tp_providerip', 'tp_removeprefix');
-$arr_ratecard_i=array(0,1,2,3,4, 6,7,8,9,   10,11,12,13,14, 15,16,60,17,18,  19,20,21,22,23,  24,25,26,27,28, 29,30,31,32,33);
+		'rc_trunkcode', 'rc_id_trunk', 'rc_providertech', 'rc_providerip', 'rc_trunkprefix', 'rc_removeprefix');
+$arr_ratecard_i=array(0,1,2,3,4, 6,7,8,9,   10,11,12,13,14, 15,16,60,17,18,  19,20,21,22,23,  24,25,26,27,28, 81,34,36,37,35,38);
 $FG_TABLE_ALTERNATE_ROW_COLOR[0]='#CDC9C9';
 $FG_TABLE_ALTERNATE_ROW_COLOR[1]='#EEE9E9';
 ?>

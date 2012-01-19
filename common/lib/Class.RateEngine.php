@@ -158,7 +158,7 @@ class RateEngine
 		cc_ratecard.additional_grace AS additional_grace, cc_ratecard.minimal_cost AS minimal_cost,disconnectcharge_after,announce_time_correction, rt_trunk.dialprefixmain,
 	rt_trunk.perioda, rt_trunk.maxsecperperioda, rt_trunk.periodcounta, UNIX_TIMESTAMP(rt_trunk.periodexpirya), rt_trunk.failover_trunka, UNIX_TIMESTAMP(rt_trunk.startdatea), UNIX_TIMESTAMP(rt_trunk.stopdatea), rt_trunk.timelefta,
 	rt_trunk.periodb, rt_trunk.maxsecperperiodb, rt_trunk.periodcountb, UNIX_TIMESTAMP(rt_trunk.periodexpiryb), rt_trunk.failover_trunkb, UNIX_TIMESTAMP(rt_trunk.startdateb), UNIX_TIMESTAMP(rt_trunk.stopdateb), rt_trunk.timeleftb,
-	tp_trunk.outbound_cidgroup_id, rt_trunk.outbound_cidgroup_id
+	tp_trunk.outbound_cidgroup_id, rt_trunk.outbound_cidgroup_id, rt_trunk.trunkcode
 
 		FROM cc_tariffgroup
 		RIGHT JOIN cc_tariffgroup_plan ON cc_tariffgroup_plan.idtariffgroup=cc_tariffgroup.id
