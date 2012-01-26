@@ -1080,15 +1080,14 @@ if ($mode == 'standard') {
 					    $exten = $A2B -> config["callback"]['extension'];
 					    $variable = $MODE_VAR.$sep."IDCONF=$idconfig".$sep;
 					}
-					if (!$CALLING_VAR && $exten) $CALLING_VAR = "CALLING=".$exten;
 					if ($argc > 4 && strlen($argv[4]) > 0) $exten = $argv[4];
+					if (!$CALLING_VAR && $exten) $CALLING_VAR = "CALLING=".$exten;
 					$context = $A2B -> config["callback"]['context_callback'];
 					$id_server_group = $A2B -> config["callback"]['id_server_group'];
 					$priority = 1;
 					$timeout = $A2B -> config["callback"]['timeout']*1000;
-					//$callerid = $A2B -> config["callback"]['callerid'];
 					if ($channeloutcid[1]) $callerid = $channeloutcid[1];
-					else $callerid =  $A2B -> CallerID;
+					else $callerid = $A2B -> config["callback"]['callerid'];
 					$application = '';
 					$account = $A2B -> accountcode;
 					$uniqueid = MDP_NUMERIC(5).'-'.MDP_STRING(7);
@@ -1198,15 +1197,14 @@ if ($mode == 'standard') {
 					$id_server_group = $A2B -> config["callback"]['id_server_group'];
 					$priority = 1;
 					$timeout = $A2B -> config["callback"]['timeout']*1000;
-					//$callerid = $A2B -> config["callback"]['callerid'];
 					if ($channeloutcid[1]) $callerid = $channeloutcid[1];
-					else $callerid =  $A2B -> CallerID;
+					else $callerid = $A2B -> config["callback"]['callerid'];
 					$application = '';
 					$account = $A2B -> accountcode;
 
 					$uniqueid = MDP_NUMERIC(5).'-'.MDP_STRING(7);
 					
-					$variable .= "CALLED=".$A2B ->destination.$sep."MODE=ALL".$sep."CBID=$uniqueid".$sep."TARIFF=".$A2B ->tariff.$sep."LEG=".$A2B -> username.$sep."TRUNK=".$channeloutcid[2].$sep."TD=".$channeloutcid[3];
+					$variable .= "CALLED=".$A2B ->destination.$sep."CALLING=".$exten.$sep."MODE=ALL".$sep."CBID=$uniqueid".$sep."TARIFF=".$A2B ->tariff.$sep."LEG=".$A2B -> username.$sep."TRUNK=".$channeloutcid[2].$sep."TD=".$channeloutcid[3];
 					
 					$status = 'PENDING';
 					$server_ip = 'localhost';
@@ -1284,19 +1282,18 @@ if ($mode == 'standard') {
 
 	// |MODEFROM=ALL-CALLBACK|TARIFF=".$A2B ->tariff;
 	$A2B -> extension = $A2B -> dnid = $A2B -> destination = $calling_party;
+	$A2B -> CallerID =  $called_party;
 
 	if ($callback_mode=='CID') {
 		$charge_callback = 1;
 		$A2B -> agiconfig['use_dnid'] = 0;
-		$A2B->CallerID = $called_party;
 
 	} elseif ($callback_mode=='CID-PROMPT') {
 		$charge_callback = 1;
 		$A2B -> agiconfig['use_dnid'] = 1;
-		$A2B->CallerID = $called_party;
 
 	} elseif ($callback_mode=='ALL') {
-		$A2B -> agiconfig['use_dnid'] = 0;
+		$A2B -> agiconfig['use_dnid'] = ($calling_party)?1:0;
 		$A2B -> agiconfig['cid_enable'] = 0;
 
 	} else {
@@ -1358,6 +1355,8 @@ if ($mode == 'standard') {
 
 			if ($A2B-> callingcard_ivr_authorize($agi, $RateEngine, $i)==1) {
 				// PERFORM THE CALL
+				$agi -> set_callerid($called_party);
+				$agi -> set_variable('CALLERID(name)', $A2B -> config["callback"]['callerid']);
 				$result_callperf = $RateEngine->rate_engine_performcall ($agi, $A2B-> destination, $A2B);
 				if (!$result_callperf) {
 					$prompt="prepaid-dest-unreachable";
@@ -1768,6 +1767,7 @@ if ($charge_callback) {
 				$RateEngine -> dialstatus = 'ANSWERED';
 				$A2B -> debug( INFO, $agi, __FILE__, __LINE__, "[CALLBACK]:[RateEngine -> answeredtime=".$RateEngine -> answeredtime."]");
 				
+				$A2B -> CallerID =  $A2B -> config["callback"]['callerid'];
 				//(ST) replace above code with the code below to store CDR for all callbacks and to only charge for the callback if requested
 				if ($callback_been_connected==1 || ($A2B -> agiconfig['callback_bill_1stleg_ifcall_notconnected']==1) )  { 
 					//(ST) this is called if we need to bill the user

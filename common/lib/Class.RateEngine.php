@@ -1625,7 +1625,6 @@ class RateEngine
 					$outcid = 0;
 					$agi -> set_callerid($A2B -> CallerID);
 					$agi -> set_variable('CALLERID(ani)', $A2B -> CallerID);
-					$agi -> set_variable('CALLERID(name)', $calleridname);
 				}
 
 				// Count this call on the trunk
