@@ -1158,9 +1158,16 @@ if ($mode == 'standard') {
 	$A2B ->credit = 1000;
 	$A2B ->tariff = $A2B -> config["callback"]['all_callback_tariff'];
 
+	// MAKE THE AUTHENTICATION ACCORDING TO THE CALLERID
+	$A2B -> agiconfig['cid_enable']=0;
+	$A2B -> agiconfig['cid_askpincode_ifnot_callerid']=0;
+	$A2B -> agiconfig['say_balance_after_auth']=0;
+
 	if (strlen($A2B->CallerID)>1 && is_numeric($A2B->CallerID)) {
-		
+
 		/* WE START ;) */
+		$cia_res = $A2B -> callingcard_ivr_authenticate($agi,$cid_1st_leg_tariff_id);
+		$A2B -> debug( DEBUG, $agi, __FILE__, __LINE__, "[TRY : callingcard_ivr_authenticate]");
 		if ($cia_res==0) {
 
 			$RateEngine = new RateEngine();

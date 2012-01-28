@@ -5,7 +5,7 @@
 *devserver*
 .gitconfig
 /update.sh
-#/addons/sounds
+/addons/sounds
 /admin/Public/templates/default/footer.tpl
 /admin/Public/templates/default/index.tpl
 /customer/templates/default/index.tpl
