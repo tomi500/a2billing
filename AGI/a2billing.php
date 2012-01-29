@@ -1360,7 +1360,8 @@ if ($mode == 'standard') {
 				$A2B -> debug( DEBUG, $agi, __FILE__, __LINE__, "[CALLBACK]:[STOP STREAM FILE $prompt]");
 			}
 
-			if ($A2B-> callingcard_ivr_authorize($agi, $RateEngine, $i)==1) {
+			$ans = $A2B -> callingcard_ivr_authorize($agi, $RateEngine, $i, true);
+			if ($ans==1) {
 				// PERFORM THE CALL
 				$agi -> set_callerid($called_party);
 				$agi -> set_variable('CALLERID(name)', $A2B -> config["callback"]['callerid']);
@@ -1383,6 +1384,32 @@ if ($mode == 'standard') {
 				}
 				
 				$A2B -> debug( DEBUG, $agi, __FILE__, __LINE__, "[CALLBACK]:[a2billing end loop num_try] RateEngine->usedratecard=".$RateEngine->usedratecard);
+			} elseif ($ans=="2DID") {
+
+				$A2B -> debug( INFO, $agi, __FILE__, __LINE__, "[ CALL OF THE SYSTEM - [DID=".$A2B-> destination."]");
+				
+				$QUERY = "SELECT cc_did.id, cc_did_destination.id, billingtype, tariff, destination, voip_call, username, useralias, connection_charge, selling_rate, did, ".
+					" aleg_carrier_connect_charge, aleg_carrier_cost_min, aleg_retail_connect_charge, aleg_retail_cost_min, ".
+					" aleg_carrier_initblock, aleg_carrier_increment, aleg_retail_initblock, aleg_retail_increment, ".
+					" aleg_timeinterval, ".
+					" aleg_carrier_connect_charge_offp, aleg_carrier_cost_min_offp, aleg_retail_connect_charge_offp, aleg_retail_cost_min_offp, ".
+					" aleg_carrier_initblock_offp, aleg_carrier_increment_offp, aleg_retail_initblock_offp, aleg_retail_increment_offp, ".
+					" cc_card.id, playsound ".
+					" FROM cc_did, cc_did_destination, cc_card ".
+					" WHERE id_cc_did=cc_did.id AND cc_card.status=1 AND cc_card.id=id_cc_card and cc_did_destination.activated=1 AND cc_did.activated=1 AND did='".$A2B-> destination."' ".
+					" AND cc_did.startingdate <= CURRENT_TIMESTAMP AND (cc_did.expirationdate > CURRENT_TIMESTAMP OR cc_did.expirationdate IS NULL ".
+					" AND cc_did_destination.validated = 1 ";
+				if ($A2B->config["database"]['dbtype'] == "mysql") {
+					$QUERY .= " OR cc_did.expirationdate = '0000-00-00 00:00:00'";
+				}
+				$QUERY .= ") ORDER BY priority ASC";
+
+				$A2B -> debug( DEBUG, $agi, __FILE__, __LINE__, $QUERY);
+				$result = $A2B -> instance_table -> SQLExec ($A2B->DBHandle, $QUERY);
+				if (is_array($result)) {
+					$A2B -> call_2did($agi, $RateEngine, $result);
+					if ($A2B->set_inuse==1) $A2B -> callingcard_acct_start_inuse($agi,0);
+				}
 			}
 		}//END FOR
 
