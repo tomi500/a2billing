@@ -745,6 +745,10 @@ if ($mode == 'standard') {
 					$result_callperf = $RateEngine->rate_engine_performcall ($agi, $A2B-> destination, $A2B);
 
 					if (!$result_callperf) {
+						if (!$A2B -> agiconfig['answer_call']) {
+							$agi -> exec('Progress');
+							usleep(200000);
+						}
 						$prompt="prepaid-dest-unreachable";
 						$agi -> stream_file($prompt, '#');
 					}
@@ -843,6 +847,10 @@ if ($mode == 'standard') {
 					$result_callperf = $RateEngine->rate_engine_performcall($agi, $A2B -> destination, $A2B);
 
 					if (!$result_callperf) {
+						if (!$A2B -> agiconfig['answer_call']) {
+							$agi -> exec('Progress');
+							usleep(200000);
+						}
 						$prompt="prepaid-dest-unreachable";
 						$agi-> stream_file($prompt, '#');
 					}
@@ -1360,11 +1368,11 @@ if ($mode == 'standard') {
 				$A2B -> debug( DEBUG, $agi, __FILE__, __LINE__, "[CALLBACK]:[STOP STREAM FILE $prompt]");
 			}
 
+			$agi -> set_callerid($called_party);
+			$agi -> set_variable('CALLERID(name)', $A2B -> config["callback"]['callerid']);
 			$ans = $A2B -> callingcard_ivr_authorize($agi, $RateEngine, $i, true);
 			if ($ans==1) {
 				// PERFORM THE CALL
-				$agi -> set_callerid($called_party);
-				$agi -> set_variable('CALLERID(name)', $A2B -> config["callback"]['callerid']);
 				$result_callperf = $RateEngine->rate_engine_performcall ($agi, $A2B-> destination, $A2B);
 				if (!$result_callperf) {
 					$prompt="prepaid-dest-unreachable";

@@ -1480,18 +1480,18 @@ if (!defined('MONITOR_PATH')) define ("MONITOR_PATH",	isset($this->config['webui
         $selling_rate = $listdestination[0][9];
         
         if ($connection_charge == 0 && $selling_rate == 0) {
-        	$call_did_free = true;
-			$this -> debug( INFO, $agi, __FILE__, __LINE__, "[A2Billing] DID call free ");
-		} else {
-			$call_did_free = false;
-			$this -> debug( INFO, $agi, __FILE__, __LINE__, "[A2Billing] DID call not free: (connection charge:".$connection_charge."|selling_rate:".$selling_rate );
-		}
-		
-		if (($listdestination[0][2]==0) || ($listdestination[0][2]==2)) {
-			$doibill = 1;
-		} else {
-			$doibill = 0;
-		}
+    	$call_did_free = true;
+		$this -> debug( INFO, $agi, __FILE__, __LINE__, "[A2Billing] DID call free ");
+	} else {
+		$call_did_free = false;
+		$this -> debug( INFO, $agi, __FILE__, __LINE__, "[A2Billing] DID call not free: (connection charge:".$connection_charge."|selling_rate:".$selling_rate );
+	}
+	
+	if (($listdestination[0][2]==0) || ($listdestination[0][2]==2)) {
+		$doibill = 1;
+	} else {
+		$doibill = 0;
+	}
 		
         if (!$call_did_free) {
 			
@@ -1523,30 +1523,34 @@ if (!defined('MONITOR_PATH')) define ("MONITOR_PATH",	isset($this->config['webui
         }
         
         $this->timeout = $time2call;
-		$callcount = 0;
-		$accountcode = $this->accountcode;
-		$username = $this->username;
-		$useralias = $this->useralias;
-		$set_inuse = $this->set_inuse;
-		$my_id_card = $this->id_card;
+	$callcount = 0;
+	$accountcode = $this->accountcode;
+	$username = $this->username;
+	$useralias = $this->useralias;
+	$set_inuse = $this->set_inuse;
+	$my_id_card = $this->id_card;
 		
-		foreach ($listdestination as $inst_listdestination) {
-			
-			$callcount++;
-			$this -> debug( INFO, $agi, __FILE__, __LINE__, "[A2Billing] DID call friend: FOLLOWME=$callcount (cardnumber:".$inst_listdestination[6]."|destination:".$inst_listdestination[4]."|tariff:".$inst_listdestination[3].")\n");
+	foreach ($listdestination as $inst_listdestination) {
 
-			$this->agiconfig['cid_enable']	= 0;
-			$this->accountcode=$this->username=$new_username= $inst_listdestination[6];
-			$this->tariff 					= $inst_listdestination[3];
-			$this->destination 				= $inst_listdestination[10];
-//			$new_username 				    = $inst_listdestination[6];
-			$this->useralias 				= $inst_listdestination[7];
-			$this->id_card					= $inst_listdestination[28];
-			
-            // CHECK IF DESTINATION IS SET
-            if (strlen($inst_listdestination[4])==0)
+	    $callcount++;
+	    $this -> debug( INFO, $agi, __FILE__, __LINE__, "[A2Billing] DID call friend: FOLLOWME=$callcount (cardnumber:".$inst_listdestination[6]."|destination:".$inst_listdestination[4]."|tariff:".$inst_listdestination[3].")\n");
+	    $this->agiconfig['cid_enable']			= 0;
+	    $this->accountcode= $this->username = $new_username = $inst_listdestination[6];
+	    $this->tariff 					= $inst_listdestination[3];
+	    $this->destination					= $inst_listdestination[10];
+//	    $new_username					= $inst_listdestination[6];
+	    $this->useralias					= $inst_listdestination[7];
+	    $this->id_card					= $inst_listdestination[28];
+
+	    // CHECK IF DESTINATION IS SET
+	    if (strlen($inst_listdestination[4])==0)
             	continue;
+
 	    if ($inst_listdestination[29]) {
+		if (!$A2B -> agiconfig['answer_call']) {
+			$agi -> exec('Progress');
+			usleep(200000);
+		}
 		$agi -> evaluate("STREAM FILE $inst_listdestination[29] \"#\" 0");
 	    }
 
@@ -1700,8 +1704,6 @@ if (!defined('MONITOR_PATH')) define ("MONITOR_PATH",	isset($this->config['webui
                     #This is a call from user to DID
                     #we will change the B-Leb using the did bill_did_aleg function
                     $this -> bill_did_aleg ($agi, $listdestination[0], $answeredtime);
-                    
-//                }
 
             // ELSEIF NOT VOIP CALL
             } else {
