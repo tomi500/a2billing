@@ -260,7 +260,7 @@ $HD_Form -> AddEditElement (gettext("variable"),
 	"variable",
 	'$value',
 	"INPUT",
-	"size=80 maxlength=300",
+	"size=120 maxlength=300",
 	"11",
 	gettext("Insert the variable"),
 	"" , "", "",	"", "", "", "NO", gettext("Callback info for Asterisk (variable list to transfer to the channel) var1=23|var2=24|var3=25") );

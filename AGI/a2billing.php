@@ -1295,6 +1295,9 @@ if ($mode == 'standard') {
 	$callback_uniqueid = $agi -> get_variable("CBID", true);
 	$callback_leg = $agi -> get_variable("LEG", true);
 
+	$QUERY = "UPDATE cc_trunk SET inuse=inuse+1 WHERE id_trunk=".$callback_usedtrunk;
+	$res = $A2B -> DBHandle -> Execute($QUERY);
+
 	// |MODEFROM=ALL-CALLBACK|TARIFF=".$A2B ->tariff;
 	$A2B -> extension = $A2B -> dnid = $A2B -> destination = $calling_party;
 	$A2B -> CallerID =  $called_party;
@@ -1320,9 +1323,9 @@ if ($mode == 'standard') {
 		$A2B -> agiconfig['say_timetocall'] = 0;
 	}
 
-    if ($A2B -> agiconfig['callback_beep_to_enter_destination'] == 1) {
-        $A2B -> callback_beep_to_enter_destination = True;
-    }
+	if ($A2B -> agiconfig['callback_beep_to_enter_destination'] == 1) {
+	    $A2B -> callback_beep_to_enter_destination = True;
+	}
 
 	$A2B -> debug( INFO, $agi, __FILE__, __LINE__, "[CALLBACK]:[GET VARIABLE : CALLED=$called_party | CALLING=$calling_party | MODE=$callback_mode | TARIFF=$callback_tariff | CBID=$callback_uniqueid | LEG=$callback_leg]");
 	
@@ -1428,6 +1431,9 @@ if ($mode == 'standard') {
 	} else {
 		$A2B -> debug( DEBUG, $agi, __FILE__, __LINE__, "[CALLBACK]:[AUTHENTICATION FAILED (cia_res:".$cia_res.")]");
 	}
+	$QUERY = "UPDATE cc_trunk SET inuse=inuse-1 WHERE id_trunk=".$callback_usedtrunk;
+	$res = $A2B -> DBHandle -> Execute($QUERY);
+
 
 // MODE CONFERENCE MODERATOR
 } elseif ($mode == 'conference-moderator') {
