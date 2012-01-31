@@ -58,7 +58,7 @@ $smarty->display('main.tpl');
 			<img src="<?php echo KICON_PATH; ?>/stock-panel-multimedia.gif"/>
 		</td>
 		<td class="bgcolor_006" height="31" align="center">
-			<a href="CC_upload.php?section=11&acc=<?php echo $i?>"><?php echo gettext("CUSTOM THE MUSICONHOLD CLASS");?> : <b>ACC_<?php echo $i?></b></a>
+			<a href="CC_upload.php?section=16&acc=<?php echo $i?>"><?php echo gettext("CUSTOM THE MUSICONHOLD CLASS");?> : <b>ACC_<?php echo $i?></b></a>
 		</td>
 	</tr>
 	<?php  } ?>
