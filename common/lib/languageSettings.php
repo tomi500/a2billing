@@ -74,6 +74,11 @@ function SetLocalLanguage()
 			$slectedLanguage = "de_DE";
 			$charEncoding = "UTF-8";
 			break;
+		case "finnish":
+			$languageEncoding = "fi_FI.UTF-8";
+			$slectedLanguage = "fi_FI";
+			$charEncoding = "UTF-8";
+			break;
 		case "italian":
 			$languageEncoding = "it_IT.UTF-8";
 			$slectedLanguage = "it_IT";
@@ -112,17 +117,17 @@ function SetLocalLanguage()
 			$slectedLanguage = "uk_UA";
 			$charEncoding = "UTF-8";
 			break;
-        case "farsi":
-            $languageEncoding = "fa_IR.UTF-8";
-            $slectedLanguage = "fa_IR";
-            $charEncoding = "UTF-8";
-            break;
-        case "greek":
-            $languageEncoding = "el_GR.UTF-8";
-            $slectedLanguage = "el_GR";
-            $charEncoding = "UTF-8";
-            break;
-        case "indonesian":
+		case "farsi":
+			$languageEncoding = "fa_IR.UTF-8";
+			$slectedLanguage = "fa_IR";
+			$charEncoding = "UTF-8";
+			break;
+		case "greek":
+			$languageEncoding = "el_GR.UTF-8";
+			$slectedLanguage = "el_GR";
+			$charEncoding = "UTF-8";
+			break;
+		case "indonesian":
 			$languageEncoding = "id_ID.UTF-8";
 			$slectedLanguage = "id_ID";
 			$charEncoding = "UTF-8";

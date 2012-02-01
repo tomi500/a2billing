@@ -4318,7 +4318,11 @@ msgstr ""
 
 #: Public/form_data/FG_var_did_destination.inc:126
 msgid "Enter the phone number you wish to call, or the VoIP client to reach. (ie: 347894999 or SIP/jeremy@182.212.1.45). If the call is VoIP, the VoIP_Call must be set to yes."
-msgstr "Введите здесь номер, на который хотите перенаправить звонок, или SIP/IAX2/H323 пользователя (напримет: 347894999 or SIP/taras@182.212.1.45). Чтобы задать SIP/IAX2/H323 направление, нужно включить VOIP ЗВОНОК = 'Да'"
+msgstr "Введите здесь номер, на который хотите перенаправить звонок, или SIP/IAX2/H323 пользователя (напримет: 347894999 или SIP/taras@182.212.1.45). Чтобы задать SIP/IAX2/H323 направление, нужно включить VOIP ВЫЗОВ - выбрать 'Да'."
+
+#: Public/form_data/FG_var_did_destination.inc:130
+msgid "Maximum time, in seconds, that the Dial command is to wait for a channel to answer"
+msgstr "Время ожидания ответа абонента в секундах. Оставьте пустым для использования умолчания из agi-conf."
 
 #: Public/form_data/FG_var_did_destination.inc:135
 msgid "If the call is VoIP, that must be set to 'Yes'"
@@ -4357,7 +4361,7 @@ msgstr ""
 
 #: Public/form_data/FG_var_did_destination.inc:173
 msgid "VOIP_CALL"
-msgstr ""
+msgstr "VOIP ВЫЗОВ"
 
 #: Public/form_data/FG_var_did_destination.inc:179
 msgid "Choose if you want to not use the trunk and let the asterisk call directly the destination (ie, Destination : SIP/jeremy@182.212.1.45)"

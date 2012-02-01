@@ -78,7 +78,7 @@ $text['template']       = 'Malli';
 $text['language']       = 'Kieli';
 $text['submit']         = 'Valitse';
 $text['created']        = 'Luonut';
-$text['locale']         = 'en_US';
+$text['locale']         = 'fi_FI';
 $text['gen_time']       = 'on %b %d, %Y at %I:%M %p';
 
 $text['days']           = 'p&auml;iv&auml;&auml;';
