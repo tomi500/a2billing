@@ -125,6 +125,15 @@ $HD_Form -> AddEditElement (gettext("DESTINATION"),
 	gettext("Insert the DID"),
 	"", "", "", "", "", "", "", gettext("Enter the phone number you wish to call, or the VoIP client to reach. (ie: 347894999 or SIP/jeremy@182.212.1.45). If the call is VoIP, the VoIP_Call must be set to yes."));
 
+$HD_Form -> AddEditElement (gettext("TIMEOUT"),
+	"timeout",
+	'$value',
+	"INPUT",
+	"size=50 maxlength=3",
+	"22",
+	gettext("Insert max 3 digits"),
+	"", "", "", "", "", "", "", gettext("Maximum time, in seconds, that the Dial command is to wait for a channel to answer"));
+
 $HD_Form -> AddEditElement (gettext("VOIP_CALL"),
 	"voip_call",
 	'0',
@@ -198,9 +207,9 @@ $HD_Form -> AddEditElement (gettext("PLAY_SOUND"),
 
 
 if ($form_action!='ask-edit' && $form_action!='edit') {
-	$HD_Form -> FieldEditElement ('activated, destination, voip_call, id_cc_card, id_cc_did, validated, priority, answer, playsound');
+	$HD_Form -> FieldEditElement ('activated, destination, timeout, voip_call, id_cc_card, id_cc_did, validated, priority, answer, playsound');
 } else {
-	$HD_Form -> FieldEditElement ('activated, destination, voip_call, validated, priority, answer, playsound');
+	$HD_Form -> FieldEditElement ('activated, destination, timeout, voip_call, validated, priority, answer, playsound');
 }
 
 // Set the filter variables

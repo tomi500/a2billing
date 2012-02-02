@@ -63,6 +63,7 @@ ALTER TABLE cc_callerid ADD phonenumber VARCHAR( 100 ) CHARACTER SET utf8 COLLAT
 
 ALTER TABLE cc_did_destination ADD answer INT( 11 ) NOT NULL DEFAULT '0';
 ALTER TABLE cc_did_destination ADD playsound VARCHAR( 100 ) CHARACTER SET utf8 COLLATE utf8_bin NOT NULL;
+ALTER TABLE cc_did_destination ADD timeout VARCHAR( 3 ) NOT NULL ;
 
 ALTER TABLE cc_did ADD id_trunk INT( 11 ) NOT NULL DEFAULT '-1';
 ALTER TABLE cc_did ADD allciduse INT( 11 ) NOT NULL DEFAULT '0';

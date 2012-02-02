@@ -146,6 +146,15 @@ if (isset($form_action) && ($form_action=='ask-edit')) {
 	    "" , "", "", "", "" , "", "", gettext("Enter here the phonenumber you wish to call or the SIP/IAX/H323 peer to reach (ie: 347894999 or SIP/jeremy@182.212.1.45). To call SIP/IAX/H323 peer, you need to enable the voip_call below (voip_call = Yes) "));
 }
 
+$HD_Form -> AddEditElement (gettext("TIMEOUT"),
+	"timeout",
+	'$value',
+	"INPUT",
+	"size=50 maxlength=3",
+	"22",
+	gettext("Insert max 3 digits"),
+	"", "", "", "", "", "", "", gettext("Maximum time, in seconds, that the Dial command is to wait for a channel to answer"));
+
 $HD_Form -> AddEditElement (gettext("VOIP_CALL"),
 	"voip_call",
 	'1',
@@ -184,7 +193,7 @@ $HD_Form -> AddEditElement (gettext("PLAY_SOUND"),
 
 
 if (isset($form_action) && ($form_action=='ask-edit')) {
-    $HD_Form -> FieldEditElement ('activated, destination, voip_call, priority, answer, playsound');
+    $HD_Form -> FieldEditElement ('activated, destination, timeout, voip_call, priority, answer, playsound');
 } else {
     $HD_Form -> FG_QUERY_EDITION_HIDDEN_FIELDS = "destination, validated, voip_call";
     $HD_Form -> FG_QUERY_EDITION_HIDDEN_VALUE = "$destination, $validated, $voip_call";

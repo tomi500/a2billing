@@ -1283,6 +1283,7 @@ if (!defined('MONITOR_PATH')) define ("MONITOR_PATH",	isset($this->config['webui
 			$this->destination 				= $inst_listdestination[4];
 			$this->username 				= $inst_listdestination[6];
 			$this->useralias 				= $inst_listdestination[7];
+			$this->time_out 				= $inst_listdestination[30];
 			
 			if ($this -> set_inuse) $this -> callingcard_acct_start_inuse($agi,0);
 			
@@ -1541,6 +1542,7 @@ if (!defined('MONITOR_PATH')) define ("MONITOR_PATH",	isset($this->config['webui
 //	    $new_username					= $inst_listdestination[6];
 	    $this->useralias					= $inst_listdestination[7];
 	    $this->id_card					= $inst_listdestination[28];
+	    $this->time_out					= $inst_listdestination[30];
 
 	    // CHECK IF DESTINATION IS SET
 	    if (strlen($inst_listdestination[4])==0)
@@ -3677,13 +3679,18 @@ if (!defined('MONITOR_PATH')) define ("MONITOR_PATH",	isset($this->config['webui
 	 */
 	function format_parameters ($parameters)
 	{
-		if ($this->config['webui']['monitor_conversion'] == "1") {
-			$parameters = str_replace("." . $this -> agiconfig['monitor_formatfile'] . "|", "|m", $parameters);
-			$parameters = str_replace("MixMonitor ", "Monitor " . $this -> agiconfig['monitor_formatfile'] . "|", $parameters);
+		$sepafter = ($this->config['global']['asterisk_version'] == "1_6" || $this->config['global']['asterisk_version'] == "1_8")?',':'|';
+		$sepbefore = ($sepafter == "|")?',':'|';
+		$parameters = str_replace($sepbefore, $sepafter, $parameters);
+		if (is_numeric($this->time_out) && !strpos($parameters, $this -> agiconfig['monitor_formatfile'])) {
+			$wer = explode($sepafter, $parameters);
+			$wer[1] = $this->time_out;
+			$parameters = implode($sepafter, $wer);
+			$this->time_out = "";
+		} elseif ($this->config['webui']['monitor_conversion'] == "1") {
+			$parameters = str_replace("." . $this -> agiconfig['monitor_formatfile'] . $sepafter, $sepafter."m", $parameters);
+			$parameters = str_replace("MixMonitor ", "Monitor " . $this -> agiconfig['monitor_formatfile'] . $sepafter, $parameters);
 			$parameters = str_replace("StopMixMonitor", "StopMonitor", $parameters);
-		}
-		if ($this->agiconfig['asterisk_version'] == "1_6" || $this->agiconfig['asterisk_version'] == "1_8") {
-			$parameters = str_replace("|", ',', $parameters);
 		}
 		return $parameters;
 	}

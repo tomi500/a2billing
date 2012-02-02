@@ -1058,6 +1058,10 @@ class FormHandler
 		$this -> FG_regular[]  = array( "^100$|^(([0-9]){0,2})((\.)([0-9]*))?$"  ,
 					gettext("(PERCENT FORMAT WITH/WITHOUT DECIMAL, use '.' for decimal and don't use '%' character. e.g.: 12.4 )"));
 		
+		// 22
+		$this -> FG_regular[]  = array(    "^(|[0-9]+)$",
+		                        "(NUMBER FORMAT OR NOTHING)");
+		
 	}
 	
 	

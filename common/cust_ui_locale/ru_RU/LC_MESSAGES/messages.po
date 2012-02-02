@@ -411,11 +411,19 @@ msgstr "Введите здесь номер, на который хотите �
 msgid "Choose if you want to activate this card"
 msgstr "Выберите, если хотите активировать эту карту"
 
-#: form_data/FG_var_did.inc:151
+#: form_data/FG_var_did.inc:149
+msgid "TIMEOUT"
+msgstr "ТАЙМАУТ"
+
+#: form_data/FG_var_did.inc:156
+msgid "Maximum time, in seconds, that the Dial command is to wait for a channel to answer"
+msgstr "Время ожидания ответа абонента в секундах. Оставьте пустым для использования значения по умолчанию."
+
+#: form_data/FG_var_did.inc:159
 msgid "VOIP_CALL"
 msgstr "VOIP звонок"
 
-#: form_data/FG_var_did.inc:157
+#: form_data/FG_var_did.inc:163
 msgid "Choose if you want to not use the trunk and let the asterisk call directly the destination (ie, Destination : SIP/jeremy@182.212.1.45)"
 msgstr "Выберите, если выхотите использовать транк и позволить системе звонить напряму (Например SIP/taras@182.212.1.42)"
 
