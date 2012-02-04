@@ -123,7 +123,7 @@ $HD_Form -> AddEditElement (gettext("DESTINATION"),
 	"size=50 maxlength=120",
 	"0",
 	gettext("Insert the DID"),
-	"", "", "", "", "", "", "", gettext("Enter the phone number you wish to call, or the VoIP client to reach. (ie: 347894999 or SIP/jeremy@182.212.1.45). If the call is VoIP, the VoIP_Call must be set to yes."));
+	"", "", "", "", "", "", "", gettext("Enter the phone number you wish to call, or the VoIP client to reach, or QUEUE to go. (ie: 347894999 or SIP/jeremy@182.212.1.45 or QUEUE myqueue,hknRt,,,300). If the call is VoIP or QUEUE, the 'VoIP_Call' must be set to yes."));
 
 $HD_Form -> AddEditElement (gettext("TIMEOUT"),
 	"timeout",
@@ -140,8 +140,8 @@ $HD_Form -> AddEditElement (gettext("VOIP_CALL"),
 	"RADIOBUTTON",
 	"",
 	"",
-	gettext("Choose if you want to not use the trunk and let the asterisk call directly the destination (ie, Destination : SIP/jeremy@182.212.1.45)"),
-	"", "",  "", gettext("Yes").":1, - ".gettext("No").":0", "", "", "", gettext("If the call is VoIP, that must be set to 'Yes'"));
+	gettext("Choose if you want to not use the trunk and let the asterisk go to QUEUE or call directly the destination (ie, Destination : SIP/jeremy@182.212.1.45)"),
+	"", "",  "", gettext("Yes").":1, - ".gettext("No").":0", "", "", "", gettext("If the call is VoIP or QUEUE, that must be set to 'Yes'"));
 
 if ($form_action!='ask-edit' && $form_action!='edit') {
 	

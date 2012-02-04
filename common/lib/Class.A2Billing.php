@@ -1312,7 +1312,8 @@ if (!defined('MONITOR_PATH')) define ("MONITOR_PATH",	isset($this->config['webui
 					$dialparams = $this->agiconfig['dialcommand_param_call_2did'];
 					$dialparams = str_replace("%timeout%", min($time2call * 1000, $max_long), $dialparams);
 					$dialparams = str_replace("%timeoutsec%", min($time2call, $max_long), $dialparams);
-					$dialstr 	= $inst_listdestination[4].$dialparams;
+					$dialstr = $inst_listdestination[4];
+					if (stripos($dialstr,"QUEUE ") !== 0) $dialstr .= $dialparams;
 
 					$this -> debug( DEBUG, $agi, __FILE__, __LINE__, "[A2Billing] DID call friend: Dialing '$dialstr' Friend.\n");
 
@@ -1573,7 +1574,8 @@ if (!defined('MONITOR_PATH')) define ("MONITOR_PATH",	isset($this->config['webui
                     $dialparams = $this->agiconfig['dialcommand_param_call_2did'];
                     $dialparams = str_replace("%timeout%", min($time2call * 1000, $max_long), $dialparams);
                     $dialparams = str_replace("%timeoutsec%", min($time2call, $max_long), $dialparams);
-                    $dialstr 	= $inst_listdestination[4].$dialparams;
+		    $dialstr = $inst_listdestination[4];
+		    if (stripos($dialstr,"QUEUE ") !== 0) $dialstr .= $dialparams;
 
                     $this -> debug( DEBUG, $agi, __FILE__, __LINE__, "[A2Billing] DID call friend: Dialing '$dialstr' Friend.\n");
                     //# Channel: technology/number@ip_of_gw_to PSTN
@@ -1588,7 +1590,8 @@ if (!defined('MONITOR_PATH')) define ("MONITOR_PATH",	isset($this->config['webui
                     $dialparams = str_replace("%timeout%", min($time2call * 1000, $max_long), $this->agiconfig['dialcommand_param']);
                     $dialparams = str_replace("%timeoutsec%", min($time2call, $max_long), $dialparams);
 
-                    $dialstr 	= $inst_listdestination[4].$dialparams;
+		    $dialstr = $inst_listdestination[4];
+		    if (stripos($dialstr,"QUEUE ") !== 0) $dialstr .= $dialparams;
                     $myres = $this -> run_dial($agi, $dialstr);
                     $this -> debug( INFO, $agi, __FILE__, __LINE__, "DIAL $dialstr");
                 }
@@ -3666,7 +3669,8 @@ if (!defined('MONITOR_PATH')) define ("MONITOR_PATH",	isset($this->config['webui
 		$dialstr = $this -> format_parameters ($dialstr);
 		
 		// Run dial command
-		$res_dial = $agi->exec("DIAL $dialstr");
+		if (stripos($dialstr,"QUEUE ") === 0) $res_dial = $agi->exec($dialstr);
+		else $res_dial = $agi->exec("DIAL $dialstr");
 		
 		return $res_dial;
 	}

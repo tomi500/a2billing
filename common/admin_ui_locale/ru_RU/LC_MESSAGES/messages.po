@@ -4317,16 +4317,16 @@ msgid "NO DID DESTINATIONS HAVE BEEN CREATED!"
 msgstr ""
 
 #: Public/form_data/FG_var_did_destination.inc:126
-msgid "Enter the phone number you wish to call, or the VoIP client to reach. (ie: 347894999 or SIP/jeremy@182.212.1.45). If the call is VoIP, the VoIP_Call must be set to yes."
-msgstr "Введите здесь номер, на который хотите перенаправить звонок, или SIP/IAX2/H323 пользователя (напримет: 347894999 или SIP/taras@182.212.1.45). Чтобы задать SIP/IAX2/H323 направление, нужно включить VOIP ВЫЗОВ - выбрать 'Да'."
+msgid "Enter the phone number you wish to call, or the VoIP client to reach, or QUEUE to go. (ie: 347894999 or SIP/jeremy@182.212.1.45 or QUEUE myqueue,hknRt,,,300). If the call is VoIP or QUEUE, the 'VoIP_Call' must be set to yes."
+msgstr "Введите здесь номер, на который хотите направить звонок, или строку VoIP SIP/IAX2/H323 вызова, или строку перехода к очереди (например: 347894999 или SIP/taras@182.212.1.45 или QUEUE myqueue,hknRt,,,300). Если вы используете SIP/IAX2/H323 или QUEUE, нужно включить ниже 'VOIP ВЫЗОВ' - выбрать 'Да'."
 
 #: Public/form_data/FG_var_did_destination.inc:130
 msgid "Maximum time, in seconds, that the Dial command is to wait for a channel to answer"
 msgstr "Время ожидания ответа абонента в секундах. Оставьте пустым для использования умолчания из agi-conf."
 
 #: Public/form_data/FG_var_did_destination.inc:135
-msgid "If the call is VoIP, that must be set to 'Yes'"
-msgstr "Если НАПРАВЛЕНИЕ задано как VoIP, выберите 'Да'"
+msgid "If the call is VoIP or QUEUE, that must be set to 'Yes'"
+msgstr "Если НАПРАВЛЕНИЕ задано как VoIP или QUEUE, выберите 'Да'"
 
 #: Public/form_data/FG_var_did_destination.inc:140
 msgid "Choose if you want to answer on the call before playing PLAY_SOUND"
@@ -4364,8 +4364,8 @@ msgid "VOIP_CALL"
 msgstr "VOIP ВЫЗОВ"
 
 #: Public/form_data/FG_var_did_destination.inc:179
-msgid "Choose if you want to not use the trunk and let the asterisk call directly the destination (ie, Destination : SIP/jeremy@182.212.1.45)"
-msgstr ""
+msgid "Choose if you want to not use the trunk and let the asterisk go to QUEUE or call directly the destination (ie, Destination : SIP/jeremy@182.212.1.45)"
+msgstr "Выберите 'Да' если не хотите использовать прописанные в а2б транки, а нужно направлять вызов непосредственно на IP-адрес или в очередь, заданную в queue.conf"
 
 #: Public/form_data/FG_var_did_destination.inc:199
 #: Public/form_data/FG_var_invoice.inc:199
