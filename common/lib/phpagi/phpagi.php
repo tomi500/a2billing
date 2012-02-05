@@ -251,7 +251,7 @@
     * @param string $channel
     * @return array, see evaluate for return information. ['data'] contains description.
     */
-    function channel_status($channel='')
+    function channel_status($channel='', $get_value = false)
     {
       $ret = $this->evaluate("CHANNEL STATUS $channel");
       switch($ret['result'])
@@ -269,7 +269,11 @@
         case AST_STATE_PRERING: $ret['data'] = 'Channel has detected an incoming call and is waiting for ring'; break;
         default: $ret['data'] = "Unknown ({$ret['result']})"; break;
       }
-      return $ret;
+      if ($get_value) {
+	return $ret['result'];
+      } else {
+	return $ret;
+      }
     }
 
    /**

@@ -622,7 +622,7 @@ if (!defined('MONITOR_PATH')) define ("MONITOR_PATH",	isset($this->config['webui
 		if (!$webui) $this -> debug( DEBUG, $agi, __FILE__, __LINE__, print_r($this->agiconfig, true));
 		
 		if ( DATE_TIMEZONE ) date_default_timezone_set( DATE_TIMEZONE );
-		
+		$this -> streamfirst = true;
 		return true;
     }
 
@@ -1292,6 +1292,11 @@ if (!defined('MONITOR_PATH')) define ("MONITOR_PATH",	isset($this->config['webui
 				if (strlen($inst_listdestination[4])==0) continue;
 
 				if ($inst_listdestination[28]) $agi -> answer();
+				elseif ($this -> streamfirst && $inst_listdestination[29] && array_search($agi -> channel_status('',true), array(AST_STATE_UP, AST_STATE_DOWN)) === false) {
+					$agi -> exec('Progress');
+					usleep(400000);
+					$this -> streamfirst = false;
+				}
 				if ($inst_listdestination[29]) {
 					$agi -> evaluate("STREAM FILE $inst_listdestination[29] \"#\" 0");
 				}
@@ -1307,16 +1312,16 @@ if (!defined('MONITOR_PATH')) define ("MONITOR_PATH",	isset($this->config['webui
 						$this -> debug( INFO, $agi, __FILE__, __LINE__, $command_mixmonitor);
 					}
 					
-					$max_long = 36000000; //Maximum 10 hours
-					$time2call = $this->agiconfig['max_call_call_2_did'];
-					$dialparams = $this->agiconfig['dialcommand_param_call_2did'];
-					$dialparams = str_replace("%timeout%", min($time2call * 1000, $max_long), $dialparams);
-					$dialparams = str_replace("%timeoutsec%", min($time2call, $max_long), $dialparams);
 					$dialstr = $inst_listdestination[4];
-					if (stripos($dialstr,"QUEUE ") !== 0) $dialstr .= $dialparams;
-
+					if (stripos($dialstr,"QUEUE ") !== 0) {
+						$max_long = 36000000; //Maximum 10 hours
+						$time2call = $this->agiconfig['max_call_call_2_did'];
+						$dialparams = str_replace("%timeout%", min($time2call * 1000, $max_long), $this->agiconfig['dialcommand_param_call_2did']);
+						$dialstr .= str_replace("%timeoutsec%", min($time2call, $max_long), $dialparams);
+					}
 					$this -> debug( DEBUG, $agi, __FILE__, __LINE__, "[A2Billing] DID call friend: Dialing '$dialstr' Friend.\n");
 
+					if ($agi -> channel_status('',true) == AST_STATE_DOWN) break;
 					//# Channel: technology/number@ip_of_gw_to PSTN
 					// Dial(IAX2/guest@misery.digium.com/s@default)
 					$myres = $this -> run_dial($agi, $dialstr);
@@ -1414,7 +1419,7 @@ if (!defined('MONITOR_PATH')) define ("MONITOR_PATH",	isset($this->config['webui
 					if ($this->CC_TESTING) $this->extension = $this->dnid = $this->destination="011324885";
 					
 					if ($this -> callingcard_ivr_authorize($agi, $RateEngine, 0)==1) {
-						
+						if ($agi -> channel_status('',true) == AST_STATE_DOWN) break;
 						// PERFORM THE CALL
 						$result_callperf = $RateEngine->rate_engine_performcall ($agi, $this -> destination, $this);
 						if (!$result_callperf) {
@@ -1547,9 +1552,10 @@ if (!defined('MONITOR_PATH')) define ("MONITOR_PATH",	isset($this->config['webui
             	continue;
 
 	    if ($inst_listdestination[29]) {
-		if (!$A2B -> agiconfig['answer_call']) {
+		if ($this -> streamfirst && array_search($agi -> channel_status('',true), array(AST_STATE_UP, AST_STATE_DOWN)) === false) {
 			$agi -> exec('Progress');
 			usleep(200000);
+			$this -> streamfirst = false;
 		}
 		$agi -> evaluate("STREAM FILE $inst_listdestination[29] \"#\" 0");
 	    }
@@ -1569,32 +1575,27 @@ if (!defined('MONITOR_PATH')) define ("MONITOR_PATH",	isset($this->config['webui
 		}
 				
 		$max_long = 36000000; //Maximum 10 hours
+		$dialstr = $inst_listdestination[4];
                 if ($call_did_free) {
                     $this -> fct_say_time_2_call($agi,$time2call,0);
-                    $dialparams = $this->agiconfig['dialcommand_param_call_2did'];
-                    $dialparams = str_replace("%timeout%", min($time2call * 1000, $max_long), $dialparams);
-                    $dialparams = str_replace("%timeoutsec%", min($time2call, $max_long), $dialparams);
-		    $dialstr = $inst_listdestination[4];
-		    if (stripos($dialstr,"QUEUE ") !== 0) $dialstr .= $dialparams;
-
+		    if (stripos($dialstr,"QUEUE ") !== 0) {
+			$dialparams = str_replace("%timeout%", min($time2call * 1000, $max_long), $this->agiconfig['dialcommand_param_call_2did']);
+			$dialstr .= str_replace("%timeoutsec%", min($time2call, $max_long), $dialparams);
+		    }
                     $this -> debug( DEBUG, $agi, __FILE__, __LINE__, "[A2Billing] DID call friend: Dialing '$dialstr' Friend.\n");
-                    //# Channel: technology/number@ip_of_gw_to PSTN
-                    // Dial(IAX2/guest@misery.digium.com/s@default)
-                    $myres = $this -> run_dial($agi, $dialstr);
-                    $this -> debug( INFO, $agi, __FILE__, __LINE__, "DIAL $dialstr");
 
                 } else {
-                    
+
                     $this -> debug( INFO, $agi, __FILE__, __LINE__, "TIME TO CALL : $time2call");
                     $this -> fct_say_time_2_call($agi,$time2call,$selling_rate);
-                    $dialparams = str_replace("%timeout%", min($time2call * 1000, $max_long), $this->agiconfig['dialcommand_param']);
-                    $dialparams = str_replace("%timeoutsec%", min($time2call, $max_long), $dialparams);
-
-		    $dialstr = $inst_listdestination[4];
-		    if (stripos($dialstr,"QUEUE ") !== 0) $dialstr .= $dialparams;
-                    $myres = $this -> run_dial($agi, $dialstr);
-                    $this -> debug( INFO, $agi, __FILE__, __LINE__, "DIAL $dialstr");
+		    if (stripos($dialstr,"QUEUE ") !== 0) {
+			$dialparams = str_replace("%timeout%", min($time2call * 1000, $max_long), $this->agiconfig['dialcommand_param']);
+			$dialstr .= str_replace("%timeoutsec%", min($time2call, $max_long), $dialparams);
+		    }
                 }
+		if ($agi -> channel_status('',true) == AST_STATE_DOWN) break;
+                $myres = $this -> run_dial($agi, $dialstr);
+                $this -> debug( INFO, $agi, __FILE__, __LINE__, "DIAL $dialstr");
 
                 $answeredtime 	= $agi->get_variable("ANSWEREDTIME");
                 $answeredtime 	= $answeredtime['data'];
@@ -1613,11 +1614,21 @@ if (!defined('MONITOR_PATH')) define ("MONITOR_PATH",	isset($this->config['webui
 					$answeredtime = 0;
 					if ($this->agiconfig['busy_timeout'] > 0)
 						$res_busy = $agi->exec("Busy ".$this->agiconfig['busy_timeout']);
+					if ($this -> streamfirst && array_search($agi -> channel_status('',true), array(AST_STATE_UP, AST_STATE_DOWN)) === false) {
+						$agi -> exec('Progress');
+						usleep(200000);
+						$this -> streamfirst = false;
+					}
 					$agi-> stream_file('prepaid-isbusy', '#');
 					if (count($listdestination)>$callcount)
 						continue;
                 } elseif ($dialstatus == "NOANSWER") {
 					$answeredtime = 0;
+					if ($this -> streamfirst && array_search($agi -> channel_status('',true), array(AST_STATE_UP, AST_STATE_DOWN)) === false) {
+						$agi -> exec('Progress');
+						usleep(200000);
+						$this -> streamfirst = false;
+					}
 					$agi-> stream_file('prepaid-noanswer', '#');
 					if (count($listdestination) > $callcount)
 						continue;
@@ -1717,19 +1728,17 @@ if (!defined('MONITOR_PATH')) define ("MONITOR_PATH",	isset($this->config['webui
                 if ($this->CC_TESTING) $this->extension = $this->dnid = $this->destination = "011324885";
 				
                 if ($this -> callingcard_ivr_authorize($agi, $RateEngine, 0)==1) {
-					
-					// check the min to call
-					if (!$call_did_free) {
-						$this->timeout= min($this->timeout,$time2call);
-					}
-					$this -> fct_say_time_2_call($agi, $this->timeout,$selling_rate);
-                    
+		// check the min to call
+		    if (!$call_did_free) {
+			$this->timeout= min($this->timeout,$time2call);
+		    }
+		    $this -> fct_say_time_2_call($agi, $this->timeout,$selling_rate);
+		    if ($agi -> channel_status('',true) == AST_STATE_DOWN) break;
                     // PERFORM THE CALL
                     $result_callperf = $RateEngine->rate_engine_performcall ($agi, $this -> destination, $this);
                     if (!$result_callperf && count($listdestination) == $callcount) {
 	                    $prompt="prepaid-callfollowme";
 	                    $agi-> stream_file($prompt, '#');
-//	                    continue;
                     }
 
                     $dialstatus = $RateEngine->dialstatus;

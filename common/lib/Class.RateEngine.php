@@ -1587,6 +1587,7 @@ class RateEngine
 //					$myres = $agi->exec("SETMUSICONHOLD $musiconhold");
 					$agi -> set_variable('CHANNEL(musicclass)', $musiconhold);
 					$A2B -> debug( DEBUG, $agi, __FILE__, __LINE__, "EXEC SETMUSICONHOLD $musiconhold");
+					$A2B -> streamfirst = false;
 				}
 
 				$dialstr = $channel.$dialparams;
@@ -1659,6 +1660,12 @@ class RateEngine
 			} // END FOR LOOP FAILOVER
 			if (!$agi || $typecall == 9) continue;
 			//# Ooh, something actually happened!
+
+			if (isset($A2B -> streamfirst) && $A2B -> streamfirst && array_search($agi -> channel_status('',true), array(AST_STATE_UP, AST_STATE_DOWN)) === false) {
+				$agi -> exec('Progress');
+				usleep(200000);
+				$A2B -> streamfirst = false;
+			}
 			if ($this->dialstatus  == "BUSY") {
 				$this -> real_answeredtime = $this -> answeredtime = 0;
 				if ($A2B->agiconfig['busy_timeout'] > 0)
