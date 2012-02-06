@@ -724,16 +724,16 @@ if (!defined('MONITOR_PATH')) define ("MONITOR_PATH",	isset($this->config['webui
 	 */
 	function get_dialstatus_from_queuestatus($agi)
 	{
+		if ($agi->get_variable('ANSWEREDTIME',true)) return "ANSWER";
 		switch($agi->get_variable('QUEUESTATUS',true))
 		{
-		    case '':			$ret = "ANSWER"; break;
+		    case '':			$ret = "CANCEL"; break;
 		    case 'TIMEOUT':		$ret = "NOANSWER"; break;
 		    case 'FULL':		$ret = "BUSY"; break;
 		    case 'JOINEMPTY':		$ret = "CHANUNAVAIL"; break;
 		    case 'LEAVEEMPTY':		$ret = "CONGESTION"; break;
 		    case 'JOINUNAVAIL':		$ret = "CHANUNAVAIL"; break;
 		    case 'LEAVEUNAVAIL':	$ret = "CONGESTION"; break;
-		    case 'CANCEL':		$ret = "CANCEL"; break;
 		    default:			$ret = "UNKNOWN"; break;
 		}
 		return $ret;
@@ -1349,11 +1349,16 @@ if (!defined('MONITOR_PATH')) define ("MONITOR_PATH",	isset($this->config['webui
 					$myres = $this -> run_dial($agi, $dialstr);
 					$this -> debug( INFO, $agi, __FILE__, __LINE__, "DIAL $dialstr");
 
-					$answeredtime		= $agi->get_variable("ANSWEREDTIME", true);
+					$answeredtime			= $agi->get_variable("ANSWEREDTIME", true);
 					if (stripos($dialstr,'QUEUE ') === 0) {
-						$dialstatus	= $this -> get_dialstatus_from_queuestatus($agi);
-						$answeredtime	= ($answeredtime) ? time() - $answeredtime : 0;
-					} else	$dialstatus	= $agi->get_variable("DIALSTATUS", true);
+						if ($answeredtime) {
+							$answeredtime	= time() - $answeredtime;
+							$dialstatus	= 'ANSWER';
+						} else {
+							$answeredtime	= 0;
+							$dialstatus	= $this -> get_dialstatus_from_queuestatus($agi);
+						}
+					} else	$dialstatus		= $agi->get_variable("DIALSTATUS", true);
 
 					if ($this->monitor == 1 || $this->agiconfig['record_call'] == 1) {
 						$myres = $agi->exec($this -> format_parameters ("StopMixMonitor"));
@@ -1618,11 +1623,16 @@ if (!defined('MONITOR_PATH')) define ("MONITOR_PATH",	isset($this->config['webui
                 $myres = $this -> run_dial($agi, $dialstr);
                 $this -> debug( INFO, $agi, __FILE__, __LINE__, "DIAL $dialstr");
 
-		$answeredtime		= $agi->get_variable("ANSWEREDTIME", true);
+		$answeredtime			= $agi->get_variable("ANSWEREDTIME", true);
 		if (stripos($dialstr,'QUEUE ') === 0) {
-			$dialstatus	= $this -> get_dialstatus_from_queuestatus($agi);
-			$answeredtime	= ($answeredtime) ? time() - $answeredtime : 0;
-		} else	$dialstatus	= $agi->get_variable("DIALSTATUS", true);
+			if ($answeredtime) {
+				$answeredtime	= time() - $answeredtime;
+				$dialstatus	= 'ANSWER';
+			} else {
+				$answeredtime	= 0;
+				$dialstatus	= $this -> get_dialstatus_from_queuestatus($agi);
+			}
+		} else	$dialstatus		= $agi->get_variable("DIALSTATUS", true);
 
 		if ($this->monitor == 1 || $this -> agiconfig['record_call'] == 1) {
                     $myres = $agi->exec($this -> format_parameters ("StopMixMonitor"));
@@ -3700,11 +3710,8 @@ if (!defined('MONITOR_PATH')) define ("MONITOR_PATH",	isset($this->config['webui
 		$dialstr = $this -> format_parameters ($dialstr);
 		
 		// Run dial command
-		if (stripos($dialstr,"QUEUE ") === 0) {
-			$agi -> set_variable('QUEUESTATUS', "CANCEL");
-			$res_dial = $agi->exec($dialstr);
-		}
-		else $res_dial = $agi->exec("DIAL $dialstr");
+		if (stripos($dialstr,"QUEUE ") === 0)	$res_dial = $agi->exec($dialstr);
+		else	$res_dial = $agi->exec("DIAL $dialstr");
 		
 		return $res_dial;
 	}
