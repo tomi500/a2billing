@@ -1614,8 +1614,8 @@ class RateEngine
 				}
 				// Count this call on the trunk
 				$this -> trunk_start_inuse($agi, $A2B, 1);
-				$agi -> set_variable('_CHANNELCIDNUM', $destination);
-				$agi -> set_variable('_CALACCOUNT', $A2B->cardnumber);
+				$agi -> set_variable('GLOBAL(CHANNELCIDNUM)', $destination);
+				$agi -> set_variable('GLOBAL(CALACCOUNT)', $A2B->cardnumber);
 				$myres = $A2B -> run_dial($agi, $dialstr);
 				$A2B -> debug( DEBUG, $agi, __FILE__, __LINE__, "DIAL FAILOVER $dialstr");
 
@@ -1661,7 +1661,7 @@ class RateEngine
 			if (!$agi || $typecall == 9) continue;
 			//# Ooh, something actually happened!
 
-			if (isset($A2B -> streamfirst) && $A2B -> streamfirst && array_search($agi -> channel_status('',true), array(AST_STATE_UP, AST_STATE_DOWN)) === false) {
+			if ($A2B -> streamfirst && array_search($agi -> channel_status('',true), array(AST_STATE_UP, AST_STATE_DOWN)) === false) {
 				$agi -> exec('Progress');
 				usleep(200000);
 				$A2B -> streamfirst = false;
