@@ -1371,8 +1371,9 @@ if ($mode == 'standard') {
 				$A2B -> debug( DEBUG, $agi, __FILE__, __LINE__, "[CALLBACK]:[STOP STREAM FILE $prompt]");
 			}
 
+			$calling_party = $agi -> get_variable('CALLERID(name)', true);
 			$agi -> set_callerid($called_party);
-			$agi -> set_variable('CALLERID(name)', $A2B -> config["callback"]['callerid']);
+			$agi -> set_variable('CALLERID(name)', ($calling_party) ? $calling_party : $A2B -> config["callback"]['callerid']);
 			$ans = $A2B -> callingcard_ivr_authorize($agi, $RateEngine, $i, true);
 			if ($ans==1) {
 				// PERFORM THE CALL
