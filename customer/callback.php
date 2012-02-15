@@ -37,7 +37,7 @@ include ("lib/customer.module.access.php");
 include ("lib/Class.RateEngine.php");	 
 include ("lib/customer.smarty.php");
 
-include (dirname(__FILE__)."/lib/phpagi/phpagi-asmanager.php");
+//include (dirname(__FILE__)."/lib/phpagi/phpagi-asmanager.php");
 
 
 getpost_ifset(array('callback', 'called', 'calling'));
@@ -98,7 +98,7 @@ if ($callback) {
 				if ($res_all_calcultimeout) {						
 
 				    // MAKE THE CALL
-				    $channeloutcid = $RateEngine->rate_engine_performcall(false, $A2B->destination, $A2B);
+				    $channeloutcid = $RateEngine->rate_engine_performcall(false, $called, $A2B);
 				    if ($channeloutcid) {
 					$channel = $channeloutcid[0];
 					$exten = $calling;
@@ -106,6 +106,7 @@ if ($callback) {
 					$id_server_group = $A2B -> config["callback"]['id_server_group'];
 					$priority=1;
 					$timeout = $A2B -> config["callback"]['timeout']*1000;
+					$timeoutbefore = $A2B -> config["callback"]['sec_wait_before_callback'];
 					$application='';
 					if ($channeloutcid[1]) $callerid = $channeloutcid[1];
 					    else $callerid = $A2B -> config["callback"]['callerid'];
@@ -115,16 +116,18 @@ if ($callback) {
 					$status = 'PENDING';
 					$server_ip = 'localhost';
 					$num_attempt = 0;
-					if ($A2B->config['global']['asterisk_version'] == "1_6") {
-						$variable = "CALLED=$called,CALLING=$calling,CBID=$uniqueid,LEG=".$A2B->cardnumber.",TRUNK=".$channeloutcid[2].",TD=".$channeloutcid[3];
-					} else {
+					
+					if ($A2B->config['global']['asterisk_version'] == "1_2" || $A2B->config['global']['asterisk_version'] == "1_4") {
 						$variable = "CALLED=$called|CALLING=$calling|CBID=$uniqueid|LEG=".$A2B->cardnumber."|TRUNK=".$channeloutcid[2]."|TD=".$channeloutcid[3];
+					} else {
+						$variable = "CALLED=$called,CALLING=$calling,CBID=$uniqueid,LEG=".$A2B->cardnumber.",TRUNK=".$channeloutcid[2].",TD=".$channeloutcid[3];
 					}
 					
 					$QUERY = " INSERT INTO cc_callback_spool (uniqueid, status, server_ip, num_attempt, channel, exten, context, priority," .
-							 " variable, id_server_group, callback_time, account, callerid, timeout ) " .
+							 " variable, id_server_group, callback_time, account, callerid, timeout, next_attempt_time, exten_leg_a) " .
 							 " VALUES ('$uniqueid', '$status', '$server_ip', '$num_attempt', '$channel', '$exten', '$context', '$priority'," .
-							 " '$variable', '$id_server_group',  now(), '$account', '$callerid', '30000')";
+							 " '$variable', '$id_server_group', ADDTIME(now(),SEC_TO_TIME($timeoutbefore)), '$account', '$callerid'," .
+							 " '$timeout', ADDTIME(now(),SEC_TO_TIME($timeoutbefore)), '$called')";
 					$res = $A2B -> DBHandle -> Execute($QUERY);
 					
 					if (!$res) {
@@ -132,12 +135,12 @@ if ($callback) {
 					} else {
 						$error_msg = gettext("Your callback request has been queued correctly!");
 						$color_msg = 'green';
-						if (!$A2B -> CC_TESTING) {
+/*						if (!$A2B -> CC_TESTING) {
 							$QUERY = "UPDATE cc_trunk SET inuse=inuse+1 WHERE id_trunk=".$channeloutcid[2];
 							$res = $A2B -> DBHandle -> Execute($QUERY);
 							if ($res) $endinuse = true;
 						}
-					}
+*/					}
 				    } else $error_msg = gettext("Error : Sorry, not enough free trunk for make call. Try again later!");
 				} else $error_msg = gettext("Error : You don t have enough credit to call you back!");
 			} else $error_msg = gettext("Error : There is no route to call back your phonenumber!");

@@ -132,3 +132,19 @@ delimiter ;
 call a2b_trf_check;
 
 drop procedure if exists a2b_trf_check;
+
+ALTER TABLE cc_callback_spool ADD `next_attempt_time` timestamp DEFAULT NULL;
+ALTER TABLE cc_callback_spool ADD `reason` int(11) DEFAULT NULL;
+ALTER TABLE cc_callback_spool ADD `num_attempts_unavailable` int(11) NOT NULL DEFAULT '0';
+ALTER TABLE cc_callback_spool ADD `num_attempts_busy` int(11) NOT NULL DEFAULT '0';
+ALTER TABLE cc_callback_spool ADD `num_attempts_noanswer` int(11) NOT NULL DEFAULT '0';
+ALTER TABLE cc_callback_spool ADD `exten_leg_a` varchar(60) COLLATE utf8_bin NOT NULL;
+ALTER TABLE cc_callback_spool ADD `last_status` varchar(80) COLLATE utf8_bin DEFAULT NULL;
+
+ALTER TABLE cc_card ADD `cbtimeoutunavailable` int(11) NOT NULL DEFAULT '5';
+ALTER TABLE cc_card ADD `cbattemptunavailable` int(11) NOT NULL DEFAULT '20';
+ALTER TABLE cc_card ADD `cbtimeoutbusy` int(11) NOT NULL DEFAULT '20';
+ALTER TABLE cc_card ADD `cbattemptbusy` int(11) NOT NULL DEFAULT '3';
+ALTER TABLE cc_card ADD `cbtimeoutnoanswer` int(11) NOT NULL DEFAULT '10';
+ALTER TABLE cc_card ADD `cbattemptnoanswer` int(11) NOT NULL DEFAULT '3';
+ALTER TABLE cc_card ADD `cbtimeoutmax` int(11) NOT NULL DEFAULT '600';

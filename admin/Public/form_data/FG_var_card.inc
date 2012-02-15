@@ -816,6 +816,70 @@ if (has_rights (ACX_MODIFY_CUSTOMERS) && !($popup_select>=1)) {
 				   "",
 				   "" , "", "",	"", "", "", "NO", gettext("Max time to recall in seconds. Set '-1' for paritet calls.") );
 	
+	$HD_Form -> AddEditElement (gettext("timeout unavailable"),
+				   "cbtimeoutunavailable",
+				   '$value',
+				   "INPUT",
+				   "size=5 maxlength=4",
+				   "",
+				   "",
+				   "" , "", "",	"", "", "", "NO", gettext("cbtimeoutunavailable"),
+				   '', '', gettext("CALLBACK PARAMETERS"));
+	
+	$HD_Form -> AddEditElement (gettext("attempts unavailable"),
+				   "cbattemptunavailable",
+				   '$value',
+				   "INPUT",
+				   "size=5 maxlength=4",
+				   "",
+				   "",
+				   "" , "", "",	"", "", "", "NO", gettext("cbattemptunavailable") );
+	
+	$HD_Form -> AddEditElement (gettext("timeout busy"),
+				   "cbtimeoutbusy",
+				   '$value',
+				   "INPUT",
+				   "size=5 maxlength=4",
+				   "",
+				   "",
+				   "" , "", "",	"", "", "", "NO", gettext("cbtimeoutbusy") );
+	
+	$HD_Form -> AddEditElement (gettext("attempts busy"),
+				   "cbattemptbusy",
+				   '$value',
+				   "INPUT",
+				   "size=5 maxlength=4",
+				   "",
+				   "",
+				   "" , "", "",	"", "", "", "NO", gettext("cbattemptbusy") );
+	
+	$HD_Form -> AddEditElement (gettext("timeout noanswer"),
+				   "cbtimeoutnoanswer",
+				   '$value',
+				   "INPUT",
+				   "size=5 maxlength=4",
+				   "",
+				   "",
+				   "" , "", "",	"", "", "", "NO", gettext("cbtimeoutnoanswer") );
+	
+	$HD_Form -> AddEditElement (gettext("attempts noanswer"),
+				   "cbattemptnoanswer",
+				   '$value',
+				   "INPUT",
+				   "size=5 maxlength=4",
+				   "",
+				   "",
+				   "" , "", "",	"", "", "", "NO", gettext("cbattemptnoanswer") );
+	
+	$HD_Form -> AddEditElement (gettext("timeout max"),
+				   "cbtimeoutmax",
+				   '$value',
+				   "INPUT",
+				   "size=5 maxlength=4",
+				   "",
+				   "",
+				   "" , "", "",	"", "", "", "NO", gettext("cbtimeoutmax") );
+	
 	$HD_Form -> AddEditElement (gettext("AUTOREFILL"),
 				   "autorefill",
 				   '0',
@@ -976,6 +1040,7 @@ if (has_rights (ACX_MODIFY_CUSTOMERS) && !($popup_select>=1)) {
 			' credit_notification, notify_email, email_notification, ' .$add_fields_voicemail.
 			' id_campaign, ' .
 			' firstusedate, enableexpire, expirationdate, expiredays, sip_buddy, iax_buddy, mac_addr, inuse, recalldays, recalltime, ' .
+			' cbtimeoutunavailable, cbattemptunavailable, cbtimeoutbusy, cbattemptbusy, cbtimeoutnoanswer, cbattemptnoanswer, cbtimeoutmax, ' .
 			' autorefill, initialbalance, invoiceday, vat, vat_rn, discount, traffic, traffic_target, restriction' );
 	
 	

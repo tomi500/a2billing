@@ -108,10 +108,10 @@ $HD_Form -> AddEditElement (gettext("UNIQUEID"),
 
 if ($form_action=="ask-add") {
 	$begin_date = date("Y");
-	$begin_date_plus = date("Y")+25;	
+	$end_date_plus = date("Y-m-d H:i:s",time()+60);
 	$end_date = date("-m-d H:i:s");
 	$comp_date = "value='".$begin_date.$end_date."'";
-	$comp_date_plus = "value='".$begin_date_plus.$end_date."'";
+	$comp_date_plus = "value='".$end_date_plus."'";
 	
 	$def_ipserver = " value='localhost' "; 
 	$def_nbattempt = " value='0' ";
@@ -167,15 +167,34 @@ $HD_Form -> AddEditElement (gettext("AGI RESULT"),
 	"" , "", "",	"", "", "" , "NO", "");
 
 
-$HD_Form -> AddEditElement (gettext("CALLBACK DATE"),
+$HD_Form -> AddEditElement (gettext("FIRST ATTEMPT"),
 	"callback_time",
 	'$value',
 	"INPUT",
-	"size=20 maxlength=20  $comp_date",
+	"size=20 maxlength=20  $comp_date_plus",
 	"10",
 	"Insert the callback time",
 	"" , "", "",	"", "", "", "NO-NULL", gettext("please use the format YYYY-MM-DD HH:MM:SS. For instance, '2004-12-31 00:00:00'"), "", "res_display_dateformat");
 	
+
+$HD_Form -> AddEditElement (gettext("NEXT ATTEMPT"),
+	"next_attempt_time",
+	'$value',
+	"INPUT",
+	"size=20 maxlength=20  $comp_date_plus",
+	"10",
+	"Insert the callback startup time",
+	"" , "", "",	"", "", "", "NO-NULL", gettext("please use the format YYYY-MM-DD HH:MM:SS. For instance, '2004-12-31 00:00:00'"), "", "res_display_dateformat");
+	
+
+$HD_Form -> AddEditElement (gettext("EXTENSION LEG-A"),
+	"exten_leg_a",
+	'$value',
+	"INPUT",
+	"size=15 maxlength=30",
+	"11",
+	gettext("Insert the extension"),
+	"" , "", "",	"", "", "", "", gettext("Extension on which to originate the call"), null, null, gettext("Define all the information requested by asterisk to generate the callback"));
 
 $HD_Form -> AddEditElement (gettext("CHANNEL"),
 	"channel",
@@ -184,16 +203,16 @@ $HD_Form -> AddEditElement (gettext("CHANNEL"),
 	"size=60 maxlength=70",
 	"11",
 	gettext("Insert the channel"),
-	"" , "", "",	"", "", "", "", gettext("Channel on which to originate the call (SIP/123@1.1.1.4)"), null, null, gettext("Define all the information requested by asterisk to generate the callback"));
+	"" , "", "",	"", "", "", "", gettext("Channel on which to originate the call (SIP/123@1.1.1.4)"));
 	
 
-$HD_Form -> AddEditElement (gettext("EXTENSION"),
+$HD_Form -> AddEditElement (gettext("EXTENSION LEG-B"),
 	"exten",
 	'$value',
 	"INPUT",
 	"size=15 maxlength=30",
 	"11",
-	gettext("Insert the channel"),
+	gettext("Insert the extension"),
 	"" , "", "",	"", "", "", "", gettext("Extension to use on connect (must use Context & Priority with it)") );
 
 $HD_Form -> AddEditElement (gettext("CONTEXT"),
@@ -204,7 +223,6 @@ $HD_Form -> AddEditElement (gettext("CONTEXT"),
 	"11",
 	gettext("Insert the context"),
 	"" , "", "",	"", "", "", "", gettext("Context to use on connect (must use Exten & Priority with it)") );
-
 
 $HD_Form -> AddEditElement (gettext("PRIORITY"),
 	"priority",
@@ -296,7 +314,7 @@ $HD_Form -> AddEditElement (gettext("actionid"),
 	"" , "", "",	"", "", "", "NO", gettext("The request identifier. It allows you to identify the response to this request. You may use a number or a string. <br> Useful when you make several simultaneous requests. ActionID: ABC45678901234567890 ") );
 
 
-$HD_Form -> FieldEditElement ('id_server_group, uniqueid, status, server_ip, num_attempt, manager_result, agi_result, callback_time, channel, exten, context, priority, application, data, timeout, callerid, variable, account, async, actionid');
+$HD_Form -> FieldEditElement ('id_server_group, uniqueid, status, server_ip, num_attempt, manager_result, agi_result, callback_time, next_attempt_time, exten_leg_a, channel, exten, context, priority, application, data, timeout, callerid, variable, account, async, actionid');
 
 
 // Set the filter variables

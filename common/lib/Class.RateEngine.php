@@ -1284,7 +1284,7 @@ class RateEngine
 			$QUERY = "UPDATE cc_trunk SET inuse=inuse-1 WHERE id_trunk='".$this -> usedtrunk."'";
 		}
 
-		$A2B -> debug( DEBUG, $agi, __FILE__, __LINE__, "[TRUNK STATUS UPDATE : $QUERY]");
+		if ($agi) $A2B -> debug( DEBUG, $agi, __FILE__, __LINE__, "[TRUNK STATUS UPDATE : $QUERY]");
 		if (!$A2B -> CC_TESTING) $result = $A2B -> instance_table -> SQLExec ($A2B->DBHandle, $QUERY, 0);
 
 		return 0;
@@ -1294,12 +1294,12 @@ class RateEngine
 		RATE ENGINE - PERFORM CALLS
 		$typecall = 1 -> predictive dialer
 	*/
-	function rate_engine_performcall ($agi, $destination, &$A2B, $typecall=0) {
+	function rate_engine_performcall ($agi, $destination, &$A2B, $typecall=0, $amicmd=false, &$ast) {
 
 		$max_long = 36000000; //Maximum 10 hours
 		$old_destination = $destination;
 
-		$A2B -> debug( INFO, $agi, __FILE__, __LINE__, "Count of ratecard_obj = ".count($this -> ratecard_obj));
+		if ($agi) $A2B -> debug( INFO, $agi, __FILE__, __LINE__, "Count of ratecard_obj = ".count($this -> ratecard_obj));
 		for ($k=0;$k<count($this -> ratecard_obj);$k++) {
 			$loop_failover = 0;
 			$destination = $old_destination;
@@ -1574,15 +1574,15 @@ class RateEngine
 					}
 				}
 
-				if (!$agi || $typecall == 9) return array( $channel, $outcid, $this -> usedtrunk, $this -> td, $k );
+				if ($typecall != 8 && (!$agi || $typecall == 9)) return array( $channel, $outcid, $this -> usedtrunk, $this -> td, $k );
 
-				$A2B -> debug( DEBUG, $agi, __FILE__, __LINE__, "app_callingcard: CIDGROUPID='$cidgroupid' OUTBOUND CID SELECTED IS '$outcid'.");
+				if ($agi) $A2B -> debug( DEBUG, $agi, __FILE__, __LINE__, "app_callingcard: CIDGROUPID='$cidgroupid' OUTBOUND CID SELECTED IS '$outcid'.");
 
 				if ($trunktimeout < 0)  $trunktimeout = $timeout;
 				if ($A2B->recalltime) $dialparams = str_replace("%timeout%", min($timeout * 1000, $max_long, $trunktimeout * 1000, $A2B->recalltime * 1000), $A2B->agiconfig['dialcommand_param']);
 					else $dialparams = str_replace("%timeout%", min($timeout * 1000, $max_long, $trunktimeout * 1000), $A2B->agiconfig['dialcommand_param']);
 
-				if (strlen($musiconhold)>0 && $musiconhold!="selected") {
+				if ($agi && strlen($musiconhold)>0 && $musiconhold!="selected") {
 					$dialparams.= "m";
 //					$myres = $agi->exec("SETMUSICONHOLD $musiconhold");
 					$agi -> set_variable('CHANNEL(musicclass)', $musiconhold);
@@ -1598,9 +1598,10 @@ class RateEngine
 					$dialstr .= $addparameter;
 				}
 
-				$A2B -> debug( INFO, $agi, __FILE__, __LINE__, "FAILOVER app_callingcard: Dialing '$dialstr' with timeout of '$timeout'.\n");
-
-				if ($A2B->monitor == 1 || $A2B -> agiconfig['record_call'] == 1) {
+				$this -> trunk_start_inuse($agi, $A2B, 1);
+				if ($agi) {
+				    $A2B -> debug( INFO, $agi, __FILE__, __LINE__, "FAILOVER app_callingcard: Dialing '$dialstr' with timeout of '$timeout'.\n");
+				    if ($A2B->monitor == 1 || $A2B -> agiconfig['record_call'] == 1) {
 					$A2B->dl_short = MONITOR_PATH . "/" . $A2B->username . "/" . date('Y') . "/" . date('n') . "/" . date('j') . "/";
 					$dl_short = $A2B->dl_short . $A2B->uniqueid . ".";
 					while (file_exists($dl_short . "WAV") || file_exists($dl_short . "wav") || file_exists($dl_short . "gsm") || file_exists($dl_short . "mp3")
@@ -1611,54 +1612,86 @@ class RateEngine
 					$command_mixmonitor = $A2B -> format_parameters ("MixMonitor {$dl_short}{$A2B->agiconfig['monitor_formatfile']}|b");
 					$myres = $agi->exec($command_mixmonitor);
 					$A2B -> debug( INFO, $agi, __FILE__, __LINE__, "EXEC ". $command_mixmonitor);
-				}
-				// Count this call on the trunk
-				$this -> trunk_start_inuse($agi, $A2B, 1);
-				$agi -> set_variable('GLOBAL(CHANNELCIDNUM)', $destination);
-				$agi -> set_variable('GLOBAL(CALACCOUNT)', $A2B->cardnumber);
-				$myres = $A2B -> run_dial($agi, $dialstr);
-				$A2B -> debug( DEBUG, $agi, __FILE__, __LINE__, "DIAL FAILOVER $dialstr");
+				    }
+				    // Count this call on the trunk
+				    $agi -> set_variable('GLOBAL(CHANNELCIDNUM)', $destination);
+				    $agi -> set_variable('GLOBAL(CALACCOUNT)', $A2B->cardnumber);
+				    $myres = $A2B -> run_dial($agi, $dialstr);
+				    $A2B -> debug( DEBUG, $agi, __FILE__, __LINE__, "DIAL FAILOVER $dialstr");
 
-				// check connection after dial(long pause) 
-				$A2B -> DbReConnect($agi);
+				    // check connection after dial(long pause) 
+				    $A2B -> DbReConnect($agi);
 
-				if ($outcid <> 0) {
+				    if ($outcid <> 0) {
 					$outcid = 0;
 					$agi -> set_callerid($A2B -> CallerID);
 					$agi -> set_variable('CALLERID(ani)', $A2B -> CallerID);
+				    }
+				} elseif (is_array($amicmd)) {
+				    write_log(LOGFILE_API_CALLBACK, basename(__FILE__) . ' line:' . __LINE__ . "[ActionID = {$amicmd[5]} #### Starting AMI ORIGINATE #### $channel]");
+				    $ast->log("[ActionID = {$amicmd[5]} #### Starting AMI ORIGINATE #### $channel]");
+				    $ast -> add_event_handler('OriginateResponse', 'originateresponse');
+				    $ast -> actionid = $amicmd[5];
+				    $res = $ast -> Originate($channel,$amicmd[0],$A2B -> config['callback']['context_callback'],$amicmd[1],NULL,NULL,
+					$A2B -> config['callback']['timeout']*1000,$amicmd[2],$amicmd[3],$amicmd[4],true,$amicmd[5]);
+				    write_log(LOGFILE_API_CALLBACK, basename(__FILE__) . ' line:' . __LINE__ . "[ActionID = {$amicmd[5]} #### RESULT AMI ORIGINATE: ".$res['Response']." ####]");
+				    $ast->log("[ActionID = {$amicmd[5]} #### RESULT AMI ORIGINATE: ".$res['Response']." ####]");
+				    if ($res['Response'] == "Success") {
+				    write_log(LOGFILE_API_CALLBACK, basename(__FILE__) . ' line:' . __LINE__ . "[ActionID = {$amicmd[5]} #### Starting AMI WAIT_RESPONSE ####]");
+				    $ast->log("[ActionID = {$amicmd[5]} #### Starting AMI WAIT_RESPONSE ####]");
+					$res = $ast -> wait_response(true);
+				    }
+				    switch($res)
+				    {
+				     case  0: $this->dialstatus = "CHANUNAVAIL"; break;
+				     case  1: $this->dialstatus = "BUSY"; break;
+				     case  3: $this->dialstatus = "NOANSWER"; break;
+				     case  4: $this->dialstatus = "ANSWER"; break;
+//				     case  5: $this->dialstatus = "CONGESTION"; break;
+				     default: $this->dialstatus = "CONGESTION"; break;
+				    }
+				    write_log(LOGFILE_API_CALLBACK, basename(__FILE__) . ' line:' . __LINE__ . "[ActionID = {$amicmd[5]} #### RESULT AMI RESPONSE: ".var_export($res, true)." = $this->dialstatus #### $channel]");
+				    $ast->log("[ActionID = {$amicmd[5]} #### RESULT AMI RESPONSE: ".var_export($res, true)." = $this->dialstatus #### $channel]");
 				}
-
 				// Count this call on the trunk
 				$this -> trunk_start_inuse($agi, $A2B, 0);
 
-				if ($A2B->monitor == 1 || $A2B -> agiconfig['record_call'] == 1) {
+				if ($agi) {
+				    if ($A2B->monitor == 1 || $A2B -> agiconfig['record_call'] == 1) {
 					$myres = $agi->exec($A2B -> format_parameters ("StopMixMonitor"));
 					$A2B -> debug( INFO, $agi, __FILE__, __LINE__, "EXEC StopMixMonitor (".$A2B->uniqueid.")");
+				    }
+
+				    $answeredtime = $agi->get_variable("ANSWEREDTIME");
+				    $this -> real_answeredtime = $this -> answeredtime = $answeredtime['data'];
+
+				    $dialstatus = $agi -> get_variable("DIALSTATUS");
+				    $this -> dialstatus = $dialstatus['data'];
+
+				    $A2B -> debug( INFO, $agi, __FILE__, __LINE__, "[FAILOVER K=$k]:[ANSTIME=".$this->answeredtime."-DIALSTATUS=".$this->dialstatus."]");
 				}
-
-				$answeredtime = $agi->get_variable("ANSWEREDTIME");
-				$this -> real_answeredtime = $this -> answeredtime = $answeredtime['data'];
-
-				$dialstatus = $agi -> get_variable("DIALSTATUS");
-				$this -> dialstatus = $dialstatus['data'];
-
-				$A2B -> debug( INFO, $agi, __FILE__, __LINE__, "[FAILOVER K=$k]:[ANSTIME=".$this->answeredtime."-DIALSTATUS=".$this->dialstatus."]");
-
-//				if (($this->dialstatus  == "CHANUNAVAIL" || $this->dialstatus  == "CONGESTION") && $intellect_count > 0) {
+//				if (($this->dialstatus  == "CHANUNAVAIL" || $this->dialstatus  == "CONGESTION") && $intellect_count > 0) 
 				if ($this->dialstatus  == "CHANUNAVAIL" && $intellect_count > 0) {
 					$firstrand = false;
 					$failover_trunk = $trunkrand;
 					continue;
 				}
-
 				// IF THE FAILOVER TRUNK IS SAME AS THE ACTUAL TRUNK WE BREAK
 				if ($next_failover_trunk == $failover_trunk) break;
 				else $failover_trunk = $next_failover_trunk;
 				$intellect_count = -1;
 				$loop_failover++;
 
-			} // END FOR LOOP FAILOVER
+			} // END while LOOP FAILOVER
+			if ($typecall == 8) {
+			    if ($this->dialstatus  == "CHANUNAVAIL" || $this->dialstatus  == "CONGESTION") {
+				$this -> real_answeredtime = $this -> answeredtime = 0;
+				if ($A2B->agiconfig['failover_lc_prefix'] || $ifmaxuse == 1) continue;
+			    }
+			    return $res;
+			}
 			if (!$agi || $typecall == 9) continue;
+			
 			//# Ooh, something actually happened!
 
 			if ($A2B -> streamfirst && array_search($agi -> channel_status('',true), array(AST_STATE_UP, AST_STATE_DOWN)) === false) {

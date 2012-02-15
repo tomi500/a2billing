@@ -969,7 +969,7 @@ if ($mode == 'standard') {
 	$A2B -> debug( DEBUG, $agi, __FILE__, __LINE__, '[MODE : '.strtoupper($mode).' - '.$A2B->CallerID.']');
 	
 	if ($mode == 'cid-callback') {
-		$agi -> exec('Congestion');
+//		$agi -> exec('Congestion');
 		$agi -> hangup();
 		$A2B -> debug( DEBUG, $agi, __FILE__, __LINE__, '[HANGUP CLI CALLBACK TRIGGER]');
 	} elseif ($mode == 'cid-prompt-callback') {
@@ -1080,7 +1080,7 @@ if ($mode == 'standard') {
 				    $channeloutcid = $RateEngine->rate_engine_performcall($agi, $A2B->destination, $A2B, 9);
 				    if ($channeloutcid) {
 					$channel = $channeloutcid[0];
-					$sep = ($A2B->config['global']['asterisk_version'] == "1_6" || $A2B->config['global']['asterisk_version'] == "1_8")?',':'|';
+					$sep = ($A2B->config['global']['asterisk_version'] == "1_2" || $A2B->config['global']['asterisk_version'] == "1_4")?'|':',';
 					if ($A2B -> cidphonenumber) {
 					    $exten = $A2B -> cidphonenumber;
 					    $variable = '';
@@ -1122,10 +1122,11 @@ if ($mode == 'standard') {
 						$sec_wait_before_callback = 1;
 					}
 
-					$QUERY = " INSERT INTO cc_callback_spool (uniqueid, status, server_ip, num_attempt, channel, exten, context, priority, variable, id_server_group, callback_time, account, callerid, timeout ) VALUES ('$uniqueid', '$status', '$server_ip', '$num_attempt', '$channel', '$exten', '$context', '$priority', '$variable', '$id_server_group', ADDDATE( CURRENT_TIMESTAMP, INTERVAL $sec_wait_before_callback SECOND ), '$account', '$callerid', '$timeout')";
+					$QUERY = "INSERT INTO cc_callback_spool (uniqueid, status, server_ip, num_attempt, channel, exten, context, priority, variable, id_server_group, callback_time, account, callerid, timeout, next_attempt_time, exten_leg_a)" .
+						" VALUES ('$uniqueid', '$status', '$server_ip', '$num_attempt', '$channel', '$exten', '$context', '$priority', '$variable', '$id_server_group', ADDDATE( CURRENT_TIMESTAMP, INTERVAL $sec_wait_before_callback SECOND ), '$account', '$callerid', '$timeout', ADDDATE( CURRENT_TIMESTAMP, INTERVAL $sec_wait_before_callback SECOND ), '$A2B->destination')";
 					$res = $A2B -> DBHandle -> Execute($QUERY);
 					$A2B -> debug( DEBUG, $agi, __FILE__, __LINE__, "[CALLBACK-ALL : INSERT CALLBACK REQUEST IN SPOOL : QUERY=$QUERY]");
-
+/*
 					if ($res && !$A2B->CC_TESTING) {
 					    $QUERY = "UPDATE cc_trunk SET inuse=inuse+1 WHERE id_trunk=".$channeloutcid[2];
 					    $res = $A2B -> DBHandle -> Execute($QUERY);
@@ -1133,7 +1134,7 @@ if ($mode == 'standard') {
 					    $QUERY = "UPDATE cc_trunk SET inuse=inuse-1 WHERE id_trunk=".$channeloutcid[2];
 					    $res = $A2B -> DBHandle -> Execute($QUERY);
 					}
-
+*/
 				    } else $error_msg = gettext("Error : Sorry, not enough free trunk for make call. Try again later!");
 
 				}else{
@@ -1160,7 +1161,7 @@ if ($mode == 'standard') {
 
 	// END
 	$A2B -> debug( DEBUG, $agi, __FILE__, __LINE__, '[HANGUP ALL CALLBACK TRIGGER]');
-	$agi -> exec('Congestion');
+//	$agi -> exec('Congestion');
 	$agi -> hangup();
 
 	$A2B ->credit = 1000;
@@ -1174,7 +1175,7 @@ if ($mode == 'standard') {
 	if (strlen($A2B->CallerID)>1 && is_numeric($A2B->CallerID)) {
 
 		/* WE START ;) */
-		$cia_res = $A2B -> callingcard_ivr_authenticate($agi,$cid_1st_leg_tariff_id);
+		$cia_res = $A2B -> callingcard_ivr_authenticate($agi,$cid_1st_leg_tariff_id); // variable $cid_1st_leg_tariff_id is using as accountcode
 		$A2B -> debug( DEBUG, $agi, __FILE__, __LINE__, "[TRY : callingcard_ivr_authenticate]");
 		if ($cia_res==0) {
 
@@ -1199,7 +1200,7 @@ if ($mode == 'standard') {
 				    $channeloutcid = $RateEngine->rate_engine_performcall($agi, $A2B->destination, $A2B, 9);
 				    if ($channeloutcid) {
 					$channel = $channeloutcid[0];
-					$sep = ($A2B->config['global']['asterisk_version'] == "1_6" || $A2B->config['global']['asterisk_version'] == "1_8")?',':'|';
+					$sep = ($A2B->config['global']['asterisk_version'] == "1_2" || $A2B->config['global']['asterisk_version'] == "1_4")?'|':',';
 					if ($A2B -> cidphonenumber) {
 					    $exten = $A2B -> cidphonenumber;
 					    $variable = '';
@@ -1231,18 +1232,19 @@ if ($mode == 'standard') {
 						$sec_wait_before_callback = 1;
 					}
 
-					$QUERY = " INSERT INTO cc_callback_spool (uniqueid, status, server_ip, num_attempt, channel, exten, context, priority, variable, id_server_group, callback_time, account, callerid, timeout ) VALUES ('$uniqueid', '$status', '$server_ip', '$num_attempt', '$channel', '$exten', '$context', '$priority', '$variable', '$id_server_group', ADDDATE( CURRENT_TIMESTAMP, INTERVAL $sec_wait_before_callback SECOND ), '$account', '$callerid', '$timeout')";
+					$QUERY = "INSERT INTO cc_callback_spool (uniqueid, status, server_ip, num_attempt, channel, exten, context, priority, variable, id_server_group, callback_time, account, callerid, timeout, next_attempt_time, exten_leg_a)" .
+						" VALUES ('$uniqueid', '$status', '$server_ip', '$num_attempt', '$channel', '$exten', '$context', '$priority', '$variable', '$id_server_group', ADDDATE( CURRENT_TIMESTAMP, INTERVAL $sec_wait_before_callback SECOND ), '$account', '$callerid', '$timeout', ADDDATE( CURRENT_TIMESTAMP, INTERVAL $sec_wait_before_callback SECOND ), '$A2B->destination')";
 					$res = $A2B -> DBHandle -> Execute($QUERY);
 					$A2B -> debug( DEBUG, $agi, __FILE__, __LINE__, "[CALLBACK-ALL : INSERT CALLBACK REQUEST IN SPOOL : QUERY=$QUERY]");
 
-					if ($res && !$A2B->CC_TESTING) {
+/*					if ($res && !$A2B->CC_TESTING) {
 					    $QUERY = "UPDATE cc_trunk SET inuse=inuse+1 WHERE id_trunk=".$channeloutcid[2];
 					    $res = $A2B -> DBHandle -> Execute($QUERY);
 					    sleep(10);
 					    $QUERY = "UPDATE cc_trunk SET inuse=inuse-1 WHERE id_trunk=".$channeloutcid[2];
 					    $res = $A2B -> DBHandle -> Execute($QUERY);
 					}
-
+*/
 				    } else $error_msg = gettext("Error : Sorry, not enough free trunk for make call. Try again later!");
 
 				} else {

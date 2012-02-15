@@ -182,7 +182,8 @@
             $timeout = $allow_timeout;
             break;
           case 'event':
-            $this->process_event($parameters);
+            $parameters = $this->process_event($parameters);
+            if ($parameters !== false) return $parameters;
             break;
           case 'response':
             break;
@@ -803,7 +804,7 @@
       if(function_exists($handler))
       {
         $this->log("Execute handler $handler");
-        $ret = $handler($e, $parameters, $this->server, $this->port);
+        $ret = $handler($e, $parameters, $this->server, $this->port, $this->actionid);
       }
       else
         $this->log("No event handler for event '$e'");

@@ -75,7 +75,7 @@ $A2B -> load_conf($agi, NULL, 0, $idconfig);
 $A2B -> agiconfig['verbosity_level'] = 4;
 $A2B -> agiconfig['logging_level'] = 0;
 
-$A2B -> debug( INFO, $agi, __FILE__, __LINE__, "START MORNITORING");
+$A2B -> debug( INFO, $agi, __FILE__, __LINE__, "START MONITORING");
 
 
 define ("DB_TYPE", isset($A2B->config["database"]['dbtype'])?$A2B->config["database"]['dbtype']:null);
