@@ -133,7 +133,7 @@ call a2b_trf_check;
 
 drop procedure if exists a2b_trf_check;
 
-ALTER TABLE cc_callback_spool ADD `next_attempt_time` timestamp DEFAULT NULL;
+ALTER TABLE cc_callback_spool ADD `next_attempt_time` timestamp NULL DEFAULT NULL;
 ALTER TABLE cc_callback_spool ADD `reason` int(11) DEFAULT NULL;
 ALTER TABLE cc_callback_spool ADD `num_attempts_unavailable` int(11) NOT NULL DEFAULT '0';
 ALTER TABLE cc_callback_spool ADD `num_attempts_busy` int(11) NOT NULL DEFAULT '0';
