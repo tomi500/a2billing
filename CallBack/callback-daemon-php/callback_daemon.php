@@ -26,9 +26,6 @@ function originateresponse($e, $parameters, $server, $port, $actionid) {
 
 function callback_engine(&$A2B, $server, $username, $secret, $AmiVars, $destination, $tariff) {
 
-//    $A2B -> DBHandle = DbConnect();
-//    $instance_table = new Table();
-//    $A2B -> set_instance_table ($instance_table);
     $A2B -> cardnumber = $AmiVars[4];
 
     if ($A2B -> callingcard_ivr_authenticate_light ($error_msg))
@@ -115,7 +112,6 @@ while(true)
     $query.=" FROM `cc_callback_spool` WHERE `id_server_group`=$id_server_group AND `status`='PENDING' AND (`next_attempt_time`<=now() OR ISNULL(`next_attempt_time`))";
     $result=$instance_table->SQLExec($A2B->DBHandle, $query);
     foreach ($result as $value) {
-print("TICK\n");
 	list($cc_id,$cc_status,$cc_exten_leg_a,$cc_account,$cc_callerid,$cc_exten,$cc_context,$cc_priority,$cc_variable,$cc_timeout,$cc_reason,$cc_num_attempts_unavailable,$cc_num_attempts_busy,$cc_num_attempts_noanswer,$cc_timediff)=$value;
 	$query2="SELECT `tariff`,`cbtimeoutunavailable`,`cbattemptunavailable`,`cbtimeoutbusy`,`cbattemptbusy`,`cbtimeoutnoanswer`,`cbattemptnoanswer`,`cbtimeoutmax`,TIME_TO_SEC(TIMEDIFF(`cbtimeoutmax`,'$cc_timediff')) FROM `cc_card` WHERE `username`='$cc_account' LIMIT 1";
 	$result2=$instance_table->SQLExec($A2B->DBHandle, $query2);

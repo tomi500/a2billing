@@ -795,7 +795,7 @@
     {
       $ret = false;
       $e = strtolower($parameters['Event']);
-      $this->log("Got event.. $e");		
+//      $this->log("Got event.. $e");		
 
       $handler = '';
       if(isset($this->event_handlers[$e])) $handler = $this->event_handlers[$e];
@@ -803,11 +803,11 @@
 
       if(function_exists($handler))
       {
-        $this->log("Execute handler $handler");
+//        $this->log("Execute handler $handler");
         $ret = $handler($e, $parameters, $this->server, $this->port, $this->actionid);
       }
-      else
-        $this->log("No event handler for event '$e'");
+//      else
+//        $this->log("No event handler for event '$e'");
       return $ret;
     }
   }
