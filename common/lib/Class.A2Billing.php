@@ -3721,10 +3721,10 @@ if (!defined('MONITOR_PATH')) define ("MONITOR_PATH",	isset($this->config['webui
 	 */
 	function format_parameters ($parameters)
 	{
-		$sepafter = ($this->config['global']['asterisk_version'] == "1_6" || $this->config['global']['asterisk_version'] == "1_8")?',':'|';
+		$sepafter = ($this->config['global']['asterisk_version'] == "1_2" || $this->config['global']['asterisk_version'] == "1_4")?'|':',';
 		$sepbefore = ($sepafter == "|")?',':'|';
 		$parameters = str_replace($sepbefore, $sepafter, $parameters);
-		if (is_numeric($this->time_out) && !strpos($parameters, $this -> agiconfig['monitor_formatfile'])) {
+		if (isset($this->time_out) && !strpos($parameters, $this -> agiconfig['monitor_formatfile'])) {
 			$wer = explode($sepafter, $parameters);
 			$wer[1] = $this->time_out;
 			$parameters = implode($sepafter, $wer);

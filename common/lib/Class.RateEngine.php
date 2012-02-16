@@ -1294,7 +1294,7 @@ class RateEngine
 		RATE ENGINE - PERFORM CALLS
 		$typecall = 1 -> predictive dialer
 	*/
-	function rate_engine_performcall ($agi, $destination, &$A2B, $typecall=0, $amicmd=false, &$ast) {
+	function rate_engine_performcall ($agi, $destination, &$A2B, $typecall=0, $amicmd=false, &$ast=false) {
 
 		$max_long = 36000000; //Maximum 10 hours
 		$old_destination = $destination;

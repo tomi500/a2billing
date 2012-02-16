@@ -167,8 +167,8 @@ while(true)
 		    case -2: $last_status="ERROR_CHANNEL-UNAVAILABLE";$timeout=$acc_to_unav;break; // not enough free trunk for make call
 		    case -1: $last_status="ERROR_NO-RATE-AVAILABLE";$fatal=1;break; // no route to call back your phonenumber or other fatal errors
 		    case  0: $last_status="ERROR_CHANNEL-UNAVAILABLE";$timeout=$acc_to_unav;break;
-		    case  1: $last_status="ERROR_BUSY";$timeout=$acc_to_busy;break;
-		    case  3: $last_status="ERROR_NO-ANSWER";$timeout=$acc_to_noansw;break;
+		    case  1: $last_status="BUSY";$timeout=$acc_to_busy;break;
+		    case  3: $last_status="NO-ANSWER";$timeout=$acc_to_noansw;break;
 		    case  4: $last_status="SENT";$fatal=1;break;
 		    case  5: $last_status="ERROR_CONGESTION";$fatal=1;break;
 		    case  8: $last_status="ERROR_CONGESTION_OR_CHANNEL-UNAVAILABLE";$fatal=0;$timeout=$acc_to_unav;break;
