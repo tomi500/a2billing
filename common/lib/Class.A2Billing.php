@@ -1694,6 +1694,8 @@ if (!defined('MONITOR_PATH')) define ("MONITOR_PATH",	isset($this->config['webui
 			$this -> debug( INFO, $agi, __FILE__, __LINE__, "Destination: " . $inst_listdestination[10]);
 		    }
 
+		    if (!isset($this->card_caller)) $this->card_caller = $my_id_card;
+
                     // User ONNet use $this->id_card
 
                     // A-LEG below to the owner of the DID
