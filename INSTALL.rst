@@ -330,7 +330,7 @@ A2BILLING INSTALLATION GUIDE
             -  This script will take care of the recurring service.
                 0 12 * * * php /usr/local/src/a2billing/Cronjobs/a2billing_batch_process.php
 
-            - Generate Invoices at 6am everyday
+            -  Generate Invoices at 6am everyday
                 0 6 * * * php /usr/local/src/a2billing/Cronjobs/a2billing_batch_billing.php
 
             -  to proceed the autodialer
@@ -338,6 +338,9 @@ A2BILLING INSTALLATION GUIDE
 
             -  manage alarms
                 0 * * * * php /usr/local/src/a2billing/Cronjobs/a2billing_alarm.php
+
+            -  Mark old callback jobs as ERROR_PROCESSING
+                * * * * * php /usr/local/src/a2billing/Cronjobs/callback_daemon_check.php
 
 
     2.9. Step 9: Call back daemon (only for Call backs)

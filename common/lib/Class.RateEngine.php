@@ -1628,17 +1628,18 @@ class RateEngine
 					$agi -> set_variable('CALLERID(ani)', $A2B -> CallerID);
 				    }
 				} elseif (is_array($amicmd)) {
-				    write_log(LOGFILE_API_CALLBACK, basename(__FILE__) . ' line:' . __LINE__ . "[ActionID = {$amicmd[5]} #### Starting AMI ORIGINATE #### $channel]");
-				    $ast->log("[ActionID = {$amicmd[5]} #### Starting AMI ORIGINATE #### $channel]");
+				    write_log(LOGFILE_API_CALLBACK, basename(__FILE__) . ' line:' . __LINE__ . " ActionID = {$amicmd[5]} [#### Starting AMI ORIGINATE ####] $channel");
+				    $ast->log("ActionID = {$amicmd[5]} [#### Starting AMI ORIGINATE ####] $channel");
 				    $ast -> add_event_handler('OriginateResponse', 'originateresponse');
 				    $ast -> actionid = $amicmd[5];
+				    $amicmd[3] = substr_replace($amicmd[3],"TRUNK=$this->usedtrunk,TD=$this->td",strpos($amicmd[3],"TRUNK"));
 				    $res = $ast -> Originate($channel,$amicmd[0],$A2B -> config['callback']['context_callback'],$amicmd[1],NULL,NULL,
 					$A2B -> config['callback']['timeout']*1000,$amicmd[2],$amicmd[3],$amicmd[4],true,$amicmd[5]);
-				    write_log(LOGFILE_API_CALLBACK, basename(__FILE__) . ' line:' . __LINE__ . "[ActionID = {$amicmd[5]} #### RESULT AMI ORIGINATE: ".$res['Response']." ####]");
-				    $ast->log("[ActionID = {$amicmd[5]} #### RESULT AMI ORIGINATE: ".$res['Response']." ####]");
+				    write_log(LOGFILE_API_CALLBACK, basename(__FILE__) . ' line:' . __LINE__ . " ActionID = {$amicmd[5]} [####  RESULT AMI ORIGINATE  ####] {$res['Response']}");
+				    $ast->log("ActionID = {$amicmd[5]} [#### RESULT AMI ORIGINATE  ####] {$res['Response']}");
 				    if ($res['Response'] == "Success") {
-				    write_log(LOGFILE_API_CALLBACK, basename(__FILE__) . ' line:' . __LINE__ . "[ActionID = {$amicmd[5]} #### Starting AMI WAIT_RESPONSE ####]");
-				    $ast->log("[ActionID = {$amicmd[5]} #### Starting AMI WAIT_RESPONSE ####]");
+				    write_log(LOGFILE_API_CALLBACK, basename(__FILE__) . ' line:' . __LINE__ . " ActionID = {$amicmd[5]} [#### Starting AMI WAIT_RESPONSE ####]");
+				    $ast->log("ActionID = {$amicmd[5]} [#### Starting AMI WAIT_RESPONSE ####]");
 					$res = $ast -> wait_response(true);
 				    }
 				    switch($res)
@@ -1648,10 +1649,11 @@ class RateEngine
 				     case  3: $this->dialstatus = "NOANSWER"; break;
 				     case  4: $this->dialstatus = "ANSWER"; break;
 //				     case  5: $this->dialstatus = "CONGESTION"; break;
+				     case  8: $this->dialstatus = "CHANUNAVAIL"; break;
 				     default: $this->dialstatus = "CONGESTION"; break;
 				    }
-				    write_log(LOGFILE_API_CALLBACK, basename(__FILE__) . ' line:' . __LINE__ . "[ActionID = {$amicmd[5]} #### RESULT AMI RESPONSE: ".var_export($res, true)." = $this->dialstatus #### $channel]");
-				    $ast->log("[ActionID = {$amicmd[5]} #### RESULT AMI RESPONSE: ".var_export($res, true)." = $this->dialstatus #### $channel]");
+				    write_log(LOGFILE_API_CALLBACK, basename(__FILE__) . ' line:' . __LINE__ . " ActionID = {$amicmd[5]} [####  RESULT AMI WAIT RESPONSE  ####] $channel  ".var_export($res, true)." = $this->dialstatus");
+				    $ast->log("ActionID = {$amicmd[5]} [####  RESULT AMI WAIT RESPONSE  ####] $channel  ".var_export($res, true)." = $this->dialstatus");
 				}
 				// Count this call on the trunk
 				$this -> trunk_start_inuse($agi, $A2B, 0);

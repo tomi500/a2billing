@@ -1,0 +1,6 @@
+#!/bin/bash
+
+sleep 10
+exec 2>&1
+date "+%F starting CallBack daemon at %X"
+exec /usr/local/bin/a2b_callback_daemon -n

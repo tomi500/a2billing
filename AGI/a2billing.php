@@ -1100,7 +1100,7 @@ if ($mode == 'standard') {
 					$account = $A2B -> accountcode;
 					$uniqueid = MDP_NUMERIC(5).'-'.MDP_STRING(7);
 					
-					$variable .= "CALLED=".$A2B ->destination.$sep.$CALLING_VAR.$sep."CBID=$uniqueid".$sep."LEG=".$A2B -> username.$sep."TRUNK=".$channeloutcid[2].$sep."TD=".$channeloutcid[3];
+					$variable .= "CALLED=".$A2B ->destination.$sep.$CALLING_VAR.$sep."CBID=$uniqueid".$sep."LEG=".$A2B -> username;
 					
 					$callbackrate = $RateEngine -> ratecard_obj[$channeloutcid[4]]['callbackrate'];
 					foreach($callbackrate as $key => $value){
@@ -1111,7 +1111,7 @@ if ($mode == 'standard') {
 					{ 
 						$variable .= $sep.'TARIFF='.$cid_1st_leg_tariff_id;
 					}
-					
+					$variable .= $sep."TRUNK=".$channeloutcid[2].$sep."TD=".$channeloutcid[3];
 					$status = 'PENDING';
 					$server_ip = 'localhost';
 					$num_attempt = 0;
