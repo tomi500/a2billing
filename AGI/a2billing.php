@@ -1002,7 +1002,7 @@ if ($mode == 'standard') {
 			$A2B -> agiconfig['say_timetocall']=0;
 
 			// We arent removing leading zero in front of the callerID if needed this might be done over the dialplan
-			$A2B -> extension = $A2B -> dnid = $A2B -> destination = $caller_areacode.$A2B->CallerID;
+			$A2B -> extension = $A2B -> dnid = $A2B -> destination = $caller_areacode.$A2B -> apply_rules($A2B -> CallerID);
 			
 			$A2B -> debug( DEBUG, $agi, __FILE__, __LINE__, '[destination: - '.$A2B->destination.']');
 			
@@ -1186,7 +1186,7 @@ if ($mode == 'standard') {
 			$A2B -> agiconfig['use_dnid']=1;
 			$A2B -> agiconfig['say_timetocall']=0;
 			$A2B -> agiconfig['say_balance_after_auth']=0;
-			$A2B -> extension = $A2B -> dnid = $A2B -> destination = $caller_areacode.$A2B -> CallerID;
+			$A2B -> extension = $A2B -> dnid = $A2B -> destination = $caller_areacode.$A2B -> apply_rules($A2B -> CallerID);
 			
 			$QUERY = "SELECT callback FROM cc_callerid WHERE cid=$A2B->destination AND (callback=0 OR activated='f')";
 			$result = $A2B -> instance_table -> SQLExec ($A2B->DBHandle, $QUERY);
