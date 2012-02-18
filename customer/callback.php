@@ -88,9 +88,9 @@ if ($callback) {
 			$A2B -> agiconfig['accountcode']=$_SESSION["pr_login"];
 			$A2B -> agiconfig['use_dnid']=1;
 			$A2B -> agiconfig['say_timetocall']=0;						
-			$A2B -> extension = $A2B -> dnid = $A2B -> destination = $called;
-			
-			$resfindrate = $RateEngine->rate_engine_findrates($A2B, $called, $_SESSION["tariff"]);
+			$A2B -> extension = $A2B -> dnid = $A2B -> destination = $A2B -> apply_rules($called);
+
+			$resfindrate = $RateEngine->rate_engine_findrates($A2B, $A2B -> dnid, $_SESSION["tariff"]);
 			
 			// IF FIND RATE
 			if ($resfindrate!=0) {				
@@ -98,7 +98,7 @@ if ($callback) {
 				if ($res_all_calcultimeout) {						
 
 				    // MAKE THE CALL
-				    $channeloutcid = $RateEngine->rate_engine_performcall(false, $called, $A2B);
+				    $channeloutcid = $RateEngine->rate_engine_performcall(false, $A2B -> dnid, $A2B);
 				    if ($channeloutcid) {
 					$channel = $channeloutcid[0];
 					$exten = $calling;
@@ -118,16 +118,16 @@ if ($callback) {
 					$num_attempt = 0;
 					
 					if ($A2B->config['global']['asterisk_version'] == "1_2" || $A2B->config['global']['asterisk_version'] == "1_4") {
-						$variable = "CALLED=$called|CALLING=$calling|CBID=$uniqueid|LEG=".$A2B->cardnumber."|TRUNK=".$channeloutcid[2]."|TD=".$channeloutcid[3];
+						$variable = "CALLED=$A2B->dnid|CALLING=$calling|CBID=$uniqueid|LEG=".$A2B->cardnumber."|TRUNK=".$channeloutcid[2]."|TD=".$channeloutcid[3];
 					} else {
-						$variable = "CALLED=$called,CALLING=$calling,CBID=$uniqueid,LEG=".$A2B->cardnumber.",TRUNK=".$channeloutcid[2].",TD=".$channeloutcid[3];
+						$variable = "CALLED=$A2B->dnid,CALLING=$calling,CBID=$uniqueid,LEG=".$A2B->cardnumber.",TRUNK=".$channeloutcid[2].",TD=".$channeloutcid[3];
 					}
 					
 					$QUERY = " INSERT INTO cc_callback_spool (uniqueid, status, server_ip, num_attempt, channel, exten, context, priority," .
 							 " variable, id_server_group, callback_time, account, callerid, timeout, next_attempt_time, exten_leg_a) " .
 							 " VALUES ('$uniqueid', '$status', '$server_ip', '$num_attempt', '$channel', '$exten', '$context', '$priority'," .
 							 " '$variable', '$id_server_group', ADDTIME(now(),SEC_TO_TIME($timeoutbefore)), '$account', '$callerid'," .
-							 " '$timeout', ADDTIME(now(),SEC_TO_TIME($timeoutbefore)), '$called')";
+							 " '$timeout', ADDTIME(now(),SEC_TO_TIME($timeoutbefore)), '$A2B->dnid')";
 					$res = $A2B -> DBHandle -> Execute($QUERY);
 					
 					if (!$res) {
