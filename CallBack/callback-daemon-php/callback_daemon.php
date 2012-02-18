@@ -64,20 +64,20 @@ function callback_engine(&$A2B, $server, $username, $secret, $AmiVars, $destinat
 }
 
 
+$FG_DEBUG = 0;
+$verbose_level = 1;
+
+$A2B = new A2Billing();
+$A2B->load_conf($agi);
+
 if (!defined('PID'))
-    define("PID", "/var/run/a2billing/a2b-callback-daemon.pid");
+    define("PID", $A2B->config["daemon-info"]['pidfile']);
 
 // CHECK IF THE DAEMON IS ALREADY RUNNING
 if (ProcessHandler :: isActive())
     die("Already running!");
 else
     ProcessHandler :: activate();
-
-$FG_DEBUG = 0;
-$verbose_level = 1;
-
-$A2B = new A2Billing();
-$A2B->load_conf($agi);
 
 write_log(LOGFILE_API_CALLBACK, basename(__FILE__) . ' line:' . __LINE__ . "[#### CALLBACK BEGIN ####]");
 

@@ -1188,10 +1188,13 @@ if ($mode == 'standard') {
 			$A2B -> agiconfig['say_balance_after_auth']=0;
 			$A2B -> extension = $A2B -> dnid = $A2B -> destination = $caller_areacode.$A2B -> CallerID;
 			
-			$resfindrate = $RateEngine->rate_engine_findrates($A2B, $A2B -> destination, $A2B -> tariff);
+			$QUERY = "SELECT callback FROM cc_callerid WHERE cid=$A2B->destination AND (callback=0 OR activated='f')";
+			$result = $A2B -> instance_table -> SQLExec ($A2B->DBHandle, $QUERY);
+			if (!is_array($result)) {
+			    $resfindrate = $RateEngine->rate_engine_findrates($A2B, $A2B -> destination, $A2B -> tariff);
 
-			// IF FIND RATE
-			if ($resfindrate!=0) {
+			    // IF FIND RATE
+			    if ($resfindrate!=0) {
 				//$RateEngine -> debug_st = 1;
 				$res_all_calcultimeout = $RateEngine->rate_engine_all_calcultimeout($A2B, $A2B->credit);
 
@@ -1251,11 +1254,11 @@ if ($mode == 'standard') {
 					$error_msg = 'Error : You don t have enough credit to call you back !!!';
 					$A2B -> debug( DEBUG, $agi, __FILE__, __LINE__, "[CALLBACK-CALLERID : CALLED=".$A2B ->destination." | $error_msg]");
 				}
-			} else {
+			    } else {
 				$error_msg = 'Error : There is no route to call back your phonenumber !!!';
 				$A2B -> debug( DEBUG, $agi, __FILE__, __LINE__, "[CALLBACK-CALLERID : CALLED=".$A2B ->destination." | $error_msg]");
-			}
-
+			    }
+			} else $A2B -> debug( DEBUG, $agi, __FILE__, __LINE__, "[CALLBACK-CALLERID : CALLED=".$A2B ->destination." | Extension for callback in the list of CallerID is inactive or CallBack not resolved]");
 		} else {
 			$A2B -> debug( DEBUG, $agi, __FILE__, __LINE__, "[CALLBACK-CALLERID : CALLED=".$A2B ->destination." | Authentication failed]");
 		}
