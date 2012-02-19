@@ -1028,7 +1028,7 @@ class RateEngine
 	 * RATE ENGINE - UPDATE SYSTEM (DURATIONCALL)
 	 * Calcul the duration allowed for the caller to this number
 	 */
-	function rate_engine_updatesystem (&$A2B, &$agi, $calledstation, $doibill = 1, $didcall=0, $callback=0, $trunk_id=0, $td=0)
+	function rate_engine_updatesystem (&$A2B, &$agi, $calledstation, $doibill = 1, $didcall=0, $callback=0, $trunk_id=0, $td=NULL)
 	{
 		$K = $this->usedratecard;
 		
@@ -1203,7 +1203,8 @@ class RateEngine
 		}
 		if ($sessiontime>0) {
 			
-			if (!$td) $td = $this->td;
+			if (!isset($td)) $td = $this->td;
+			elseif (!$td) $td = $this->td;
 			if ($didcall==0 && $callback==0) {
 				$myclause_nodidcall = " , redial='".$calledstation."' ";
 			} else {
@@ -1632,7 +1633,7 @@ class RateEngine
 				    $ast->log("ActionID = {$amicmd[5]} [#### Starting AMI ORIGINATE ####] $channel");
 				    $ast -> add_event_handler('OriginateResponse', 'originateresponse');
 				    $ast -> actionid = $amicmd[5];
-				    $amicmd[3] = substr_replace($amicmd[3],"TRUNK=$this->usedtrunk,TD=$this->td",strpos($amicmd[3],"TRUNK"));
+				    $amicmd[3] = substr_replace($amicmd[3],"RATECARD={ratecard_obj[$k][6]},TRUNK=$this->usedtrunk,TD=$this->td",strpos($amicmd[3],"RATECARD"));
 				    $res = $ast -> Originate($channel,$amicmd[0],$A2B -> config['callback']['context_callback'],$amicmd[1],NULL,NULL,
 					$A2B -> config['callback']['timeout']*1000,$amicmd[2],$amicmd[3],$amicmd[4],true,$amicmd[5]);
 				    write_log(LOGFILE_API_CALLBACK, basename(__FILE__) . ' line:' . __LINE__ . " ActionID = {$amicmd[5]} [####  RESULT AMI ORIGINATE  ####] {$res['Response']}");

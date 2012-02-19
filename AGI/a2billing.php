@@ -98,6 +98,16 @@ elseif ($argc > 2 && strlen($argv[2]) > 0 && $argv[2] == 'conference-member')		$
 elseif ($argc > 2 && strlen($argv[2]) > 0 && $argv[2] == 'auto-did-callback-cid')	$mode = 'auto';
 else											$mode = 'standard';
 
+$A2B = new A2Billing();
+$A2B -> load_conf($agi, NULL, 0, $idconfig, $optconfig);
+$A2B -> mode = $mode;
+$A2B -> G_startime = $G_startime;
+
+
+$A2B -> debug( INFO, $agi, __FILE__, __LINE__, "IDCONFIG : $idconfig");
+$A2B -> debug( INFO, $agi, __FILE__, __LINE__, "MODE : $mode");
+
+
 // get the area code for the cid-callback, all-callback and cid-prompt-callback
 if ($argc > 3 && strlen($argv[3]) > 0) {
 	$caller_areacode = $argv[3];
@@ -112,16 +122,6 @@ if ($argc > 4 && strlen($argv[4]) > 0) {
 if ($argc > 5 && strlen($argv[5]) > 0) {
 	$cid_1st_leg_tariff_id = $argv[5];
 } else $cid_1st_leg_tariff_id = "";
-
-$A2B = new A2Billing();
-$A2B -> load_conf($agi, NULL, 0, $idconfig, $optconfig);
-$A2B -> mode = $mode;
-$A2B -> G_startime = $G_startime;
-
-
-$A2B -> debug( INFO, $agi, __FILE__, __LINE__, "IDCONFIG : $idconfig");
-$A2B -> debug( INFO, $agi, __FILE__, __LINE__, "MODE : $mode");
-
 
 $A2B -> CC_TESTING = isset($A2B -> agiconfig['debugshell']) && $A2B -> agiconfig['debugshell'];
 //$A2B -> CC_TESTING = true;
@@ -1081,7 +1081,7 @@ if ($mode == 'standard') {
 				    if ($channeloutcid) {
 					$channel = $channeloutcid[0];
 					$sep = ($A2B->config['global']['asterisk_version'] == "1_2" || $A2B->config['global']['asterisk_version'] == "1_4")?'|':',';
-					if ($A2B -> cidphonenumber) {
+					if (isset($A2B -> cidphonenumber) && $A2B -> cidphonenumber) {
 					    $exten = $A2B -> cidphonenumber;
 					    $variable = '';
 					} else {
@@ -1111,7 +1111,7 @@ if ($mode == 'standard') {
 					{ 
 						$variable .= $sep.'TARIFF='.$cid_1st_leg_tariff_id;
 					}
-					$variable .= $sep."TRUNK=".$channeloutcid[2].$sep."TD=".$channeloutcid[3];
+					$variable .= $sep."RATECARD=".$RateEngine->ratecard_obj[$channeloutcid[4]][6].$sep."TRUNK=".$channeloutcid[2].$sep."TD=".$channeloutcid[3];
 					$status = 'PENDING';
 					$server_ip = 'localhost';
 					$num_attempt = 0;
@@ -1204,7 +1204,7 @@ if ($mode == 'standard') {
 				    if ($channeloutcid) {
 					$channel = $channeloutcid[0];
 					$sep = ($A2B->config['global']['asterisk_version'] == "1_2" || $A2B->config['global']['asterisk_version'] == "1_4")?'|':',';
-					if ($A2B -> cidphonenumber) {
+					if (isset($A2B -> cidphonenumber) && $A2B -> cidphonenumber) {
 					    $exten = $A2B -> cidphonenumber;
 					    $variable = '';
 					} else {
@@ -1223,7 +1223,7 @@ if ($mode == 'standard') {
 
 					$uniqueid = MDP_NUMERIC(5).'-'.MDP_STRING(7);
 					
-					$variable .= "CALLED=".$A2B ->destination.$sep."CALLING=".$exten.$sep."MODE=ALL".$sep."CBID=$uniqueid".$sep."TARIFF=".$A2B ->tariff.$sep."LEG=".$A2B -> username.$sep."TRUNK=".$channeloutcid[2].$sep."TD=".$channeloutcid[3];
+					$variable .= "CALLED=".$A2B ->destination.$sep."CALLING=".$exten.$sep."MODE=ALL".$sep."CBID=$uniqueid".$sep."TARIFF=".$A2B ->tariff.$sep."LEG=".$A2B -> username.$sep."RATECARD=".$RateEngine->ratecard_obj[$channeloutcid[4]][6].$sep."TRUNK=".$channeloutcid[2].$sep."TD=".$channeloutcid[3];
 					
 					$status = 'PENDING';
 					$server_ip = 'localhost';
@@ -1299,6 +1299,7 @@ if ($mode == 'standard') {
 	$callback_tariff = $agi -> get_variable("TARIFF", true);
 	$callback_uniqueid = $agi -> get_variable("CBID", true);
 	$callback_leg = $agi -> get_variable("LEG", true);
+	$usedratecard = $agi -> get_variable("RATECARD", true);
 
 	$QUERY = "UPDATE cc_trunk SET inuse=inuse+1 WHERE id_trunk=".$callback_usedtrunk;
 	$res = $A2B -> DBHandle -> Execute($QUERY);
@@ -1468,6 +1469,7 @@ if ($mode == 'standard') {
 	$callback_tariff = $agi -> get_variable("TARIFF", true);
 	$callback_uniqueid = $agi -> get_variable("CBID", true);
 	$callback_leg = $agi -> get_variable("LEG", true);
+	$usedratecard = $agi -> get_variable("RATECARD", true);
     $accountcode = $agi -> get_variable("ACCOUNTCODE", true);
     $phonenumber_member = $agi -> get_variable("PN_MEMBER", true);
     $room_number = $agi -> get_variable("ROOMNUMBER", true);
@@ -1612,7 +1614,7 @@ if ($mode == 'standard') {
                         $sep = ($A2B->config['global']['asterisk_version'] == "1_6" || $A2B->config['global']['asterisk_version'] == "1_8")?',':'|';
 
                         $variable = "CALLED=$inst_pn_member".$sep."CALLING=$inst_pn_member".$sep."CBID=$callback_uniqueid".$sep."TARIFF=$callback_tariff".$sep.
-                                    "LEG=".$A2B -> accountcode.$sep."ACCOUNTCODE=".$A2B -> accountcode.$sep."ROOMNUMBER=".$room_number;
+                                    "LEG=".$A2B -> accountcode.$sep."ACCOUNTCODE=".$A2B -> accountcode.$sep."ROOMNUMBER=".$room_number.$sep."RATECARD=".$RateEngine -> ratecard_obj[0][6];
                         
                         $status = 'PENDING';
                         $server_ip = 'localhost';
@@ -1693,6 +1695,7 @@ if ($mode == 'standard') {
 	$callback_tariff = $agi -> get_variable("TARIFF", true);
 	$callback_uniqueid = $agi -> get_variable("CBID", true);
 	$callback_leg = $agi -> get_variable("LEG", true);
+	$usedratecard = $agi -> get_variable("RATECARD", true);
     $accountcode = $agi -> get_variable("ACCOUNTCODE", true);
     $room_number = $agi -> get_variable("ROOMNUMBER", true);
 
@@ -1809,10 +1812,16 @@ if ($charge_callback) {
 		$A2B -> dnid = $A2B -> destination = $called_party;
 		
 		$resfindrate = $RateEngine -> rate_engine_findrates($A2B, $called_party, $A2B -> tariff);
-		$RateEngine -> usedratecard = 0;
-		
 		// IF FIND RATE
 		if ($resfindrate != 0) {
+			if (isset($usedratecard)) {
+				for ($k=0;$k<count($RateEngine -> ratecard_obj);$k++) {
+					if ($RateEngine -> ratecard_obj[$k][6] == $usedratecard) {
+						$RateEngine -> usedratecard = $k;
+						break;
+					}
+				}
+			} else $RateEngine -> usedratecard = 0;
 			$res_all_calcultimeout = $RateEngine -> rate_engine_all_calcultimeout($A2B, $A2B->credit);
 
 			if ($res_all_calcultimeout) {

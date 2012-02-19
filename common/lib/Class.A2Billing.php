@@ -559,7 +559,7 @@ if (!defined('MONITOR_PATH')) define ("MONITOR_PATH",	isset($this->config['webui
 			$this->config["agi-conf$idconfig"]['international_prefixes'] = explode(",",$this->config["agi-conf$idconfig"]['international_prefixes']);
 		} else {
 			// to retain config file compatibility assume a default unless config option is set
-			$this->config["agi-conf$idconfig"]['international_prefixes'] = explode(",","011,09,00,1");
+			$this->config["agi-conf$idconfig"]['international_prefixes'] = explode(",","+,011,09,00,1");
 		}
 		
 		if (!isset($this->config["agi-conf$idconfig"]['number_try'])) $this->config["agi-conf$idconfig"]['number_try'] = 3;
