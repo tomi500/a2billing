@@ -1633,7 +1633,7 @@ class RateEngine
 				    $ast->log("ActionID = {$amicmd[5]} [#### Starting AMI ORIGINATE ####] $channel");
 				    $ast -> add_event_handler('OriginateResponse', 'originateresponse');
 				    $ast -> actionid = $amicmd[5];
-				    $amicmd[3] = substr_replace($amicmd[3],"RATECARD={ratecard_obj[$k][6]},TRUNK=$this->usedtrunk,TD=$this->td",strpos($amicmd[3],"RATECARD"));
+				    $amicmd[3] = substr_replace($amicmd[3],"RATECARD={$this->ratecard_obj[$k][6]},TRUNK=$this->usedtrunk,TD=$this->td",strpos($amicmd[3],"RATECARD"));
 				    $res = $ast -> Originate($channel,$amicmd[0],$A2B -> config['callback']['context_callback'],$amicmd[1],NULL,NULL,
 					$A2B -> config['callback']['timeout']*1000,$amicmd[2],$amicmd[3],$amicmd[4],true,$amicmd[5]);
 				    write_log(LOGFILE_API_CALLBACK, basename(__FILE__) . ' line:' . __LINE__ . " ActionID = {$amicmd[5]} [####  RESULT AMI ORIGINATE  ####] {$res['Response']}");
