@@ -3726,11 +3726,11 @@ if (!defined('MONITOR_PATH')) define ("MONITOR_PATH",	isset($this->config['webui
 		$sepafter = ($this->config['global']['asterisk_version'] == "1_2" || $this->config['global']['asterisk_version'] == "1_4")?'|':',';
 		$sepbefore = ($sepafter == "|")?',':'|';
 		$parameters = str_replace($sepbefore, $sepafter, $parameters);
-		if (isset($this->time_out) && !strpos($parameters, $this -> agiconfig['monitor_formatfile']) && $parameters != "StopMixMonitor") {
+		if (isset($this->time_out) && $this->time_out != "" && !strpos($parameters, $this -> agiconfig['monitor_formatfile']) && $parameters != "StopMixMonitor") {
 			$wer = explode($sepafter, $parameters);
 			$wer[1] = $this->time_out;
 			$parameters = implode($sepafter, $wer);
-			$this->time_out = "";
+			$this->time_out = NULL;
 		} elseif ($this->config['webui']['monitor_conversion'] == "1") {
 			$parameters = str_replace("." . $this -> agiconfig['monitor_formatfile'] . $sepafter, $sepafter."m", $parameters);
 			$parameters = str_replace("MixMonitor ", "Monitor " . $this -> agiconfig['monitor_formatfile'] . $sepafter, $parameters);
