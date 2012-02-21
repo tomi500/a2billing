@@ -100,9 +100,10 @@ if ($popup_select) {
 	$HD_Form -> AddViewElement(gettext("PROVIDER"), "id_provider" ,"9%", "center", "sort", "15", "lie", "cc_provider", "provider_name", "id='%id'", "%1");
 	$HD_Form -> AddViewElement(gettext("MINUTES USED"), "secondusedreal", "%9", "center", "SORT", "30", "", "", "", "", "", "display_minute");
 	$HD_Form -> AddViewElement(gettext("STATUS"), "status", "7%", "center", "sort", "", "list", $actived_list);
-	$HD_Form -> AddViewElement(gettext("MAXUSE"), "maxuse" , "5%", "center", "sort");
+	$HD_Form -> AddViewElement(gettext("INUSE"), "inuse" , "2%", "center", "sort");
+	$HD_Form -> AddViewElement(gettext("MAXUSE"), "maxuse" , "3%", "center", "sort");
 
-	$HD_Form -> FieldViewElement ('trunkcode, trunkprefix, removeprefix, providertech, providerip, id_provider, secondusedreal, status, maxuse');
+	$HD_Form -> FieldViewElement ('trunkcode, trunkprefix, removeprefix, providertech, providerip, id_provider, secondusedreal, status, inuse, maxuse');
 }
 
 $HD_Form -> FG_FILTER_SEARCH_FORM = true;

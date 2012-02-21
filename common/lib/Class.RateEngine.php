@@ -1203,8 +1203,7 @@ class RateEngine
 		}
 		if ($sessiontime>0) {
 			
-			if (!isset($td)) $td = $this->td;
-			elseif (!$td) $td = $this->td;
+			if (!isset($td)) $td = (isset($this->td))?$this->td:"";
 			if ($didcall==0 && $callback==0) {
 				$myclause_nodidcall = " , redial='".$calledstation."' ";
 			} else {
