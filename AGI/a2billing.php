@@ -86,17 +86,23 @@ if ($dynamic_idconfig = intval($agi -> get_variable("IDCONF", true))) {
 	$idconfig = $dynamic_idconfig;
 }
 
-if     ($argc > 2 && strlen($argv[2]) > 0 && $argv[2] == 'did')				$mode = 'did';
-elseif ($argc > 2 && strlen($argv[2]) > 0 && $argv[2] == 'callback')			$mode = 'callback';
-elseif ($argc > 2 && strlen($argv[2]) > 0 && $argv[2] == 'cid-callback')		$mode = 'cid-callback';
-elseif ($argc > 2 && strlen($argv[2]) > 0 && $argv[2] == 'cid-prompt-callback')		$mode = 'cid-prompt-callback';
-elseif ($argc > 2 && strlen($argv[2]) > 0 && $argv[2] == 'all-callback')		$mode = 'all-callback';
-elseif ($argc > 2 && strlen($argv[2]) > 0 && $argv[2] == 'voucher')			$mode = 'voucher';
-elseif ($argc > 2 && strlen($argv[2]) > 0 && $argv[2] == 'campaign-callback')		$mode = 'campaign-callback';
-elseif ($argc > 2 && strlen($argv[2]) > 0 && $argv[2] == 'conference-moderator')	$mode = 'conference-moderator';
-elseif ($argc > 2 && strlen($argv[2]) > 0 && $argv[2] == 'conference-member')		$mode = 'conference-member';
-elseif ($argc > 2 && strlen($argv[2]) > 0 && $argv[2] == 'auto-did-callback-cid')	$mode = 'auto';
-else											$mode = 'standard';
+if ($argc > 2 && strlen($argv[2]) > 0) {
+	switch($argv[2])
+	{
+	    case 'did': 			$mode = 'did'; break;
+	    case 'callback':			$mode = 'callback'; break;
+	    case 'cid-callback':		$mode = 'cid-callback'; break;
+	    case 'cid-prompt-callback': 	$mode = 'cid-prompt-callback'; break;
+	    case 'all-callback':		$mode = 'all-callback'; break;
+	    case 'voucher':			$mode = 'voucher'; break;
+	    case 'campaign-callback':		$mode = 'campaign-callback'; break;
+	    case 'conference-moderator':	$mode = 'conference-moderator'; break;
+	    case 'conference-member':		$mode = 'conference-member'; break;
+	    case 'auto-did-callback-cid':	$mode = 'auto'; break;
+	    case 'auto':			$mode = 'auto'; break;
+	    default:				$mode = 'standard'; break;
+	}
+} else $mode = 'standard';
 
 $A2B = new A2Billing();
 $A2B -> load_conf($agi, NULL, 0, $idconfig, $optconfig);

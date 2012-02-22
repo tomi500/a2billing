@@ -117,11 +117,9 @@ if ($callback) {
 					$server_ip = 'localhost';
 					$num_attempt = 0;
 					
-					if ($A2B->config['global']['asterisk_version'] == "1_2" || $A2B->config['global']['asterisk_version'] == "1_4") {
-						$variable = "CALLED=$A2B->dnid|CALLING=$calling|CBID=$uniqueid|LEG=".$A2B->cardnumber."|RATECARD=".$RateEngine->ratecard_obj[$channeloutcid[4]][6]."|TRUNK=".$channeloutcid[2]."|TD=".$channeloutcid[3];
-					} else {
-						$variable = "CALLED=$A2B->dnid,CALLING=$calling,CBID=$uniqueid,LEG=".$A2B->cardnumber.",RATECARD=".$RateEngine->ratecard_obj[$channeloutcid[4]][6].",TRUNK=".$channeloutcid[2].",TD=".$channeloutcid[3];
-					}
+					$sep = ($A2B->config['global']['asterisk_version'] == "1_2" || $A2B->config['global']['asterisk_version'] == "1_4")?"|":",";
+					$variable = "CALLED=".$A2B->dnid.$sep."CALLING=".$calling.$sep."CBID=".$uniqueid.$sep."LEG=".$A2B->cardnumber.$sep."RATECARD=".
+						$RateEngine->ratecard_obj[$channeloutcid[4]][6].$sep."TRUNK=".$channeloutcid[2].$sep."TD=".$channeloutcid[3];
 					
 					$QUERY = " INSERT INTO cc_callback_spool (uniqueid, status, server_ip, num_attempt, channel, exten, context, priority," .
 							 " variable, id_server_group, callback_time, account, callerid, timeout, next_attempt_time, exten_leg_a) " .
