@@ -241,7 +241,7 @@ if ($mode == 'auto') {
 
 	    if (is_array($result)) {
 		if ($caller_areacode == 'recalldidless') break;
-		$QUERY = "SELECT src, cc_card.username, cc_card.recalltime FROM cc_card, cc_call
+		$QUERY = "SELECT src, cc_card.username, cc_card.recalltime, continuewithdid FROM cc_card, cc_call
 			LEFT JOIN cc_did ON cc_did.id_trunk=cc_call.id_trunk
 			WHERE cc_card.id=card_id AND did='$mydnid' AND DATEDIFF(NOW(),stoptime) < cc_card.recalldays
 			AND ('$A2B->CallerID' LIKE CONCAT('%',SUBSTRING(calledstation,2)) OR calledstation LIKE CONCAT('%','$A2B->CallerID'))
@@ -290,6 +290,11 @@ if ($mode == 'auto') {
 					}
 					// INSERT CDR  & UPDATE SYSTEM
 					$RateEngine->rate_engine_updatesystem($A2B, $agi, $A2B -> destination);
+					if ($result[0][3] && $RateEngine->dialstatus != "ANSWER") {
+						$A2B -> mode = $mode = 'did';
+						$A2B -> agiconfig['cid_enable']=0;
+						$A2B -> agiconfig['number_try']=1;
+					}
 				}
 			}
 

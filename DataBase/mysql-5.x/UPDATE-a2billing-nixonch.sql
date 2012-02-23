@@ -28,6 +28,13 @@ ALTER TABLE cc_trunk ADD failover_trunkb int(11) NULL DEFAULT NULL;
 ALTER TABLE cc_card ADD monitor int(11) DEFAULT '0';
 ALTER TABLE cc_card ADD recalldays int(11) NOT NULL DEFAULT '10';
 ALTER TABLE cc_card ADD recalltime int(11) NOT NULL DEFAULT '7200';
+ALTER TABLE cc_card ADD cbtimeoutunavailable int(11) NOT NULL DEFAULT '5';
+ALTER TABLE cc_card ADD cbattemptunavailable int(11) NOT NULL DEFAULT '20';
+ALTER TABLE cc_card ADD cbtimeoutbusy int(11) NOT NULL DEFAULT '20';
+ALTER TABLE cc_card ADD cbattemptbusy int(11) NOT NULL DEFAULT '3';
+ALTER TABLE cc_card ADD cbtimeoutnoanswer int(11) NOT NULL DEFAULT '10';
+ALTER TABLE cc_card ADD cbattemptnoanswer int(11) NOT NULL DEFAULT '3';
+ALTER TABLE cc_card ADD cbtimeoutmax int(11) NOT NULL DEFAULT '600';
 
 CREATE TABLE IF NOT EXISTS `cc_trunk_rand` (
   `trunk_id` int(11) NOT NULL DEFAULT '0',
@@ -67,6 +74,7 @@ ALTER TABLE cc_did_destination ADD timeout VARCHAR( 3 ) NOT NULL ;
 
 ALTER TABLE cc_did ADD id_trunk INT( 11 ) NOT NULL DEFAULT '-1';
 ALTER TABLE cc_did ADD allciduse INT( 11 ) NOT NULL DEFAULT '0';
+ALTER TABLE cc_did ADD continuewithdid INT( 11 ) NOT NULL DEFAULT '0';
 
 drop procedure if exists a2b_trf_check;
 
@@ -78,7 +86,7 @@ begin
     select count(*) into a from cc_config where config_key='date_timezone';
     if a=0 then
 	INSERT INTO cc_config (id, config_title, config_key, config_value, config_description, config_valuetype, config_listvalues, config_group_title)
-	VALUES (NULL , 'Time Zone', 'date_timezone', 'Europe/Moscow', 'Defines the default timezone used by the date functions, eg Europe/Kiev', '0', NULL , 'global');
+	VALUES (NULL , 'Time Zone', 'date_timezone', '0', 'Defines the default timezone used by the date functions, eg Europe/Kiev', '0', NULL , 'global');
     elseif a>1 then
 	select id into a from cc_config where config_key='date_timezone' order by id limit 0,1;
 	delete from cc_config where config_key='date_timezone' and id>a;
@@ -140,11 +148,3 @@ ALTER TABLE cc_callback_spool ADD `num_attempts_busy` int(11) NOT NULL DEFAULT '
 ALTER TABLE cc_callback_spool ADD `num_attempts_noanswer` int(11) NOT NULL DEFAULT '0';
 ALTER TABLE cc_callback_spool ADD `exten_leg_a` varchar(60) COLLATE utf8_bin NOT NULL;
 ALTER TABLE cc_callback_spool ADD `last_status` varchar(80) COLLATE utf8_bin DEFAULT NULL;
-
-ALTER TABLE cc_card ADD `cbtimeoutunavailable` int(11) NOT NULL DEFAULT '5';
-ALTER TABLE cc_card ADD `cbattemptunavailable` int(11) NOT NULL DEFAULT '20';
-ALTER TABLE cc_card ADD `cbtimeoutbusy` int(11) NOT NULL DEFAULT '20';
-ALTER TABLE cc_card ADD `cbattemptbusy` int(11) NOT NULL DEFAULT '3';
-ALTER TABLE cc_card ADD `cbtimeoutnoanswer` int(11) NOT NULL DEFAULT '10';
-ALTER TABLE cc_card ADD `cbattemptnoanswer` int(11) NOT NULL DEFAULT '3';
-ALTER TABLE cc_card ADD `cbtimeoutmax` int(11) NOT NULL DEFAULT '600';

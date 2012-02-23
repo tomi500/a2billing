@@ -2019,7 +2019,7 @@ msgstr "ОПИСАНИЕ"
 #: Public/form_data/FG_var_callerid.inc:83 Public/A2B_card_info.php:454
 #: Public/A2B_card_info.php:967 Public/A2B_entity_voucher.php:203
 msgid "ACTIVATED"
-msgstr ""
+msgstr "АКТИВЕН"
 
 #: lib/interface/constants.php:344 lib/interface/constants.php:430
 msgid "WAITING"
@@ -4039,6 +4039,10 @@ msgid "You can associate trunk for selective routing incoming calls through that
 msgstr "Нужно ассоциировать с транком для корректной работы функции возврата звонков через этот DID. Не забудьте установить параметр 'OTЗBOH' в настройках аккаунта абонента."
 
 #: Public/form_data/FG_var_did.inc:132
+msgid "Continue with DID progress when RECALL failed"
+msgstr "Продолжить обработку по DID при неудачном ОТЗВОНе"
+
+#: Public/form_data/FG_var_did.inc:141
 msgid "Allow for all active CallerIDs at system to use that DID for direct access (DISA), rather than just for active CallerIDs of customer."
 msgstr "Позволять всем активным CallerID в системе использовать этот DID для прямого доступа (DISA), а не только для активных CallerID клиента."
 

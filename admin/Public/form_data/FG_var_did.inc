@@ -112,6 +112,15 @@ $HD_Form -> AddEditElement (gettext("DID"),
 	"" , "", "", "", "" , "", "" ,
 	gettext("Define the DID's. If you ADD a new DID, NOT an EDIT, you can define a range of DID. <br>80412340210-80412340218 would add all DID's between the range, whereas DIDs separated by a comma e.g. 80412340210,80412340212,80412340214 would only add the individual DID listed."));
 
+$HD_Form -> AddEditElement (gettext("ACTIVATED"),
+	"activated",
+	'1',
+	"RADIOBUTTON",
+	"",
+	"",
+	gettext("Choose if you want to activate this card"),
+	"" , "", "", gettext("Yes").":1, - ".gettext("No").":0", "", "", "" , "" );
+
 $HD_Form -> AddEditElement (gettext("ASSOCIATE TRUNK"),
 	"id_trunk",
 	'$value',
@@ -121,6 +130,15 @@ $HD_Form -> AddEditElement (gettext("ASSOCIATE TRUNK"),
 	"cc_trunk",
 	"trunkcode, id_trunk",
 	"", "", "%1", "", gettext("You can associate trunk for selective routing incoming calls through that DID. View word of word help for parameter 'RECALL DAYS' in customer account."), '', '<OPTION  value="-1" selected>NOT DEFINED</OPTION>');
+
+$HD_Form -> AddEditElement (gettext("DID AFTER RECALL"),
+	"continuewithdid",
+	'0',
+	"RADIOBUTTON",
+	"",
+	"",
+	"",
+	"" , "", "", gettext("Yes").":1, - ".gettext("No").":0", "", "", "" , gettext("Continue with DID progress when RECALL failed"));
 
 $HD_Form -> AddEditElement (gettext("SUPER CID USE"),
 	"allciduse",
@@ -177,15 +195,6 @@ $HD_Form -> AddEditElement (gettext("COUNTRY"),
 	"cc_country",
 	"countryname, id",
 	"", "", "%1", "", "");
-
-$HD_Form -> AddEditElement (gettext("ACTIVATED"),
-	"activated",
-	'1',
-	"RADIOBUTTON",
-	"",
-	"",
-	gettext("Choose if you want to activate this card"),
-	"" , "", "", gettext("Yes").":1, - ".gettext("No").":0", "", "", "" , "" );
 
 $HD_Form -> AddEditElement (gettext("MONTHLY RATE"),
 	"fixrate",
@@ -384,7 +393,7 @@ $HD_Form -> AddEditElement(gettext("RETAIL BILLING BLOCK OFF PEAK"),
 
 
 
-$HD_Form -> FieldEditElement ('did, id_trunk, allciduse, billingtype, startingdate, expirationdate, id_cc_didgroup, id_cc_country, activated, fixrate, connection_charge, selling_rate, aleg_timeinterval, aleg_carrier_connect_charge, aleg_carrier_cost_min, aleg_carrier_initblock, aleg_carrier_increment, aleg_retail_connect_charge, aleg_retail_cost_min, aleg_retail_initblock, aleg_retail_increment, aleg_carrier_connect_charge_offp, aleg_carrier_cost_min_offp, aleg_carrier_initblock_offp, aleg_carrier_increment_offp, aleg_retail_connect_charge_offp, aleg_retail_cost_min_offp, aleg_retail_initblock_offp, aleg_retail_increment_offp');
+$HD_Form -> FieldEditElement ('did, activated, id_trunk, continuewithdid, allciduse, billingtype, startingdate, expirationdate, id_cc_didgroup, id_cc_country, fixrate, connection_charge, selling_rate, aleg_timeinterval, aleg_carrier_connect_charge, aleg_carrier_cost_min, aleg_carrier_initblock, aleg_carrier_increment, aleg_retail_connect_charge, aleg_retail_cost_min, aleg_retail_initblock, aleg_retail_increment, aleg_carrier_connect_charge_offp, aleg_carrier_cost_min_offp, aleg_carrier_initblock_offp, aleg_carrier_increment_offp, aleg_retail_connect_charge_offp, aleg_retail_cost_min_offp, aleg_retail_initblock_offp, aleg_retail_increment_offp');
 
 
 // Set the filter variables
