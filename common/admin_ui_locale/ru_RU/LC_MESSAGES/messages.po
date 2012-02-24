@@ -77,11 +77,11 @@ msgstr "НЕПРАВИЛЬНЫЙ"
 
 #: lib/admin.help.php:35
 msgid "For further information please consult"
-msgstr "Для дополнительной информации проконсультируйтесь пожалуйста"
+msgstr "Для дополнительной информации проконсультируйтесь пожалуйста в"
 
 #: lib/admin.help.php:35
 msgid "the online documention"
-msgstr "документация в сети"
+msgstr "документации в сети"
 
 #: lib/admin.help.php:55
 msgid "The Notification component is responsible for informing the Customer, via e-mail, that the account has reached a minimum credit."
@@ -532,10 +532,9 @@ msgid "This tool can be used to extract and present information from various log
 msgstr ""
 
 #: lib/admin.help.php:244
-msgid ""
-"Callback will offer you an easy way to connect any phone to our Asterisk platform.\n"
+msgid "Callback will offer you an easy way to connect any phone to our Asterisk platform.\n"
 "Browse here the pending and completed callbacks. You will see that different parameters determine the callback, the way to reach the user, the time when we need to call him, the result of the last attempts, etc..."
-msgstr ""
+msgstr "CallBack предлагает Вам лёгкий способ соединять любые телефоны между собой через Вашу платформу Asterisk. Просматривайте тут ожидаемые и завершенные задания на CallBack. Вы увидите, что есть различные параметры для задания обратного вызова, тип/способ соединения, время начала вызова, результат последней попытки, и т.д."
 
 #: lib/admin.help.php:247
 msgid "PACKAGES SYSTEM - FREE MINUTES, etc..."
@@ -5273,7 +5272,7 @@ msgstr ""
 #: Public/form_data/FG_var_server_group.inc:105
 #: Public/form_data/FG_var_callback.inc:314
 msgid "Modify the properties of the"
-msgstr "Изменитьсвойства"
+msgstr "Измение свойств для"
 
 #: Public/form_data/FG_var_server.inc:140
 #: Public/form_data/FG_var_package.inc:149
@@ -9177,11 +9176,11 @@ msgstr ""
 
 #: Public/form_data/FG_var_callback.inc:106
 msgid "This is an identifier to cross check the callback's request."
-msgstr ""
+msgstr "Идентификатор запроса на обратный вызов."
 
 #: Public/form_data/FG_var_callback.inc:106
 msgid "(useful if you have requests coming from an other platform through the API))"
-msgstr ""
+msgstr "(полезно, если у Вас есть запросы, поступающие от других платформ через API)"
 
 #: Public/form_data/FG_var_callback.inc:130
 msgid "IP SERVER"
@@ -9215,6 +9214,10 @@ msgstr ""
 msgid "CALLBACK DATE"
 msgstr ""
 
+#: Public/form_data/FG_var_callback.inc:180
+msgid "Extension on which to originate the call"
+msgstr "1-й номер для соединения"
+
 #: Public/form_data/FG_var_callback.inc:186
 #: Public/form_data/FG_var_callback.inc:196
 msgid "Insert the channel"
@@ -9222,7 +9225,7 @@ msgstr "Введите канал"
 
 #: Public/form_data/FG_var_callback.inc:187
 msgid "Channel on which to originate the call (SIP/123@1.1.1.4)"
-msgstr ""
+msgstr "Канал для 1-го номера, инициирующего соединение (например SIP/123@1.1.1.4). Не используется с php-вариантом демона."
 
 #: Public/form_data/FG_var_callback.inc:187
 msgid "Define all the information requested by asterisk to generate the callback"
@@ -9234,11 +9237,11 @@ msgstr ""
 
 #: Public/form_data/FG_var_callback.inc:197
 msgid "Extension to use on connect (must use Context & Priority with it)"
-msgstr ""
+msgstr "2-й номер для соединения (обязательно заполните поля КОНТЕКСТ и ПРИОРИТЕТ ниже)"
 
 #: Public/form_data/FG_var_callback.inc:206
 msgid "Context to use on connect (must use Exten & Priority with it)"
-msgstr ""
+msgstr "Контекст, в который должен уйти звонок на 2-й номер после ответа 1-го номера. (обязательно заполние полей EXTENSION LEG-B и ПРИОРИТЕТ)"
 
 #: Public/form_data/FG_var_callback.inc:215
 msgid "Insert the priority"
@@ -9246,7 +9249,7 @@ msgstr "Введите приоритет"
 
 #: Public/form_data/FG_var_callback.inc:216
 msgid "Priority to use on connect (must use Context & Exten with it)"
-msgstr ""
+msgstr "Приоритет, в который должен уйти звонок на 2-й номер после ответа 1-го номера. (обязательно заполние полей EXTENSION LEG-B и КОНТЕКСТ)"
 
 #: Public/form_data/FG_var_callback.inc:219
 msgid "APPLICATION"
@@ -9283,7 +9286,7 @@ msgstr "Введите таймаут"
 
 #: Public/form_data/FG_var_callback.inc:246
 msgid "Timeout for the connection to happen (30000)"
-msgstr ""
+msgstr "Максимальное время в милисекундах, указывающее сколько времени надо ждать ответа на 1-й вызов (30000 = 30 сек)"
 
 #: Public/form_data/FG_var_callback.inc:256
 msgid "CallerID to use for the call"
@@ -9323,7 +9326,7 @@ msgstr ""
 
 #: Public/form_data/FG_var_callback.inc:286
 msgid "For the origination to be asynchronous (allows multiple calls to be generated without waiting for a response)"
-msgstr ""
+msgstr "Асинхронный режим позволяет генерировать следующий звонок без ожидания ответа на текущий.<br>(Осторожно!!! Питоновский демон не учитывает результата текущего звонка!) Не используется с php-демоном, т.к. всегда асинхронен."
 
 #: Public/form_data/FG_var_callback.inc:289
 msgid "actionid"
@@ -9335,7 +9338,7 @@ msgstr ""
 
 #: Public/form_data/FG_var_callback.inc:296
 msgid "The request identifier. It allows you to identify the response to this request. You may use a number or a string. <br> Useful when you make several simultaneous requests. ActionID: ABC45678901234567890 "
-msgstr ""
+msgstr "Идентификатор AMI-запроса. Он позволяет идентифицировать ответ на этот запрос среди множества чужих ответов. <br> Можно использовать цифры и символы, например, ActionID: ABC45678901234567890"
 
 #: Public/form_data/FG_var_restore.inc:48
 msgid "FILE"

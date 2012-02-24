@@ -106,13 +106,14 @@ $HD_Form -> AddEditElement (gettext("UNIQUEID"),
 	"" , "", "",	"", "" , "", "", gettext("This is an identifier to cross check the callback's request.").gettext("(useful if you have requests coming from an other platform through the API))") );
 
 
+$readonly = "readonly";
 if ($form_action=="ask-add") {
 	$begin_date = date("Y");
 	$end_date_plus = date("Y-m-d H:i:s",time()+60);
 	$end_date = date("-m-d H:i:s");
 	$comp_date = "value='".$begin_date.$end_date."'";
 	$comp_date_plus = "value='".$end_date_plus."'";
-	
+	$readonly = "";
 	$def_ipserver = " value='localhost' "; 
 	$def_nbattempt = " value='0' ";
 }
@@ -151,7 +152,7 @@ $HD_Form -> AddEditElement (gettext("MANAGER RESULT"),
 	"manager_result",
 	'$value',
 	"INPUT",
-	"size=50 maxlength=80",
+	"size=50 maxlength=80 $readonly",
 	"11",
 	gettext("Insert the manager result"),
 	"" , "", "",	"", "", "" , "NO", "");
@@ -196,11 +197,21 @@ $HD_Form -> AddEditElement (gettext("EXTENSION LEG-A"),
 	gettext("Insert the extension"),
 	"" , "", "",	"", "", "", "", gettext("Extension on which to originate the call"), null, null, gettext("Define all the information requested by asterisk to generate the callback"));
 
+$HD_Form -> AddEditElement (gettext("TIMEOUT"),
+	"timeout",
+	'$value',
+	"INPUT",
+	"size=10 maxlength=15",
+	"11",
+	gettext("Insert the timeout"),
+	"" , "", "",	"", "", "", "NO", gettext("Timeout for the connection to happen (30000)") );
+
+
 $HD_Form -> AddEditElement (gettext("CHANNEL"),
 	"channel",
 	'$value',
 	"INPUT",
-	"size=60 maxlength=70",
+	"size=60 maxlength=70 $readonly",
 	"11",
 	gettext("Insert the channel"),
 	"" , "", "",	"", "", "", "", gettext("Channel on which to originate the call (SIP/123@1.1.1.4)"));
@@ -254,16 +265,6 @@ $HD_Form -> AddEditElement (gettext("DATA"),
 	"" , "", "",	"", "", "", "NO", gettext("Data if Application parameter is used") );
 
 
-$HD_Form -> AddEditElement (gettext("TIMEOUT"),
-	"timeout",
-	'$value',
-	"INPUT",
-	"size=10 maxlength=15",
-	"11",
-	gettext("Insert the timeout"),
-	"" , "", "",	"", "", "", "NO", gettext("Timeout for the connection to happen (30000)") );
-
-
 $HD_Form -> AddEditElement (gettext("CALLERID"),
 	"callerid",
 	'$value',
@@ -314,7 +315,7 @@ $HD_Form -> AddEditElement (gettext("actionid"),
 	"" , "", "",	"", "", "", "NO", gettext("The request identifier. It allows you to identify the response to this request. You may use a number or a string. <br> Useful when you make several simultaneous requests. ActionID: ABC45678901234567890 ") );
 
 
-$HD_Form -> FieldEditElement ('id_server_group, uniqueid, status, server_ip, num_attempt, manager_result, agi_result, callback_time, next_attempt_time, exten_leg_a, channel, exten, context, priority, application, data, timeout, callerid, variable, account, async, actionid');
+$HD_Form -> FieldEditElement ('id_server_group, uniqueid, status, server_ip, num_attempt, manager_result, agi_result, callback_time, next_attempt_time, exten_leg_a, timeout, channel, exten, context, priority, application, data, callerid, variable, account, async, actionid');
 
 
 // Set the filter variables
