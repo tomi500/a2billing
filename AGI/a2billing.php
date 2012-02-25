@@ -343,6 +343,7 @@ if ($mode == 'standard') {
 	} else {
 		$A2B -> debug( INFO, $agi, __FILE__, __LINE__, '[NO ANSWER CALL]');
 		$status_channel=4;
+		if ($A2B -> agiconfig['play_audio']==1) $agi -> exec('Progress');
 	}
 
 	$A2B -> play_menulanguage ($agi);
