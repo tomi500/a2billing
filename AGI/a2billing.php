@@ -343,13 +343,13 @@ if ($mode == 'standard') {
 	} else {
 		$A2B -> debug( INFO, $agi, __FILE__, __LINE__, '[NO ANSWER CALL]');
 		$status_channel=4;
-		if ($A2B -> agiconfig['play_audio']==1) $agi -> exec('Progress');
 	}
 
 	$A2B -> play_menulanguage ($agi);
 
 	// Play intro message
 	if (strlen($A2B -> agiconfig['intro_prompt'])>0) {
+		$A2B -> let_stream_listening($agi);
 		$agi -> stream_file($A2B -> agiconfig['intro_prompt'], '#');
 	}
 	
@@ -399,8 +399,10 @@ if ($mode == 'standard') {
                         $res_dtmf = $agi -> get_data('prepaid-enter-pin-lock', 3000, 10, '#'); //Please enter your locking code
                         if ($res_dtmf['result'] != $result[0][1]) {
                             $agi -> say_digits($res_dtmf['result']);
-                            if (strlen($res_dtmf['result']) > 0)
+                            if (strlen($res_dtmf['result']) > 0) {
+				$A2B -> let_stream_listening($agi);
                                 $agi -> stream_file('prepaid-no-pin-lock', '#');
+                            }
                             $try++;
                             $return = TRUE;
                         }
@@ -466,6 +468,7 @@ if ($mode == 'standard') {
                                                     WHERE card_id = {$A2B->id_card} ORDER BY starttime DESC LIMIT 1";
                                         $result = $A2B -> instance_table -> SQLExec ($A2B->DBHandle, $QUERY);
                                         $lastcall_info = $result[0];
+					$A2B -> let_stream_listening($agi);
                                         if (is_array($lastcall_info)) {
                                             $A2B -> debug( DEBUG, $agi, __FILE__, __LINE__, "[INFORMATION MENU]:[OPTION 1]" );
                                             $agi -> stream_file('prepaid-lastcall', '#'); //Your last call was made
@@ -480,7 +483,7 @@ if ($mode == 'standard') {
                                     break;
 
                                     case 2 :
-
+					$A2B -> let_stream_listening($agi);
                                         if ($card_info['lock_date']) {
                                             $agi -> stream_file('prepaid-account-has-locked', '#'); //Your Account has been locked the
                                             $agi -> exec("SayUnixTime {$card_info['lock_date']}");
@@ -491,6 +494,7 @@ if ($mode == 'standard') {
                                     break;
 
                                     case 3 :
+					$A2B -> let_stream_listening($agi);
                                         $agi -> stream_file('prepaid-account-firstused', '#'); //Your Account has been used for the first time the
                                         $agi -> exec("SayUnixTime {$card_info['firstuse']}");
                                         $return = TRUE;
@@ -501,6 +505,7 @@ if ($mode == 'standard') {
                                     break;
 
                                     case '*' :
+					$A2B -> let_stream_listening($agi);
                                         $agi -> stream_file('prepaid-final', '#');
                                         if ($A2B->set_inuse==1)
                                             $A2B -> callingcard_acct_start_inuse($agi,0);
@@ -533,6 +538,7 @@ if ($mode == 'standard') {
 
                     if (strlen($res_dtmf['result']) > 0 && is_int(intval($res_dtmf['result'])) ) {
 
+			$A2B -> let_stream_listening($agi);
                         $agi -> stream_file('prepaid-your-locking-is', '#'); //Your locking code is
                         $agi -> say_digits($res_dtmf['result']);
                         $lock_pin = $res_dtmf['result'];
@@ -553,6 +559,7 @@ if ($mode == 'standard') {
                                     $QUERY = "UPDATE cc_card SET block = 1, lock_pin = '{$lock_pin}', lock_date = NOW() WHERE username = '{$A2B->username}'";
                                     $A2B -> instance_table -> SQLExec ($A2B->DBHandle, $QUERY);
                                     $A2B -> debug( DEBUG, $agi, __FILE__, __LINE__, "[QUERY]:[$QUERY]" );
+				    $A2B -> let_stream_listening($agi);
                                     $agi -> stream_file('prepaid-locking-accepted', '#'); // Your locking code has been accepted
                                     $return = TRUE;
                                 break;
@@ -562,6 +569,7 @@ if ($mode == 'standard') {
                                 break;
 
                                 case '*' :
+				    $A2B -> let_stream_listening($agi);
                                     $agi -> stream_file('prepaid-final', '#');
                                     if ($A2B->set_inuse==1)
                                         $A2B -> callingcard_acct_start_inuse($agi,0);
@@ -579,6 +587,7 @@ if ($mode == 'standard') {
 			if (!$A2B -> enough_credit_to_call()) {
 
 				// SAY TO THE CALLER THAT IT DEOSNT HAVE ENOUGH CREDIT TO MAKE A CALL
+				$A2B -> let_stream_listening($agi);
 				$prompt = "prepaid-no-enough-credit-stop";
 				$agi -> stream_file($prompt, '#');
 				$A2B -> debug( DEBUG, $agi, __FILE__, __LINE__, "[STOP STREAM FILE $prompt]");
@@ -647,7 +656,7 @@ if ($mode == 'standard') {
 								$result = $A2B -> instance_table -> SQLExec ($A2B->DBHandle, $QUERY);
 								$id_speeddial = $result[0][1];
 								if (is_array($result)) {
-                                    $agi -> say_number($speeddial_number);
+									$agi -> say_number($speeddial_number);
 									$agi -> stream_file("prepaid-is-used-for", "#");
 									$agi -> say_digits($result[0][0]);
 										$res_dtmf = $agi -> get_data("prepaid-press1-change-speeddial", 3000, 1); //if you want to change it press 1 or an other key to enter an other speed dial number.
@@ -757,10 +766,7 @@ if ($mode == 'standard') {
 					$result_callperf = $RateEngine->rate_engine_performcall ($agi, $A2B-> destination, $A2B);
 
 					if (!$result_callperf) {
-						if (!$A2B -> agiconfig['answer_call']) {
-							$agi -> exec('Progress');
-							usleep(200000);
-						}
+						$A2B -> let_stream_listening($agi);
 						$prompt="prepaid-dest-unreachable";
 						$agi -> stream_file($prompt, '#');
 					}
@@ -859,10 +865,7 @@ if ($mode == 'standard') {
 					$result_callperf = $RateEngine->rate_engine_performcall($agi, $A2B -> destination, $A2B);
 
 					if (!$result_callperf) {
-						if (!$A2B -> agiconfig['answer_call']) {
-							$agi -> exec('Progress');
-							usleep(200000);
-						}
+						$A2B -> let_stream_listening($agi);
 						$prompt="prepaid-dest-unreachable";
 						$agi-> stream_file($prompt, '#');
 					}

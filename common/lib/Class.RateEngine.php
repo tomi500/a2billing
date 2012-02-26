@@ -1587,7 +1587,7 @@ class RateEngine
 //					$myres = $agi->exec("SETMUSICONHOLD $musiconhold");
 					$agi -> set_variable('CHANNEL(musicclass)', $musiconhold);
 					$A2B -> debug( DEBUG, $agi, __FILE__, __LINE__, "EXEC SETMUSICONHOLD $musiconhold");
-					$A2B -> streamfirst = false;
+//					$A2B -> streamfirst = false;
 				}
 
 				$dialstr = $channel.$dialparams;
@@ -1696,18 +1696,15 @@ class RateEngine
 			
 			//# Ooh, something actually happened!
 
-			if ($A2B -> streamfirst && array_search($agi -> channel_status('',true), array(AST_STATE_UP, AST_STATE_DOWN)) === false) {
-				$agi -> exec('Progress');
-				usleep(200000);
-				$A2B -> streamfirst = false;
-			}
 			if ($this->dialstatus  == "BUSY") {
 				$this -> real_answeredtime = $this -> answeredtime = 0;
 				if ($A2B->agiconfig['busy_timeout'] > 0)
 					$res_busy = $agi->exec("Busy ".$A2B->agiconfig['busy_timeout']);
+				if (array_search($agi -> channel_status('',true), array(AST_STATE_UP, AST_STATE_DOWN)) === false) $A2B -> let_stream_listening($agi);
 				$agi-> stream_file('prepaid-isbusy', '#');
 			} elseif ($this->dialstatus == "NOANSWER") {
 				$this -> real_answeredtime = $this -> answeredtime = 0;
+				if (array_search($agi -> channel_status('',true), array(AST_STATE_UP, AST_STATE_DOWN)) === false) $A2B -> let_stream_listening($agi);
 				$agi-> stream_file('prepaid-noanswer', '#');
 			} elseif ($this->dialstatus == "CANCEL") {
 				$this -> real_answeredtime = $this -> answeredtime = 0;

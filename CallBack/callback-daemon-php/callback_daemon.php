@@ -1,7 +1,7 @@
 #!/usr/bin/php -q
 <?php
 
-$id_server_group=1;
+//$id_server_group=1;
 
 declare(ticks = 1);
 if (function_exists('pcntl_signal'))
@@ -95,47 +95,47 @@ else
 $instance_table = new Table();
 $A2B -> set_instance_table ($instance_table);
 
-$query="SELECT `id`,`manager_host`,`manager_username`,`manager_secret` FROM `cc_server_manager` WHERE `id_group`=$id_server_group LIMIT 1";
-$result=$instance_table->SQLExec($A2B->DBHandle, $query);
-if (!(is_array($result) && count($result)>0)) {
-    print("id_server_group $id_server_group does not exist\n");
-    exit(1);
-}
-list($manager_id,$manager_host,$manager_username,$manager_secret)=$result[0];
-$query="UPDATE `cc_server_manager` SET `lasttime_used`=now()";
-if (!$A2B->DBHandle->Execute($query)) die("Can't execute query '$query'\n");
-
 while(true)
 {
     pcntl_wait($status, WNOHANG);
-    $query="SELECT `id`,`status`,`exten_leg_a`,`account`,`callerid`,`exten`,`context`,`priority`,`variable`,`timeout`,`reason`,`num_attempts_unavailable`,`num_attempts_busy`,`num_attempts_noanswer`,TIMEDIFF(now(),`callback_time`)";
-    $query.=" FROM `cc_callback_spool` WHERE `id_server_group`=$id_server_group AND `status`='PENDING' AND (`next_attempt_time`<=now() OR ISNULL(`next_attempt_time`))";
+    $query="SELECT `id`,`status`,`exten_leg_a`,`account`,`callerid`,`exten`,`context`,`priority`,`variable`,`timeout`,`reason`,`num_attempts_unavailable`,`num_attempts_busy`,`num_attempts_noanswer`,TIMEDIFF(now(),`callback_time`),`id_server_group`";
+    $query.=" FROM `cc_callback_spool` WHERE `status`='PENDING' AND (`next_attempt_time`<=now() OR ISNULL(`next_attempt_time`))";
     $result=$instance_table->SQLExec($A2B->DBHandle, $query);
     foreach ($result as $value) {
-	list($cc_id,$cc_status,$cc_exten_leg_a,$cc_account,$cc_callerid,$cc_exten,$cc_context,$cc_priority,$cc_variable,$cc_timeout,$cc_reason,$cc_num_attempts_unavailable,$cc_num_attempts_busy,$cc_num_attempts_noanswer,$cc_timediff)=$value;
-	$query2="SELECT `tariff`,`cbtimeoutunavailable`,`cbattemptunavailable`,`cbtimeoutbusy`,`cbattemptbusy`,`cbtimeoutnoanswer`,`cbattemptnoanswer`,`cbtimeoutmax`,TIME_TO_SEC(TIMEDIFF(`cbtimeoutmax`,'$cc_timediff')) FROM `cc_card` WHERE `username`='$cc_account' LIMIT 1";
-	$result2=$instance_table->SQLExec($A2B->DBHandle, $query2);
-	if (!(is_array($result2) && count($result2)>0)) die("Can't execute query '$query2'\n");
-	list($acc_tariff,$acc_to_unav,$acc_max_unav,$acc_to_busy,$acc_max_busy,$acc_to_noansw,$acc_max_noansw,$acc_max_timeout,$acc_timeout_res)=$result2[0];
+	list($cc_id,$cc_status,$cc_exten_leg_a,$cc_account,$cc_callerid,$cc_exten,$cc_context,$cc_priority,$cc_variable,$cc_timeout,$cc_reason,$cc_num_attempts_unavailable,$cc_num_attempts_busy,$cc_num_attempts_noanswer,$cc_timediff,$id_server_group)=$value;
+	$query="SELECT `id`,`manager_host`,`manager_username`,`manager_secret` FROM `cc_server_manager` WHERE `id_group`=$id_server_group LIMIT 1";
+	$result1=$instance_table->SQLExec($A2B->DBHandle, $query);
+	if (!(is_array($result1) && count($result1)>0)) {
+	    print("id_server_group $id_server_group does not exist\n");
+	    exit(1);
+	}
+	list($manager_id,$manager_host,$manager_username,$manager_secret)=$result1[0];
+	$query="UPDATE `cc_server_manager` SET `lasttime_used`=now()";
+	if (!$A2B->DBHandle->Execute($query)) die("Can't execute query '$query'\n");
+
+	$query="SELECT `tariff`,`cbtimeoutunavailable`,`cbattemptunavailable`,`cbtimeoutbusy`,`cbattemptbusy`,`cbtimeoutnoanswer`,`cbattemptnoanswer`,`cbtimeoutmax`,TIME_TO_SEC(TIMEDIFF(`cbtimeoutmax`,'$cc_timediff')) FROM `cc_card` WHERE `username`='$cc_account' LIMIT 1";
+	$result1=$instance_table->SQLExec($A2B->DBHandle, $query);
+	if (!(is_array($result1) && count($result1)>0)) die("Can't execute query '$query'\n");
+	list($acc_tariff,$acc_to_unav,$acc_max_unav,$acc_to_busy,$acc_max_busy,$acc_to_noansw,$acc_max_noansw,$acc_max_timeout,$acc_timeout_res)=$result1[0];
 	if ($acc_timeout_res < 0)
 	{
-	    $query3="UPDATE `cc_callback_spool` SET `status`='ERROR_TIMEOUT',`id_server`='$manager_id',`id_server_group`='$id_server_group' WHERE `id`=$cc_id";
-	    if (!$A2B->DBHandle->Execute($query3)) die("Can't execute query '$query3'\n");
+	    $query="UPDATE `cc_callback_spool` SET `status`='ERROR_TIMEOUT',`id_server`='$manager_id' WHERE `id`=$cc_id";
+	    if (!$A2B->DBHandle->Execute($query)) die("Can't execute query '$query'\n");
 	}
 	elseif($acc_max_unav<=$cc_num_attempts_unavailable)
 	{
-	    $query3="UPDATE `cc_callback_spool` SET `status`='ERROR_UNAVAILABLE',`id_server`='$manager_id',`id_server_group`='$id_server_group' WHERE `id`=$cc_id";
-	    if (!$A2B->DBHandle->Execute($query3)) die("Can't execute query '$query3'\n");
+	    $query="UPDATE `cc_callback_spool` SET `status`='ERROR_UNAVAILABLE',`id_server`='$manager_id' WHERE `id`=$cc_id";
+	    if (!$A2B->DBHandle->Execute($query)) die("Can't execute query '$query'\n");
 	}
 	elseif($acc_max_busy<=$cc_num_attempts_busy)
 	{
-	    $query3="UPDATE `cc_callback_spool` SET `status`='ERROR_BUSY',`id_server`='$manager_id',`id_server_group`='$id_server_group' WHERE `id`=$cc_id";
-	    if (!$A2B->DBHandle->Execute($query3)) die("Can't execute query '$query3'\n");
+	    $query="UPDATE `cc_callback_spool` SET `status`='ERROR_BUSY',`id_server`='$manager_id' WHERE `id`=$cc_id";
+	    if (!$A2B->DBHandle->Execute($query)) die("Can't execute query '$query'\n");
 	}
 	elseif($acc_max_noansw<=$cc_num_attempts_noanswer)
 	{
-	    $query3="UPDATE `cc_callback_spool` SET `status`='ERROR_NO-ANSWER',`id_server`='$manager_id',`id_server_group`='$id_server_group' WHERE `id`=$cc_id";
-	    if (!$A2B->DBHandle->Execute($query3)) die("Can't execute query '$query3'\n");
+	    $query="UPDATE `cc_callback_spool` SET `status`='ERROR_NO-ANSWER',`id_server`='$manager_id' WHERE `id`=$cc_id";
+	    if (!$A2B->DBHandle->Execute($query)) die("Can't execute query '$query'\n");
 	}
 	else {
 	    $A2B->DbDisconnect();
@@ -155,8 +155,8 @@ while(true)
 
 		$A2B -> DbConnect($agi);
 		$A2B -> set_instance_table ($instance_table);
-		$query3="UPDATE `cc_callback_spool` SET `status`='PROCESSING',`num_attempt`=`num_attempt`+1,`last_attempt_time`=now(),`id_server`='$manager_id',`id_server_group`='$id_server_group' WHERE `id`=$cc_id";
-		if (!$A2B->DBHandle->Execute($query3)) die("Can't execute query '$query3'\n");
+		$query="UPDATE `cc_callback_spool` SET `status`='PROCESSING',`num_attempt`=`num_attempt`+1,`last_attempt_time`=now(),`id_server`='$manager_id' WHERE `id`=$cc_id";
+		if (!$A2B->DBHandle->Execute($query)) die("Can't execute query '$query'\n");
 		$return=callback_engine($A2B, $manager_host.":5038", $manager_username, $manager_secret, array($cc_exten,$cc_priority,$cc_callerid,$cc_variable,$cc_account,$cc_id), $cc_exten_leg_a, $acc_tariff);
 		$timeout=-1;
 		$fatal=0;
@@ -176,13 +176,13 @@ while(true)
 		}
 		if($fatal) $status=$last_status;
 		    else $status='PENDING';
-		$query3="UPDATE `cc_callback_spool` SET `status`='$status',`last_status`='$last_status',`manager_result`='$last_status',`id_server`='$manager_id',`id_server_group`='$id_server_group'";
-		if($return==-2 || $return==0 || $return==8) $query3.=",`num_attempts_unavailable`=`num_attempts_unavailable`+1";
-		if($return==1) $query3.=",`num_attempts_busy`=`num_attempts_busy`+1";
-		if($return==3) $query3.=",`num_attempts_noanswer`=`num_attempts_noanswer`+1";
-		if($timeout>=0) $query3.=",`next_attempt_time`=ADDTIME(now(),SEC_TO_TIME($timeout))";
-		$query3.=" WHERE `id`=$cc_id";
-		if (!$A2B->DBHandle->Execute($query3)) die("Can't execute query '$query3'\n");
+		$query="UPDATE `cc_callback_spool` SET `status`='$status',`last_status`='$last_status',`manager_result`='$last_status'";
+		if($return==-2 || $return==0 || $return==8) $query.=",`num_attempts_unavailable`=`num_attempts_unavailable`+1";
+		if($return==1) $query.=",`num_attempts_busy`=`num_attempts_busy`+1";
+		if($return==3) $query.=",`num_attempts_noanswer`=`num_attempts_noanswer`+1";
+		if($timeout>=0) $query.=",`next_attempt_time`=ADDTIME(now(),SEC_TO_TIME($timeout))";
+		$query.=" WHERE `id`=$cc_id";
+		if (!$A2B->DBHandle->Execute($query)) die("Can't execute query '$query'\n");
 		$A2B->DbDisconnect();
 		exit(0);
 	    }

@@ -180,7 +180,7 @@ class A2Billing {
 
 	var $languageselected;
 	var $current_language;
-
+	var $streamfirst = true;
 
 	var $cardholder_lastname;
 	var $cardholder_firstname;
@@ -413,6 +413,7 @@ class A2Billing {
 		if (!isset($this->config['global']['base_currency'])) 		$this->config['global']['base_currency'] = 'usd';
 		if (!isset($this->config['global']['didbilling_daytopay'])) 	$this->config['global']['didbilling_daytopay'] = 5;
 		if (!isset($this->config['global']['admin_email'])) 			$this->config['global']['admin_email'] = 'root@localhost';
+		define ("DATE_TIMEZONE", isset($this->config['global']['date_timezone'])?$this->config['global']['date_timezone']:0);
 
 				// Conf for the Callback
 		if (!isset($this->config['callback']['context_callback']))	$this->config['callback']['context_callback'] = 'a2billing-callback';
@@ -486,6 +487,7 @@ class A2Billing {
 		if (!isset($this->config['webui']['voucher_export_field_list']))	$this->config['webui']['voucher_export_field_list'] = 'id, voucher, credit, tag, activated, usedcardnumber, usedate, currency';
 		if (!isset($this->config['webui']['advanced_mode']))				$this->config['webui']['advanced_mode'] = 0;
 		if (!isset($this->config['webui']['delete_fk_card']))			$this->config['webui']['delete_fk_card'] = 1;
+		if (!defined('MONITOR_PATH')) define ("MONITOR_PATH",	isset($this->config['webui']['monitor_path'])			?$this->config['webui']['monitor_path']:null);
 
 		// conf for the recurring process
 		if (!isset($this->config["recprocess"]['batch_log_file'])) 	$this->config["recprocess"]['batch_log_file'] = '/tmp/batch-a2billing.log';
@@ -521,12 +523,10 @@ class A2Billing {
 		define ("LOGFILE_CRONT_CURRENCY_UPDATE",isset($this->config['log-files']['cront_currency_update'])	?$this->config['log-files']['cront_currency_update']:null);
 		define ("LOGFILE_CRONT_INVOICE",		isset($this->config['log-files']['cront_invoice'])			?$this->config['log-files']['cront_invoice']:null);
 		define ("LOGFILE_CRONT_CHECKACCOUNT",	isset($this->config['log-files']['cront_check_account'])	?$this->config['log-files']['cront_check_account']:null);
-if (!defined('MONITOR_PATH')) define ("MONITOR_PATH",	isset($this->config['webui']['monitor_path'])			?$this->config['webui']['monitor_path']:null);
 		define ("LOGFILE_API_ECOMMERCE", 		isset($this->config['log-files']['api_ecommerce'])			?$this->config['log-files']['api_ecommerce']:null);
 		define ("LOGFILE_API_CALLBACK", 		isset($this->config['log-files']['api_callback'])			?$this->config['log-files']['api_callback']:null);
 		define ("LOGFILE_PAYPAL", 				isset($this->config['log-files']['paypal'])					?$this->config['log-files']['paypal']:null);
 		define ("LOGFILE_EPAYMENT", 			isset($this->config['log-files']['epayment'])				?$this->config['log-files']['epayment']:null);
-		define ("DATE_TIMEZONE", 		isset($this->config['global']['date_timezone'])?$this->config['global']['date_timezone']:0);
 
 		// conf for the AGI
 		if (!isset($this->config["agi-conf$idconfig"]['play_audio'])) 	$this->config["agi-conf$idconfig"]['play_audio'] = 1;
@@ -622,7 +622,7 @@ if (!defined('MONITOR_PATH')) define ("MONITOR_PATH",	isset($this->config['webui
 		if (!$webui) $this -> debug( DEBUG, $agi, __FILE__, __LINE__, print_r($this->agiconfig, true));
 		
 		if ( DATE_TIMEZONE ) date_default_timezone_set( DATE_TIMEZONE );
-		$this -> streamfirst = true;
+//		$this -> streamfirst = true;
 		return true;
     }
 
@@ -739,6 +739,19 @@ if (!defined('MONITOR_PATH')) define ("MONITOR_PATH",	isset($this->config['webui
 		return $ret;
 	}
 
+
+
+	/*
+	 * function to let audable not answer status
+	 */
+	function let_stream_listening($agi)
+	{
+		if ($this -> streamfirst && !$this -> agiconfig['answer_call'] && $this -> agiconfig['play_audio']) {
+			$agi -> exec('Progress');
+			$A2B -> streamfirst = false;
+			usleep(200000);
+		}
+	}
 
 
 	/*
@@ -1063,18 +1076,20 @@ if (!defined('MONITOR_PATH')) define ("MONITOR_PATH",	isset($this->config['webui
 	
 	        // IF DONT FIND RATE
 	        if ($resfindrate==0) {
-                $prompt="prepaid-dest-unreachable";
-                $agi-> stream_file($prompt, '#');
-                return -1;
+			if (array_search($agi -> channel_status('',true), array(AST_STATE_UP, AST_STATE_DOWN)) === false) $this -> let_stream_listening($agi);
+			$prompt="prepaid-dest-unreachable";
+			$agi-> stream_file($prompt, '#');
+			return -1;
 	        }
 	        // CHECKING THE TIMEOUT
 	        $res_all_calcultimeout = $RateEngine->rate_engine_all_calcultimeout($this, $this->credit);
 	
 	        $this -> debug( DEBUG, $agi, __FILE__, __LINE__, "RES_ALL_CALCULTIMEOUT ::> $res_all_calcultimeout");
 	        if (!$res_all_calcultimeout) {
-                $prompt="prepaid-no-enough-credit";
-                $agi-> stream_file($prompt, '#');
-                return -1;
+			if (array_search($agi -> channel_status('',true), array(AST_STATE_UP, AST_STATE_DOWN)) === false) $this -> let_stream_listening($agi);
+			$prompt="prepaid-no-enough-credit";
+			$agi-> stream_file($prompt, '#');
+			return -1;
 	        }
 	
 	        // calculate timeout
@@ -1314,11 +1329,7 @@ if (!defined('MONITOR_PATH')) define ("MONITOR_PATH",	isset($this->config['webui
 				if (strlen($inst_listdestination[4])==0) continue;
 
 				if ($inst_listdestination[28]) $agi -> answer();
-				elseif ($this -> streamfirst && $inst_listdestination[29] && array_search($agi -> channel_status('',true), array(AST_STATE_UP, AST_STATE_DOWN)) === false) {
-					$agi -> exec('Progress');
-					usleep(400000);
-					$this -> streamfirst = false;
-				}
+				elseif ($inst_listdestination[29] && array_search($agi -> channel_status('',true), array(AST_STATE_UP, AST_STATE_DOWN)) === false) $this -> let_stream_listening($agi);
 				if ($inst_listdestination[29]) {
 					$agi -> evaluate("STREAM FILE $inst_listdestination[29] \"#\" 0");
 				}
@@ -1580,11 +1591,7 @@ if (!defined('MONITOR_PATH')) define ("MONITOR_PATH",	isset($this->config['webui
             	continue;
 
 	    if ($inst_listdestination[29]) {
-		if ($this -> streamfirst && array_search($agi -> channel_status('',true), array(AST_STATE_UP, AST_STATE_DOWN)) === false) {
-			$agi -> exec('Progress');
-			usleep(200000);
-			$this -> streamfirst = false;
-		}
+		if (array_search($agi -> channel_status('',true), array(AST_STATE_UP, AST_STATE_DOWN)) === false) $this -> let_stream_listening($agi);
 		$agi -> evaluate("STREAM FILE $inst_listdestination[29] \"#\" 0");
 	    }
 
@@ -1646,21 +1653,13 @@ if (!defined('MONITOR_PATH')) define ("MONITOR_PATH",	isset($this->config['webui
 					$answeredtime = 0;
 					if ($this->agiconfig['busy_timeout'] > 0)
 						$res_busy = $agi->exec("Busy ".$this->agiconfig['busy_timeout']);
-					if ($this -> streamfirst && array_search($agi -> channel_status('',true), array(AST_STATE_UP, AST_STATE_DOWN)) === false) {
-						$agi -> exec('Progress');
-						usleep(200000);
-						$this -> streamfirst = false;
-					}
+					if (array_search($agi -> channel_status('',true), array(AST_STATE_UP, AST_STATE_DOWN)) === false) $this -> let_stream_listening($agi);
 					$agi-> stream_file('prepaid-isbusy', '#');
 					if (count($listdestination)>$callcount)
 						continue;
                 } elseif ($dialstatus == "NOANSWER") {
 					$answeredtime = 0;
-					if ($this -> streamfirst && array_search($agi -> channel_status('',true), array(AST_STATE_UP, AST_STATE_DOWN)) === false) {
-						$agi -> exec('Progress');
-						usleep(200000);
-						$this -> streamfirst = false;
-					}
+					if (array_search($agi -> channel_status('',true), array(AST_STATE_UP, AST_STATE_DOWN)) === false) $this -> let_stream_listening($agi);
 					$agi-> stream_file('prepaid-noanswer', '#');
 					if (count($listdestination) > $callcount)
 						continue;
@@ -1675,6 +1674,7 @@ if (!defined('MONITOR_PATH')) define ("MONITOR_PATH",	isset($this->config['webui
 					$answeredtime = 0;
 					if (count($listdestination)>$callcount) continue;
                 } else {
+		    if (array_search($agi -> channel_status('',true), array(AST_STATE_UP, AST_STATE_DOWN)) === false) $this -> let_stream_listening($agi);
                     $agi-> stream_file('prepaid-callfollowme', '#');
                     if (count($listdestination)>$callcount) continue;
                 }
