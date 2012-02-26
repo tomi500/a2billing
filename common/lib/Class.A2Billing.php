@@ -748,7 +748,7 @@ class A2Billing {
 	{
 		if ($this -> streamfirst && !$this -> agiconfig['answer_call'] && $this -> agiconfig['play_audio']) {
 			$agi -> exec('Progress');
-			$A2B -> streamfirst = false;
+			$this -> streamfirst = false;
 			usleep(200000);
 		}
 	}
@@ -1907,7 +1907,7 @@ class A2Billing {
             # duration of the call for the A-Leg is since the start date
             
             // SET CORRECTLY THE CALLTIME FOR THE 1st LEG
-	        if ($A2B -> agiconfig['answer_call'] == 1) {
+	        if ($this -> agiconfig['answer_call'] == 1) {
 	            $aleg_answeredtime  = time() - $this -> G_startime;
 	        } else {
 	            $aleg_answeredtime = $b_leg_answeredtime;
