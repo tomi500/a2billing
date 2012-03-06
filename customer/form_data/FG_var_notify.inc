@@ -56,12 +56,15 @@ if ($numrow == 0) exit();
 $customer_info =$resmax -> fetchRow();
 
 
-	
 $currencies_list = get_currencies();
+$two_currency = false;
 
-if (!isset($currencies_list[strtoupper($customer_info [1])][2]) || !is_numeric($currencies_list[strtoupper($customer_info [1])][2])) $mycur = 1;
-else $mycur = $currencies_list[strtoupper($customer_info [1])][2];
-
+if (!isset($currencies_list[strtoupper($customer_info [1])][2]) || !is_numeric($currencies_list[strtoupper($customer_info [1])][2]))
+    $mycur = 1;
+else {
+    $mycur = $currencies_list[strtoupper($customer_info [1])][2];
+    if (strtoupper($_SESSION['currency'])!=strtoupper(BASE_CURRENCY)) $two_currency=true;
+}
 
 // Possible value to notify the user
 $instance_config_table = new Table("cc_config", "id, config_value");
@@ -72,8 +75,9 @@ $values = explode(":",$return[0]["config_value"]);
 $limits_notify = array();
 $idx =0;
 foreach ($values as $val) {
-$val_display = $val / $mycur;
-	$val_display = round($val_display,2);	
+	$val_display = round($val,2);
+	if ($two_currency)
+		$val_display .= " ".strtoupper(BASE_CURRENCY)." - ".round($val/$mycur,2)." ".strtoupper($_SESSION['currency']);
 	$limits_notify [$idx] = array($val_display,$val);
 	$idx++;
 }
@@ -86,7 +90,7 @@ $HD_Form -> AddEditElement (gettext("LIMIT CREDIT NOTIFICATION"),
 			   "",
 			   "",
 			   gettext("Insert the number of credit when the customer receive a notification"),
-			   "list" , "", "", "", $limits_notify , "%1", "", gettext("currency : ").strtoupper(BASE_CURRENCY),"", '<OPTION  value="-1" selected>'.gettext("NOT DEFINED").'</OPTION>'  );
+			   "list" , "", "", "", $limits_notify , "%1", "", (!$two_currency)?gettext('currency : ').strtoupper(BASE_CURRENCY):'',"", '<OPTION  value="-1" selected>'.gettext("NOT DEFINED").'</OPTION>'  );
 
 
 $HD_Form -> AddEditElement (gettext("PERMITTED NOTIFICATIONS BY MAIL"),

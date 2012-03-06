@@ -1244,7 +1244,7 @@ function currencies_update_yahoo ($DBHandle, $instance_table)
 
 			// if we've changed base_currency,  update each SQL row to reflect this
 			if (BASE_CURRENCY != $old_currencies[$i][2]) {
-				$QUERY .= ", basecurrency='" . BASE_CURRENCY . "'";
+				$QUERY .= ", basecurrency='" . strtoupper(BASE_CURRENCY) . "'";
 			}
 
 			$QUERY .= " , lastupdate = CURRENT_TIMESTAMP WHERE id ='" . $old_currencies[$i][0] . "'";
