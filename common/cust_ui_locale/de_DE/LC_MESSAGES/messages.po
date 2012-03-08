@@ -21,7 +21,7 @@ msgstr "Ihre Anmeldung Einstellungen wurden erfolgreich aktualisiert."
 
 #: A2B_recurring_payment.php:140 A2B_recurring_payment.php:146
 msgid "Reccurring payment : automated refill"
-msgstr ""
+msgstr "Wiederkehrende zahlung : Automatisch Aufladung"
 
 #: A2B_recurring_payment.php:156 iridium_threed.php:315
 #: checkout_process.php:357
@@ -36,7 +36,7 @@ msgstr "Rechnung für Nachfüllung"
 
 #: A2B_recurring_payment.php:165
 msgid "Automated Refill : recurring payment"
-msgstr ""
+msgstr "Automatisch Aufladung : wiederkehrende zahlung"
 
 #: A2B_recurring_payment.php:194 iridium_threed.php:387
 #: lib/Form/Class.FormBO.php:996 checkout_process.php:392
@@ -325,7 +325,7 @@ msgstr "ERSCHAFFEN"
 
 #: iridium_threed.php:331 checkout_process.php:365
 msgid "Refill ONLINE"
-msgstr "ONLINE Nachfüllen"
+msgstr "ONLINE Aufladung"
 
 #: form_data/FG_var_did.inc:60 lib/interface/constants.php:89
 msgid "Active"
@@ -1135,12 +1135,8 @@ msgid "Made your change to edit this callerid."
 msgstr "Ihre Aenderungen an dieser CallerID wurden durchgeführt."
 
 #: lib/customer.defines.php:114
-msgid "The expiry date entered for the credit card is invalid."
-msgstr "Die Frist für die Eingabe der Kreditkarte ist ungültig."
-
-#: lib/customer.defines.php:114
-msgid "Please check the date and try again."
-msgstr "Bitte überprüfen Sie das Datum und versuchen Sie es erneut."
+msgid "The expiry date entered for the credit card is invalid.<br>Please check the date and try again."
+msgstr "Die Frist für die Eingabe der Kreditkarte ist ungültig.<br>Bitte überprüfen Sie das Datum und versuchen Sie es erneut."
 
 #: lib/customer.defines.php:115
 msgid "The credit card number entered is invalid."
@@ -1151,16 +1147,8 @@ msgid "Please check the number and try again."
 msgstr "Bitte überprüfen Sie die Nummer und versuchen Sie es erneut."
 
 #: lib/customer.defines.php:116
-msgid "The first four digits of the number entered are"
-msgstr "Die ersten vier Ziffern der Nummer eingegeben"
-
-#: lib/customer.defines.php:116
-msgid "If that number is correct, we do not accept that type of credit card."
-msgstr "Wenn die Nummer korrekt ist, akzeptieren wir dieser Art von Kreditkarte nicht."
-
-#: lib/customer.defines.php:116
-msgid "If it is wrong, please try again."
-msgstr "Wenn es falsch, bitte wiederholen."
+msgid "The first four digits of the number entered are: <br>If that number is correct, we do not accept that type of credit card.<br>If it is wrong, please try again."
+msgstr "Die ersten vier Ziffern der Nummer eingegeben: <br>Wenn die Nummer korrekt ist, akzeptieren wir dieser Art von Kreditkarte nicht.<br>Wenn es falsch, bitte wiederholen."
 
 #: lib/customer.defines.php:123
 msgid "Errors have occured during the process of your form."
@@ -1229,7 +1217,7 @@ msgstr "* Die Kreditkartennummer muss mindestens"
 
 #: lib/customer.defines.php:138
 msgid "Credit Card Error!"
-msgstr "Kredit Kartenfehler !"
+msgstr "Kredit Kartenfehler!"
 
 #: lib/customer.defines.php:142
 msgid "There has been an error processing your credit card"
@@ -1498,7 +1486,7 @@ msgstr "Rechnung für NACHZAHLUNG"
 #: lib/Form/Class.FormBO.php:836 lib/Form/Class.FormBO.php:838
 #: lib/Form/Class.FormBO.php:945 lib/Form/Class.FormBO.php:947
 msgid "REFILL"
-msgstr "NACHFÜLLEN"
+msgstr "AUFLADEN"
 
 #: lib/Form/Class.SearchHandler.inc.php:24
 #: lib/Form/Class.SearchHandler.inc.php:100
@@ -2113,7 +2101,7 @@ msgstr "Neu"
 
 #: lib/interface/constants.php:223
 msgid "Proceed"
-msgstr "Fortfahren"
+msgstr "Weiter"
 
 #: lib/interface/constants.php:224
 msgid "In Process"
@@ -2497,7 +2485,6 @@ msgid "Map single digit to your most dialed numbers."
 msgstr ""
 
 #: lib/customer.help.php:89
-#, fuzzy
 msgid "Callback : Entre your phone number and the phone number you wish to call."
 msgstr "Tippen Sie für den Rückruf, Ihre Telefonnummer und die Nummer, die Sie anrufen möchten! "
 
@@ -2563,9 +2550,13 @@ msgstr "Betrag"
 msgid "VAT"
 msgstr "MwSt."
 
+#: checkout_confirmation.php:170
+msgid "PayPal comission fee"
+msgstr "PayPal gebühr"
+
 #: checkout_confirmation.php:177
 msgid "Total Amount Incl. VAT"
-msgstr "Gesamtbetrag inkl. MwSt. "
+msgstr "Gesamtbetrag inkl. MwSt."
 
 #: checkout_confirmation.php:194
 msgid "Please click button to confirm your order"
@@ -2596,7 +2587,6 @@ msgid "You can initiate the callback by entering your phonenumber and the number
 msgstr "Tippen Sie für den Rückruf, Ihre Telefonnummer und die Nummer, die Sie anrufen möchten! "
 
 #: callback.php:217
-#, fuzzy
 msgid "Your Phone Number"
 msgstr "Ihr Telefonnummer"
 
@@ -3046,6 +3036,20 @@ msgstr "Entfernen Sie, wenn Sie eine andere AnruferID benutzen wollen."
 msgid "Max CallerId"
 msgstr "Max AnruferID"
 
+#: checkout_payment.php:200
+#, fuzzy
+msgid "==The first four digits of the number entered are:\\nIf that number is correct, we do not accept that type of credit card.\\nIf it is wrong, please try again."
+msgstr "-----------------"
+
+#: checkout_payment.php:201
+#, fuzzy
+msgid "==Please check the date and try again."
+msgstr "-----------------"
+
+#: checkout_payment.php:248
+msgid "Refill"
+msgstr "Aufladen"
+
 #: checkout_payment.php:306
 msgid "Please enter the order amount"
 msgstr "Bitte den Betrag eingeben"
@@ -3080,7 +3084,7 @@ msgstr "LAND"
 
 #: userinfo.php:127
 msgid "EDIT PERSONAL INFORMATION"
-msgstr "EDIT PERSONAL INFORMATION"
+msgstr "EINGABE DER PERSONALDATEN"
 
 #: userinfo.php:141
 msgid "CARD NUMBER"
@@ -3111,20 +3115,24 @@ msgid "Your subscription for an automique refill faild"
 msgstr ""
 
 #: userinfo.php:196
-msgid "Click below to buy credit : "
+msgid "Click below to buy credit:"
 msgstr "Klicken Sie unten auf Kredit kaufen:"
 
 #: userinfo.php:229
 msgid "BUY NOW"
-msgstr "JETZT KAUFEN"
+msgstr "AUFLADEN"
 
 #: userinfo.php:245
 msgid "Click below to subscribe an automated refill : "
 msgstr "Klicken Sie unten auf Kredit kaufen:"
 
+#: userinfo.php:248
+msgid " of "
+msgstr " mit "
+
 #: userinfo.php:252
 msgid "for each"
-msgstr ""
+msgstr "jeden"
 
 #: userinfo.php:254
 msgid "Days"
@@ -3140,11 +3148,11 @@ msgstr "Ja"
 
 #: userinfo.php:275
 msgid "Automated refill"
-msgstr ""
+msgstr "Automatische Aufladung"
 
 #: userinfo.php:301
 msgid "SUBSCRIPTION"
-msgstr "BESCHREIBUNG"
+msgstr "ANMELDUNG"
 
 #: CC_entity_edit_did_destination.php:565
 msgid "Add a new "
@@ -3359,6 +3367,10 @@ msgid "ACCOUNT INFO"
 msgstr "KONTO INFO"
 
 #: templates/default/main.tpl:15
+msgid "MY PROFILE"
+msgstr "MEIN PROFIL"
+
+#: templates/default/main.tpl:17
 msgid "VOICEMAIL"
 msgstr "VOICEMAIL"
 
@@ -3368,11 +3380,11 @@ msgstr "SIP/IAX INFO"
 
 #: templates/default/main.tpl:23
 msgid "CALL HISTORY"
-msgstr "ANRUF HISTORIE"
+msgstr "VERBINDUNGEN"
 
 #: templates/default/main.tpl:27
 msgid "PAYMENT HISTORY"
-msgstr "ZAHLUNGSHISTORIE"
+msgstr "ZAHLUNGEN"
 
 #: templates/default/main.tpl:32
 msgid "VOUCHERS"

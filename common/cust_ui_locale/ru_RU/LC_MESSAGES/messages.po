@@ -43,6 +43,10 @@ msgstr ""
 msgid "AUTOMATICALY GENERATED COMMISSION!"
 msgstr "АВТОМАТИЧЕСКИ СОЗДАННАЯ КОМИССИЯ!"
 
+#: paypal.php:72
+msgid "Payment for "
+msgstr "Платёж для "
+
 #: A2B_entity_phonenumber.php:113
 #, fuzzy
 msgid "CAMPAIGN"
@@ -129,7 +133,7 @@ msgstr "Изменить пароль"
 
 #: A2B_entity_password.php:122
 msgid "Do not use \" or = characters in your password"
-msgstr ""
+msgstr "Не используйте символы ( \" ) и (=) для пароля"
 
 #: A2B_entity_password.php:125
 msgid "Old Password"
@@ -146,6 +150,10 @@ msgstr "Подтверждение пароля"
 #: A2B_entity_password.php:140
 msgid "Save"
 msgstr "Сохранить"
+
+#: A2B_entity_password.php:145
+msgid "Reset"
+msgstr "Очистить форму"
 
 #: A2B_phonelist_import.php:71
 msgid "Please, you must first select a phonebook !"
@@ -508,7 +516,7 @@ msgstr "ЗАГОЛОВОК"
 
 #: form_data/FG_var_invoice.inc:71 form_data/FG_var_receipt.inc:69
 msgid "AMOUNT INCL VAT"
-msgstr "ВСЕГО ВКЛЮЧАЯ НДС"
+msgstr "ВСЕГО с НДС"
 
 #: form_data/FG_var_invoice.inc:75
 #, fuzzy
@@ -533,9 +541,8 @@ msgid "LASTNAME"
 msgstr "ФАМИЛИЯ"
 
 #: form_data/FG_var_signup.inc:180
-#, fuzzy
 msgid "Insert your lastname"
-msgstr "Добавьте Имя"
+msgstr "Добавьте фамилию"
 
 #: form_data/FG_var_signup.inc:184 form_data/FG_var_card.inc:62
 msgid "FIRSTNAME"
@@ -551,10 +558,9 @@ msgstr "EMAIL"
 
 #: form_data/FG_var_signup.inc:197
 msgid "Insert your email"
-msgstr "Введите уьфшд"
+msgstr "Введите Ваш email"
 
-#: form_data/FG_var_signup.inc:199 form_data/FG_var_card.inc:72
-#: userinfo.php:112
+#: form_data/FG_var_signup.inc:199 form_data/FG_var_card.inc:72 userinfo.php:112
 msgid "ADRESS"
 msgstr "АДРЕС"
 
@@ -635,7 +641,7 @@ msgstr "Введите номер НДС компании"
 
 #: form_data/FG_var_signup.inc:308
 msgid "TRAFFIC PER MONTH"
-msgstr ""
+msgstr "МЕСЯЧНЫЙ ТРАФИК"
 
 #: form_data/FG_var_signup.inc:312
 msgid "Insert the traffic per month for this customer"
@@ -643,7 +649,7 @@ msgstr "Введите ожидаемый месячный траффик"
 
 #: form_data/FG_var_signup.inc:316
 msgid "TARGET TRAFFIC"
-msgstr ""
+msgstr "ОСНОВНЫЕ НАПРАВЛЕНИЯ"
 
 #: form_data/FG_var_signup.inc:320
 msgid "Insert the target traffic description"
@@ -655,7 +661,11 @@ msgstr "ПРОВЕРКА"
 
 #: form_data/FG_var_signup.inc:324
 msgid "Insert code from above picture"
-msgstr ""
+msgstr "Введите код с картинки"
+
+#: form_data/FG_var_signup.inc:333
+msgid "Enter code from above picture here."
+msgstr "Введите 6 символов с картинки."
 
 #: form_data/FG_var_signup.inc:425
 msgid "You can modify, through the following form, the different properties of your "
@@ -663,7 +673,7 @@ msgstr "Вы можете редактировать используя след
 
 #: form_data/FG_var_signup.inc:426
 msgid "If you really want remove this "
-msgstr ""
+msgstr "Если вы действительно хотите удалить это "
 
 #: form_data/FG_var_signup.inc:427
 msgid "you can add easily a new "
@@ -671,7 +681,7 @@ msgstr "вы можете легко добавить"
 
 #: form_data/FG_var_signup.inc:430
 msgid "Thanks for registering with us.<br>A email with your information has been sent to your account "
-msgstr ""
+msgstr "Спасибо за регистрацию у нас.<br>Письмо с Вашей информацией было отправлено на Вашу учётную запись "
 
 #: form_data/FG_var_signup.inc:430
 msgid "Your card number is "
@@ -1056,9 +1066,8 @@ msgstr "THERE IS NO"
 
 #: form_data/FG_var_phonebook.inc:38 form_data/FG_var_phonenumber.inc:91
 #: templates/default/main.tpl:114
-#, fuzzy
 msgid "Phone Book"
-msgstr "Телефон"
+msgstr "Телефонные книги"
 
 #: form_data/FG_var_phonebook.inc:56
 msgid "You have some phone using this PhoneBook! Please comfirm that you really want to remove this PhoneBook ? "
@@ -1168,9 +1177,8 @@ msgid "No phone numbers have been created"
 msgstr ""
 
 #: form_data/FG_var_phonenumber.inc:82 templates/default/main.tpl:115
-#, fuzzy
 msgid "Phone Number"
-msgstr "Ваш номер телефона / Нахождение"
+msgstr "Номера"
 
 #: form_data/FG_var_phonenumber.inc:88
 #, fuzzy
@@ -1962,7 +1970,7 @@ msgstr "(только одно число длиной более 8 цифр)"
 
 #: lib/Form/Class.FormHandler.inc.php:1004
 msgid "(at least 8 digits using . or - or the space key)"
-msgstr "(как минимум 8 знаков, включая . - либо пробел)"
+msgstr "(не менее 8 симв. из цифр, 'точек' 'тире' и 'пробелов')"
 
 #: lib/Form/Class.FormHandler.inc.php:1008
 msgid "network adress format"
@@ -1978,7 +1986,7 @@ msgstr "(КАК МИНИМУМ 2 СИМВОЛА)"
 
 #: lib/Form/Class.FormHandler.inc.php:1024
 msgid "(NUMBER FORMAT WITH/WITHOUT DECIMAL, use '.' for decimal)"
-msgstr "(ЧИСЛО С/БЕЗ РАЗДЕЛИТЕЛЯ. используйте . для разделителя)"
+msgstr "(число с или без разделителя. используйте '.' для разделителя)"
 
 #: lib/Form/Class.FormHandler.inc.php:1040
 msgid "You must write something."
@@ -2119,19 +2127,27 @@ msgstr "ОШИБКа"
 msgid "ENGLISH"
 msgstr "АНГЛИЙСКИЙ"
 
-#: lib/interface/constants.php:25 lib/interface/constants.php:39
-msgid "SPANISH"
-msgstr "ИСПАНСКИЙ"
-
-#: lib/interface/constants.php:26 lib/interface/constants.php:40
-msgid "FRENCH"
-msgstr "ФРАНЦУЗКИЙ"
-
-#: lib/interface/constants.php:27 lib/interface/constants.php:41
+#: lib/interface/constants.php:27 lib/interface/constants.php:39
 msgid "RUSSIAN"
 msgstr "РУССКИЙ"
 
-#: lib/interface/constants.php:28 lib/interface/constants.php:42
+#: lib/interface/constants.php:27 lib/interface/constants.php:40
+msgid "GERMAN"
+msgstr "НЕМЕЦКИЙ"
+
+#: lib/interface/constants.php:25 lib/interface/constants.php:41
+msgid "SPANISH"
+msgstr "ИСПАНСКИЙ"
+
+#: lib/interface/constants.php:25 lib/interface/constants.php:42
+msgid "FINNISH"
+msgstr "ФИНСКИЙ"
+
+#: lib/interface/constants.php:26 lib/interface/constants.php:43
+msgid "FRENCH"
+msgstr "ФРАНЦУЗКИЙ"
+
+#: lib/interface/constants.php:28 lib/interface/constants.php:44
 msgid "BRAZILIAN"
 msgstr "БРАЗИЛЬСКИЙ"
 
@@ -2661,11 +2677,11 @@ msgstr "Список телефонов - список всех телефоно
 
 #: lib/customer.help.php:77
 msgid "Invoice history - The section below allows you to see and pay the invoices that you have to pay."
-msgstr "История инвойсов - В этом разделе вы можете просмотреть список инвойсов, и оплатить неоплаченные"
+msgstr "История счетов - В этом разделе Вы можете просмотреть список счёт-фактур и оплатить неоплаченные"
 
 #: lib/customer.help.php:79
 msgid "Receipt history - The section below allows you to see the receipt that you received. you can see in them the summary of some withdrawal"
-msgstr "История счетов"
+msgstr "Список квитанций - В этом разделе Вы можете просматривать полученные квитанции с описанием расходов"
 
 #: lib/customer.help.php:81
 msgid "Phonebook are set of phone numbers. You can add, remove and edit the phonebook. You can also associate phonebook to a campaign in the Campaign section"
@@ -2736,15 +2752,15 @@ msgstr ""
 
 #: checkout_confirmation.php:144
 msgid "Please confirm your order"
-msgstr ""
+msgstr "Пожалуйста подтвердите Ваш заказ"
 
 #: checkout_confirmation.php:151
 msgid "Payment Method"
-msgstr ""
+msgstr "Платёжная система"
 
 #: checkout_confirmation.php:156
 msgid "Amount"
-msgstr "Сумма"
+msgstr "Сумма пополнения"
 
 #: checkout_confirmation.php:166 A2B_invoice_view.php:217
 #: A2B_invoice_view.php:274 A2B_billing_preview.php:279 userinfo.php:250
@@ -2754,11 +2770,11 @@ msgstr "НДС"
 
 #: checkout_confirmation.php:177
 msgid "Total Amount Incl. VAT"
-msgstr "Сумма включая НДС"
+msgstr "К оплате с НДС"
 
 #: checkout_confirmation.php:194
 msgid "Please click button to confirm your order"
-msgstr ""
+msgstr "Чтобы подтвердить оплату нажмите эту кнопку"
 
 #: callback.php:173
 msgid "Cannot insert the callback request in the spool!"
@@ -2774,7 +2790,7 @@ msgstr "Ошибка: У вас недостаточно средства для
 
 #: callback.php:183
 msgid "Error : There is no route to call back your phonenumber!"
-msgstr "Ошибка: отсутствует маршрут для осуществления звонка на  ваш номер"
+msgstr "Ошибка: отсутствует маршрут для осуществления звонка на ваш номер"
 
 #: callback.php:189
 msgid "Error : You have to specify your phonenumber and the number you wish to call!"
@@ -2861,6 +2877,7 @@ msgid "INVOICE"
 msgstr "СЧЕТА"
 
 #: A2B_invoice_view.php:163 A2B_invoice_view.php:180 A2B_receipt_view.php:155
+#, fuzzy
 msgid "VAT nr."
 msgstr "НДС"
 
@@ -2873,6 +2890,7 @@ msgid "fax"
 msgstr "факс"
 
 #: A2B_invoice_view.php:178
+#, fuzzy
 msgid "mail"
 msgstr "почта"
 
@@ -2886,13 +2904,12 @@ msgid "Date"
 msgstr "Дата"
 
 #: A2B_invoice_view.php:194
-#, fuzzy
 msgid "Invoice number"
-msgstr "Ваш номер телефона / Нахождение"
+msgstr "Счёт №"
 
 #: A2B_invoice_view.php:199 A2B_receipt_view.php:185
 msgid "Client Account Number"
-msgstr "Номер счета клиента"
+msgstr "Аккаунт №"
 
 #: A2B_invoice_view.php:216 A2B_billing_preview.php:278
 msgid "Cost excl. VAT"
@@ -3254,12 +3271,20 @@ msgstr "Удалите один, если необходимо использо�
 msgid "Max CallerId"
 msgstr ""
 
+#: checkout_payment.php:248
+msgid "Refill"
+msgstr "Cумма пополнения"
+
 #: checkout_payment.php:306
 #, fuzzy
 msgid "Please enter the order amount"
 msgstr "на ваш счет!"
 
-#: checkout_payment.php:313
+#: checkout_payment.php:310
+msgid "PayPal comission fee"
+msgstr "Комиссия PayPal"
+
+#: checkout_payment.php:320
 msgid "Total Amount"
 msgstr "Общая сумма"
 
@@ -3323,31 +3348,28 @@ msgid "Your subscription for an automique refill faild"
 msgstr "Вам не удалось подписаться на сервис автоматического пополнения"
 
 #: userinfo.php:196
-#, fuzzy
-msgid "Click below to buy credit : "
-msgstr "Нажмите для покупки <br>кредитов на"
+msgid "Click below to buy credit:"
+msgstr "Нажмите кнопку ниже чтобы"
 
 #: userinfo.php:229
 msgid "BUY NOW"
-msgstr "Купить сейчас"
+msgstr "ПОПОЛНИТЬ БАЛАНС"
 
 #: userinfo.php:245
-#, fuzzy
 msgid "Click below to subscribe an automated refill : "
-msgstr "Нажмите для покупки <br>кредитов на"
+msgstr "Нажмите ниже для автоматического пополнения на "
 
 #: userinfo.php:252
 msgid "for each"
-msgstr "для кажд."
+msgstr "каждый"
 
 #: userinfo.php:254
 msgid "Days"
 msgstr "Дней"
 
 #: userinfo.php:257
-#, fuzzy
 msgid "Months"
-msgstr "Минуты"
+msgstr "месяц"
 
 #: userinfo.php:259
 #, fuzzy
@@ -3359,9 +3381,8 @@ msgid "Automated refill"
 msgstr "Автоматическое пополнение"
 
 #: userinfo.php:301
-#, fuzzy
 msgid "SUBSCRIPTION"
-msgstr "НАПРАВЛЕНИЕ"
+msgstr "ОФОРМИТЬ ПОДПИСКУ"
 
 #: CC_entity_edit_did_destination.php:565
 msgid "Add a new "
@@ -3531,7 +3552,7 @@ msgstr "Простите, активация уже была отослана. �
 
 #: activate.php:103
 msgid "Welcome! Your account has been successfully activated. Thank you!"
-msgstr "Добро пожаловать! Ваша учетная запись была спешно активирована. Благодарим за сотрудничество"
+msgstr "Добро пожаловать! Ваша учетная запись была успешно активирована. Благодарим за сотрудничество"
 
 #: activate.php:105 signup_confirmation.php:115
 msgid "Thank you for registering with us !"
@@ -3539,17 +3560,15 @@ msgstr "Спасибо за регистрацию!"
 
 #: activate.php:106 signup_confirmation.php:116
 msgid "An email confirming your information has been sent to"
-msgstr "Письмо, подтверждающее информацию было отослано на"
+msgstr "Письмо, с подтверждающей информацией было отослано на"
 
 #: activate.php:108 signup_confirmation.php:118
-#, fuzzy
 msgid "Your cardnumber is "
-msgstr "Ваш номер телефона / Нахождение"
+msgstr "Ваш номер учётной записи "
 
 #: activate.php:109 signup_confirmation.php:119
-#, fuzzy
 msgid "To login to your account :"
-msgstr "на ваш счет!"
+msgstr "Данные для входа в пользовательский интерфейс"
 
 #: activate.php:110 signup_confirmation.php:120
 msgid "Your card alias (login) is "
@@ -3557,14 +3576,13 @@ msgstr "Ваш логин"
 
 #: activate.php:115
 msgid "Follow the link to access your account : "
-msgstr "Перейдите по ссылке для доступа к учетной записи"
+msgstr "Перейдите по ссылке для доступа к учетной записи : "
 
 #: activate.php:137
 msgid "Your account is already activated."
 msgstr "Учетная запись уже активирована"
 
 #: activate.php:141
-#, fuzzy
 msgid "Your account cannot be activated please contact <br/> the website administrator or retry later."
 msgstr "Учетная запись не может быть активирована .<br> Обратитесь к администратору, или попробуйте позже"
 
@@ -3602,15 +3620,15 @@ msgstr "СЧЕТА"
 
 #: templates/default/main.tpl:55
 msgid "View Receipts"
-msgstr "ПРОСМОТР СЧЕТОВ"
+msgstr "КВИТАНЦИИ"
 
 #: templates/default/main.tpl:56
 msgid "View Invoices"
-msgstr "ПРОСМОТР ИНВОЙСОВ"
+msgstr "СЧЕТ-ФАКТУРЫ"
 
 #: templates/default/main.tpl:57
 msgid "Preview Next Billing"
-msgstr "ПРЕДПОЛАГАЕМЫЙ БИЛИНГ"
+msgstr "ПЛАНИРОВАНИЕ РАСХОДОВ"
 
 #: templates/default/main.tpl:69
 msgid "SPEED DIAL"
@@ -3618,7 +3636,7 @@ msgstr "БЫСТРЫЙ НАБОР"
 
 #: templates/default/main.tpl:77
 msgid "SIMULATOR"
-msgstr "СИМУЛЯТОР"
+msgstr "ЦЕННИК ЗВОНКА"
 
 #: templates/default/main.tpl:90
 msgid "ADD CALLER ID"
@@ -3637,12 +3655,12 @@ msgid "NOTIFICATION"
 msgstr "УВЕДОМЛЕНИЯ"
 
 #: templates/default/main.tpl:112
-msgid "AUTO DIALER"
+msgid "AUTO DIALLER"
 msgstr "АВТООБЗВОН"
 
 #: templates/default/main.tpl:121
 msgid "Campaign's"
-msgstr "КАМПАНИИ"
+msgstr "Кампании"
 
 #: templates/default/main.tpl:124
 msgid "Import Phone List"
@@ -3691,7 +3709,7 @@ msgstr ""
 
 #: signup_confirmation.php:46
 msgid "Sorry the confirmation email has been sent already, multi-signup are not authorized! Please wait 2 minutes before making any other signup!"
-msgstr ""
+msgstr "Простите, подтверждающее письмо уже выслано, множественная регистрация не разрешена! Пожалуйста подождите 2 минуты для новой попытки! "
 
 #: signup_confirmation.php:51
 msgid "Error : No User Created."
@@ -3707,15 +3725,15 @@ msgstr ""
 
 #: signup_confirmation.php:108
 msgid "SIGNUP CONFIRMATION"
-msgstr ""
+msgstr "ПОДТВЕРЖДЕНИЕ РЕГИСТРАЦИИ"
 
 #: signup_confirmation.php:112
 msgid "thank you for registering with us!"
-msgstr ""
+msgstr "спасибо что прошли регистрацию!"
 
 #: signup_confirmation.php:113
 msgid "An activation email has been sent to"
-msgstr ""
+msgstr "Инструкция по активации выслана Вам на почту"
 
 #: A2B_entity_did.php:82
 msgid "The following Destinaton-DID has been relesed:"

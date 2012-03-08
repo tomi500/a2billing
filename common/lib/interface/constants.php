@@ -22,10 +22,12 @@ class Constants
 	public static function getLanguagesList(){
 		$language_list = array();
 		$language_list["0"] = array( gettext("ENGLISH"), "en");
-		$language_list["1"] = array( gettext("SPANISH"), "es");
-		$language_list["2"] = array( gettext("FRENCH"),  "fr");
-		$language_list["3"] = array( gettext("RUSSIAN"), "ru");
-		$language_list["4"] = array( gettext("BRAZILIAN"), "br");
+		$language_list["1"] = array( gettext("RUSSIAN"), "ru");
+		$language_list["2"] = array( gettext("GERMAN"), "de");
+		$language_list["3"] = array( gettext("SPANISH"), "es");
+		$language_list["4"] = array( gettext("FINNISH"),  "fi");
+		$language_list["5"] = array( gettext("FRENCH"),  "fr");
+		$language_list["6"] = array( gettext("BRAZILIAN"), "br");
 		return $language_list;
 	}
 	
@@ -36,9 +38,11 @@ class Constants
 	public static function getLanguages(){
 		$language_list = array();
 		$language_list["en"] = array( gettext("ENGLISH"));
-		$language_list["es"] = array( gettext("SPANISH"));
-		$language_list["fr"] = array( gettext("FRENCH"));
 		$language_list["ru"] = array( gettext("RUSSIAN"));
+		$language_list["de"] = array( gettext("GERMAN"));
+		$language_list["es"] = array( gettext("SPANISH"));
+		$language_list["fi"] = array( gettext("FINNISH"));
+		$language_list["fr"] = array( gettext("FRENCH"));
 		$language_list["br"] = array( gettext("BRAZILIAN"));
 		return $language_list;
 	}

@@ -86,7 +86,7 @@ $HD_Form -> AddEditElement (gettext("BILLING DATE"),
 			   "INPUT",	
 			   "size=40 maxlength=40  $comp_date",	
 			   "5",	
-			   gettext("Insert the current date (YYYY-MM-DD)"),
+			   gettext("Insert the current date"),
 			   "" , "", "",	"", "", "", "", "" );
 
 

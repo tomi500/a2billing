@@ -69,7 +69,7 @@ if ($customer_info[14] != "1" && $customer_info[14] != "8") {
 	die();
 }
 
-$customer = $_SESSION["pr_login"];
+//$customer = $_SESSION["pr_login"];
 
 getpost_ifset(array('posted', 'Period', 'frommonth', 'fromstatsmonth', 'tomonth', 'tostatsmonth', 'fromday', 'fromstatsday_sday', 'fromstatsmonth_sday', 'today', 'tostatsday_sday', 'tostatsmonth_sday', 'dsttype', 'sourcetype', 'clidtype', 'channel', 'resulttype', 'stitle', 'atmenu', 'current_page', 'order', 'sens', 'dst', 'src', 'clid','subscribe'));
 
@@ -182,7 +182,7 @@ if(!empty($subscribe)){
 }
 ?>
 
-<?php if ($A2B->config["epayment_method"]['enable']){ ?>
+<?php if ($A2B->config["epayment_method"]['enable'] && $ACXPAYMENT_HISTORY >0){ ?>
 
 <br>
 

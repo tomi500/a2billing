@@ -112,7 +112,7 @@ class captcha
 			$angle	= mt_rand(-30, 30);
 			
 			$size	= mt_rand(20, 40);
-			$y		= mt_rand((int)($size * 1.5), (int)($this->height - ($size / 7)));
+			$y	= mt_rand((int)($size - $size/5), (int)($this->height + $size/5));
 
 			$color	= $func2($image, mt_rand(0, 127), mt_rand(0, 127), mt_rand(0, 127));
 			$shadow = $func2($image, mt_rand(127, 254), mt_rand(127, 254), mt_rand(127, 254));			

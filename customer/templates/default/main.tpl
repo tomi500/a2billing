@@ -27,11 +27,6 @@
 	<div class="toggle_menu"><li><a href="call-history.php"><strong>{php} echo gettext("CALL HISTORY");{/php}</strong></a></li></div>
 	{/if}
 	
-	{if $ACXPAYMENT_HISTORY >0 }
-	<div class="toggle_menu"><li><a href="payment-history.php"><strong>{php} echo gettext("PAYMENT HISTORY");{/php}</strong></a></li></div>
-	{/if}
-	
-
 	{if $ACXVOUCHER >0 }
 	<div class="toggle_menu"><li><a href="A2B_entity_voucher.php?form_action=list"><strong>{php} echo gettext("VOUCHERS");{/php}</strong></a></li></div>
 	{/if}
@@ -70,6 +65,10 @@
 	
 	{if $ACXNOTIFICATION >0 }
 	<div class="toggle_menu"><li><a href="A2B_notification.php?form_action=ask-edit"><strong>{php} echo gettext("NOTIFICATION");{/php}</strong></a></li></div>
+	{/if}
+
+	{if $ACXPAYMENT_HISTORY >0 }
+	<div class="toggle_menu"><li><a href="payment-history.php"><strong>{php} echo gettext("PAYMENT HISTORY");{/php}</strong></a></li></div>
 	{/if}
 
 	{if $ACXINVOICES >0 }

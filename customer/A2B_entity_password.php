@@ -137,7 +137,7 @@ if ($form_action=="ask-update") {
     <td align=left colspan=2>&nbsp;</td>
 </tr>
 <tr>
-    <td align=center colspan=2 ><input type="submit" name="submitPassword" value="&nbsp;<?php echo gettext("Save")?>&nbsp;" class="form_input_button" onclick="return CheckPassword();" >&nbsp;&nbsp;<input type="reset" name="resetPassword" value="&nbsp;Reset&nbsp;" class="form_input_button" > </td>
+    <td align=center colspan=2 ><input type="submit" name="submitPassword" value="&nbsp;<?php echo gettext("Save")?>&nbsp;" class="form_input_button" onclick="return CheckPassword();" >&nbsp;&nbsp;<input type="reset" name="resetPassword" value="&nbsp;<?php echo gettext("Reset")?>&nbsp;" class="form_input_button" > </td>
 </tr>
 <tr>
     <td align=left colspan=2>&nbsp;</td>
