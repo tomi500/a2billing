@@ -272,13 +272,18 @@ $zipcode_editFG = "zipcode,";
 }
 $timezone_list = get_timezones();
 $one_select = false;
+if (function_exists('geoip_time_zone_by_country_and_region')) {
+$UserDateTimeZone = new DateTimeZone(geoip_time_zone_by_country_and_region(geoip_country_code_by_name($_SERVER['REMOTE_ADDR']),geoip_region_by_name($_SERVER['REMOTE_ADDR'])));
+$UserDateTime = new DateTime("now", $UserDateTimeZone);
+$servergmt = $UserDateTimeZone->getOffset($UserDateTime);
+} else $servergmt = SERVER_GMT;
 foreach ($timezone_list as $key => $cur_value) {
 	$timezone_list[$key] = array (
 		$cur_value[2],
 		$key
 	);
 	if ($form_action == 'ask-add') {
-		if (in_array(SERVER_GMT, $cur_value) && !$one_select) {
+		if (in_array($servergmt, $cur_value) && !$one_select) {
 			$id_timezone = $key;
 			$one_select = true;
 		}

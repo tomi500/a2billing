@@ -8308,11 +8308,11 @@ INSERT INTO `cc_timezone` (`id`, `gmtzone`, `gmttime`, `gmtoffset`) VALUES(29, '
 INSERT INTO `cc_timezone` (`id`, `gmtzone`, `gmttime`, `gmtoffset`) VALUES(30, '(GMT+01:00) Brussels, Copenhagen, Madrid, Paris', 'GMT+01:00', 3600);
 INSERT INTO `cc_timezone` (`id`, `gmtzone`, `gmttime`, `gmtoffset`) VALUES(31, '(GMT+01:00) Sarajevo, Skopje, Warsaw, Zagreb', 'GMT+01:00', 3600);
 INSERT INTO `cc_timezone` (`id`, `gmtzone`, `gmttime`, `gmtoffset`) VALUES(32, '(GMT+01:00) West Central Africa', 'GMT+01:00', 3600);
-INSERT INTO `cc_timezone` (`id`, `gmtzone`, `gmttime`, `gmtoffset`) VALUES(33, '(GMT+02:00) Athens, Istanbul, Minsk', 'GMT+02:00', 7200);
-INSERT INTO `cc_timezone` (`id`, `gmtzone`, `gmttime`, `gmtoffset`) VALUES(34, '(GMT+02:00) Bucharest', 'GMT+02:00', 7200);
-INSERT INTO `cc_timezone` (`id`, `gmtzone`, `gmttime`, `gmtoffset`) VALUES(35, '(GMT+02:00) Cairo', 'GMT+02:00', 7200);
-INSERT INTO `cc_timezone` (`id`, `gmtzone`, `gmttime`, `gmtoffset`) VALUES(36, '(GMT+02:00) Harere, Pretoria', 'GMT+02:00', 7200);
-INSERT INTO `cc_timezone` (`id`, `gmtzone`, `gmttime`, `gmtoffset`) VALUES(37, '(GMT+02:00) Helsinki, Kyiv, Riga, Sofia, Tallinn, Vilnius', 'GMT+02:00', 7200);
+INSERT INTO `cc_timezone` (`id`, `gmtzone`, `gmttime`, `gmtoffset`) VALUES(33, '(GMT+02:00) Helsinki, Kyiv, Riga, Sofia, Tallinn, Vilnius', 'GMT+02:00', 7200);
+INSERT INTO `cc_timezone` (`id`, `gmtzone`, `gmttime`, `gmtoffset`) VALUES(34, '(GMT+02:00) Athens, Istanbul, Minsk', 'GMT+02:00', 7200);
+INSERT INTO `cc_timezone` (`id`, `gmtzone`, `gmttime`, `gmtoffset`) VALUES(35, '(GMT+02:00) Bucharest', 'GMT+02:00', 7200);
+INSERT INTO `cc_timezone` (`id`, `gmtzone`, `gmttime`, `gmtoffset`) VALUES(36, '(GMT+02:00) Cairo', 'GMT+02:00', 7200);
+INSERT INTO `cc_timezone` (`id`, `gmtzone`, `gmttime`, `gmtoffset`) VALUES(37, '(GMT+02:00) Harere, Pretoria', 'GMT+02:00', 7200);
 INSERT INTO `cc_timezone` (`id`, `gmtzone`, `gmttime`, `gmtoffset`) VALUES(38, '(GMT+02:00) Jeruasalem', 'GMT+02:00', 7200);
 INSERT INTO `cc_timezone` (`id`, `gmtzone`, `gmttime`, `gmtoffset`) VALUES(39, '(GMT+03:00) Baghdad', 'GMT+03:00', 10800);
 INSERT INTO `cc_timezone` (`id`, `gmtzone`, `gmttime`, `gmtoffset`) VALUES(40, '(GMT+03:00) Kuwait, Riyadh', 'GMT+03:00', 10800);
