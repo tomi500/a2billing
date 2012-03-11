@@ -249,7 +249,8 @@ $HD_Form->AddEditElement(gettext("STATE/PROVINCE"),
 $state_editFG = "state,";
 }
 if ($form_action == 'ask-add') {
-	$country = 'USA';
+// -= Need to install GeoIP http://ua2.php.net/manual/en/geoip.setup.php =-
+	$country = (function_exists('geoip_country_code3_by_name'))?geoip_country_code3_by_name($_SERVER['REMOTE_ADDR']):'USA';
 }
 if (COUNTRY_ENABLE)  {
 $HD_Form->AddEditElement(gettext("COUNTRY")." *",

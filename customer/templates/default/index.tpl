@@ -15,30 +15,9 @@
 
 <BODY leftmargin="0" topmargin="0" marginwidth="0" marginheight="0">
 
-{literal}
-<script LANGUAGE="JavaScript">
-<!--
-	function test()
-	{
-		if(document.form.pr_login.value=="" || document.form.pr_password.value=="")
-		{
-			alert("You must enter an user and a password!" + document.form.pr_password.value);
-			return false;
-		}
-		else
-		{
-			return true;
-		}
-	}
--->
-</script>
-
-{/literal}
-
 	<form name="form" method="POST" action="userinfo.php" onsubmit="return test()">
 	<input type="hidden" name="done" value="submit_log">
 
-	  	
     <div id="login-wrapper" class="login-border-up">
 	<div class="login-border-down">
 	<div class="login-border-center">
@@ -46,7 +25,17 @@
 	<table border="0" cellpadding="3" cellspacing="12">
 	<tr>
 		<td class="login-title" colspan="2">
-			 {php} echo gettext("AUTHENTICATION");{/php}
+    {if ($error == 1)}
+		{php} echo gettext("AUTHENTICATION REFUSED :<br>please check your user/password!");{/php}
+    {elseif ($error==2)}
+		{php} echo gettext("INACTIVE ACCOUNT :<br>Your account need to be activated!");{/php}
+    {elseif ($error==3)}
+		{php} echo gettext("BLOCKED ACCOUNT :<br>Please contact the administrator!");{/php}
+    {elseif ($error==4)}
+		{php} echo gettext("NEW ACCOUNT :<br>Your account has not been validate yet!");{/php}
+    {else}
+		{php} echo gettext("AUTHENTICATION");{/php}
+    {/if}
 		</td>
 	</tr>
 	<tr>
@@ -105,20 +94,10 @@
   	</div>
   	</div>
   	
-  	<div style="color:#BC2222;font-family:Arial,Helvetica,sans-serif;font-size:11px;font-weight:bold;padding-left:10px;" >
-  	{if ($error == 1)}
-		{php} echo gettext("AUTHENTICATION REFUSED : please check your user/password!");{/php}
-    {elseif ($error==2)}
-		{php} echo gettext("INACTIVE ACCOUNT : Your account need to be activated!");{/php}
-    {elseif ($error==3)}
-		{php} echo gettext("BLOCKED ACCOUNT : Please contact the administrator!");{/php}
-    {elseif ($error==4)}
-		{php} echo gettext("NEW ACCOUNT : Your account has not been validate yet!");{/php}
-    {/if}
     </div>
-    <div id="footer_index"><div style=" border: solid 1px #F4F4F4; text-align:center;">{$COPYRIGHT}</div></div>
-    
-  	</div>
+    <div id="footer">
+    <div style="color: #BD2A15; font-size: 11px; text-align:center;">{$COPYRIGHT}</div>
+    </div>
 	</form>
 {literal}
 <script LANGUAGE="JavaScript">

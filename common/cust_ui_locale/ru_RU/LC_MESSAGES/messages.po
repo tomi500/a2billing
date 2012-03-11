@@ -1986,7 +1986,7 @@ msgstr "(КАК МИНИМУМ 2 СИМВОЛА)"
 
 #: lib/Form/Class.FormHandler.inc.php:1024
 msgid "(NUMBER FORMAT WITH/WITHOUT DECIMAL, use '.' for decimal)"
-msgstr "(число с или без разделителя. используйте '.' для разделителя)"
+msgstr "(число с разделитетем или без, используйте '.' для разделителя)"
 
 #: lib/Form/Class.FormHandler.inc.php:1040
 msgid "You must write something."
@@ -3671,9 +3671,8 @@ msgid "LOGOUT"
 msgstr "ВЫХОД"
 
 #: templates/default/index.tpl:49
-#, fuzzy
 msgid "AUTHENTICATION"
-msgstr "НАПРАВЛЕНИЕ"
+msgstr "АВТОРИЗАЦИЯ"
 
 #: templates/default/index.tpl:57
 msgid "User"
@@ -3692,19 +3691,19 @@ msgid "To sign up"
 msgstr "Для регистрации"
 
 #: templates/default/index.tpl:107
-msgid "AUTHENTICATION REFUSED : please check your user/password!"
-msgstr ""
+msgid "AUTHENTICATION REFUSED :<br>please check your user/password!"
+msgstr "АВТОРИЗАЦИЯ ОТКЛОНЕНА<br>Пожалуйста проверьте Ваши логин/пароль!"
 
 #: templates/default/index.tpl:109
-msgid "INACTIVE ACCOUNT : Your account need to be activated!"
-msgstr ""
+msgid "INACTIVE ACCOUNT :<br>Your account need to be activated!"
+msgstr "АККАУНТ НЕ АКТИВИРОВАН<br>Ваш аккаунт нуждается в активации!"
 
 #: templates/default/index.tpl:111
-msgid "BLOCKED ACCOUNT : Please contact the administrator!"
-msgstr ""
+msgid "BLOCKED ACCOUNT :<br>Please contact the administrator!"
+msgstr "АККАУНТ ЗАБЛОКИРОВАН<br>Пожалуйста свяжитесь с администратором!"
 
 #: templates/default/index.tpl:113
-msgid "NEW ACCOUNT : Your account has not been validate yet!"
+msgid "NEW ACCOUNT :<br>Your account has not been validate yet!"
 msgstr ""
 
 #: signup_confirmation.php:46

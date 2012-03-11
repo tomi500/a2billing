@@ -3467,20 +3467,20 @@ msgid "To sign up"
 msgstr "zum Anmelden"
 
 #: templates/default/index.tpl:107
-msgid "AUTHENTICATION REFUSED : please check your user/password!"
-msgstr "AUTHENTIFIZIERUNG ABGELEHNT: Bitte überprüfen Sie Ihre Benutzer / Passwort!"
+msgid "AUTHENTICATION REFUSED :<br>please check your user/password!"
+msgstr "AUTHENTIFIZIERUNG ABGELEHNT<br>Bitte überprüfen Sie Ihre Benutzer / Passwort!"
 
 #: templates/default/index.tpl:109
-msgid "INACTIVE ACCOUNT : Your account need to be activated!"
-msgstr "INACTIVE KONTO: Ihr Konto muss aktiviert werden!"
+msgid "INACTIVE ACCOUNT :<br>Your account need to be activated!"
+msgstr "INACTIVE KONTO<br>Ihr Konto muss aktiviert werden!"
 
 #: templates/default/index.tpl:111
-msgid "BLOCKED ACCOUNT : Please contact the administrator!"
-msgstr "GESPERRTE KONTO: Bitte wenden Sie sich an den Administrator!"
+msgid "BLOCKED ACCOUNT :<br>Please contact the administrator!"
+msgstr "GESPERRTE KONTO<br>Bitte wenden Sie sich an den Administrator!"
 
 #: templates/default/index.tpl:113
-msgid "NEW ACCOUNT : Your account has not been validate yet!"
-msgstr "NEUES KONTO: Ihr Konto ist noch in Validierung!"
+msgid "NEW ACCOUNT :<br>Your account has not been validate yet!"
+msgstr "NEUES KONTO<br>Ihr Konto ist noch in Validierung!"
 
 #: signup_confirmation.php:46
 msgid "Sorry the confirmation email has been sent already, multi-signup are not authorized! Please wait 2 minutes before making any other signup!"

@@ -77,13 +77,14 @@
 }
 
 #login-wrapper {
-  position:absolute;
+  position: absolute;
   left: 50%; 
   top: 50%;
-  width: 350px;
   height: 150px;
-  margin-top: -100px; /* half height */
-  margin-left: -175px; /* half width */
+  width: 380px;
+  margin-top: -125px; /* half height */
+  margin-left: -190px; /* half width */
+  z-index: 1;
 }
 
 .login-border-up{

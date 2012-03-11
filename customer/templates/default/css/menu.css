@@ -59,14 +59,12 @@
 }
 
 #footer {
+  position: fixed;
   margin-bottom: 1em;
-  color: #BD2A15; 
-  margin-top: 40px; 
-  margin-right: 55px;  
-  margin-left: 235px;
-  border: solid 1px #EFEFEF;
-  background-color:#E5E5E5;
-  font-size: 9px;
+  right: 0px;
+  left: 0px;
+  bottom: 0;
+  z-index: 0;
 }
 
 #footer_index {
