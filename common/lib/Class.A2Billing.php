@@ -1998,6 +1998,7 @@ class A2Billing {
 		
         $this -> debug( DEBUG, $agi, __FILE__, __LINE__, "TIMEOUT::> ".$this->timeout." : minutes=$minutes - seconds=$seconds");
         if (!($minutes>0) && !($seconds>10)) {
+            if (array_search($agi -> channel_status('',true), array(AST_STATE_UP, AST_STATE_DOWN)) === false) $this -> let_stream_listening($agi);
             $prompt="prepaid-no-enough-credit";
             $agi-> stream_file($prompt, '#');
             return -1;
@@ -2788,7 +2789,10 @@ class A2Billing {
 				if ( $result[0][2] != "t" && $result[0][2] != "1" ) 	$prompt = "prepaid-auth-fail";
 
 				// CHECK credit < min_credit_2call / you have zero balance
-				if (!$this -> enough_credit_to_call()) $prompt = "prepaid-no-enough-credit-stop";
+				if (!$this -> enough_credit_to_call()) {
+					if (array_search($agi -> channel_status('',true), array(AST_STATE_UP, AST_STATE_DOWN)) === false) $this -> let_stream_listening($agi);
+					$prompt = "prepaid-no-enough-credit-stop";
+				}
 				
 				// CHECK activated=t / CARD NOT ACTIVE, CONTACT CUSTOMER SUPPORT
 				if ( $this->status != "1") 	$prompt = "prepaid-auth-fail";	// not expired but inactive.. probably not yet sold.. find better prompt
@@ -2999,6 +3003,7 @@ class A2Billing {
 				
 				if (strlen($prompt)>0) {
 					
+					if (array_search($agi -> channel_status('',true), array(AST_STATE_UP, AST_STATE_DOWN)) === false) $this -> let_stream_listening($agi);
 					$agi -> stream_file($prompt, '#'); // Added because was missing the prompt
 					$this -> debug( DEBUG, $agi, __FILE__, __LINE__, "[ERROR CHECK CARD : $prompt (cardnumber:".$this->cardnumber.")]");
 					

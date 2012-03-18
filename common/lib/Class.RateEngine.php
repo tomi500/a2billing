@@ -268,7 +268,7 @@ class RateEngine
             if ($this->webui) {
                 $A2B -> debug( DEBUG, $agi, __FILE__, __LINE__, "[rate-engine: COUNTDELETE=".$countdelete."]");
                 $A2B -> debug( DEBUG, $agi, __FILE__, __LINE__, "[rate-engine: MYRESULT  before unset \n".print_r($myresult, true));
-            };
+            }
             if (count($result)>1 and $countdelete != 0) {
                 if ($this->webui) $A2B -> debug( DEBUG, $agi, __FILE__, __LINE__, "[rate-engine: LAST UNSET");
                 unset($mysearchvalue[$resultcount]);
@@ -279,16 +279,14 @@ class RateEngine
                 }
                 $mysearchvalue = array_values($mysearchvalue);
                 unset($myresult);
-            };
+                $result = $mysearchvalue;
+            }
             if ($this->webui) {
                 $A2B -> debug( DEBUG, $agi, __FILE__, __LINE__, "[rate-engine: RESULTCOUNT".$resultcount."]");
                 $A2B -> debug( DEBUG, $agi, __FILE__, __LINE__, "[rate-engine: MYRESULT  after delete \n".print_r($myresult, true));
                 $A2B -> debug( DEBUG, $agi, __FILE__, __LINE__, "[rate-engine: MYSEARCHVALUE after delete \n".print_r($mysearchvalue, true));
                 $A2B -> debug( DEBUG, $agi, __FILE__, __LINE__, "[rate-engine: Count Total result after 4 ".count($myresult)."]");
-            };
-            if (count($result)>1 and $countdelete != 0) {
-                $result=$mysearchvalue;
-            };
+            }
             unset($mysearchvalue);
             if ($this->webui) $A2B -> debug( DEBUG, $agi, __FILE__, __LINE__, "[rate-engine: RESULT  after delete \n".print_r($result, true));
         }
@@ -309,6 +307,7 @@ class RateEngine
 		if ($ind_stop_default > 0) {
 			$result = array_merge ((array)$result, (array)$result_defaultprefix);
 		}
+		if ($result[count($result)-1][12]>=100) unset($result[count($result)-1]);
 		
 		// 3) REMOVE THOSE THAT USE THE SAME TRUNK - MAKE A DISTINCT
 		//    AND THOSE THAT ARE DISABLED.
@@ -525,7 +524,7 @@ class RateEngine
 		This following "if" statement used to verify the minimum credit to call can be improved.
 		This mininum credit should be calculated based on the destination, and the minimum billing block.
 		*/
-		if ($credit < $A2B->agiconfig['min_credit_2call'] && !$this -> freecall[$K] && $this -> freetimetocall_left[$K]<=0) {
+		if (($credit <= 0 || $credit < $A2B->agiconfig['min_credit_2call']) && !$this -> freecall[$K] && $this -> freetimetocall_left[$K]<=0) {
 		    $A2B -> debug( DEBUG, $agi, __FILE__, __LINE__, "[NO ENOUGH CREDIT TO CALL THIS NUMBER - ERROR CT1]");
 			return "ERROR CT1";  //NO ENOUGH CREDIT TO CALL THIS NUMBER
 		}
