@@ -4585,7 +4585,7 @@
 	define('MODULE_PAYMENT_IRIDIUM_TEXT_TITLE', 'Iridium');
 	define('MODULE_PAYMENT_IRIDIUM_TEXT_DESCRIPTION', 'iridiumcorp.co.uk');
 	define('MODULE_PAYMENT_IRIDIUM_CURRENCY', 'USD');
-	define('STORE_NAME', 'A2Billing');
+//	define('STORE_NAME', 'A2Billing');
 	define('MODULE_PAYMENT_IRIDIUM_LANGUAGE', 'EN');
 	define('MODULE_PAYMENT_IRIDIUM_TEXT_CREDIT_CARD_OWNER', 'Card owner:');
 	define('MODULE_PAYMENT_IRIDIUM_TEXT_CREDIT_CARD_NUMBER', 'Card number:');

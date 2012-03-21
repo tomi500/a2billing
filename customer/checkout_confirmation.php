@@ -51,19 +51,9 @@ if (! has_rights (ACX_ACCESS)) {
 	die();
 }
 
-$currencies_list = get_currencies();
-$two_currency = false;
-if (!isset($currencies_list[strtoupper($_SESSION['currency'])][2]) || !is_numeric($currencies_list[strtoupper($_SESSION['currency'])][2])) {
-	$mycur = 1; 
-} else { 
-	$mycur = $currencies_list[strtoupper($_SESSION['currency'])][2];
-	$display_currency =strtoupper($_SESSION['currency']);
-	if(strtoupper($_SESSION['currency'])!=strtoupper(BASE_CURRENCY))$two_currency=true;
-}
-
 $vat=$_SESSION["vat"];
 
-getpost_ifset(array('amount','payment','authorizenet_cc_expires_year','authorizenet_cc_owner','authorizenet_cc_expires_month','authorizenet_cc_number','authorizenet_cc_expires_year'));
+getpost_ifset(array('amount','payment','authorizenet_cc_expires_year','authorizenet_cc_owner','authorizenet_cc_expires_month','authorizenet_cc_number','authorizenet_cc_expires_year','wm_purse_type'));
 // PLUGNPAY
 getpost_ifset(array('credit_card_type', 'plugnpay_cc_owner', 'plugnpay_cc_number', 'plugnpay_cc_expires_month', 'plugnpay_cc_expires_year', 'cvv'));
 //Iridium
@@ -71,8 +61,12 @@ getpost_ifset(array('CardName', 'CardNumber', 'ExpiryDateMonth', 'ExpiryDateYear
 // Invoice
 getpost_ifset(array('item_id','item_type'));
 
+$two_currency = false;
+$currencies_list = get_currencies();
+
 $vat_amount= $amount*$vat/100;
-$total_amount = $amount+($amount*$vat/100);
+$mc_fee = (strcasecmp("paypal",$payment)==0)?round($amount*0.049,2)+0.35:0;
+$total_amount = $mc_fee+$amount+($amount*$vat/100);
 if (!isset($item_id) || is_null($item_id) || $item_id == "") {
 	$item_id = 0;
 }
@@ -115,6 +109,24 @@ $HD_Form -> create_toppage ($form_action);
 
 $payment_modules = new payment($payment);
 $order = new order($amount_string);
+if (!isset($wm_purse_type)) {
+	$paycur = 1;
+	$getcur = strtoupper(BASE_CURRENCY);
+} else {
+    if (is_array($payment_modules->modules)) {
+	$getcur = $payment_modules->get_CurrentCurrency();
+    }
+}
+$paycur = $currencies_list[$getcur][2];
+if (!isset($currencies_list[strtoupper($_SESSION['currency'])][2]) || !is_numeric($currencies_list[strtoupper($_SESSION['currency'])][2])) {
+	$mycur = 1;
+} else {
+	$mycur = $currencies_list[strtoupper($_SESSION['currency'])][2]/$paycur;
+	if ($payment == 'webmoney') {
+		$getcur = $wm_purse_type;
+		$two_currency=true;
+	} elseif ($getcur!=strtoupper($_SESSION['currency'])) $two_currency=true;
+}
 
 if (is_array($payment_modules->modules)) {
 	$payment_modules->pre_confirmation_check();
@@ -139,65 +151,68 @@ if (is_array($payment_modules->modules)) {
 
 <br><br>
 <center>
-<table width=80% align=center class="infoBox">
+<table width=85% align=center class="infoBox">
 <tr height="15">
-    <td colspan=2 class="infoBoxHeading">&nbsp;<?php echo gettext("Please confirm your order")?></td>
+    <td colspan=3 class="infoBoxHeading" align=left>&nbsp;<font color=green><?php echo gettext("Please confirm your order")?></font></td>
 </tr>
 <tr>
-    <td width=50%>&nbsp;</td>
-    <td width=50%>&nbsp;</td>
+    <td colspan=3>&nbsp;</td>
 </tr>
 <tr>
-    <td width=50%><div align="right"><?php echo gettext("Payment Method");?>:&nbsp;</div></td>
-    <td width=50%><?php echo strtoupper($payment)?></td>
+    <td align=center align=left><?php echo $SPOT[$payment];?>&nbsp;</td>
+    <td><div align="right"><?php echo gettext("Payment Method");?>: &nbsp;</div></td>
+    <td width=50% align="left"><?php echo strtoupper($payment)?></td>
 </tr>
 <?php if(strcasecmp("invoice",$item_type)!=0){?>
 <tr>
-    <td align=right><?php echo gettext("Amount")?>: &nbsp;</td>
+    <td COLSPAN=2 align=right><?php echo gettext("Amount")?>: &nbsp;</td>
     <td align=left>
     <?php
-     echo round($amount,2)." ".strtoupper(BASE_CURRENCY);
+     echo round($amount,2)." ".$getcur;
      if($two_currency){
-					echo " - ".round($amount/$mycur,2)." ".strtoupper($_SESSION['currency']);	
+					echo " = ".round($amount/$mycur,3)." ".strtoupper($_SESSION['currency']);	
 	 }	
      ?> </td>
 </tr>
 <tr>
-    <td align=right><?php echo gettext("VAT")."(".$vat."%)"?>: &nbsp;</td>
+    <td COLSPAN=2 align=right><?php echo gettext("VAT")."(".$vat."%)"?>: &nbsp;</td>
     <td align=left>
     <?php
-     echo round($vat_amount,2)." ".strtoupper(BASE_CURRENCY);
-     if($two_currency){
-					echo " - ".round($vat_amount/$mycur,2)." ".strtoupper($_SESSION['currency']);	
+     echo round($vat_amount,2)." ".$getcur;
+     if($two_currency && $vat_amount){
+					echo " = ".round($vat_amount/$mycur,2)." ".strtoupper($_SESSION['currency']);	
 	 }	
      ?> </td>
 </tr>
 <?php } ?>
+<?php if($mc_fee){?>
 <tr>
-    <td align=right><?php echo gettext("Total Amount Incl. VAT")?>: &nbsp;</td>
+    <td COLSPAN=2 align=right><?php echo gettext("PayPal comission fee")?>: &nbsp;</td>
     <td align=left>
     <?php
-     echo round($total_amount,2)." ".strtoupper(BASE_CURRENCY);
-     if($two_currency){
-					echo " - ".round($total_amount/$mycur,2)." ".strtoupper($_SESSION['currency']);	
-	 }	
+     echo $mc_fee." ".$getcur;
+     $amount += $mc_fee;
      ?> </td>
 </tr>
+<?php } ?>
 <tr>
-    <td>&nbsp;</td>
-    <td>&nbsp;</td>
+    <td COLSPAN=2 align=right><?php echo gettext("Total Amount Incl. VAT")?>: &nbsp;</td>
+    <th align=left><font color=green>
+    <?php echo round($total_amount,2)." ".$getcur;
+    ?></font>
+    </th>
+</tr>
+<tr>
+    <td COLSPAN=3>&nbsp;</td>
+</tr>
+<tr height="25">
+   <td colspan=2 align=right class="main"><b><?php echo gettext("Please click button to confirm your order")?></b>: &nbsp;</td>
+   <td halign=left>
+   <input type="image" src="<?php echo Images_Path;?>/button_confirm_order.gif" alt="Confirm Order" border="0" align=left title="Confirm Order">
+   &nbsp;</td>
 </tr>
 </table>
 <br>
-<table class="infoBox" width="80%" cellspacing="0" cellpadding="2" align=center>
-   <tr height="25">
-   <td  align=left class="main"> <b><?php echo gettext("Please click button to confirm your order")?>.</b>
-   </td>
-          <td align=right halign=center >
-            <input type="image" src="<?php echo Images_Path;?>/button_confirm_order.gif" alt="Confirm Order" border="0" title="Confirm Order">
-             &nbsp;</td>
-          </tr>
-</table>
 </form>
 </center>
 

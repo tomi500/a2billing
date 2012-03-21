@@ -61,39 +61,37 @@ class paypal {
     function process_button($transactionID = 0, $key= "") {
 		global $order, $currencies, $currency;
 
-		$my_currency = strtoupper($GLOBALS['A2B']->config['global']['base_currency']);
+		$my_currency = strtoupper(BASE_CURRENCY);
 
 		if (!in_array($my_currency, $this->paypal_allowed_currencies)) {
 			$my_currency = 'USD';
 		}
 		$currencyObject = new currencies();
 		$process_button_string = tep_draw_hidden_field('cmd', '_xclick') .
-							   tep_draw_hidden_field('business', MODULE_PAYMENT_PAYPAL_ID) .
-							   tep_draw_hidden_field('item_name', STORE_NAME) .
-							   tep_draw_hidden_field('rm', '2') .
-							   tep_draw_hidden_field('LC', 'US') .
-							   tep_draw_hidden_field('country', 'USA') .
-							   tep_draw_hidden_field('no_shipping', '1') .
-							   tep_draw_hidden_field('PHPSESSID', session_id()) .
-							   tep_draw_hidden_field('amount', number_format($order->info['total'], $currencyObject->get_decimal_places($my_currency))) .
-							   //tep_draw_hidden_field('shipping', number_format($order->info['shipping_cost'] * $currencyObject->get_value($my_currency), $currencyObject->get_decimal_places($my_currency))) .
-							   tep_draw_hidden_field('currency_code', $my_currency) .
-							   tep_draw_hidden_field('notify_url', tep_href_link("checkout_process.php?transactionID=".$transactionID."&sess_id=".session_id()."&key=".$key, '', 'SSL')) .
-							   tep_draw_hidden_field('return', tep_href_link("userinfo.php", '', 'SSL')) .
-							   tep_draw_hidden_field('cancel_return', tep_href_link("userinfo.php", '', 'SSL'));
+					 tep_draw_hidden_field('business', MODULE_PAYMENT_PAYPAL_ID) .
+					 tep_draw_hidden_field('item_name', gettext('Payment for ').STORE_NAME) .
+					 tep_draw_hidden_field('rm', '2') .
+//					 tep_draw_hidden_field('bn', 'Credits_BuyNow_WPS_'.substr($order->customer['country'],0,2)) .
+//					 tep_draw_hidden_field('country', substr($order->customer['country'],0,2)) .
+					 tep_draw_hidden_field('lc', LANG) .
+					 tep_draw_hidden_field('charset', 'UTF-8') .
+					 tep_draw_hidden_field('email', $order->customer['email_address']) .
+					 tep_draw_hidden_field('no_shipping', '1') .
+					 tep_draw_hidden_field('PHPSESSID', session_id()) .
+					 tep_draw_hidden_field('amount', number_format($order->info['total'], $currencyObject->get_decimal_places($my_currency))) .
+//					 tep_draw_hidden_field('shipping', number_format($order->info['shipping_cost'] * $currencyObject->get_value($my_currency), $currencyObject->get_decimal_places($my_currency))) .
+					 tep_draw_hidden_field('currency_code', $my_currency) .
+					 tep_draw_hidden_field('notify_url', tep_href_link("checkout_process.php?transactionID=".$transactionID."&sess_id=".session_id()."&key=".$key, '', 'SSL')) .
+					 tep_draw_hidden_field('return', tep_href_link("userinfo.php", '', 'SSL')) .
+					 tep_draw_hidden_field('cbt', gettext('Return to ').STORE_NAME) .
+					 tep_draw_hidden_field('cancel_return', tep_href_link("userinfo.php", '', 'SSL'));
 
 		return $process_button_string;
     }
     function get_CurrentCurrency()
-    {    
-        $my_currency = MODULE_PAYMENT_PAYPAL_CURRENCY;
-        $base_currency = strtoupper($GLOBALS['A2B']->config['global']['base_currency']);
-        if($my_currency =='Selected Currency' && in_array($base_currency, $this->paypal_allowed_currencies) ){
-        	$my_currency = $base_currency;
-        }
-        elseif (!in_array($my_currency, $this->paypal_allowed_currencies)) {
-			$my_currency = 'USD';
-		}
+    {
+        $my_currency = strtoupper(BASE_CURRENCY);
+        if (!in_array($my_currency, $this->paypal_allowed_currencies)) $my_currency = 'USD';
         return $my_currency;
     }
     function before_process() {

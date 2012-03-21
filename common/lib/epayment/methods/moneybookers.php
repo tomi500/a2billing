@@ -88,12 +88,12 @@ class moneybookers {
     {
      
         $my_currency = MODULE_PAYMENT_MONEYBOOKERS_CURRENCY;
-        $base_currency = strtoupper($GLOBALS['A2B']->config['global']['base_currency']);
+        $base_currency = strtoupper(BASE_CURRENCY);
         if($my_currency =='Selected Currency' && in_array($base_currency, array('EUR', 'USD', 'GBP', 'HKD', 'SGD', 'JPY', 'CAD', 'AUD', 'CHF', 'DKK', 'SEK', 'NOK', 'ILS', 'MYR', 'NZD', 'TWD', 'THB', 'CZK', 'HUF', 'SKK', 'ISK', 'INR')) ){
         	$my_currency = $base_currency;
         }
         elseif (!in_array($my_currency,  array('EUR', 'USD', 'GBP', 'HKD', 'SGD', 'JPY', 'CAD', 'AUD', 'CHF', 'DKK', 'SEK', 'NOK', 'ILS', 'MYR', 'NZD', 'TWD', 'THB', 'CZK', 'HUF', 'SKK', 'ISK', 'INR'))) {
-			$my_currency = 'USD';
+			$my_currency = $base_currency;
 		}
         return $my_currency;
     }

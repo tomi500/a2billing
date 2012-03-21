@@ -75,7 +75,7 @@ $smarty->display( 'main.tpl');
           break;
           case 0:
 		  	write_log(LOGFILE_EPAYMENT, basename(__FILE__).' line:'.__LINE__." ERROR TRANSACTION PENDING");
-            echo gettext("We are sorry your transaction is pending.");
+            echo gettext("We are sorry your transaction is pending.".$errcode);
           break;
           case 1:
 		  	write_log(LOGFILE_EPAYMENT, basename(__FILE__).' line:'.__LINE__." ERROR TRANSACTION INPROGRESS");

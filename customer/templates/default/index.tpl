@@ -96,7 +96,44 @@
   	
     </div>
     <div id="footer">
-    <div style="color: #BD2A15; font-size: 11px; text-align:center;">{$COPYRIGHT}</div>
+<!--    <div style="color: #BD2A15; font-size: 11px; text-align:center;">{$COPYRIGHT}</div>
+-->
+    {php}
+    $DBHandle = DbConnect();
+    $instance_table = new Table();
+    $QUERY = "SELECT configuration_key FROM cc_configuration where configuration_key in ('MODULE_PAYMENT_AUTHORIZENET_STATUS','MODULE_PAYMENT_PAYPAL_STATUS','MODULE_PAYMENT_MONEYBOOKERS_STATUS','MODULE_PAYMENT_WORLDPAY_STATUS','MODULE_PAYMENT_PLUGNPAY_STATUS','MODULE_PAYMENT_WM_STATUS') AND configuration_value='True'";
+    $payment_methods = $instance_table->SQLExec($DBHandle, $QUERY);
+    $show_logo = '';
+    for ($index = 0; $index < sizeof($payment_methods); $index++) {
+	if ($payment_methods[$index][0] == "MODULE_PAYMENT_PAYPAL_STATUS") {
+	    $show_logo .= '<a href="https://www.paypal.com/en/mrb/pal=PGSJEXAEXKTBU" target="_blank"><img src="' . KICON_PATH . '/payments_paypal.gif" alt="Paypal"/></a>' . ' &nbsp; ';
+	} elseif ($payment_methods[$index][0] == "MODULE_PAYMENT_MONEYBOOKERS_STATUS") {
+	    $show_logo .= '<a href="https://www.moneybookers.com/app/?rid=811621" target="_blank"><img src="' . KICON_PATH . '/moneybookers.gif" alt="Moneybookers"/></a>' . ' &nbsp; ';
+	} elseif ($payment_methods[$index][0] == "MODULE_PAYMENT_PLUGNPAY_STATUS") {
+	    $show_logo .= '<a href="http://www.plugnpay.com/" target="_blank"><img src="' . KICON_PATH . '/plugnpay.png" alt="plugnpay.com"/></a>' . ' &nbsp; ';
+	} elseif ($payment_methods[$index][0] == "MODULE_PAYMENT_WM_STATUS") {
+	    $show_logo .= '<a href="http://www.wmtransfer.com/" target="_blank"><img src="' . KICON_PATH . '/webmoney_virified.png" alt="WebMoney"/></a>' . ' &nbsp; ';
+	}
+    }
+    $show_logo .= <<<'EOD'
+<!--LiveInternet counter-->
+<script type="text/javascript">
+document.write("<a href='http://www.liveinternet.ru/click' "+
+"target=_blank><img src='//counter.yadro.ru/hit?t39.2;r"+
+escape(document.referrer)+((typeof(screen)=="undefined")?"":
+";s"+screen.width+"*"+screen.height+"*"+(screen.colorDepth?
+screen.colorDepth:screen.pixelDepth))+";u"+escape(document.URL)+
+";"+Math.random()+
+"' alt='' title='LiveInternet' "+
+"border='0' width='31' height='31'><\/a>")
+</script>
+<!--/LiveInternet-->
+EOD;
+    echo '<table style="width:100%;margin:0 auto;" align="center">
+    <tr><td valign="top" align="center" class="tableBodyRight">' . $show_logo . '
+    </td></tr></table>';
+{/php}
+
     </div>
 	</form>
 {literal}

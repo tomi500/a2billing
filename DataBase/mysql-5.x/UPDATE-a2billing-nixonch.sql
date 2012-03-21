@@ -148,3 +148,17 @@ ALTER TABLE cc_callback_spool ADD `num_attempts_busy` int(11) NOT NULL DEFAULT '
 ALTER TABLE cc_callback_spool ADD `num_attempts_noanswer` int(11) NOT NULL DEFAULT '0';
 ALTER TABLE cc_callback_spool ADD `exten_leg_a` varchar(60) COLLATE utf8_bin NOT NULL;
 ALTER TABLE cc_callback_spool ADD `last_status` varchar(80) COLLATE utf8_bin DEFAULT NULL;
+
+INSERT INTO `cc_payment_methods` (`payment_method`, `payment_filename`) VALUES ('WebMoney', 'webmoney.php');
+
+INSERT INTO `cc_configuration` (`configuration_title`, `configuration_key`, `configuration_value`, `configuration_description`, `configuration_type`, `use_function`, `set_function`) VALUES
+('Enable webmoney Module', 'MODULE_PAYMENT_WM_STATUS', 'False', 'Do you want to accept webmoney payments?', 0, NULL, 'tep_cfg_select_option(array(''True'', ''False''),'),
+('Provider WMID', 'MODULE_PAYMENT_WM_WMID', '111111111111', '', 0, NULL, NULL),
+('WME Purse', 'MODULE_PAYMENT_WM_PURSE_WME', 'E222222222222', 'Euro (EUR)', 0, NULL, NULL),
+('WMR purse', 'MODULE_PAYMENT_WM_PURSE_WMR', 'R333333333333', 'Russian Rouble (RUB)', 0, NULL, NULL),
+('WMZ purse', 'MODULE_PAYMENT_WM_PURSE_WMZ', 'Z444444444444', 'U.S. Dollar (USD)', 0, NULL, NULL),
+('WMU Purse', 'MODULE_PAYMENT_WM_PURSE_WMU', 'U555555555555', 'Ukraine Hryvnia (UAH)', 0, NULL, NULL),
+('WebMoney', 'MODULE_PAYMENT_WM_CACERT', './WebMoneyTransferRootCA.crt', 'root certificate path, in PEM-format', 0, NULL, NULL),
+('Secret Key', 'MODULE_PAYMENT_WM_LMI_SECRET_KEY', 'Secret Key', 'Known to seller and WM Merchant Interface service on', 0, NULL, NULL),
+('Extra field for testmode', 'MODULE_PAYMENT_WM_LMI_SIM_MODE', '0', '0 - simulate success; 1 - simulate fail; 2 - simulate 80% sucsess, 20% fail', 0, NULL, NULL),
+('Hash method', 'MODULE_PAYMENT_WM_LMI_HASH_METHOD', 'MD 5', 'Method of forming control signature', 0, NULL, 'tep_cfg_select_option(array(''MD 5'', ''SIGN''),');

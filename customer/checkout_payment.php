@@ -93,6 +93,33 @@ if($item_type == "invoice" && is_numeric($item_id)){
 		die;
 	}
 }
+
+
+
+$inst_table = new Table();
+
+$QUERY = "SELECT credit, status FROM cc_card WHERE username = '" . $_SESSION["pr_login"] ."' AND uipass = '" . $_SESSION["pr_password"] . "'";
+
+$customer_info = $inst_table -> SQLExec($DBHandle, $QUERY);
+
+if (!$customer_info || !is_array($customer_info)) {
+    echo gettext("Error loading your account information!");
+    exit ();
+}
+
+if ($customer_info[0][1] != "1" && $customer_info[0][1] != "8") {
+    Header("HTTP/1.0 401 Unauthorized");
+    Header("Location: PP_error.php?c=accessdenied");
+    die();
+}
+
+$credit_cur = $customer_info[0][0] / $mycur;
+$credit_cur = round($credit_cur, 3);
+
+
+
+
+
 // #### HEADER SECTION
 $smarty->display( 'main.tpl');
 
@@ -154,24 +181,34 @@ function rowOutEffect(object) {
 	echo $PAYMENT_METHOD;
 ?>
 <br>
-<?php
-$form_action_url = tep_href_link("checkout_confirmation.php", '', 'SSL');
-echo tep_draw_form('checkout_amount', $form_action_url, 'post', 'onsubmit="checkamount()"');
-?>
 
-    <input name="item_id" type=hidden value="<?php echo $item_id?>">
-    <input name="item_type" type=hidden value="<?php echo $item_type?>">
 
     <table width="80%" cellspacing="0" cellpadding="2" align=center>
-    <?php
-	if (isset($payment_error) && is_object(${$payment_error}) && ($error = ${$payment_error}->get_error())) {
-  		write_log(LOGFILE_EPAYMENT, basename(__FILE__).' line:'.__LINE__." ERROR ".$error['title']." ".$error['error']);
-	?>
-	
+<?php
+    $selection = $payment_modules->selection();
+?>
+
+
+
+
+
+	<table class="infoBox" width="85%" cellspacing="0" cellpadding="2" align=center>
+	<tr>
+	<td align=center>
+	<font class="fontstyle_002"><?php echo gettext("BALANCE REMAINING");?> :</font><font class="fontstyle_007"> <?php echo $credit_cur.' '.gettext($_SESSION['currency']); ?> </font>
+	</td>
+	</tr>
+	</table><br><br>
+
+<?php
+    if (isset($payment_error) && is_object(${$payment_error}) && ($error = ${$payment_error}->get_error())) {
+        write_log(LOGFILE_EPAYMENT, basename(__FILE__).' line:'.__LINE__." ERROR ".$error['title']." ".$error['error']);
+?>
+  <table class="infoBox" width="85%" cellspacing="0" cellpadding="2" align=center>
       <tr>
         <td ><table border="0" width="100%" cellspacing="0" cellpadding="2">
           <tr>
-            <td class="main" ><b><?php echo tep_output_string_protected($error['title']); ?></b></td>
+            <td class="main" ><b><?php echo tep_output_string_protected(gettext($error['title'])); ?></b></td>
           </tr>
         </table></td>
       </tr>
@@ -181,7 +218,7 @@ echo tep_draw_form('checkout_amount', $form_action_url, 'post', 'onsubmit="check
             <td><table border="0" width="100%" cellspacing="0" cellpadding="2">
               <tr>
                 <td><?php echo tep_draw_separator('clear.gif', '10', '1'); ?></td>
-                <td class="main" width="100%" valign="top"><?php echo tep_output_string($error['error']); ?></td>
+                <td class="main" width="100%" valign="top"><?php echo tep_output_string(gettext($error['error'])); ?></td>
                 <td><?php echo tep_draw_separator('clear.gif', '10', '1'); ?></td>
               </tr>
             </table></td>
@@ -191,176 +228,88 @@ echo tep_draw_form('checkout_amount', $form_action_url, 'post', 'onsubmit="check
       <tr>
         <td><?php echo tep_draw_separator('clear.gif', '100%', '10'); ?></td>
       </tr>
-      </table>
-<?php
-    }
-?>
-    <table class="infoBox" width="80%" cellspacing="0" cellpadding="2" align=center>
-
-<?php
-    $selection = $payment_modules->selection();
-  
-    if (sizeof($selection) > 1) {
-?>
-
-       <tr height=10>
-            <td class="infoBoxHeading">&nbsp;</td>
-            <td class="infoBoxHeading" width="15%" valign="top" align="center"><b><?php echo "Please Select"; ?></b></td>
-            <td class="infoBoxHeading" width="10%" >&nbsp;</td>
-            <td class="infoBoxHeading"  width="75%" valign="top"><b><?php echo "Payment Method"; ?><b></td>
-       </tr>
-<?php
-    } else {
-?>
-      <tr>
-        <td>&nbsp;</td>
-        <td class="main" width="100%" colspan="3"><?php echo "This is currently the only payment method available to use on this order."; ?></td>
-      </tr>
+  </table>
+  <br><br>
 
 <?php
     }
-
+?>
+  <table class="infoBox" width="85%" cellspacing="0" cellpadding="2" align=center rules=rows>
+<?php
     $radio_buttons = 0;
+    $form_action_url = tep_href_link("checkout_confirmation.php", '', 'SSL');
     for ($i=0, $n=sizeof($selection); $i<$n; $i++) {
+    echo tep_draw_form('checkout_amount'.$i, $form_action_url, 'post', 'onsubmit="checkamount()"');
 ?>
-
-
-	 <tr>
-		 	<td colspan="3">&nbsp; </td>
-	 </tr>
-		 
+<tr>
+  <td><table width="100%" border="0" cellspacing="0" cellpadding="2">
+	<input name="item_id" type=hidden value="<?php echo $item_id?>">
+	<input name="item_type" type=hidden value="<?php echo $item_type?>">
+	<input name="payment" type=hidden value="<?php echo $selection[$i]['id']?>">
+    <tr height="50px">
+      <td width="150px" align=center>
+	<?php echo $SPOT[$selection[$i]['id']];?>
+      </td>
+      <td class="main" colspan="2" align=left>
+	<font class="fontstyle_002"><?php echo gettext("Refill");?> :</font>
+	<input class="form_input_text" name="amount" size="10" maxlength="10">
 <?php
-    if ( ($selection[$i]['id'] == $payment) || ($n == 1) ) {
-      echo '             <tr id="defaultSelected" class="moduleRowSelected" onmouseover="rowOverEffect(this)" onmouseout="rowOutEffect(this)" onclick="selectRowEffect(this, ' . $radio_buttons . ')">' . "\n";
+        if (isset($selection[$i]['error'])) {
+?>
+	<class="main"><?php echo $selection[$i]['error']; ?>
+<?php
+        } elseif (isset($selection[$i]['fields']) && is_array($selection[$i]['fields'])) {
+          if (sizeof($selection[$i]['fields'])>1){?>
+	<input name="wm_purse_type" type=hidden value="<?php echo strtoupper(BASE_CURRENCY)?>">
+      <?php echo strtoupper(BASE_CURRENCY)?>
+      </td>
+      <td style="padding-right:18px;" align=right>
+	<input type="submit" class="form_input_button" value=" <?php echo '>>'.gettext("Proceed")?> " alt="Continue"  title="Continue">
+<?php	  }
+	if (sizeof($selection[$i]['fields'])==1) {
+	  echo $selection[$i]['fields'][0]['field'];?>
+      </td>
+      <td style="padding-right:18px;" align=right>
+	<input type="submit" class="form_input_button" value=" <?php echo '>>'.gettext("Proceed")?> " alt="Continue"  title="Continue">
+      &nbsp;</td>
+<?php	}
+       else {?>
+      &nbsp;</td>
+    </tr>
+    <td width="150px"></td><td colspan="100%"><table width="100%" border="0" cellspacing="0" cellpadding="0"><tr><td>
+<?php
+       for ($j=0, $n2=sizeof($selection[$i]['fields']); $j<$n2; $j++) {
+?>
+    <tr>
+      <td class="main" width="144px" align=left><?php echo $selection[$i]['fields'][$j]['title']?></td>
+      <td class="main" align=left><?php echo $selection[$i]['fields'][$j]['field']?></td>
+    </tr>
+<?php
+       }
+?>
+    </td></tr></table></td>
+<?php
+       }
     } else {
-      echo '             <tr class="moduleRow" onmouseover="rowOverEffect(this)" onmouseout="rowOutEffect(this)" onclick="selectRowEffect(this, ' . $radio_buttons . ')">' . "\n";
-    }
 ?>
-            <td >&nbsp;</td>
-            <td width="15%" align="center">
-            <?php
-			    if (sizeof($selection) > 1) {
-			      echo tep_draw_radio_field('payment', $selection[$i]['id']);
-			    } else {
-			      echo tep_draw_hidden_field('payment', $selection[$i]['id']);
-			    }
-			?>
-			</td>
-			<td width="10%" >&nbsp;</td>
-            <td width="75%" ><b><?php echo $selection[$i]['module']; ?></b></td>
-       </tr>
-      
-
-       <tr>
-        <td colspan="3">&nbsp;</td>
-        <td >
-            <table border="0" width="100%" cellspacing="0" cellpadding="2">
-
-<?php
-    if (isset($selection[$i]['error'])) {
-?>
-      <tr>
-            <td class="main" ><?php echo $selection[$i]['error']; ?></td>
-      </tr>
-<?php
-    } elseif (isset($selection[$i]['fields']) && is_array($selection[$i]['fields'])) {
-?>
-      <tr>
-            <td ><table border="0" cellspacing="0" cellpadding="2">
-            
-<?php
-      for ($j=0, $n2=sizeof($selection[$i]['fields']); $j<$n2; $j++) {
-?>
-          <tr>
-            <td width="10">&nbsp;</td>
-            <td class="main"><?php echo $selection[$i]['fields'][$j]['title']; ?></td>
-            <td>&nbsp;</td>
-            <td class="main"><?php echo $selection[$i]['fields'][$j]['field']; ?></td>
-          </tr>
-<?php
-      }
-?>
-            </table></td>
-            <td>&nbsp;</td>
-          </tr>
+	<input name="wm_purse_type" type=hidden value="<?php echo strtoupper(BASE_CURRENCY)?>">
+	<?php echo strtoupper(BASE_CURRENCY)?>
+      </td>
+      <td style="padding-right:18px;" align=right>
+	<input type="submit" class="form_input_button" value=" <?php echo '>>'.gettext("Proceed")?> " alt="Continue"  title="Continue">
+      &nbsp;</td>
+    </tr>
 <?php
     }
 ?>
-        </table></td>
-        <td>&nbsp;</td>
-      </tr>
+</table>
+</td></tr>
+	</form>
 <?php
     $radio_buttons++;
   }
 ?>
-      </table>
-      <br>
-      <?php  if (sizeof($selection) > 0){ ?>
-      
-      <table width=80% align=center class="infoBox">
-			<tr height="15">
-			    <td colspan=2 class="infoBoxHeading">&nbsp;<?php echo gettext("Please enter the order amount")?>:</td>
-			</tr>
-			<tr>
-			    <td width=50%>&nbsp;</td>
-			    <td width=50%>&nbsp;</td>
-			</tr>
-			<tr>
-			    <td align=right><?php echo gettext("Total Amount")?>: &nbsp;</td>
-			    <td align=left>
-				<?php
-				if($static_amount){
-					echo round($amount,2)." ".strtoupper(BASE_CURRENCY); 
-					if($two_currency){
-						echo " - ".round($amount/$mycur,2)." ".strtoupper($_SESSION['currency']);	
-					}	
-				?>
-				<input name="amount" type=hidden value="<?php echo $amount?>">
-				<?php     	
-      			}else{ ?>
-			    <select name="amount" class="form_input_select"  >
-				<?php
-				$arr_purchase_amount = preg_split("/:/", EPAYMENT_PURCHASE_AMOUNT);
-						if (!is_array($arr_purchase_amount)) $arr_purchase_amount[0]=10;
-			
-						foreach($arr_purchase_amount as $value){
-				?>
-				<option value="<?php echo $value?>">
-					<?php
-				echo round($value,2); 
-				if($two_currency){
-					echo " ".strtoupper(BASE_CURRENCY)." - ".round($value/$mycur,2)." ".strtoupper($_SESSION['currency']);	
-				}	
-				?>
-				</option>
-			
-				<?php }?></select>
-				&nbsp;<?php if(!$two_currency) echo strtoupper(BASE_CURRENCY);
-      			}
-				?>
-				
-				</td>
-			</tr>
-			<tr>
-			    <td>&nbsp;</td>
-			    <td>&nbsp;</td>
-			</tr>
-		</table>
-         <br/>
-      
-      
-      <table class="infoBox" width="80%" cellspacing="0" cellpadding="2" align=center>
-          <tr height="20">
-          <td  align=left class="main"> <b>Continue Checkout Procedure</b><br>to confirm this order. 
-
-          </td>
-          <td align=right halign=center >
-            <input type="image" src="<?php echo Images_Path;?>/button_continue.gif" alt="Continue" border="0" title="Continue">
-             &nbsp;</td>
-          </tr>
-         </table>
-         <?php } ?>
-     </form>
+	</table>
 
 <?php
 

@@ -17,7 +17,7 @@ include_once (dirname(__FILE__)."/sessions.php");
     }
 
     if ( (ENABLE_SSL == true) && (getenv('HTTPS') == 'on') ) { // We are loading an SSL page
-      if (substr($url, 0, strlen(HTTP_SERVER)) == HTTP_SERVER) { // NONSSL url
+      if (HTTP_SERVER != "" && substr($url, 0, strlen(HTTP_SERVER)) == HTTP_SERVER) { // NONSSL url
         $url = HTTPS_SERVER . substr($url, strlen(HTTP_SERVER)); // Change it to SSL
       }
     }
@@ -1327,4 +1327,42 @@ include_once (dirname(__FILE__)."/sessions.php");
 
     return $string;
   }
+
+
+  function tep_ip_vs_net($ip,$network,$mask){
+
+    if (((ip2long($ip))&(ip2long($mask)))==ip2long($network)){
+       return 1;
+    }else{
+       return 0;
+    }
+  }
+
+// Подпись с помощью WebMoney WMSigner
+  function wmsign($input) {
+      global $_SETTINGS;
+      // Открываем поток к WMSigner, на запись и чтение.
+      $f=proc_open("./signer/wmsigner -i ./signer/wmsigner.ini -k ./signer/".$_SETTINGS['wmid'].".kwm", array(
+          0=>array("pipe", "r"),
+          1=>array("pipe", "w"),
+          2=>array("file", "/tmp/error-output.txt", "a")), $pipes);
+
+      if(is_resource($f)) {
+          $output="";
+          // Отсылаем вышесгенерированную строку и закрываем поток на запись.
+          fwrite($pipes[0], $input);
+          fclose($pipes[0]);
+
+          // Читаем хэш из входного потока
+          while(!feof($pipes['1']))
+          {
+            $output .= fread($pipes[1], '1024');
+          }
+          // Закрываем входной поток и закрываем поток WMSigner
+          fclose($pipes['1']);
+          proc_close($f);
+      }
+      return $output;
+  }
+
 ?>

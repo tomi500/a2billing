@@ -34,8 +34,9 @@
 include ("./lib/customer.defines.php");
 
 getpost_ifset (array('transactionID', 'sess_id', 'key', 'mc_currency', 'currency', 'md5sig', 'merchant_id', 'mb_amount', 'status', 'mb_currency',
-					'transaction_id', 'mc_fee', 'card_number'));
-
+					'transaction_id', 'mc_fee', 'card_number', 'mc_gross', 'item_name', 'receiver_id',
+					'LMI_PREREQUEST','LMI_PAYEE_PURSE','LMI_PAYMENT_AMOUNT','LMI_PAYMENT_NO','LMI_MODE','LMI_SYS_INVS_NO',
+					'LMI_SYS_TRANS_NO','LMI_PAYER_PURSE','LMI_PAYER_WM','LMI_HASH','LMI_SYS_TRANS_DATE','LMI_PAYMENT_DESC'));
 
 
 write_log(LOGFILE_EPAYMENT, basename(__FILE__).' line:'.__LINE__."EPAYMENT : transactionID=$transactionID - transactionKey=$key \n -POST Var \n".print_r($_POST, true));
@@ -68,9 +69,9 @@ $DBHandle_max  = DbConnect();
 $paymentTable = new Table();
 
 if (DB_TYPE == "postgres") {
-	$NOW_2MIN = " creationdate <= (now() - interval '2 minute') ";
+	$NOW_2MIN = " creationdate >= (now() - interval '7 minute') ";
 } else {
-	$NOW_2MIN = " creationdate <= DATE_SUB(NOW(), INTERVAL 2 MINUTE) ";
+	$NOW_2MIN = " creationdate >= DATE_SUB(NOW(), INTERVAL 7 MINUTE) ";
 }
 
 // Status - New 0 ; Proceed 1 ; In Process 2
@@ -78,6 +79,8 @@ $QUERY = "SELECT id, cardid, amount, vat, paymentmethod, cc_owner, cc_number, cc
 		 " FROM cc_epayment_log " .
 		 " WHERE id = ".$transactionID." AND (status = 0 OR (status = 2 AND $NOW_2MIN))";
 $transaction_data = $paymentTable->SQLExec ($DBHandle_max, $QUERY);
+write_log(LOGFILE_EPAYMENT, basename(__FILE__).' line:'.__LINE__."- QUERY = $QUERY");
+write_log(LOGFILE_EPAYMENT, basename(__FILE__).' line:'.__LINE__.print_r($transaction_data, true));
 
 $item_id = $transaction_data[0][13];
 $item_type = $transaction_data[0][14];
@@ -104,14 +107,15 @@ $transaction_detail = serialize($_POST);
 
 $currencyObject 	= new currencies();
 $currencies_list 	= get_currencies();
+$payment_modules = new payment($transaction_data[0][4]);
 switch($transaction_data[0][4])
 {
 	case "paypal":
 		$currCurrency = $mc_currency;
 		if($A2B->config['epayment_method']['charge_paypal_fee']==1){
-			$currAmount = $transaction_data[0][2] ;
+			$currAmount = $mc_gross;
 		}else{
-			$currAmount = $transaction_data[0][2] - $mc_fee;
+			$currAmount = $mc_gross - $mc_fee;
 		}
 		$postvars = array();
 		$req = 'cmd=_notify-validate';
@@ -146,6 +150,7 @@ switch($transaction_data[0][4])
 					$flag_ver = 1;
 				}				
 			}
+			if ($receiver_id != MODULE_PAYMENT_PAYPAL_ID) $flag_ver = 0;
 			if ($flag_ver == 0) {
 				write_log(LOGFILE_EPAYMENT, basename(__FILE__).' line:'.__LINE__."-PAYPAL Transaction Verification Status: Failed \nreq=$req\n$gather_res");
 				$security_verify = false;
@@ -223,11 +228,53 @@ switch($transaction_data[0][4])
 		$transaction_detail = serialize($pnp_transaction_array);
 		break;
 		
-	case 'iridium':
-        $currCurrency           = BASE_CURRENCY;
-        $currAmount             = $transaction_data[0][2];
+	case "iridium":
+		$currCurrency           = BASE_CURRENCY;
+		$currAmount             = $transaction_data[0][2];
 		break;
 		
+	case "webmoney":
+		switch(substr($LMI_PAYEE_PURSE,0,1))
+		{
+		    case 'U': $currCurrency = "UAH"; break;
+		    case 'Z': $currCurrency = "USD"; break;
+		    case 'E': $currCurrency = "EUR"; break;
+		    case 'R': $currCurrency = "RUB"; break;
+		    default : $security_verify = false; break;
+		}
+		$ipaddress = tep_get_ip_address();
+		if (!tep_ip_vs_net($ipaddress,"212.118.48.0", "255.255.255.0")
+		 && !tep_ip_vs_net($ipaddress,"212.158.173.0","255.255.255.0")
+		 && !tep_ip_vs_net($ipaddress,"91.200.28.0",  "255.255.255.0")
+		 && !tep_ip_vs_net($ipaddress,"91.227.52.0",  "255.255.255.0")) $security_verify = false;
+		if($transaction_data[0][2] != trim($LMI_PAYMENT_AMOUNT)) $security_verify = false;
+		if(array_search($LMI_PAYEE_PURSE, array(MODULE_PAYMENT_WM_PURSE_WMU,MODULE_PAYMENT_WM_PURSE_WMZ,MODULE_PAYMENT_WM_PURSE_WME,MODULE_PAYMENT_WM_PURSE_WMR)) === false) $security_verify = false;
+		write_log(LOGFILE_EPAYMENT, basename(__FILE__).' line:'.__LINE__." - WebMoney LMI_PREREQUEST='$LMI_PREREQUEST', LMI_MODE='$LMI_MODE', LMI_SYS_INVS_NO='$LMI_SYS_INVS_NO', LMI_SYS_TRANS_NO='$LMI_SYS_TRANS_NO', LMI_PAYER_WM='$LMI_PAYER_WM'");
+		if ($LMI_PREREQUEST == 1 && $security_verify) {
+			echo "YES";
+			exit();
+		}
+		switch(MODULE_PAYMENT_WM_LMI_HASH_METHOD)
+		{
+		    case "MD 5":
+				$common_string = $LMI_PAYEE_PURSE.$LMI_PAYMENT_AMOUNT.$LMI_PAYMENT_NO.$LMI_MODE.$LMI_SYS_INVS_NO.
+						$LMI_SYS_TRANS_NO.$LMI_SYS_TRANS_DATE.MODULE_PAYMENT_WM_LMI_SECRET_KEY.$LMI_PAYER_PURSE.$LMI_PAYER_WM;
+				$hash = strtoupper(md5($common_string));
+				if ($hash!=$LMI_HASH) $security_verify = false;
+				break;
+		    case "SIGN":
+//				$sign = wmsign($_SETTINGS['wmid'].$purse.$pay_no.$_REQUEST['number'].$_REQUEST['number_type']);
+//				$merchant->appendChild($xml->createElement('sign'))->appendChild($xml->createTextNode($sign));
+				$security_verify = false;
+				write_log(LOGFILE_EPAYMENT, basename(__FILE__).' line:'.__LINE__." - WebMoney check by SIGN not support");
+				break;
+		    default:
+				$security_verify = false;
+				break;
+		}
+		$currAmount = ($transaction_data[0][2]<=$LMI_PAYMENT_AMOUNT)?$transaction_data[0][2]:$LMI_PAYMENT_AMOUNT;
+		break;
+
 	default:
 		write_log(LOGFILE_EPAYMENT, basename(__FILE__).' line:'.__LINE__."-NO SUCH EPAYMENT FOUND");
 		exit();
@@ -270,7 +317,6 @@ if($newkey == $key) {
 	exit();
 }
 write_log(LOGFILE_EPAYMENT, basename(__FILE__).' line:'.__LINE__."-transactionID=$transactionID"." ---------- TRANSACTION INFO ------------\n".print_r($transaction_data,1));
-$payment_modules = new payment($transaction_data[0][4]);
 // load the before_process function from the payment modules
 //$payment_modules->before_process();
 
@@ -289,10 +335,8 @@ $nowDate = date("Y-m-d H:i:s");
 $pmodule = $transaction_data[0][4];
 
 $orderStatus = $payment_modules->get_OrderStatus();
-if (empty($item_type))
-	$transaction_type = 'balance';
-else
-	$transaction_type = $item_type;
+$transaction_type = (empty($item_type))?'balance':$item_type;
+$item_name = (empty($item_name))?(empty($LMI_PAYMENT_DESC)?$transaction_type:$LMI_PAYMENT_DESC):$item_name;
 
 $Query = "INSERT INTO cc_payments ( customers_id, customers_name, customers_email_address, item_name, item_id, item_quantity, payment_method, cc_type, cc_owner, " .
 			" cc_number, cc_expires, orders_status, last_modified, date_purchased, orders_date_finished, orders_amount, currency, currency_value) values (" .
@@ -543,7 +587,7 @@ if (preg_match("/^[a-z]+[a-z0-9_-]*(([.]{1})|([a-z0-9_-]*))[a-z0-9_-]+[@]{1}[a-z
         write_log(LOGFILE_EPAYMENT, basename(__FILE__).' line:'.__LINE__."-SENDING EMAIL TO CUSTOMER ".$customer_info["email"]);
         $mail->replaceInEmail(Mail::$ITEM_AMOUNT_KEY,$amount_paid);
         $mail->replaceInEmail(Mail::$ITEM_ID_KEY,$id_logrefill);
-        $mail->replaceInEmail(Mail::$ITEM_NAME_KEY,'balance');
+        $mail->replaceInEmail(Mail::$ITEM_NAME_KEY,$item_name);
         $mail->replaceInEmail(Mail::$PAYMENT_METHOD_KEY,$pmodule);
         $mail->replaceInEmail(Mail::$PAYMENT_STATUS_KEY,$statusmessage);
         $mail->send($customer_info["email"]);

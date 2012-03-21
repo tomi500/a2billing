@@ -94,22 +94,54 @@ if (!isset ($disable_load_conf) || !($disable_load_conf)) {
 
 	$DBHandle = DbConnect();
 	$instance_table = new Table();
-	$QUERY = "SELECT configuration_key FROM cc_configuration where configuration_key in ('MODULE_PAYMENT_AUTHORIZENET_STATUS','MODULE_PAYMENT_PAYPAL_STATUS','MODULE_PAYMENT_MONEYBOOKERS_STATUS','MODULE_PAYMENT_WORLDPAY_STATUS','MODULE_PAYMENT_PLUGNPAY_STATUS') AND configuration_value='True'";
+	$QUERY = "SELECT configuration_key FROM cc_configuration where configuration_key in ('MODULE_PAYMENT_AUTHORIZENET_STATUS','MODULE_PAYMENT_PAYPAL_STATUS','MODULE_PAYMENT_MONEYBOOKERS_STATUS','MODULE_PAYMENT_WORLDPAY_STATUS','MODULE_PAYMENT_PLUGNPAY_STATUS','MODULE_PAYMENT_WM_STATUS') AND configuration_value='True'";
 	$payment_methods = $instance_table->SQLExec($DBHandle, $QUERY);
 	$show_logo = '';
+	$SPOT['paypal'] = '<a href="https://www.paypal.com/ru/mrb/pal=PGSJEXAEXKTBU" target="_blank"><img src="' . KICON_PATH . '/paypal_logo.gif" alt="Paypal"/></a>';
+	$SPOT['moneybookers'] = '<a href="https://www.moneybookers.com/app/?rid=811621" target="_blank"><img src="' . KICON_PATH . '/moneybookers.gif" alt="Moneybookers"/></a>';
+//	$SPOT['authorizenet'] = '<a href="http://authorize.net/" target="_blank"><img src="'.KICON_PATH.'/authorize.gif" alt="Authorize.net"/></a>';
+//	$SPOT['authorizenet'] = '';
+//	$SPOT['worlpay'] = '<a href="http://www.worldpay.com/" target="_blank"><img src="'.KICON_PATH.'/worldpay.gif" alt="worldpay.com"/></a>';
+//	$SPOT['worlpay'] = '';
+	$SPOT['plugnpay'] = '<a href="http://www.plugnpay.com/" target="_blank"><img src="' . KICON_PATH . '/plugnpay.png" alt="plugnpay.com"/></a>';
+	$SPOT['webmoney'] = '<a href="http://www.webmoney.ru/" target="_blank"><img src="' . KICON_PATH . '/webmoney.gif" alt="WebMoney"/></a>';
+	$PAYMENT_METHOD = '
+	<table width="100%" align="center">
+	<tr>
+		<TD valign="top" align="center" class="tableBodyRight">
+			' . $SPOT['paypal'] . '
+			&nbsp;&nbsp; &nbsp;
+			' . $SPOT['moneybookers'] . '
+			&nbsp;&nbsp; &nbsp;
+			' . $SPOT['authorizenet'] . '
+			&nbsp;&nbsp; &nbsp;
+			' . $SPOT['plugnpay'] . '
+			&nbsp;&nbsp; &nbsp;
+			' . $SPOT['worldpay'] . '
+			&nbsp;&nbsp; &nbsp;
+			' . $SPOT['webmoney'] . '
+		</td>
+	</tr>
+	</table>';
+	
 	for ($index = 0; $index < sizeof($payment_methods); $index++) {
 		if ($payment_methods[$index][0] == "MODULE_PAYMENT_PAYPAL_STATUS") {
-			$show_logo .= '<a href="https://www.paypal.com/en/mrb/pal=PGSJEXAEXKTBU" target="_blank"><img src="' . KICON_PATH . '/paypal_logo.gif" alt="Paypal"/></a> &nbsp; ';
-			//} elseif( $payment_methods[$index][0] == "MODULE_PAYMENT_AUTHORIZENET_STATUS") {
-			//	$show_logo .= '<a href="http://authorize.net/" target="_blank"><img src="'.KICON_PATH.'/authorize.gif" alt="Authorize.net"/></a> &nbsp; ';
+			$show_logo .= $SPOT['paypal'] . ' &nbsp; ';
 		}
+//		elseif( $payment_methods[$index][0] == "MODULE_PAYMENT_AUTHORIZENET_STATUS") {
+//			$show_logo .= $SPOT['authorizenet'] . ' &nbsp; ';
+//		}
 		elseif ($payment_methods[$index][0] == "MODULE_PAYMENT_MONEYBOOKERS_STATUS") {
-			$show_logo .= '<a href="https://www.moneybookers.com/app/?rid=811621" target="_blank"><img src="' . KICON_PATH . '/moneybookers.gif" alt="Moneybookers"/></a> &nbsp; ';
-			//} elseif( $payment_methods[$index][0] == "MODULE_PAYMENT_WORLDPAY_STATUS") {
-			//	$show_logo .= '<a href="http://www.worldpay.com/" target="_blank"><img src="'.KICON_PATH.'/worldpay.gif" alt="worldpay.com"/></a> &nbsp; ';
+			$show_logo .= $SPOT['moneybookers'] . ' &nbsp; ';
 		}
+//		elseif( $payment_methods[$index][0] == "MODULE_PAYMENT_WORLDPAY_STATUS") {
+//			$show_logo .= $SPOT['worldpay'] . ' &nbsp; ';
+//		}
 		elseif ($payment_methods[$index][0] == "MODULE_PAYMENT_PLUGNPAY_STATUS") {
-			$show_logo .= '<a href="http://www.plugnpay.com/" target="_blank"><img src="' . KICON_PATH . '/plugnpay.png" alt="plugnpay.com"/></a> &nbsp; ';
+			$show_logo .= $SPOT['plugnpay'] . ' &nbsp; ';
+		}
+		elseif ($payment_methods[$index][0] == "MODULE_PAYMENT_WM_STATUS") {
+			$show_logo .= $SPOT['webmoney'] . ' &nbsp; ';
 		}
 	}
 	$PAYMENT_METHOD = '<table style="width:70%;margin:0 auto;" align="center" ><tr><TD valign="top" align="center" class="tableBodyRight">' . $show_logo . '</td></tr></table>';

@@ -97,14 +97,14 @@ if ($pmethod != 'all') {
 $status_list = Constants::getPaymentStateList();
 
 
-$HD_Form -> AddViewElement(gettext("Id"), "ID", "10%", "center");
+$HD_Form -> AddViewElement(gettext("Id"), "ID", "5%", "center");
 $HD_Form -> AddViewElement(gettext("Created At"), "creationdate", "15%", "center");
 $HD_Form -> AddViewElement(gettext("Payment Method"), "paymentmethod", "15%", "center");
-$HD_Form -> AddViewElement(gettext("Status"), "status", "15%", "center", "sort", "", "list", $status_list);
+$HD_Form -> AddViewElement(gettext("Status"), "status", "10%", "center", "sort", "", "list", $status_list);
 $HD_Form -> AddViewElement(gettext("Owner"), "cc_owner", "15%", "center");
 $HD_Form -> AddViewElement(gettext("Amount"), "amount", "10%", "center");
-$HD_Form -> AddViewElement(gettext("CardID"), "cardid", "10%", "center");
-$HD_Form -> AddViewElement(gettext("Cardnumber"), "cardid", "20%", "center", "sort", "", "lie_link", "cc_card", "username,id", "id='%id'", "%1", "", "A2B_entity_card.php");
+$HD_Form -> AddViewElement(gettext("CardID"), "cardid", "7%", "center");
+$HD_Form -> AddViewElement(gettext("Cardnumber"), "cardid", "12%", "center", "sort", "", "lie_link", "cc_card", "username,id", "id='%id'", "%1", "", "A2B_entity_card.php");
 
 // added a parameter to append  FG_TABLE_ID  ( by default ) or disable 0.
 $HD_Form -> FieldViewElement ('id, creationdate, paymentmethod, status, cc_owner, amount, cardid, cardid ');

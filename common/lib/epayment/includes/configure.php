@@ -4,7 +4,7 @@
 	// * DIR_FS_* = Filesystem directories (local/physical)
 	// * DIR_WS_* = Webserver directories (virtual/URL)
 	define('HTTP_SERVER', $A2B->config["epayment_method"]["http_server"]); 
-	define('HTTPS_SERVER', $A2B->config["epayment_method"]["http_server"]);
+	define('HTTPS_SERVER', $A2B->config["epayment_method"]["https_server"]);
 	define('ENABLE_SSL', $A2B->config["epayment_method"]["enable_ssl"]);  
 
 	define('HTTP_COOKIE_DOMAIN', $A2B->config["epayment_method"]["http_domain"]);

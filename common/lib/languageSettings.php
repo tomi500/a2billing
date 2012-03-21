@@ -151,5 +151,6 @@ function SetLocalLanguage()
 	textdomain($domain);
 	bind_textdomain_codeset($domain, $charEncoding);
 	define('CHARSET', $charEncoding);
+	define('LANG', substr($slectedLanguage,0,2));
 }
 

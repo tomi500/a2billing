@@ -191,35 +191,9 @@ if(!empty($subscribe)){
 ?>
 
 <table style="width:80%;margin:0 auto;" cellspacing="0"  align="center" >
-	<tr background="<?php echo Images_Path; ?>/background_cells.gif" >
-		<TD  valign="top" align="right" class="tableBodyRight"   >
-			<font size="2"><?php echo gettext("Click below to buy credit : ");?> </font>
-		</TD>
-		<td class="tableBodyRight" >
-	
-			<?php
-
-$arr_purchase_amount = preg_split("/:/", EPAYMENT_PURCHASE_AMOUNT);
-if (!is_array($arr_purchase_amount)) {
-	$to_echo = 10;
-} else {
-	if ($two_currency) {
-		$purchase_amounts_convert = array ();
-		for ($i = 0; $i < count($arr_purchase_amount); $i++) {
-			$purchase_amounts_convert[$i] = round($arr_purchase_amount[$i] / $mycur, 2);
-		}
-		$to_echo = join(" - ", $purchase_amounts_convert);
-
-		echo $to_echo;
-?>
-			<font size="2">
-			<?php echo $display_currency; ?> </font>
-			<br/>
-			<?php } ?>
-			<?php echo join(" - ", $arr_purchase_amount); ?>
-			<font size="2"><?php echo strtoupper(BASE_CURRENCY);?> </font>
-			<?php } ?>
-			
+	<tr>
+		<TD  valign="top" align="center" class="tableBodyRight"   >
+			<font size="2"><?php echo gettext("Click below to buy credit:");?> </font>
 		</TD>
 	</tr>
 	<tr>
@@ -241,13 +215,11 @@ if (!is_array($arr_purchase_amount)) {
 	     $amount_subscribe = $A2B->config['epayment_method']['paypal_subscription_amount'];
 	    ?>
 	<tr background="<?php echo Images_Path; ?>/background_cells.gif" >
-		<TD  valign="top" align="right" class="tableBodyRight"   >
+		<TD  valign="top" align="center" class="tableBodyRight"   >
 			<font size="2"><?php echo gettext("Click below to subscribe an automated refill : ");?> </font>
-		</TD>
-		<td class="tableBodyRight" >
 		    <?php
 		    $head_desc= $amount_subscribe." ".strtoupper(BASE_CURRENCY);
-		     if($vat>0)$head_desc .= " + ".(($vat/100)*$amount_subscribe)." ".strtoupper(BASE_CURRENCY)." of ".gettext("VAT")."";
+		     if($vat>0)$head_desc .= " + ".(($vat/100)*$amount_subscribe)." ".strtoupper(BASE_CURRENCY).gettext(" of ").gettext("VAT")."";
 		     echo $head_desc;
 		     echo " (".gettext("for each")." ".$A2B->config['epayment_method']['paypal_subscription_period_number']." ";
 		     switch (strtoupper($A2B->config['epayment_method']['paypal_subscription_time_period'])) {
@@ -267,13 +239,13 @@ if (!is_array($arr_purchase_amount)) {
 	</tr>
 	<tr>
 		<td align="center" colspan="2" class="tableBodyRight" >
-		    <img src="<?php echo Images_Path ?>/payments_paypal.gif" />
+		    <img src="<?php echo KICON_PATH ?>/payments_paypal.gif" />
 		</td>
 	</tr>
 
 	<?php
 	    $desc = gettext("Automated refill")." ".$A2B->config['epayment_method']['paypal_subscription_amount']." ".strtoupper(BASE_CURRENCY);
-	    if($vat>0)$desc .= " + ".(($vat/100)*$amount_subscribe)." ".strtoupper(BASE_CURRENCY)." of ".gettext("VAT");
+	    if($vat>0)$desc .= " + ".(($vat/100)*$amount_subscribe)." ".strtoupper(BASE_CURRENCY).gettext(" of ").gettext("VAT");
 	    $amount_subscribe = $amount_subscribe +(($vat/100)*$amount_subscribe);
 	    $key = securitykey(EPAYMENT_TRANSACTION_KEY, $username."^".$_SESSION["card_id"]."^".$useralias."^".$creation_date);
 	    $link= tep_href_link("A2B_recurring_payment.php?id=".$_SESSION["card_id"]."&key=".$key, '', 'SSL');
@@ -287,6 +259,9 @@ if (!is_array($arr_purchase_amount)) {
 		    <input type="hidden" name="cmd" value="_xclick-subscriptions">
 		    <input type="hidden" name="business" value="<?php echo $A2B->config['epayment_method']['paypal_subscription_account']?>">
 		    <input type="hidden" name="currency_code" value="<?php echo strtoupper(BASE_CURRENCY);?>">
+		    <input type="hidden" name="charset" value="UTF-8">
+		    <input type="hidden" name="lc" value="<?php echo LANG?>">
+		    <input type="hidden" name="email" value="<?php echo $customer_info[10]?>">
 		    <input type="hidden" name="no_shipping" value="1">
 		    <input type="hidden" name="no_note" value="1">
 		    <input type="hidden" name="notify_url" value="<?php echo $link?>">

@@ -247,7 +247,7 @@ class RateEngine
                         if ($mysearchvalue[$resultcount][3] == $i[3] ) {
                             if (strlen($mysearchvalue[$resultcount][7]) != strlen($i[7])) {
                                 unset($myresult[$j]);
-                                $countdelete = $countdelete+1;
+                                $countdelete++;
                                 if ($this->webui) {
                                     $A2B -> debug( DEBUG, $agi, __FILE__, __LINE__, "[rate-engine: foreach: COUNTDELETE: ".$countdelete."]");
                                     $A2B -> debug( DEBUG, $agi, __FILE__, __LINE__, "[rate-engine: foreach: MYRESULT count after delete: ".count($myresult)."]");

@@ -134,7 +134,7 @@ class iridium {
 				tep_draw_pull_down_menu('ExpiryDateYear', $expires_year)),
 			array('title' => MODULE_PAYMENT_IRIDIUM_TEXT_ISSUE_NUMBER,
                                 'field' => tep_draw_input_field('IssueNumber', '',"SIZE=5, MAXLENGTH=5"). '(Switch/Solo/Maestro only)'),
-			array('title' => 'CV2 ' . ' ' .'<a href="#" onclick="javascript:window.open(\'' . 'cvv.php' . '\',\'CardNumberSelection\',\'width=600,height=280,top=20,left=100,scrollbars=1\');">' . '<u><i>' . '(' .		MODULE_PAYMENT_IRIDIUM_TEXT_CVV_LINK . ')' . '</i></u></a>',
+			array('title' => 'CVV num. ' . ' ' .'<a href="#" onclick="javascript:window.open(\'' . 'cvv.php' . '\',\'CardNumberSelection\',\'width=600,height=280,top=20,left=100,scrollbars=1\');">' . '<u><i>' . '(' .		MODULE_PAYMENT_IRIDIUM_TEXT_CVV_LINK . ')' . '</i></u></a>',
 			'field' => tep_draw_input_field('CV2','',"SIZE=4, MAXLENGTH=4"))
 
          ));
