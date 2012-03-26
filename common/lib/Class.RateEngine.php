@@ -1551,7 +1551,7 @@ class RateEngine
 				$pos_dialingnumber = max(strpos($ipaddress, '%dialingnumber%'),strpos($ipaddress, '%none%'));
 				$ipaddress = str_replace("%cardnumber%", $A2B->cardnumber, $ipaddress);
 				$ipaddress = str_replace("%none%", '', $ipaddress);
-				if (strncmp($destination, $prefix, strlen($prefix)) == 0) $prefix="";
+				if (strncmp($destination, $prefix, strlen($prefix)) == 0 && strlen($prefix) > 1) $prefix="";
 				$ipaddress = str_replace("%dialingnumber%", $prefix.$destination, $ipaddress);
 
 				if ($pos_dialingnumber !== false) $channel = "$tech/$ipaddress";
