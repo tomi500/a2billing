@@ -167,7 +167,7 @@ if ($uptime == '') {
 	$uptime = explode(" ", exec("/sbin/sysctl -n kern.boottime"));
 	$startUpSystem = str_replace( ",", "", $uptime[3]);
 } else {
-	$uptime = split(" ",$uptime);
+	$uptime = explode(" ", $uptime);
 	$startUpSystem = time() - $uptime[0];
 }
 if ($startUpSystem) {

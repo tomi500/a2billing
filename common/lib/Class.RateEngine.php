@@ -228,7 +228,7 @@ class RateEngine
             $resultcount = 0;
             $mysearchvalue[$resultcount] = $myresult[0];
             for ($ii=0;$ii<count($result)-1;$ii++){
-                $mysearchvalue[$resultcount] = $myresult[$ii];
+                if (isset($myresult[$ii])) $mysearchvalue[$resultcount] = $myresult[$ii];
                 if ($this->webui) {
                     $A2B -> debug( DEBUG, $agi, __FILE__, __LINE__, "[rate-engine: Begin for ii value ".$ii."]");
                     $A2B -> debug( DEBUG, $agi, __FILE__, __LINE__, "[rate-engine: MYSEARCHCVALUE \n".print_r($mysearchvalue,true)."]");
@@ -283,9 +283,11 @@ class RateEngine
             }
             if ($this->webui) {
                 $A2B -> debug( DEBUG, $agi, __FILE__, __LINE__, "[rate-engine: RESULTCOUNT".$resultcount."]");
-                $A2B -> debug( DEBUG, $agi, __FILE__, __LINE__, "[rate-engine: MYRESULT  after delete \n".print_r($myresult, true));
+                if (isset($myresult)) {
+                    $A2B -> debug( DEBUG, $agi, __FILE__, __LINE__, "[rate-engine: MYRESULT  after delete \n".print_r($myresult, true));
+                    $A2B -> debug( DEBUG, $agi, __FILE__, __LINE__, "[rate-engine: Count Total result after 4 ".count($myresult)."]");
+                }
                 $A2B -> debug( DEBUG, $agi, __FILE__, __LINE__, "[rate-engine: MYSEARCHVALUE after delete \n".print_r($mysearchvalue, true));
-                $A2B -> debug( DEBUG, $agi, __FILE__, __LINE__, "[rate-engine: Count Total result after 4 ".count($myresult)."]");
             }
             unset($mysearchvalue);
             if ($this->webui) $A2B -> debug( DEBUG, $agi, __FILE__, __LINE__, "[rate-engine: RESULT  after delete \n".print_r($result, true));
