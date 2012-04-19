@@ -1837,7 +1837,7 @@ msgstr "Новый"
 
 #: lib/interface/constants.php:223
 msgid "Proceed"
-msgstr "Продолжить"
+msgstr "Cформирован"
 
 #: lib/interface/constants.php:224
 msgid "In Process"
@@ -1845,7 +1845,7 @@ msgstr "В процессе"
 
 #: lib/interface/constants.php:230
 msgid "Failed"
-msgstr "Неуспешно"
+msgstr "Облом"
 
 #: lib/interface/constants.php:231
 msgid "Successful"

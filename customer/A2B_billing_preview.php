@@ -331,7 +331,7 @@ function amount_convert($amount) {
          <?php foreach ($vat_array as $key => $val) { ?>
                  <tr class="vat">
                    <td class="one"></td>
-                   <td class="two"><?php echo gettext("VAT $key%:") ?></td>
+                   <td class="two"><?php echo gettext("VAT")." $key%:" ?></td>
                    <td class="three"><?php echo number_format(round(amount_convert($val),2),2)." $display_curr"; ?></td>
                  </tr> 
          <?php } ?>

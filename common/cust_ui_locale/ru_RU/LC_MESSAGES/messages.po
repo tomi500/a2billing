@@ -311,7 +311,7 @@ msgstr "Простите, возникла проблема при создан�
 
 #: A2B_support.php:130
 msgid "Create support ticket"
-msgstr "Заполните все поля и подробно сформулируйте Ваш запрос в техподдержку"
+msgstr "Заполните все поля и подробно сформулируйте Ваш запрос в поддержку"
 
 #: A2B_support.php:138
 msgid "Title"
@@ -380,7 +380,7 @@ msgstr ""
 
 #: form_data/FG_var_did.inc:68 templates/default/main.tpl:62
 msgid "DID"
-msgstr "DID"
+msgstr "ВНЕШНИЕ НОМЕРА"
 
 #: form_data/FG_var_did.inc:69 form_data/FG_var_did.inc:132
 #: form_data/FG_var_callerid.inc:49 form_data/FG_var_callerid.inc:91
@@ -750,7 +750,7 @@ msgstr "ОТЗВОН"
 
 #: form_data/FG_var_card.inc:166
 msgid "Define number of days ago for use back phone number by callers you have called in past this days"
-msgstr "Введите количество последних дней для того чтобы с телефонов, на которые вы звонили за эти дни, могли к вам дозвониться через высветившийся номер. Такой звонок будет переадресован непосредственно на номер, с которого вы набирали."
+msgstr "Введите количество последних дней для того чтобы с телефонов, на которые вы звонили за эти дни, могли к вам дозвониться через высветившийся номер. Такой звонок будет переадресован непосредственно на тот внутренний номер, с которого вы набирали."
 
 #: form_data/FG_var_card.inc:168
 msgid "RECALL TIME"
@@ -1607,7 +1607,7 @@ msgstr "МАЙ"
 
 #: lib/Form/Class.FormBO.php:696
 msgid "Summary of the calls charged since the last billing"
-msgstr "Итоговое количество звонков с последнего биллинга"
+msgstr "Учтены протарифицированные звонки со дня последнего перерасчёта"
 
 #: lib/Form/Class.FormBO.php:713
 msgid "SUMMARY OF CHARGE"
@@ -1615,7 +1615,7 @@ msgstr "СВОДКА СНЯТИЙ"
 
 #: lib/Form/Class.FormBO.php:715 A2B_billing_preview.php:230
 msgid "Summary of the charge charged since the last billing."
-msgstr "Сводка сум, списанных со дня последнего биллинга"
+msgstr "* Согласно сумм, списанных со дня последнего перерасчёта"
 
 #: lib/Form/Class.FormBO.php:721 lib/Form/Class.FormBO.php:751
 #: A2B_billing_preview.php:107 A2B_billing_preview.php:116
@@ -1631,7 +1631,7 @@ msgstr "НАДБАВКА"
 
 #: lib/Form/Class.FormBO.php:741
 msgid "This invoice is for some charges unpaid since the last billing."
-msgstr "Инвойс за некоторые списания не оплачен со дня последнего биллинга"
+msgstr "Счёт за списания, не оплаченые со дня последнего биллинга"
 
 #: lib/Form/Class.FormBO.php:773
 msgid "BILLING POSTPAID"
@@ -2290,11 +2290,11 @@ msgstr "ОТОСЛАНО-ОПЛАЧЕНО"
 #: lib/interface/constants.php:222 CC_entity_edit_speeddial.php:1080
 #: CC_entity_edit_did_destination.php:1240
 msgid "New"
-msgstr "Создать новое"
+msgstr "Новый"
 
 #: lib/interface/constants.php:223
 msgid "Proceed"
-msgstr "Продолжить"
+msgstr "Сформирован"
 
 #: lib/interface/constants.php:224
 msgid "In Process"
@@ -2302,7 +2302,7 @@ msgstr "В процессе"
 
 #: lib/interface/constants.php:230
 msgid "Failed"
-msgstr "Не удалось"
+msgstr "Облом"
 
 #: lib/interface/constants.php:231
 msgid "Successful"
@@ -3117,39 +3117,35 @@ msgstr "ПЕРЕЙТИ НА СТРАНИЦУ  ЛОГИНА"
 
 #: A2B_billing_preview.php:83
 msgid "Cost of calls between the "
-msgstr ""
+msgstr "Стоимость звонков между "
 
 #: A2B_billing_preview.php:87
 msgid "Cost of calls before the "
-msgstr ""
+msgstr "Стоимость звонков до "
 
 #: A2B_billing_preview.php:152
-#, fuzzy
 msgid "PREVIEW NEXT RECEIPT"
-msgstr "СЧЕТА"
+msgstr "ПРЕДПРОСМОТР ВОЗМОЖНЫХ РАСХОДОВ*"
 
 #: A2B_billing_preview.php:169 A2B_billing_preview.php:262
-#, fuzzy
 msgid "Client number"
-msgstr "Ваш номер телефона / Нахождение"
+msgstr "Номер аккаунта"
 
 #: A2B_billing_preview.php:221 A2B_receipt_view.php:238
-#, fuzzy
 msgid "Total:"
-msgstr "ИТОГО"
+msgstr "Итого:"
 
 #: A2B_billing_preview.php:232
 msgid "Summary of calls since the last billing."
-msgstr ""
+msgstr "* Учтены звонки со дня последнего перерасчета."
 
 #: A2B_billing_preview.php:246
-#, fuzzy
 msgid "PREVIEW NEXT INVOICE"
-msgstr "СЧЕТА"
+msgstr "ПРЕДПРОСМОТР ВОЗМОЖНОЙ СЧЕТ-ФАКТУРЫ*"
 
 #: A2B_billing_preview.php:349
 msgid "This invoice is for some charges unpaid since the last billing, and for the negative balance."
-msgstr ""
+msgstr "* В этот счёт входят непогашенные начисления со дня последнего биллинга и отрицательный баланс в целом."
 
 #: checkout_success.php:63
 msgid "Thank you for your purchase"
@@ -3600,7 +3596,7 @@ msgstr "ГОЛОСОВАЯ ПОЧТА"
 
 #: templates/default/main.tpl:23
 msgid "SIP/IAX INFO"
-msgstr "ПАРАМЕТРЫ SIP/IAX"
+msgstr "ВНУТРЕННИЕ НОМЕРА"
 
 #: templates/default/main.tpl:27
 msgid "CALL HISTORY"
@@ -3636,7 +3632,7 @@ msgstr "БЫСТРЫЙ НАБОР"
 
 #: templates/default/main.tpl:77
 msgid "SIMULATOR"
-msgstr "ЦЕННИК ЗВОНКА"
+msgstr "ПРОВЕРКА ЦЕНЫ"
 
 #: templates/default/main.tpl:90
 msgid "ADD CALLER ID"

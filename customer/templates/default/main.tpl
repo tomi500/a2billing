@@ -18,9 +18,13 @@
 	{if $ACXVOICEMAIL>0 }
 	<div class="toggle_menu"><li><a href="A2B_entity_voicemail.php"><strong>{php} echo gettext("VOICEMAIL");{/php}</strong></a></li></div>
 	{/if}
-	
+
 	{if $ACXSIP_IAX>0 }
 	<div class="toggle_menu"><li><a href="A2B_entity_sipiax_info.php"><strong>{php} echo gettext("SIP/IAX INFO");{/php}</strong></a></li></div>
+	{/if}
+
+	{if $ACXDID >0 }
+	<div class="toggle_menu"><li><a href="A2B_entity_did.php?form_action=list"><strong>{php} echo gettext("DID");{/php}</strong></a></li></div>
 	{/if}
 
 	{if $ACXCALL_HISTORY >0 }
@@ -29,10 +33,6 @@
 	
 	{if $ACXVOUCHER >0 }
 	<div class="toggle_menu"><li><a href="A2B_entity_voucher.php?form_action=list"><strong>{php} echo gettext("VOUCHERS");{/php}</strong></a></li></div>
-	{/if}
-
-	{if $ACXDID >0 }
-	<div class="toggle_menu"><li><a href="A2B_entity_did.php?form_action=list"><strong>{php} echo gettext("DID");{/php}</strong></a></li></div>
 	{/if}
 
 	{if $ACXSPEED_DIAL >0 }

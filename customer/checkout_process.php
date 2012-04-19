@@ -36,7 +36,7 @@ include ("./lib/customer.defines.php");
 getpost_ifset (array('transactionID', 'sess_id', 'key', 'mc_currency', 'currency', 'md5sig', 'merchant_id', 'mb_amount', 'status', 'mb_currency',
 					'transaction_id', 'mc_fee', 'card_number', 'mc_gross', 'item_name', 'receiver_id',
 					'LMI_PREREQUEST','LMI_PAYEE_PURSE','LMI_PAYMENT_AMOUNT','LMI_PAYMENT_NO','LMI_MODE','LMI_SYS_INVS_NO',
-					'LMI_SYS_TRANS_NO','LMI_PAYER_PURSE','LMI_PAYER_WM','LMI_HASH','LMI_SYS_TRANS_DATE','LMI_PAYMENT_DESC'));
+					'LMI_SYS_TRANS_NO','LMI_PAYER_PURSE','LMI_SDP_TYPE','LMI_PAYER_WM','LMI_HASH','LMI_SYS_TRANS_DATE','LMI_PAYMENT_DESC'));
 
 
 write_log(LOGFILE_EPAYMENT, basename(__FILE__).' line:'.__LINE__."EPAYMENT : transactionID=$transactionID - transactionKey=$key \n -POST Var \n".print_r($_POST, true));
@@ -69,24 +69,33 @@ $DBHandle_max  = DbConnect();
 $paymentTable = new Table();
 
 if (DB_TYPE == "postgres") {
-	$NOW_2MIN = " creationdate >= (now() - interval '7 minute') ";
+	$NOW_7MIN = "creationdate >= (now() - interval '7 minute')";
+	$CASHIN_7DAY = "creationdate >= (now() - interval '7 day')";
 } else {
-	$NOW_2MIN = " creationdate >= DATE_SUB(NOW(), INTERVAL 7 MINUTE) ";
+	$NOW_7MIN = "creationdate >= DATE_SUB(NOW(), INTERVAL 7 MINUTE)";
+	$CASHIN_7DAY = "creationdate >= DATE_SUB(NOW(), INTERVAL 7 DAY)";
 }
 
 // Status - New 0 ; Proceed 1 ; In Process 2
 $QUERY = "SELECT id, cardid, amount, vat, paymentmethod, cc_owner, cc_number, cc_expires, creationdate, status, cvv, credit_card_type, currency, item_id, item_type " .
 		 " FROM cc_epayment_log " .
-		 " WHERE id = ".$transactionID." AND (status = 0 OR (status = 2 AND $NOW_2MIN))";
+		 " WHERE id = ".$transactionID." AND (status = 0 OR ((status = 1 OR status = 2) AND cc_expires = 'w' AND $CASHIN_7DAY) OR (status = 2 AND $NOW_7MIN))";
 $transaction_data = $paymentTable->SQLExec ($DBHandle_max, $QUERY);
 write_log(LOGFILE_EPAYMENT, basename(__FILE__).' line:'.__LINE__."- QUERY = $QUERY");
 write_log(LOGFILE_EPAYMENT, basename(__FILE__).' line:'.__LINE__.print_r($transaction_data, true));
 
 $item_id = $transaction_data[0][13];
 $item_type = $transaction_data[0][14];
+if ($transaction_data[0][9] == 0 && $LMI_SDP_TYPE == 8) {
+    $transaction_data[0][7] = "w";
+    $paystatus = 1;
+} else {
+    $paystatus = 2;
+//    if ($transaction_data[0][7] == "w" && $transaction_data[0][9] == 2) $transaction_data[0][7] = "-";
+}
 
 //Update the Transaction Status to 1
-$QUERY = "UPDATE cc_epayment_log SET status = 2 WHERE id = ".$transactionID;
+$QUERY = "UPDATE cc_epayment_log SET status = $paystatus, cc_expires = '{$transaction_data[0][7]}' WHERE id = ".$transactionID;
 write_log(LOGFILE_EPAYMENT, basename(__FILE__).' line:'.__LINE__."- QUERY = $QUERY");
 $paymentTable->SQLExec ($DBHandle_max, $QUERY);
 
@@ -252,6 +261,7 @@ switch($transaction_data[0][4])
 		write_log(LOGFILE_EPAYMENT, basename(__FILE__).' line:'.__LINE__." - WebMoney LMI_PREREQUEST='$LMI_PREREQUEST', LMI_MODE='$LMI_MODE', LMI_SYS_INVS_NO='$LMI_SYS_INVS_NO', LMI_SYS_TRANS_NO='$LMI_SYS_TRANS_NO', LMI_PAYER_WM='$LMI_PAYER_WM'");
 		if ($LMI_PREREQUEST == 1 && $security_verify) {
 			echo "YES";
+			write_log(LOGFILE_EPAYMENT, basename(__FILE__).' line:'.__LINE__." - Answered 'YES' to WebMoney ");
 			exit();
 		}
 		switch(MODULE_PAYMENT_WM_LMI_HASH_METHOD)
@@ -301,12 +311,12 @@ if ($security_verify == false) {
     $mail->replaceInEmail(Mail::$TIME_KEY,date("y-m-d H:i:s"));
     $mail->replaceInEmail(Mail::$PAYMENTGATEWAY_KEY, $transaction_data[0][4]);
     $mail->replaceInEmail(Mail::$ITEM_AMOUNT_KEY, $amount_paid.$currCurrency);
-    
-	// Add Post information / useful to track down payment transaction without having to log
-	$mail->AddToMessage("\n\n\n\n"."-POST Var \n".print_r($_POST, true));
-	$mail->send(ADMIN_EMAIL);
 
-	exit;
+    // Add Post information / useful to track down payment transaction without having to log
+    $mail->AddToMessage("\n\n\n\n"."-POST Var \n".print_r($_POST, true));
+    $mail->send(ADMIN_EMAIL);
+
+    exit;
 }
 
 $newkey = securitykey(EPAYMENT_TRANSACTION_KEY, $transaction_data[0][8]."^".$transactionID."^".$transaction_data[0][2]."^".$transaction_data[0][1]."^".$item_id."^".$item_type);
@@ -405,7 +415,7 @@ if ($id > 0 ) {
 		$instance_table = new Table("cc_invoice", $field_insert);
 		$id_invoice = $instance_table -> Add_table ($DBHandle, $value_insert, null, null,"id");
 		//load vat of this card
-		if (!empty($id_invoice)&& is_numeric($id_invoice)) {
+		if (!empty($id_invoice) && is_numeric($id_invoice)) {
 			$amount = $amount_without_vat;
 			$description = gettext("Refill ONLINE")." : ".$transaction_data[0][4];
 			$field_insert = "date, id_invoice ,price,vat, description";
@@ -476,7 +486,7 @@ if ($id > 0 ) {
 				$items = $invoice -> loadItems();
 				foreach ($items as $item) {
 					if ($item -> getExtType() == 'DID') {
-						$QUERY = "UPDATE cc_did_use set month_payed = month_payed+1 , reminded = 0 WHERE id_did = '" . $item -> getExtId() .
+						$QUERY = "UPDATE cc_did_use SET month_payed = month_payed+1 , reminded = 0 WHERE id_did = '" . $item -> getExtId() .
 								 "' AND activated = 1 AND ( releasedate IS NULL OR releasedate < '1984-01-01 00:00:00') ";
 						$instance_table->SQLExec($DBHandle, $QUERY, 0);
 					}

@@ -115,7 +115,7 @@
 	    $show_logo .= '<a href="http://www.wmtransfer.com/" target="_blank"><img src="' . KICON_PATH . '/webmoney_virified.png" alt="WebMoney"/></a>' . ' &nbsp; ';
 	}
     }
-    $show_logo .= <<<'EOD'
+if (true==false) $show_logo .= <<<'EOD'
 <!--LiveInternet counter-->
 <script type="text/javascript">
 document.write("<a href='http://www.liveinternet.ru/click' "+

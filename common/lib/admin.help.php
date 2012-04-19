@@ -293,7 +293,7 @@ $SPOT['moneybookers'] = '<a href="https://www.moneybookers.com/app/?rid=811621" 
 //$SPOT['AUTHORIZENET'] = '<a href="http://authorize.net/" target="_blank"><img src="'.KICON_PATH.'/authorize.gif" alt="Authorize.net"/></a>';
 $SPOT['authorizenet'] = '';
 //$SPOT['WORLDPAY'] = '<a href="http://www.worldpay.com/" target="_blank"><img src="'.KICON_PATH.'/worldpay.gif" alt="worldpay.com"/></a>';
-$SPOT['worlpay'] = '';
+$SPOT['worldpay'] = '';
 $SPOT['plugnpay'] = '<a href="http://www.plugnpay.com/" target="_blank"><img src="' . KICON_PATH . '/plugnpay.png" alt="plugnpay.com"/></a>';
 $SPOT['webmoney'] = '<a href="http://www.webmoney.ru/" target="_blank"><img src="' . KICON_PATH . '/webmoney.gif" alt="WebMoney"/></a>';
 $PAYMENT_METHOD = '
