@@ -54,7 +54,7 @@ ALTER TABLE cc_sip_buddies ADD transport varchar(20) COLLATE utf8_bin NOT NULL;
 
 ALTER TABLE cc_sip_buddies
   CHANGE canreinvite canreinvite VARCHAR( 20 ) CHARACTER SET utf8 COLLATE utf8_bin NOT NULL,
-  CHANGE nat nat CHAR( 3 ) CHARACTER SET utf8 COLLATE utf8_bin NULL DEFAULT NULL,
+  CHANGE nat nat CHAR( 7 ) CHARACTER SET utf8 COLLATE utf8_bin NULL DEFAULT NULL,
   CHANGE qualify qualify CHAR( 7 ) CHARACTER SET utf8 COLLATE utf8_bin NULL DEFAULT NULL,
   CHANGE regseconds regseconds VARCHAR( 15 ) CHARACTER SET utf8 COLLATE utf8_bin NOT NULL,
   CHANGE rtpkeepalive rtpkeepalive VARCHAR( 15 ) CHARACTER SET utf8 COLLATE utf8_bin NOT NULL;

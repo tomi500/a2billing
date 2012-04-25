@@ -62,7 +62,7 @@ if($configtype == "IAX") {
 } else {
 	$config_name = gettext("SIP Config");
 	$config_file = gettext("sip.conf");
-	$QUERY = "SELECT sip.id, sip.username, sip.secret, sip.disallow, sip.allow, sip.type, sip.host, sip.context FROM cc_sip_buddies sip where sip.id_cc_card = ".$_SESSION["card_id"];
+	$QUERY = "SELECT sip.id, sip.username, sip.secret, sip.disallow, sip.allow, sip.type, sip.host, sip.context, sip.defaultuser FROM cc_sip_buddies sip where sip.id_cc_card = ".$_SESSION["card_id"];
 }
 
 $sip_iax_data = $table_instance->SQLExec ($DBHandle, $QUERY);
@@ -113,9 +113,9 @@ echo $CC_help_sipiax_info;
 		  </tr>
 		  <tr>
 			<td colspan="2" bgcolor="#FFFFFF" class="fontstyle_006" align="center">
-				<br><b><?php echo $configtype;?> URI :</b> <?php echo SIP_IAX_INFO_HOST; ?><br>
-				<br><b><?php echo gettext("Username")?> :</b> <?php echo $sip_iax_data[0][1]?><br>
-				<br><b><?php echo gettext("Password")?> :</b> <?php echo $sip_iax_data[0][2]?><br><br>
+				<br><b><?php echo $configtype;?> URI :</b> <?php echo SIP_IAX_INFO_HOST." / "; ?>
+				<b><?php echo gettext("Username")?> :</b> <?php echo $sip_iax_data[0][($sip_iax_data[0][1])?1:8]." / "?>
+				<b><?php echo gettext("Password")?> :</b> <?php echo $sip_iax_data[0][2]?><br>
 				
 				<br><?php echo gettext("To configure your Asterisk server, copy and paste this into your ")?> <?php echo $config_file;?><br>
 			 
@@ -140,14 +140,14 @@ if (count($additional_iax) > 0)
 }		
 ?>
 <?php }else{ ?>[<?php echo SIP_IAX_INFO_TRUNKNAME; ?>]
-username=<?php echo $sip_iax_data[0][1]?>
+defaultuser=<?php echo $sip_iax_data[0][($sip_iax_data[0][1])?1:8]?>
 
 type=friend
 secret=<?php echo $sip_iax_data[0][2]?>
 
 host=<?php echo SIP_IAX_INFO_HOST; ?>
 
-fromuser=<?php echo $sip_iax_data[0][1]?>
+fromuser=<?php echo $sip_iax_data[0][($sip_iax_data[0][1])?1:8]?>
 
 context=<?php echo $sip_iax_data[0][7]?> ; change for proper context
 allow=<?php echo SIP_IAX_INFO_ALLOWCODEC?> ; we alsow support ulaw,g723.1,g726
