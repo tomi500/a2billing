@@ -97,16 +97,15 @@ $smarty->display('main.tpl');
 		<td align="center"> 
 			<?php if (SHOW_DONATION) { ?>
 			<center>
-				<?php echo gettext("If you find A2Billing useful, please donate to the A2Billing project by clicking the Donate button :");?>  
+				<?php echo gettext("If you find A2Billing NixonCH branch useful, please donate to the NixonCH subproject by clicking the Donate button :");?>
 				
 				<form action="https://www.paypal.com/cgi-bin/webscr" method="post">
 					<input type="hidden" name="cmd" value="_s-xclick">
-					<input type="hidden" name="lc" value="US">
-					<input type="hidden" name="country" value="USA">
-					<input type="hidden" name="hosted_button_id" value="3769548">
-					<input type="image" src="https://www.paypal.com/en_US/ES/i/btn/btn_donateCC_LG.gif" border="0" name="submit" alt="Make Donation with PayPal">
-					<img alt="" border="0" src="https://www.paypal.com/en_US/i/scr/pixel.gif" width="1" height="1">
-				</form>	
+					<input type="hidden" name="hosted_button_id" value="UPUA743XMK2BJ">
+					<input type="image" src="https://www.paypalobjects.com/en_US/IL/i/btn/btn_donateCC_LG.gif" border="0" name="submit" alt="PayPal - The safer, easier way to pay online!">
+					<img alt="" border="0" src="https://www.paypalobjects.com/en_US/i/scr/pixel.gif" width="1" height="1">
+				</form>
+				
 			</center>
 			<br>
 			<?php } ?>
