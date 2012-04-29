@@ -2611,6 +2611,18 @@ msgstr "Все звонки указаны ниже. Вы можете иска�
 msgid "On this page, you can open a support ticket and consult the status of your existing ticket."
 msgstr "На этой странице можно открыть новый тикет, либо посмотреть статус уже созданного"
 
+#: lib/customer.help.php:45
+msgid "Your balance"
+msgstr "Ваш баланс"
+
+#: lib/customer.help.php:52
+msgid "Credit limit"
+msgstr "Кредит"
+
+#: lib/customer.help.php:61
+msgid "BUY CREDIT"
+msgstr "ПОПОЛНИТЬ БАЛАНС"
+
 #: lib/customer.help.php:53
 #, fuzzy
 msgid "Personal information."
@@ -2636,7 +2648,7 @@ msgstr "Симулируйте процесс звонка для того. чт
 msgid "Configuration information for SIP and IAX Client. You can simply copy and paste it in your configuration files and do necessary modifications."
 msgstr "Конфигурационная информация для  SIP и IAX  клиента. Вы можете просто скопировать конфигурацию либо внести нужные изменения"
 
-#: lib/customer.help.php:61
+#: lib/customer.help.php:62
 msgid "On this page you will be able to change your password, You have to enter the New Password and Confirm it."
 msgstr "На этой странице вы сможете изменить пароль. Необходимо ввести Новый Пароль и подтвердить его"
 

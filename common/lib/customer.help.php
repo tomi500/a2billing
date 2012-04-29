@@ -36,35 +36,37 @@ function create_help($text,$balance=null,$limit=null) {
 	<div class="toggle_show2hide">
 	<div class="tohide" style="display:visible;">
 	<div class="msg_info"';
-	if ($balance != null) $help .= ' style="padding:5px 10px 20px 50px;"';
+	if ($balance != null) $help .= ' style="padding:0px 10px 25px 50px;"';
 	$help .= '>
 	<table border="0" style="max-width:97%;" cellspacing="1" cellpadding="2" align="left">
 	<tr>';
 	if ($balance != null) {
 	    $help .= '
-	    <td align="right" nowrap><font class="fontstyle_001">Your balance:</font></td>
-	    <td align="right" nowrap><font class="fontstyle_00' . (($limit)?5:'1" style="font-weight:bold;') . '">' . $balance . '</font></td>';
-	    if ($limit && $limit != -1) $help .= '
+	    <td align="right" nowrap><font class="fontstyle_001">' . gettext("Your balance") . ':</font></td>
+	    <td align="right" nowrap><font class="fontstyle_00' . (($limit)?5:'1" style="font-weight:bold;') . '">' . $balance . '</font></td>
 	    <td ROWSPAN=3 width=2%></td>
-	    <td ROWSPAN=3 valign="bottom">' . $text . '</td>
+	    <td ROWSPAN=3 width=100% valign="bottom" align="center">' . $text . '</td>
 	</tr>
-	<tr>
-	    <td align="right" nowrap><font class="fontstyle_001">Credit limit:</font></td>
-	    <td align="right" nowrap><font class="fontstyle_001" style="font-weight:bold;">' . $limit . '</font></td>
-	</tr>'; else $help .= '
-	    <td ROWSPAN=2 width=2%></td>
-	    <td ROWSPAN=2 valign="top">' . $text . '</td>
+	<tr heigth="5px">
+	    <td';
+	    if ($limit && $limit != -1) $help .= ' align="right" nowrap><font class="fontstyle_001">' . gettext("Credit limit") . ':</font';
+	    else $help .= ' height="5px"';
+	    $help .= '></td>
+	    <td';
+	    if ($limit && $limit != -1) $help .= ' align="right" nowrap><font class="fontstyle_001" style="font-weight:bold;">' . $limit . '</font';
+	    else $help .= ' height="5px"';
+	    $help .= '></td>
 	</tr>';
 	$help .= '<tr>
-	    <td COLSPAN=2 align="center"><a href="userinfo.php"><font class="fontstyle_00' . (($limit)?5:1) . '">>BUY CREDIT<</font></a></td>';
+	    <td COLSPAN=2 align="center" valign="bottom">
+		<form action="checkout_payment.php" method="post">
+		<input type="submit" class="form_input_button" value="' . gettext("BUY CREDIT") . '">
+	    </td>';
 	} else $help .= '<td>' . $text . '</td>';
 	$help .= '
 	</tr>
-	</table>
-	<p></p><a href="#" target="_self" class="hide_help" style="float:right;"><img class="toggle_show2hide" src="' . Images_Path . '/toggle_hide2show_on.png" onmouseover="this.style.cursor=\'hand\';" HEIGHT="16"> </a>';
-	if ($balance != null && $limit) $help .= '
-	<br>';
-	$help .= '<br>
+	</table><br/><br/>
+	<a href="#" target="_self" class="hide_help" style="float:right;"><img class="toggle_show2hide" src="' . Images_Path . '/toggle_hide2show_on.png" onmouseover="this.style.cursor=\'hand\';" HEIGHT="16"> </a>
 	</div></div></div>';
 	return $help;
 
