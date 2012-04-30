@@ -36,7 +36,7 @@ function create_help($text,$balance=null,$limit=null) {
 	<div class="toggle_show2hide">
 	<div class="tohide" style="display:visible;">
 	<div class="msg_info"';
-	if ($balance != null) $help .= ' style="padding:0px 10px 25px 50px;"';
+	if ($balance != null) $help .= ' style="padding:0px 10px 28px 50px;"';
 	$help .= '>
 	<table border="0" style="max-width:97%;" cellspacing="1" cellpadding="2" align="left">
 	<tr>';
@@ -57,17 +57,20 @@ function create_help($text,$balance=null,$limit=null) {
 	    else $help .= ' height="5px"';
 	    $help .= '></td>
 	</tr>';
-	$help .= '<tr>
+	$help .= '
+	<tr>
 	    <td COLSPAN=2 align="center" valign="bottom">
 		<form action="checkout_payment.php" method="post">
 		<input type="submit" class="form_input_button" value="' . gettext("BUY CREDIT") . '">
+		</form>
 	    </td>';
 	} else $help .= '<td>' . $text . '</td>';
 	$help .= '
 	</tr>
 	</table><br/><br/>
 	<a href="#" target="_self" class="hide_help" style="float:right;"><img class="toggle_show2hide" src="' . Images_Path . '/toggle_hide2show_on.png" onmouseover="this.style.cursor=\'hand\';" HEIGHT="16"> </a>
-	</div></div></div>';
+	</div></div></div>
+	';
 	return $help;
 
 }

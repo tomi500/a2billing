@@ -358,20 +358,20 @@ function CheckCountry(Source){
 </script>
 	  <center><?php echo $error_msg;?>
 	  <a href="A2B_entity_did.php?assign=1"><input type="radio" value="1" <?php if ($assign==1) echo 'checked'; ?>/><?php echo gettext("Buy New DID");?> </a> - <a href="A2B_entity_did.php?assign=2"><input type="radio" value="2" <?php if ($assign==2) echo 'checked'; ?>/><?php echo gettext("Add Phone Number to your DID");?></a> - <a href="A2B_entity_did.php?assign=3"><input type="radio" value="3" <?php if ($assign==3) echo 'checked'; ?>/><?php echo gettext("Release DID");?></a>
-	  
+	
+	   <form name="theForm" action="A2B_entity_did.php">
+	    <INPUT type="hidden" name="assign" value="<?php echo $assign ?>">
+	    <INPUT type="hidden" name="new_did_page" value="<?php echo $new_did_page?>">
+	    <INPUT type="hidden" name="confirm_buy_did" value="0">
+	    <INPUT type="hidden" name="action_release">
 	   <table align="center"  border="0" class="bgcolor_006" width="75%">
-		<form name="theForm" action="A2B_entity_did.php">
-		<INPUT type="hidden" name="assign" value="<?php echo $assign ?>">
-		<INPUT type="hidden" name="new_did_page" value="<?php echo $new_did_page?>">
-		<INPUT type="hidden" name="confirm_buy_did" value="0">
-		<INPUT type="hidden" name="action_release">
 		<?php 
 		switch ($new_did_page) {
 		
 		case 0:
 		if ($assign==1){ ?>
 		<tr class="bgcolor_001">
-          <td align="left" width="80%" colspan="2">
+		<td align="left" width="80%" colspan="2">
 				<select NAME="choose_country" size="1" class="form_input_select"  onChange="JavaScript:CheckCountry('select');">
 					<option value=''><?php echo gettext("Select Country");?></option>
 					<?php
@@ -414,7 +414,7 @@ function CheckCountry(Source){
 				<br>
 				<?php echo gettext("Destination");?> :
 
-				<input class="form_input_text" name="destination" size="40" maxlength="120"  <?php if (isset($destination) && ($confirm_buy_did!=4)) {?>value="<?php echo $destination; }?>">
+				<input class="form_input_text" name="destination" size="40" maxlength="120<?php if (isset($destination) && ($confirm_buy_did!=4)) { ?>" value="<?php echo $destination; }?>">
 				<br/><center><font color="red"><?php echo gettext("Enter the phone number you wish to call, or the SIP/IAX client to reach  (ie: 347894999 or SIP/jeremy@182.212.1.45). In order to call a VoIP number, you will need to enable voip_call");?> </font></center>
 			</td>
 		<?php } else { ?>
@@ -488,17 +488,14 @@ function CheckCountry(Source){
 		<?php
 		break;
 		} ?>
-
-	</form>
   </table>
+  </form>
   </center>
   <br>
+  <?php
 
-<?php
 				$HD_Form->create_form($form_action, $list, $id = null);
 			} // End Switch
 
-
 // #### FOOTER SECTION
 $smarty->display('footer.tpl');
-
