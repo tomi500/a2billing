@@ -47,17 +47,23 @@ CREATE TABLE IF NOT EXISTS `cc_trunk_rand` (
 ALTER TABLE cc_invoice_conf CHANGE value value VARCHAR( 250 ) CHARACTER SET utf8 COLLATE utf8_bin NOT NULL;
 INSERT INTO cc_invoice_conf (key_val) VALUES ('comments');
 
-ALTER TABLE cc_sip_buddies ADD callbackextension varchar(15) NOT NULL DEFAULT '';
-ALTER TABLE cc_sip_buddies ADD directmedia varchar(15) NOT NULL DEFAULT 'update,nonat';
-ALTER TABLE cc_sip_buddies ADD encryption varchar(20) COLLATE utf8_bin NOT NULL;
-ALTER TABLE cc_sip_buddies ADD transport varchar(20) COLLATE utf8_bin NOT NULL;
+ALTER TABLE cc_sip_buddies ADD `callbackextension` varchar( 40 ) DEFAULT NULL;
+ALTER TABLE cc_sip_buddies ADD `directmedia` enum('yes','no','nonat','update','update,nonat') NULL DEFAULT 'update,nonat';
+ALTER TABLE cc_sip_buddies ADD `encryption` varchar( 20 ) COLLATE utf8_bin DEFAULT NULL;
+ALTER TABLE cc_sip_buddies ADD `transport` enum('udp','tcp','udp,tcp','tcp,udp') DEFAULT NULL;
 
 ALTER TABLE cc_sip_buddies
-  CHANGE canreinvite canreinvite VARCHAR( 20 ) CHARACTER SET utf8 COLLATE utf8_bin NOT NULL,
-  CHANGE nat nat CHAR( 7 ) CHARACTER SET utf8 COLLATE utf8_bin NULL DEFAULT NULL,
-  CHANGE qualify qualify CHAR( 7 ) CHARACTER SET utf8 COLLATE utf8_bin NULL DEFAULT NULL,
-  CHANGE regseconds regseconds VARCHAR( 15 ) CHARACTER SET utf8 COLLATE utf8_bin NOT NULL,
-  CHANGE rtpkeepalive rtpkeepalive VARCHAR( 15 ) CHARACTER SET utf8 COLLATE utf8_bin NOT NULL;
+  CHANGE `canreinvite` `canreinvite` varchar( 20 ) CHARACTER SET utf8 COLLATE utf8_bin NULL DEFAULT NULL ,
+  CHANGE `nat` `nat` enum( 'yes', 'no', 'force_rport', 'comedia', 'never', 'route' ) NULL DEFAULT NULL ,
+  CHANGE `qualify` `qualify` varchar( 40 ) CHARACTER SET utf8 COLLATE utf8_bin NULL DEFAULT NULL ,
+  CHANGE `regseconds` `regseconds` int( 11 ) NULL DEFAULT NULL ,
+  CHANGE `rtpholdtimeout` `rtpholdtimeout` int( 11 ) NULL DEFAULT NULL ,
+  CHANGE `rtpkeepalive` `rtpkeepalive` int( 11 ) NULL DEFAULT NULL ,
+  CHANGE `outboundproxy` `outboundproxy` varchar( 40 ) NULL DEFAULT NULL ,
+  CHANGE `callbackextension` `callbackextension` varchar( 40 ) NULL DEFAULT NULL ,
+  CHANGE `directmedia` `directmedia` enum( 'yes', 'no', 'nonat', 'update', 'update,nonat' ) NULL DEFAULT 'update,nonat',
+  CHANGE `encryption` `encryption` varchar( 20 ) COLLATE utf8_bin NULL DEFAULT NULL ,
+  CHANGE `transport` `transport` enum( 'udp', 'tcp', 'udp,tcp', 'tcp,udp' ) NULL DEFAULT NULL;
 
 ALTER TABLE cc_trunk CHANGE removeprefix removeprefix CHAR( 30 ) CHARACTER SET utf8 COLLATE utf8_bin NULL DEFAULT NULL;
 
