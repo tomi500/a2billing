@@ -81,27 +81,18 @@ class webmoney {
 	function process_button($transactionID = 0, $key= "") {
 		global $order, $currencies, $currency;
 
-//		$my_currency = get_CurrentCurrency();
-//		$currencyObject = new currencies();
-
 		$process_button_string = tep_draw_hidden_field('LMI_PAYMENT_AMOUNT', $order->info['total']);
 		$process_button_string .= tep_draw_hidden_field('LMI_PAYMENT_DESC', MODULE_PAYMENT_WM_LMI_PAYMENT_DESC);
 //		$process_button_string .= tep_draw_hidden_field('LMI_PAYMENT_NO', '1');
 
-//		$process_button_string .= tep_draw_hidden_field('LMI_PAYEE_PURSE', MODULE_PAYMENT_WM_PURSE);
-
-		if($_POST['wm_purse_type'] == 'WMU'){
+		if ($_POST['wm_purse_type'] == 'WMU')
 		   $process_button_string .= tep_draw_hidden_field('LMI_PAYEE_PURSE', MODULE_PAYMENT_WM_PURSE_WMU);
-		}
-		if($_POST['wm_purse_type'] == 'WMZ'){
+		elseif ($_POST['wm_purse_type'] == 'WMZ')
 		   $process_button_string .= tep_draw_hidden_field('LMI_PAYEE_PURSE', MODULE_PAYMENT_WM_PURSE_WMZ);
-		}
-		if($_POST['wm_purse_type'] == 'WME'){
+		elseif ($_POST['wm_purse_type'] == 'WME')
 		   $process_button_string .= tep_draw_hidden_field('LMI_PAYEE_PURSE', MODULE_PAYMENT_WM_PURSE_WME);
-		}
-		if($_POST['wm_purse_type'] == 'WMR'){
+		elseif ($_POST['wm_purse_type'] == 'WMR')
 		   $process_button_string .= tep_draw_hidden_field('LMI_PAYEE_PURSE', MODULE_PAYMENT_WM_PURSE_WMR);
-		}
 
 		$process_button_string .= tep_draw_hidden_field('LMI_SIM_MODE', MODULE_PAYMENT_WM_LMI_SIM_MODE);
 

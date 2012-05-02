@@ -36,7 +36,7 @@
 getpost_ifset(array('id', 'billingtype', 'did', 'startingdate', 'expirationdate', 'id_cc_didgroup', 'id_cc_country', 'activated', 'fixrate', 'id_trunk', 'choose_country', 'choose_did', 'assign', 'countrycode', 'arecode', 'phonenumber', 'voip_call', 'destination', 'choose_did_rate', 'new_did_page', 'confirm_buy_did', 'action_release'));
 
 
-$HD_Form = new FormHandler("cc_did_destination","destination");
+$HD_Form = new FormHandler("cc_did_destination",gettext("Destination"));
 
 $HD_Form -> FG_DEBUG = 0;
 $HD_Form -> FG_TABLE_DEFAULT_ORDER = "did DESC, priority";
@@ -45,6 +45,7 @@ $HD_Form -> FG_TABLE_DEFAULT_SENS = "ASC";
 $HD_Form -> FG_EDITION = true;
 $HD_Form -> FG_DELETION = true;
 $HD_Form -> FG_ADDITION = true;
+$HD_Form -> FG_OTHER_BUTTON1 = false;
 
 $actived_list = Constants::getActivationList();
 $billingtype_list = Constants::getBillingTypeList();
@@ -134,7 +135,7 @@ $HD_Form -> AddEditElement (gettext("ACTIVATED"),
 	"" , "", "", gettext("Yes").":1, - ".gettext("No").":0", "", "", "", "");
 	
 
-if (isset($form_action) && ($form_action=='ask-edit')) {
+if (isset($form_action) && ($form_action=='ask-edit' || $form_action=='ask-delete')) {
 
     $HD_Form -> AddEditElement (gettext("DESTINATION"),
 	    "destination",
@@ -191,8 +192,8 @@ $HD_Form -> AddEditElement (gettext("PLAY_SOUND"),
 	gettext("Insert the path and name of sound file"),
 	"" , "", "", "", "", "", "", gettext("Play sound before calling DESTINATION. ie 'ivr/wait-please'"));
 
-
-if (isset($form_action) && ($form_action=='ask-edit')) {
+echo $form_action;
+if (isset($form_action) && ($form_action=='ask-edit' || $form_action=='ask-delete')) {
     $HD_Form -> FieldEditElement ('activated, destination, timeout, voip_call, priority, answer, playsound');
 } else {
     $HD_Form -> FG_QUERY_EDITION_HIDDEN_FIELDS = "destination, validated, voip_call";
@@ -203,18 +204,12 @@ $HD_Form -> FG_INTRO_TEXT_EDITION= '';
 $HD_Form -> FG_INTRO_TEXT_ASK_DELETION = gettext("If you really want remove this")." ".$HD_Form->FG_INSTANCE_NAME.", ".gettext("click on the delete button.");
 $HD_Form -> FG_INTRO_TEXT_ADD = gettext("you can add easily a new")." ".$HD_Form->FG_INSTANCE_NAME.".<br>".gettext("Fill the following fields and confirm by clicking on the button add.");
 
-
 $HD_Form -> FG_INTRO_TEXT_ADITION = '';
 $HD_Form -> FG_TEXT_ADITION_CONFIRMATION = gettext("Your new")." ".$HD_Form->FG_INSTANCE_NAME." ".gettext("has been inserted.")."<br>";
-
 
 $HD_Form -> FG_BUTTON_EDITION_SRC = $HD_Form -> FG_BUTTON_ADITION_SRC  = Images_Path."/cormfirmboton.gif";
 $HD_Form -> FG_BUTTON_EDITION_BOTTOM_TEXT = $HD_Form -> FG_BUTTON_ADITION_BOTTOM_TEXT = gettext("Setup those values to create or edit the ")." ".$HD_Form->FG_INSTANCE_NAME;
 
-
-
 $HD_Form -> FG_GO_LINK_AFTER_ACTION_ADD = $_SERVER['PHP_SELF']."?atmenu=document&stitle=Document&wh=AC&id=";
 $HD_Form -> FG_GO_LINK_AFTER_ACTION_EDIT = $_SERVER['PHP_SELF']."?atmenu=document&stitle=Document&wh=AC&id=";
 $HD_Form -> FG_GO_LINK_AFTER_ACTION_DELETE = $_SERVER['PHP_SELF']."?atmenu=document&stitle=Document&wh=AC&id=";
-
-

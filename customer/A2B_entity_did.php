@@ -47,10 +47,8 @@ if (!has_rights(ACX_DID)) {
 $HD_Form->setDBHandler(DbConnect());
 $HD_Form->init();
 
-if (!isset ($form_action))
-	$form_action = "list";
-if (!isset ($action))
-	$action = $form_action;
+if (!isset ($form_action)) $form_action = "list";
+if (!isset ($action)) $action = $form_action;
 
 $FG_LIMITE_DISPLAY = 10;
 if (isset ($mydisplaylimit) && (is_numeric($mydisplaylimit) || ($mydisplaylimit == 'ALL'))) {
@@ -211,7 +209,8 @@ if (!isset ($action_release) || $action_release == "confirm_release" || $action_
 	}
 
 	// TODO integrate in Framework
-	if ($form_action == "delete") {
+
+	if ($form_action == "ask-delete" || $form_action == "delete") {
 		$HD_Form->FG_TABLE_NAME = "cc_did_destination";
 		$HD_Form->FG_EDITION_CLAUSE = "id_cc_card='" . $_SESSION["card_id"] . "' AND id = " . $id;
 	}
@@ -267,11 +266,12 @@ if (!isset ($action_release) || $action_release == "confirm_release" || $action_
 	elseif ($assign >= 2) {
 		// LIST USED DID TO ADD PHONENUMBER
 		$instance_table_did = new Table("cc_did LEFT JOIN cc_did_use ON id_did=cc_did.id", "cc_did.id, did, fixrate");
-		$FG_TABLE_CLAUSE = "id_cc_didgroup='" . $_SESSION["id_didgroup"] . "' and id_cc_card='" . $_SESSION["card_id"] . "' and cc_did_use.activated=1 AND ( releasedate IS NULL OR releasedate < '1984-01-01 00:00:00')  GROUP BY cc_did.id, did, fixrate ";
+		$FG_TABLE_CLAUSE = "(id_cc_didgroup='" . $_SESSION["id_didgroup"] . "' or iduser='" . $_SESSION["card_id"] . "') and id_cc_card='" . $_SESSION["card_id"] . "' and cc_did_use.activated=1 AND ( releasedate IS NULL OR releasedate < '1984-01-01 00:00:00')  GROUP BY cc_did.id, did, fixrate ";
 		//$instance_table_did -> debug_st = 1;
 		$list_did = $instance_table_did->Get_list($HD_Form->DBHandle, $FG_TABLE_CLAUSE, "did", "ASC", null, null, null, null);
 		$nb_did = count($list_did);
 	}
+	if ($form_action != 'ask-delete') {
 ?>
 <script language="JavaScript" type="text/JavaScript">
 <!--
@@ -386,7 +386,7 @@ function CheckCountry(Source){
 		<?php } ?>
 		<tr class="did_maintable_tr2" valign="top">
 			<td align="left" valign="top" colspan="2">
-				<select NAME="choose_did_rate" size="3" class="form_input_select">
+				<select NAME="choose_did_rate" size="5" class="form_input_select">
 					<option value=''><?php echo gettext("Select Virtual Phone Number");?></option>
 
 					<?php
@@ -493,7 +493,7 @@ function CheckCountry(Source){
   </center>
   <br>
   <?php
-
+	}
 				$HD_Form->create_form($form_action, $list, $id = null);
 			} // End Switch
 

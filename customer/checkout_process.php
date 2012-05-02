@@ -255,11 +255,11 @@ switch($transaction_data[0][4])
 		if (!tep_ip_vs_net($ipaddress,"212.118.48.0", "255.255.255.0")
 		 && !tep_ip_vs_net($ipaddress,"212.158.173.0","255.255.255.0")
 		 && !tep_ip_vs_net($ipaddress,"91.200.28.0",  "255.255.255.0")
-		 && !tep_ip_vs_net($ipaddress,"91.227.52.0",  "255.255.255.0")) $security_verify = false;
+		 && !tep_ip_vs_net($ipaddress,"91.227.52.0",  "255.255.255.0")) $ipaddress = $security_verify = false;
 		if($transaction_data[0][2] != trim($LMI_PAYMENT_AMOUNT)) $security_verify = false;
 		if(array_search($LMI_PAYEE_PURSE, array(MODULE_PAYMENT_WM_PURSE_WMU,MODULE_PAYMENT_WM_PURSE_WMZ,MODULE_PAYMENT_WM_PURSE_WME,MODULE_PAYMENT_WM_PURSE_WMR)) === false) $security_verify = false;
 		write_log(LOGFILE_EPAYMENT, basename(__FILE__).' line:'.__LINE__." - WebMoney LMI_PREREQUEST='$LMI_PREREQUEST', LMI_MODE='$LMI_MODE', LMI_SYS_INVS_NO='$LMI_SYS_INVS_NO', LMI_SYS_TRANS_NO='$LMI_SYS_TRANS_NO', LMI_PAYER_WM='$LMI_PAYER_WM'");
-		if ($LMI_PREREQUEST == 1 && $security_verify) {
+		if ($LMI_PREREQUEST == 1 && ($security_verify || ($ipaddress && $LMI_PAYMENT_DESC == "Donate Author"))) {
 			echo "YES";
 			write_log(LOGFILE_EPAYMENT, basename(__FILE__).' line:'.__LINE__." - Answered 'YES' to WebMoney ");
 			exit();

@@ -21,7 +21,8 @@ $yandex_summ = '50';
 $yandex_successurl = $mosConfig_live_site;
 // PayPal
 $use_paypal = 1;
-$donate_email = '4935XK7M8RJQY';
+//$donate_email = '4935XK7M8RJQY';
+$donate_email = 'VBP4BCSYDMWD6';
 $paypalcur_on = 1;
 $paypalcur_val = 'EUR';
 $paypalval_on = 0;
@@ -200,8 +201,10 @@ $logopaypal_sm = $mosConfig_live_site.'/templates/default/images/kicons/logopayp
 						<option value="<?php echo $wmnum1;?>"><?php echo $wmtype1;?></option>
 						<option value="<?php echo $wmnum2;?>"><?php echo $wmtype2;?></option>
 						<option value="<?php echo $wmnum3;?>"><?php echo $wmtype3;?></option>
-        		        <option value="<?php echo $wmnum4;?>"><?php echo $wmtype4;?></option>
+						<option value="<?php echo $wmnum4;?>"><?php echo $wmtype4;?></option>
 					</select>
+					<input type="hidden" name="sess_id" value="1">
+					<input type="hidden" name="transactionID" value="1">
 				</td>
 			</tr>
 			<tr>

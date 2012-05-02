@@ -413,7 +413,7 @@ msgstr "Не создано ни одного направления"
 
 #: form_data/FG_var_did.inc:139
 msgid "Enter here the phonenumber you wish to call or the SIP/IAX/H323 peer to reach (ie: 347894999 or SIP/jeremy@182.212.1.45). To call SIP/IAX/H323 peer, you need to enable the voip_call below (voip_call = Yes) "
-msgstr "Введите здесь номер, на который хотите перенаправить звонок, или SIP/IAX2/H323 пользователя (напримет: 347894999 or SIP/taras@182.212.1.45). Чтобы задать SIP/IAX2/H323 направление, нужно включить VOIP ЗВОНОК = 'Да'"
+msgstr "Введите здесь номер, на который хотите перенаправить звонок, или SIP/IAX2/H323 пользователя (напримет: 347894999 or SIP/taras@182.212.1.45). Чтобы направление работало как SIP/IAX2/H323, нужно включить VOIP ЗВОНОК = 'Да'"
 
 #: form_data/FG_var_did.inc:138 form_data/FG_var_callerid.inc:97
 msgid "Choose if you want to activate this card"
@@ -433,7 +433,7 @@ msgstr "VOIP звонок"
 
 #: form_data/FG_var_did.inc:163
 msgid "Choose if you want to not use the trunk and let the asterisk call directly the destination (ie, Destination : SIP/jeremy@182.212.1.45)"
-msgstr "Выберите, если выхотите использовать транк и позволить системе звонить напряму (Например SIP/taras@182.212.1.42)"
+msgstr "Выберите, если хотите использовать транк и позволить системе звонить напрямую (Например SIP/taras@182.212.1.42)"
 
 #: form_data/FG_var_did.inc:166
 msgid "Choose 'Yes' if you want to answer on the call"
@@ -450,9 +450,8 @@ msgstr "Если действительно хотите удалить"
 #: form_data/FG_var_speeddial.inc:118 form_data/FG_var_phonebook.inc:109
 #: form_data/FG_var_ticket.inc:80 form_data/FG_var_phonenumber.inc:144
 #: form_data/FG_var_callerid.inc:116
-#, fuzzy
 msgid "click on the delete button."
-msgstr "Click on Add button"
+msgstr "нажмите на кнопку 'УДАЛИТЬ'."
 
 #: form_data/FG_var_did.inc:170 form_data/FG_var_campaign.inc:296
 #: form_data/FG_var_speeddial.inc:119 form_data/FG_var_phonebook.inc:110
@@ -1507,9 +1506,8 @@ msgid "Records"
 msgstr "Секунды"
 
 #: lib/Form/Class.ViewHandler.inc.php:136
-#, fuzzy
 msgid "FILTER ON "
-msgstr "FILTER ON PREFIX"
+msgstr "Фильтровать по полю"
 
 #: lib/Form/Class.ViewHandler.inc.php:153
 #, fuzzy
@@ -3815,7 +3813,7 @@ msgstr "НЕТ"
 
 #: A2B_entity_did.php:418
 msgid "Enter the phone number you wish to call, or the SIP/IAX client to reach  (ie: 347894999 or SIP/jeremy@182.212.1.45). In order to call a VoIP number, you will need to enable voip_call"
-msgstr "Введите здесь номер, на который хотите перенаправить звонок, или SIP/IAX2/H323 пользователя (напримет: 347894999 or SIP/taras@182.212.1.45). Чтобы задать SIP/IAX2/H323 направление, нужно включить VOIP ЗВОНОК = 'Да'"
+msgstr "Введите здесь номер, на который хотите перенаправить звонок, или SIP/IAX2/H323 пользователя (напримет: 347894999 or SIP/taras@182.212.1.45). Чтобы направление работало как SIP/IAX2/H323, нужно включить VOIP ЗВОНОК = 'Да'."
 
 #: A2B_entity_did.php:422
 msgid "If you release the did you will not be monthly charged any more."
