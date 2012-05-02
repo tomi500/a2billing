@@ -491,7 +491,6 @@ function CheckCountry(Source){
   </table>
   </form>
   </center>
-  <br>
   <?php
 	}
 				$HD_Form->create_form($form_action, $list, $id = null);

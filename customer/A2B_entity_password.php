@@ -116,7 +116,7 @@ if ($form_action=="ask-update") {
 <form method="post" action="<?php  echo $_SERVER["PHP_SELF"]."?form_action=ask-update"?>" name="frmPass">
 <table class="changepassword_maintable" align=center>
 <tr class="bgcolor_009">
-    <td align=left colspan=2><b><font color="#ffffff">- <?php echo gettext("Change Password")?>&nbsp; -</b></td>
+    <td align="center" colspan=2><b><font color="#ffffff">- <?php echo gettext("Change Password")?>&nbsp; -</b></td>
 </tr>
 <tr>
     <td align="center" colspan=2>&nbsp;<p class="liens"><?php echo gettext("Do not use \" or = characters in your password");?></p></td>

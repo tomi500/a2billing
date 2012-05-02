@@ -138,21 +138,20 @@ $show_fields['credit'] = array("<acronym title=\"".gettext("BALANCE")."\">".gett
 
 if (!($popup_select>=1)) {
 	$serial_pad_length = $A2B->config["webui"]['card_serial_length'];
-	$show_fields['id_seria'] = array(gettext("SERIE"), "id_seria", "*", "center", "sort", "15", "lie", "cc_card_seria", "name","id='%id'", "%1","");
-	$show_fields['serial'] = array("<acronym title=\"".gettext("SERIAL NUMBER")."\">SERIAL#</acronym>", "serial", "*","center", "sort","","eval",'str_pad("%C",'.$serial_pad_length.' , "0", STR_PAD_LEFT)');
-	$show_fields['tariff'] = array("<acronym title=\"".gettext("CALL PLAN")."\">".gettext('PLAN')."</acronym>",
-	       "tariff", "8%", "center", "sort", "20", "lie", "cc_tariffgroup", "tariffgroupname", "id='%id'", "%1");
-	$show_fields['status'] = array(gettext("STATUS"), "status", "4%", "center", "sort", "", "list", $cardstatus_list_acronym);
-	$show_fields['language']=array(gettext("LG"), "language", "3%", "center", "sort");
-	$show_fields['inuse'] = array(gettext("USE"), "inuse", "3%", "center", "sort");
-	$show_fields['currency'] = array("<acronym title=\"".gettext("CURRENCY")."\">".gettext("CUR")."</acronym>", "currency", "4%", "center", "sort", "", "list", $currency_list_key);
+	$show_fields['id_seria']  = array(gettext("SERIE"), "id_seria", "*", "center", "sort", "15", "lie", "cc_card_seria", "name","id='%id'", "%1","");
+	$show_fields['serial']    = array("<acronym title=\"".gettext("SERIAL NUMBER")."\">SERIAL#</acronym>", "serial", "*","center", "sort","","eval",'str_pad("%C",'.$serial_pad_length.' , "0", STR_PAD_LEFT)');
+	$show_fields['tariff']    = array("<acronym title=\"".gettext("CALL PLAN")."\">".gettext('PLAN')."</acronym>", "tariff", "8%", "center", "sort", "20", "lie", "cc_tariffgroup", "tariffgroupname", "id='%id'", "%1");
+	$show_fields['status']    = array(gettext("STATUS"), "status", "4%", "center", "sort", "", "list", $cardstatus_list_acronym);
+	$show_fields['language']  = array(gettext("LG"), "language", "3%", "center", "sort");
+	$show_fields['inuse']     = array(gettext("INUSE"), "inuse", "3%", "center", "sort");
+	$show_fields['currency']  = array("<acronym title=\"".gettext("CURRENCY")."\">".gettext("CUR")."</acronym>", "currency", "4%", "center", "sort", "", "list", $currency_list_key);
 	$show_fields['sip_buddy'] = array(gettext("SIP"), "sip_buddy", "2%", "center", "sort", "", "list", $yesno);
 	$show_fields['iax_buddy'] = array(gettext("IAX"), "iax_buddy", "2%", "center", "sort", "", "list", $yesno);
-	$show_fields['nbused'] = array("<acronym title=\"AMOUNT OF CALL DONE\">".gettext("ACD")."</acronym>", "nbused", "3%", "center", "sort");
+	$show_fields['nbused']    = array("<acronym title=\"AMOUNT OF CALL DONE\">".gettext("ACD")."</acronym>", "nbused", "3%", "center", "sort");
 	$show_fields['firstname'] = array(gettext("FIRSTNAME"), "firstname", "7%", "center", "sort", "15");
-	$show_fields['email'] = array(gettext("EMAIL"), "email","","center", "sort", "15");
-	$show_fields['discount'] = array("<acronym title=\"DISCOUNT\">".gettext("DISC")."</acronym>", "discount","","center", "sort", "15","30", "", "", "", "", "display_percentage");
-	$show_fields['callerid'] = array("<acronym title=\"CALLER IDENTIFICATION NUMBER\">".gettext("CID")."</acronym>", "callerid","","center", "sort", "15");
+	$show_fields['email']     = array(gettext("EMAIL"), "email","","center", "sort", "15");
+	$show_fields['discount']  = array("<acronym title=\"DISCOUNT\">".gettext("DISC")."</acronym>", "discount","","center", "sort", "15","30", "", "", "", "", "display_percentage");
+	$show_fields['callerid']  = array("<acronym title=\"CALLER IDENTIFICATION NUMBER\">".gettext("CID")."</acronym>", "callerid","","center", "sort", "15");
 	$FG_COL_QUERY = 'DISTINCT ';
 }else{
 	$show_list_temp = array('id', 'username', 'lastname', 'id_group',  'credit');

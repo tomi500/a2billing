@@ -192,7 +192,6 @@ $HD_Form -> AddEditElement (gettext("PLAY_SOUND"),
 	gettext("Insert the path and name of sound file"),
 	"" , "", "", "", "", "", "", gettext("Play sound before calling DESTINATION. ie 'ivr/wait-please'"));
 
-echo $form_action;
 if (isset($form_action) && ($form_action=='ask-edit' || $form_action=='ask-delete')) {
     $HD_Form -> FieldEditElement ('activated, destination, timeout, voip_call, priority, answer, playsound');
 } else {

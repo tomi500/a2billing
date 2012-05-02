@@ -129,7 +129,7 @@ msgstr "Старый пароль введен неверно"
 
 #: A2B_entity_password.php:119
 msgid "Change Password"
-msgstr "Изменить пароль"
+msgstr "Изменение пароля"
 
 #: A2B_entity_password.php:122
 msgid "Do not use \" or = characters in your password"

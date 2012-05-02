@@ -4415,7 +4415,7 @@ msgstr "ДЕТАЛИ"
 #: Public/form_data/FG_var_ticket_agent.inc:70
 #: Public/form_data/FG_var_ticket_agent.inc:116
 msgid "TITLE"
-msgstr "ЗАОГОЛОВОК"
+msgstr "ЗАГОЛОВОК"
 
 #: Public/form_data/FG_var_config_group.inc:62
 #: Public/form_data/FG_var_invoice.inc:173
