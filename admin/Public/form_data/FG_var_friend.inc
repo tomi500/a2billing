@@ -39,7 +39,7 @@ getpost_ifset(array('id_cc_card', 'cardnumber', 'id', 'name', 'amaflags', 'callg
 
 getpost_ifset(array('defaultuser', 'subscribemwi', 'vmexten', 'cid_number', 'callingpres', 'usereqphone', 'incominglimit', 'subscribecontext', 'musicclass', 
 'allowtransfer', 'autoframing', 'maxcallbitrate', 'outboundproxy', 'regserver', 'rtpkeepalive', 'dbsecret ', 'regcontext ', 'sourceaddress ', 'mohinterpret ', 
-'mohsuggest ', 'inkeys', 'outkey', 'sendani', 'fullname', 'maxauthreq', 'encryption', 'transport', 'forceencryption', 'transfer', 'jitterbuffer', 
+'mohsuggest ', 'inkeys', 'outkey', 'sendani', 'fullname', 'maxauthreq', 'encryption', 'ignorecryptolifetime', 'transport', 'forceencryption', 'transfer', 'jitterbuffer', 
 'forcejitterbuffer', 'codecpriority', 'qualifysmoothing', 'qualifyfreqok ', 'qualifyfreqnotok ', 'timezone', 'adsi'));
 
 
@@ -377,13 +377,23 @@ $HD_Form -> AddEditElement (gettext("ENCRYPTION"),
 
 if ($atmenu=='sip') {
 
+	$HD_Form -> AddEditElement (gettext("IGNORECRYPTOLIFETIME"),
+	                           "ignorecryptolifetime",
+	                           '',
+	                           "INPUT",
+	                           "size=20 maxlength=10",
+	                           "",
+	                           "",
+	                           "", "", "", "", "", "", "", "" );
+	
+	
 	$HD_Form -> AddEditElement (gettext("TRANSPORT"),
-				   "transport",
-				   '',
-				   "INPUT",
-				   "size=20 maxlength=20",
-				   "",
-				   "",
+	                           "transport",
+	                           '',
+	                           "INPUT",
+	                           "size=20 maxlength=20",
+	                           "",
+	                           "",
 	                           "", "", "", "", "", "",	"", gettext("transport = udp | tcp | tls ( default : udp )") );
 
 	
@@ -954,7 +964,7 @@ if ($atmenu=='sip') {
 $field_list_edit = 'id_cc_card, name, accountcode, regexten, callerid, cid_number, amaflags, secret, qualify, disallow, allow, host, context, defaultip, language, port, regseconds, ipaddr, mohsuggest, auth, setvar, type, deny, permit, encryption';
 
 if ($atmenu=='sip') {
-	$field_list_edit .= ', transport, username, md5secret, directmedia, nat, dtmfmode, canreinvite, callgroup, fromuser, fromdomain, insecure, mailbox, mask, pickupgroup, restrictcid, rtptimeout, rtpholdtimeout, ' .
+	$field_list_edit .= ', ignorecryptolifetime, transport, username, md5secret, directmedia, nat, dtmfmode, canreinvite, callgroup, fromuser, fromdomain, insecure, mailbox, mask, pickupgroup, restrictcid, rtptimeout, rtpholdtimeout, ' .
 			'musiconhold,  cancallforward, defaultuser, subscribemwi, vmexten, callingpres, usereqphone, incominglimit, subscribecontext, musicclass, allowtransfer, ' .
 			'autoframing, maxcallbitrate, outboundproxy, regserver, rtpkeepalive, callbackextension';
 } else {

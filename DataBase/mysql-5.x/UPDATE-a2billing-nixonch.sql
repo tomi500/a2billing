@@ -50,6 +50,7 @@ INSERT INTO cc_invoice_conf (key_val) VALUES ('comments');
 ALTER TABLE cc_sip_buddies ADD `callbackextension` varchar( 40 ) DEFAULT NULL;
 ALTER TABLE cc_sip_buddies ADD `directmedia` enum('yes','no','nonat','update','update,nonat') NULL DEFAULT 'update,nonat';
 ALTER TABLE cc_sip_buddies ADD `encryption` varchar( 20 ) COLLATE utf8_bin DEFAULT NULL;
+ALTER TABLE cc_sip_buddies ADD `ignorecryptolifetime` varchar( 20 ) COLLATE utf8_bin DEFAULT NULL;
 ALTER TABLE cc_sip_buddies ADD `transport` enum('udp','tcp','udp,tcp','tcp,udp') DEFAULT NULL;
 
 ALTER TABLE cc_sip_buddies

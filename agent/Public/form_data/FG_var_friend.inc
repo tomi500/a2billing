@@ -38,7 +38,7 @@ getpost_ifset(array('id_cc_card', 'cardnumber', 'id', 'name', 'amaflags', 'callg
 
 getpost_ifset(array('defaultuser', 'subscribemwi', 'vmexten', 'cid_number', 'callingpres', 'usereqphone', 'incominglimit', 'subscribecontext', 'musicclass', 'mohsuggest', 
 'allowtransfer', 'autoframing', 'maxcallbitrate', 'outboundproxy', 'regserver', 'rtpkeepalive', 'dbsecret ', 'regcontext ', 'sourceaddress ', 'mohinterpret ', 
-'inkeys ', 'outkey ', ' sendani ', 'fullname ', ' maxauthreq ', 'encryption ', 'forceencryption', 'transfer ', 'jitterbuffer ', 'forcejitterbuffer ', 'codecpriority ', 'qualifysmoothing ', 
+'inkeys ', 'outkey ', ' sendani ', 'fullname ', ' maxauthreq ', 'encryption ', 'ignorecryptolifetime', 'forceencryption', 'transfer ', 'jitterbuffer ', 'forcejitterbuffer ', 'codecpriority ', 'qualifysmoothing ', 
 'qualifyfreqok ', 'qualifyfreqnotok ', 'timezone', 'adsi'));
 
 
@@ -363,6 +363,15 @@ $HD_Form -> AddEditElement (gettext("ENCRYPTION"),
 	
 if ($atmenu=='sip') {
 
+	$HD_Form -> AddEditElement (gettext("IGNORECRYPTOLIFETIME"),
+				   "ignorecryptolifetime",
+				   '',
+				   "INPUT",
+				   "size=20 maxlength=20",
+				   "",
+				   "",
+				   "", "", "",	"", "", "", "", "" );
+	
 	$HD_Form -> AddEditElement (gettext("DIRECTMEDIA"),
 	                           "directmedia",
 	                           '4',
@@ -930,7 +939,7 @@ if ($atmenu=='sip') {
 
 if ($atmenu=='sip') {
 	$field_list_edit = 'id_cc_card, name, accountcode, regexten, callerid, cid_number, amaflags, context, type, defaultuser, secret, username, fromuser,
-			fromdomain, insecure, mailbox, qualify, disallow, allow, host, defaultip, encryption, directmedia, nat, dtmfmode, cancallforward, language, port,
+			fromdomain, insecure, mailbox, qualify, disallow, allow, host, defaultip, encryption, ignorecryptolifetime, directmedia, nat, dtmfmode, cancallforward, language, port,
 			regseconds, ipaddr, mohsuggest, auth, setvar, deny, permit, md5secret, canreinvite, callgroup, mask, pickupgroup, restrictcid, rtptimeout,
 			rtpholdtimeout, musiconhold,  subscribemwi, vmexten, callingpres, usereqphone, incominglimit, subscribecontext, musicclass, allowtransfer,
 			autoframing, maxcallbitrate, outboundproxy, regserver, rtpkeepalive, callbackextension';

@@ -93,7 +93,7 @@ if ( $action == "reload" ) {
 	}
 	
 	// This Variable store the argument for the SQL query
-	$FG_QUERY_EDITION='name, type, username, accountcode, regexten, callerid, amaflags, secret, md5secret, encryption, transport, directmedia, nat, dtmfmode, qualify, canreinvite, 
+	$FG_QUERY_EDITION='name, type, username, accountcode, regexten, callerid, amaflags, secret, md5secret, encryption, ignorecryptolifetime, transport, directmedia, nat, dtmfmode, qualify, canreinvite, 
 disallow, allow, host, callgroup, context, defaultip, fromuser, fromdomain, insecure, language, mailbox, permit, deny, mask, pickupgroup, port, 
 restrictcid, rtptimeout, rtpholdtimeout, musiconhold, regseconds, ipaddr, cancallforward, callbackextension';
 
