@@ -129,18 +129,23 @@ if ($form_action=="ask-add") {
 
 if ($form_action=="ask-add" || $form_action == "add_sip" || $form_action == "add_iax") {
 	$AMAFLAGS_default= "value='".$A2B->config["peer_friend"]['amaflag']."'";
-	$TYPE_default= "value='friend'";
+	$TYPE_default= "value='".$A2B->config["peer_friend"]['type']."'";
 	$DIRECTMEDIA_default= "update,nonat";
 	$NAT_default= $A2B->config["peer_friend"]['nat'];
 	$DTMFMODE_default= "value='".$A2B->config["peer_friend"]['dtmfmode']."'";
 	$CANREINVITE_default= "value=''";
 	$DISALLOW_default= "value='all'";
 	$ALLOW_default= "value='".$A2B->config["peer_friend"]['allow']."'";
-	$HOST_default= "value='dynamic'";
+	$HOST_default= "value='".$A2B->config["peer_friend"]['host']."'";
 	$CONTEXT_default= "value='".$A2B->config["peer_friend"]['context']."'";
-	$REGSECONDS_default= "value=''";
+	$REGSECONDS_default= "value='0'";
 	$CANCALLFORWARD_default= "value='yes'";
 	$TRUNK_default= "value='yes'";
+	$LANGUAGE_default= "value='".$A2B->config["global"]['base_language']."'";
+	$RTPTIMEOUT_default= "value='60'";
+	$RTPHOLDTIMEOUT_default= "value='300'";
+	$RTPKEEPALIVE_default= "value='30'";
+	$QUALIFY_default= "value='".$A2B->config["peer_friend"]['qualify']."'";
 }
 
 
@@ -231,7 +236,7 @@ $HD_Form -> AddEditElement (gettext("QUALIFY"),
                            "qualify",
                            '',
                            "INPUT",
-                           "size=8 maxlength=7",
+                           "size=8 maxlength=7 $QUALIFY_default",
                            "",
                            gettext("Insert the qualify"),
                            "", "", "", "", "", "",	"", "" );
@@ -291,7 +296,7 @@ $HD_Form -> AddEditElement (gettext("LANGUAGE"),
 						   "language",		
 						   '',	
 						   "INPUT",	
-						   "size=10 maxlength=4",	
+						   "size=10 maxlength=4 $LANGUAGE_default",
 						   "",	
 						   gettext("Insert the language"),
 						   "", "", "",	"", "", "",	"", "" );
@@ -396,11 +401,11 @@ if ($atmenu=='sip') {
 	$HD_Form -> AddEditElement (gettext("IGNORECRYPTOLIFETIME"),
 	                           "ignorecryptolifetime",
 	                           '',
-	                           "INPUT",
-	                           "size=20 maxlength=10",
+	                           "SELECT",
 	                           "",
 	                           "",
-	                           "", "", "", "", "", "", "", "" );
+	                           "",
+	                           "list", "", "", "", $values_list['ignorecryptolifetime'], "%1" );
 	
 	
 	$HD_Form -> AddEditElement (gettext("TRANSPORT"),
@@ -411,6 +416,16 @@ if ($atmenu=='sip') {
 	                           "",
 	                           "",
 	                           "list", "", "", "", $values_list['transport'], "%1" );
+	
+	
+	$HD_Form -> AddEditElement (gettext("DEFAULTUSER"),
+	                           "defaultuser",
+	                           '',
+	                           "INPUT",
+	                           "size=50 maxlength=40",
+	                           "",
+	                           "",
+	                           "", "", "", "", "", "", "", "" );
 	
 	
 	$HD_Form -> AddEditElement (gettext("USERNAME"),
@@ -563,7 +578,7 @@ if ($atmenu=='sip') {
 							   "rtptimeout",		
 							   '',	
 							   "INPUT",	
-							   "size=7 maxlength=3",	
+							   "size=7 maxlength=3 $RTPTIMEOUT_default",
 							   "",	
 							   gettext("Insert the rtptimeout"),
 							   "", "", "",	"", "", "",	"", "" );
@@ -573,7 +588,7 @@ if ($atmenu=='sip') {
 							   "rtpholdtimeout",		
 							   '',	
 							   "INPUT",	
-							   "size=7 maxlength=3",	
+							   "size=7 maxlength=3 $RTPHOLDTIMEOUT_default",
 							   "",	
 							   gettext("Insert the rtpholdtimeout"),
 							   "", "", "",	"", "", "",	"", "" );
@@ -598,16 +613,6 @@ if ($atmenu=='sip') {
 							   gettext("Insert the cancallforward"),
 							   "", "", "",	"", "", "",	"", gettext("cancallforward = yes | no ( default : yes )"));
 	
-	
-	$HD_Form -> AddEditElement (gettext("DEFAULTUSER"),
-							   "defaultuser",		
-							   '',	
-							   "INPUT",	
-							   "size=50 maxlength=40",	
-							   "",	
-							   "",
-							   "", "", "",	"", "", "",	"", "" );
-							   
 	
 	$HD_Form -> AddEditElement (gettext("SUBSCRIBEMWI"),
 							   "subscribemwi",		
@@ -733,7 +738,7 @@ if ($atmenu=='sip') {
 							   "rtpkeepalive",		
 							   '',	
 							   "INPUT",	
-							   "size=15 maxlength=15",	
+							   "size=15 maxlength=15 $RTPKEEPALIVE_default",
 							   "",	
 							   "",
 							   "", "", "",	"", "", "",	"", "" );
@@ -980,8 +985,8 @@ if ($atmenu=='sip') {
 $field_list_edit = 'id_cc_card, name, accountcode, regexten, callerid, cid_number, amaflags, secret, qualify, disallow, allow, host, context, defaultip, language, port, regseconds, ipaddr, mohsuggest, auth, setvar, type, deny, permit, encryption';
 
 if ($atmenu=='sip') {
-	$field_list_edit .= ', ignorecryptolifetime, transport, username, md5secret, directmedia, nat, dtmfmode, canreinvite, callgroup, fromuser, fromdomain, insecure, mailbox, mask, pickupgroup, restrictcid, rtptimeout, rtpholdtimeout, ' .
-			'musiconhold,  cancallforward, defaultuser, subscribemwi, vmexten, callingpres, usereqphone, incominglimit, subscribecontext, musicclass, allowtransfer, ' .
+	$field_list_edit .= ', ignorecryptolifetime, transport, defaultuser, username, md5secret, directmedia, nat, dtmfmode, canreinvite, callgroup, fromuser, fromdomain, insecure, mailbox, mask, pickupgroup, ' .
+			'restrictcid, rtptimeout, rtpholdtimeout, musiconhold,  cancallforward, subscribemwi, vmexten, callingpres, usereqphone, incominglimit, subscribecontext, musicclass, allowtransfer, ' .
 			'autoframing, maxcallbitrate, outboundproxy, regserver, rtpkeepalive, callbackextension';
 } else {
 	$field_list_edit .= ', forceencryption, trunk, dbsecret, regcontext, sourceaddress, mohinterpret, inkeys, outkey,  sendani, fullname,  maxauthreq, transfer, jitterbuffer, ' .

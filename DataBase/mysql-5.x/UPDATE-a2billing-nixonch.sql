@@ -50,12 +50,12 @@ INSERT IGNORE INTO cc_invoice_conf (key_val) VALUES ('comments');
 ALTER TABLE cc_sip_buddies ADD `callbackextension` varchar( 40 ) DEFAULT NULL;
 ALTER TABLE cc_sip_buddies ADD `directmedia` enum('yes','no','nonat','update','update,nonat') NULL DEFAULT 'update,nonat';
 ALTER TABLE cc_sip_buddies ADD `encryption` varchar( 20 ) COLLATE utf8_bin DEFAULT NULL;
-ALTER TABLE cc_sip_buddies ADD `ignorecryptolifetime` varchar( 20 ) COLLATE utf8_bin DEFAULT NULL;
-ALTER TABLE cc_sip_buddies ADD `transport` enum('udp','tcp','udp,tcp','tcp,udp') DEFAULT NULL;
+ALTER TABLE cc_sip_buddies ADD `ignorecryptolifetime` enum( 'yes', 'no' ) DEFAULT NULL;
+ALTER TABLE cc_sip_buddies ADD `transport` enum( 'tls', 'udp', 'tcp', 'udp,tcp', 'tcp,udp' ) DEFAULT NULL;
 
 ALTER TABLE cc_sip_buddies
   CHANGE `canreinvite` `canreinvite` varchar( 20 ) CHARACTER SET utf8 COLLATE utf8_bin NULL DEFAULT NULL ,
-  CHANGE `nat` `nat` enum( 'yes', 'no', 'force_rport', 'comedia', 'never', 'route' ) NULL DEFAULT NULL ,
+  CHANGE `nat` `nat` enum( 'yes', 'no', 'force_rport', 'comedia', 'never', 'route' ) NULL DEFAULT 'yes' ,
   CHANGE `qualify` `qualify` varchar( 40 ) CHARACTER SET utf8 COLLATE utf8_bin NULL DEFAULT NULL ,
   CHANGE `regseconds` `regseconds` int( 11 ) NULL DEFAULT NULL ,
   CHANGE `rtpholdtimeout` `rtpholdtimeout` int( 11 ) NULL DEFAULT NULL ,
@@ -66,7 +66,8 @@ ALTER TABLE cc_sip_buddies
   CHANGE `encryption` `encryption` varchar( 20 ) COLLATE utf8_bin NULL DEFAULT NULL ,
   CHANGE `transport` `transport` enum( 'tls', 'udp', 'tcp', 'udp,tcp', 'tcp,udp' ) NULL DEFAULT NULL ,
   CHANGE `callgroup` `callgroup` varchar( 40 ) NULL DEFAULT NULL ,
-  CHANGE `pickupgroup` `pickupgroup` varchar( 40 ) NULL DEFAULT NULL;
+  CHANGE `pickupgroup` `pickupgroup` varchar( 40 ) NULL DEFAULT NULL ,
+  CHANGE `ignorecryptolifetime` `ignorecryptolifetime` enum( 'yes', 'no' ) NULL DEFAULT NULL;
 
 ALTER TABLE cc_trunk CHANGE removeprefix removeprefix CHAR( 30 ) CHARACTER SET utf8 COLLATE utf8_bin NULL DEFAULT NULL;
 
