@@ -56,7 +56,23 @@ $typepaid_list = Constants::getPaidTypeList();
 $actived_list =  Constants::getActivationTrueFalseList();
 $yesno = Constants::getYesNoList();
 
+$handle = DbConnect();
+$instance_table = new Table();
 
+$QUERY = "SHOW COLUMNS FROM cc_sip_buddies";
+$result = $instance_table -> SQLExec ($handle, $QUERY);
+$values_list = array();
+foreach ($result as $one) {
+	if (stripos($one[1], 'enum') !== false) {
+		sscanf($one[1], "enum(%[^)])",$elem);
+		$elem = explode("!", str_replace("'","",str_replace("','","'!'",$elem)));
+		$value_elem = array();
+		foreach ($elem as $key) array_push ($value_elem, array ($key, $key));
+		array_unshift ($value_elem, array_shift($value_elem), array (null, null));
+		$values_list[$one[0]] = $value_elem;
+		unset($value_elem);
+	}
+}
 
 $HD_Form -> AddViewElement(gettext("CARDHOLDER"), "id_cc_card", "17%", "center", "sort", "25", "lie", "cc_card", "lastname, firstname", "id='%id'", "%1 %2");
 $HD_Form -> AddViewElement(gettext("NAME"), "name", "15%", "center", "sort");
@@ -114,8 +130,8 @@ if ($form_action=="ask-add") {
 if ($form_action=="ask-add" || $form_action == "add_sip" || $form_action == "add_iax") {
 	$AMAFLAGS_default= "value='".$A2B->config["peer_friend"]['amaflag']."'";
 	$TYPE_default= "value='friend'";
-	$DIRECTMEDIA_default= "value='update,nonat'";
-	$NAT_default= "value='".$A2B->config["peer_friend"]['nat']."'";
+	$DIRECTMEDIA_default= "update,nonat";
+	$NAT_default= $A2B->config["peer_friend"]['nat'];
 	$DTMFMODE_default= "value='".$A2B->config["peer_friend"]['dtmfmode']."'";
 	$CANREINVITE_default= "value=''";
 	$DISALLOW_default= "value='all'";
@@ -390,12 +406,12 @@ if ($atmenu=='sip') {
 	$HD_Form -> AddEditElement (gettext("TRANSPORT"),
 	                           "transport",
 	                           '',
-	                           "INPUT",
-	                           "size=20 maxlength=20",
+	                           "SELECT",
 	                           "",
 	                           "",
-	                           "", "", "", "", "", "",	"", gettext("transport = udp | tcp | tls ( default : udp )") );
-
+	                           "",
+	                           "list", "", "", "", $values_list['transport'], "%1" );
+	
 	
 	$HD_Form -> AddEditElement (gettext("USERNAME"),
 	                           "username",
@@ -419,22 +435,22 @@ if ($atmenu=='sip') {
 	
 	$HD_Form -> AddEditElement (gettext("DIRECTMEDIA"),
 	                           "directmedia",
-	                           '4',
-	                           "INPUT",
-	                           "size=60 maxlength=50 $DIRECTMEDIA_default",
+	                           $DIRECTMEDIA_default,
+	                           "SELECT",
 	                           "",
-	                           gettext("Insert the directmedia"),
-	                           "", "", "", "", "", "",	"", gettext("directmedia = nonat | yes | update ( default : yes )") );
+	                           "",
+	                           "",
+	                           "list", "", "", "", $values_list['directmedia'], "%1" );
 	
 	
 	$HD_Form -> AddEditElement (gettext("NAT"),
 	                           "nat",
-	                           '4',
-	                           "INPUT",
-	                           "size=60 maxlength=50 $NAT_default",
+	                           $NAT_default,
+	                           "SELECT",
 	                           "",
-	                           gettext("Insert the nat"),
-	                           "", "", "", "", "", "",	"", gettext("nat = yes | no | never | route ( default : yes )") );
+	                           "",
+	                           "",
+	                           "list", "", "", "", $values_list['nat'], "%1" );
 	
 	
 	$HD_Form -> AddEditElement (gettext("DTMFMODE"),

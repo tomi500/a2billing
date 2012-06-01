@@ -64,7 +64,7 @@ ALTER TABLE cc_sip_buddies
   CHANGE `callbackextension` `callbackextension` varchar( 40 ) NULL DEFAULT NULL ,
   CHANGE `directmedia` `directmedia` enum( 'yes', 'no', 'nonat', 'update', 'update,nonat' ) NULL DEFAULT 'update,nonat',
   CHANGE `encryption` `encryption` varchar( 20 ) COLLATE utf8_bin NULL DEFAULT NULL ,
-  CHANGE `transport` `transport` enum( 'udp', 'tcp', 'udp,tcp', 'tcp,udp' ) NULL DEFAULT NULL ,
+  CHANGE `transport` `transport` enum( 'tls', 'udp', 'tcp', 'udp,tcp', 'tcp,udp' ) NULL DEFAULT NULL ,
   CHANGE `callgroup` `callgroup` varchar( 40 ) NULL DEFAULT NULL ,
   CHANGE `pickupgroup` `pickupgroup` varchar( 40 ) NULL DEFAULT NULL;
 
