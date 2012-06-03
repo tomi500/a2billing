@@ -803,9 +803,9 @@ if ($mode == 'standard') {
 
                     if (is_array($result)) {
                         //On Net
-						$A2B -> call_2did($agi, $RateEngine, $result);
-						if ($A2B->set_inuse==1)
-                            $A2B -> callingcard_acct_start_inuse($agi,0);
+			$A2B -> call_2did($agi, $RateEngine, $result);
+			if ($A2B->set_inuse==1)
+				$A2B -> callingcard_acct_start_inuse($agi,0);
                     }
             	}
 			}
