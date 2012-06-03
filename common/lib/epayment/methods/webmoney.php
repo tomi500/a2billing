@@ -15,7 +15,7 @@ class webmoney {
 		$this->title = MODULE_PAYMENT_WM_TEXT_TITLE;
 		$this->description = MODULE_PAYMENT_WM_TEXT_DESCRIPTION;
 		$this->sort_order = 1;
-		$this->enabled = true;
+		$this->enabled = ((MODULE_PAYMENT_WM_STATUS == 'True') ? true : false);
 
 		$this->form_action_url = 'https://merchant.webmoney.ru/lmi/payment.asp';
 	}
