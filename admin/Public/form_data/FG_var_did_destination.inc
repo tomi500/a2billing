@@ -65,8 +65,8 @@ for ($k=1;$k<=5;$k++)
     $priority_list["$k"]  = array( "$k", "$k");
 
 $validated_list = array();
-$validated_list["0"] = array( gettext("Validated"), "1");
-$validated_list["1"] = array( gettext("Pending"), "0");
+$validated_list["1"] = array( gettext("Validated"), "1");
+$validated_list["0"] = array( gettext("Pending"), "0");
 
 
 $HD_Form -> AddViewElement(gettext("DID"), "did", "12%", "center", "sort", "15");
