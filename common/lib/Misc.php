@@ -668,7 +668,7 @@ function MDP_STRING($chrs = LEN_CARDNUMBER)
 		if (preg_match("/^[0-9a-z]$/i", $chr))
 			$pwd = $pwd . $chr;
 	};
-	return strtolower($pwd);
+	return $pwd;
 }
 
 /*
@@ -750,9 +750,10 @@ function gen_card_with_alias($table = "cc_card", $api = 0, $length_cardnumber = 
 			}
 		}
 
-		$query = "SELECT username FROM " . $table . " where username='$card_gen' OR useralias='$alias_gen'";
+		$query = "SELECT cc_card.username, cc_sip_buddies.name  FROM " . $table . " where cc_card.username='$card_gen' OR cc_card.useralias='$alias_gen' OR cc_card.useralias='$card_gen' FULL OUTER JOIN cc_sip_buddies ON cc_sip_buddies.name='$card_gen' OR cc_sip_buddies.name='$alias_gen'";
 		$numrow = 0;
 		$resmax = $DBHandle->Execute($query);
+
 		if ($resmax)
 			$numrow = $resmax->RecordCount();
 

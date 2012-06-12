@@ -1641,7 +1641,7 @@ class A2Billing {
 				$answeredtime	= 0;
 				$dialstatus	= $this -> get_dialstatus_from_queuestatus($agi);
 			}
-		} else	$dialstatus		= $agi->get_variable("DIALSTATUS", true);
+		} else		$dialstatus	= $agi->get_variable("DIALSTATUS", true);
 
 		if ($this->monitor == 1 || $this -> agiconfig['record_call'] == 1) {
                     $myres = $agi->exec($this -> format_parameters ("StopMixMonitor"));

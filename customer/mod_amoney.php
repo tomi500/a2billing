@@ -23,7 +23,7 @@ $yandex_successurl = $mosConfig_live_site;
 $use_paypal = 1;
 //$donate_email = '4935XK7M8RJQY';
 $donate_email = 'VBP4BCSYDMWD6';
-$paypalcur_on = 1;
+$paypalcur_on = 0;
 $paypalcur_val = 'EUR';
 $paypalval_on = 0;
 $paypalval_val = 10;
@@ -277,7 +277,8 @@ elseif ($length == 3) {
   header("Location: https://www.paypal.com/cgi-bin/webscr?cmd=_xclick-subscriptions&business=".$donate_email."&item_name=".$donate_org."&no_shipping=1&no_note=1&currency_code=".$currency_code."&bn=PP%2dSubscriptionsBF&charset=UTF%2d8&a3=".$amount."%2e00&p3=1&t3=Y&src=1&sra=1&return=".$link_return."&cancel=".$link_cancel);
 }
 */
-$currencies = array( 'USD' => '$ ', 'GBP' => '&pound; ', 'EUR' => '&euro; ' );
+$currencies = array( 'USD' => '$ ', 'EUR' => '&euro; ' );
+//$currencies = array( 'USD' => '$ ', 'GBP' => '&pound; ', 'EUR' => '&euro; ' );
 ?>
 <div id="paypal_logo">
 <img src="<?php echo $logopaypal?>" alt="PayPal" />
@@ -304,7 +305,7 @@ if ($paypalval_on == 0) {
     var currencyObj = document.getElementById( 'donate_symbol_currency' );
     if( currencyObj )
     {
-      var currencySymbols = { 'USD': '$ ', 'GBP': '&pound; ', 'EUR': 'ˆ ' };
+      var currencySymbols = { 'USD': '$ ', 'GBP': '&pound; ', 'EUR': '&euro; ' };
       var currencySymbol = currencySymbols[ selection ];
       currencyObj.innerHTML = currencySymbol;
     }

@@ -123,7 +123,7 @@ $maxi='';
 if ($form_action=="ask-add") {
 	$card_gen = gen_card($HD_Form->FG_TABLE_NAME);
 	$maxi = "value='".$card_gen."'";
-	$pass =  MDP(6);
+	$pass =  MDP_STRING(10);
 	$pass_secret = "value='".$pass."'";
 }
 

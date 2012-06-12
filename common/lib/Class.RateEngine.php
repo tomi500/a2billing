@@ -309,7 +309,7 @@ class RateEngine
 		if ($ind_stop_default > 0) {
 			$result = array_merge ((array)$result, (array)$result_defaultprefix);
 		}
-		if ($result[count($result)-1][12]>=100) unset($result[count($result)-1]);
+		if (count($result) > 1 && $result[count($result)-1][12]>=100) unset($result[count($result)-1]);
 		
 		// 3) REMOVE THOSE THAT USE THE SAME TRUNK - MAKE A DISTINCT
 		//    AND THOSE THAT ARE DISABLED.

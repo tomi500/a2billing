@@ -264,13 +264,13 @@ function rowOutEffect(object) {
       <?php echo strtoupper(BASE_CURRENCY)?>
       </td>
       <td style="padding-right:18px;" align=right>
-	<input type="submit" class="form_input_button" value=" <?php echo '>>'.gettext("Proceed")?> " alt="Continue"  title="Continue">
+	<input type="submit" class="form_input_button" value=" <?php echo '>> '.gettext("Continue")?> " alt="Continue"  title="Continue">
 <?php	  }
 	if (sizeof($selection[$i]['fields'])==1) {
 	  echo $selection[$i]['fields'][0]['field'];?>
       </td>
       <td style="padding-right:18px;" align=right>
-	<input type="submit" class="form_input_button" value=" <?php echo '>>'.gettext("Proceed")?> " alt="Continue"  title="Continue">
+	<input type="submit" class="form_input_button" value=" <?php echo '>> '.gettext("Continue")?> " alt="Continue"  title="Continue">
       &nbsp;</td>
 <?php	}
        else {?>
@@ -296,7 +296,7 @@ function rowOutEffect(object) {
 	<?php echo strtoupper(BASE_CURRENCY)?>
       </td>
       <td style="padding-right:18px;" align=right>
-	<input type="submit" class="form_input_button" value=" <?php echo '>>'.gettext("Proceed")?> " alt="Continue"  title="Continue">
+	<input type="submit" class="form_input_button" value=" <?php echo '>> '.gettext("Continue")?> " alt="Continue"  title="Continue">
       &nbsp;</td>
     </tr>
 <?php

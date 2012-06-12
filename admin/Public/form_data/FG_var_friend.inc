@@ -118,12 +118,14 @@ $HD_Form -> FG_EDITION = true;
 $HD_Form -> FG_DELETION = true;
 $HD_Form -> FG_ADDITION = true;
 
-$maxi='';
 if ($form_action=="ask-add") {
 	$card_gen = gen_card($HD_Form->FG_TABLE_NAME);
 	$maxi = "value='".$card_gen."'";
-	$pass =  MDP(6);
+	$acc = "value='Select ID CARD first'";
+	$pass =  MDP_STRING(10);
 	$pass_secret = "value='".$pass."'";
+} else {
+$maxi=$acc='';
 }
 
 
@@ -176,7 +178,7 @@ $HD_Form -> AddEditElement (gettext("ACCOUNTCODE"),
                            "accountcode",
                            '',
                            "INPUT",
-                           "size=20 $maxi maxlength=50",
+                           "size=20 $acc maxlength=50",
                            "",
                            gettext("Insert the accountcode"),
                            "", "", "", "", "", "",	"", "" );
@@ -422,7 +424,7 @@ if ($atmenu=='sip') {
 	                           "defaultuser",
 	                           '',
 	                           "INPUT",
-	                           "size=50 maxlength=40",
+	                           "size=50 maxlength=40 $maxi",
 	                           "",
 	                           "",
 	                           "", "", "", "", "", "", "", "" );

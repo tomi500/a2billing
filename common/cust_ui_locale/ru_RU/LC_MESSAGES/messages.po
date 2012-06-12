@@ -695,6 +695,26 @@ msgstr "Ваш пароль"
 msgid "SIGNUP"
 msgstr ""
 
+#: form_data/FG_var_sipiax_info:47
+msgid "EXTEN"
+msgstr "ВН.НОМЕР"
+
+#: form_data/FG_var_sipiax_info:49
+msgid "LANG"
+msgstr "ЯЗЫК"
+
+#: form_data/FG_var_sipiax_info:52
+msgid "CALLGROUP"
+msgstr "ЗВОНКОВАЯ_ГРУППА"
+
+#: form_data/FG_var_sipiax_info:53
+msgid "PICKUPGROUP"
+msgstr "ГРУППА_ПЕРЕХВАТА"
+
+#: form_data/FG_var_sipiax_info:57
+msgid "SECRET"
+msgstr "ПАРОЛЬ"
+
 #: form_data/FG_var_card.inc:59
 msgid "Insert the lastname of the customers"
 msgstr "Введите фамилию клиентов"
@@ -2607,7 +2627,7 @@ msgstr "Все звонки указаны ниже. Вы можете иска�
 
 #: lib/customer.help.php:51
 msgid "On this page, you can open a support ticket and consult the status of your existing ticket."
-msgstr "На этой странице можно открыть новый тикет, либо посмотреть статус уже созданного"
+msgstr "На этой странице можно инициировать новый запрос, либо посмотреть статус уже созданного"
 
 #: lib/customer.help.php:45
 msgid "Your balance"
@@ -2784,7 +2804,7 @@ msgstr "К оплате с НДС"
 
 #: checkout_confirmation.php:194
 msgid "Please click button to confirm your order"
-msgstr "Чтобы подтвердить оплату нажмите эту кнопку"
+msgstr "Чтобы начать оплату нажмите эту кнопку"
 
 #: callback.php:173
 msgid "Cannot insert the callback request in the spool!"
@@ -3203,6 +3223,34 @@ msgstr "SIP"
 msgid "Username"
 msgstr "Имя"
 
+#: A2B_entity_sipiax_info.php:120
+msgid "GENERATE EXTENSIONS"
+msgstr "Добавление внутренних номеров"
+
+#: A2B_entity_sipiax_info.php:123
+msgid "Create extensions from"
+msgstr "Создать номера от"
+
+#: A2B_entity_sipiax_info.php:126
+msgid "Quantity"
+msgstr "Количество"
+
+#: A2B_entity_sipiax_info.php:130
+msgid " CREATE "
+msgstr "СОЗДАТЬ"
+
+#: A2B_entity_sipiax_info.php:133
+msgid "Extensions left"
+msgstr "Осталось номеров"
+
+#: A2B_entity_sipiax_info.php:135
+msgid "from"
+msgstr "номера от"
+
+#: A2B_entity_sipiax_info.php:138
+msgid "to"
+msgstr "до"
+
 #: A2B_entity_sipiax_info.php:118 templates/default/index.tpl:61
 msgid "Password"
 msgstr "Пароль"
@@ -3293,6 +3341,10 @@ msgstr "Комиссия PayPal"
 #: checkout_payment.php:320
 msgid "Total Amount"
 msgstr "Общая сумма"
+
+#: checkout_payment.php:330
+msgid "Continue"
+msgstr "Оформить"
 
 #: userinfo.php:61
 msgid "Error loading your account information!"
@@ -3594,11 +3646,15 @@ msgstr "Учетная запись не может быть активиров�
 
 #: templates/default/main.tpl:12
 msgid "ACCOUNT INFO"
-msgstr "ИНФОРМАЦИЯ О СЧЕТЕ"
+msgstr "ОБЩАЯ ИНФОРМАЦИЯ"
 
 #: templates/default/main.tpl:15
 msgid "MY PROFILE"
 msgstr "ПРОФИЛЬ"
+
+#: templates/default/main.tpl:16
+msgid "MY PBX"
+msgstr "МОЯ АТС"
 
 #: templates/default/main.tpl:19
 msgid "VOICEMAIL"
@@ -3606,7 +3662,7 @@ msgstr "ГОЛОСОВАЯ ПОЧТА"
 
 #: templates/default/main.tpl:23
 msgid "SIP/IAX INFO"
-msgstr "ВНУТРЕННИЕ НОМЕРА"
+msgstr "МОИ ЛИНИИ"
 
 #: templates/default/main.tpl:27
 msgid "CALL HISTORY"

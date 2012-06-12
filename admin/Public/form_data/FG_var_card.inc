@@ -315,7 +315,7 @@ if (has_rights (ACX_MODIFY_CUSTOMERS) && !($popup_select>=1)) {
 		$array_card_generated  = gen_card_with_alias("cc_card", 0, $cardnumberlenght_list);
 		$maxi = "value='".$array_card_generated[0]."'";
 		$maxi2 = "value='".$array_card_generated[1]."'";
-		$pass = MDP_NUMERIC(10);
+		$pass = MDP_STRING(10);
 		$maxi3 = "value='".$pass."'";
 		$default_initbalance = "value='0'";
 	}

@@ -96,7 +96,8 @@ if (isset($posted) && !$popup_select) {
 }
 
 $HD_Form -> FG_DEBUG = 0;
-$HD_Form -> FG_TABLE_DEFAULT_ORDER = " dialprefix";
+$HD_Form -> FG_TABLE_DEFAULT_ORDER = " IF(CONCAT(dialprefix+0) = dialprefix, dialprefix, ''),
+					IF(CONCAT(dialprefix+0) = dialprefix, cast(dialprefix as signed), -LENGTH(dialprefix))";
 $HD_Form -> FG_TABLE_DEFAULT_SENS = "ASC";
 
 $HD_Form->FG_FILTER_SEARCH_SESSION_NAME = 'entity_ratecard_selection';
@@ -158,6 +159,7 @@ if ($popup_select) {
 	$HD_Form -> FG_EDITION = true;
 	$HD_Form -> FG_DELETION = true;
 	$HD_Form -> FG_ADDITION = true;
+	$HD_Form -> FG_LIMITE_DISPLAY = 15;
 }
 
 $HD_Form -> CV_NO_FIELDS  = gettext("NO")." ".strtoupper($HD_Form->FG_INSTANCE_NAME)." ".gettext("HAVE BEEN CREATED."); 
