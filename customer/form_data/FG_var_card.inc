@@ -176,7 +176,7 @@ $HD_Form -> AddEditElement (gettext("RECALL TIME"),
 			   "",
 			   "" , "", "", "", "", "", "NO", gettext("Max time to recall in seconds. Set '-1' for paritet calls."));
 
-if (ACT_VOICEMAIL) {
+if (ACT_VOICEMAIL && $ACXVOICEMAIL) {
 	$HD_Form -> AddEditElement (gettext("ACTIVE VOICEMAIL SERVICE"),
 				   "voicemail_activated",
 				   '0',
@@ -184,11 +184,11 @@ if (ACT_VOICEMAIL) {
 				   "",
 				   "",
 				   gettext("Customer can choose to enable the voicemail for this card"),
-				   "" , "", "", "Yes :1, - No:0", "", "" , "", gettext("Customer can enable the voicemail for this card."));
+				   "" , "", "", "Yes :1, - No:0", "", "" , "", gettext("You can enable the voicemail"));
 }
 
 $add_fields_voicemail = '';
-if (ACT_VOICEMAIL)
+if (ACT_VOICEMAIL && $ACXVOICEMAIL)
 	$add_fields_voicemail = ', voicemail_activated ';
 $add_fields_monitor = '';
 if ($ACXSEERECORDING)

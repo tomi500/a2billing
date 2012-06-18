@@ -148,7 +148,7 @@ if (isset ($form_action) && $form_action == "add") {
 	$array_card_generated = gen_card_with_alias();
 	$maxi = $array_card_generated[0];
 	$maxi2 = $array_card_generated[1];
-	$pass = MDP_NUMERIC(10);
+	$pass = MDP_STRING(10);
 	$loginkey = MDP_STRING(20);
 }
 

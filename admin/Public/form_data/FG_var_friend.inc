@@ -999,14 +999,14 @@ if ($atmenu=='sip') {
 $HD_Form -> FieldEditElement ($field_list_edit);
 
 $HD_Form -> FG_FILTER_APPLY = true;
-$HD_Form -> FG_FILTERFIELD = 'name';
-$HD_Form -> FG_FILTERFIELDNAME = gettext('username');
+$HD_Form -> FG_FILTERFIELD = 'accountcode';
+$HD_Form -> FG_FILTERFIELDNAME = gettext('accountcode');
 $HD_Form -> FG_FILTER_FORM_ACTION = 'list';
 
 
 if (isset($filterprefix)  &&  (strlen($filterprefix)>0)){
 	if (strlen($HD_Form -> FG_TABLE_CLAUSE)>0) $HD_Form -> FG_TABLE_CLAUSE.=" AND ";
-	$HD_Form -> FG_TABLE_CLAUSE.="name like '$filterprefix%'";
+	$HD_Form -> FG_TABLE_CLAUSE.="accountcode like '$filterprefix%'";
 }
 
 $HD_Form -> FG_INTRO_TEXT_EDITION= '';

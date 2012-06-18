@@ -881,7 +881,7 @@ class SOAP_A2Billing
 			    $instance_refill_table->Add_table($this->DBHandle, $value_insert_refill, null, null);
 		    }
             
-		    $instance_realtime -> insert_voip_config ($sip_buddy, $iax_buddy, $id_cc_card, $accountnumber, $passui_secret);
+		    $instance_realtime -> insert_voip_config ($sip_buddy, $iax_buddy, $id_cc_card, $accountnumber, $passui_secret, $useralias, $language);
 	    }
 	    
 	    // Save Sip accounts to file

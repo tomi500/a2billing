@@ -127,7 +127,7 @@ class Realtime {
 	// insert_voip_config
 	// sip : 1 / 0
 	// iax : 1 / 0
-	function insert_voip_config ($sip, $iax, $id_card, $accountnumber, $passui_secret) 
+	function insert_voip_config ($sip, $iax, $id_card, $accountnumber, $passui_secret, $useralias, $language)
 	{
 	    $who_id = '';
 	    if (!isset ($sip))
@@ -177,11 +177,11 @@ class Realtime {
 	    // Insert data for sip_buddy
 		if ($sip) {
 			
-			$FG_QUERY_ADITION_SIP_FIELDS = "name, accountcode, regexten, amaflags, callerid, context, dtmfmode, host, type, username, allow, secret, id_cc_card, nat, qualify";
+			$FG_QUERY_ADITION_SIP_FIELDS = "name, accountcode, regexten, amaflags, callerid, context, dtmfmode, host, type, defaultuser, allow, secret, id_cc_card, nat, qualify, language, rtptimeout, rtpholdtimeout, rtpkeepalive, allowtransfer";
 		    $instance_sip_table = new Table($FG_TABLE_SIP_NAME, $FG_QUERY_ADITION_SIP_FIELDS);
 		    
-			$FG_QUERY_ADITION_SIP_IAX_VALUE = "'$accountnumber', '$accountnumber', '$accountnumber', '$amaflags', '', '$context', '$dtmfmode','$host', '$type', ".
-			                                    "'$accountnumber', '$allow', '$passui_secret', '$id_card', '$nat', '$qualify'";
+			$FG_QUERY_ADITION_SIP_IAX_VALUE = "'$useralias', '$accountnumber', '', '$amaflags', '', '$context', '$dtmfmode','$host', '$type', ".
+			                                    "'$useralias', '$allow', '$passui_secret', '$id_card', '$nat', '$qualify', '$language', '60', '300', '30', 'yes'";
 			$result_query1 = $instance_sip_table->Add_table($this->DBHandler, $FG_QUERY_ADITION_SIP_IAX_VALUE, null, null, null);
 			if (USE_REALTIME) {
 				$_SESSION["is_sip_iax_change"] = 1;

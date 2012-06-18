@@ -1616,8 +1616,8 @@ class RateEngine
 					$A2B -> debug( INFO, $agi, __FILE__, __LINE__, "EXEC ". $command_mixmonitor);
 				    }
 				    // Count this call on the trunk
-				    $agi -> set_variable('GLOBAL(CHANNELCIDNUM)', $destination);
-				    $agi -> set_variable('GLOBAL(CALACCOUNT)', $A2B->cardnumber);
+				    $agi -> set_variable('MASTER_CHANNEL(CHANNELCIDNUM)', $destination);
+				    $agi -> set_variable('MASTER_CHANNEL(CALACCOUNT)', $A2B->cardnumber);
 				    $myres = $A2B -> run_dial($agi, $dialstr);
 				    $A2B -> debug( DEBUG, $agi, __FILE__, __LINE__, "DIAL FAILOVER $dialstr");
 
@@ -1666,13 +1666,13 @@ class RateEngine
 					$A2B -> debug( INFO, $agi, __FILE__, __LINE__, "EXEC StopMixMonitor (".$A2B->uniqueid.")");
 				    }
 
-				    $answeredtime = $agi->get_variable("ANSWEREDTIME");
-				    $this -> real_answeredtime = $this -> answeredtime = $answeredtime['data'];
+				    $answeredtime = $agi->get_variable("ANSWEREDTIME",true);
+				    if ($answeredtime == "")		$answeredtime = $agi->get_variable("CDR(billsec)",true);
+				    $this -> real_answeredtime = $this -> answeredtime = $answeredtime;
 
-				    $dialstatus = $agi -> get_variable("DIALSTATUS");
-				    $this -> dialstatus = $dialstatus['data'];
+				    $this -> dialstatus = $agi -> get_variable("DIALSTATUS",true);
 
-				    $A2B -> debug( INFO, $agi, __FILE__, __LINE__, "[FAILOVER K=$k]:[ANSTIME=".$this->answeredtime."-DIALSTATUS=".$this->dialstatus."]");
+				    $A2B -> debug( INFO, $agi, __FILE__, __LINE__, "[FAILOVER K=$k]:[ANSWEREDTIME=".$this->answeredtime."]:[DIALSTATUS=".$this->dialstatus."]");
 				}
 //				if (($this->dialstatus  == "CHANUNAVAIL" || $this->dialstatus  == "CONGESTION") && $intellect_count > 0) 
 				if ($this->dialstatus  == "CHANUNAVAIL" && $intellect_count > 0) {

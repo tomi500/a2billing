@@ -1362,6 +1362,8 @@ class A2Billing {
 					$this -> debug( INFO, $agi, __FILE__, __LINE__, "DIAL $dialstr");
 
 					$answeredtime			= $agi->get_variable("ANSWEREDTIME", true);
+					if ($answeredtime == "")
+							  $answeredtime = $agi->get_variable("CDR(billsec)",true);
 					if (stripos($dialstr,'QUEUE ') === 0) {
 						if ($answeredtime) {
 							$answeredtime	= time() - $answeredtime;
@@ -1633,6 +1635,8 @@ class A2Billing {
                 $this -> debug( INFO, $agi, __FILE__, __LINE__, "DIAL $dialstr");
 
 		$answeredtime			= $agi->get_variable("ANSWEREDTIME", true);
+		if ($answeredtime == "")
+				  $answeredtime = $agi->get_variable("CDR(billsec)",true);
 		if (stripos($dialstr,'QUEUE ') === 0) {
 			if ($answeredtime) {
 				$answeredtime	= time() - $answeredtime;
@@ -2107,7 +2111,7 @@ class A2Billing {
 			default:
 				$cent_audio = substr($cents_audio,0,-1);
 		}
-
+		if (array_search($agi -> channel_status('',true), array(AST_STATE_UP, AST_STATE_DOWN)) === false) $this -> let_stream_listening($agi);
 		// say 'you have x dollars and x cents'
 		if ($fromvoucher!=1)
 			$agi-> stream_file('prepaid-you-have', '#');

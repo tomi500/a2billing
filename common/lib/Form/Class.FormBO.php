@@ -1057,6 +1057,7 @@ class FormBO {
 		$id = $FormHandler -> RESULT_QUERY; // DEFINED BEFORE FG_ADDITIONAL_FUNCTION_AFTER_ADD		
 		$sip = stripslashes($processed['sip_buddy']);
 		$iax = stripslashes($processed['iax_buddy']);
+		$language = stripslashes($processed['language']);
 		
 		// $FormHandler -> FG_QUERY_EXTRA_HIDDED - username, useralias, uipass, loginkey
 		if (strlen($FormHandler -> FG_QUERY_EXTRA_HIDDED[0])>0) {
@@ -1071,7 +1072,7 @@ class FormBO {
 		
 		$instance_realtime = new Realtime();
 		
-		$instance_realtime -> insert_voip_config ($sip, $iax, $id, $username, $uipass);
+		$instance_realtime -> insert_voip_config ($sip, $iax, $id, $username, $uipass, $useralias, $language);
 		
 		// Save info in table and in sip file
 		if ($sip == 1) {
