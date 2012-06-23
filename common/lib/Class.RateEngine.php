@@ -237,14 +237,14 @@ class RateEngine
                     foreach($myresult as $j=>$i){
                         if ($this->webui) {
                             $A2B -> debug( DEBUG, $agi, __FILE__, __LINE__, "[rate-engine: foreach J=".print_r($j, true));
-                            $A2B -> debug( DEBUG, $agi, __FILE__, __LINE__, "[rate-engine:mysearchvalue[4]=".$mysearchvalue[$resultcount][4]);
+                            if (isset($mysearchvalue[$resultcount][4])) $A2B -> debug( DEBUG, $agi, __FILE__, __LINE__, "[rate-engine:mysearchvalue[4]=".$mysearchvalue[$resultcount][4]);
                             $A2B -> debug( DEBUG, $agi, __FILE__, __LINE__, "[rate-engine:i[4]=".$i[4]);
-                            $A2B -> debug( DEBUG, $agi, __FILE__, __LINE__, "[rate-engine:mysearchvalue[3]=".$mysearchvalue[$resultcount][3]);
+                            if (isset($mysearchvalue[$resultcount][3])) $A2B -> debug( DEBUG, $agi, __FILE__, __LINE__, "[rate-engine:mysearchvalue[3]=".$mysearchvalue[$resultcount][3]);
                             $A2B -> debug( DEBUG, $agi, __FILE__, __LINE__, "[rate-engine:i[3]=".$i[3]);
-                            $A2B -> debug( DEBUG, $agi, __FILE__, __LINE__, "[rate-engine:mysearchvalue[7]=".$mysearchvalue[$resultcount][7]);
+                            if (isset($mysearchvalue[$resultcount][7])) $A2B -> debug( DEBUG, $agi, __FILE__, __LINE__, "[rate-engine:mysearchvalue[7]=".$mysearchvalue[$resultcount][7]);
                             $A2B -> debug( DEBUG, $agi, __FILE__, __LINE__, "[rate-engine:i[7]=".$i[7]);
                         };
-                        if ($mysearchvalue[$resultcount][3] == $i[3] ) {
+                        if (isset($mysearchvalue[$resultcount][3]) && $mysearchvalue[$resultcount][3] == $i[3] ) {
                             if (strlen($mysearchvalue[$resultcount][7]) != strlen($i[7])) {
                                 unset($myresult[$j]);
                                 $countdelete++;
@@ -1034,8 +1034,11 @@ class RateEngine
 		$K = $this->usedratecard;
 		
 		// ****************  PACKAGE PARAMETERS ****************
-		$id_cc_package_offer = $this -> ratecard_obj[$K][45];
-		$additional_grace_time = $this -> ratecard_obj[$K][58];
+		if (is_array($this -> ratecard_obj)) {
+			$id_cc_package_offer = $this -> ratecard_obj[$K][45];
+			$additional_grace_time = $this -> ratecard_obj[$K][58];
+		} else $id_cc_package_offer = 'NONE';
+		
 		$id_card_package_offer = null;
 		
 		if ($A2B -> CC_TESTING) {
@@ -1103,12 +1106,14 @@ class RateEngine
 		} else {
 			$sessiontime = 0;
 		}
-
-		$calldestination = $this -> ratecard_obj[$K][5];
-		$id_tariffgroup = $this -> ratecard_obj[$K][2];
-		$id_tariffplan = $this -> ratecard_obj[$K][3];
-		$id_ratecard = $this -> ratecard_obj[$K][6];
-		
+		if (is_array($this -> ratecard_obj)) {
+			$calldestination = $this -> ratecard_obj[$K][5];
+			$id_tariffgroup  = $this -> ratecard_obj[$K][2];
+			$id_tariffplan	 = $this -> ratecard_obj[$K][3];
+			$id_ratecard	 = $this -> ratecard_obj[$K][6];
+			$buyrateapply	 = $this -> ratecard_obj[$K][9];
+			$rateapply	 = $this -> ratecard_obj[$K][12];
+		}
 		$buycost = 0;
 		if ($doibill==0 || $sessiontime < $A2B->agiconfig['min_duration_2bill']) {
 			$cost = 0;
@@ -1125,9 +1130,6 @@ class RateEngine
 			$signe = '+';
 			$signe_cc_call = '-';
 		}
-
-		$buyrateapply = $this -> ratecard_obj[$K][9];
-		$rateapply = $this -> ratecard_obj[$K][12];
 
 		$A2B -> debug( DEBUG, $agi, __FILE__, __LINE__, "[CC_RATE_ENGINE_UPDATESYSTEM: usedratecard K=$K - (sessiontime=$sessiontime :: dialstatus=$dialstatus :: buycost=$buycost :: cost=$cost : signe_cc_call=$signe_cc_call: signe=$signe)]");
 
@@ -1153,14 +1155,14 @@ class RateEngine
         
 		$card_id =  (!is_numeric($A2B->id_card)) ? '-1' : "'". $A2B->id_card ."'";
 		$real_sessiontime = (!is_numeric($this->real_answeredtime)) ? 'NULL' : "'". $this->real_answeredtime ."'";
-		$id_tariffgroup = (!is_numeric($id_tariffgroup)) ? 'NULL' : "'$id_tariffgroup'";
-		$id_tariffplan = (!is_numeric($id_tariffplan)) ? 'NULL' : "'$id_tariffplan'";
-		$id_ratecard = (!is_numeric($id_ratecard)) ? 'NULL' : "'$id_ratecard'";
+		$id_tariffgroup = (!isset($id_tariffgroup) || !is_numeric($id_tariffgroup)) ? 'NULL' : "'$id_tariffgroup'";
+		$id_tariffplan = (!isset($id_tariffplan) || !is_numeric($id_tariffplan)) ? 'NULL' : "'$id_tariffplan'";
+		$id_ratecard = (!isset($id_ratecard) || !is_numeric($id_ratecard)) ? 'NULL' : "'$id_ratecard'";
 		$trunk_id =  ($trunk_id) ? "'". $trunk_id ."'" : "'". $this->usedtrunk ."'";
 		$id_card_package_offer = (!is_numeric($id_card_package_offer)) ? 'NULL' : "'$id_card_package_offer'";
-		$calldestination = (!is_numeric($calldestination)) ? 'DEFAULT' : "'$calldestination'";
+		$calldestination = (!isset($calldestination) || !is_numeric($calldestination)) ? 'DEFAULT' : "'$calldestination'";
 		$card_caller = (isset($A2B->card_caller)) ? "'$A2B->card_caller'" : "'0'";
-		$id_did = (!is_numeric($A2B->id_did)) ? 'NULL' : "'$A2B->id_did'";
+		$id_did = (!isset($A2B->id_did) || !is_numeric($A2B->id_did)) ? 'NULL' : "'$A2B->id_did'";
 
 		$QUERY_COLUMN = "uniqueid, sessionid, card_id, card_caller, nasipaddress, starttime, sessiontime, real_sessiontime, calledstation, ".
 			" terminatecauseid, stoptime, sessionbill, id_tariffgroup, id_tariffplan, id_ratecard, " .
@@ -1628,6 +1630,7 @@ class RateEngine
 					$outcid = 0;
 					$agi -> set_callerid($A2B -> CallerID);
 					$agi -> set_variable('CALLERID(ani)', $A2B -> CallerID);
+					$agi -> set_variable('CALLERID(name)', $calleridname);
 				    }
 				} elseif (is_array($amicmd)) {
 				    write_log(LOGFILE_API_CALLBACK, basename(__FILE__) . ' line:' . __LINE__ . " ActionID = {$amicmd[5]} [#### Starting AMI ORIGINATE ####] $channel");

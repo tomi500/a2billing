@@ -1501,7 +1501,7 @@ msgid "at least 1 character"
 msgstr "минимум 1 символ"
 
 #: lib/Form/Class.FormHandler.inc.php:1020
-msgid "(AT LEAST 2 CARACTERS)"
+msgid "(AT LEAST 2 CHARACTERS)"
 msgstr "(МИНИМУМ 2 СИМВОЛА)"
 
 #: lib/Form/Class.FormHandler.inc.php:1024
@@ -3865,7 +3865,7 @@ msgstr ""
 
 #: Public/A2B_entity_card.php:507
 msgid "Change the Account Number Length"
-msgstr "Изменить дину номера уч.записи"
+msgstr "Изменить длину номера уч.записи"
 
 #: Public/A2B_entity_card.php:512 Public/A2B_entity_card_multi.php:248
 msgid "Digits"
@@ -9992,7 +9992,7 @@ msgstr ""
 
 #: Public/dashboard.php:81
 msgid "PAYMENTS INFO"
-msgstr "ИНФОРМАЦИЯ О ПЛТЕЖАХ"
+msgstr "ИНФОРМАЦИЯ О ПЛАТЕЖАХ"
 
 #: Public/dashboard.php:84
 #, fuzzy

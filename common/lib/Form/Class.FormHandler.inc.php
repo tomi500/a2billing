@@ -1017,7 +1017,7 @@ class FormHandler
 
 		// 11
 		$this -> FG_regular[]  = array(    "^.{2}",
-					gettext("(AT LEAST 2 CARACTERS)"));
+					gettext("(AT LEAST 2 CHARACTERS)"));
 
 		// 12
 		$this -> FG_regular[]  = array(    "^(-){0,1}[0-9]+(\.){0,1}[0-9]*$"       ,
@@ -1035,11 +1035,11 @@ class FormHandler
 		$this -> FG_regular[]  = array(    "^([0-9]{2}):([0-9]{2})$"   ,
 		                        "(HH:MM)");
 						
-		// 16  TEXT > 15 caract
+		// 16  TEXT > 15 charact
 		$this -> FG_regular[]  = array(	".{15}", 
 						gettext("You must write something."));
 		
-		// 17  TEXT > 15 caract
+		// 17  TEXT > 8 charact
 		$this -> FG_regular[]  = array(	".{8}", 
 						gettext("8 characters alphanumeric"));
 		

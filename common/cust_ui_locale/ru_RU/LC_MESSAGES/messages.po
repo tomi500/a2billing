@@ -527,7 +527,7 @@ msgid "No Call Plan id are defined"
 msgstr ""
 
 #: form_data/FG_var_signup.inc:155
-msgid "LANGUAGE"
+msgid "LANG"
 msgstr "ЯЗЫК"
 
 #: form_data/FG_var_signup.inc:163
@@ -696,11 +696,15 @@ msgid "SIGNUP"
 msgstr ""
 
 #: form_data/FG_var_sipiax_info:47
-msgid "EXTEN"
+msgid "EXTENSION"
 msgstr "ВН.НОМЕР"
 
+#: form_data/FG_var_sipiax_info:47
+msgid "EXTENSION "
+msgstr "ВНУТРЕННИЙ НОМЕР"
+
 #: form_data/FG_var_sipiax_info:49
-msgid "LANG"
+msgid "LANGUAGE"
 msgstr "ЯЗЫК"
 
 #: form_data/FG_var_sipiax_info:52
@@ -831,9 +835,8 @@ msgid "EXPIRATIONDATE"
 msgstr ""
 
 #: form_data/FG_var_campaign.inc:71 A2B_entity_sipiax_info.php:88
-#, fuzzy
 msgid "CARD"
-msgstr "CALL"
+msgstr "НОМЕР АККАУНТА"
 
 #: form_data/FG_var_campaign.inc:78
 msgid "No campaigns have been created."
@@ -1999,7 +2002,7 @@ msgid "at least 1 character"
 msgstr "как минимум 1 символ"
 
 #: lib/Form/Class.FormHandler.inc.php:1020
-msgid "(AT LEAST 2 CARACTERS)"
+msgid "(AT LEAST 2 CHARACTERS)"
 msgstr "(КАК МИНИМУМ 2 СИМВОЛА)"
 
 #: lib/Form/Class.FormHandler.inc.php:1024
@@ -3212,16 +3215,16 @@ msgstr "ТИП КОНФИГУРАЦИИ"
 #: A2B_entity_sipiax_info.php:95
 #, fuzzy
 msgid "IAX"
-msgstr "FAX"
+msgstr "IAX"
 
 #: A2B_entity_sipiax_info.php:96
+#, fuzzy
 msgid "SIP"
 msgstr "SIP"
 
 #: A2B_entity_sipiax_info.php:117
-#, fuzzy
-msgid "Username"
-msgstr "Имя"
+msgid "CALLERID NAME"
+msgstr "ПОКАЗЫВАЕМОЕ ИМЯ"
 
 #: A2B_entity_sipiax_info.php:120
 msgid "GENERATE EXTENSIONS"
@@ -3459,6 +3462,46 @@ msgstr "Удаление"
 msgid "ERROR: Cannot download file "
 msgstr ""
 
+#: call-history.php
+msgid "RegName"
+msgstr "С линии"
+
+#: A2B_entity_sipiax_info.php
+msgid "REGNAME"
+msgstr "РЕГИМЯ"
+
+#: A2B_entity_sipiax_info.php
+msgid "REGISTRATION NAME"
+msgstr "РЕГИСТРАЦИОННОЕ ИМЯ"
+
+#: A2B_entity_sipiax_info.php
+msgid "Use for information only"
+msgstr "Информация о регистрационном имени телефона"
+
+#: A2B_entity_sipiax_info.php
+msgid "Extension number from "
+msgstr "Доступны номера от "
+
+#: A2B_entity_sipiax_info.php
+msgid " to "
+msgstr " до "
+
+#: A2B_entity_sipiax_info.php
+msgid "yes"
+msgstr "да"
+
+#: A2B_entity_sipiax_info.php
+msgid "no"
+msgstr "нет"
+
+#: A2B_entity_sipiax_info.php
+msgid "Is this extension behind the nat?"
+msgstr "Если телефон находится за NATом, выберите 'да'"
+
+#: A2B_entity_sipiax_info.php
+msgid "Allows you to set the Name of the caller"
+msgstr "Можно установить имя звонящего с этой линии"
+
 #: call-history.php:115
 #, fuzzy
 msgid "STANDARD"
@@ -3656,7 +3699,23 @@ msgstr "ПРОФИЛЬ"
 msgid "MY PBX"
 msgstr "МОЯ АТС"
 
+#: templates/default/main.tpl:17
+msgid "EXTENSIONS"
+msgstr "ВНУТРЕННИЕ ЛИНИИ"
+
+#: templates/default/main.tpl:18
+msgid "EXTERNAL LINES"
+msgstr "ВНЕШНИЕ ЛИНИИ"
+
 #: templates/default/main.tpl:19
+msgid "Outbound call plan"
+msgstr "Исходящая маршрутизация"
+
+#: templates/default/main.tpl:20
+msgid "Incoming call plan"
+msgstr "Входящая маршрутизация"
+
+#: templates/default/main.tpl:22
 msgid "VOICEMAIL"
 msgstr "ГОЛОСОВАЯ ПОЧТА"
 

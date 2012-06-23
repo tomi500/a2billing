@@ -1502,7 +1502,7 @@ msgid "at least 1 character"
 msgstr "минимум 1 символ"
 
 #: lib/Form/Class.FormHandler.inc.php:1020
-msgid "(AT LEAST 2 CARACTERS)"
+msgid "(AT LEAST 2 CHARACTERS)"
 msgstr "(МИНИМУМ 2 СИМВОЛА)"
 
 #: lib/Form/Class.FormHandler.inc.php:1024

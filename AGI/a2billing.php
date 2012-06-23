@@ -418,7 +418,7 @@ if ($mode == 'standard') {
             
 			// Feature to switch the Callplan from a customer : callplan_deck_minute_threshold 
 			$A2B-> deck_switch($agi);
-			
+
 			if( !$A2B -> enough_credit_to_call() && $A2B -> agiconfig['jump_voucher_if_min_credit']==1) {
 
 				$A2B -> debug( DEBUG, $agi, __FILE__, __LINE__, "[NOTENOUGHCREDIT - Refill with vouchert]");
