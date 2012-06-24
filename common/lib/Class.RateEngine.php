@@ -1140,7 +1140,7 @@ class RateEngine
         }
 
         // CALLTYPE -  0 = NORMAL CALL ; 1 = VOIP CALL (SIP/IAX) ; 2= DIDCALL + TRUNK ; 3 = VOIP CALL DID ; 4 = CALLBACK call
-		if ($didcall == 3) {
+	if ($didcall == 3) {
 			$calltype = $didcall;
 	} elseif ($didcall) {
 			$calltype = 2;
@@ -1160,7 +1160,7 @@ class RateEngine
 		$id_ratecard = (!isset($id_ratecard) || !is_numeric($id_ratecard)) ? 'NULL' : "'$id_ratecard'";
 		$trunk_id =  ($trunk_id) ? "'". $trunk_id ."'" : "'". $this->usedtrunk ."'";
 		$id_card_package_offer = (!is_numeric($id_card_package_offer)) ? 'NULL' : "'$id_card_package_offer'";
-		$calldestination = (!isset($calldestination) || !is_numeric($calldestination)) ? 'DEFAULT' : "'$calldestination'";
+		$calldestination = (!isset($calldestination) || !is_numeric($calldestination) || ($didcall && $dialstatus != 'ANSWERED')) ? -1 : $calldestination;
 		$card_caller = (isset($A2B->card_caller)) ? "'$A2B->card_caller'" : "'0'";
 		$id_did = (!isset($A2B->id_did) || !is_numeric($A2B->id_did)) ? 'NULL' : "'$A2B->id_did'";
 
