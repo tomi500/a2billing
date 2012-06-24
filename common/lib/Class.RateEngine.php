@@ -1034,7 +1034,7 @@ class RateEngine
 		$K = $this->usedratecard;
 		
 		// ****************  PACKAGE PARAMETERS ****************
-		if (is_array($this -> ratecard_obj)) {
+		if (count($this -> ratecard_obj)>0) {
 			$id_cc_package_offer = $this -> ratecard_obj[$K][45];
 			$additional_grace_time = $this -> ratecard_obj[$K][58];
 		} else $id_cc_package_offer = 'NONE';
@@ -1106,7 +1106,7 @@ class RateEngine
 		} else {
 			$sessiontime = 0;
 		}
-		if (is_array($this -> ratecard_obj)) {
+		if (count($this -> ratecard_obj)>0) {
 			$calldestination = $this -> ratecard_obj[$K][5];
 			$id_tariffgroup  = $this -> ratecard_obj[$K][2];
 			$id_tariffplan	 = $this -> ratecard_obj[$K][3];
