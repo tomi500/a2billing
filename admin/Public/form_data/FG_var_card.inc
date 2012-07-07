@@ -35,8 +35,8 @@
 
 getpost_ifset(array('id', 'username', 'useralias', 'uipass', 'credit', 'language', 'tariff',
 'id_didgroup','id_campaign', 'callback', 'simultaccess', 'currency','typepaid', 'creditlimit',
-'lastname', 'firstname', 'email', 'address','city', 'state', 'country', 'zipcode', 'phone', 'fax', 'inuse',
-'recalldays', 'recalltime', 'cid', 'runservice', 'firstusedate','expirationdate', 'enableexpire', 'expiredays', 'sip_buddy',
+'lastname', 'firstname', 'email', 'address','city', 'state', 'country', 'zipcode', 'phone', 'fax', 'inuse', 'recalldays',
+'recalltime', 'cid', 'runservice', 'paypal', 'firstusedate', 'expirationdate', 'enableexpire', 'expiredays', 'sip_buddy',
 'iax_buddy','popup_select', 'vat', 'autorefill', 'initialbalance', 'mac_addr', 'cardnumberlenght_list',
 'status', 'block', 'lock_pin', 'template_invoice', 'template_outstanding', 'description', 'voicemail_activated', 
 'voicemail_permitted','email_notification','credit_notification','notify_email', 'id_seria',
@@ -635,6 +635,16 @@ if (has_rights (ACX_MODIFY_CUSTOMERS) && !($popup_select>=1)) {
 				   "" , "", "", "Yes :1, - No:0", "", "" , "", gettext("Apply recurring service to this account."));
 	
 	
+	$HD_Form -> AddEditElement (gettext("PAYPAL PAYMENT"),
+				   "paypal",
+				   '0',
+				   "RADIOBUTTON",
+				   "",
+				   "",
+				   gettext("Choose if you want to enable ability PayPal payment on this account"),
+				   "" , "", "", "Yes :1, - No:0", "", "" , "", gettext("Apply PayPal payment to this account."));
+	
+	
 	$HD_Form -> AddEditElement (gettext("CREDIT LIMIT"),
 				   "creditlimit",
 				   "",
@@ -1034,8 +1044,8 @@ if (has_rights (ACX_MODIFY_CUSTOMERS) && !($popup_select>=1)) {
 		$add_fields_voicemail = 'voicemail_permitted, voicemail_activated, ';
 	
 	$HD_Form -> FieldEditElement ('username, useralias, uipass, credit, id_group, id_seria, lastname, firstname, email, '.
-			' address, city, state, country, zipcode, phone, fax,company_name, company_website, '.
-			$update_field_typepaid.' tariff, id_didgroup, id_timezone, language, currency, status, block, lock_pin, simultaccess,  runservice, creditlimit, ' .
+			' address, city, state, country, zipcode, phone, fax,company_name, company_website, ' .$update_field_typepaid.
+			' tariff, id_didgroup, id_timezone, language, currency, status, block, lock_pin, simultaccess,  runservice, paypal, creditlimit, ' .
 			' credit_notification, notify_email, email_notification, ' .$add_fields_voicemail.
 			' id_campaign, ' .
 			' firstusedate, enableexpire, expirationdate, expiredays, sip_buddy, iax_buddy, mac_addr, inuse, recalldays, recalltime, ' .

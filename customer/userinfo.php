@@ -47,8 +47,8 @@ if (!has_rights(ACX_ACCESS)) {
 
 $inst_table = new Table();
 
-$QUERY = "SELECT username, credit, lastname, firstname, address, city, state, country, zipcode, phone, email, fax, lastuse, activated, status, " .
-"freetimetocall, label, packagetype, billingtype, startday, id_cc_package_offer, cc_card.id, currency,cc_card.useralias,UNIX_TIMESTAMP(cc_card.creationdate) creationdate  FROM cc_card " .
+$QUERY = "SELECT username, credit, lastname, firstname, address, city, state, country, zipcode, phone, email, fax, lastuse, activated, status, freetimetocall, label, " .
+"packagetype, billingtype, startday, id_cc_package_offer, cc_card.id, currency, cc_card.useralias, UNIX_TIMESTAMP(cc_card.creationdate) creationdate FROM cc_card " .
 "LEFT JOIN cc_tariffgroup ON cc_tariffgroup.id=cc_card.tariff LEFT JOIN cc_package_offer ON cc_package_offer.id=cc_tariffgroup.id_cc_package_offer " .
 "LEFT JOIN cc_card_group ON cc_card_group.id=cc_card.id_group WHERE username = '" . $_SESSION["pr_login"] .
 "' AND uipass = '" . $_SESSION["pr_password"] . "'";
@@ -137,11 +137,11 @@ $smarty->display('main.tpl');
 		<table width="80%" align="center" class="tablebackgroundcamel">
 		<tr>
 			<td></td>
-			<td width="50%">
+			<td width="50%" nowrap="nowrap">
 			<br><font class="fontstyle_002"><?php echo gettext("CARD NUMBER");?> :</font><font class="fontstyle_007"> <?php echo $customer_info[0]; ?></font>
 			<br><br>
 			</td>
-			<td width="50%">
+			<td width="50%" nowrap="nowrap">
 			<br><font class="fontstyle_002"><?php echo gettext("BALANCE REMAINING");?> :</font><font class="fontstyle_007"> <?php echo $credit_cur.' '.gettext($customer_info[22]); ?> </font>
 			<br><br>
 			</td>

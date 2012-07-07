@@ -35,6 +35,7 @@ ALTER TABLE cc_card ADD cbattemptbusy int(11) NOT NULL DEFAULT '3';
 ALTER TABLE cc_card ADD cbtimeoutnoanswer int(11) NOT NULL DEFAULT '10';
 ALTER TABLE cc_card ADD cbattemptnoanswer int(11) NOT NULL DEFAULT '3';
 ALTER TABLE cc_card ADD cbtimeoutmax int(11) NOT NULL DEFAULT '600';
+ALTER TABLE cc_card ADD paypal INT( 1 ) NOT NULL DEFAULT '0';
 
 CREATE TABLE IF NOT EXISTS `cc_trunk_rand` (
   `trunk_id` int(11) NOT NULL DEFAULT '0',

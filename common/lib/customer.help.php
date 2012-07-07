@@ -32,20 +32,21 @@
 **/
 
 function create_help($text,$balance=null,$limit=null) {
+	global $r;
 	$help = '
 	<div class="toggle_show2hide">
 	<div class="tohide" style="display:visible;">
 	<div class="msg_info"';
 	if ($balance != null) $help .= ' style="padding:0px 10px 28px 50px;"';
 	$help .= '>
-	<table border="0" style="max-width:97%;" cellspacing="1" cellpadding="2" align="left">
+	<table border="0" style="max-width:97%;" cellspacing="1" cellpadding="2" align="left" height="50px">
 	<tr>';
 	if ($balance != null) {
 	    $help .= '
 	    <td align="right" nowrap><font class="fontstyle_001">' . gettext("Your balance") . ':</font></td>
 	    <td align="right" nowrap><font class="fontstyle_00' . (($limit)?5:'1" style="font-weight:bold;') . '">' . $balance . '</font></td>
-	    <td ROWSPAN=3 width=2%></td>
-	    <td ROWSPAN=3 width=100% valign="bottom" align="center">' . $text . '</td>
+	    <td ROWSPAN='.$r.' width=2%></td>
+	    <td ROWSPAN='.$r.' width=100% valign="bottom" align="center">' . $text . '</td>
 	</tr>
 	<tr heigth="5px">
 	    <td';
@@ -55,9 +56,9 @@ function create_help($text,$balance=null,$limit=null) {
 	    <td';
 	    if ($limit && $limit != -1) $help .= ' align="right" nowrap><font class="fontstyle_001" style="font-weight:bold;">' . $limit . '</font';
 	    else $help .= ' height="5px"';
-	    $help .= '></td>
-	</tr>';
-	$help .= '
+	    $help .= '></td>';
+	    if ($r == 3) $help .= '
+	</tr>
 	<tr>
 	    <td COLSPAN=2 align="center" valign="bottom">
 		<form action="checkout_payment.php" method="post">
@@ -77,7 +78,7 @@ function create_help($text,$balance=null,$limit=null) {
 
 $inst_table = new Table();
 
-$QUERY = "SELECT creditlimit, credit, currency, credit_notification FROM cc_card WHERE username = '" . $_SESSION["pr_login"] . "' AND uipass = '" . $_SESSION["pr_password"] . "'";
+$QUERY = "SELECT creditlimit, credit, currency, credit_notification, paypal, users_perms FROM cc_card LEFT JOIN cc_card_group ON cc_card_group.id = id_group WHERE username = '" . $_SESSION["pr_login"] . "' AND uipass = '" . $_SESSION["pr_password"] . "'";
 
 $DBHandle = DbConnect();
 
@@ -85,6 +86,7 @@ $customer_res = $inst_table -> SQLExec($DBHandle, $QUERY);
 
 $customer_info = $customer_res[0];
 $currencies_list = get_currencies();
+$user_paypal = $customer_info[4];
 
 $two_currency = false;
 if (!isset ($currencies_list[strtoupper($customer_info[2])][2]) || !is_numeric($currencies_list[strtoupper($customer_info[2])][2])) {
@@ -103,6 +105,8 @@ if ($credit_cur < 0) {
 	if ($limit_cur) $limit_cur = round($limit_cur, 2).' '.gettext($customer_info[2]);
 } elseif (($customer_info[3] != -1 && ($customer_info[1]-$customer_info[3]) <= 0) || $customer_info[1] <=0) $limit_cur = -1;
     else $limit_cur = 0;
+
+$r = ($A2B->config["epayment_method"]['enable'] && (16 & $customer_info[5])) ? 3 : 2 ;
 
 if (SHOW_HELP) {
 

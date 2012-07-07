@@ -178,7 +178,7 @@ function rowOutEffect(object) {
 <br>
 <center>
 <?php
-	echo $PAYMENT_METHOD;
+	if ($A2B->config["epayment_method"]['enable'] && $ACXPAYMENT_HISTORY >0) echo $PAYMENT_METHOD;
 ?>
 <br>
 
@@ -236,6 +236,7 @@ function rowOutEffect(object) {
 ?>
   <table class="infoBox" width="85%" cellspacing="0" cellpadding="2" align=center rules=rows>
 <?php
+    if ($A2B->config["epayment_method"]['enable'] && $ACXPAYMENT_HISTORY >0) {
     $radio_buttons = 0;
     $form_action_url = tep_href_link("checkout_confirmation.php", '', 'SSL');
     for ($i=0, $n=sizeof($selection); $i<$n; $i++) {
@@ -307,7 +308,7 @@ function rowOutEffect(object) {
 	</form>
 <?php
     $radio_buttons++;
-  }
+  }}
 ?>
 	</table>
 

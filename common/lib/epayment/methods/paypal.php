@@ -7,13 +7,13 @@ class paypal {
 
 	// class constructorform_action_url
     function paypal() {
-		global $order;
+		global $user_paypal;
 
 		$this->code = 'paypal';
 		$this->title = MODULE_PAYMENT_PAYPAL_TEXT_TITLE;
 		$this->description = MODULE_PAYMENT_PAYPAL_TEXT_DESCRIPTION;
 		$this->sort_order = 1;
-		$this->enabled = ((MODULE_PAYMENT_PAYPAL_STATUS == 'True') ? true : false);
+		$this->enabled = ((MODULE_PAYMENT_PAYPAL_STATUS == 'True' && $user_paypal) ? true : false);
 		//$this->enabled = true;
 
 		$this->form_action_url = PAYPAL_PAYMENT_URL;

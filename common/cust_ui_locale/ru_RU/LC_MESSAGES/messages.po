@@ -3379,7 +3379,7 @@ msgstr "РЕДАКТИРОВАТЬ ЛИЧНУЮ ИНФОРМАЦИЮ"
 
 #: userinfo.php:141
 msgid "CARD NUMBER"
-msgstr "НОМЕР КАРТЫ"
+msgstr "НОМЕР АККАУНТА"
 
 #: userinfo.php:145
 msgid "BALANCE REMAINING"

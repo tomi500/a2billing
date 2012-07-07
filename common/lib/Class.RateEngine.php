@@ -1140,9 +1140,9 @@ class RateEngine
         }
 
         // CALLTYPE -  0 = NORMAL CALL ; 1 = VOIP CALL (SIP/IAX) ; 2= DIDCALL + TRUNK ; 3 = VOIP CALL DID ; 4 = CALLBACK call
-	if ($didcall == 3) {
+        if ($didcall == 3) {
 			$calltype = $didcall;
-	} elseif ($didcall) {
+        } elseif ($didcall) {
 			$calltype = 2;
         } elseif ($callback) {
 			$calltype = 4;
@@ -1152,7 +1152,7 @@ class RateEngine
         } else {
 			$calltype = 0;
         }
-        
+
 		$card_id =  (!is_numeric($A2B->id_card)) ? '-1' : "'". $A2B->id_card ."'";
 		$real_sessiontime = (!is_numeric($this->real_answeredtime)) ? 'NULL' : "'". $this->real_answeredtime ."'";
 		$id_tariffgroup = (!isset($id_tariffgroup) || !is_numeric($id_tariffgroup)) ? 'NULL' : "'$id_tariffgroup'";
