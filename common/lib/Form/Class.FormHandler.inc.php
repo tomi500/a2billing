@@ -976,7 +976,7 @@ class FormHandler
 						gettext("(at least 3 characters)"));
 						
 		// 1.  EMAIL ADRESSE
-		$this -> FG_regular[]  = array(	"^[_a-zA-Z0-9-]+(\.[_a-zA-Z0-9-]+)*@[a-zA-Z0-9-]+(\.[a-zA-Z0-9-]+)*$", 
+		$this -> FG_regular[]  = array(	"^[_A-Za-z0-9-]+(\\.[_A-Za-z0-9-]+)*@[A-Za-z0-9]+(\\.[A-Za-z0-9]+)*(\\.[A-Za-z]{2,})$",
 						gettext("(must match email structure. Example : name@domain.com)"));
 						
 		// 2 . IF AT LEAST FIVE SUCCESSIVE CHARACTERS APPEAR AT THE END OF THE STRING.

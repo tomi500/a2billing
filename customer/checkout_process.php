@@ -393,13 +393,13 @@ if ($id > 0 ) {
 		}
 		
 		$field_insert = "date, credit, card_id, description, agent_id";
-		$value_insert = "'$nowDate', '".$amount_without_vat."', '$id', '".$transaction_data[0][4]."',$id_agent_insert";
+		$value_insert = "'$nowDate', '".$amount_without_vat."', '$id', '".$transaction_data[0][4]." (".$currAmount." ".$currCurrency.")', $id_agent_insert";
 		$instance_sub_table = new Table("cc_logrefill", $field_insert);
 		$id_logrefill = $instance_sub_table -> Add_table ($DBHandle, $value_insert, null, null, 'id');
 		write_log(LOGFILE_EPAYMENT, basename(__FILE__).' line:'.__LINE__."-transactionID=$transactionID"." Add_table cc_logrefill : $field_insert - VALUES $value_insert");
 		
 		$field_insert = "date, payment, card_id, id_logrefill, description, agent_id";
-		$value_insert = "'$nowDate', '".$amount_paid."', '$id', '$id_logrefill', '".$transaction_data[0][4]."',$id_agent_insert ";
+		$value_insert = "'$nowDate', '".$amount_paid."', '$id', '$id_logrefill', '".$transaction_data[0][4]." (".$currAmount." ".$currCurrency.")', $id_agent_insert ";
 		$instance_sub_table = new Table("cc_logpayment", $field_insert);
 		$id_payment = $instance_sub_table -> Add_table ($DBHandle, $value_insert, null, null,"id");
 		write_log(LOGFILE_EPAYMENT, basename(__FILE__).' line:'.__LINE__."-transactionID=$transactionID"." Add_table cc_logpayment : $field_insert - VALUES $value_insert");
@@ -589,9 +589,10 @@ if ( ($orderStatus == 0) && ($transaction_data[0][4]=='iridium')) {
 write_log(LOGFILE_EPAYMENT, basename(__FILE__).' line:'.__LINE__."-transactionID=$transactionID"." EPAYMENT ORDER STATUS  = ".$statusmessage);
 
 // CHECK IF THE EMAIL ADDRESS IS CORRECT
-if (preg_match("/^[a-z]+[a-z0-9_-]*(([.]{1})|([a-z0-9_-]*))[a-z0-9_-]+[@]{1}[a-z0-9_-]+[.](([a-z]{2,3})|([a-z]{3}[.]{1}[a-z]{2}))$/i", $customer_info["email"])) {
+if (preg_match("/^[_A-Za-z0-9-]+(\\.[_A-Za-z0-9-]+)*@[A-Za-z0-9]+(\\.[A-Za-z0-9]+)*(\\.[A-Za-z]{2,})$/i", $customer_info["email"])) {
+
 	// FIND THE TEMPLATE APPROPRIATE
-	
+
     try {
         $mail = new Mail(Mail::$TYPE_PAYMENT,$id);
         write_log(LOGFILE_EPAYMENT, basename(__FILE__).' line:'.__LINE__."-SENDING EMAIL TO CUSTOMER ".$customer_info["email"]);
