@@ -1458,7 +1458,7 @@ class A2Billing {
 					$this->agiconfig['use_dnid']=1;
 					$this->agiconfig['say_timetocall']=0;
 
-					$this->extension = $this->dnid = $this->destination = $inst_listdestination[4];
+					$this->extension = $this->destination = $inst_listdestination[4];
 					if ($this->CC_TESTING) $this->extension = $this->dnid = $this->destination="011324885";
 					
 					if ($this -> callingcard_ivr_authorize($agi, $RateEngine, 0)==1) {
