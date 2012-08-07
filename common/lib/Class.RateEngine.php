@@ -219,7 +219,7 @@ class RateEngine
             // 3 - tariff plan, 7 - dialprefix, 12 - rateinitial
             foreach ($myresult as $key => $row) {
                 $sorttariffplan[$key]    = $row[3];
-                $sortdialprefixstr[$key] = (ctype_digit($row[7]))?1:(($row[12]<100)?strlen($row[7]):0);
+                $sortdialprefixstr[$key] = (ctype_digit($row[7]))?1:(($row[12] != 100)?strlen($row[7]):0);
                 $sortdialprefixnum[$key] = $row[7];
             }
             array_multisort($sorttariffplan,SORT_NUMERIC,$sortdialprefixstr,SORT_NUMERIC,SORT_DESC,$sortdialprefixnum,SORT_NUMERIC,SORT_DESC,$myresult);
@@ -300,7 +300,7 @@ class RateEngine
 		$LCtype = $result[0][1];
 
 		foreach ($result as $key => $row) {
-		    $strprefix[$key]  = (ctype_digit($row[7]))?0:(($row[12]<100)?strlen($row[7]):0);
+		    $strprefix[$key]  = (ctype_digit($row[7]))?0:(($row[12] != 100)?strlen($row[7]):0);
 		    $lcrsort[$key] = ($LCtype==0)?$row[9]:$row[12];
 		}
 		array_multisort($strprefix, SORT_DESC, $lcrsort, $result);
@@ -309,7 +309,8 @@ class RateEngine
 		if ($ind_stop_default > 0) {
 			$result = array_merge ((array)$result, (array)$result_defaultprefix);
 		}
-		if (count($result) > 1 && $result[count($result)-1][12]>=100) unset($result[count($result)-1]);
+		if (count($result) > 1 && $result[count($result)-1][12] == 100) unset($result[count($result)-1]);
+		if (count($result) > 0 && $result[count($result)-1][12] == 100) $result[count($result)-1][12] = 0;
 		
 		// 3) REMOVE THOSE THAT USE THE SAME TRUNK - MAKE A DISTINCT
 		//    AND THOSE THAT ARE DISABLED.

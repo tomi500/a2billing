@@ -1222,7 +1222,7 @@ class A2Billing {
 				if ($this->agiconfig['busy_timeout'] > 0)
 					$res_busy = $agi->exec("Busy ".$this->agiconfig['busy_timeout']);
 				$agi-> stream_file('prepaid-isbusy', '#');
-			} elseif ($this->dialstatus == "NOANSWER") {
+			} elseif ($dialstatus == "NOANSWER") {
 				$answeredtime = 0;
 				$agi-> stream_file('prepaid-noanswer', '#');
 			} elseif ($dialstatus == "CANCEL") {
@@ -1319,6 +1319,7 @@ class A2Billing {
 			$this->useralias 				= $inst_listdestination[7];
 			$this->time_out 				= $inst_listdestination[30];
 			$this->id_did					= $inst_listdestination[0];
+			$this->dnid					= $inst_listdestination[10];
 			
 			if ($this -> set_inuse) $this -> callingcard_acct_start_inuse($agi,0);
 			
@@ -1426,10 +1427,10 @@ class A2Billing {
 					}
 					
 					$QUERY = "INSERT INTO cc_call (uniqueid, sessionid, card_id, nasipaddress, starttime, sessiontime, calledstation, ".
-						" terminatecauseid, stoptime, sessionbill, id_tariffgroup, id_tariffplan, id_ratecard, id_trunk, src, sipiax, id_did) VALUES ".
+						" terminatecauseid, stoptime, sessionbill, id_tariffgroup, id_tariffplan, id_ratecard, id_trunk, src, sipiax, id_did, dnid) VALUES ".
 						"('".$this->uniqueid."', '".$this->channel."',  '".$this->id_card."', '".$this->hostname."',";
 					$QUERY .= " CURRENT_TIMESTAMP - INTERVAL $answeredtime SECOND ";
-					$QUERY .= ", '$answeredtime', '".$inst_listdestination[4]."', '$terminatecauseid', now(), '0', '0', '0', '0', '0', '$this->CallerID', '3', '$this->id_did' )";
+					$QUERY .= ", '$answeredtime', '".$inst_listdestination[4]."', '$terminatecauseid', now(), '0', '0', '0', '0', '0', '$this->CallerID', '3', '$this->id_did', '$this->dnid')";
 					
 					$result = $this -> instance_table -> SQLExec ($this->DBHandle, $QUERY, 0);
 					$this -> debug( INFO, $agi, __FILE__, __LINE__, "[DID CALL - LOG CC_CALL: SQL: $QUERY]:[result:$result]");
@@ -1709,10 +1710,10 @@ class A2Billing {
                     	//CALL2DID CDR is free
 	                    /* CDR A-LEG OF DID CALL */
 	                    $QUERY = "INSERT INTO cc_call (uniqueid, sessionid, card_id, card_caller, nasipaddress, starttime, sessiontime, calledstation, ".
-	                            " terminatecauseid, stoptime, sessionbill, id_tariffgroup, id_tariffplan, id_ratecard, id_trunk, src, sipiax, id_did) VALUES ".
+	                            " terminatecauseid, stoptime, sessionbill, id_tariffgroup, id_tariffplan, id_ratecard, id_trunk, src, sipiax, id_did, dnid) VALUES ".
 	                            "('".$this->uniqueid."', '".$this->channel."',  '".$my_id_card."',  '".$this->card_caller."', '".$this->hostname."',";
 	                    $QUERY .= " CURRENT_TIMESTAMP - INTERVAL $answeredtime SECOND ";
-	                    $QUERY .= ", '$answeredtime', '".$inst_listdestination[10]."', '$terminatecauseid', now(), '0', '0', '0', '0', '0', '$this->CallerID', '3', '$this->id_did')";
+	                    $QUERY .= ", '$answeredtime', '".$inst_listdestination[10]."', '$terminatecauseid', now(), '0', '0', '0', '0', '0', '$this->CallerID', '3', '$this->id_did', '$this->destination')";
 
 	                    $result = $this -> instance_table -> SQLExec ($this->DBHandle, $QUERY, 0);
 	                    $this -> debug( INFO, $agi, __FILE__, __LINE__, "[DID CALL - LOG CC_CALL: SQL: $QUERY]:[result:$result]");
@@ -1727,10 +1728,10 @@ class A2Billing {
                         
                         /* CDR A-LEG OF DID CALL */
                         $QUERY = "INSERT INTO cc_call (uniqueid, sessionid, card_id, card_caller, nasipaddress, starttime, sessiontime, calledstation, ".
-                                " terminatecauseid, stoptime, sessionbill, id_tariffgroup, id_tariffplan, id_ratecard, id_trunk, src, sipiax, id_did) VALUES ".
+                                " terminatecauseid, stoptime, sessionbill, id_tariffgroup, id_tariffplan, id_ratecard, id_trunk, src, sipiax, id_did, dnid) VALUES ".
                                 "('".$this->uniqueid."', '".$this->channel."',  '".$my_id_card."', '".$this->card_caller."', '".$this->hostname."',";
                         $QUERY .= " CURRENT_TIMESTAMP - INTERVAL $answeredtime SECOND ";
-                        $QUERY .= ", '$answeredtime', '". $listdestination[0][10]."', '$terminatecauseid', now(), '$cost', '0', '0', '0', '0', '$this->CallerID', '3', '$this->id_did' )";
+                        $QUERY .= ", '$answeredtime', '". $listdestination[0][10]."', '$terminatecauseid', now(), '$cost', '0', '0', '0', '0', '$this->CallerID', '3', '$this->id_did', '$this->destination'";
 
                         $result = $this -> instance_table -> SQLExec ($this->DBHandle, $QUERY, 0);
                         $this -> debug( INFO, $agi, __FILE__, __LINE__, "[DID CALL - LOG CC_CALL: SQL: $QUERY]:[result:$result]");
@@ -1767,7 +1768,8 @@ class A2Billing {
                 $this->agiconfig['use_dnid'] = 1;
                 $this->agiconfig['say_timetocall'] = 0;
 
-                $this->extension = $this->dnid = $this->destination = $inst_listdestination[4];
+                $this->dnid = $this->destination;
+                $this->extension = $this->destination = $inst_listdestination[4];
                 if ($this->CC_TESTING) $this->extension = $this->dnid = $this->destination = "011324885";
 				
                 if ($this -> callingcard_ivr_authorize($agi, $RateEngine, 0)==1) {
