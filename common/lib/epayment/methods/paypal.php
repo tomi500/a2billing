@@ -9,9 +9,9 @@ class paypal {
     function paypal() {
 		global $user_paypal;
 
-		$this->code = 'paypal';
 		$this->title = MODULE_PAYMENT_PAYPAL_TEXT_TITLE;
 		$this->description = MODULE_PAYMENT_PAYPAL_TEXT_DESCRIPTION;
+		$this->code = 'paypal';
 		$this->sort_order = 1;
 		$this->enabled = ((MODULE_PAYMENT_PAYPAL_STATUS == 'True' && $user_paypal) ? true : false);
 		//$this->enabled = true;
@@ -104,8 +104,7 @@ class paypal {
         {
             return -2;
         }
-        switch($_POST['payment_status'])
-        {
+        switch ($_POST['payment_status']) {
             case "Failed":
                 return -2;
             break;
@@ -128,7 +127,7 @@ class paypal {
                 return 4;
             break;
             default:
-              return 5;
+                return 5;
         }
     }
     function after_process() {

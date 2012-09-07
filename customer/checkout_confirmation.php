@@ -65,7 +65,9 @@ $two_currency = false;
 $currencies_list = get_currencies();
 
 $vat_amount= $amount*$vat/100;
-$mc_fee = (strcasecmp("paypal",$payment)==0)?round($amount*0.049,2)+0.35:0;
+$mc_fee = (strcasecmp("paypal",$payment)==0)?round(($amount)/(1-0.049)-$amount,2)+0.36:0;
+//Test value:
+//$mc_fee = 0;
 $total_amount = $mc_fee+$amount+($amount*$vat/100);
 if (!isset($item_id) || is_null($item_id) || $item_id == "") {
 	$item_id = 0;
