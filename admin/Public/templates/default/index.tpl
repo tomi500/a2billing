@@ -1,7 +1,7 @@
 <HTML>
 <HEAD>
 	<link rel="shortcut icon" href="images/ico/a2billing-icon-32x32.ico">
-	<title>..:: {$CCMAINTITLE} ::..</title>
+	<title>{$CCMAINTITLE}</title>
 	<meta http-equiv="Content-Type" content="text/html; charset=utf-8">
 		{if ($CSS_NAME!="" && $CSS_NAME!="default")}
 			   <link href="templates/default/css/{$CSS_NAME}.css" rel="stylesheet" type="text/css">

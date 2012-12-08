@@ -3,7 +3,7 @@
 <html xmlns="http://www.w3.org/1999/xhtml" xml:lang="en" lang="en">
 <HEAD>
 	<link rel="shortcut icon" href="templates/{$SKIN_NAME}/images/a2billing-icon-32x32.ico">
-	<title>..:: {$CCMAINTITLE} ::..</title>
+	<title>{$CCMAINTITLE}</title>
 	<meta http-equiv="Content-Type" content="text/html; charset=utf-8">
 
 	<link href="templates/{$SKIN_NAME}/css/main.css" rel="stylesheet" type="text/css">

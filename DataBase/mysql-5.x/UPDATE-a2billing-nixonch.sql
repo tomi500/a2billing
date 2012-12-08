@@ -115,6 +115,27 @@ delimiter //
 create procedure a2b_trf_check()
 begin
     declare a int;
+    select count(*) into a from cc_config where config_key='main_title';
+    if a=0 then
+	INSERT INTO cc_config (id, config_title, config_key, config_value, config_description, config_valuetype, config_listvalues, config_group_title)
+	VALUES (NULL , 'Main Title', 'main_title', '..:: A2Billing Portal ::..', 'HTML title Attribute', '0', NULL , 'webui');
+    elseif a>1 then
+	select id into a from cc_config where config_key='main_title' order by id limit 0,1;
+	delete from cc_config where config_key='main_title' and id>a;
+    end if;
+end //
+
+delimiter ;
+
+call a2b_trf_check;
+
+drop procedure if exists a2b_trf_check;
+
+delimiter //
+
+create procedure a2b_trf_check()
+begin
+    declare a int;
     select count(*) into a from cc_config where config_key='monitor_conversion';
     if a=0 then
 	INSERT INTO cc_config (id, config_title, config_key, config_value, config_description, config_valuetype, config_listvalues, config_group_title)
