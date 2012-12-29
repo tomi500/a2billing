@@ -1366,7 +1366,7 @@ class A2Billing {
 					if ($answeredtime == "")
 							  $answeredtime = $agi->get_variable("CDR(billsec)",true);
 					if (stripos($dialstr,'QUEUE ') === 0) {
-						if ($answeredtime) {
+						if ($answeredtime>1356000000) {
 							$answeredtime	= time() - $answeredtime;
 							$dialstatus	= 'ANSWER';
 						} else {
@@ -1639,7 +1639,7 @@ class A2Billing {
 		if ($answeredtime == "")
 				  $answeredtime = $agi->get_variable("CDR(billsec)",true);
 		if (stripos($dialstr,'QUEUE ') === 0) {
-			if ($answeredtime) {
+			if ($answeredtime>1356000000) {
 				$answeredtime	= time() - $answeredtime;
 				$dialstatus	= 'ANSWER';
 			} else {
