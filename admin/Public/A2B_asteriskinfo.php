@@ -79,6 +79,7 @@ $extdisplay = isset($_REQUEST['extdisplay'])?$_REQUEST['extdisplay']:'summary';
 
 $modes = array(
 	"summary" => "Summary",
+	"dongle" => "Dongle",
 	"registries" => "Registries",
 	"channels" => "Channels",
 	"peers" => "Peers",
@@ -89,6 +90,9 @@ $modes = array(
 	"voicemail" => "Voicemail Users",
 	"codecs" => "Codecs",
 	"all" => "Full Report"
+);
+$arr_dongle = array(
+	"Dongle" => "dongle show devices"
 );
 $arr_all = array(
 	"Version" => "core show version",
