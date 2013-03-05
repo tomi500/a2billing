@@ -897,8 +897,8 @@ class FormHandler
 	 */
 
 	function AddEditElement($displayname, $fieldname, $defaultvalue, $fieldtype, $fieldproperty, $regexpr_nb, $error_message, $type_selectfield,
-		$lie_tablename, $lie_tablefield, $lie_clause, $listname, $displayformat_selectfield, $check_emptyvalue , $comment, $custom_query = null,
-		$displayinput_defaultselect = null, $comment_above = null, $field_enabled = true){
+		$lie_tablename, $lie_tablefield, $lie_clause, $listname, $displayformat_selectfield, $check_emptyvalue = null, $comment = null,
+		$custom_query = null, $displayinput_defaultselect = null, $comment_above = null, $field_enabled = true){
 		if( strtoupper($fieldtype)=="LABEL" && (strtoupper($_GET['form_action']) == "EDIT" ||strtoupper($_POST['form_action'])== "EDIT") ){
 		 return;
 		}
