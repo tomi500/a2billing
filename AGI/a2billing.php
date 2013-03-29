@@ -301,7 +301,6 @@ if ($mode == 'auto') {
 		} elseif ($caller_areacode == 'didless') break;
 		  else {
 		    $A2B -> mode = $mode = 'did';
-		    $A2B -> agiconfig['play_audio']=0;
 		    $A2B -> agiconfig['answer_call']=0;
 		    $A2B -> agiconfig['cid_enable']=0;
 		    $A2B -> agiconfig['use_dnid']=1;
@@ -319,10 +318,10 @@ if ($mode == 'auto') {
 			$A2B -> mode = $mode = 'standard';
 			if ($result[0][1] != "") {
 			    $agi -> request['agi_extension'] = preg_replace('/\+/','',$result[0][1]);
-//			    $agi -> set_extension(preg_replace('/\+/','',$result[0][1]));
 			    $A2B -> agiconfig['use_dnid']=1;
 			    $A2B -> agiconfig['number_try']=1;
 			} else {
+			    $A2B -> agiconfig['answer_call']=1;
 			    $A2B -> agiconfig['use_dnid']=0;
 			}
 		    }
@@ -339,10 +338,10 @@ if ($mode == 'standard') {
 	if ($A2B -> agiconfig['answer_call']==1) {
 		$A2B -> debug( INFO, $agi, __FILE__, __LINE__, '[ANSWER CALL]');
 		$agi -> answer();
-		$status_channel=6;
+//		$status_channel=AST_STATE_UP;
 	} else {
 		$A2B -> debug( INFO, $agi, __FILE__, __LINE__, '[NO ANSWER CALL]');
-		$status_channel=4;
+//		$status_channel=AST_STATE_RING;
 	}
 
 	$A2B -> play_menulanguage ($agi);
@@ -370,15 +369,16 @@ if ($mode == 'standard') {
 			$A2B-> Reinit();
 
 			// RETRIEVE THE CHANNEL STATUS AND LOG : STATUS - CREIT - MIN_CREDIT_2CALL
-			$stat_channel = $agi -> channel_status($A2B-> channel);
+			$stat_channel = $agi -> channel_status();
 			$A2B -> debug( INFO, $agi, __FILE__, __LINE__, '[CHANNEL STATUS : '.$stat_channel["result"].' = '.$stat_channel["data"].']'.
 						   "\n[CREDIT : ".$A2B-> credit."][CREDIT MIN_CREDIT_2CALL : ".$A2B -> agiconfig['min_credit_2call']."]");
 			
 			// CHECK IF THE CHANNEL IS UP
-			if (($A2B -> agiconfig['answer_call']==1) && ($stat_channel["result"]!=$status_channel) && ($A2B -> CC_TESTING!=1)) {
+//			if (($A2B -> agiconfig['answer_call']==1) && ($stat_channel["result"]!=$status_channel) && ($A2B -> CC_TESTING!=1)) {
+			if (array_search($stat_channel["result"], array(AST_STATE_UP, AST_STATE_RING)) === false && $A2B -> CC_TESTING!=1) {
 				if ($A2B->set_inuse==1) $A2B->callingcard_acct_start_inuse($agi,0);
 				$A2B -> write_log("[STOP - EXIT]", 0);
-				exit();
+				break;
 			}
 
 			// CREATE A DIFFERENT UNIQUEID FOR EACH TRY
