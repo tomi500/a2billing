@@ -119,11 +119,10 @@ class RateEngine
 		if (strlen($A2B->CallerID)>=1) $mycallerid = $A2B->CallerID;
 
 		if ($this->webui) $A2B -> debug( DEBUG, $agi, __FILE__, __LINE__, "[CC_asterisk_rate-engine - CALLERID : ".$A2B->CallerID."]",0);
-        
+
 		$DNID_SUB_QUERY = "AND 0 = (SELECT COUNT(dnidprefix) FROM cc_tariffgroup_plan RIGHT JOIN cc_tariffplan ON cc_tariffgroup_plan.idtariffplan=cc_tariffplan.id WHERE dnidprefix=SUBSTRING('$mydnid',1,length(dnidprefix)) AND idtariffgroup=$tariffgroupid ) ";
-        
+
 		$CID_SUB_QUERY = "AND 0 = (SELECT count(calleridprefix) FROM cc_tariffgroup_plan RIGHT JOIN cc_tariffplan ON cc_tariffgroup_plan.idtariffplan=cc_tariffplan.id WHERE calleridprefix=SUBSTRING('$mycallerid',1,length(calleridprefix)) AND idtariffgroup=$tariffgroupid )";
-		
 		
 		// $prefixclause to allow good DB servers to use an index rather than sequential scan
 		// justification at http://forum.asterisk2billing.org/viewtopic.php?p=9620#9620
@@ -1078,7 +1077,6 @@ class RateEngine
 						}
 						break;
                 }
-                
 				$this -> rate_engine_calculcost ($A2B, $sessiontime, 0);
 				// rate_engine_calculcost could have change the duration of the call
 				$sessiontime = $this -> answeredtime;

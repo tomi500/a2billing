@@ -368,13 +368,13 @@ if ($mode == 'standard') {
 			$RateEngine->Reinit();
 			$A2B-> Reinit();
 
-			// RETRIEVE THE CHANNEL STATUS AND LOG : STATUS - CREIT - MIN_CREDIT_2CALL
+			// RETRIEVE THE CHANNEL STATUS AND LOG : STATUS - CREDIT - MIN_CREDIT_2CALL
 			$stat_channel = $agi -> channel_status();
 			$A2B -> debug( INFO, $agi, __FILE__, __LINE__, '[CHANNEL STATUS : '.$stat_channel["result"].' = '.$stat_channel["data"].']'.
 						   "\n[CREDIT : ".$A2B-> credit."][CREDIT MIN_CREDIT_2CALL : ".$A2B -> agiconfig['min_credit_2call']."]");
 			
 			// CHECK IF THE CHANNEL IS UP
-//			if (($A2B -> agiconfig['answer_call']==1) && ($stat_channel["result"]!=$status_channel) && ($A2B -> CC_TESTING!=1)) {
+//			if (($A2B -> agiconfig['answer_call']==1) && ($stat_channel["result"]!=$status_channel) && ($A2B -> CC_TESTING!=1))
 			if (array_search($stat_channel["result"], array(AST_STATE_UP, AST_STATE_RING)) === false && $A2B -> CC_TESTING!=1) {
 				if ($A2B->set_inuse==1) $A2B->callingcard_acct_start_inuse($agi,0);
 				$A2B -> write_log("[STOP - EXIT]", 0);
@@ -757,7 +757,6 @@ if ($mode == 'standard') {
 				$cia_res = $A2B-> call_sip_iax_buddy($agi, $RateEngine, $i);
 
 			} else {
-				
 				$ans = $A2B-> callingcard_ivr_authorize($agi, $RateEngine, $i,true);
 				$A2B -> debug( DEBUG, $agi, __FILE__, __LINE__, 'ANSWER fct callingcard_ivr authorize:> '.$ans);
 				
@@ -767,7 +766,7 @@ if ($mode == 'standard') {
 
 					if (!$result_callperf) {
 						$A2B -> let_stream_listening($agi);
-						$prompt="prepaid-dest-unreachable";
+						$prompt = "prepaid-dest-unreachable";
 						$agi -> stream_file($prompt, '#');
 					}
 					// INSERT CDR  & UPDATE SYSTEM
@@ -984,7 +983,7 @@ if ($mode == 'standard') {
 	$A2B -> debug( DEBUG, $agi, __FILE__, __LINE__, '[MODE : '.strtoupper($mode).' - '.$A2B->CallerID.']');
 	
 	if ($mode == 'cid-callback') {
-//		$agi -> exec('Congestion');
+		$agi -> exec('Busy');
 		$agi -> hangup();
 		$A2B -> debug( DEBUG, $agi, __FILE__, __LINE__, '[HANGUP CLI CALLBACK TRIGGER]');
 	} elseif ($mode == 'cid-prompt-callback') {
@@ -1295,7 +1294,7 @@ if ($mode == 'standard') {
 		$agi -> answer();
 		$status_channel = 6;
 		$A2B -> play_menulanguage ($agi);
-        
+
 		// PLAY INTRO FOR CALLBACK
 		if (strlen($A2B -> config["callback"]['callback_audio_intro']) > 0) {
 			$agi -> stream_file($A2B -> config["callback"]['callback_audio_intro'], '#');
@@ -1474,8 +1473,8 @@ if ($mode == 'standard') {
 		$status_channel = 4;
 	}
 
-    $A2B -> play_menulanguage ($agi);
-    
+	$A2B -> play_menulanguage ($agi);
+
 	$callback_td = $agi -> get_variable("TD", true);
 	$callback_usedtrunk = $agi -> get_variable("TRUNK", true);
 	$called_party = $agi -> get_variable("CALLED", true);
