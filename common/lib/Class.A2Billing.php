@@ -2891,16 +2891,16 @@ class A2Billing {
 
 				if ($callerID_enable!=1 || !is_numeric($this->CallerID) || $this->CallerID<=0 || $accountback>0) {
 					
-					$QUERY = "SELECT credit, tariff, cc_card.activated, inuse, simultaccess, typepaid, creditlimit, language, removeinterprefix, " .
-								" redial, enableexpire, UNIX_TIMESTAMP(expirationdate), expiredays, nbused, UNIX_TIMESTAMP(firstusedate), " .
-								" UNIX_TIMESTAMP(cc_card.creationdate), cc_card.currency, cc_card.lastname, cc_card.firstname, cc_card.email, " .
-								" cc_card.uipass, cc_card.id_campaign, cc_card.id, useralias, status, voicemail_permitted, voicemail_activated, " .
-								" cc_card.restriction, cc_country.countryprefix, cc_card.monitor, cc_callerid.activated" .
+					$QUERY = "SELECT credit, tariff, cc_card.activated, inuse, simultaccess, typepaid, creditlimit, language, removeinterprefix," .
+								" redial, enableexpire, UNIX_TIMESTAMP(expirationdate), expiredays, nbused, UNIX_TIMESTAMP(firstusedate)," .
+								" UNIX_TIMESTAMP(cc_card.creationdate), currency, lastname, firstname, email," .
+								" uipass, id_campaign, cc_card.id, useralias, status, voicemail_permitted, voicemail_activated," .
+								" restriction, cc_country.countryprefix, monitor, cc_callerid.activated" .
 								" FROM cc_card" .
-								" LEFT JOIN cc_tariffgroup ON tariff=cc_tariffgroup.id " .
-								" LEFT JOIN cc_country ON cc_card.country=cc_country.countrycode " .
-								" LEFT JOIN cc_callerid ON cc_callerid.cid = '".$this->CallerID."' AND (cc_callerid.id_cc_card = cc_card.id OR cc_callerid.id_cc_card = -1)" .
-								" WHERE username = '".$this->cardnumber."'";
+								" LEFT JOIN cc_tariffgroup ON tariff = cc_tariffgroup.id" .
+								" LEFT JOIN cc_country ON country = countrycode" .
+								" LEFT JOIN cc_callerid ON (id_cc_card = cc_card.id OR id_cc_card = -1) AND cid = '".$this->CallerID."'" .
+								" WHERE username = '".$this->cardnumber."' LIMIT 1";
 					$result = $this->instance_table -> SQLExec ($this->DBHandle, $QUERY);
 					$this -> debug( DEBUG, $agi, __FILE__, __LINE__, ' - Retrieve account info SQL ::> '.$QUERY);
 
@@ -2909,26 +2909,7 @@ class A2Billing {
 						$this -> debug( DEBUG, $agi, __FILE__, __LINE__, strtoupper($prompt));
 						$res = -2;
 						break;
-						// -%-%-%-	WE ARE GOING TO CHECK IF THE CALLERID IS CORRECT FOR THIS CARD	-%-%-%-
 					}
-/**
-					elseif ($this->agiconfig['callerid_authentication_over_cardnumber']==1) {
-						if (!is_numeric($this->CallerID) && $this->CallerID<=0) {
-							$res = -2;
-							break;
-						}
-						$QUERY = " SELECT cid, id_cc_card, activated FROM cc_callerid "
-								." WHERE cc_callerid.cid='".$this->CallerID."' AND id_cc_card='".$result[0][22]."' OR id_cc_card = -1";
-						$result_check_cid = $this->instance_table -> SQLExec ($this->DBHandle, $QUERY);
-						$this -> debug( DEBUG, $agi, __FILE__, __LINE__, $result_check_cid);
-							if ( !is_array($result_check_cid)) {
-							$prompt="prepaid-auth-fail";
-							$this -> debug( DEBUG, $agi, __FILE__, __LINE__, strtoupper($prompt));
-							$res = -2;
-							break;
-						}
-					}
-**/
 					$this->credit 				= $result[0][0];
 					$this->tariff 				= $result[0][1];
 					$this->active 				= $result[0][2];
@@ -2980,9 +2961,12 @@ class A2Billing {
 				$prompt = '';
 				// CHECK credit > min_credit_2call / you have zero balance
 				if ( !$this -> enough_credit_to_call() ) $prompt = "prepaid-no-enough-credit-stop";
-				// CHECK activated=t / CARD NOT ACTIVE, CONTACT CUSTOMER SUPPORT
-				if ( $this->status != "1" || $this->cidactivated == "f" || ($this->agiconfig['callerid_authentication_over_cardnumber']==1 && is_null($this->cidactivated)))
-						$prompt = "prepaid-auth-fail";	// not expired but inactive.. probably not yet sold.. find better prompt
+				// CHECK activated=t / CARD NOT ACTIVE, CONTACT CUSTOMER -%-%- AND CHECK IF THE CALLERID IS CORRECT FOR THIS CARD	-%-%-%-
+				if ( $this->status != "1" || $this->cidactivated == "f" || ($this->agiconfig['callerid_authentication_over_cardnumber']==1 && is_null($this->cidactivated))) {
+					$prompt = "prepaid-auth-fail";	// not expired but inactive.. probably not yet sold.. find better prompt
+					$res = -2;
+					break;
+				}
 				// CHECK IF THE CARD IS USED
 				if (($isused>0) && ($simultaccess!=1))	$prompt="prepaid-card-in-use";
 				// CHECK FOR EXPIRATION  -  enableexpire ( 0 : none, 1 : expire date, 2 : expire days since first use, 3 : expire days since creation)
@@ -3065,7 +3049,7 @@ class A2Billing {
 					$this -> debug( DEBUG, $agi, __FILE__, __LINE__, "Streamfile : ".strtoupper($prompt));
 				}
 				if ($res < 0) {
-					$res = -1;
+//					$res = -1;
 					break;
 				}
 
@@ -3272,7 +3256,7 @@ class A2Billing {
 				$this -> fct_say_balance ($agi, $this->credit);
 			}
 
-		} else if ($res == -2 ) {
+		} elseif ($res == -2 ) {
 			$agi-> stream_file($prompt, '#');
 		} else {
 			$res = -1;
