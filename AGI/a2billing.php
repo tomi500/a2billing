@@ -275,7 +275,6 @@ if ($mode == 'auto') {
 					    $A2B -> dnid = substr($A2B -> dnid,strlen($A2B -> agiconfig['sip_iax_pstn_direct_call_prefix']));
 				    }
 				}
-
 				if ( strlen($A2B-> sip_iax_buddy) > 0 || ($A2B-> sip_iax_buddy == $A2B->agiconfig['sip_iax_pstn_direct_call_prefix'])) {
 					$cia_res = $A2B-> call_sip_iax_buddy($agi, $RateEngine, 0);
 				} else {
@@ -1024,8 +1023,12 @@ if ($mode == 'standard') {
 			$resfindrate = $RateEngine->rate_engine_findrates($A2B, $A2B ->destination, $A2B ->tariff);
 			$A2B -> debug( DEBUG, $agi, __FILE__, __LINE__, '[resfindrate: - '.$resfindrate.']');
 
+			$instance_table = new Table("cc_callback_spool");
+			$FG_TABLE_CLAUSE = "callerid='{$A2B->config['callback']['callerid']}' AND exten_leg_a='{$A2B->destination}' AND timediff(now(),entry_time)<{$A2B->config['callback']['sec_avoid_repeate']}";
+			$FG_NB_RECORD = $instance_table -> Table_count ($A2B -> DBHandle, $FG_TABLE_CLAUSE);
+
 			// IF FIND RATE
-			if ($resfindrate!=0) {
+			if ($resfindrate!=0 && $FG_NB_RECORD == 0) {
 				//$RateEngine -> debug_st	=1;
 				$res_all_calcultimeout = $RateEngine->rate_engine_all_calcultimeout($A2B, $A2B->credit);
 				//echo ("RES_ALL_CALCULTIMEOUT ::> $res_all_calcultimeout");
@@ -1176,6 +1179,7 @@ if ($mode == 'standard') {
 	// END
 	$A2B -> debug( DEBUG, $agi, __FILE__, __LINE__, '[HANGUP ALL CALLBACK TRIGGER]');
 //	$agi -> exec('Congestion');
+	$agi -> exec('Busy');
 	$agi -> hangup();
 
 	$A2B ->credit = 1000;
@@ -1204,7 +1208,12 @@ if ($mode == 'standard') {
 			
 			$QUERY = "SELECT callback FROM cc_callerid WHERE cid=$A2B->destination AND (callback=0 OR activated='f')";
 			$result = $A2B -> instance_table -> SQLExec ($A2B->DBHandle, $QUERY);
-			if (!is_array($result)) {
+
+			$instance_table = new Table("cc_callback_spool");
+			$FG_TABLE_CLAUSE = "callerid='{$A2B->config['callback']['callerid']}' and exten_leg_a='{$A2B->destination}' and timediff(now(),entry_time)<{$A2B->config['callback']['sec_avoid_repeate']}";
+			$FG_NB_RECORD = $instance_table -> Table_count ($A2B -> DBHandle, $FG_TABLE_CLAUSE);
+
+			if (!is_array($result) && $FG_NB_RECORD == 0) {
 			    $resfindrate = $RateEngine->rate_engine_findrates($A2B, $A2B -> destination, $A2B -> tariff);
 
 			    // IF FIND RATE
@@ -1248,7 +1257,6 @@ if ($mode == 'standard') {
 					}else{
 						$sec_wait_before_callback = 1;
 					}
-
 					$QUERY = "INSERT INTO cc_callback_spool (uniqueid, status, server_ip, num_attempt, channel, exten, context, priority, variable, id_server_group, callback_time, account, callerid, timeout, next_attempt_time, exten_leg_a)" .
 						" VALUES ('$uniqueid', '$status', '$server_ip', '$num_attempt', '$channel', '$exten', '$context', '$priority', '$variable', '$id_server_group', ADDDATE( CURRENT_TIMESTAMP, INTERVAL $sec_wait_before_callback SECOND ), '$account', '$callerid', '$timeout', ADDDATE( CURRENT_TIMESTAMP, INTERVAL $sec_wait_before_callback SECOND ), '$A2B->destination')";
 					$res = $A2B -> DBHandle -> Execute($QUERY);
