@@ -971,8 +971,8 @@ class FormHandler
 	
 	function set_regular_expression()
 	{
-		// 0.  A STRING WITH EXACTLY 3 CHARACTERS.			
-		$this -> FG_regular[]  = array(	"^.{3}", 
+		// 0.  A STRING WITH EXACTLY 3 CHARACTERS.
+		$this -> FG_regular[]  = array(	"^.{3}",
 						gettext("(at least 3 characters)"));
 						
 		// 1.  EMAIL ADRESSE
@@ -980,15 +980,15 @@ class FormHandler
 						gettext("(must match email structure. Example : name@domain.com)"));
 						
 		// 2 . IF AT LEAST FIVE SUCCESSIVE CHARACTERS APPEAR AT THE END OF THE STRING.
-		$this -> FG_regular[]  = array(	".{5}$", 
+		$this -> FG_regular[]  = array(	".{5}$",
 						gettext("(at least 5 successive characters appear at the end of this string)"));
 
 		// 3. IF AT LEAST 4 CHARACTERS
-		$this -> FG_regular[]  = array(	".{4}", 
+		$this -> FG_regular[]  = array(	".{4}",
 						gettext("(at least 4 characters)"));
 
 		// 4
-		$this -> FG_regular[]  = array(	"^[0-9]+$", 
+		$this -> FG_regular[]  = array(	"^\d+$",
 						gettext("(number format)"));
 			
 		// 5
@@ -996,71 +996,98 @@ class FormHandler
 						"(YYYY-MM-DD)");
 			
 		// 6
-		$this -> FG_regular[]  = array(	"^[0-9]{8,}$"	, 
+		$this -> FG_regular[]  = array(	"^\d{8,}$",
 						gettext("(only number with more that 8 digits)"));
-			
+		
 		// 7
-		$this -> FG_regular[]  = array(	"^[0-9][ .0-9\/\-]{6,}[0-9]$"	, 
-						gettext("(at least 8 digits using . or - or the space key)"));
-						
+//		$this -> FG_regular[]  = array(	"^\+?([87](?!95[4-79]|99[^2457]|907|94[^0]|336|986)([348]\d|9[0-689]|7[0247])\d{8}|[1246]\d{9,13}|68\d{7}|5[1-46-9]\d{8,12}|55[1-9]\d{9}|55119\d{8}|500[56]\d{4}|5016\d{6}|5068\d{7}|502[45]\d{7}|5037\d{7}|50[457]\d{8}|50855\d{4}|509[34]\d{7}|376\d{6}|855\d{8}|856\d{10}|85[0-4789]\d{8,10}|8[68]\d{10,11}|8[14]\d{10}|82\d{9,10}|852\d{8}|90\d{10}|96(0[79]|17[01]|13)\d{6}|96[23]\d{9}|964\d{10}|96(5[69]|89)\d{7}|96(65|77)\d{8}|92[023]\d{9}|91[1879]\d{9}|9[34]7\d{8}|959\d{7}|989\d{9}|97\d{8,12}|99[^4568]\d{7,11}|994\d{9}|9955\d{8}|996[57]\d{8}|9989\d{8}|380[34569]\d{8}|381\d{9}|385\d{8,9}|375[234]\d{8}|372\d{7,8}|37[0-4]\d{8}|37[6-9]\d{7,11}|30[69]\d{9}|34[67]\d{8}|3[12359]\d{8,12}|36\d{9}|38[1679]\d{8}|382\d{8,9})$",
+//						gettext("(at least 8 digits using '<font color=green>+().-</font>' or the space key)"));
+		$this -> FG_regular[]  = array(	"^\+?([87](?!95[4-79]|99[^2457]|907|94[^0]|336|986)([348]\d|9[0-689]|7[0247])\d{8}|[1246]\d{9,13}|68\d{7}|5[1-46-9]\d{8,12}|55[1-9]\d{9}|55119\d{8}|500[56]\d{4}|5016\d{6}|5068\d{7}|502[45]\d{7}|5037\d{7}|50[457]\d{8}|50855\d{4}|509[34]\d{7}|376\d{6}|855\d{8}|856\d{10}|85[0-4789]\d{8,10}|8[68]\d{10,11}|8[14]\d{10}|82\d{9,10}|852\d{8}|90\d{10}|96(0[79]|17[01]|13)\d{6}|96[23]\d{9}|964\d{10}|96(5[69]|89)\d{7}|96(65|77)\d{8}|92[023]\d{9}|91[1879]\d{9}|9[34]7\d{8}|959\d{7}|989\d{9}|97\d{8,12}|99[^4568]\d{7,11}|994\d{9}|9955\d{8}|996[57]\d{8}|9989\d{8}|380[34569]\d{8}|381\d{9}|385\d{8,9}|375[234]\d{8}|372\d{7,8}|37[0-4]\d{8}|37[6-9]\d{7,11}|30[69]\d{9}|34[67]\d{8}|3[12359]\d{8,12}|36\d{9}|38[1679]\d{8}|382\d{8,9})$",
+						gettext("(at least 8 digits in international format of phone numbers)"));
+		
 		// 8
-		$this -> FG_regular[]  = array(	".{5}", 
-						gettext("network adress format"));
+//		$this -> FG_regular[]  = array(	".{5}",       ================)
+		$this -> FG_regular[]  = array(	"(^(25[0-5]|2[0-4]\d|[0-1]\d{2}|\d{2}|\d)(\.(25[0-5]|2[0-4]\d|[0-1]\d{2}|\d{2}|\d)){3})|(^([a-zA-Z0-9]([a-zA-Z0-9\-]{0,61}[a-zA-Z0-9])?\.)+[a-zA-Z]{2,6})$",
+						gettext("network adress format or domain name"));
 
 		// 9
 		$this -> FG_regular[]  = array(	"^.{1}",
 						gettext("at least 1 character"));
-	
+		
 		// 10
-		$this -> FG_regular[]  = array("^(19|20)\d\d-((0[1-9]|1[012])-(0[1-9]|[12]\d)|(0[13-9]|1[012])-30|(0[13578]|1[02])-31) ([0-9]{2}):([0-9]{2}):([0-9]{2})$",
-		                        "(YYYY-MM-DD HH:MM:SS)");
+		$this -> FG_regular[]  = array("^(19|20)\d\d-((0[1-9]|1[012])-(0[1-9]|[12]\d)|(0[13-9]|1[012])-30|(0[13578]|1[02])-31) (([0,1]\d)|(2[0-3])):[0-5]\d:[0-5]\d$",
+						"(YYYY-MM-DD HH:MM:SS)");
 
 		// 11
 		$this -> FG_regular[]  = array(    "^.{2}",
-					gettext("(AT LEAST 2 CHARACTERS)"));
+						gettext("(AT LEAST 2 CHARACTERS)"));
 
 		// 12
 		$this -> FG_regular[]  = array(    "^(-){0,1}[0-9]+(\.){0,1}[0-9]*$"       ,
-					gettext("(NUMBER FORMAT WITH/WITHOUT DECIMAL, use '.' for decimal)"));
+						gettext("(NUMBER FORMAT WITH/WITHOUT DECIMAL, use '.' for decimal)"));
 		
 		// 13  - RATECARD
-		$this -> FG_regular[]  = array(    "^(defaultprefix|[-,0-9]+|_[-[.[.][.].]0-9XZN(){}|.,_]+)$",
-					"(NUMBER FORMAT OR 'defaultprefix' OR ASTERISK/POSIX REGEX FORMAT)");
+		$this -> FG_regular[]  = array(	"^(defaultprefix|[-,0-9]+|_[-[.[.][.].]0-9XZN(){}|.,_]+)$",
+						"(NUMBER FORMAT OR 'defaultprefix' OR ASTERISK/POSIX REGEX FORMAT)");
 		
 		// 14  - DNID PREFIX FOR RATECARD
-		$this -> FG_regular[]  = array(    "^(all|[0-9]+)$",
-		                        "(NUMBER FORMAT OR 'all')");
+		$this -> FG_regular[]  = array(	"^(all|[0-9]+)$",
+						"(NUMBER FORMAT OR 'all')");
 		
 		// 15 - RATECARD TIME
-		$this -> FG_regular[]  = array(    "^([0-9]{2}):([0-9]{2})$"   ,
-		                        "(HH:MM)");
+		$this -> FG_regular[]  = array(	"^(([0,1]\d)|(2[0-3])):[0-5]\d$",
+						"(HH:MM)");
 						
 		// 16  TEXT > 15 charact
-		$this -> FG_regular[]  = array(	".{15}", 
+		$this -> FG_regular[]  = array(	".{15}",
 						gettext("You must write something."));
 		
 		// 17  TEXT > 8 charact
-		$this -> FG_regular[]  = array(	".{8}", 
+		$this -> FG_regular[]  = array(	".{8}",
 						gettext("8 characters alphanumeric"));
 		
 		// 18 - CALLERID - PhoneNumber
-		$this -> FG_regular[]  = array(    "^(\+|[0-9]{1})[0-9]+$"   ,
-		                        gettext("(Phone Number format)"));
+//		$this -> FG_regular[]  = array(	"^(\+?|\d{1})\d+$",          ======)
+		$this -> FG_regular[]  = array(	"(^\+?([87](?!95[4-79]|99[^2457]|907|94[^0]|336|986)([348]\d|9[0-689]|7[0247])\d{8}|[1246]\d{9,13}|68\d{7}|5[1-46-9]\d{8,12}|55[1-9]\d{9}|55119\d{8}|500[56]\d{4}|5016\d{6}|5068\d{7}|502[45]\d{7}|5037\d{7}|50[457]\d{8}|50855\d{4}|509[34]\d{7}|376\d{6}|855\d{8}|856\d{10}|85[0-4789]\d{8,10}|8[68]\d{10,11}|8[14]\d{10}|82\d{9,10}|852\d{8}|90\d{10}|96(0[79]|17[01]|13)\d{6}|96[23]\d{9}|964\d{10}|96(5[69]|89)\d{7}|96(65|77)\d{8}|92[023]\d{9}|91[1879]\d{9}|9[34]7\d{8}|959\d{7}|989\d{9}|97\d{8,12}|99[^4568]\d{7,11}|994\d{9}|9955\d{8}|996[57]\d{8}|9989\d{8}|380[34569]\d{8}|381\d{9}|385\d{8,9}|375[234]\d{8}|372\d{7,8}|37[0-4]\d{8}|37[6-9]\d{7,11}|30[69]\d{9}|34[67]\d{8}|3[12359]\d{8,12}|36\d{9}|38[1679]\d{8}|382\d{8,9})$)|(^[a-zA-Z].{2,}$)",
+						gettext("(Phone Number format or Skype nickname)"));
+		
 		// 19 - CAPTCHAIMAGE - Alpahnumeric
-		$this -> FG_regular[]  = array("^(".strtoupper($_SESSION["captcha_code"]).")|(".strtolower($_SESSION["captcha_code"]).")$",
+		$this -> FG_regular[]  = array(	"^(".strtoupper($_SESSION["captcha_code"]).")|(".strtolower($_SESSION["captcha_code"]).")$",
 						gettext("(at least 6 Alphanumeric characters)"));
+		
 		//20 TIME
-		$this -> FG_regular[]  = array(    "^([0-9]{2}):([0-9]{2}):([0-9]{2})$"   ,
-		                        "(HH:MM:SS)");				
+		$this -> FG_regular[]  = array(	"^(([0,1]\d)|(2[0-3])):[0-5]\d:[0-5]\d$",
+						"(HH:MM:SS)");
+		
 						// check_select
 		// TO check if a select have a value different -1
 		// 21 -> Check percent more of 0 and under 100
-		$this -> FG_regular[]  = array( "^100$|^(([0-9]){0,2})((\.)([0-9]*))?$"  ,
-					gettext("(PERCENT FORMAT WITH/WITHOUT DECIMAL, use '.' for decimal and don't use '%' character. e.g.: 12.4 )"));
+		$this -> FG_regular[]  = array(	"^100$|^(([0-9]){0,2})((\.)([0-9]*))?$"  ,
+						gettext("(PERCENT FORMAT WITH/WITHOUT DECIMAL, use '.' for decimal and don't use '%' character. e.g.: 12.4 )"));
 		
 		// 22
-		$this -> FG_regular[]  = array(    "^(|[0-9]+)$",
-		                        "(NUMBER FORMAT OR NOTHING)");
+		$this -> FG_regular[]  = array(	"^(|[0-9]+)$",
+						gettext("(NUMBER FORMAT OR NOTHING)"));
+		
+		// 23
+		$this -> FG_regular[]  = array("^(|[1-9]{1})$",
+						gettext("(ONLY 1 NUMERIC CHARACTER [1-9] OR NOTHING)"));
+		
+		// 24
+		$this -> FG_regular[]  = array(	"^0|(([1-9]+\d*|0[1-9]+\d*)(\,([1-9]+\d*|0[1-9]+\d*))?)$",
+						gettext("(ONLY NUMERIC CHARACTERS WITH/WITHOUT COMMA SEPARATED)"));
+		
+		// 25
+		$this -> FG_regular[]  = array(	"^\d+(\,\d+)*$",
+						gettext("(ONLY NUMERIC CHARACTERS WITH/WITHOUT COMMA SEPARATED)"));
+		
+		// 26
+		$this -> FG_regular[]  = array(	"(?=^.{8,}$)((?=.*\d)|(?=.*\W+))(?![.\n])(?=.*[A-Z])(?=.*[a-z]).*$",
+						gettext("(AT LEAST 8 CHARACTERS)"));
+		
+		// 27 -> Check integer percent from 0 to 100
+		$this -> FG_regular[]  = array(	"^(\d|[1-9]\d|100)$",
+						"");
 		
 	}
 	

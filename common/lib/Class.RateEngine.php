@@ -152,12 +152,12 @@ class RateEngine
         rt_trunk.trunkprefix AS rc_trunkprefix, rt_trunk.providertech AS rc_providertech,rt_trunk.providerip AS rc_providerip, rt_trunk.removeprefix AS rc_removeprefix, musiconhold,
 		tp_trunk.failover_trunk AS tp_failover_trunk, rt_trunk.failover_trunk AS rt_failover_trunk,tp_trunk.addparameter AS tp_addparameter_trunk, rt_trunk.addparameter AS rt_addparameter_trunk, id_outbound_cidgroup,
         id_cc_package_offer, tp_trunk.status, rt_trunk.status, tp_trunk.inuse, rt_trunk.inuse,
-        tp_trunk.maxuse, rt_trunk.maxuse, tp_trunk.if_max_use, rt_trunk.if_max_use, cc_ratecard.rounding_calltime AS rounding_calltime,
+        IF(tp_trunk.wrapnexttime>NOW(),0,tp_trunk.maxuse), IF(rt_trunk.wrapnexttime>NOW(),0,rt_trunk.maxuse), tp_trunk.if_max_use, rt_trunk.if_max_use, cc_ratecard.rounding_calltime AS rounding_calltime,
         cc_ratecard.rounding_threshold AS rounding_threshold, cc_ratecard.additional_block_charge AS additional_block_charge, cc_ratecard.additional_block_charge_time AS additional_block_charge_time,
 		cc_ratecard.additional_grace AS additional_grace, cc_ratecard.minimal_cost AS minimal_cost,disconnectcharge_after,announce_time_correction, rt_trunk.dialprefixmain,
 	rt_trunk.perioda, rt_trunk.maxsecperperioda, rt_trunk.periodcounta, UNIX_TIMESTAMP(rt_trunk.periodexpirya), rt_trunk.failover_trunka, UNIX_TIMESTAMP(rt_trunk.startdatea), UNIX_TIMESTAMP(rt_trunk.stopdatea), rt_trunk.timelefta,
 	rt_trunk.periodb, rt_trunk.maxsecperperiodb, rt_trunk.periodcountb, UNIX_TIMESTAMP(rt_trunk.periodexpiryb), rt_trunk.failover_trunkb, UNIX_TIMESTAMP(rt_trunk.startdateb), UNIX_TIMESTAMP(rt_trunk.stopdateb), rt_trunk.timeleftb,
-	tp_trunk.outbound_cidgroup_id, rt_trunk.outbound_cidgroup_id, rt_trunk.trunkcode
+	tp_trunk.outbound_cidgroup_id, rt_trunk.outbound_cidgroup_id, rt_trunk.trunkcode, tp_trunk.wrapuptime, rt_trunk.wrapuptime
 
 		FROM cc_tariffgroup
 		RIGHT JOIN cc_tariffgroup_plan ON cc_tariffgroup_plan.idtariffgroup=cc_tariffgroup.id
@@ -1279,12 +1279,12 @@ class RateEngine
 	/*
 	 *	function would set when the trunk is used or when it release
 	 */
-	function trunk_start_inuse($agi, $A2B, $inuse) {
+	function trunk_start_inuse($agi, $A2B, $inuse, $wrapuptime=0) {
 
 		if ($inuse) {
 			$QUERY = "UPDATE cc_trunk SET inuse=inuse+1 WHERE id_trunk='".$this -> usedtrunk."'";
 		} else {
-			$QUERY = "UPDATE cc_trunk SET inuse=inuse-1 WHERE id_trunk='".$this -> usedtrunk."'";
+			$QUERY = "UPDATE cc_trunk SET inuse=inuse-1, wrapnexttime = DATE_ADD(NOW(), INTERVAL $wrapuptime SECOND) WHERE id_trunk='".$this -> usedtrunk."'";
 		}
 
 		if ($agi) $A2B -> debug( DEBUG, $agi, __FILE__, __LINE__, "[TRUNK STATUS UPDATE : $QUERY]");
@@ -1319,7 +1319,7 @@ class RateEngine
 			    && $periodcount >= $maxsecperperiod - $timeleft && $periodexpiry > time()) || $periodexpiry <= time()))) {
 
 				$this -> td = $this -> prefixclause = '';
-				$this -> real_answeredtime = $this -> answeredtime = 0;
+				$this -> real_answeredtime = $this -> answeredtime = $wrapuptime = 0;
 				$destination=$old_destination;
 
 				if ($loop_failover == 0 && $intellect_count == -1) {
@@ -1347,9 +1347,10 @@ class RateEngine
 				    $maxuse		= $this -> ratecard_obj[$k][50+$usetrunk_failover];
 				    $ifmaxuse		= $this -> ratecard_obj[$k][52+$usetrunk_failover];
 				    $cidgroupid		= $this -> ratecard_obj[$k][79+$usetrunk_failover];
+				    $wrapuprange	= explode(",",$this -> ratecard_obj[$k][82+$usetrunk_failover]);
 				} else {
 				    $this -> usedtrunk = $failover_trunk;
-				    $QUERY = "SELECT trunkprefix, providertech, providerip, removeprefix, failover_trunk, status, inuse, maxuse, if_max_use, outbound_cidgroup_id, addparameter FROM cc_trunk WHERE id_trunk='$this->usedtrunk' LIMIT 1";
+				    $QUERY = "SELECT trunkprefix, providertech, providerip, removeprefix, failover_trunk, status, inuse, IF(wrapnexttime>NOW(),0,maxuse), if_max_use, outbound_cidgroup_id, addparameter, wrapuptime FROM cc_trunk WHERE id_trunk='$this->usedtrunk' LIMIT 1";
 				    $A2B->instance_table = new Table();
 				    $result = $A2B->instance_table -> SQLExec ($A2B -> DBHandle, $QUERY);
 
@@ -1366,6 +1367,7 @@ class RateEngine
 					$ifmaxuse		= $result[0][8];
 					$cidgroupid		= $result[0][9];
 					$addparameter		= $result[0][10];
+					$wrapuprange		= explode(",",$result[0][11]);
 				    } else break;
 				}
 				if ($cidgroupid == -1) $cidgroupid = $cidgroupidrate;
@@ -1659,9 +1661,6 @@ class RateEngine
 				    write_log(LOGFILE_API_CALLBACK, basename(__FILE__) . ' line:' . __LINE__ . " ActionID = {$amicmd[5]} [####  RESULT AMI WAIT RESPONSE  ####] $channel  ".var_export($res, true)." = $this->dialstatus");
 				    $ast->log("ActionID = {$amicmd[5]} [####  RESULT AMI WAIT RESPONSE  ####] $channel  ".var_export($res, true)." = $this->dialstatus");
 				}
-				// Count this call on the trunk
-				$this -> trunk_start_inuse($agi, $A2B, 0);
-
 				if ($agi) {
 				    if ($A2B->monitor == 1 || $A2B -> agiconfig['record_call'] == 1) {
 					$myres = $agi->exec($A2B -> format_parameters ("StopMixMonitor"));
@@ -1675,7 +1674,18 @@ class RateEngine
 				    $this -> dialstatus = $agi -> get_variable("DIALSTATUS",true);
 
 				    $A2B -> debug( INFO, $agi, __FILE__, __LINE__, "[FAILOVER K=$k]:[ANSWEREDTIME=".$this->answeredtime."]:[DIALSTATUS=".$this->dialstatus."]");
+
+				    if ($this->dialstatus == "ANSWER" && is_array($wrapuprange)) {
+					if (count($wrapuprange)==1) {
+						$wrapuptime = $wrapuprange[0];
+					} else {
+						$wrapuptime = mt_rand($wrapuprange[0],$wrapuprange[1]);
+					}
+				    }
 				}
+				// Count this call on the trunk
+				$this -> trunk_start_inuse($agi, $A2B, 0, $wrapuptime);
+
 //				if (($this->dialstatus  == "CHANUNAVAIL" || $this->dialstatus  == "CONGESTION") && $intellect_count > 0) 
 				if ($this->dialstatus  == "CHANUNAVAIL" && $intellect_count > 0) {
 					$firstrand = false;

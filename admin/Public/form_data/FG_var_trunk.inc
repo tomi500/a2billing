@@ -192,9 +192,9 @@ $HD_Form -> AddEditElement (gettext("REMOVE PREFIX"),
 	"$value",
 	"INPUT",
 	"size=30 maxlength=30",
-	"",
+	"25",
 	gettext("Insert the removeprefix"),
-	"" , "", "", "", "" , "" , "", gettext("Remove prefix from the dialed digits."));
+	"", "", "", "", "", "" , "NO", gettext("Remove prefix from the dialed digits."));
 	
 $HD_Form -> AddEditElement (gettext("PROVIDER TECH"),
 	"providertech",
@@ -203,7 +203,7 @@ $HD_Form -> AddEditElement (gettext("PROVIDER TECH"),
 	"size=20 maxlength=15",
 	"0",
 	gettext("Insert the providertech"),
-	"" , "", "", "", "" , "" , "", gettext("Technology used on the trunk (SIP,IAX2,ZAP,H323)"));
+	"", "", "", "", "", "" , "", gettext("Technology used on the trunk (SIP,IAX2,ZAP,H323)"));
 	
 $HD_Form -> AddEditElement (gettext("PROVIDER IP"),
 	"providerip",
@@ -288,6 +288,15 @@ $HD_Form -> AddEditElement(gettext("CIDGroup"),
 	"cc_outbound_cid_group",
 	"group_name, id",
 	"", "", "%1", "", gettext("Set the Outgoing CID Group to use for this trunk, or RATECARD PRESET to use rate card presetted."), '', '<OPTION  value="-1" selected>'.gettext("RATECARD PRESET").'</OPTION>');
+
+$HD_Form -> AddEditElement (gettext("TIMEOUT"),
+	"wrapuptime",
+	"$value",
+	"INPUT",
+	"size=30 maxlength=20",
+	"24",
+	gettext("Insert the timeout"),
+	"" , "", "", "", "" , "" , "", gettext("Add a timeout range before next call in seconds, eg. '400,600' or '600'"));
 
 $HD_Form -> AddEditElement(gettext("DIALPREFIX")." A",
 	"dialprefixa",
@@ -536,10 +545,12 @@ if ($form_action<>"ask-add") {
 		"" , "" , "", "", "", "", "NO-NULL", "", "", "res_display_dateformat");
 }
 
-$HD_Form -> FieldEditElement ('id_provider, trunkcode, trunkprefix, removeprefix, providertech, providerip, addparameter, dialprefixmain, failover_trunk, inuse, maxuse, if_max_use, status, outbound_cidgroup_id,
+$HD_Form -> FieldEditElement ('id_provider, trunkcode, trunkprefix, removeprefix, providertech, providerip, addparameter, dialprefixmain, failover_trunk, inuse, maxuse, if_max_use, status, outbound_cidgroup_id, wrapuptime,
 	dialprefixa, failover_trunka, secondusedcarrier,  startdatea, stopdatea, billblockseca, perioda, periodexpirya, timelefta, maxsecperperioda, periodcounta, lastcallstoptimea,
 	dialprefixb, failover_trunkb, secondusedratecard, startdateb, stopdateb, billblocksecb, periodb, periodexpiryb, timeleftb, maxsecperperiodb, periodcountb, lastcallstoptimeb');
 
+$HD_Form -> FG_QUERY_EDITION_HIDDEN_FIELDS = "wrapnexttime";
+$HD_Form -> FG_QUERY_EDITION_HIDDEN_VALUE = date("Y-m-d H:i:s");
 
 $HD_Form -> FG_INTRO_TEXT_EDITION= gettext("Modify the properties of the trunk below.");
 $HD_Form -> FG_INTRO_TEXT_ASK_DELETION = gettext("If you really want remove this")." ".$HD_Form->FG_INSTANCE_NAME.", ".gettext("click on the delete button.");
