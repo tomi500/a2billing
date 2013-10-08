@@ -1675,7 +1675,7 @@ class RateEngine
 
 				    $A2B -> debug( INFO, $agi, __FILE__, __LINE__, "[FAILOVER K=$k]:[ANSWEREDTIME=".$this->answeredtime."]:[DIALSTATUS=".$this->dialstatus."]");
 
-				    if ($this->dialstatus == "ANSWER" && is_array($wrapuprange)) {
+				    if (is_array($wrapuprange)) {
 					if (count($wrapuprange)==1) {
 						$wrapuptime = $wrapuprange[0];
 					} else {
