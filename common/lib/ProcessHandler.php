@@ -34,9 +34,9 @@
 
 class ProcessHandler{
 
-	function isActive() {
+function isActive() {
         $pid = ProcessHandler::getPID();
-        
+
         if ($pid == null) {
             $ret = false;
         } else {
@@ -48,19 +48,19 @@ class ProcessHandler{
         }
 
         return $ret;
-    }
-	
-    function activate() {
-        $pidfile = PID;
+}
+
+function activate() {
         $pid = ProcessHandler::getPID();
 
         if ($pid != null && $pid == getmypid()) {
             return "Already running!\n";
         } else {
-            $fp = fopen($pidfile,"w+");
+            $fp = fopen(PID,"w+");
 
             if ($fp) {
-                if (!fwrite($fp,"<"."?php\n\$pid = ".getmypid().";\n?".">")) {
+//                if (!fwrite($fp,"<"."?php\n\$pid = ".getmypid().";\n?".">"))
+                if (!fwrite($fp,getmypid()."\n")) {
                     die("Can not create pid file!\n");
                 }
 
@@ -69,16 +69,18 @@ class ProcessHandler{
                 die("Can not create pid file!\n");
             }
         }
-    }
-	
-    function getPID() {
+}
+
+function getPID() {
         if (file_exists(PID)) {
-            require(PID);
+	    $fp = fopen(PID, "r");
+	    $pid = fgets($fp, 4096);
+	    fclose($fp);
             return $pid;
         } else {
             return null;
         }
-    }
-	
+}
+
 }
 ?>

@@ -159,11 +159,13 @@ define ("MY_MAX_FILE_SIZE_IMPORT", isset($A2B->config['webui']['my_max_file_size
 define ("MY_MAX_FILE_SIZE", isset($A2B->config['webui']['my_max_file_size'])?$A2B->config['webui']['my_max_file_size']:null);
 define ("DIR_STORE_MOHMP3",isset($A2B->config['webui']['dir_store_mohmp3'])?$A2B->config['webui']['dir_store_mohmp3']:null);
 define ("DIR_STORE_AUDIO", isset($A2B->config['webui']['dir_store_audio'])?$A2B->config['webui']['dir_store_audio']:null);
+define ("DELETE_FK_CARD", isset($A2B->config['webui']['delete_fk_card'])?$A2B->config['webui']['delete_fk_card']:null);
 define ("MY_MAX_FILE_SIZE_AUDIO", isset($A2B->config['webui']['my_max_file_size_audio'])?$A2B->config['webui']['my_max_file_size_audio']:null);
 $file_ext_allow = isset($A2B->config['webui']['file_ext_allow'])?$A2B->config['webui']['file_ext_allow']:null;
 $file_ext_allow_musiconhold = isset($A2B->config['webui']['file_ext_allow_musiconhold'])?$A2B->config['webui']['file_ext_allow_musiconhold']:null;
 define ("LINK_AUDIO_FILE", isset($A2B->config['webui']['link_audio_file'])?$A2B->config['webui']['link_audio_file']:null);
-if (!defined('MONITOR_PATH')) define ("MONITOR_PATH", isset($A2B->config['webui']['monitor_path'])?$A2B->config['webui']['monitor_path']:null);
+if (!defined('MONITOR_PATH')) define ("MONITOR_PATH", isset($A2B->config['webui']['monitor_path'])?$A2B->config['webui']['monitor_path']:"/tmp");
+if (!defined('FAX_PATH')) define ("FAX_PATH",isset($A2B->config['webui']['fax_path'])?$A2B->config['webui']['fax_path']:"/tmp");
 define ("MONITOR_FORMATFILE", isset($A2B->config['webui']['monitor_formatfile'])?$A2B->config['webui']['monitor_formatfile']:null); 
 define ("SHOW_ICON_INVOICE", isset($A2B->config['webui']['show_icon_invoice'])?$A2B->config['webui']['show_icon_invoice']:null);
 define ("SHOW_TOP_FRAME", isset($A2B->config['webui']['show_top_frame'])?$A2B->config['webui']['show_top_frame']:null);
@@ -187,22 +189,23 @@ define ("RETURN_URL_DISTANT_LOGIN", isset($A2B->config["webcustomerui"]['return_
 define ("RETURN_URL_DISTANT_FORGETPASSWORD", isset($A2B->config["webcustomerui"]['return_url_distant_forgetpassword'])?$A2B->config["webcustomerui"]['return_url_distant_forgetpassword']:null);
 
 
-// GLOBAL POST/GET VARIABLE
-getpost_ifset (array('form_action', 'atmenu', 'action', 'stitle', 'sub_action', 'IDmanager', 'current_page', 'order', 'sens', 'mydisplaylimit', 'filterprefix', 'ui_language', 'cssname', 'popup_select', 'popup_formname', 'popup_fieldname', 'exporttype', 'msg'));
-
 if (!isset($_SESSION)) {
 	session_start();
 }
+
+// GLOBAL POST/GET VARIABLE
+getpost_ifset (array('form_action', 'atmenu', 'action', 'stitle', 'sub_action', 'IDmanager', 'current_page', 'order', 'sens', 'mydisplaylimit', 'filterprefix', 'ui_language', 'cssname', 'popup_select', 'popup_formname', 'popup_fieldname', 'exporttype', 'msg'));
 
 // Language Selection
 if (isset($ui_language)) {
 	$_SESSION["ui_language"] = $ui_language;
 	setcookie  ("ui_language", $ui_language);
 } elseif (!isset($_SESSION["ui_language"])) {
-    if(!isset($_COOKIE["ui_language"])) 
-    	$_SESSION["ui_language"]='english';
-    else 
+    if(!isset($_COOKIE["ui_language"])) {
+    	$_SESSION["ui_language"]=getAcceptLanguage(array('en_US', 'en_AU', 'en_bz', 'en_gb', 'en_zw', 'en_ie', 'en_ca', 'en_nz', 'en_tt', 'en_ph', 'en_za', 'en_jm', 'ru_RU', 'ru_UA', 'uk_UA', 'de_DE', 'de_li', 'de_at', 'de_li', 'de_lu', 'de_ch', 'it_IT', 'fr_FR', 'fi_FI', 'pt_BR', 'zh_TW', 'es_ES', 'pt_PT', 'ro_RO', 'ur_PK', 'fa_IR', 'el_GR', 'id_ID'));
+    } else {
     	$_SESSION["ui_language"]=$_COOKIE["ui_language"];
+    }
 }
 
 define ("LANGUAGE", $_SESSION["ui_language"]);

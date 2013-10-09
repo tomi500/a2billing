@@ -89,6 +89,8 @@ $typemail_list["invoice_to_pay"]	= array( gettext("Invoice to Pay"), Mail::$TYPE
 $typemail_list["subscription_paid"]	= array( gettext("Subscription Paid"), Mail::$TYPE_SUBSCRIPTION_PAID);
 $typemail_list["subscription_unpaid"]	= array( gettext("Subscription Unpaid"), Mail::$TYPE_SUBSCRIPTION_UNPAID);
 $typemail_list["subscription_disable_card"]	= array( gettext("Subscription Disable Card"), Mail::$TYPE_SUBSCRIPTION_DISABLE_CARD);
+$typemail_list["fax_success"] 		= array( gettext("Fax success"), Mail::$TYPE_FAX_SUCCESS);
+$typemail_list["fax_failed"] 		= array( gettext("Fax failed"), Mail::$TYPE_FAX_FAILED);
 
 if (($popup_select>=1)) {
 	$HD_Form -> AddViewElement(gettext("ID MAIL"), "id", "10%", "center", "sort");
@@ -214,6 +216,14 @@ $HD_Form -> FG_BUTTON_ADITION_BOTTOM_TEXT .= '<u>'.gettext('Tags used for Paymen
 		'<b>$paymentMethod$</b> : '.gettext('methode of payment').'<br/> ' .
 		'<b>$paymentStatus$</b> : '.gettext('status of payment').'<br/>' .
 		'<b>$itemAmount$</b>: '.gettext('amount of payment').'<br/>';
+$HD_Form -> FG_BUTTON_ADITION_BOTTOM_TEXT .= '<u>'.gettext('Tags used for FAX mail').': </u><br/> ' .
+		'<b>$cid_number$</b>: '.gettext('CID number of fax sender').'<br/> ' .
+		'<b>$cid_name$</b>: '.gettext('CID name of fax sender').'<br/> ' .
+		'<b>$count$</b> : '.gettext('Number pages received').'<br/> ' .
+		'<b>$dest_exten$</b> : '.gettext('CID number of recipient').'<br/> ' .
+		'<b>$datetime$</b> : '.gettext('Time has been obtained').'<br/>' .
+		'<b>$fax_result$</b> : '.gettext('Cause of failure').'<br/>' .
+		'<b>$format$</b>: '.gettext('File format attached, e.g. PDF').'<br/>';
 $HD_Form -> FG_BUTTON_ADITION_BOTTOM_TEXT .= '<u>'.gettext('Tags used for Signup').': </u><br/> ' .
 		'<b>$loginkey$</b>: '.gettext('key created to validate the signup').'<br/> ';
 $HD_Form -> FG_BUTTON_ADITION_BOTTOM_TEXT .= '<u>'.gettext('Tag used for Did Payment confirmation email').': </u><br/> ' .

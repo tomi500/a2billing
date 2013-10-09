@@ -74,6 +74,8 @@ $smarty->assign("ACXNOTIFICATION", $ACXNOTIFICATION);
 $smarty->assign("ACXAUTODIALER", $ACXAUTODIALER);
 $smarty->assign("ACXVOICEMAIL", $ACXVOICEMAIL);
 $smarty->assign("ACX_PERSONALINFO", $ACX_PERSONALINFO);
+$smarty->assign("ACXDISTRIBUTION", $ACXDISTRIBUTION);
+$smarty->assign("ACXSURVEILLANCE", $ACXSURVEILLANCE);
 
 
 if($exporttype != "" && $exporttype != "html") {

@@ -134,16 +134,16 @@ $HD_Form -> AddEditElement (gettext("PHONE NUMBER"),
 			   '$value',	
 			   "INPUT",	
 			   "size=30 maxlength=20",	
-			   "7",	
+			   "7",
 			   gettext("Insert the phone number of the customers"),
-			   "" , "", "",	"", "", "" , "NO", "");
+			   "", "", "", "", "", "", "", "");
 
 $HD_Form -> AddEditElement (gettext("FAX NUMBER"),
 			   "fax",			
 			   '$value',	
 			   "INPUT",	
 			   "size=30 maxlength=20",
-			   "",	
+			   "7",
 			   gettext("Insert the fax number of the customers"),
 			   "" , "", "",	"", "", "" , "NO", "");
 
@@ -155,7 +155,7 @@ $HD_Form -> AddEditElement (gettext("RECORD CALL"),
 			   "",
 			   "",
 			   gettext("Enable to monitor the call (to record all the conversations) value : YES - NO"),
-			   "" , "", "", "Yes :1, - No:0", "", "" , "", gettext("Define if you want to record all the conversations"));
+			   "" , "", "", gettext("Yes")." :1, - ".gettext("No").":0", "", "" , "", gettext("Define if you want to record all the conversations"));
 }
 
 $HD_Form -> AddEditElement (gettext("RECALL DAYS"),
@@ -163,8 +163,8 @@ $HD_Form -> AddEditElement (gettext("RECALL DAYS"),
 			   '$value',
 			   "INPUT",
 			   "size=30 maxlength=20",
+			   "4",
 			   "",
-			   gettext("Insert the how many days ago you want to search back phone number"),
 			   "" , "", "", "", "", "" , "NO", gettext("Define number of days ago for use back phone number by callers you have called in past this days"));
 			
 $HD_Form -> AddEditElement (gettext("RECALL TIME"),
@@ -172,7 +172,7 @@ $HD_Form -> AddEditElement (gettext("RECALL TIME"),
 			   '$value',
 			   "INPUT",
 			   "size=30 maxlength=4 readonly",
-			   "",
+			   "4",
 			   "",
 			   "" , "", "", "", "", "", "NO", gettext("Max time to recall in seconds. Set '-1' for paritet calls."));
 

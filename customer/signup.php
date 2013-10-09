@@ -80,14 +80,33 @@ if ($id != "" || !is_null($id)) {
 
 $list = $HD_Form->perform_action($form_action);
 
-
 if ($form_action == "add") {
+/**
+echo "form_action       = ".$form_action."<br>And go to signup_confirmation.php<br>";
+echo "language          = ".$language."<br>";
+echo "=========================<br>";
+echo "language_code     = ".$_SESSION["language_code"]."<br>";
+echo "cardnumber_signup = ".$_SESSION["cardnumber_signup"]."<br>";
+echo "id_signup         = ".$_SESSION["id_signup"]."<br>";
+echo "=========================<br>";
+**/
 	unset ($_SESSION["cardnumber_signup"]);
 	$_SESSION["language_code"] = $_POST["language"];
 	$_SESSION["cardnumber_signup"] = $maxi;
 	$_SESSION["id_signup"] = $HD_Form->RESULT_QUERY;
+/**
+echo "language_code     = ".$_SESSION["language_code"]."<br>";
+echo "cardnumber_signup = ".$maxi."<br>";
+echo "id_signup         = ".$_SESSION["id_signup"]."<br>";
+echo "=========================<br>";
+**/
 	Header("Location: signup_confirmation.php");
 }
+
+//if (!($popup_select>=1) && has_rights (ACX_DISTRIBUTION)) {
+//	$smarty->display('main.tpl');
+//	echo $CC_help_money_situation;
+//}
 
 // #### HEADER SECTION
 $smarty->display('signup_header.tpl');
@@ -99,5 +118,3 @@ $HD_Form->create_form($form_action, $list, $id = null);
 
 // #### FOOTER SECTION
 $smarty->display('signup_footer.tpl');
-
-

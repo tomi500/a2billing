@@ -45,14 +45,17 @@ $HD_Form -> FG_TABLE_ID = 'cc_logpayment.id';
 $HD_Form -> FG_TABLE_CLAUSE="card_id=".$_SESSION["card_id"];
 
 $HD_Form -> FG_DEBUG = 0;
+//$HD_Form -> FG_HTML_TABLE_WIDTH = "100%";
+$HD_Form -> FG_VIEW_TABLE_WITDH = "700";
 $HD_Form -> FG_TABLE_DEFAULT_SENS = "DESC";
 
-$HD_Form -> AddViewElement(gettext("ID"), "cc_logpayment.id", "10%", "center", "sort");
+//$HD_Form -> AddViewElement(gettext("ID"), "cc_logpayment.id", "10%", "center", "sort");
 $HD_Form -> AddViewElement(gettext("PAYMENT DATE"), "date", "20%", "center", "sort", "30", "", "", "", "", "", "display_dateformat");
-$HD_Form -> AddViewElement(gettext("PAYMENT AMOUNT"), "payment", "10%", "center", "sort");
-$HD_Form -> AddViewElement(gettext("DESCRIPTION"), "description", "30%", "center", "sort");
+$HD_Form -> AddViewElement(gettext("PAYMENT INCL FEE"), "payment", "35%", "center", "sort", "", "", "", "", "", "", "display_refill_money");
+$HD_Form -> AddViewElement(gettext("DESCRIPTION"), "description", "45%", "center", "sort");
 
-$HD_Form -> FieldViewElement ("cc_logpayment.id, date + INTERVAL UNIX_TIMESTAMP('".display_GMT('1970-01-02', $_SESSION['gmtoffset'], 1)."')-75600 SECOND AS date, CONCAT_WS(' ',payment,'".BASE_CURRENCY."') AS payment, description ");
+//$HD_Form -> FieldViewElement ("cc_logpayment.id, date + INTERVAL UNIX_TIMESTAMP('".display_GMT('1970-01-02', $_SESSION['gmtoffset'], 1)."')-75600 SECOND AS date, CONCAT_WS(' ',payment,'".BASE_CURRENCY."') AS payment, description ");
+$HD_Form -> FieldViewElement ("date + INTERVAL UNIX_TIMESTAMP('".display_GMT('1970-01-02', $_SESSION['gmtoffset'], 1)."')-75600 SECOND AS date, payment, description ");
 
 $HD_Form -> CV_TITLE_TEXT = gettext("Payment list");
 $HD_Form -> CV_NO_FIELDS  = gettext("No payments have been made!"); 

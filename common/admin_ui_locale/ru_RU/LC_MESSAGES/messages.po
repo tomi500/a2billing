@@ -161,7 +161,7 @@ msgstr ""
 
 #: lib/admin.help.php:86
 msgid "Set the caller ID so that the customer calling in is authenticated on the basis of the callerID rather than with the account number"
-msgstr ""
+msgstr "Вы можете добавить любой номер телефона ниже, чтобы он был автоматически распознан системой, и звонящий мог использовать телефонные сервисы без ввода PIN. Можете подтвердить номер, чтобы пользователь получил возможность изменять установки передачи номера звонящего, при исходящих звонках."
 
 #: lib/admin.help.php:88
 msgid "This screen shows refills and payments made against each account, along with the current credit on each account. The initial amount of credit applied to the account is not included. The amount owing is calculated by subtracting payments from refills"
@@ -2139,6 +2139,10 @@ msgstr ""
 msgid "Invalid card number lenght defined in configuration."
 msgstr "Неверный номер карты указан в конфигурации."
 
+#: lib/Class.A2Billing.php:2002
+msgid "The call dropped prematurely"
+msgstr "Вызывающая сторона положила трубку не начав передачу факса"
+
 #: lib/Class.A2Billing.php:3280
 msgid "Error : Authentication Failed !!!"
 msgstr "Ошибка : Ошибка аутентификации !!!"
@@ -4039,7 +4043,7 @@ msgstr "Нужно ассоциировать с транком для корр�
 
 #: Public/form_data/FG_var_did.inc:132
 msgid "Continue with DID progress when RECALL failed"
-msgstr "Продолжить обработку по DID при неудачном ОТЗВОНе"
+msgstr "Продолжать обработку по DID при неудачном ОТЗВОНе"
 
 #: Public/form_data/FG_var_did.inc:141
 msgid "Allow for all active CallerIDs at system to use that DID for direct access (DISA), rather than just for active CallerIDs of customer."
@@ -4558,6 +4562,10 @@ msgstr ""
 msgid "MAXUSE"
 msgstr ""
 
+#: Public/form_data/FG_var_trunk.inc:110
+msgid "Add a timeout range before next call in seconds, eg. '400,600' or '600'"
+msgstr "Установите паузу или диапазон перед следующим разрешенным звонком через этот транк для того чтобы не перегружать транк исходящими звонками, например, '400,600' или '600'"
+
 #: Public/form_data/FG_var_trunk.inc:111 Public/card-history.php:229
 msgid "Search"
 msgstr "Поиск"
@@ -4659,7 +4667,7 @@ msgstr ""
 
 #: Public/form_data/FG_var_trunk.inc
 msgid "Destination prefix condition for FAILOVER TRUNK with respect to REMOVE PREFIX. This will overrule for Destinations Limited if defined. Leave empty to use FAILOVER TRUNK without condition."
-msgstr "Задайте префикс, с учётом отработки REMOVE PREFIX, как условие срабатывания FAILOVER TRUNK. Использование этой настройки перекрывает остальные DIALPREFIX'ы ниже. Оставьте пустым, чтобы переход на FAILOVER TRUNK срабатывал только, если остальные DIALPREFIX'ы не нашли соответствия."
+msgstr "Задайте префикс-условие, с учётом отработки REMOVE PREFIX, как условие срабатывания FAILOVER TRUNK. Использование этого условия перекрывает остальные DIALPREFIX'ы ниже. Оставьте пустым, чтобы переход на FAILOVER TRUNK срабатывал только, если остальные DIALPREFIX'ы не нашли соответствия."
 
 #: Public/form_data/FG_var_trunk.inc:214
 msgid "FAILOVER TRUNK"
@@ -4745,8 +4753,12 @@ msgid "has been inserted."
 msgstr ""
 
 #: Public/form_data/FG_var_trunk.inc:
+msgid "Choose 'Yes' if you want to handover customer`s CallerID (not extensions)"
+msgstr "Выберите 'Да' если нужно пропускать пользовательские CallerID в качестве CLI (кроме внутренних номеров)"
+
+#: Public/form_data/FG_var_trunk.inc:
 msgid "Set the Outgoing CID Group to use for this trunk, or RATECARD PRESET to use rate card presetted."
-msgstr "Выберите исходящую CID группу или оставьте RATECARD PRESET, чтобы использовать такую же настройка из тарифа, через который будет обработан вызов"
+msgstr "Выберите исходящую CID группу или оставьте RATECARD PRESET, чтобы использовать настройку CIDGROUP из тарифа, через который обработается вызов."
 
 #: Public/form_data/FG_var_trunk.inc:
 msgid "Add destination prefix like for RateCard with respect to REMOVE PREFIX. Leave empty to disable all rule criterions."
@@ -9373,6 +9385,38 @@ msgstr ""
 msgid "Agent LOGIN"
 msgstr "ЛОГИН для агента"
 
+#: Public/form_data/FG_var_callerid.inc
+msgid "Settings for general Caller Line Identity (CLI)"
+msgstr "Правила, которые будут автоматически использованы в общих принципах передачи номера звонящего [Caller Line Identity (CLI)]"
+
+#: Public/form_data/FG_var_callerid.inc
+msgid "CONSPIRATION"
+msgstr "КОНСПИРАЦИЯ"
+
+#: Public/form_data/FG_var_callerid.inc
+msgid "Local"
+msgstr "Локальная"
+
+#: Public/form_data/FG_var_callerid.inc
+msgid "If this CallerID number was verified you can use the remaining options..."
+msgstr "Если номер CallerID не подтверждён, то ниже приведенные опции отрабатываться не будут!"
+
+#: Public/form_data/FG_var_callerid.inc
+msgid "Choose 'Yes' if you want hide CLI and replace its in a general manner for calls from this CallerID. Choose 'No' if you want set a veto for replacement CLI for calls from this CallerID. Choose 'Local' to replace this CallerID when calling to countries for which there exist a local number(s) for replacement."
+msgstr "Выберите 'Да', если хотите скрыть этот CallerID при звонках с него же, чтобы передавался номер звонящего согласно общих настроек. Выберите 'Нет' чтобы звонки с этого CallerID отображались как есть. Выберите 'Локальная' чтобы заменять этот CallerID при звонках в страны, для которых есть локальный номер для отображения."
+
+#: Public/form_data/FG_var_callerid.inc
+msgid "Present this CallerID, when calls are made to a country relevant to this CallerID."
+msgstr "Передавать этот CallerID, когда звонки осуществляются в страну, к которой он принадлежит."
+
+#: Public/form_data/FG_var_callerid.inc
+msgid "Present this CallerID, when calls are made to countries not relevant to this CallerID."
+msgstr "Передавать этот CallerID, когда звонки осуществляются в страны, отличные от принадлежности этого CallerID."
+
+#: Public/form_data/FG_var_callerid.inc
+msgid "Present this CallerID, when calls are made to countries from listed prefixes. Insert the replaceable prefixes separated by comma, e.g. for UK,IT,RU,UA are '44,39,7,380'."
+msgstr "Передавать этот CallerID, когда звонки осуществляются в страны с перечисленными префиксами. Внесите один или несколько префиксов через запятую, например для UK,IT,RU,UA введите '44,39,7,380'."
+
 #: Public/form_data/FG_var_callerid.inc:57
 #, fuzzy
 msgid "CUSTOMER NAME"
@@ -9382,21 +9426,45 @@ msgstr "ИНФОРМАЦИЯ О КЛИЕНТЕ"
 msgid " CREATED!"
 msgstr " СОЗДАНО!"
 
-#: Public/form_data/FG_var_callerid.inc:80
-msgid "Insert the CallerID"
-msgstr ""
-
 #: Public/form_data/FG_var_callerid.inc:119
 msgid "Modify via the form below, the properties of the callerID"
 msgstr ""
 
-#: Public/form_data/FG_var_callerid.inc:119
+#: Public/form_data/FG_var_callerid.inc
 msgid "Enter the phone number for immediatly dial instead prompt to dial"
 msgstr "Задайте моментальный номер дозвона. Услуга интерактивного донабора временно отключится."
 
-#: Public/form_data/FG_var_callerid.inc:119
+#: Public/form_data/FG_var_callerid.inc
 msgid "Choose 'Yes' if you want to callback to this CallerID"
 msgstr "Выберите 'Да' чтобы выполнять обратный звонок"
+
+#: form_data/FG_var_callerid.inc
+msgid "Insert the CallerID"
+msgstr "Введите номер звонящего"
+
+#: form_data/FG_var_callerid.inc
+msgid "NEVER"
+msgstr "НИКОГДА"
+
+#: form_data/FG_var_callerid.inc
+msgid "ALWAYS"
+msgstr "ВСЕГДА"
+
+#: form_data/FG_var_callerid.inc
+msgid "SAY BALANCE AFTER AUTH"
+msgstr "ПРОГОВАРИВАТЬ БАЛАНС ПРИ ВХОДЕ В СИСТЕМУ"
+
+#: form_data/FG_var_callerid.inc
+msgid "SAY RATE BEFORE CALL"
+msgstr "ПРОГОВАРИВАТЬ ЦЕНУ ПЕРЕД ЗВОНКОМ"
+
+#: form_data/FG_var_callerid.inc
+msgid "with the warning threshold"
+msgstr "задайте порог предупреждения, чтобы проговаривать только тогда, когда баланс опустится меньше заданного"
+
+#: form_data/FG_var_callerid.inc
+msgid "SAY BALANCE AFTER CALL"
+msgstr "ПРОГОВАРИВАТЬ ОСТАТОК БАЛАНСА ПОСЛЕ РАЗГОВОРА"
 
 #: Public/A2B_payment_info_agent.php:72 Public/A2B_payment_info.php:72
 msgid "PAYMENT INFO"

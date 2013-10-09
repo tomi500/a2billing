@@ -62,6 +62,7 @@ if (isset ($choose_did_rate) && strlen($choose_did_rate) != 0) {
 	$did_rate = explode("CUR", $choose_did_rate);
 	$choose_did = $did_rate[0];
 	$rate = $did_rate[1];
+	$did_name = $did_rate[2];
 }
 
 $QUERY = "SELECT credit, creditlimit, typepaid FROM cc_card	WHERE username = '" . $_SESSION["pr_login"] . "' AND uipass = '" . $_SESSION["pr_password"] . "'";
@@ -77,9 +78,9 @@ if ($resmax) {
 /*           release the choosen did                        */
 if ($action_release == "confirm_release") {
 
-	$message = "\n\n" . gettext("The following Destinaton-DID has been relesed:") . "\n\n";
+	$message = "\n\n" . gettext("The following Destination-DID has been released:") . "\n\n";
 	$instance_table = new Table();
-	$QUERY = "UPDATE cc_did SET iduser = 0, reserved=0 WHERE id=$choose_did";
+	$QUERY = "UPDATE cc_did SET iduser = 0, reserved = 0, voicebox = NULL WHERE id = $choose_did";
 	$result = $instance_table->SQLExec($HD_Form->DBHandle, $QUERY, 0);
 	$message .= "QUERY on cc_did : $QUERY \n\n";
 
@@ -161,8 +162,8 @@ if (!isset ($action_release) || $action_release == "confirm_release" || $action_
 		
 		$result = $instance_table_did_use->SQLExec($HD_Form->DBHandle, $QUERY, 0);
 		if ($confirm_buy_did == 2) {
-			$QUERY1 = "INSERT INTO cc_charge (id_cc_card, amount, chargetype, id_cc_did) " .
-					"VALUES ('" . $_SESSION["card_id"] . "', '" . $rate . "', '2','" . $choose_did . "')";
+			$QUERY1 = "INSERT INTO cc_charge (id_cc_card, amount, chargetype, description, id_cc_did) " .
+					"VALUES ('" . $_SESSION["card_id"] . "', '" . $rate . "', '2', 'DID: ".$did_name."', '" . $choose_did . "')";
 			$result = $instance_table_did_use->SQLExec($HD_Form->DBHandle, $QUERY1, 0);
 
 			$QUERY1 = "UPDATE cc_did set iduser = " . $_SESSION["card_id"] . ",reserved=1 where id = '" . $choose_did . "'";
@@ -393,13 +394,17 @@ function CheckCountry(Source){
 				  	foreach ($list_did as $recordset){
 				  	// fixrate, connection_charge, selling_rate, aleg_retail_connect_charge, aleg_retail_cost_min
 					$price_annoucement = gettext("Monthly:").$recordset[2].' '.BASE_CURRENCY;
+					if ($recordset[3]>0)
 					$price_annoucement .= ';'.gettext("B-Leg Connect:").$recordset[3].' '.BASE_CURRENCY;
+					if ($recordset[4]>0)
 					$price_annoucement .= ';'.gettext("B-Leg Rate:").$recordset[4].' '.BASE_CURRENCY;
+					if ($recordset[5]>0)
 					$price_annoucement .= ';'.gettext("A-Leg Connect:").$recordset[5].' '.BASE_CURRENCY;
+					if ($recordset[6]>0)
 					$price_annoucement .= ';'.gettext("A-Leg Rate:").$recordset[6].' '.BASE_CURRENCY;
 					?>
 					
-						<option class=input value='<?php echo $recordset[0]."CUR".$recordset[2] ?>'<?php if ($choose_did_rate == $recordset[0]."CUR".$recordset[2]) echo 'selected';?>><?php echo $recordset[1]?>  (<?php echo $price_annoucement; ?>)</option>
+						<option class=input value='<?php echo $recordset[0]."CUR".$recordset[2]."CUR".$recordset[1] ?>'<?php if ($choose_did_rate == $recordset[0]."CUR".$recordset[2]."CUR".$recordset[1]) echo 'selected';?>><?php echo $recordset[1]?>  (<?php echo $price_annoucement; ?>)</option>
 					<?php 	 }
 					?>
 				</select>

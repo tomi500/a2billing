@@ -33,6 +33,7 @@
 
 
 include ("./lib/customer.defines.php");
+include ("./lib/customer.module.access.php");
 include ("./lib/customer.smarty.php");
 
 if (!$A2B->config["signup"]['enable_signup']) {
@@ -55,17 +56,22 @@ if (!isset ($_SESSION["cardnumber_signup"]) || strlen($_SESSION["cardnumber_sign
 $FG_DEBUG = 0;
 $DBHandle = DbConnect();
 
-$activatedbyuser = $A2B->config["signup"]['activatedbyuser'];
-
+//echo "activatedbyuser = ".$activatedbyuser."<br>";
 $lang_code = $_SESSION["language_code"];
+//if (has_rights(ACX_DISTRIBUTION)) $activatedbyuser = true;
+//else $activatedbyuser = $A2B->config['signup']['activatedbyuser'];
+$activatedbyuser = has_rights(ACX_DISTRIBUTION) ? true : $A2B->config['signup']['activatedbyuser'];
 if (!$activatedbyuser) {
 	$mailtype = Mail :: $TYPE_SIGNUP;
 } else {
 	$mailtype = Mail :: $TYPE_SIGNUPCONFIRM;
 }
-
+//echo "id_signup       = ".$_SESSION["id_signup"]."<br>";
+//echo "language_code   = ".$_SESSION["language_code"]."<br>";
+//echo "language        = ".$language."<br>";
+//echo "=========================<br>";
 try {
-	$mail = new Mail($mailtype, $_SESSION["id_signup"], $_SESSION["language_code"]);
+	$mail = new Mail($mailtype, $_SESSION["id_signup"], $lang_code);
 } catch (A2bMailException $e) {
 	echo "<br>" . gettext("Error : No email Template Found");
 	exit ();
@@ -105,18 +111,26 @@ $smarty->display('signup_header.tpl');
 
 <blockquote>
     <div align="center"><br><br>
-	 <font color="#FF0000"><b><?php echo gettext("SIGNUP CONFIRMATION"); ?></b></font><br>
-		  <br/><br/>
-		  
-	<?php if (!$activatedbyuser){ ?>
-		<?php echo $list[0][2]; ?> <?php echo $list[0][1]; ?>, <?php echo gettext("thank you for registering with us!");?><br>
-		<?php echo gettext("An activation email has been sent to"); ?> <b><?php echo $list[0][3]; ?></b><br><br>	  
-	<?php }else{ ?>
-		  <?php echo $list[0][2]; ?> <?php echo $list[0][1]; ?>, <?php echo gettext("Thank you for registering with us !");?><br>
+	<font color="#FF0000"><b><?php echo gettext("SIGNUP CONFIRMATION"); ?></b></font><br>
+	<br/><br/>
+	<?php if (!$activatedbyuser){
+			echo $list[0][2]; ?> <?php echo $list[0][1]; ?>, <?php echo gettext("thank you for registering with us!");?><br>
+		  <?php echo gettext("An activation email has been sent to"); ?> <b><?php echo $list[0][3]; ?></b><br><br>	  
+	<?php }elseif (has_rights(ACX_DISTRIBUTION)){
+			echo gettext("Your new customer was registered successfully");?><br>
+		  <?php echo gettext("An email confirming registration information has been sent to customer to"); ?> <b><?php echo $list[0][3]; ?></b><br><br>
+			<h3>
+			  <?php echo gettext("Cardnumber of ").$list[0][2]; ?> <?php echo $list[0][1] . gettext(" is "); ?> <b><font color="#00AA00"><?php echo $list[0][0]; ?></font></b><br><br><br><u>
+			  <?php echo gettext("To login to account :"); ?></u><br>
+			  <?php echo gettext("Card alias (login) is "); ?> <b><font color="#00AA00"><?php echo $list[0][6]; ?></font></b><br>
+			  <?php echo gettext("Password is "); ?> <b><font color="#00AA00"><?php echo $list[0][4]; ?></font></b><br>
+			</h3>
+	<?php }else {
+			echo $list[0][2]; ?> <?php echo $list[0][1]; ?>, <?php echo gettext("Thank you for registering with us !");?><br>
 		  <?php echo gettext("An email confirming your information has been sent to"); ?> <b><?php echo $list[0][3]; ?></b><br><br>
 			<h3>
-			  <?php echo gettext("Your cardnumber is "); ?> <b><font color="#00AA00"><?php echo $list[0][0]; ?></font></b><br><br><br>
-			  <?php echo gettext("To login to your account :"); ?><br>
+			  <?php echo gettext("Your cardnumber is "); ?> <b><font color="#00AA00"><?php echo $list[0][0]; ?></font></b><br><br><br><u>
+			  <?php echo gettext("To login to your account :"); ?></u><br>
 			  <?php echo gettext("Your card alias (login) is "); ?> <b><font color="#00AA00"><?php echo $list[0][6]; ?></font></b><br>
 			  <?php echo gettext("Your password is "); ?> <b><font color="#00AA00"><?php echo $list[0][4]; ?></font></b><br>
 			</h3>
@@ -132,4 +146,3 @@ $smarty->display('signup_header.tpl');
 <?php
 
 $smarty->display('signup_footer.tpl');
-

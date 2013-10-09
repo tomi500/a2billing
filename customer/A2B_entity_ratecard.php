@@ -45,7 +45,7 @@ if (! has_rights (ACX_RATECARD)) {
 	die();
 }
 
-getpost_ifset(array('letter', 'posted_search'));
+getpost_ifset(array('letter', 'posted_search', 'filterprefix'));
 
 $HD_Form -> setDBHandler (DbConnect());
 $HD_Form -> init();
@@ -94,7 +94,7 @@ $HD_Form -> create_toppage ($form_action);
     <table width="80%" border=0 cellspacing=1 cellpadding=3 bgcolor="#000033" align="center">
         <tr>
        <td bgcolor="#EEEEEE" width="100%" valign="top" align="center" class="bb2">
-	   		  <a href="A2B_entity_ratecard.php?form_action=list&letter="><?php echo gettext("NONE")?></a> -
+	  <a href="A2B_entity_ratecard.php?form_action=list&letter="><?php echo gettext("NONE")?></a> -
               <a href="A2B_entity_ratecard.php?form_action=list&letter=A">A</a> - 
               <a href="A2B_entity_ratecard.php?form_action=list&letter=B">B</a> -          
               <a href="A2B_entity_ratecard.php?form_action=list&letter=C">C</a> -       
@@ -125,8 +125,7 @@ $HD_Form -> create_toppage ($form_action);
         </tr>
     </table>
 </center>
-<?php   
-
+<?php
 
 $HD_Form -> create_form ($form_action, $list, $id=null) ;
 

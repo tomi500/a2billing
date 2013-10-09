@@ -33,7 +33,7 @@
 
 
 
-getpost_ifset(array('id', 'trunkcode', 'trunkprefix', 'removeprefix', 'providertech', 'providerip', 'addparameter', 'dialprefixmain', 'failover_trunk', 'id_provider', 'popup_select', 'inuse', 'maxuse', 'status', 'if_max_use', 'outbound_cidgroup_id',
+getpost_ifset(array('id', 'trunkcode', 'trunkprefix', 'removeprefix', 'providertech', 'providerip', 'addparameter', 'dialprefixmain', 'failover_trunk', 'id_provider', 'popup_select', 'inuse', 'maxuse', 'status', 'if_max_use', 'cid_handover', 'outbound_cidgroup_id',
 	'dialprefixa', 'failover_trunka', 'secondusedcarrier',  'startdatea', 'stopdatea', 'billblockseca', 'perioda', 'periodexpirya', 'timelefta', 'maxsecperperioda', 'periodcounta', 'lastcallstoptimea',
 	'dialprefixb', 'failover_trunkb', 'secondusedratecard', 'startdateb', 'stopdateb', 'billblocksecb', 'periodb', 'periodexpiryb', 'timeleftb', 'maxsecperperiodb', 'periodcountb', 'lastcallstoptimeb'));
 
@@ -278,6 +278,15 @@ $HD_Form -> AddEditElement ("STATUS",
 	"",
 	"",
 	"list" , "", "", "", $actived_list, "%1" , "", gettext("Define if this trunk is active or not"));
+
+$HD_Form -> AddEditElement (gettext("cid_handover"),
+	"cid_handover",
+	'0',
+	"RADIOBUTTON",
+	"",
+	"",
+	"",
+	"" , "", "", gettext("Yes").":1, - ".gettext("No").":0", "", "", "", gettext("Choose 'Yes' if you want to handover customer`s CallerID (not extensions)"));
 
 $HD_Form -> AddEditElement(gettext("CIDGroup"),
 	"outbound_cidgroup_id",
@@ -545,7 +554,7 @@ if ($form_action<>"ask-add") {
 		"" , "" , "", "", "", "", "NO-NULL", "", "", "res_display_dateformat");
 }
 
-$HD_Form -> FieldEditElement ('id_provider, trunkcode, trunkprefix, removeprefix, providertech, providerip, addparameter, dialprefixmain, failover_trunk, inuse, maxuse, if_max_use, status, outbound_cidgroup_id, wrapuptime,
+$HD_Form -> FieldEditElement ('id_provider, trunkcode, trunkprefix, removeprefix, providertech, providerip, addparameter, dialprefixmain, failover_trunk, inuse, maxuse, if_max_use, status, cid_handover, outbound_cidgroup_id, wrapuptime,
 	dialprefixa, failover_trunka, secondusedcarrier,  startdatea, stopdatea, billblockseca, perioda, periodexpirya, timelefta, maxsecperperioda, periodcounta, lastcallstoptimea,
 	dialprefixb, failover_trunkb, secondusedratecard, startdateb, stopdateb, billblocksecb, periodb, periodexpiryb, timeleftb, maxsecperperiodb, periodcountb, lastcallstoptimeb');
 

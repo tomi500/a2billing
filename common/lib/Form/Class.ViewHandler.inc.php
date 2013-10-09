@@ -29,7 +29,6 @@ if( !($popup_select>=1) &&($this->FG_LIST_ADDING_BUTTON1 || $this->FG_LIST_ADDIN
 		  </td>
 	 </tr></table>
 <?php  } //END IF ?>
-<br>
 <?php
 
 if ((count($list)>0) && is_array($list)){
@@ -46,6 +45,7 @@ function openURLFilter(theLINK)
 	this.location.href = theLINK + goURL;
 }
 //-->
+
 </script>
 
 <img src="<?php echo Images_Path_Main;?>/clear.gif" width="1" height="1"/>
@@ -237,7 +237,13 @@ function openURLFilter(theLINK)
 								$record_display = "<a href='$link'>$val</a>";
 							}
 						} else {
-							$record_display="";
+							$record_display = "<a href='{$this->FG_TABLE_COL[$i][12]}'>{$list[$ligne_number][$i-$k]}</a>";
+							$string_to_eval = $this->FG_TABLE_COL[$i][7];
+							for ($ll=15;$ll>=0;$ll--){
+								if ($list[$ligne_number][$ll]=='')
+									$list[$ligne_number][$ll]=0;
+								$record_display = str_replace("%$ll", $list[$ligne_number][$ll], $record_display);
+							}
 						}
 					} elseif ($this->FG_TABLE_COL[$i][6]=="eval") {
 
@@ -248,23 +254,61 @@ function openURLFilter(theLINK)
 						}
 						eval("\$eval_res = $string_to_eval;");
 						$record_display = $eval_res;
-						
+
 					} elseif ($this->FG_TABLE_COL[$i][6]=="list") {
 
 						$select_list = $this->FG_TABLE_COL[$i][7];
 						$record_display = $select_list[$list[$ligne_number][$i-$k]][0];
-						
+
 					} elseif ($this->FG_TABLE_COL[$i][6]=="list-conf") {
 
 						$select_list = $this->FG_TABLE_COL[$i][7];
 						$key_config =  $list[$ligne_number][$i-$k + 3];
 						$record_display = $select_list[$key_config][0];
-						
+
 					} elseif ($this->FG_TABLE_COL[$i][6]=="value") {
 
 						$record_display = $this->FG_TABLE_COL[$i][7];
 						$k++;
-						
+
+					} elseif ($this->FG_TABLE_COL[$i][6]=="timeleft") {
+
+						$record_display = $list[$ligne_number][$i-$k];
+						if ($record_display < 0) {
+							$record_display = "<span style='color: red'>00:00</span>";
+						} else {
+							$string_to_eval = $this->FG_TABLE_COL[$i][7]; // %4-%3
+							for ($ll=15;$ll>=0;$ll--){
+								if ($list[$ligne_number][$ll]=='') $list[$ligne_number][$ll]=0;
+								$string_to_eval = str_replace("%$ll", $list[$ligne_number][$ll], $string_to_eval);
+							}
+							eval("\$eval_res = $string_to_eval;");
+
+							$record_display ="
+								<span style='color: green' id='timer{$ligne_number}_out'></span>
+								<div style='display: none' id='timer{$ligne_number}_inp'>{$record_display}</div>
+								<script type='text/javascript'>
+								    function timer{$ligne_number}(){
+									var objout=document.getElementById('timer{$ligne_number}_out');
+									var objinp=document.getElementById('timer{$ligne_number}_inp');
+									objinp.innerHTML--;
+
+									var m = Math.floor(objinp.innerHTML/60);
+									var _m = (m < 10 ? '0' : '') + m;
+									var s = objinp.innerHTML%60;
+									var _s = (s < 10 ? '0' : '') + s;
+									objout.innerHTML = _m+':'+_s;
+
+									if(objinp.innerHTML<=0) {
+										objinp.innerHTML = {$eval_res}*60;
+									}
+								    }
+								    timer{$ligne_number}();
+								    setInterval(timer{$ligne_number}, 999);
+								</script>
+							";
+						}
+
 					} else {
 
 						$record_display = $list[$ligne_number][$i-$k];
@@ -290,7 +334,7 @@ function openURLFilter(theLINK)
 		 		 <?php  } ?>
 
 				  	<?php if($this->FG_EDITION  || $this->FG_INFO || $this->FG_DELETION || $this -> FG_OTHER_BUTTON1 || $this -> FG_OTHER_BUTTON2 || $this -> FG_OTHER_BUTTON3 || $this -> FG_OTHER_BUTTON4 ){?>
-					  <TD align="center" vAlign=top class=tableBodyRight>
+					  <TD align="center" vAlign=top class=tableBodyRight nowrap>
 					
 						<?php if($this->FG_INFO){?>&nbsp; <a href="<?php echo $this->FG_INFO_LINK?><?php echo $list[$ligne_number][$this->FG_NB_TABLE_COL]?>"><img src="<?php echo Images_Path_Main;?>/<?php echo $this->FG_INFO_IMG?>" border="0" title="<?php echo $this->FG_INFO_ALT?>" alt="<?php echo $this->FG_INFO_ALT?>"></a><?php } ?>
 						<?php if($this->FG_EDITION){

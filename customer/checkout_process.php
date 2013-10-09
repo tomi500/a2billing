@@ -109,23 +109,23 @@ if(!is_array($transaction_data) && count($transaction_data) == 0) {
 		" FROM ".$transaction_data[0][4]."; FOR CUSTOMER ID ".$transaction_data[0][1]."; OF AMOUNT ".$transaction_data[0][2]);
 }
 
-
-$security_verify = true;
-$transaction_detail = serialize($_POST);
-
+$security_verify	= true;
+$transaction_detail	= serialize($_POST);
 $currencyObject 	= new currencies();
 $currencies_list 	= get_currencies();
 $user_paypal 		= true;
-$payment_modules = new payment($transaction_data[0][4]);
+$payment_modules	= new payment($transaction_data[0][4]);
+
+if ($A2B->config['epayment_method']['charge_paypal_fee']==1 || !isset($mc_fee))
+	$mc_fee 	= 0;
+if (!isset($mc_gross))
+	$mc_gross	= 0;
+
 switch($transaction_data[0][4])
 {
 	case "paypal":
 		$currCurrency = $mc_currency;
-		if($A2B->config['epayment_method']['charge_paypal_fee']==1){
-			$currAmount = $mc_gross;
-		}else{
-			$currAmount = $mc_gross - $mc_fee;
-		}
+		$currAmount = $mc_gross;
 		$postvars = array();
 		$req = 'cmd=_notify-validate';
 		foreach ($_POST as $vkey => $Value) {
@@ -150,18 +150,17 @@ switch($transaction_data[0][4])
 			exit();
 		} else {
 			fputs ($fp, $header . $req);
-			$flag_ver = 0;
+			$flag_ver = false;
 			while (!feof($fp)) {
 				$res = fgets ($fp, 1024);
 				$gather_res .= $res;
-//				if (strcmp ($res, "VERIFIED\r\n") == 0) {
 				if (strncmp ($res, "VERIFIED", 8) == 0) {
 					write_log(LOGFILE_EPAYMENT, basename(__FILE__).' line:'.__LINE__." - PAYPAL Transaction Verification Status: Verified \nreq=$req\n$gather_res");
-					$flag_ver = 1;
+					$flag_ver = true;
 				}
 			}
-			if ($receiver_id != MODULE_PAYMENT_PAYPAL_ID) $flag_ver = 0;
-			if ($flag_ver == 0) {
+			if ($receiver_id != MODULE_PAYMENT_PAYPAL_ID) $flag_ver = false;
+			if (!$flag_ver) {
 				write_log(LOGFILE_EPAYMENT, basename(__FILE__).' line:'.__LINE__." - PAYPAL Transaction Verification Status: Failed \nreq=$req\n$gather_res");
 				$security_verify = false;
 			}
@@ -257,10 +256,11 @@ switch($transaction_data[0][4])
 		 && !tep_ip_vs_net($ipaddress,"212.158.173.0","255.255.255.0")
 		 && !tep_ip_vs_net($ipaddress,"91.200.28.0",  "255.255.255.0")
 		 && !tep_ip_vs_net($ipaddress,"91.227.52.0",  "255.255.255.0")) $ipaddress = $security_verify = false;
-		if($transaction_data[0][2] != trim($LMI_PAYMENT_AMOUNT)) $security_verify = false;
+//		if($transaction_data[0][2] != trim($LMI_PAYMENT_AMOUNT) && (trim($LMI_PAYMENT_DESC) != "Donate Author" && $transactionID != "1")) $security_verify = false;
+//		if($transaction_data[0][2] != trim($LMI_PAYMENT_AMOUNT)) $security_verify = false;
 		if(array_search($LMI_PAYEE_PURSE, array(MODULE_PAYMENT_WM_PURSE_WMU,MODULE_PAYMENT_WM_PURSE_WMZ,MODULE_PAYMENT_WM_PURSE_WME,MODULE_PAYMENT_WM_PURSE_WMR)) === false) $security_verify = false;
 		write_log(LOGFILE_EPAYMENT, basename(__FILE__).' line:'.__LINE__." - WebMoney LMI_PREREQUEST='$LMI_PREREQUEST', LMI_MODE='$LMI_MODE', LMI_SYS_INVS_NO='$LMI_SYS_INVS_NO', LMI_SYS_TRANS_NO='$LMI_SYS_TRANS_NO', LMI_PAYER_WM='$LMI_PAYER_WM'");
-		if ($LMI_PREREQUEST == 1 && ($security_verify || ($ipaddress && $LMI_PAYMENT_DESC == "Donate Author"))) {
+		if ($LMI_PREREQUEST == 1 && ($security_verify || ($ipaddress && trim($LMI_PAYMENT_DESC) == "Donate Author"))) {
 			echo "YES";
 			write_log(LOGFILE_EPAYMENT, basename(__FILE__).' line:'.__LINE__." - Answered 'YES' to WebMoney ");
 			exit();
@@ -283,7 +283,8 @@ switch($transaction_data[0][4])
 				$security_verify = false;
 				break;
 		}
-		$currAmount = ($transaction_data[0][2]<=$LMI_PAYMENT_AMOUNT)?$transaction_data[0][2]:$LMI_PAYMENT_AMOUNT;
+		$mc_gross = $LMI_PAYMENT_AMOUNT;
+		$currAmount = ($transaction_data[0][2]<=$mc_gross)?$transaction_data[0][2]:$mc_gross;
 		break;
 
 	default:
@@ -291,17 +292,20 @@ switch($transaction_data[0][4])
 		exit();
 }
 
-if(empty($transaction_data[0]['vat']) || !is_numeric($transaction_data[0]['vat']))
+if(empty($transaction_data[0][3]) || !is_numeric($transaction_data[0][3]))
 	$VAT =0;
 else
-	$VAT = $transaction_data[0]['vat'];
+	$VAT = $transaction_data[0][3];
 
-write_log(LOGFILE_EPAYMENT, basename(__FILE__).' line:'.__LINE__." - curr amount $currAmount $currCurrency ".BASE_CURRENCY);
+write_log(LOGFILE_EPAYMENT, basename(__FILE__).' line:'.__LINE__." - curr amount $currAmount $currCurrency BASE_CURRENCY=".BASE_CURRENCY);
+$fee = convert_currency($currencies_list, $mc_fee, $currCurrency, BASE_CURRENCY);
+$amount_without_vat = convert_currency($currencies_list, ($currAmount-$mc_fee) / (1+$VAT/100), $currCurrency, BASE_CURRENCY);
 $amount_paid = convert_currency($currencies_list, $currAmount, $currCurrency, BASE_CURRENCY);
-$amount_without_vat = $amount_paid / (1+$VAT/100);
+$vat_amount = round($amount_paid - $amount_without_vat - $fee, 2);
 
 //If security verification fails then send an email to administrator as it may be a possible attack on epayment security.
 if ($security_verify == false) {
+    write_log(LOGFILE_EPAYMENT, basename(__FILE__).' line:'.__LINE__." - security_verify == False | END");
     try {
     	//TODO create mail class for agent
     	$mail = new Mail('epaymentverify',$id);
@@ -396,36 +400,37 @@ if ($id > 0 && is_null($is_transaction[0][0])) {
 			$id_agent = null;
 			$id_agent_insert = "NULL";
 		}
-		
+
+		$addfield = " (".$mc_gross." ".$currCurrency.")";
 		$field_insert = "date, credit, card_id, description, agent_id";
-		$value_insert = "'$nowDate', '".$amount_without_vat."', '$id', '".$transaction_data[0][4]." (".$currAmount." ".$currCurrency.")', $id_agent_insert";
+		$value_insert = "'$nowDate', '".$amount_without_vat."', '$id', '".$transaction_data[0][4].$addfield."', $id_agent_insert";
 		$instance_sub_table = new Table("cc_logrefill", $field_insert);
 		$id_logrefill = $instance_sub_table -> Add_table ($DBHandle, $value_insert, null, null, 'id');
 		write_log(LOGFILE_EPAYMENT, basename(__FILE__).' line:'.__LINE__." - transactionID=$transactionID"." Add_table cc_logrefill : $field_insert - VALUES $value_insert");
 		
-		$field_insert = "date, payment, card_id, id_logrefill, description, agent_id";
-		$value_insert = "'$nowDate', '".$amount_paid."', '$id', '$id_logrefill', '".$transaction_data[0][4]." (".$currAmount." ".$currCurrency.")', $id_agent_insert ";
+		if ($currCurrency == BASE_CURRENCY)	$addfield = '';
+		$field_insert = "date, payment, card_id, id_logrefill, description, agent_id, fee";
+		$value_insert = "'$nowDate', '".$amount_paid."', '$id', '$id_logrefill', '".$transaction_data[0][4].$addfield."', $id_agent_insert, '$fee'";
 		$instance_sub_table = new Table("cc_logpayment", $field_insert);
 		$id_payment = $instance_sub_table -> Add_table ($DBHandle, $value_insert, null, null,"id");
 		write_log(LOGFILE_EPAYMENT, basename(__FILE__).' line:'.__LINE__." - transactionID=$transactionID"." Add_table cc_logpayment : $field_insert - VALUES $value_insert");
 		
 		//ADD an INVOICE
 		$reference = generate_invoice_reference();
-		$field_insert = "date, id_card, title ,reference, description,status,paid_status";
+		$field_insert = "date, id_card, title, reference, description, status, paid_status";
 		$date = $nowDate;
 		$card_id = $id;
 		$title = gettext("CUSTOMER REFILL");
 		$description = gettext("Invoice for refill");
-		$value_insert = " '$date' , '$card_id', '$title','$reference','$description',1,1 ";
+		$value_insert = "'$date', '$card_id', '$title', '$reference', '$description', 1, 1";
 		$instance_table = new Table("cc_invoice", $field_insert);
-		$id_invoice = $instance_table -> Add_table ($DBHandle, $value_insert, null, null,"id");
+		$id_invoice = $instance_table -> Add_table ($DBHandle, $value_insert, null, null, "id");
 		//load vat of this card
 		if (!empty($id_invoice) && is_numeric($id_invoice)) {
-			$amount = $amount_without_vat;
 			$description = gettext("Refill ONLINE")." : ".$transaction_data[0][4];
-			$field_insert = "date, id_invoice ,price,vat, description";
+			$field_insert = "date, id_invoice, price, fee, vat, description";
 			$instance_table = new Table("cc_invoice_item", $field_insert);
-			$value_insert = " '$date' , '$id_invoice', '$amount','$VAT','$description' ";
+			$value_insert = "'$date', '$id_invoice', '$amount_without_vat', '$fee', '$VAT', '$description'";
 			$instance_table -> Add_table ($DBHandle, $value_insert, null, null,"id");
 		}
 	    //link payment to this invoice
@@ -601,11 +606,16 @@ if (preg_match("/^[_A-Za-z0-9-]+(\\.[_A-Za-z0-9-]+)*@[A-Za-z0-9]+(\\.[A-Za-z0-9]
     try {
         $mail = new Mail(Mail::$TYPE_PAYMENT,$id);
         write_log(LOGFILE_EPAYMENT, basename(__FILE__).' line:'.__LINE__." - SENDING EMAIL TO CUSTOMER ".$customer_info["email"]);
-        $mail->replaceInEmail(Mail::$ITEM_AMOUNT_KEY,$amount_paid);
+        $mail->replaceInEmail(Mail::$ITEM_AMOUNT_KEY,$amount_without_vat." ".BASE_CURRENCY);
         $mail->replaceInEmail(Mail::$ITEM_ID_KEY,$id_logrefill);
         $mail->replaceInEmail(Mail::$ITEM_NAME_KEY,$item_name);
         $mail->replaceInEmail(Mail::$PAYMENT_METHOD_KEY,$pmodule);
         $mail->replaceInEmail(Mail::$PAYMENT_STATUS_KEY,gettext($statusmessage));
+        $mail->replaceInEmail(Mail::$PAYMENT_FEE_KEY,$fee." ".BASE_CURRENCY);
+        $mail->replaceInEmail(Mail::$PAYMENT_VAT_KEY,$VAT);
+        $mail->replaceInEmail(Mail::$PAYMENT_VATAMOUNT_KEY,$vat_amount." ".BASE_CURRENCY);
+        $mail->replaceInEmail(Mail::$PAYMENT_AMOUNT_KEY,$amount_paid." ".BASE_CURRENCY);
+        $mail->replaceInEmail(Mail::$PAYMENT_CURCURRENCY_KEY,$currAmount." ".$currCurrency);
         $mail->send($customer_info["email"]);
 
         write_log(LOGFILE_EPAYMENT, basename(__FILE__).' line:'.__LINE__." - transactionID=$transactionID"."- MAILTO:".$customer_info["email"]."-Sub=".$mail->getTitle()." , mtext=".$mail->getMessage());

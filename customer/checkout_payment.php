@@ -119,7 +119,6 @@ $credit_cur = round($credit_cur, 3);
 
 
 
-
 // #### HEADER SECTION
 $smarty->display( 'main.tpl');
 

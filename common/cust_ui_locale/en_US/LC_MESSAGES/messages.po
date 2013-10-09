@@ -3470,7 +3470,7 @@ msgid "An activation email has been sent to"
 msgstr ""
 
 #: A2B_entity_did.php:82
-msgid "The following Destinaton-DID has been relesed:"
+msgid "The following Destination-DID has been released:"
 msgstr ""
 
 #: A2B_entity_did.php:108

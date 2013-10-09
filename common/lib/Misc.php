@@ -63,7 +63,7 @@ function monitor_recognize(&$ipointer) {
  * a2b_round: specific function to use the same precision everywhere
  */
 function a2b_round($number) {
-	$PRECISION = 6;
+	$PRECISION = 5;
 	return round($number, $PRECISION);
 }
 
@@ -84,23 +84,25 @@ function a2b_decrypt($text, $key) {
 /*
  * a2b_mail - function mail used in a2billing
  */
-function a2b_mail($to, $subject, $mail_content, $from = 'root@localhost', $fromname = '', $contenttype = 'multipart/alternative')
+function a2b_mail($to, $subject, $mail_content, $from = 'root@localhost', $fromname = '', $contenttype = 'multipart/alternative', $attachfile = '')
 {
 	
 	$mail = new PHPMailer(true);
 	
 	if (SMTP_SERVER) {
-		$mail->Mailer = "smtp";
+		$mail->IsSMTP();
 	} else {
-		$mail->Mailer = "sendmail";
+		$mail->IsQmail();
 	}
 
+	$mail->CharSet = 'UTF-8';
+	$mail->Encoding = 'base64';
 	$mail->Host = SMTP_HOST;
 	$mail->Username = SMTP_USERNAME;
 	$mail->Password = SMTP_PASSWORD;
 	$mail->Port = SMTP_PORT;
 	$mail->SMTPSecure = SMTP_SECURE;
-    $mail->CharSet = 'UTF-8';
+//	$mail->Hostname = 'sipde.net';
 
 	if (strlen(SMTP_USERNAME) > 0)
 		$mail->SMTPAuth = true;
@@ -109,6 +111,7 @@ function a2b_mail($to, $subject, $mail_content, $from = 'root@localhost', $fromn
 	$mail->FromName = $fromname;
 	$mail->Subject = $subject;
 	$mail->Body = nl2br($mail_content); //$HTML;
+	if ($attachfile) $mail->AddAttachment($attachfile);
 	$mail->AltBody = $mail_content; // Plain text body (for mail clients that cannot read 	HTML)
 	// if ContentType = multipart/alternative -> HTML will be send
 	$mail->ContentType = $contenttype;
@@ -265,13 +268,12 @@ function sanitize_data($input) {
 
 		// remove whitespaces (not a must though)  
 		$input = trim($input);
-
 		$input = str_replace('--', '', $input);
 		$input = str_replace(';', '', $input);
-		$input = str_replace('#', '', $input);
+//		$input = str_replace('#', '', $input);
 		$input = str_replace('/*', '', $input);
 		
-		#injection sql
+		//injection sql
 		$input = str_ireplace('HAVING', '', $input);
 		$input = str_ireplace('UNION', '', $input);
 		$input = str_ireplace('SUBSTRING', '', $input);
@@ -281,8 +283,8 @@ function sanitize_data($input) {
 		$input = str_ireplace('SCRIPT', '', $input);
 		$input = str_ireplace('ROW_COUNT', '', $input);
 		$input = str_ireplace('SELECT', '', $input);
-		#$input = str_ireplace('UPDATE', '', $input);
-		#$input = str_ireplace('DELETE', '', $input);
+//		#$input = str_ireplace('UPDATE', '', $input);
+//		#$input = str_ireplace('DELETE', '', $input);
 		
 		if (!(stripos($input, ' or 1') === FALSE)) {
 			return false;
@@ -355,7 +357,49 @@ function getpost_ifset($test_vars) {
  * function display_money
  */
 function display_money($value, $currency = BASE_CURRENCY) {
-	echo number_format($value, 2, '.', ' ') . ' ' . strtoupper($currency);
+	$body = explode(" ", $value);
+	if (isset($body[1]))
+		$currency = $body[1];
+	echo number_format($body[0], 2, '.', ' ') . ' ' . strtoupper($currency);
+}
+
+function display_refill_money($value, $currency = BASE_CURRENCY) {
+	$body = explode(" ", $value);
+	if (isset($body[1]))
+		$currency = $body[1];
+	$tempval = 100*abs($value-floor($value));
+	$value = number_format($value, 5, '.', ' ');
+	$value = (round($tempval-floor($tempval),5) == 0) ? number_format($value, 2, '.', ' ') : rtrim($value, '0');
+	echo $value . ' ' . strtoupper($currency);
+}
+
+function display_money_nocur($var, $currency = BASE_CURRENCY) {
+	global $currencies_list, $choose_currency;
+
+	if (isset($choose_currency) && strlen($choose_currency) == 3)
+		$currency = $choose_currency;
+	if ((!isset ($currencies_list)) || (!is_array($currencies_list)))
+		$currencies_list = get_currencies();
+	$var = round($var / $currencies_list[strtoupper($currency)][2], 5);
+	$tempval = 100*abs($var-floor($var));
+	$var = number_format($var, 5, '.', ' ');
+	$var = (round($tempval-floor($tempval),5) == 0) ? number_format($var, 2, '.', ' ') : rtrim($var, '0');
+	echo $var;
+}
+
+function display_2bill($var, $currency = BASE_CURRENCY) {
+	global $currencies_list, $choose_currency;
+
+	if (isset($choose_currency) && strlen($choose_currency) == 3)
+		$currency = $choose_currency;
+	if ((!isset ($currencies_list)) || (!is_array($currencies_list)))
+		$currencies_list = get_currencies();
+	$var = round($var / $currencies_list[strtoupper($currency)][2], 5);
+	$tempval = 100*abs($var-floor($var));
+	$var = number_format($var, 5, '.', ' ');
+	$var = (round($tempval-floor($tempval),5) == 0) ? number_format($var, 2, '.', ' ') : rtrim($var, '0');
+	echo $var . ' ' . strtoupper($currency);
+//	echo number_format($var, 5) . ' ' . strtoupper($currency);
 }
 
 /*
@@ -370,6 +414,7 @@ function display_dateformat($mydate) {
 			return;
 		}
 	}
+//	echo "<font color=red>".$mydate."</font>";
 	echo $mydate;
 }
 
@@ -458,17 +503,6 @@ function display_percentage($var) {
 	}
 }
 
-function display_2bill($var, $currency = BASE_CURRENCY) {
-	global $currencies_list, $choose_currency;
-
-	if (isset ($choose_currency) && strlen($choose_currency) == 3)
-		$currency = $choose_currency;
-	if ((!isset ($currencies_list)) || (!is_array($currencies_list)))
-		$currencies_list = get_currencies();
-	$var = $var / $currencies_list[strtoupper($currency)][2];
-	echo number_format($var, 3) . ' ' . strtoupper($currency);
-}
-
 function remove_prefix($phonenumber) {
 	if (substr($phonenumber, 0, 3) == "011") {
 		echo substr($phonenumber, 3);
@@ -532,6 +566,24 @@ function linkonmonitorfile_customer($value) {
 	    $myfile = base64_encode($myfile);
 	    echo '<a href="call-history.php?download=file&file=' . $myfile . '&.' . $c_format . '"></a> ';
 	    echo '<a target=_blank href="call-history.php?download=file&file=' . $myfile . '"><img src="' . Images_Path . '/icoDisk.gif" height="16"/></a>';
+	} else return false;
+}
+
+/*
+ * function linkonfaxfile_customer
+ */
+function linkonfaxfile_customer($value) {
+	$handle = DbConnect();
+	$instance_table = new Table();
+	$QUERY = "SELECT YEAR(starttime), MONTH(starttime), DAYOFMONTH(starttime), cc_card.username, faxstatus FROM cc_call LEFT JOIN cc_card ON cc_card.id=card_id WHERE uniqueid='$value' ORDER BY cc_call.id DESC LIMIT 1";
+	$result = $instance_table -> SQLExec ($handle, $QUERY);
+	if (is_array($result) && count($result)>0) {
+		$dl_short = FAX_PATH . "/" . $result[0][3] . "/" . $result[0][0] . "/" . $result[0][1] . "/" . $result[0][2];
+		$myfile = $value . ".pdf";
+		if (!file_exists($dl_short . "/" . $myfile)) return false;
+		$myfile = base64_encode($myfile);
+		echo '<a href="fax-history.php?download=file&file=' . $myfile . '"></a>';
+		echo '<a target=_blank href="fax-history.php?download=file&file=' . $myfile . '"><img src="' . Images_Path . '/pdf.gif" height="16"/></a>';
 	} else return false;
 }
 
@@ -706,9 +758,9 @@ function gen_card($table = "cc_card", $len = LEN_CARDNUMBER, $field = "username"
 function generate_unique_value($table, $len, $field)
 {
 	$DBHandle_max = DbConnect();
-	for ($k = 0; $k <= 200; $k++) {
+	for ($k = 0; $k <= 1000; $k++) {
 		$card_gen = MDP($len);
-		if ($k == 200) {
+		if ($k == 1000) {
 			echo "ERROR : Impossible to generate a $field not yet used!<br>Perhaps check the LEN_CARDNUMBER (value:" . LEN_CARDNUMBER . ")";
 			exit ();
 		}
@@ -728,7 +780,7 @@ function generate_unique_value($table, $len, $field)
 /*
  * function gen_card_with_alias
  */
-function gen_card_with_alias($table = "cc_card", $api = 0, $length_cardnumber = LEN_CARDNUMBER, $DBHandle = null)
+function gen_card_with_alias($table = "cc_card", $api = 0, $length_cardnumber = LEN_CARDNUMBER, $DBHandle = null, $alias_static = 0)
 {
 	if (!isset($DBHandle)) {
 		$DBHandle = DbConnect();
@@ -736,7 +788,9 @@ function gen_card_with_alias($table = "cc_card", $api = 0, $length_cardnumber = 
 
 	for ($k = 0; $k <= 200; $k++) {
 		$card_gen = MDP($length_cardnumber);
-		$alias_gen = MDP(LEN_ALIASNUMBER);
+		do {
+			$alias_gen = ($k==0 && LEN_ALIASNUMBER==strlen($alias_static))?$alias_static:MDP(LEN_ALIASNUMBER);
+		} while ($alias_static == 0 && $alias_gen < pow(10,LEN_ALIASNUMBER-1));
 		if ($k == 200) {
 			if ($api) {
 				global $mail_content, $email_alarm, $logfile;
@@ -763,6 +817,83 @@ function gen_card_with_alias($table = "cc_card", $api = 0, $length_cardnumber = 
 		$arr_val[1] = $alias_gen;
 		return $arr_val;
 	}
+}
+
+/*
+ * function 
+ gen_friends
+ */
+function gen_friends($card_id, $start, $quantity, $min, $max, $DBHandle = null, &$A2B, $language = false, $api = 0)
+{
+	if (!isset($DBHandle)) {
+		$DBHandle = DbConnect();
+	}
+	$inst_table = new Table('cc_sip_buddies');
+
+	$amaflags	= $A2B->config["peer_friend"]['amaflag'];
+	$type		= $A2B->config["peer_friend"]['type'];
+	$nat		= $A2B->config["peer_friend"]['nat'];
+	$dtmfmode	= $A2B->config["peer_friend"]['dtmfmode'];
+	$allow		= $A2B->config["peer_friend"]['allow'];
+	$host		= $A2B->config["peer_friend"]['host'];
+	$context	= $A2B->config["peer_friend"]['context'];
+	$qualify	= $A2B->config["peer_friend"]['qualify'];
+	if (!$language)	$language = $A2B->config["global"]['base_language'];
+	$regseconds	= "'0'";
+	$rtptimeout	= "'60'";
+	$rtpholdtimeout	= "'300'";
+	$rtpkeepalive	= "'30'";
+	$allowtransfer	= "'yes'";
+
+		for ($i = 1; $i <= $quantity; $i++) {
+		    for ($k = 0; $k <= 1000; $k++) {
+			if ($k == 1000) {
+				if ($api) {
+					global $mail_content, $email_alarm, $logfile;
+					mail($email_alarm, "ALARM : API (gen_friends - CODE_ERROR 8)", $mail_content);
+					error_log("[" . date("Y/m/d G:i:s", mktime()) . "] " . "[gen_friends] - CODE_ERROR 8" . "\n", 3, $logfile);
+					echo "500 Internal server error";
+					exit ();
+				} else {
+					echo "ERROR : Impossible to generate a Friends not yet used!<br>Perhaps check the StartNumber (value:" . $start . ") & Quantity (value:" . $quantity . ")";
+					exit ();
+				}
+			}
+			$QUERY = "SELECT regexten AS field FROM cc_sip_buddies
+					LEFT JOIN cc_card_concat bb ON id_cc_card = bb.concat_card_id
+					LEFT JOIN ( SELECT aa.concat_id FROM cc_card_concat aa WHERE aa.concat_card_id = $card_id ) AS v ON bb.concat_id = v.concat_id
+					WHERE (id_cc_card = $card_id OR v.concat_id IS NOT NULL) AND regexten = '$start' AND external = 0
+				UNION ALL
+				  SELECT ext_num AS field FROM cc_fax
+					LEFT JOIN cc_card_concat bb ON bb.concat_card_id = id_cc_card
+					LEFT JOIN ( SELECT aa.concat_id FROM cc_card_concat aa WHERE aa.concat_card_id = $card_id ) AS v ON bb.concat_id = v.concat_id
+					WHERE (id_cc_card = $card_id OR v.concat_id IS NOT NULL) AND ext_num = '$start'
+				ORDER BY field";
+			$numrow = 0;
+			$resmax = $DBHandle->Execute($QUERY);
+			if ($resmax)
+				$numrow = $resmax->RecordCount();
+			if ($numrow != 0) {
+				if ($start >= $max) return $i-1;
+				$start++;
+				continue;
+			}
+			break;
+		    }
+//echo $start."-";
+		$pass = MDP_STRING(10);
+		$name = gen_card_with_alias("cc_card", 0, LEN_CARDNUMBER, $DBHandle, $start);
+
+		$QUERY = "INSERT INTO cc_sip_buddies (id_cc_card, name, defaultuser, accountcode, secret, regexten, callerid, amaflags, type, nat, dtmfmode, allow, host, context, regseconds, language, mailbox, rtptimeout, rtpholdtimeout, rtpkeepalive, qualify, allowtransfer)
+			VALUES ('$card_id', '{$name[1]}', '{$name[1]}', '" . $_SESSION["pr_login"] . "', '$pass', '$start', 'Internal-$start', '$amaflags', '$type', '$nat', '$dtmfmode', '$allow', '$host', '$context', $regseconds, '$language', '{$start}@{$_SESSION["pr_login"]}', $rtptimeout, $rtpholdtimeout, $rtpkeepalive, '$qualify', $allowtransfer)";
+		$result = $inst_table->SQLExec($DBHandle, $QUERY, 0);
+//echo $QUERY."<br/>";
+		$QUERY = "INSERT INTO cc_voicemail_users (customer_id, sip_buddy_id, context, mailbox, password, fullname, email, language)
+					SELECT cc_card.id, cc_sip_buddies.id, cc_card.username, '$start', '0000', concat(lastname,' ',firstname) fullname, email, cc_card.language FROM cc_card, cc_sip_buddies WHERE cc_card.id='$card_id' AND cc_sip_buddies.name='{$name[1]}'";
+		$result = $inst_table->SQLExec($DBHandle, $QUERY, 0);
+		$start++;
+		}
+		return --$i;
 }
 
 /**
@@ -914,6 +1045,96 @@ function securitykey($key, $data) {
 	$k_opad = $key ^ $opad;
 
 	return md5($k_opad . pack("H*", md5($k_ipad . $data)));
+}
+
+function getAcceptLanguage($languages)
+{
+    if (!isset($_SERVER['HTTP_ACCEPT_LANGUAGE']) ||
+        !$_SERVER['HTTP_ACCEPT_LANGUAGE']) {
+        return $languages[0];
+    }
+
+    /*
+     * Разбираем заголовок Accept-Language
+     *
+     * http://www.w3.org/Protocols/rfc2616/rfc2616-sec14.html#sec14.4
+     * 14.4 Accept-Language
+     * Accept-Language = "Accept-Language" ":"
+     *                   1#( language-range [ ";" "q" "=" qvalue ] )
+     * language-range  = ( ( 1*8ALPHA *( "-" 1*8ALPHA ) ) | "*" )
+     *
+     * http://www.w3.org/Protocols/rfc2616/rfc2616-sec3.html#sec3.9
+     * 3.9 Quality Values
+     * qvalue         = ( "0" [ "." 0*3DIGIT ] )
+     *                | ( "1" [ "." 0*3("0") ] )
+     */
+    preg_match_all("/([a-z]{1,8})(?:-([a-z]{1,8}))?(?:\s*;\s*q\s*=\s*(1|1\.0{0,3}|0|0\.[0-9]{0,3}))?\s*(?:,|$)/i",
+                   $_SERVER['HTTP_ACCEPT_LANGUAGE'], $matches);
+
+    // Результат по умолчанию - первый из доступных языков
+    $result = $languages[0];
+    $max_q = 0;
+
+    for ($i = 0; $i < count($matches); $i++) {
+        // Выделяем очередной язык
+        $lang = $matches[1][$i];
+        if (!empty($matches[2][$i])) {
+            // Переводим ru-RU в ru_RU (т.к. локаль ru_RU)
+            $lang .= '_'.$matches[2][$i];
+        }
+//echo $lang."<br>";
+        // Определяем приоритет
+        if (!empty($matches[3][$i])) {
+            $q = (float)$matches[3][$i];
+        } else {
+            $q = 1.0;
+        }
+        // Проверяем есть ли проверяемый язык в массиве доступных
+        if (in_array($lang, $languages) && ($q > $max_q)) {
+            $result = $lang;
+            $max_q = $q;
+        }
+        // Если язык только из первой части (например, просто ru, а не ru-RU) и более приоритетный язык еще не найден,
+        // то пробуем найти в массиве доступых языков тот, который начинается так же
+        elseif (empty($matches[2][$i]) && ($q * 0.8 > $max_q)) {
+            $n = strlen($lang);
+            foreach ($languages as $l) {
+                if (!strncmp($l, $lang, $n)) {
+                    $result = $l;
+                    // Поскольку не точное совпадение, то уменьшаем q на 20%
+                    $max_q = $q * 0.8;
+                    break;
+                }
+            }
+        }
+    }
+
+    switch (substr($result,0,2))
+    {
+	case 'ru':
+		$result = 'russian';
+		break;
+	case 'uk':
+		$result = 'russian';
+		break;
+	case 'de':
+		$result = 'german';
+		break;
+	case 'en':
+		$result = 'english';
+		break;
+	case 'it':
+		$result = 'italian';
+		break;
+	case 'fr':
+		$result = 'french';
+		break;
+	default:
+		$result = 'english';
+		break;
+    }
+//echo $result;
+    return $result;
 }
 
 /*
@@ -1109,16 +1330,19 @@ function archive_data($condition, $entity = "")
  * Function use to define exact sql statement for
  * different criteria selection
  */
-function do_field($sql, $fld, $dbfld) {
+function do_field($sql, $fld, $dbfld, $oro=false, $sko=0) {
 	$fldtype = $fld . 'type';
 	global $$fld;
 	global $$fldtype;
 	
 	if ($$fld) {
 		if (strpos($sql, 'WHERE') > 0) {
-			$sql = "$sql AND ";
+			if ($sko==1) $sql .= "(";
+			if ($oro) $sql .= " OR ";
+			else $sql .= " AND ";
 		} else {
-			$sql = "$sql WHERE ";
+			$sql .= " WHERE ";
+			if ($sko==1) $sql .= "(";
 		}
 		$sql = "$sql $dbfld";
 		if (isset ($$fldtype)) {
@@ -1138,6 +1362,7 @@ function do_field($sql, $fld, $dbfld) {
 		} else {
 			$sql = "$sql LIKE '%" . $$fld . "%'";
 		}
+		if ($sko==2) $sql .= ")";
 	}
 	return $sql;
 }
@@ -1157,7 +1382,6 @@ function currencies_update_yahoo ($DBHandle, $instance_table)
 	
 	$QUERY = "SELECT id, currency, basecurrency FROM cc_currencies ORDER BY id";
 	$old_currencies = $instance_table->SQLExec($DBHandle, $QUERY);
-
 	// we will retrieve a .CSV file e.g. USD to EUR and USD to CAD with a URL like:
 	// http://download.finance.yahoo.com/d/quotes.csv?s=USDEUR=X+USDCAD=X&f=l1
 	if (is_array($old_currencies)) {
@@ -1240,6 +1464,8 @@ function currencies_update_yahoo ($DBHandle, $instance_table)
 			// if the currency is base_currency then set to exactly 1.00000
 			if ($i == $index_base_currency)
 				$currency = 1;
+
+if ($old_currencies[$i][1] == 'UAH')		$currency = '0.085';
 
 			$QUERY = "UPDATE cc_currencies SET value='$currency'";
 
@@ -1555,3 +1781,67 @@ function Display_Login_Button ($DBHandle, $id) {
 }
 
 
+function regex_range($from, $to, $exclude = NULL) {
+
+	if($from < 0 || $to < 0) {
+	    throw new Exception("Negative values not supported");
+	}
+	if($from > $to) {
+		throw new Exception("Invalid range $from..$to, from > to");
+	}
+
+	$ranges = array($from);
+	$increment = 1;
+	$next = $from;
+	$higher = true;
+
+	while(true) {
+
+		$next += $increment;
+
+		if($next + $increment > $to) {
+			if($next <= $to) {
+				$ranges[] = $next;
+			}
+			$increment /= 10;
+			$higher = false;
+		}
+		else if($next % ($increment*10) === 0) {
+			$ranges[] = $next;
+			$increment = $higher ? $increment*10 : $increment/10;
+		}
+
+		if(!$higher && $increment < 10) {
+			break;
+		}
+	}
+
+	$ranges[] = $to + 1;
+	$excludeseparated = implode("|",$exclude);
+	$regex = "^(?:";
+	$regex .= ($excludeseparated != "") ? "(?!".$excludeseparated.")" : $excludeseparated;
+	$regex .= "(";
+	for($i = 0; $i < sizeof($ranges) - 1; $i++) {
+		$str_from = (string)($ranges[$i]);
+		$str_to = (string)($ranges[$i + 1] - 1);
+		for($j = 0; $j < strlen($str_from); $j++) {
+			if($str_from[$j] == $str_to[$j]) {
+				$regex .= $str_from[$j];
+			}
+			else {
+				$regex .= "[" . $str_from[$j] . "-" . $str_to[$j] . "]";
+			}
+		}
+		$regex .= "|";
+	}
+
+	return substr($regex, 0, strlen($regex)-1) . '))$';
+}
+
+function test($from, $to) {
+	try {
+		printf("%-10s %s\n", $from . '-' . $to, regex_range($from, $to));
+	} catch (Exception $e) {
+		echo $e->getMessage() . "\n";
+	}
+}

@@ -32,12 +32,157 @@
 **/
 
 
-getpost_ifset(array('voucher'));
 
-$plang='en';
+getpost_ifset(array('id'));
 
-$HD_Form = new FormHandler("cc_voucher","Voucher");
+$atmenu = ($atmenu=='IAX')?$atmenu:'SIP';
+if (!isset($form_action) || $form_action=="list"){
+	$HD_Form = new FormHandler("cc_".strtolower($atmenu)."_buddies LEFT JOIN cc_card_concat bb ON id_cc_card = bb.concat_card_id LEFT JOIN ( SELECT aa.concat_id FROM cc_card_concat aa WHERE aa.concat_card_id = ".$_SESSION["card_id"]." ) AS v ON bb.concat_id = v.concat_id", gettext($atmenu . " Config"));
+}else {
+	$HD_Form = new FormHandler("cc_".strtolower($atmenu)."_buddies", gettext($atmenu . " Config"));
+}
 
 $HD_Form -> FG_DEBUG = 0;
+$HD_Form -> FG_TABLE_DEFAULT_ORDER = "server DESC, regexten";
+$HD_Form -> FG_TABLE_DEFAULT_SENS = "ASC";
 
-?>
+$HD_Form -> FG_FK_DELETE_CONFIRM = true;
+$HD_Form -> FG_FK_DELETE_ALLOWED = true;
+$HD_Form -> FG_FK_TABLENAMES = array('cc_voicemail_users');
+$HD_Form -> FG_FK_EDITION_CLAUSE = array(strtolower($atmenu)."_buddy_id");
+// DEFINE IF WE WANT TO DELETE THE CARD OR NOT
+$HD_Form -> FG_FK_WARNONLY = (DELETE_FK_CARD == true) ? false: true;
+
+if (DELETE_FK_CARD) {
+	// WE WILL DELETE THE FK
+	$HD_Form -> FG_FK_DELETE_MESSAGE = gettext("You are going as well to remove VoiceMail account attached to this SIP/IAX account! Please confirm that you really want to remove this SIP/IAX account?");
+} else {
+	// WE JUST NOTIFY
+	$HD_Form -> FG_FK_DELETE_MESSAGE = gettext("You are going to remove SIP/IAX account that have VoiceMail account attached to it! Please confirm that you really want to remove this SIP/IAX account?");
+}
+
+
+//$HD_Form -> FG__DELETION_LINK = $_SERVER['PHP_SELF']."?form_action=ask-delete&atmenu=$atmenu&regexten=|$FN_COLUMN_REGEXTEN|&id=";
+
+$values_list['nat'] = array(array(gettext('yes'),'force_rport,comedia'),array(gettext('no'),'no'),array(null,null));
+
+$HD_Form -> AddViewElement(gettext("EXTENSION"), "regexten", "10%", "center", "sort", "25");
+$HD_Form -> AddViewElement(gettext("CALLERID NAME"), "callerid", "22%", "center", "sort");
+$HD_Form -> AddViewElement(gettext("LANGUAGE"), "language", "5%", "center", "sort");
+$HD_Form -> AddViewElement(gettext("HOST"), "host", "25%", "center", "sort");
+/**
+if ($atmenu!='IAX') {
+    $HD_Form -> AddViewElement(gettext("CALLGROUP"), "callgroup", "5%", "center", "sort");
+    $HD_Form -> AddViewElement(gettext("PICKUPGROUP"), "pickupgroup", "5%", "center", "sort");
+}
+**/
+$HD_Form -> AddViewElement($atmenu . " URI", "server", "11%", "center", "sort");
+$HD_Form -> AddViewElement(gettext("REGNAME"), "name", "8%", "center", "sort");
+$HD_Form -> AddViewElement(gettext("SECRET"), "secret", "8%", "center", "sort");
+
+//$HD_Form -> FieldViewElement ("IF(regexten='',name,regexten) AS regexten, callerid, language, host, ".(($atmenu!='IAX')?"callgroup, pickupgroup, ":"")."'".SIP_IAX_INFO_HOST."', name, secret ");
+//$HD_Form -> FieldViewElement ("IF(regexten='',name,regexten) AS regexten, callerid, IF(id_cc_card = ".$_SESSION["card_id"].",language,NULL) AS language, IF(id_cc_card = ".$_SESSION["card_id"].",IF(port>0 AND UNIX_TIMESTAMP()<regseconds,concat('<font color=green>',ipaddr,':',port,'</font>'),host),IF(port>0 AND UNIX_TIMESTAMP()<regseconds,'<font color=green>ONLINE</font>','offline')) AS host, IF(id_cc_card = ".$_SESSION["card_id"].",'".SIP_IAX_INFO_HOST."',NULL) AS server, IF(id_cc_card = ".$_SESSION["card_id"].",name,NULL) AS name, IF(id_cc_card = ".$_SESSION["card_id"].",secret,NULL) AS secret ");
+$HD_Form -> FieldViewElement ("IF(regexten='',name,regexten) AS regexten, callerid, IF(id_cc_card = ".$_SESSION["card_id"].",language,NULL) AS language, IF(id_cc_card = ".$_SESSION["card_id"].",IF(port>0 AND UNIX_TIMESTAMP()<regseconds,concat('<font color=green>',ipaddr,':',port,'</font> ',IF(lastms=-1,'UNREACHABLE',IF(lastms>0,concat('(',lastms,' ms)'),'')),'<br>',useragent),host),IF(port>0 AND UNIX_TIMESTAMP()<regseconds,'<font color=green>ONLINE</font>','offline')) AS host, IF(id_cc_card = ".$_SESSION["card_id"].",'".SIP_IAX_INFO_HOST."',NULL) AS server, name, IF(id_cc_card = ".$_SESSION["card_id"].",secret,NULL) AS secret ");
+//$HD_Form -> FieldViewElement ("IF(regexten='',name,regexten) AS regexten, callerid, IF(id_cc_card = ".$_SESSION["card_id"].",language,NULL) AS language, IF(port>0 AND UNIX_TIMESTAMP()<regseconds,concat('<font color=green>',ipaddr,':',port,'</font>'),host) AS host, IF(id_cc_card = ".$_SESSION["card_id"].",'".SIP_IAX_INFO_HOST."',NULL) AS server, IF(id_cc_card = ".$_SESSION["card_id"].",name,NULL) AS name, IF(id_cc_card = ".$_SESSION["card_id"].",secret,NULL) AS secret ");
+
+$HD_Form -> CV_NO_FIELDS  = gettext("THERE IS NO ".strtoupper($HD_Form->FG_INSTANCE_NAME)." CREATED!");
+$HD_Form -> CV_DISPLAY_LINE_TITLE_ABOVE_TABLE = false;
+$HD_Form -> CV_TEXT_TITLE_ABOVE_TABLE = '';
+$HD_Form -> CV_DISPLAY_FILTER_ABOVE_TABLE = false;
+$HD_Form -> FG_LIMITE_DISPLAY = 24;
+$HD_Form -> FG_OTHER_BUTTON1 = false;
+
+if (strlen($HD_Form -> FG_TABLE_CLAUSE)>0)
+    $HD_Form -> FG_TABLE_CLAUSE.=" AND ";
+
+$HD_Form -> FG_TABLE_CLAUSE.="(id_cc_card = ".$_SESSION["card_id"]." OR v.concat_id IS NOT NULL) AND external = 0";
+/**
+if (strlen($HD_Form -> FG_EDITION_CLAUSE)>0)
+    $HD_Form -> FG_EDITION_CLAUSE.=" AND ";
+
+$HD_Form -> FG_DELETION_CLAUSE = "id_cc_card = ".$_SESSION["card_id"]." AND external = 0";
+
+$HD_Form -> FG_EDITION_CLAUSE .= $HD_Form -> FG_DELETION_CLAUSE;
+**/
+$HD_Form -> FG_EDITION_CONDITION = '"|col6|" != ""';
+$HD_Form -> FG_DELETION_CONDITION = '"|col6|" != "" && "|col5|" != "{$_SESSION["user_alias"]}"';
+
+$HD_Form -> FG_EDITION = true;
+$HD_Form -> FG_DELETION = true;
+$HD_Form -> FG_ADDITION = false;
+$HD_Form -> FG_VIEW_TABLE_WITDH = '80%';
+
+$HD_Form -> AddEditElement (gettext("EXTENSION "),
+					"regexten",
+					$exten_include,
+					"INPUT",
+					"size=50 maxlength=$extlen",
+					regex_range($extmin,$extmax,$exten_include),
+					"Enter right number from range below exclude afore existing numbers",
+					"", "", "", "", "", "", "", gettext("Extension number from ").$extmin.gettext(" to ").$extmax);
+
+$HD_Form -> AddEditElement (gettext("REGISTRATION NAME"),
+					"name",
+					"",
+					"INPUT",
+					"size=50 readonly",
+					"",
+					"",
+					"", "", "", "", "", "", "", gettext("Use for information only"));
+
+$HD_Form -> AddEditElement (gettext("SECRET"),
+					"secret",
+					"",
+					"INPUT",
+					"size=50 maxlength=20",
+					"26",
+					gettext("THE PASSWORD SHOULD CONSIST OF NUMBERS AND LETTERS"),
+					"", "", "", "", "", "", "", gettext("Between 8-20 characters, include Latin letters and numbers"));
+
+$HD_Form -> AddEditElement (gettext("CALLERID NAME"),
+					"callerid",
+					"",
+					"INPUT",
+					"size=50 maxlength=40",
+					"",
+					"",
+					"", "", "", "", "", "", "NO-NULL", gettext("Allows you to set the Name of the caller"));
+
+$HD_Form -> AddEditElement (gettext("NAT"),
+					"nat",
+					"",
+					"SELECT",
+					"",
+					"",
+					"",
+					"list", "", "", "", $values_list['nat'], "%1", "NO-NULL", gettext("Is this extension behind the nat?"));
+
+$field_list_edit = 'regexten, name, secret, callerid, nat';
+
+$HD_Form -> FieldEditElement ($field_list_edit);
+
+$HD_Form -> FG_FILTER_APPLY = false;
+$HD_Form -> FG_FILTERFIELD = 'name';
+$HD_Form -> FG_FILTERFIELDNAME = gettext('NAME');
+$HD_Form -> FG_FILTER_FORM_ACTION = 'list';
+
+
+if (isset($filterprefix)  &&  (strlen($filterprefix)>0)){
+	if (strlen($HD_Form -> FG_TABLE_CLAUSE)>0) $HD_Form -> FG_TABLE_CLAUSE.=" AND ";
+	$HD_Form -> FG_TABLE_CLAUSE.="name like '$filterprefix%'";
+}
+
+$HD_Form -> FG_INTRO_TEXT_EDITION= '';
+$HD_Form -> FG_INTRO_TEXT_ASK_DELETION = gettext("If you really want remove this")." EXTENSION, ".gettext("click on the delete button.");
+$HD_Form -> FG_INTRO_TEXT_ADD = gettext("you can add easily a new").$HD_Form->FG_INSTANCE_NAME.".<br>".gettext("Fill the following fields and confirm by clicking on the button add.");
+
+$HD_Form -> FG_INTRO_TEXT_ADITION = '';
+
+$HD_Form -> FG_BUTTON_EDITION_SRC = $HD_Form -> FG_BUTTON_ADITION_SRC  = Images_Path . "/cormfirmboton.gif";
+$HD_Form -> FG_BUTTON_EDITION_BOTTOM_TEXT = $HD_Form -> FG_BUTTON_ADITION_BOTTOM_TEXT = gettext("Click 'Confirm Data' to continue");
+
+$HD_Form->FG_ADDITIONAL_FUNCTION_AFTER_DELETE = $HD_Form->FG_ADDITIONAL_FUNCTION_AFTER_EDITION = 'processing_sipiax_generate';
+
+//$HD_Form -> FG_GO_LINK_AFTER_ACTION_ADD = $_SERVER['PHP_SELF']."?atmenu=$atmenu&stitle=Document&wh=AC&id=";
+$HD_Form -> FG_GO_LINK_AFTER_ACTION_EDIT = $_SERVER['PHP_SELF']."?atmenu=$atmenu&stitle=Document&wh=AC&id=";
+$HD_Form -> FG_GO_LINK_AFTER_ACTION_DELETE = $_SERVER['PHP_SELF']."?atmenu=$atmenu&stitle=Document&wh=AC&id=";

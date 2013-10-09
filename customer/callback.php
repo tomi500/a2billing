@@ -70,28 +70,46 @@ if ($customer_info[14] != "1" && $customer_info[14] != "8") {
 	die();
 }
 
-if ($callback) {
-	
+$A2B -> DBHandle = DbConnect();
+$instance_table = new Table();
+$A2B -> set_instance_table ($instance_table);
+$A2B -> cardnumber = $_SESSION["pr_login"];
+if ($A2B -> callingcard_ivr_authenticate_light ($error_msg) && $callback) {
+	$called  = $A2B -> apply_rules($called);
+	$calling = $A2B -> apply_rules($calling);
 	if (strlen($called)>1 && strlen($calling)>1 && is_numeric($called) && is_numeric($calling)) {
-		
-		$A2B -> DBHandle = DbConnect();
-		$instance_table = new Table();
-		$A2B -> set_instance_table ($instance_table);
-		$A2B -> cardnumber = $_SESSION["pr_login"];
-			
-		if ($A2B -> callingcard_ivr_authenticate_light ($error_msg)) {
-		
+		$virtcalled = $called;
+		$virtcalling = $calling;
+			$QUERY = "SELECT name, regexten FROM cc_sip_buddies
+					LEFT JOIN cc_card_concat bb ON id_cc_card = bb.concat_card_id
+					LEFT JOIN ( SELECT aa.concat_id FROM cc_card_concat aa WHERE aa.concat_card_id = {$A2B->card_id} ) AS v ON v.concat_id = bb.concat_id
+					WHERE (id_cc_card = {$A2B->card_id} OR v.concat_id IS NOT NULL) AND (regexten = '{$called}' OR name = '{$called}') LIMIT 1";
+//			$QUERY = "SELECT name FROM cc_sip_buddies WHERE id_cc_card = $A2B->card_id AND regexten = '$called' LIMIT 1";
+			$result = $A2B -> instance_table -> SQLExec ($A2B->DBHandle, $QUERY);
+			if (is_array($result) && $result[0][0] != "") {
+				$virtcalled			= $result[0][0];
+				if ($result[0][1]) $called	= $result[0][1];
+			}
+			$QUERY = "SELECT name, regexten FROM cc_sip_buddies
+					LEFT JOIN cc_card_concat bb ON id_cc_card = bb.concat_card_id
+					LEFT JOIN ( SELECT aa.concat_id FROM cc_card_concat aa WHERE aa.concat_card_id = {$A2B->card_id} ) AS v ON v.concat_id = bb.concat_id
+					WHERE (id_cc_card = {$A2B->card_id} OR v.concat_id IS NOT NULL) AND (regexten = '{$calling}' OR name = '{$calling}') LIMIT 1";
+//			$QUERY = "SELECT name FROM cc_sip_buddies WHERE id_cc_card = $A2B->card_id AND regexten = '$calling' LIMIT 1";
+			$result = $A2B -> instance_table -> SQLExec ($A2B->DBHandle, $QUERY);
+			if (is_array($result) && $result[0][0] != "") {
+				$virtcalling			= $result[0][0];
+				if ($result[0][1]) $calling	= $result[0][1];
+			}
 			$RateEngine = new RateEngine();
 			$RateEngine -> webui = 0;
 			// LOOKUP RATE : FIND A RATE FOR THIS DESTINATION
-			
+
 			$A2B -> agiconfig['accountcode']=$_SESSION["pr_login"];
 			$A2B -> agiconfig['use_dnid']=1;
 			$A2B -> agiconfig['say_timetocall']=0;						
-			$A2B -> extension = $A2B -> dnid = $A2B -> destination = $A2B -> apply_rules($called);
-
+			$A2B -> extension = $A2B -> dnid = $A2B -> destination = $virtcalled;
 			$resfindrate = $RateEngine->rate_engine_findrates($A2B, $A2B -> dnid, $_SESSION["tariff"]);
-			
+
 			// IF FIND RATE
 			if ($resfindrate!=0) {				
 				$res_all_calcultimeout = $RateEngine->rate_engine_all_calcultimeout($A2B, $A2B->credit);
@@ -101,7 +119,7 @@ if ($callback) {
 				    $channeloutcid = $RateEngine->rate_engine_performcall(false, $A2B -> dnid, $A2B);
 				    if ($channeloutcid) {
 					$channel = $channeloutcid[0];
-					$exten = $calling;
+					$exten = $virtcalling;
 					$context = $A2B -> config["callback"]['context_callback'];
 					$id_server_group = $A2B -> config["callback"]['id_server_group'];
 					$priority=1;
@@ -118,7 +136,7 @@ if ($callback) {
 					$num_attempt = 0;
 					
 					$sep = ($A2B->config['global']['asterisk_version'] == "1_2" || $A2B->config['global']['asterisk_version'] == "1_4")?"|":",";
-					$variable = "CALLED=".$A2B->dnid.$sep."CALLING=".$calling.$sep."CBID=".$uniqueid.$sep."LEG=".$A2B->cardnumber.$sep."RATECARD=".
+					$variable = "CALLED=".$A2B->dnid.$sep."CALLING=".$virtcalling.$sep."CBID=".$uniqueid.$sep."LEG=".$A2B->cardnumber.$sep."RATECARD=".
 						$RateEngine->ratecard_obj[$channeloutcid[4]][6].$sep."TRUNK=".$channeloutcid[2].$sep."TD=".$channeloutcid[3];
 					
 					$QUERY = " INSERT INTO cc_callback_spool (uniqueid, status, server_ip, num_attempt, channel, exten, context, priority," .
@@ -142,15 +160,14 @@ if ($callback) {
 				    } else $error_msg = gettext("Error : Sorry, not enough free trunk for make call. Try again later!");
 				} else $error_msg = gettext("Error : You don t have enough credit to call you back!");
 			} else $error_msg = gettext("Error : There is no route to call back your phonenumber!");
-		} else {
-			// ERROR MESSAGE IS CONFIGURE BY THE callingcard_ivr_authenticate_light
-		}
 	} else $error_msg = gettext("Error : You have to specify your phonenumber and the number you wish to call!");
 }
 
-set_time_limit(0);
-ignore_user_abort(true);
-ob_start();
+if ($endinuse) {
+	set_time_limit(0);
+	ignore_user_abort(true);
+	ob_start();
+}
 
 $customer = $_SESSION["pr_login"];
 
@@ -158,6 +175,31 @@ $customer = $_SESSION["pr_login"];
 $smarty->display( 'main.tpl');
 
 echo $CC_help_callback;
+
+if ($calling == '' && $called == '') {
+	$QUERY = "SELECT exten_leg_a, exten FROM cc_callback_spool WHERE account = $A2B->cardnumber ORDER BY id DESC LIMIT 1";
+	$result = $A2B -> instance_table -> SQLExec ($A2B->DBHandle, $QUERY);
+	if (is_array($result)) {
+		$called 	= $result[0][0];
+		$calling	= $result[0][1];
+		$QUERY = "SELECT regexten FROM cc_sip_buddies
+				LEFT JOIN cc_card_concat bb ON id_cc_card = bb.concat_card_id
+				LEFT JOIN ( SELECT aa.concat_id FROM cc_card_concat aa WHERE aa.concat_card_id = {$A2B->card_id} ) AS v ON v.concat_id = bb.concat_id
+				WHERE (id_cc_card = {$A2B->card_id} OR v.concat_id IS NOT NULL) AND (regexten = '{$called}' OR name = '{$called}') LIMIT 1";
+		$result = $A2B -> instance_table -> SQLExec ($A2B->DBHandle, $QUERY);
+		if (is_array($result) && $result[0][0]) {
+			$called	= $result[0][0];
+		}
+		$QUERY = "SELECT regexten FROM cc_sip_buddies
+				LEFT JOIN cc_card_concat bb ON id_cc_card = bb.concat_card_id
+				LEFT JOIN ( SELECT aa.concat_id FROM cc_card_concat aa WHERE aa.concat_card_id = {$A2B->card_id} ) AS v ON v.concat_id = bb.concat_id
+				WHERE (id_cc_card = {$A2B->card_id} OR v.concat_id IS NOT NULL) AND (regexten = '{$calling}' OR name = '{$calling}') LIMIT 1";
+		$result = $A2B -> instance_table -> SQLExec ($A2B->DBHandle, $QUERY);
+		if (is_array($result) && $result[0][0]) {
+			$calling = $result[0][0];
+		}
+	}
+}
 
 ?>
 <br>

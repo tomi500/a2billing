@@ -77,7 +77,7 @@ define ("BUDDY_SIP_FILE", isset($A2B->config['webui']['buddy_sip_file'])?$A2B->c
 define ("BUDDY_IAX_FILE", isset($A2B->config['webui']['buddy_iax_file'])?$A2B->config['webui']['buddy_iax_file']:null);
 
 // VOICEMAIL
-define ("ACT_VOICEMAIL", false);
+define ("ACT_VOICEMAIL", true);
 
 // SHOW DONATION
 define ("SHOW_DONATION", true);

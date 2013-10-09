@@ -170,7 +170,9 @@ $smarty->display('header.tpl');
    <?php
    } else {
    ?>			
-			<table width="100%" >
+			<table width="92%">
+			<tr><td>
+			<table align="right" width="90%">
 			<tr><td colspan="2" ></td></tr>
 			<tr>
 			<td>
@@ -178,6 +180,8 @@ $smarty->display('header.tpl');
 			<?php echo $login_message;?></b>
 			</td></tr>
                 <tr><td colspan="2" ></td></tr>
+			</table>
+			</td></tr>
 			</table>
 			   
     <?php } ?>

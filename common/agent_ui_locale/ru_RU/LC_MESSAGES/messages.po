@@ -2140,6 +2140,10 @@ msgstr ""
 msgid "Invalid card number lenght defined in configuration."
 msgstr "Неверный номер карты указан в конфигурации."
 
+#: lib/Class.A2Billing.php:2002
+msgid "The call dropped prematurely"
+msgstr "Вызывающая сторона положила трубку не начав передачу факса"
+
 #: lib/Class.A2Billing.php:3276
 msgid "Error : Authentication Failed !!!"
 msgstr "Ошибка : Ошибка аутентификации !!!"

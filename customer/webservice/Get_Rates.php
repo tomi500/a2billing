@@ -75,7 +75,7 @@ function Service_Get_Rates($activation_code)
 		return array('500', ' ERROR - CONNECT DB ');
 	}
 	
-	list($accountnumber, $password) = (preg_split("{_}",$activation_code,2));
+	list($accountnumber, $password) = (preg_split("{_}",$activation_code));
 	
 	$QUERY = "SELECT cc.username, cc.credit, cc.status, cc.id, cc.id_didgroup, cc.tariff, cc.vat, ct.gmtoffset, cc.voicemail_permitted, " .
 			 "cc.voicemail_activated, cc_card_group.users_perms, cc.currency " .

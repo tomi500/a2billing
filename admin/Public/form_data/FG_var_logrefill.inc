@@ -37,6 +37,7 @@ getpost_ifset(array('id', 'card_id', 'date', 'credit','description,added_invoice
 
 if (!isset($form_action) || $form_action=="list") {
 	$HD_Form = new FormHandler("cc_logrefill LEFT JOIN cc_card ON cc_card.id=card_id","Refill");
+//	$HD_Form -> FG_TABLE_DEFAULT_ORDER = 'date';
 } else {
 	$HD_Form = new FormHandler("cc_logrefill","Refill");
 }

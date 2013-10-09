@@ -38,65 +38,100 @@ include ("./lib/Form/Class.FormHandler.inc.php");
 include ("./form_data/FG_var_callerid.inc");
 include ("lib/customer.smarty.php");
 
+getpost_ifset(array('add_callerid'));
 
-if (! has_rights (ACX_CALLER_ID)) {
+$HD_Form -> setDBHandler (DbConnect());
+
+if (!isset($form_action))  $form_action="list"; //ask-add
+if (!isset($action)) $action = $form_action;
+
+//if ($idcust == "") $idcust = $_SESSION["card_id"];
+$result_security = true;
+if (is_numeric($idcust) && $idcust != $_SESSION['card_id'] && (array_search($form_action, array("ask-edit", "ask-delete")) !== false || array_search($action, array("edit", "delete")) !== false)) {
+	$table_diller_security = new Table("cc_callerid LEFT JOIN cc_card ON cc_card.id=id_cc_card", "cc_callerid.id");
+	$clause_diller_security = "id_cc_card=$idcust AND cc_card.id_diller = {$_SESSION['card_id']}";
+	$result_security = $table_diller_security -> Table_count ($HD_Form -> DBHandle, $clause_diller_security);
+}
+
+if (!has_rights(ACX_CALLER_ID) || !$result_security) {
 	Header ("HTTP/1.0 401 Unauthorized");
 	Header ("Location: PP_error.php?c=accessdenied");
 	die();
 }
 
-
-getpost_ifset(array('add_callerid'));
-
-$HD_Form -> setDBHandler (DbConnect());
-$HD_Form -> init();
+//echo "result_security = ".$result_security."<br>";
 
 // ADD SPEED DIAL
-if (strlen($add_callerid)>0  && is_numeric($add_callerid)) {
-	$instance_sub_table = new Table('cc_callerid');
-	$QUERY = "SELECT count(*) FROM cc_callerid WHERE id_cc_card='".$_SESSION["card_id"]."'";
-	$result = $instance_sub_table -> SQLExec ($HD_Form -> DBHandle, $QUERY, 1);
-	// CHECK IF THE AMOUNT OF CALLERID IS LESS THAN THE LIMIT
-	if ($result[0][0] < $A2B->config["webcustomerui"]['limit_callerid']){
-		$QUERY = "INSERT INTO cc_callerid (id_cc_card, cid) VALUES ('".$_SESSION["card_id"]."', '".$add_callerid."')";
+if (strlen($add_callerid)>0) {
+	$instance_sub_table = new Table("cc_callerid", "*");
+	$QUERY = "SELECT id FROM cc_card WHERE id = $idcard OR id_diller = $idcard";
+	$result = $instance_sub_table -> SQLExec ($HD_Form -> DBHandle, $QUERY);
+	if ($result) {
+		$clause_limit = "id_cc_card = $idcard";
+		$result = $instance_sub_table -> Table_count ($HD_Form -> DBHandle, $clause_limit);
+	} else {
+		Header ("HTTP/1.0 401 Unauthorized");
+		Header ("Location: PP_error.php?c=accessdenied");
+		die();
+	}
+// CHECK IF THE AMOUNT OF CALLERID IS LESS THAN THE LIMIT
+	if ($result < $A2B->config["webcustomerui"]['limit_callerid']) {
+		$QUERY = "INSERT INTO cc_callerid (id_cc_card, cid) VALUES ($idcard, '".$add_callerid."')";
 		$result = $instance_sub_table -> SQLExec ($HD_Form -> DBHandle, $QUERY, 0);
 	}
 }
 
+$HD_Form -> init();
 
+$HD_Form -> FG_EDITION_LINK = $_SERVER['PHP_SELF']."?form_action=ask-edit&popup_select=$popup_select&idcust=$idcust&id=";
+$HD_Form -> FG_DELETION_LINK = $_SERVER['PHP_SELF']."?form_action=ask-delete&popup_select=$popup_select&idcust=$idcust&id=";
+
+// My Code for Where Cluase
+if (strlen($HD_Form -> FG_EDITION_CLAUSE)>0)
+	$HD_Form -> FG_EDITION_CLAUSE .= " AND ";
+$HD_Form -> FG_EDITION_CLAUSE .= "id_cc_card = ".$idcard;
+if ($form_action == "ask-delete" || $form_action == "delete") {
+	$HD_Form -> FG_EDITION_CLAUSE .= " AND verify = 0";
+}
 if ($id!="" || !is_null($id)){
 	$HD_Form -> FG_EDITION_CLAUSE = str_replace("%id", "$id", $HD_Form -> FG_EDITION_CLAUSE);
 }
 
-if (!isset($form_action))  $form_action="list"; //ask-add
-if (!isset($action)) $action = $form_action;
-
 $list = $HD_Form -> perform_action($form_action);
 
-
 // #### HEADER SECTION
-$smarty->display( 'main.tpl');
+$smarty->display('main.tpl');
+
+?>
+<center>
+<?php
+if (has_rights(ACX_DISTRIBUTION) && ($popup_select>=1)) {
+	$instance_table_card = new Table('cc_card');
+	$QUERY = "SELECT lastname, firstname FROM cc_card WHERE id = $idcust AND id_diller = " . $_SESSION["card_id"];
+	$resmax = $instance_table_card -> SQLExec ($HD_Form -> DBHandle, $QUERY, 1);
+	if ($resmax) {
+		echo "<u>".$resmax[0][0]." ".$resmax[0][1]."</u><br>";
+	} else exit();
+}
 
 if ($form_action == "list") {
     // My code for Creating two functionalities in a page
     $HD_Form -> create_toppage ("ask-add");
-?>
-<center>
-<?php
-    
-	if (isset($update_msg) && strlen($update_msg)>0) echo $update_msg;
-	
+    if (isset($update_msg) && strlen($update_msg)>0) echo $update_msg;
+
     $count_cid = is_array($list) ? sizeof($list) : 0;
     if ($count_cid < $A2B->config["webcustomerui"]['limit_callerid']) {
 
 ?>
 	   <table align="center"  border="0" width="55%" class="bgcolor_006">
 		<form name="theForm" action="<?php  $_SERVER["PHP_SELF"]?>">
+		<input name="popup_select" type=hidden value="<?php echo $popup_select?>">
+		<input name="idcust" type=hidden value="<?php echo $idcust?>">
 		<tr class="bgcolor_001" >
 
 		<td align="center" valign="top">
-				<?php gettext("CALLER ID :");?>
-				<input class="form_input_text" name="add_callerid" size="15" maxlength="60">
+				<?php //echo gettext("CALLER ID :");?>
+				+<input class="form_input_text" name="add_callerid" size="15" maxlength="60">
 			</td>
 			<td align="center" valign="middle">
 						<input class="form_input_button"  value="<?php echo gettext("ADD NEW CALLERID"); ?>"  type="submit">
@@ -104,23 +139,20 @@ if ($form_action == "list") {
         </tr>
 		</form>
       </table>
-	  <br>
 	<?php
-	} else { 
-	
-	?>
-		<table align="center"  border="0" width="70%" class="bgcolor_006">
-			<tr class="bgcolor_001" >
-				<td align="center" valign="middle">
-					<b><i> <?php  echo gettext("You are not allowed to add more CallerID.");
-					echo "<br/>";
-					 echo gettext("Remove one if you are willing to use an other CallerID.");?> </i> </b>
-					<br/>
-					<?php echo gettext("Max CallerId");?> &nbsp;:&nbsp; <?php echo $A2B->config["webcustomerui"]['limit_callerid'] ?>
-	  			</td>
-     		 </tr>
-	 	</table>
-	<?php 	 
+	} else {
+	?><table align="center"  border="0" width="70%" class="bgcolor_006">
+		<tr class="bgcolor_001" >
+			<td align="center" valign="middle">
+				<b><i> <?php  echo gettext("You are not allowed to add more CallerID.");
+				echo "<br/>";
+				echo gettext("Remove one if you are willing to use an other CallerID.");?> </i> </b>
+				<br/>
+				<?php echo gettext("Max CallerId");?> &nbsp;:&nbsp; <?php echo $A2B->config["webcustomerui"]['limit_callerid'] ?>
+			</td>
+		</tr>
+	  </table>
+	<?php
 	}
     // END END END My code for Creating two functionalities in a page
 }
@@ -133,8 +165,5 @@ $HD_Form -> create_toppage ($form_action);
 
 $HD_Form -> create_form ($form_action, $list, $id=null) ;
 
-
 // #### FOOTER SECTION
 $smarty->display( 'footer.tpl');
-
-

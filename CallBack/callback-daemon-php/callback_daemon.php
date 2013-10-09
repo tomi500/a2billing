@@ -74,10 +74,12 @@ if (!defined('PID'))
     define("PID", $A2B->config["daemon-info"]['pidfile']);
 
 // CHECK IF THE DAEMON IS ALREADY RUNNING
-if (ProcessHandler :: isActive())
+$pH = new ProcessHandler();
+if ($pH->isActive()) {
     die("Already running!");
-else
-    ProcessHandler :: activate();
+} else {
+    $pH->activate();
+}
 
 write_log(LOGFILE_API_CALLBACK, basename(__FILE__) . ' line:' . __LINE__ . "[#### CALLBACK BEGIN ####]");
 

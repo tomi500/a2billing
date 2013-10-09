@@ -121,6 +121,9 @@ if (ADVANCED_MODE) {
 $HD_Form->setDBHandler(DbConnect());
 $HD_Form->init();
 
+$HD_Form -> FG_EDITION_LINK = $_SERVER['PHP_SELF']."?form_action=ask-edit&current_page=$current_page&filterprefix=$filterprefix&id=";
+$HD_Form -> FG_DELETION_LINK = $_SERVER['PHP_SELF']."?form_action=ask-delete&current_page=$current_page&filterprefix=$filterprefix&id=";
+
 // CHECK IF REQUEST OF BATCH UPDATE
 if ($batchupdate == 1 && is_array($check)) {
 

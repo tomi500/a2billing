@@ -1,4 +1,4 @@
-# A2Billing Customer Panel - PO File.
+# A2Billing Customer Panel - PO File. 
 # Copyright (C) 2004-2009 A2BILLING
 # This file is distributed under the same license as the PACKAGE package.
 # ARESKI <areski@gmail.com>.
@@ -32,7 +32,7 @@ msgstr ""
 #: lib/Form/Class.FormBO.php:840 lib/Form/Class.FormBO.php:949
 #: checkout_process.php:358
 msgid "Invoice for refill"
-msgstr "Инвойс для пополнения"
+msgstr "Счёт за пополнение"
 
 #: A2B_recurring_payment.php:165
 msgid "Automated Refill : recurring payment"
@@ -43,14 +43,17 @@ msgstr ""
 msgid "AUTOMATICALY GENERATED COMMISSION!"
 msgstr "АВТОМАТИЧЕСКИ СОЗДАННАЯ КОМИССИЯ!"
 
+#: lib/customer.help.php:159
+msgid "This screen shows refills and payments made against each account, along with the current credit on each card. The initial amount of credit applied to the card is not included. The amount owing is calculated by subtracting payments from refills."
+msgstr "Просматривайте баллансы, суммы счетов и платежей каждого Вашего клиента. В правой колонке можно выбрать информацию о других параметрах, а так же пополнить баланс клиента или вернуть средства. <u>ВНИМАНИЕ</u>! Отмена проведенного перевода средств невозможна!"
+
 #: paypal.php:72
 msgid "Payment for "
 msgstr "Платёж для "
 
 #: A2B_entity_phonenumber.php:113
-#, fuzzy
 msgid "CAMPAIGN"
-msgstr "КОМПАНИЯ"
+msgstr "МЕРОПРИЯТИЕ"
 
 #: A2B_entity_phonenumber.php:116 lib/interface/constants.php:15
 #, fuzzy
@@ -133,7 +136,7 @@ msgstr "Изменение пароля"
 
 #: A2B_entity_password.php:122
 msgid "Do not use \" or = characters in your password"
-msgstr "Не используйте символы ( \" ) и (=) для пароля"
+msgstr "Не используйте символы <font color=green>\"</font> и <font color=green>=</font> для пароля"
 
 #: A2B_entity_password.php:125
 msgid "Old Password"
@@ -240,7 +243,7 @@ msgstr "Неправильная карта"
 
 #: simulator.php:146
 msgid "Simulator"
-msgstr "Симулятор Звонков"
+msgstr "Узнать стоимость звонка по номеру"
 
 #: simulator.php:152
 msgid "Enter the number you wish to call"
@@ -249,16 +252,15 @@ msgstr "Введите номер для проверки"
 #: simulator.php:157
 #, fuzzy
 msgid "YOUR BALANCE"
-msgstr "Ваш Баланс"
+msgstr "НА СЧЕТУ"
 
 #: simulator.php:165
-#, fuzzy
 msgid "SEARCH"
-msgstr "МАРТ"
+msgstr "ЗАПРОС"
 
 #: simulator.php:176
 msgid "Cost per minute"
-msgstr "Стоимость полной минуты разговора"
+msgstr "Стоимость полной минуты"
 
 #: simulator.php:185
 msgid "Simulator found a rate for your destination"
@@ -276,6 +278,10 @@ msgstr "НАПРАВЛЕНИЕ"
 #: simulator.php:214
 msgid "CallTime available"
 msgstr "Время, доступное для разговора"
+
+#: simulator.php
+msgid "ROUTE"
+msgstr "МАРШРУТ"
 
 #: simulator.php:216 call-history.php:380
 msgid "Minutes"
@@ -413,7 +419,7 @@ msgstr "Не создано ни одного направления"
 
 #: form_data/FG_var_did.inc:139
 msgid "Enter here the phonenumber you wish to call or the SIP/IAX/H323 peer to reach (ie: 347894999 or SIP/jeremy@182.212.1.45). To call SIP/IAX/H323 peer, you need to enable the voip_call below (voip_call = Yes) "
-msgstr "Введите здесь номер, на который хотите перенаправить звонок, или SIP/IAX2/H323 пользователя (напримет: 347894999 or SIP/taras@182.212.1.45). Чтобы направление работало как SIP/IAX2/H323, нужно включить VOIP ЗВОНОК = 'Да'"
+msgstr "Введите здесь номер, на который хотите перенаправить звонок, или SIP/IAX2/H323 пользователя (например: 347894999 или SIP/taras@182.212.1.45). Чтобы направление работало как SIP/IAX2/H323, нужно включить VOIP ЗВОНОК = 'Да'"
 
 #: form_data/FG_var_did.inc:138 form_data/FG_var_callerid.inc:97
 msgid "Choose if you want to activate this card"
@@ -475,6 +481,9 @@ msgstr "Заполните поля, и поддвердите нажава кн
 msgid "Your new"
 msgstr "Новый"
 
+msgid "Your new Refill has been inserted.<br>"
+msgstr "Перевод средств осуществлён успешно.<br>"
+
 #: form_data/FG_var_did.inc:174 form_data/FG_var_campaign.inc:300
 #: form_data/FG_var_speeddial.inc:124 form_data/FG_var_phonebook.inc:114
 #: form_data/FG_var_ticket.inc:85 form_data/FG_var_callerid.inc:123
@@ -525,6 +534,14 @@ msgstr "THERE IS NO"
 #: form_data/FG_var_signup.inc:88
 msgid "No Call Plan id are defined"
 msgstr ""
+
+#: form_data/FG_var_signup.inc:111
+msgid "PAYPAL PAYMENT"
+msgstr "PAYPAL ПЛАТЕЖИ"
+
+#: form_data/FG_var_signup.inc:117
+msgid "Apply PayPal payment to this customer"
+msgstr "Разрешить клиенту платить Пейпалом"
 
 #: form_data/FG_var_signup.inc:155
 msgid "LANG"
@@ -636,7 +653,7 @@ msgstr "Код плательщика НДС"
 
 #: form_data/FG_var_signup.inc:304
 msgid "Insert the VAT registration number of this customer"
-msgstr "Введите номер НДС компании"
+msgstr "Введите номер НДС вашей фирмы"
 
 #: form_data/FG_var_signup.inc:308
 msgid "TRAFFIC PER MONTH"
@@ -668,7 +685,7 @@ msgstr "Введите 6 символов с картинки."
 
 #: form_data/FG_var_signup.inc:425
 msgid "You can modify, through the following form, the different properties of your "
-msgstr "Вы можете редактировать используя следующую форму различные параметры вашего"
+msgstr "Вы можете редактировать используя следующую форму различные параметры "
 
 #: form_data/FG_var_signup.inc:426
 msgid "If you really want remove this "
@@ -679,27 +696,127 @@ msgid "you can add easily a new "
 msgstr "вы можете легко добавить"
 
 #: form_data/FG_var_signup.inc:430
-msgid "Thanks for registering with us.<br>A email with your information has been sent to your account "
-msgstr "Спасибо за регистрацию у нас.<br>Письмо с Вашей информацией было отправлено на Вашу учётную запись "
+msgid "Thanks for registering with us.<br>A email with information about your account has been sent to "
+msgstr "Спасибо за регистрацию у нас.<br>Письмо с информацией о Вашей учётной записи было отправлено на "
 
 #: form_data/FG_var_signup.inc:430
 msgid "Your card number is "
 msgstr "Ваш номер "
 
+#: signup_confirmation.php:100
+msgid "Your new customer was registered successfully"
+msgstr "Вы успешно ввели в систему своего нового клиента"
+
+#: signup_confirmation.php:101
+msgid "An email confirming registration information has been sent to customer to"
+msgstr "Письмо, с подтверждающей информацией было отослано Вашему клиенту на адрес"
+
+#: signup_confirmation.php:102
+msgid "Cardnumber of "
+msgstr "Номер учётной записи у "
+
+#: signup_confirmation.php:103
+msgid " is "
+msgstr " - "
+
+#: signup_confirmation.php:104
+msgid "To login to account :"
+msgstr "Данные для входа в пользовательский интерфейс"
+
+#: signup_confirmation.php:105
+msgid "Card alias (login) is "
+msgstr "Логин: "
+
+#: signup_confirmation.php:106
+msgid "Password is "
+msgstr "Пароль: "
+
 #: form_data/FG_var_signup.inc:430 activate.php:111
 #: signup_confirmation.php:121
 msgid "Your password is "
-msgstr "Ваш пароль"
+msgstr "Ваш пароль "
 
 #: form_data/FG_var_signup.inc:433
 msgid "SIGNUP"
-msgstr ""
+msgstr "РЕГИСТРАЦИЯ"
+
+#: FG_var_logrefill
+msgid "PARTNER"
+msgstr "КОНТРАГЕНТ"
+
+#: FG_var_logrefill
+msgid "Connection charge for DID setup"
+msgstr "ПОДКЛЮЧЕНИЕ"
+
+#: FG_var_logrefill
+msgid "Monthly Charge for DID use"
+msgstr "ЕЖЕМЕСЯЧНО"
+
+#: FG_var_logrefill
+msgid "Subscription fee"
+msgstr "ПОДПИСКА"
+
+#: FG_var_logrefill
+msgid "Extra charge"
+msgstr "ДРУГОЕ"
+
+#: FG_var_logrefill
+msgid "REFUND FROM YOUR CUSTOMER"
+msgstr "ВОЗВРАТ СРЕДСТВ"
+
+#: A2B_entity_logrefill
+msgid "REFILL DATE"
+msgstr "ДАТА ОПЕРАЦИИ"
+
+#: A2B_entity_logrefill
+msgid "REFILL TYPE"
+msgstr "ТИП ОПЕРАЦИИ"
+
+#: A2B_entity_logrefill
+msgid "REFILL AMOUNT"
+msgstr "+НАЧИСЛЕНО/-СПИСАНО"
+
+#: A2B_entity_logrefill
+msgid "REFILL AMOUNT "
+msgstr "+НАЧИСЛЕНИЕ/-СПИСАНИЕ"
+
+#: FG_var_logrefill
+msgid "REFILL FROM YOUR DILLER"
+msgstr "ПЕРЕВОД ОТ ВАШЕГО ДИЛЛЕРА"
+
+#: FG_var_logrefill
+msgid "REFUND TO YOUR DILLER"
+msgstr "ВОЗВРАТ ВАШЕМУ ДИЛЛЕРУ"
+
+#: FG_var_logrefill
+msgid "REFILL TO YOUR CUSTOMER"
+msgstr "ПЕРЕВОД СРЕДСТВ КЛИЕНТУ"
+
+#: FG_var_logrefill
+msgid " OR "
+msgstr " ИЛИ "
+
+#: FG_var_logrefill
+msgid "COMPANY"
+msgstr "КОМПАНИЯ"
+
+#: FG_var_logrefill:80
+msgid "BILLING"
+msgstr "ФИНАНСЫ"
+
+#: A2B_entity_logrefill:81
+msgid "ACCOUNT ACTIVITY"
+msgstr "ДВИЖЕНИЯ ПО СЧЁТУ"
+
+#: A2B_entity_logrefill:83
+msgid "To: "
+msgstr "Кому: "
 
 #: form_data/FG_var_sipiax_info:47
 msgid "EXTENSION"
-msgstr "ВН.НОМЕР"
+msgstr "НОМЕР"
 
-#: form_data/FG_var_sipiax_info:47
+#: form_data/FG_var_sipiax_info:48
 msgid "EXTENSION "
 msgstr "ВНУТРЕННИЙ НОМЕР"
 
@@ -747,9 +864,13 @@ msgstr "Введите индекс"
 msgid "PHONE NUMBER"
 msgstr "НОМЕР ТЕЛЕФОНА"
 
+#: form_data/FG_var_card.inc:132
+msgid "PHONE FORWARD"
+msgstr "ПЕРЕНАПРАВЛЕНИЕ"
+
 #: form_data/FG_var_card.inc:138
 msgid "Insert the phone number of the customers"
-msgstr "Введите номер телефона клиентов"
+msgstr "Введите номер телефона"
 
 #: form_data/FG_var_card.inc:142
 msgid "FAX NUMBER"
@@ -757,7 +878,7 @@ msgstr "НОМЕР ФАКСА"
 
 #: form_data/FG_var_card.inc:148
 msgid "Insert the fax number of the customers"
-msgstr "Введите номер факса клиентов"
+msgstr "Введите номер факса"
 
 #: form_data/FG_var_card.inc:150
 msgid "RECORD CALL"
@@ -773,7 +894,7 @@ msgstr "ОТЗВОН"
 
 #: form_data/FG_var_card.inc:166
 msgid "Define number of days ago for use back phone number by callers you have called in past this days"
-msgstr "Введите количество последних дней для того чтобы с телефонов, на которые вы звонили за эти дни, могли к вам дозвониться через высветившийся номер. Такой звонок будет переадресован непосредственно на тот внутренний номер, с которого вы набирали."
+msgstr "Введите количество последних дней для того чтобы с телефонов, на которые вы звонили за эти дни, могли к вам дозвониться через высветившийся номер. Такой звонок будет адресован непосредственно на тот номер, с которого вы набирали."
 
 #: form_data/FG_var_card.inc:168
 msgid "RECALL TIME"
@@ -785,7 +906,7 @@ msgstr "Ограничение продолжительности разгово
 
 #: form_data/FG_var_card.inc:178
 msgid "ACTIVE VOICEMAIL SERVICE"
-msgstr ""
+msgstr "АКТИВАЦИЯ АВТООТВЕТЧИКА"
 
 #: form_data/FG_var_card.inc:158
 msgid "Customer can choose to enable the voicemail for this card"
@@ -805,7 +926,7 @@ msgstr "Запись была обновлена"
 
 #: form_data/FG_var_voucher.inc:45 A2B_entity_voucher.php:116
 msgid "VOUCHER"
-msgstr "ВАУЧЕР"
+msgstr "КАРТА ПОПОЛНЕНИЯ"
 
 #: form_data/FG_var_voucher.inc:46
 msgid "CREDIT"
@@ -813,11 +934,11 @@ msgstr "КРЕДИТ"
 
 #: form_data/FG_var_voucher.inc:54
 msgid "No vouchers have been used!"
-msgstr "Ни одного ваучера не было использовано !"
+msgstr "Ни одной карты пополнения не было использовано!"
 
 #: form_data/FG_var_campaign.inc:64
 msgid "Add CAMPAIGN"
-msgstr "Дабавить КАМПАНИЮ"
+msgstr "Дабавить МЕРОПРИЯТИЕ"
 
 #: form_data/FG_var_campaign.inc:68 form_data/FG_var_speeddial.inc:53
 #: form_data/FG_var_speeddial.inc:90 form_data/FG_var_phonebook.inc:65
@@ -844,7 +965,7 @@ msgstr ""
 
 #: form_data/FG_var_campaign.inc:89
 msgid "CAMPAIGN NAME"
-msgstr "КАМПАНИЯ"
+msgstr "НАЗВАНИЕ МЕРОПРИЯТИЯ"
 
 #: form_data/FG_var_campaign.inc:95
 #, fuzzy
@@ -991,9 +1112,12 @@ msgstr "ТЕЛЕФОН"
 
 #: form_data/FG_var_campaign.inc:294 form_data/FG_var_speeddial.inc:117
 #: form_data/FG_var_phonebook.inc:108 form_data/FG_var_phonenumber.inc:143
-#: form_data/FG_var_callerid.inc:115 lib/Form/Class.FormHandler.inc.php:553
 msgid "You can modify, through the following form, the different properties of your"
 msgstr "Вы можете изменить , используя форму, разные свойства "
+
+#: form_data/FG_var_callerid.inc:115 lib/Form/Class.FormHandler.inc.php:553
+msgid "You can modify, through the following form, the different properties of your CallerID"
+msgstr "Вы можете изменить разные свойства номера"
 
 #: form_data/FG_var_campaign.inc:299
 #, fuzzy
@@ -1036,11 +1160,15 @@ msgstr "Enter the number which you wish to assign to the code here"
 
 #: form_data/FG_var_speeddial.inc:128
 msgid "Once you have completed the form above, click on the CONTINUE button."
-msgstr "После заполнения форму, нажмите кнопку ПРОДОЛЖИТЬ"
+msgstr "После заполнения формы, нажмите кнопку ПРОДОЛЖИТЬ"
 
 #: form_data/FG_var_payment.inc:40
 msgid "payment"
 msgstr "платеж"
+
+#: form_data/FG_var_payment.inc:41
+msgid "PAYMENT"
+msgstr "ПЛАТЕЖИ"
 
 #: form_data/FG_var_payment.inc:50 form_data/FG_var_receipt.inc:65
 #: form_data/FG_var_ticket.inc:54
@@ -1189,10 +1317,8 @@ msgid "PHONEBOOK"
 msgstr "ТЕЛЕФОН"
 
 #: form_data/FG_var_phonenumber.inc:63 form_data/FG_var_phonenumber.inc:110
-#: lib/interface/constants.php:410
-#, fuzzy
 msgid "AMOUNT"
-msgstr "СТРАНА"
+msgstr "ПЛАТЁЖ"
 
 #: form_data/FG_var_phonenumber.inc:71
 msgid "No phone numbers have been created"
@@ -1245,6 +1371,46 @@ msgstr "Your PhoneNumber / Location"
 msgid "Your new phone number has been inserted."
 msgstr "зарегистрирован"
 
+#: form_data/FG_var_callerid.inc
+msgid "Settings for general Caller Line Identity (CLI)"
+msgstr "Правила, которые будут автоматически использованы в общих принципах передачи номера звонящего [Caller Line Identity (CLI)]"
+
+#: form_data/FG_var_callerid.inc
+msgid "CONSPIRATION"
+msgstr "КОНСПИРАЦИЯ"
+
+#: form_data/FG_var_callerid.inc
+msgid "Local"
+msgstr "Локальная"
+
+#: form_data/FG_var_callerid.inc
+msgid "If your CallerID number was verified you can use the remaining options..."
+msgstr "Если номер CallerID подтверждён, то можно использовать ниже приведенные опции, которые отрабатываются вне зависимости от настройки 'АКТИВИРОВАН'."
+
+#: form_data/FG_var_callerid.inc
+msgid "Choose 'Yes' if you want hide CLI and replace its in a general manner for calls from this CallerID. Choose 'No' if you want set a veto for replacement CLI for calls from this CallerID. Choose 'Local' to replace this CallerID when calling to countries for which there exist a local number(s) for replacement."
+msgstr "Настройка распространяется только на звонки с этого CallerID... Выберите 'Да', если хотите скрыть номер - будет передаваться номер звонящего согласно общих настроек. Выберите 'Нет' чтобы звонки отображались как есть. Выберите 'Локальная' чтобы скрыть номер при звонках в страны, для которых у Вас заданы локальные CallerID для отображения."
+
+#: form_data/FG_var_callerid.inc
+msgid "Present this CallerID, when calls are made to a country relevant to this CallerID."
+msgstr "Передавать этот CallerID, когда звонки осуществляются в страну, к которой он принадлежит."
+
+#: form_data/FG_var_callerid.inc
+msgid "Present this CallerID, when calls are made to countries not relevant to this CallerID."
+msgstr "Передавать этот CallerID, когда звонки осуществляются в страны, отличные от принадлежности этого CallerID."
+
+#: form_data/FG_var_callerid.inc
+msgid "Present this CallerID, when calls are made to countries from listed prefixes. Insert the replaceable prefixes separated by comma, e.g. for UK,IT,RU,UA are '44,39,7,380'."
+msgstr "Передавать этот CallerID, когда звонки осуществляются в страны с перечисленными префиксами. Внесите один или несколько префиксов через запятую, например для UK,IT,RU,UA введите '44,39,7,380'."
+
+#: form_data/FG_var_callerid.inc:52
+msgid "VERIFY"
+msgstr "ПОДТВЕРЖДЁН"
+
+#: form_data/FG_var_callerid.inc:90
+msgid "Enter digits only"
+msgstr "Только цифры"
+
 #: form_data/FG_var_callerid.inc:108
 msgid "Enter the phone"
 msgstr "Введите номер назначения"
@@ -1255,7 +1421,7 @@ msgstr "Задайте моментальный номер дозвона. Ус�
 
 #: form_data/FG_var_callerid.inc:117
 msgid "Choose 'Yes' if you want to callback to this CallerID"
-msgstr "Выберите 'Да' чтобы выполнять обратный звонок"
+msgstr "Выберите 'Да' чтобы выполнялся обратный звонок"
 
 #: form_data/FG_var_callerid.inc:39 call-history.php:131
 msgid "CallerID"
@@ -1263,7 +1429,7 @@ msgstr "Номер звонящего"
 
 #: form_data/FG_var_callerid.inc:48 form_data/FG_var_callerid.inc:81
 msgid "CALLERID"
-msgstr "НОМЕР ЗВОНЯЩЕГО"
+msgstr "НОМЕР ЗВОНЯЩЕГО (CallerID)"
 
 #: form_data/FG_var_callerid.inc:54
 msgid "CallerID list"
@@ -1277,9 +1443,33 @@ msgstr "Ни одного  CallerID не создано"
 msgid "Insert the CallerID"
 msgstr "Введите номер звонящего"
 
+#: form_data/FG_var_callerid.inc
+msgid "NEVER"
+msgstr "НИКОГДА"
+
+#: form_data/FG_var_callerid.inc
+msgid "ALWAYS"
+msgstr "ВСЕГДА"
+
+#: form_data/FG_var_callerid.inc
+msgid "SAY BALANCE AFTER AUTH"
+msgstr "ПРОГОВАРИВАТЬ БАЛАНС ПРИ ВХОДЕ В СИСТЕМУ"
+
+#: form_data/FG_var_callerid.inc
+msgid "SAY RATE BEFORE CALL"
+msgstr "ПРОГОВАРИВАТЬ ЦЕНУ ПЕРЕД ЗВОНКОМ"
+
+#: form_data/FG_var_callerid.inc
+msgid "with the warning threshold"
+msgstr "задайте порог предупреждения, чтобы проговаривать только тогда, когда баланс опустится меньше заданного"
+
+#: form_data/FG_var_callerid.inc
+msgid "SAY BALANCE AFTER CALL"
+msgstr "ПРОГОВАРИВАТЬ ОСТАТОК БАЛАНСА ПОСЛЕ РАЗГОВОРА"
+
 #: form_data/FG_var_callerid.inc:122
 msgid "You can add your home phone or cellphone number below to allow you to call in, be automatically recognized, and use your telephony services without having to enter your PIN."
-msgstr "Вы можете добавить ваш мобильный либо домашний телефон ниже, чтобы быть автоматически распознанным системой, и использовать телефонные сервисы без ввода  PIN"
+msgstr "Вы можете добавить ваш мобильный либо домашний телефон ниже, чтобы быть автоматически распознанным системой, и использовать телефонные сервисы без ввода  PIN. Так же можете подтвердить номер, чтобы в дальнейшем иметь возможность установить определение номера, при исходящих звонках с АТС."
 
 #: form_data/FG_var_callerid.inc:126
 msgid "Made your change to edit this callerid."
@@ -1530,7 +1720,7 @@ msgstr "Секунды"
 
 #: lib/Form/Class.ViewHandler.inc.php:136
 msgid "FILTER ON "
-msgstr "Фильтровать по полю"
+msgstr "Фильтровать по"
 
 #: lib/Form/Class.ViewHandler.inc.php:153
 #, fuzzy
@@ -1682,7 +1872,6 @@ msgid "February"
 msgstr "Февраль"
 
 #: lib/Form/Class.SearchHandler.inc.php:35 lib/interface/constants.php:197
-#, fuzzy
 msgid "March"
 msgstr "Март"
 
@@ -1733,7 +1922,7 @@ msgstr "Точно"
 
 #: lib/Form/Class.SearchHandler.inc.php:214 call-history.php:330
 msgid "Begins with"
-msgstr "Начинаестя с"
+msgstr "Начинается с"
 
 #: lib/Form/Class.SearchHandler.inc.php:215 call-history.php:331
 msgid "Contains"
@@ -1742,6 +1931,10 @@ msgstr "Содержит"
 #: lib/Form/Class.SearchHandler.inc.php:216 call-history.php:332
 msgid "Ends with"
 msgstr "Заканчивается на"
+
+#: call-history.php
+msgid "Route"
+msgstr "Маршрут"
 
 #: lib/Form/Class.SearchHandler.inc.php:327
 msgid "There is"
@@ -1887,9 +2080,8 @@ msgid "One"
 msgstr "Один"
 
 #: lib/Form/Class.FormHandler.inc.php:555
-#, fuzzy
 msgid "has been deleted!"
-msgstr "зарегистрирован"
+msgstr "успешно удалён!"
 
 #: lib/Form/Class.FormHandler.inc.php:558
 msgid "Add a"
@@ -1900,14 +2092,13 @@ msgid "now."
 msgstr "сейчас."
 
 #: lib/Form/Class.FormHandler.inc.php:559
-#, fuzzy
 msgid "has been inserted.<br>"
-msgstr "зарегистрирован"
+msgstr "зарегистрирован.<br>"
 
 #: lib/Form/Class.FormHandler.inc.php:560
 #, fuzzy
 msgid "hasn't been inserted."
-msgstr "зарегистрирован"
+msgstr "не зарегистрирован."
 
 #: lib/Form/Class.FormHandler.inc.php:561
 msgid "You cannot choose more than one !"
@@ -1990,12 +2181,16 @@ msgid "(only number with more that 8 digits)"
 msgstr "(только одно число длиной более 8 цифр)"
 
 #: lib/Form/Class.FormHandler.inc.php:1004
-msgid "(at least 8 digits using . or - or the space key)"
-msgstr "(не менее 8 симв. из цифр, 'точек' 'тире' и 'пробелов')"
+msgid "(at least 8 digits using '<font color=green>+().-</font>' or the space key)"
+msgstr "(не менее 8 симв. из 'плюса<font color=green>+</font>' в начале, 'цифр<font color=green>[0-9]</font>', 'точек<font color=green>.</font>', 'тире<font color=green>-</font>', 'круглых скобок<font color=green>()</font>' и 'пробелов')"
+
+#: lib/Form/Class.FormHandler.inc.php:1005
+msgid "(at least 8 digits in international format of phone numbers)"
+msgstr "(можно 'плюс<font color=green>+</font>' в начале и не менее 8 цифр)"
 
 #: lib/Form/Class.FormHandler.inc.php:1008
-msgid "network adress format"
-msgstr "формат сетевого адреса"
+msgid "network adress format or domain name"
+msgstr "в виде сетевого адреса или имени домена"
 
 #: lib/Form/Class.FormHandler.inc.php:1012
 msgid "at least 1 character"
@@ -2133,7 +2328,7 @@ msgstr ""
 
 #: lib/interface/constants.php:16
 msgid "SUCCESS"
-msgstr "УСПЕХ"
+msgstr "УСПЕШНЫЙ"
 
 #: lib/interface/constants.php:17
 #, fuzzy
@@ -2515,18 +2710,16 @@ msgid "DIGIT"
 msgstr ""
 
 #: lib/interface/constants.php:411
-#, fuzzy
 msgid "CORRECTION"
-msgstr "DURATION"
+msgstr "КОРРЕКЦИЯ"
 
 #: lib/interface/constants.php:412
-#, fuzzy
 msgid "EXTRA FEE"
-msgstr "НАДБАВКА"
+msgstr "БОНУС"
 
 #: lib/interface/constants.php:413
 msgid "AGENT REFUND"
-msgstr ""
+msgstr "ВЗАИМОЗАЧЁТ"
 
 #: lib/interface/constants.php:419
 #, fuzzy
@@ -2554,6 +2747,10 @@ msgstr "У ВАС НЕТ IAX АККАУНТА"
 #: lib/Class.A2Billing.php:391
 msgid "Invalid card number lenght defined in configuration."
 msgstr "Неверная длина номера карты указана в конфигурации"
+
+#: lib/Class.A2Billing.php:2002
+msgid "The call dropped prematurely"
+msgstr "Вызывающая сторона положила трубку не начав передачу факса"
 
 #: lib/Class.A2Billing.php:3276
 msgid "Error : Authentication Failed !!!"
@@ -2622,11 +2819,11 @@ msgstr ""
 
 #: lib/customer.help.php:47
 msgid "From here, you can use the web based screen phone. You need microphone and speakers on your PC."
-msgstr "В этом месте вы можете использовать встроенный телефон.Вам необходим телефон и наушники, присоединенные ко компьютеру"
+msgstr "В этом месте вы можете использовать встроенный телефон. Для качественного звука необходимы наушники с микрофооном, присоединенные к компьютеру."
 
 #: lib/customer.help.php:49
 msgid "All calls are listed below. Search by month, day or status. Additionally, you can check the rate and price."
-msgstr "Все звонки указаны ниже. Вы можете искать по месяцу, дню или статусу. Кроме того, вы можете просмотреть цену и тариф"
+msgstr "Все звонки указаны ниже. Вы можете искать по месяцу, дню или статусу. Кроме того, вы можете просмотреть стоимость каждого соединения."
 
 #: lib/customer.help.php:51
 msgid "On this page, you can open a support ticket and consult the status of your existing ticket."
@@ -2634,7 +2831,7 @@ msgstr "На этой странице можно инициировать но�
 
 #: lib/customer.help.php:45
 msgid "Your balance"
-msgstr "Ваш баланс"
+msgstr "Остаток"
 
 #: lib/customer.help.php:52
 msgid "Credit limit"
@@ -2659,7 +2856,7 @@ msgstr "Настройки уведомлений"
 
 #: lib/customer.help.php:55
 msgid "You can update your notification settings here."
-msgstr "Вы можете обновить настройки уведомлений тут"
+msgstr "Тут можно обновить настройки уведомлений если баланс станет ниже заданного"
 
 #: lib/customer.help.php:57
 msgid "Simulate the calling process to discover the cost per minute of a call, and the number of minutes you can call that number with your current credit."
@@ -2674,8 +2871,8 @@ msgid "On this page you will be able to change your password, You have to enter 
 msgstr "На этой странице вы сможете изменить пароль. Необходимо ввести Новый Пароль и подтвердить его"
 
 #: lib/customer.help.php:63
-msgid "View Rates"
-msgstr "Просмотр тарифов"
+msgid "View Rates<br>Rates are subjected to change without notice"
+msgstr "Эта страница отображает минимальный тариф по каждому направлению. Подробное ценообразование ищите на странице 'СТОИМОСТЬ ЗВОНКА'.<br>* ВНИМАНИЕ! Тарифы могут меняться без предупреждений"
 
 msgid "Rates"
 msgstr "Тарифы"
@@ -2690,35 +2887,35 @@ msgstr "Голосовая почта - этот раздел позволяет
 
 #: lib/customer.help.php:69
 msgid "Enter your voucher number to top up your card."
-msgstr "Введите код ваучера для пополнения счета"
+msgstr "Введите код с карты пополнения для пополнения счета."
 
 #: lib/customer.help.php:71
 msgid "This section will allow you to create and edit campaign. "
-msgstr "Эта секция позволит создать либо отредактировать кампанию"
+msgstr "Эта секция позволит создать либо отредактировать МЕРОПРИЯТИЕ"
 
 #: lib/customer.help.php:72
 msgid "A campaign will be attached to a user in order to let him use the predictive-dialer option. "
-msgstr "Кампания будет закреплена за пользователем чтобы разрешить ему использовать быстрый набор"
+msgstr ", что позволит использовать интеллектуальный обзвон. "
 
 #: lib/customer.help.php:73
 msgid "Predictive dialer will browse all the phone numbers from the campaign and perform outgoing calls."
-msgstr "Быстрый набиратель пройдется по всем телефонным номерам в кампании и создаст исходящие звонки"
+msgstr "Интеллектуальный набиратель пройдется по всем телефонным номерам каждого мероприятия и создаст исходящие звонки, тут же соединяя ответивших с освободившимися операторами."
 
 #: lib/customer.help.php:75
 msgid "Phonelist are all the phone numbers attached to a campaign. You can add, remove and edit the phone numbers."
-msgstr "Список телефонов - список всех телефонов добавленных в кампанию . Можно добавлять , редактировать и удалять номер телефона"
+msgstr "Список телефонов, добавленных в МЕРОПРИЯТИЕ. Можно добавлять, редактировать и удалять номера телефонов."
 
 #: lib/customer.help.php:77
 msgid "Invoice history - The section below allows you to see and pay the invoices that you have to pay."
-msgstr "История счетов - В этом разделе Вы можете просмотреть список счёт-фактур и оплатить неоплаченные"
+msgstr "История счетов - в этом разделе Вы можете просмотреть список счёт-фактур и оплатить неоплаченные."
 
 #: lib/customer.help.php:79
 msgid "Receipt history - The section below allows you to see the receipt that you received. you can see in them the summary of some withdrawal"
-msgstr "Список квитанций - В этом разделе Вы можете просматривать полученные квитанции с описанием расходов"
+msgstr "Список квитанций - В этом разделе Вы можете просматривать выписанные квитанции с описанием расходов"
 
 #: lib/customer.help.php:81
 msgid "Phonebook are set of phone numbers. You can add, remove and edit the phonebook. You can also associate phonebook to a campaign in the Campaign section"
-msgstr "Телефонные книги - это наборы телефонов. Можно добавлять, удалять и редактировать телефонную книгу. Также можно прикрепить телефонную книгу к кампании в разделе Кампании"
+msgstr "Телефонные книги - это наборы телефонов. Можно добавлять, удалять и редактировать телефонную книгу. Также можно прикрепить телефонную книгу к мероприятию в разделе МЕРОПРИЯТИЯ."
 
 #: lib/customer.help.php:83
 msgid "Select the country below where you would like a DID, select a DID from the list and enter the destination you would like to assign it to."
@@ -2831,7 +3028,7 @@ msgstr "Ошибка : Оба номера должны быть существ�
 
 #: callback.php:208
 msgid "You can initiate the callback by entering your phonenumber and the number you wish to call!"
-msgstr "Чтобы соединиться с нужным абонентом введите свой номер телефона и номер по которому хотите позвонить"
+msgstr "Чтобы соединиться с нужным абонентом введите свой номер телефона и номер, на который хотите позвонить"
 
 #: callback.php:217
 msgid "Your Phone Number"
@@ -2870,7 +3067,7 @@ msgstr "Довавить новое"
 
 #: forgotpassword.php:56
 msgid "Please wait 1 minutes before making any other request for the forgot password!"
-msgstr ""
+msgstr "Пожалуйста подождите одну минуту перед тем как делать запрос пароля снова!"
 
 #: forgotpassword.php:85
 msgid "Error : Mail sender"
@@ -2878,7 +3075,7 @@ msgstr ""
 
 #: forgotpassword.php:104
 msgid "Your login information email has been sent to you."
-msgstr ""
+msgstr "На Ваш адрес электронной почты отправлено сообщение c информацией о существующем пароле.<br><br>Не получили электронное сообщение? Проверьте, нет ли письма в папке, предназначенной для спама и рекламных сообщений (Spam/Junk)."
 
 #: forgotpassword.php:107
 msgid "No such login exists."
@@ -2905,9 +3102,20 @@ msgid "Print"
 msgstr "Печать"
 
 #: A2B_invoice_view.php:155
-#, fuzzy
 msgid "INVOICE"
+msgstr "СЧЕТ"
+
+#: A2B_invoice_view.php
+msgid "INVOICE "
 msgstr "СЧЕТА"
+
+#: A2B_invoice_view.php
+msgid "AMOUNT "
+msgstr "ПЛАТЕЖИ"
+
+#: A2B_invoice_view.php
+msgid "PAYMENT INCL FEE"
+msgstr "ОПЛАЧЕНО С КОМИССИЕЙ"
 
 #: A2B_invoice_view.php:163 A2B_invoice_view.php:180 A2B_receipt_view.php:155
 #, fuzzy
@@ -2977,7 +3185,7 @@ msgstr "Стоимость"
 
 #: A2B_receipt_detail.php:175 A2B_receipt_preview_detail.php:254
 msgid "Total Page"
-msgstr "Всего страниц"
+msgstr "Всего на странице"
 
 #: A2B_receipt_detail.php:182 A2B_receipt_preview_detail.php:260
 msgid "Total Receipt :"
@@ -3254,9 +3462,13 @@ msgstr "номера от"
 msgid "to"
 msgstr "до"
 
-#: A2B_entity_sipiax_info.php:118 templates/default/index.tpl:61
+#: templates/default/index.tpl:61
 msgid "Password"
 msgstr "Пароль"
+
+#: A2B_entity_sipiax_info.php:118
+msgid "Between 8-20 characters, include Latin letters and numbers"
+msgstr "От 8 до 20 символов, только буквы латинского алфавита и цифры"
 
 #: A2B_entity_sipiax_info.php:120
 msgid "To configure your Asterisk server, copy and paste this into your "
@@ -3312,9 +3524,8 @@ msgid "CALLER ID :"
 msgstr "НОМЕР"
 
 #: A2B_entity_callerid.php:102
-#, fuzzy
 msgid "ADD NEW CALLERID"
-msgstr "ДОБАВИТЬ НОВЫЙ НОМЕР"
+msgstr "ДОБАВИТЬ НОМЕР"
 
 #: A2B_entity_callerid.php:115
 msgid "You are not allowed to add more CallerID."
@@ -3700,30 +3911,74 @@ msgid "MY PBX"
 msgstr "МОЯ АТС"
 
 #: templates/default/main.tpl:17
-msgid "EXTENSIONS"
-msgstr "ВНУТРЕННИЕ ЛИНИИ"
+msgid "MY CUSTOMERS"
+msgstr "КЛИЕНТЫ"
 
 #: templates/default/main.tpl:18
+msgid "LIST CUSTOMERS"
+msgstr "СПИСОК"
+
+#: templates/default/main.tpl:19
+msgid "COMMISSION ACCRUED"
+msgstr "КОМИССИОННЫЕ"
+
+#: templates/default/main.tpl:22
+msgid "Refills"
+msgstr "Пополнения/Переводы"
+
+#: templates/default/main.tpl:20
+msgid "MARGIN"
+msgstr "НАЦЕНКА"
+
+#: templates/default/main.tpl:21
+msgid "TO PAY"
+msgstr "К ОПЛАТЕ"
+
+#: templates/default/main.tpl:23
+msgid "EXTENSIONS "
+msgstr "ВНУТРЕННИЕ НОМЕРА"
+
+#: templates/default/main.tpl:24
+msgid "EXTENSIONS"
+msgstr "ЛИНИИ"
+
+#: templates/default/main.tpl:25
 msgid "EXTERNAL LINES"
 msgstr "ВНЕШНИЕ ЛИНИИ"
 
-#: templates/default/main.tpl:19
+#: form_data/FG_var_moneysituation.inc
+msgid "CUSTOMER"
+msgstr "КЛИЕНТ"
+
+#: form_data/FG_var_moneysituation.inc:95
+msgid "Add Refill to this Card"
+msgstr "Перевод средств клиенту с моего баланса"
+
+#: form_data/FG_var_moneysituation.inc
+msgid "BALANCE"
+msgstr "БАЛАНС"
+
+#: form_data/FG_var_moneysituation.inc:100
+msgid "Add Customer"
+msgstr "Добавить клиента"
+
+#: templates/default/main.tpl:26
 msgid "Outbound call plan"
-msgstr "Исходящая маршрутизация"
+msgstr "Исходящие звонки"
 
-#: templates/default/main.tpl:20
-msgid "Incoming call plan"
-msgstr "Входящая маршрутизация"
+#: templates/default/main.tpl:27
+msgid "Incoming call plan and IVR"
+msgstr "Входящие звонки и IVR"
 
-#: templates/default/main.tpl:22
+#: templates/default/main.tpl:28
 msgid "VOICEMAIL"
 msgstr "ГОЛОСОВАЯ ПОЧТА"
 
-#: templates/default/main.tpl:23
+#: templates/default/main.tpl:29
 msgid "SIP/IAX INFO"
 msgstr "МОИ ЛИНИИ"
 
-#: templates/default/main.tpl:27
+#: templates/default/main.tpl:30
 msgid "CALL HISTORY"
 msgstr "ИСТОРИЯ ЗВОНКОВ"
 
@@ -3733,7 +3988,7 @@ msgstr "ИСТОРИЯ ПЛАТЕЖЕЙ"
 
 #: templates/default/main.tpl:37
 msgid "VOUCHERS"
-msgstr "ВАУЧЕРЫ"
+msgstr "КАРТЫ ПОПОЛНЕНИЯ"
 
 #: templates/default/main.tpl:46
 msgid "INVOICES"
@@ -3757,11 +4012,11 @@ msgstr "БЫСТРЫЙ НАБОР"
 
 #: templates/default/main.tpl:77
 msgid "SIMULATOR"
-msgstr "ПРОВЕРКА ЦЕНЫ"
+msgstr "СТОИМОСТЬ ЗВОНКА"
 
 #: templates/default/main.tpl:90
 msgid "ADD CALLER ID"
-msgstr "ДОБАВИТЬ CALLER ID"
+msgstr "AOH (CallerID)"
 
 #: templates/default/main.tpl:94
 msgid "PASSWORD"
@@ -3781,7 +4036,7 @@ msgstr "АВТООБЗВОН"
 
 #: templates/default/main.tpl:121
 msgid "Campaign's"
-msgstr "Кампании"
+msgstr "Мероприятия"
 
 #: templates/default/main.tpl:124
 msgid "Import Phone List"
@@ -3790,6 +4045,22 @@ msgstr "Импорт списка телефонов"
 #: templates/default/main.tpl:134
 msgid "LOGOUT"
 msgstr "ВЫХОД"
+
+#: Public/A2B_entity_moneysituation.php:174
+msgid "NB TOTAL INVOICE"
+msgstr "ВЫПИСАННЫХ СЧЕТОВ"
+
+#: Public/A2B_entity_moneysituation.php:175
+msgid "NB INVOICE WITH ENOUGH PAYMENT "
+msgstr "ПОЛНОСТЬЮ ОПЛАЧЕНЫх"
+
+#: Public/A2B_entity_moneysituation.php:176
+msgid "NB INVOICE WITH PAID STATUS"
+msgstr "СО СТАТУСОМ 'ОПЛАЧЕНО'"
+
+#: Public/A2B_entity_moneysituation.php:177
+msgid "NB INVOICE WITH UNPAID STATUS"
+msgstr "К ОПЛАТЕ"
 
 #: templates/default/index.tpl:49
 msgid "AUTHENTICATION"
@@ -3849,14 +4120,14 @@ msgstr "ПОДТВЕРЖДЕНИЕ РЕГИСТРАЦИИ"
 
 #: signup_confirmation.php:112
 msgid "thank you for registering with us!"
-msgstr "спасибо что прошли регистрацию!"
+msgstr "спасибо, что прошли регистрацию!"
 
 #: signup_confirmation.php:113
 msgid "An activation email has been sent to"
 msgstr "Инструкция по активации выслана Вам на почту"
 
 #: A2B_entity_did.php:82
-msgid "The following Destinaton-DID has been relesed:"
+msgid "The following Destination-DID has been released:"
 msgstr "Следующий номер был освобожден"
 
 #: A2B_entity_did.php:108
@@ -3891,16 +4162,15 @@ msgstr "Освободить НОМЕР"
 
 #: A2B_entity_did.php:376
 msgid "Select Country"
-msgstr "Выбирите Страну"
+msgstr "Выберите страну"
 
 #: A2B_entity_did.php:390
 msgid "Select Virtual Phone Number"
-msgstr "Выбирите себе виртуальный Номер"
+msgstr "Выберите виртуальный номер"
 
 #: A2B_entity_did.php:395
-#, fuzzy
 msgid "Monthly:"
-msgstr "Ежемесячно"
+msgstr "Ежемесячный платёж:"
 
 #: A2B_entity_did.php:396
 msgid "B-Leg Connect:"
@@ -3928,7 +4198,7 @@ msgstr "НЕТ"
 
 #: A2B_entity_did.php:418
 msgid "Enter the phone number you wish to call, or the SIP/IAX client to reach  (ie: 347894999 or SIP/jeremy@182.212.1.45). In order to call a VoIP number, you will need to enable voip_call"
-msgstr "Введите здесь номер, на который хотите перенаправить звонок, или SIP/IAX2/H323 пользователя (напримет: 347894999 or SIP/taras@182.212.1.45). Чтобы направление работало как SIP/IAX2/H323, нужно включить VOIP ЗВОНОК = 'Да'."
+msgstr "Введите здесь номер, на который хотите перенаправить звонок, или SIP/IAX2/H323 пользователя (например: 347894999 или SIP/taras@182.212.1.45). Чтобы направление работало как SIP/IAX2/H323, нужно включить VOIP ЗВОНОК = 'Да'."
 
 #: A2B_entity_did.php:422
 msgid "If you release the did you will not be monthly charged any more."
@@ -4005,8 +4275,88 @@ msgstr "Такой Ваучер не существует !"
 
 #: A2B_entity_voucher.php:83
 msgid "The voucher should be a number !"
-msgstr "Номер ваучера должен быть числом"
+msgstr "Номер карты пополнения должен быть числом!"
 
 #: A2B_entity_voucher.php:121
 msgid "USE VOUCHER"
-msgstr "ИСПОЛЬЗОВАТЬ ВАУЧЕР"
+msgstr "ИСПОЛЬЗОВАТЬ КАРТУ ПОПОЛНЕНИЯ"
+
+#:
+msgid "All faxes are listed below. Search by month, day or status. Additionally, you can download have been received faxes in pdf format."
+msgstr "Cписок факсовых звонков указан ниже. Вы можете искать по месяцу, дню и статусу. Кроме того, вы можете загрузить полученные факсы."
+
+#:
+msgid "FAX STATUS"
+msgstr "СТАТУС ЗВОНКА"
+
+#:
+msgid "FAX HISTORY"
+msgstr "ПОЛУЧЕННЫЕ ФАКСЫ"
+
+#:
+msgid "FAX Logs"
+msgstr "ФАКСЫ"
+
+#:
+msgid "Number of Faxes"
+msgstr "Общее количество факс звонков"
+
+#:
+msgid "STORE ON SERVER"
+msgstr "ХРАНЕНИЕ НА СЕРВЕРЕ"
+
+#:
+msgid "FORWARD TO EMAIL"
+msgstr "АДРЕС ЭЛ. ПОЧТЫ"
+
+#:
+msgid "PERMITTED FORWARDING"
+msgstr "ОТПРАВЛЯТЬ НА ПОЧТУ"
+
+#:
+msgid "FAX EXTENSION"
+msgstr "ВНУТРЕННИЙ НОМЕР ФАКСА"
+
+#:
+msgid "You can add new virtual fax extension below to allow you to receive faxes."
+msgstr "Вы можете добавить виртуальный факс с внутренним номером чтобы принимать факсы."
+
+#:
+msgid "ADD NEW VIRTUAL FAX"
+msgstr "ДОБАВИТЬ ФАКС-НОМЕР"
+
+#:
+msgid "LOCAL STATION ID"
+msgstr "ЛОКАЛЬНЫЙ ИДЕНТИФИКАТОР"
+
+#:
+msgid "Insert number to identify itself to the remote end"
+msgstr "Введите Ваш локальный идентификатор (высветится у отправителя факса). Обычно задаётся Ваш номер телефона."
+
+#:
+msgid "Choose 'Yes' if you want keep copy on server"
+msgstr "Выберите 'Да', если хотите сохранять копию факса на сервере."
+
+#:
+msgid "Choose 'Yes' if you want to receive faxes to email"
+msgstr "Выберите 'Да', если хотите получать копии приходящих факсов на e-mail."
+
+#:
+msgid "VIRTUAL FAX"
+msgstr "ФАКС МАШИНА"
+
+#:
+msgid "SURVEILLANCE"
+msgstr "ВИДЕОНАБЛЮДЕНИЕ"
+
+#:
+msgid "CALL"
+msgstr "НОМЕР"
+
+#:
+msgid "THE PASSWORD SHOULD CONSIST OF NUMBERS AND LETTERS"
+msgstr "ПАРОЛЬ ДОЛЖЕН СОСТОЯТЬ ИЗ ЦИФР И АНГЛИЙСКИХ ПРОПИСНЫХ И СТРОЧНЫХ БУКВ"
+
+#:
+msgid "(AT LEAST 8 CHARACTERS)"
+msgstr "(ВСЕГО НЕ МЕНЕЕ 8 СИМВОЛОВ)"

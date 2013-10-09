@@ -32,7 +32,7 @@
 **/
 
 
-getpost_ifset(array('id', 'billingtype', 'did', 'id_trunk', 'startingdate', 'expirationdate', 'id_cc_didgroup', 'id_cc_country', 'activated', 'fixrate', 'id_trunk','connection_charge','selling_rate', 'aleg_timeinterval', 'aleg_carrier_connect_charge', 'aleg_carrier_cost_min', 'aleg_carrier_initblock', 'aleg_carrier_increment', 'aleg_retail_connect_charge', 'aleg_retail_cost_min', 'aleg_retail_initblock', 'aleg_retail_increment', 'aleg_carrier_connect_charge_offp', 'aleg_carrier_cost_min_offp', 'aleg_carrier_initblock_offp', 'aleg_carrier_increment_offp', 'aleg_retail_connect_charge_offp', 'aleg_retail_cost_min_offp', 'aleg_retail_initblock_offp', 'aleg_retail_increment_offp'));
+getpost_ifset(array('id', 'did', 'activated', 'id_trunk', 'continuewithdid', 'allciduse', 'verify_callerid', 'voicebox', 'billingtype', 'startingdate', 'expirationdate', 'id_cc_didgroup', 'areaprefix', 'citylength', 'id_cc_country', 'fixrate', 'connection_charge','selling_rate', 'aleg_timeinterval', 'aleg_carrier_connect_charge', 'aleg_carrier_cost_min', 'aleg_carrier_initblock', 'aleg_carrier_increment', 'aleg_retail_connect_charge', 'aleg_retail_cost_min', 'aleg_retail_initblock', 'aleg_retail_increment', 'aleg_carrier_connect_charge_offp', 'aleg_carrier_cost_min_offp', 'aleg_carrier_initblock_offp', 'aleg_carrier_increment_offp', 'aleg_retail_connect_charge_offp', 'aleg_retail_cost_min_offp', 'aleg_retail_initblock_offp', 'aleg_retail_increment_offp'));
 
 
 $HD_Form = new FormHandler("cc_did","did");
@@ -149,6 +149,26 @@ $HD_Form -> AddEditElement (gettext("SUPER CID USE"),
 	"",
 	"" , "", "", gettext("Yes").":1, - ".gettext("No").":0", "", "", "" , gettext("Allow for all active CallerIDs at system to use that DID for direct access (DISA), rather than just for active CallerIDs of customer."));
 
+$HD_Form -> AddEditElement (gettext("VERIFY CALLERID"),
+	"verify_callerid",
+	'0',
+	"SELECT",
+	"",
+	"",
+	"",
+	"list", "", "", "", $yesno, "%1", "",
+	gettext("Choose 'Yes' to do CallerID verifing if incoming CLI is exist into CallerID table of database"));
+
+$HD_Form -> AddEditElement (gettext("VOICEBOX"),
+	"voicebox",
+	'',
+	"INPUT",
+	"size=20 maxlength=20",
+	"",
+	gettext("Insert the regexten"),
+	"", "", "", "", "", "", "NO-NULL",
+	gettext("Insert extension number that receive voicemail when nobody answered on incoming call"));
+
 $HD_Form -> AddEditElement (gettext("BILLING"),
 	"billingtype",
 	"",
@@ -186,6 +206,24 @@ $HD_Form -> AddEditElement (gettext("DIDGROUP"),
 	"didgroupname, id",
 	"", "", "%1","", "");
 
+$HD_Form -> AddEditElement(gettext("AREA CODE"),
+	"areaprefix",
+	'$value',
+	"INPUT",
+	"size=30 maxlength=6",
+	"22",
+	"",
+	"", "", "", "", "", "", "NO-NULL", gettext("Set area code where is DID from (i.e. 30 for Berlin)"));
+
+$HD_Form -> AddEditElement(gettext("CITY LENGTH"),
+	"citylength",
+	'$value',
+	"INPUT",
+	"size=30 maxlength=1",
+	"23",
+	"",
+	"", "", "", "", "", "", "NO-NULL", gettext("Set length of city numbers"));
+
 $HD_Form -> AddEditElement (gettext("COUNTRY"),
 	"id_cc_country",
 	'$value',
@@ -200,7 +238,7 @@ $HD_Form -> AddEditElement (gettext("MONTHLY RATE"),
 	"fixrate",
 	'$value',
 	"INPUT",
-	"size=20  maxlength=20 $fixval",
+	"size=30  maxlength=20 $fixval",
 	"12",
 	gettext("Insert the monthly rate"),
 	"" , "", "", "", "", "", "", gettext("currency : ").strtoupper(BASE_CURRENCY),
@@ -393,7 +431,7 @@ $HD_Form -> AddEditElement(gettext("RETAIL BILLING BLOCK OFF PEAK"),
 
 
 
-$HD_Form -> FieldEditElement ('did, activated, id_trunk, continuewithdid, allciduse, billingtype, startingdate, expirationdate, id_cc_didgroup, id_cc_country, fixrate, connection_charge, selling_rate, aleg_timeinterval, aleg_carrier_connect_charge, aleg_carrier_cost_min, aleg_carrier_initblock, aleg_carrier_increment, aleg_retail_connect_charge, aleg_retail_cost_min, aleg_retail_initblock, aleg_retail_increment, aleg_carrier_connect_charge_offp, aleg_carrier_cost_min_offp, aleg_carrier_initblock_offp, aleg_carrier_increment_offp, aleg_retail_connect_charge_offp, aleg_retail_cost_min_offp, aleg_retail_initblock_offp, aleg_retail_increment_offp');
+$HD_Form -> FieldEditElement ('did, activated, id_trunk, continuewithdid, allciduse, verify_callerid, voicebox, billingtype, startingdate, expirationdate, id_cc_didgroup, areaprefix, citylength, id_cc_country, fixrate, connection_charge, selling_rate, aleg_timeinterval, aleg_carrier_connect_charge, aleg_carrier_cost_min, aleg_carrier_initblock, aleg_carrier_increment, aleg_retail_connect_charge, aleg_retail_cost_min, aleg_retail_initblock, aleg_retail_increment, aleg_carrier_connect_charge_offp, aleg_carrier_cost_min_offp, aleg_carrier_initblock_offp, aleg_carrier_increment_offp, aleg_retail_connect_charge_offp, aleg_retail_cost_min_offp, aleg_retail_initblock_offp, aleg_retail_increment_offp');
 
 
 // Set the filter variables

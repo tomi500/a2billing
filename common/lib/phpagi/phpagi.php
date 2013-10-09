@@ -269,6 +269,7 @@
         case AST_STATE_PRERING: $ret['data'] = 'Channel has detected an incoming call and is waiting for ring'; break;
         default: $ret['data'] = "Unknown ({$ret['result']})"; break;
       }
+$this->Verbose("=================CHANNEL STATUS: ".$ret['result']." ".$ret['data']);
       if ($get_value) {
 	return $ret['result'];
       } else {
@@ -411,6 +412,33 @@
 				return $var;
 			}
     }
+
+   /**
+    * Fetch the value of a full variable.
+    *
+    *
+    * @link http://www.voip-info.org/wiki/view/get+full+variable
+    * @link http://www.voip-info.org/wiki-Asterisk+variables
+    * @param string $variable name
+    * @param string $channel channel
+    * @param boolean $getvalue return the value only 
+    * @return array, see evaluate for return information. ['result'] is 0 if variable hasn't been set, 1 if it has. ['data'] holds the value.  returns value if $getvalue is TRUE
+    */
+    function get_fullvariable($variable, $channel = false, $get_value = false)
+    {
+	if($channel === false) {
+		$req = $variable;
+	} else {
+		$req = $variable.' '.$channel;
+	}
+	$var = $this->evaluate("GET FULL VARIABLE $req");
+	if(isset($get_value) && $get_value) {
+		return $var['data'];
+	} else {
+		return $var;
+	}
+    }
+
 
    /**
     * Hangup the specified channel. If no channel name is given, hang up the current channel.
@@ -605,6 +633,7 @@
     */
     function set_callerid($cid)
     {
+$this->Verbose("=================SET CALLERID $cid");
       return $this->evaluate("SET CALLERID $cid");
     }
 
@@ -689,6 +718,7 @@
     function set_variable($variable, $value)
     {
       $value = str_replace("\n", '\n', addslashes($value));
+//$this->Verbose("=================SET VARIABLE $variable \"$value\"");
       return $this->evaluate("SET VARIABLE $variable \"$value\"");
     }
 
@@ -1262,6 +1292,7 @@
 
       $ret = array('name'=>'', 'protocol'=>'', 'username'=>'', 'host'=>'', 'port'=>'');
       $callerid = trim($callerid);
+$this->Verbose("================= CallerID =  \"$callerid\"");
 
       if($callerid{0} == '"' || $callerid{0} == "'")
       {

@@ -115,23 +115,23 @@ $yesno = Constants::getYesNoList();
 
 // 
 if ($popup_select) $HD_Form -> AddViewElement(gettext("ID"), "id", "5%", "center", "sort");
-$HD_Form -> AddViewElement(gettext("DESTINATION"), "destination", "17%", "center", "", "15");
+$HD_Form -> AddViewElement(gettext("DESTINATION"), "destination", "17%", "center", "", "40");
 $HD_Form -> AddViewElement("<acronym title=\"DIALING PREFIX\">".gettext("PREFIX")."</acronym>", "dialprefix", "10%", "center", "sort", "");
 $HD_Form -> AddViewElement("<acronym title=\"BUYING RATE\">".gettext("BR")."</acronym>", "buyrate", "4%", "center", "sort");
 $HD_Form -> AddViewElement("<acronym title=\"SELLING RATE\">".gettext("SR")."</acronym>", "rateinitial", "4%", "center", "sort");
-if (!$popup_select) $HD_Form -> AddViewElement(gettext("START-DATE"), "startdate", "13%", "center", "sort", "19", "", "", "", "", "", "display_dateformat");
-if (!$popup_select) $HD_Form -> AddViewElement(gettext("STOP-DATE"), "stopdate", "13%", "center", "sort", "19", "", "", "", "", "", "display_dateformat");
+if (!$popup_select) $HD_Form -> AddViewElement(gettext("START-DATE"), "startdate", "13%", "center", "sort", "35", "", "", "", "", "", "display_dateformat");
+if (!$popup_select) $HD_Form -> AddViewElement(gettext("STOP-DATE"), "stopdate", "13%", "center", "sort", "35", "", "", "", "", "", "display_dateformat");
 if (!$popup_select) $HD_Form -> AddViewElement("<acronym title=\"INITBLOCK\">".gettext("INITB")."</acronym>", "initblock", "4%", "center", "sort");
 if (!$popup_select) $HD_Form -> AddViewElement("<acronym title=\"CONNECT CHARGE\">".gettext("CC")."</acronym>", "connectcharge", "4%", "center", "sort");
-if (!$popup_select) $HD_Form -> AddViewElement(gettext("TRUNK"), "id_trunk", "10%", "center", "sort", "15", "lie", "cc_trunk", "trunkcode", "id_trunk='%id'", "%1");
-if (!$popup_select) $HD_Form -> AddViewElement(gettext("RATE CARD"), "idtariffplan", "12%", "center", "sort", "15", "lie", "cc_tariffplan", "tariffname", "id='%id'", "%1");
+if (!$popup_select) $HD_Form -> AddViewElement(gettext("TRUNK"), "id_trunk", "10%", "center", "sort", "19", "lie", "cc_trunk", "trunkcode", "id_trunk='%id'", "%1");
+if (!$popup_select) $HD_Form -> AddViewElement(gettext("RATE CARD"), "idtariffplan", "12%", "center", "sort", "30", "lie", "cc_tariffplan", "tariffname", "id='%id'", "%1");
 
 
 if (!$popup_select) {
 	if ($use_lcr_callplan)
 		$HD_Form -> FieldViewElement ('destination, dialprefix, buyrate, '.$rateinitial_field.', startdate, stopdate, initblock, connectcharge, id_trunk , idtariffplan ');
 	else
-		$HD_Form -> FieldViewElement ('cc_prefix.destination, cc_ratecard.dialprefix, cc_ratecard.buyrate, cc_ratecard.rateinitial, cc_ratecard.startdate, cc_ratecard.stopdate, cc_ratecard.initblock, cc_ratecard.connectcharge, cc_ratecard.id_trunk , cc_ratecard.idtariffplan ');
+		$HD_Form -> FieldViewElement ("cc_prefix.destination, cc_ratecard.dialprefix, cc_ratecard.buyrate, cc_ratecard.rateinitial, IF(cc_ratecard.startdate>NOW(),CONCAT('<font color=red>',cc_ratecard.startdate,'</font>'),cc_ratecard.startdate) AS startdate, IF(cc_ratecard.stopdate<NOW(),CONCAT('<font color=red>',cc_ratecard.stopdate,'</font>'),cc_ratecard.stopdate) AS stopdate, cc_ratecard.initblock, cc_ratecard.connectcharge, cc_ratecard.id_trunk , cc_ratecard.idtariffplan ");
 } else {
 	if ($use_lcr_callplan)
 		$HD_Form -> FieldViewElement ('id, destination, dialprefix, buyrate, '.$rateinitial_field);
@@ -575,7 +575,7 @@ $HD_Form -> AddEditElement(gettext("TRUNK"),
    "SELECT",
    "", "", "",
    "sql",
-   "cc_trunk",
+   "cc_trunk ORDER BY trunkcode ASC",
    "trunkcode, id_trunk",
 	"", "", "%1", "", gettext("Set the trunk to use for this destination, or NOT DEFINED to use the rate card trunk."), '', '<OPTION  value="-1" selected>'.gettext("NOT DEFINED").'</OPTION>');
 
@@ -621,6 +621,8 @@ if (ADVANCED_MODE) {
 	$HD_Form -> FieldEditElement ('cc_ratecard.idtariffplan, dialprefix, cc_ratecard.destination, buyrate, buyrateinitblock, buyrateincrement, rateinitial, initblock, billingblock, connectcharge, disconnectcharge,disconnectcharge_after, minimal_cost, startdate, stopdate, starttime, endtime, rounding_calltime, rounding_threshold, additional_block_charge, additional_block_charge_time,additional_grace, id_trunk, id_outbound_cidgroup, tag');
 }
 
+$HD_Form->FG_ADITION_HIDDEN_PARAM = $HD_Form->FG_EDITION_HIDDEN_PARAM = 'filterprefix';
+$HD_Form->FG_ADITION_HIDDEN_PARAM = $HD_Form->FG_EDITION_HIDDEN_PARAM_VALUE = "$filterprefix";
 
 $HD_Form -> FG_SPLITABLE_FIELD = 'dialprefix';
 
@@ -647,8 +649,8 @@ if (isset($filterprefix)  &&  (strlen($filterprefix)>0)) {
 	$HD_Form -> FG_TABLE_CLAUSE.="dialprefix like '$filterprefix%'";
 }
 
-$HD_Form -> FG_GO_LINK_AFTER_ACTION_ADD = $_SERVER['PHP_SELF']."?atmenu=document&stitle=Document&wh=AC&id=";
-$HD_Form -> FG_GO_LINK_AFTER_ACTION_EDIT = $_SERVER['PHP_SELF']."?atmenu=document&stitle=Document&wh=AC&id=";
-$HD_Form -> FG_GO_LINK_AFTER_ACTION_DELETE = $_SERVER['PHP_SELF']."?atmenu=document&stitle=Document&wh=AC&id=";
+$HD_Form -> FG_GO_LINK_AFTER_ACTION_ADD = $_SERVER['PHP_SELF']."?atmenu=document&stitle=Document&wh=AC&filterprefix=$filterprefix&filterfield=dialprefix&id=";
+$HD_Form -> FG_GO_LINK_AFTER_ACTION_EDIT = $_SERVER['PHP_SELF']."?atmenu=document&stitle=Document&wh=AC&filterprefix=$filterprefix&filterfield=dialprefix&id=";
+$HD_Form -> FG_GO_LINK_AFTER_ACTION_DELETE = $_SERVER['PHP_SELF']."?atmenu=document&stitle=Document&wh=AC&filterprefix=$filterprefix&filterfield=dialprefix&id=";
 
 

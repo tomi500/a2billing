@@ -68,11 +68,11 @@ if (isset($_SESSION['startTime'])) {
   
 
     //destroy session
-    if ($timeDiff > 3600) { // 60 minutes
+    if ($timeDiff > 43200) { // 60 minutes
         //echo "You've been logged in too long. ($timeDiff)";
         $_SESSION = array();
         session_destroy();
-        setcookie('PHPSESSID', '', time()-3600, '/', '', 0,0);
+        setcookie('PHPSESSID', '', time()-43200, '/', '', 0,0);
     }
 } else {
   $_SESSION['startTime'] = time();

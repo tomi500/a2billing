@@ -54,7 +54,7 @@
 		<td align="center" style="padding-right: 10px">
 			<table width="90%">
 			<tr align="center">
-				<td align="left"><font size="2" face="Arial, Helvetica, Sans-Serif"><b>{php} echo gettext("User");{/php}:</b></font></td>
+				<td align="left"><font size="2" face="Arial, Helvetica, Sans-Serif"><b>{php} echo gettext("Agent");{/php}:</b></font></td>
 				<td><input class="form_input_text" type="text" name="pr_login" size="15"></td>
 			</tr>
 			<tr align="center">
@@ -94,8 +94,6 @@
 			{php} echo gettext("BLOCKED ACCOUNT, Please contact the administrator!");{/php}
     {/if}
     </div>
-    <div id="footer_index"><div style=" border: solid 1px #F4F4F4; text-align:center;">{$COPYRIGHT}</div></div>
-    
   	</div>
 	</form>
 {literal}

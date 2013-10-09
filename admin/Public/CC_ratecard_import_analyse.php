@@ -120,6 +120,9 @@ if ($task == 'upload') {
 		exit ();
 	}
 
+	$begin_date = date("Y");
+	$begin_date_plus = date("Y") + 15;
+	$end_date = date("-m-d H:i:s");
 	$nb_imported = 0;
 	$nb_to_import = 0;
 	$DBHandle = DbConnect();
@@ -145,12 +148,13 @@ if ($task == 'upload') {
 		{
 			$FG_ADITION_SECOND_ADD_TABLE = 'cc_ratecard';
 			$FG_ADITION_SECOND_ADD_FIELDS = 'idtariffplan, id_trunk, dialprefix, destination, rateinitial'; //$fieldtoimport_sql
-			$FG_ADITION_SECOND_ADD_FIELDS_PREFIX = 'prefix, destination';					
+			$FG_ADITION_SECOND_ADD_FIELDS_PREFIX = 'prefix, destination';
 			if ($currencytype == "cent") {
 				$val[2] = $val[2] / 100;
 			}
-            
+
 			$FG_ADITION_SECOND_ADD_VALUE = "'" . $tariffplanval[0] . "', '" . $trunkval[0] . "', '" . $val[0] . "', '" . intval($val[0]) . "', '" . $val[2] . "'";
+			$TT_UPDATE_QUERY = "UPDATE " . $FG_ADITION_SECOND_ADD_TABLE . " SET idtariffplan='" . $tariffplanval[0] . "', id_trunk='" . $trunkval[0] . "', dialprefix='" . $val[0] . "', destination='" . intval($val[0]) . "', rateinitial='" . $val[2] . "'";
 			
 			for ($k = 0; $k < count($fieldtoimport); $k++) {
 				if (!empty ($val[$k +3]) || $val[$k +3] == '0') {
@@ -165,61 +169,65 @@ if ($task == 'upload') {
 						}
 					}
 					$FG_ADITION_SECOND_ADD_FIELDS .= ', ' . $fieldtoimport[$k];
+					$TT_UPDATE_QUERY .= ', ' . $fieldtoimport[$k] . '=';
 
 					if (is_numeric($val[$k +3])) {
-						$FG_ADITION_SECOND_ADD_VALUE .= ", " . $val[$k +3] . "";
+						$FG_ADITION_SECOND_ADD_VALUE .= ", " . $val[$k +3];
+						$TT_UPDATE_QUERY .= $val[$k +3];
 					} else {
 						$FG_ADITION_SECOND_ADD_VALUE .= ", '" . trim($val[$k +3]) . "'";
+						$TT_UPDATE_QUERY .= "'" . trim($val[$k +3]) . "'";
 					}
 
 					if ($fieldtoimport[$k] == "startdate")
-						$find_stardate = 1;
+						$find_startdate = 1;
 					if ($fieldtoimport[$k] == "stopdate")
 						$find_stopdate = 1;
 				}
 			}
 
-			if ($find_stardate != 1) {
-				$begin_date = date("Y");
-				$end_date = date("-m-d H:i:s");
+			if ($find_startdate != 1) {
 				$FG_ADITION_SECOND_ADD_FIELDS .= ', startdate';
 				$FG_ADITION_SECOND_ADD_VALUE .= ", '" . $begin_date . $end_date . "'";
+				$TT_UPDATE_QUERY .= ", startdate='" . $begin_date . $end_date . "'";
 			}
 
 			if ($find_stopdate != 1) {
-				$begin_date_plus = date("Y") + 10;
-				$end_date = date("-m-d H:i:s");
 				$FG_ADITION_SECOND_ADD_FIELDS .= ', stopdate';
 				$FG_ADITION_SECOND_ADD_VALUE .= ", '" . $begin_date_plus . $end_date . "'";
+				$TT_UPDATE_QUERY .= ", stopdate='" . $begin_date_plus . $end_date . "'";
 			}
 			if (intval($val[0]) > 0) {
 				$FG_ADITION_SECOND_ADD_VALUE_PREFIX = "'" . intval($val[0]) . "', '" . $val[1] . "'";
-				$TT_QUERY_PREFIX = "REPLACE INTO cc_prefix " . $FG_ADITION_SECOND_ADD_TABLE_PREFIX . " (" . $FG_ADITION_SECOND_ADD_FIELDS_PREFIX . ") values (" . $FG_ADITION_SECOND_ADD_VALUE_PREFIX . ") ";
-                $DBHandle->Execute($TT_QUERY_PREFIX);
+				$TT_QUERY_PREFIX = "INSERT INTO cc_prefix (" . $FG_ADITION_SECOND_ADD_FIELDS_PREFIX . ") values (" . $FG_ADITION_SECOND_ADD_VALUE_PREFIX . ") ON DUPLICATE KEY UPDATE destination = '" . $val[1] . "'";
+				$DBHandle->Execute($TT_QUERY_PREFIX);
 			}
-			
-			$TT_QUERY .= "INSERT INTO " . $FG_ADITION_SECOND_ADD_TABLE . " (" . $FG_ADITION_SECOND_ADD_FIELDS . ") values (" . $FG_ADITION_SECOND_ADD_VALUE . ") ";
+			$TT_UPDATE_QUERY .= $addinsertquery = " WHERE dialprefix='" . $val[0] . "' AND idtariffplan='" . $tariffplanval[0] . "' LIMIT 1";
+			$TT_INSERT_QUERY = "INSERT INTO " . $FG_ADITION_SECOND_ADD_TABLE . "(" . $FG_ADITION_SECOND_ADD_FIELDS . ") SELECT " . $FG_ADITION_SECOND_ADD_VALUE . " FROM " . $FG_ADITION_SECOND_ADD_TABLE . " WHERE NOT EXISTS(SELECT id FROM " . $FG_ADITION_SECOND_ADD_TABLE . $addinsertquery . ") LIMIT 1";
+
 			$nb_to_import++;
 		}
 		
-		if ($TT_QUERY != '' && strlen($TT_QUERY) > 0 && ($nb_to_import == 1)) {
+		if ($TT_UPDATE_QUERY != '' && strlen($TT_UPDATE_QUERY) > 0 && ($nb_to_import == 1)) {
 			$nb_to_import = 0;
-			$result_query = $DBHandle->Execute($TT_QUERY);
-			
+			$result_query = $DBHandle->Execute($TT_UPDATE_QUERY);
+			$result_query = $DBHandle->Execute($TT_INSERT_QUERY);
 			if ($result_query) {
-				$nb_imported = $nb_imported +1;
+				$nb_imported++;
 			} else {
 				$buffer_error .= $ligneoriginal . '<br/>';
 			}
-			$TT_QUERY = '';
+			$TT_UPDATE_QUERY = '';
 		}
 
 	} // END WHILE EOF
 
-	if ($TT_QUERY != '' && strlen($TT_QUERY) > 0 && ($nb_to_import > 0)) {
-		$result_query = @ $DBHandle->Execute($TT_QUERY);
-		if ($result_query)
+	if ($TT_UPDATE_QUERY != '' && strlen($TT_UPDATE_QUERY) > 0 && ($nb_to_import > 0)) {
+		$result_query = @ $DBHandle->Execute($TT_UPDATE_QUERY);
+		$result_query = @ $DBHandle->Execute($TT_INSERT_QUERY);
+		if ($result_query) {
 			$nb_imported = $nb_imported + $nb_to_import;
+		}
 	}
 }
 
@@ -253,6 +261,20 @@ function sendtoupload(form) {
 
 <?php
 if ($status=="ok") {
+	$TT_QUERY = "";
+	if ($find_startdate != 1) {
+		$TT_QUERY .= "startdate<>'" . $begin_date . $end_date . "'";
+		if ($find_stopdate != 1) {
+			$TT_QUERY .= " AND ";
+		}
+	}
+	if ($find_stopdate != 1) {
+		$TT_QUERY .= "stopdate<>'" . $begin_date_plus . $end_date . "'";
+	}
+	if ($TT_QUERY != "") {
+		$TT_QUERY = "DELETE FROM " . $FG_ADITION_SECOND_ADD_TABLE . " WHERE idtariffplan='" . $tariffplanval[0] . "' AND " . $TT_QUERY;
+		$result_query = @ $DBHandle->Execute($TT_QUERY);
+	}
 	echo $CC_help_import_ratecard_confirm;
 } else {
 	echo $CC_help_import_ratecard_analyse;

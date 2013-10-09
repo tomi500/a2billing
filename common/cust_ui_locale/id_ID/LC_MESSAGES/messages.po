@@ -3481,7 +3481,7 @@ msgstr "Sebuah email aktivasi telah dikirim ke"
 
 #: A2B_entity_did.php:82
 #, fuzzy
-msgid "The following Destinaton-DID has been relesed:"
+msgid "The following Destination-DID has been released:"
 msgstr "Tujuan berikut-DID telah rilis:"
 
 #: A2B_entity_did.php:108

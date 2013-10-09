@@ -32,7 +32,7 @@
 **/
 
 
-getpost_ifset(array('IDCust', 'id', 'cid', 'activated'));
+getpost_ifset(array('IDCust', 'id', 'cid', 'activated', 'verify'));
 
 $HD_Form = new FormHandler("cc_callerid", gettext("CallerID"));
 
@@ -53,13 +53,14 @@ $actived_list = Constants::getActivationTrueFalseList();
 $yesno = Constants::getYesNoList();
 
 $HD_Form -> AddViewElement(gettext("CALLERID"), "cid", "15%", "center", "sort");
+$HD_Form -> AddViewElement(gettext("VERIFY"), "verify", "5%", "center", "SORT");
 $HD_Form -> AddViewElement(gettext("PHONE NUMBER"), "phonenumber", "15%", "center", "sort", "26");
 $HD_Form -> AddViewElement(gettext("CALLBACK"), "callback", "10%", "center", "SORT", "", "list", $yesno);
 $HD_Form -> AddViewElement(gettext("ACCOUNT NUMBER"), "id_cc_card", "12%", "center", "sort", "", "lie_link", "cc_card", "username, id", "id='%id'", "%1", "", "A2B_entity_card.php");
 $HD_Form -> AddViewElement(gettext("CUSTOMER NAME"), "id_cc_card", "20%", "center", "sort", "", "lie_link", "cc_card", "lastname, id, firstname", "id='%id'", "%1 %3", "", "A2B_entity_card.php");
 $HD_Form -> AddViewElement(gettext("ACTIVATED"), "activated", "10%", "center", "sort", "", "list", $actived_list);
 
-$HD_Form -> FieldViewElement ('cid, phonenumber, callback, id_cc_card, id_cc_card, cc_callerid.activated, cc_callerid.id');
+$HD_Form -> FieldViewElement ("cid, IF(verify=0,'".gettext("No")."','<font color=green>".gettext("Yes")."</font>'), phonenumber, callback, id_cc_card, id_cc_card, cc_callerid.activated");
 
 
 $HD_Form -> CV_NO_FIELDS  = gettext("THERE IS NO ").strtoupper($HD_Form->FG_INSTANCE_NAME).gettext(" CREATED!");
@@ -72,58 +73,150 @@ $HD_Form -> FG_ADDITION = true;
 $HD_Form -> FG_EDITION = true;
 $HD_Form -> FG_DELETION = true;
 
-
-$HD_Form -> AddEditElement (gettext("CALLERID"),
-			   "cid",
-			   '$value',
-			   "INPUT",
-			   "size=20 maxlength=30",
-			   "18",
-			   gettext("Insert the CallerID"),
-			   "" , "", "",	"", "" , "", "", "");
+// Possible value to notify the user
+$instance_config_table = new Table("cc_config", "id, config_value");
+$QUERY = " config_key = 'values_notifications' ";
+$return = null;
+$return = $instance_config_table -> Get_list($DBHandle, $QUERY, 0);
+$values = explode(":",$return[0]["config_value"]);
+$limits_notify = array();
+$idx =0;
+$limits_notify [$idx] = array(gettext("NEVER").'&nbsp;', -2);
+foreach ($values as $val) {
+	$idx++;
+	$val_display = round($val,2);
+	$limits_notify [$idx] = array($val_display,$val);
+}
 
 $HD_Form -> AddEditElement (gettext("ACTIVATED"),
-			   "activated",
-			   't',
-			   "RADIOBUTTON",
-			   "",
-			   "",
-			   gettext("Choose if you want to activate this card"),
-			   "" , "", "", gettext("Yes").":t, - ".gettext("No").":f", "", "", "", "" );
+			"activated",
+			't',
+			"RADIOBUTTON",
+			"",
+			"",
+			gettext("Choose if you want to activate this card"),
+			"", "", "", gettext("Yes").":t, - ".gettext("No").":f", "", "", "",
+			gettext("... for incoming calls from this number"));
+
+$HD_Form -> AddEditElement (gettext("CALLERID"),
+			"cid",
+			'$value',
+			"INPUT",
+			"size=20 maxlength=30",
+			"",
+			gettext("Insert the CallerID"),
+			"", "", "", "", "", "", "", "");
+
+$HD_Form -> AddEditElement (gettext("VERIFY"),
+			"verify",
+			'0',
+			"SELECT",
+			"",
+			"",
+			"",
+			"list", "", "", "", $yesno, "%1", "",
+			gettext("Choose 'Yes' if this CallerID verified"));
 
 $HD_Form -> AddEditElement (gettext("ID CARD"),
-			   "id_cc_card",		
-			   "$value",	
-			   "POPUPVALUE",	
-			   "size=30 maxlength=50",	
-			   "4",	
-			   gettext("Insert the Id CardNumber"),
-			    "" , "", "", "", "", 				
-				"A2B_entity_card.php?popup_select=1&"
-				, ", 'CardNumberSelection','width=550,height=580,top=20,left=100,scrollbars=1'" ,
-				gettext("Define the card number ID to use."));
-
-$HD_Form -> AddEditElement (gettext("PHONE NUMBER"),
-			    "phonenumber",
-			    '$value',
-			    "INPUT",
-			    "size=50 maxlength=50",
-			    "",
-			    gettext("Insert the phone"),
-			    "" , "", "", "", "", "", "", gettext("Enter the phone number for immediatly dial instead prompt to dial") );
+			"id_cc_card",
+			"$value",
+			"POPUPVALUE",
+			"size=30 maxlength=50",
+			"4",
+			gettext("Insert the Id CardNumber"),
+			"", "", "", "", "", "A2B_entity_card.php?popup_select=1&",
+			", 'CardNumberSelection','width=550,height=580,top=20,left=100,scrollbars=1'",
+			gettext("Define the card number ID to use."));
 
 $HD_Form -> AddEditElement (gettext("CALLBACK"),
-			   "callback",
-			   '0',
-			   "RADIOBUTTON",
-			   "",
-			   "",
-			   gettext("Choose if you want to callback to this CallerID"),
-			   "" , "", "", gettext("Yes").":1, - ".gettext("No").":0", "", "", "", gettext("Choose 'Yes' if you want to callback to this CallerID"));
+			"callback",
+			'0',
+			"SELECT",
+			"",
+			"",
+			gettext("Choose if you want to callback to this CallerID"),
+			"list", "", "", "", $yesno, "%1", "",
+			gettext("Choose 'Yes' if you want to callback to this CallerID"));
 
+$HD_Form -> AddEditElement (gettext("PHONE NUMBER"),
+			"phonenumber",
+			'$value',
+			"INPUT",
+			"size=50 maxlength=50",
+			"",
+			gettext("Insert the phone"),
+			"" , "", "", "", "", "", "", gettext("Enter the phone number for immediatly dial instead prompt to dial") );
 
-$HD_Form -> FieldEditElement ('cid, activated, id_cc_card, phonenumber, callback');
+$HD_Form -> AddEditElement (gettext("SAY BALANCE AFTER AUTH"),
+			"warning_threshold",
+			'',
+			"SELECT",
+			"",
+			"",
+			"",
+			"list", "", "", "", $limits_notify , "%1", "", gettext('currency : ').strtoupper(BASE_CURRENCY)." (".gettext("with the warning threshold").")", "", '<OPTION  value="-1" selected>'.gettext("ALWAYS").'&nbsp;</OPTION>');
 
+$HD_Form -> AddEditElement (gettext("SAY RATE BEFORE CALL"),
+			"say_rateinitial",
+			'0',
+			"SELECT",
+			"",
+			"",
+			"",
+			"list", "", "", "", $yesno, "%1");
+
+$HD_Form -> AddEditElement (gettext("SAY BALANCE AFTER CALL"),
+			"say_balance_after_call",
+			'0',
+			"SELECT",
+			"",
+			"",
+			"",
+			"list", "", "", "", $yesno, "%1");
+
+$HD_Form -> AddEditElement (gettext("CONSPIRATION"),
+			"cli_replace",
+			'0',
+			"SELECT",
+			"",
+			"",
+			"",
+			"list", "", "", "", $yesno, "%1", "",
+			gettext("Choose 'Yes' if you want hide CLI and replace its in a general manner for calls from this CallerID. Choose 'No' if you want set a veto for replacement CLI for calls from this CallerID. Choose 'Local' to replace this CallerID when calling to countries for which there exist a local number(s) for replacement."),
+			"", '<OPTION  value="2">'.gettext("Local").'&nbsp;</OPTION>',
+			gettext("If this CallerID number was verified you can use the remaining options..."));
+
+$HD_Form -> AddEditElement (gettext("LOCAL REPLACE"),
+			"cli_localreplace",
+			'0',
+			"SELECT",
+			"",
+			"",
+			"",
+			"list", "", "", "", $yesno, "%1", "",
+			gettext("Present this CallerID, when calls are made to a country relevant to this CallerID."),
+			null, null, gettext("Settings for general Caller Line Identity (CLI)"));
+
+$HD_Form -> AddEditElement (gettext("OTHER REPLACE"),
+			"cli_otherreplace",
+			'0',
+			"SELECT",
+			"",
+			"",
+			"",
+			"list", "", "", "", $yesno, "%1", "",
+			gettext("Present this CallerID, when calls are made to countries not relevant to this CallerID."));
+
+$HD_Form -> AddEditElement (gettext("REPLACE BY PREFIX"),
+			"cli_prefixreplace",
+			"$value",
+			"INPUT",
+			"size=30 maxlength=30 ",
+			"",
+			"",
+			"" , "", "", "", "" , "" , "", gettext("Present this CallerID, when calls are made to countries from listed prefixes. Insert the replaceable prefixes separated by comma, e.g. for UK,IT,RU,UA are '44,39,7,380'."));
+
+$HD_Form -> FieldEditElement ('activated, cid, verify, id_cc_card, callback, phonenumber, warning_threshold, say_rateinitial, say_balance_after_call, cli_replace, cli_localreplace, cli_otherreplace, cli_prefixreplace');
 
 // Set the filter variables
 $HD_Form -> FG_FILTER_APPLY = true;
@@ -160,6 +253,3 @@ $HD_Form -> FG_BUTTON_EDITION_BOTTOM_TEXT = $HD_Form -> FG_BUTTON_ADITION_BOTTOM
 $HD_Form -> FG_GO_LINK_AFTER_ACTION_ADD = $_SERVER['PHP_SELF']."?atmenu=document&stitle=Document&wh=AC&id=";
 $HD_Form -> FG_GO_LINK_AFTER_ACTION_EDIT = $_SERVER['PHP_SELF']."?atmenu=document&stitle=Document&wh=AC&id=";
 $HD_Form -> FG_GO_LINK_AFTER_ACTION_DELETE = $_SERVER['PHP_SELF']."?atmenu=document&stitle=Document&wh=AC&id=";
-
-
-

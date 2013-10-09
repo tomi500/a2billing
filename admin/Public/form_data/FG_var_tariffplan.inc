@@ -58,7 +58,7 @@ $HD_Form -> FG_FK_DELETE_MESSAGE = gettext("You are going as well to remove all 
 
 
 $HD_Form -> AddViewElement(gettext("ID"), "id", "4%", "center", "sort");
-$HD_Form -> AddViewElement(gettext("TARIFFNAME"), "tariffname", "18%", "center", "sort");
+$HD_Form -> AddViewElement(gettext("TARIFFNAME"), "tariffname", "18%", "left", "sort");
 $HD_Form -> AddViewElement(gettext("START DATE"), "startingdate", "13%", "center", "sort", "16", "", "", "", "", "", "display_dateformat");
 $HD_Form -> AddViewElement(gettext("EXPIRY DATE"), "expirationdate", "13%", "center", "sort", "16", "", "", "", "", "", "display_dateformat");
 $HD_Form -> AddViewElement(gettext("TRUNK"), "id_trunk", "11%", "center", "sort", "15", "lie", "cc_trunk", "trunkcode", "id_trunk='%id'", "%1");

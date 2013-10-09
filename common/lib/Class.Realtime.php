@@ -51,12 +51,13 @@ class Realtime {
 		$this -> DBHandler = DBConnect();
 		$this -> instance_table = new Table();
 		
-		$this -> FG_QUERY_ADITION_SIP = 'name, accountcode, regexten, amaflags, callgroup, callerid, canreinvite, context, DEFAULTip, dtmfmode, fromuser, fromdomain, host, insecure, language, ' .
-				'mailbox, md5secret, encryption, ignorecryptolifetime, transport, directmedia, nat, deny, permit, mask, pickupgroup, port, qualify, restrictcid, rtptimeout, rtpholdtimeout, secret, type, username, disallow, allow, musiconhold, regseconds, ' .
-				'ipaddr, cancallforward, fullcontact, setvar, lastms, regserver, defaultuser, auth, subscribemwi, vmexten, cid_number, callingpres, usereqphone, incominglimit, subscribecontext, ' .
+		$this -> FG_QUERY_ADITION_SIP = 'name, accountcode, regexten, amaflags, callgroup, callerid, canreinvite, context, defaultip, dtmfmode, fromuser, fromdomain, host, insecure, language, ' .
+				'mailbox, md5secret, encryption, ignorecryptolifetime, transport, directmedia, nat, deny, permit, mask, pickupgroup, port, qualify, restrictcid, rtptimeout, rtpholdtimeout, ' .
+				'secret, type, username, disallow, allow, t38pt_udptl, musiconhold, regseconds, ipaddr, ' .
+				'cancallforward, fullcontact, setvar, lastms, regserver, defaultuser, auth, subscribemwi, vmexten, cid_number, callingpres, usereqphone, incominglimit, subscribecontext, ' .
 				'musicclass, mohsuggest, allowtransfer, autoframing, maxcallbitrate, outboundproxy, rtpkeepalive, callbackextension';
 
-		$this -> FG_QUERY_ADITION_IAX = 'name, accountcode, regexten, amaflags, callerid, context, DEFAULTip, host, language, mask, port, qualify, secret, username, disallow, allow, regseconds, ' .
+		$this -> FG_QUERY_ADITION_IAX = 'name, accountcode, regexten, amaflags, callerid, context, defaultip, host, language, mask, port, qualify, secret, username, disallow, allow, regseconds, ' .
 				'ipaddr, trunk, dbsecret, regcontext, sourceaddress, mohinterpret, mohsuggest, inkeys, outkey, cid_number, sendani, fullname, auth, maxauthreq, encryption, forceencryption, transfer, jitterbuffer, ' .
 				'forcejitterbuffer, codecpriority, qualifysmoothing, qualifyfreqok, qualifyfreqnotok, timezone, adsi, setvar, type, deny, permit, requirecalltoken, maxcallnumbers, ' .
 				'maxcallnumbers_nonvalidated';
@@ -177,12 +178,16 @@ class Realtime {
 	    // Insert data for sip_buddy
 		if ($sip) {
 			
-			$FG_QUERY_ADITION_SIP_FIELDS = "name, accountcode, regexten, amaflags, callerid, context, dtmfmode, host, type, defaultuser, allow, secret, id_cc_card, nat, qualify, language, rtptimeout, rtpholdtimeout, rtpkeepalive, allowtransfer";
+			$FG_QUERY_ADITION_SIP_FIELDS = "name, accountcode, regexten, amaflags, callerid, context, dtmfmode, host, type, defaultuser, allow, secret, id_cc_card, nat, qualify, language, mailbox, rtptimeout, rtpholdtimeout, rtpkeepalive, allowtransfer";
 		    $instance_sip_table = new Table($FG_TABLE_SIP_NAME, $FG_QUERY_ADITION_SIP_FIELDS);
-		    
-			$FG_QUERY_ADITION_SIP_IAX_VALUE = "'$useralias', '$accountnumber', '', '$amaflags', '', '$context', '$dtmfmode','$host', '$type', ".
-			                                    "'$useralias', '$allow', '$passui_secret', '$id_card', '$nat', '$qualify', '$language', '60', '300', '30', 'yes'";
+
+			$FG_QUERY_ADITION_SIP_IAX_VALUE = "'$useralias', '$accountnumber', '701', '$amaflags', 'Internal-701', '$context', '$dtmfmode','$host', '$type', ".
+			                                    "'$useralias', '$allow', '$passui_secret', '$id_card', '$nat', '$qualify', '$language', '701@$accountnumber', '60', '300', '30', 'yes'";
 			$result_query1 = $instance_sip_table->Add_table($this->DBHandler, $FG_QUERY_ADITION_SIP_IAX_VALUE, null, null, null);
+
+			$QUERY = "INSERT INTO cc_voicemail_users (customer_id, sip_buddy_id, context, mailbox, password, fullname, email, language)
+					SELECT cc_card.id, cc_sip_buddies.id, cc_card.username, '701', '0000', concat(lastname,' ',firstname) fullname, email, cc_card.language FROM cc_card, cc_sip_buddies WHERE cc_card.id='$id_card' AND cc_sip_buddies.name='{$useralias}'";
+			$result = $instance_sip_table->SQLExec($this->DBHandler, $QUERY, 0);
 			if (USE_REALTIME) {
 				$_SESSION["is_sip_iax_change"] = 1;
 				$_SESSION["is_sip_changed"] = 1;

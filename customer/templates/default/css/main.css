@@ -1228,6 +1228,15 @@ SPAN.errorText {
   border-style: solid;
   border-width: 1px;
 }
+.infoBoxGeneration {
+  width: 100%;
+  min-width: 740px;
+  max-width: 900px;
+  background: WhiteSmoke;
+  border-color: #7b9ebd;
+  border-style: solid;
+  border-width: 1px;
+}
 .invoice_main_table
 {
 	border-right: LightGrey 1px solid;

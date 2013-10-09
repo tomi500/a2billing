@@ -65,7 +65,7 @@ $validated_list = array();
 $validated_list["0"] = array( gettext("Pending"), "0");
 $validated_list["1"] = array( gettext("Validated"), "1");
 
-$HD_Form -> AddViewElement(gettext("DID"), "id_cc_did", "15%", "center", "sort", "15", "lie", "cc_did", "did", "id='%id'", "%1");
+$HD_Form -> AddViewElement(gettext("DID"), "id_cc_did", "15%", "center", "sort", "30", "lie", "cc_did", "did", "id='%id'", "%1");
 $HD_Form -> AddViewElement(gettext("ACTIVATED"), "t1.activated", "10%", "center", "sort", "", "list", $actived_list);
 $HD_Form -> AddViewElement(gettext("PRIORITY"), "priority", "10%", "center", "sort", "", "list", $priority_list);
 $HD_Form -> AddViewElement(gettext("DESTINATION"), "destination", "20%", "center", "sort");
@@ -120,9 +120,10 @@ $HD_Form -> CV_NO_FIELDS  = gettext("There are no destinations created");
 $HD_Form -> CV_DISPLAY_LINE_TITLE_ABOVE_TABLE = false;
 $HD_Form -> CV_TEXT_TITLE_ABOVE_TABLE = '';
 $HD_Form -> CV_DISPLAY_FILTER_ABOVE_TABLE = false;
+$HD_Form -> FG_LIMITE_DISPLAY = 14;
 
-$HD_Form -> FG_EDITION = true;
-$HD_Form -> FG_DELETION = true;
+$HD_Form -> FG_EDITION = false;
+$HD_Form -> FG_DELETION = false;
 $HD_Form -> FG_VIEW_TABLE_WITDH = '80%';
 
 $HD_Form -> AddEditElement (gettext("ACTIVATED"),

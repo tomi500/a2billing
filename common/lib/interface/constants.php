@@ -64,8 +64,8 @@ class Constants
 	
 	public static function getYesNoList(){
 		$yesno = array();
-		$yesno["1"] = array( gettext("Yes"), "1");
-		$yesno["0"] = array( gettext("No"), "0");
+		$yesno["1"] = array( gettext("Yes").'&nbsp;', "1");
+		$yesno["0"] = array( gettext("No").'&nbsp;', "0");
 		return $yesno;
 	}	
 

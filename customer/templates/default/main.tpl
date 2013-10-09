@@ -10,29 +10,74 @@
 <ul id="nav">
 
 	<div class="toggle_menu"><li><a href="userinfo.php"><strong>{php} echo gettext("ACCOUNT INFO");{/php}</strong></a></li></div>
-	
-	{if $ACX_PERSONALINFO >0 }
-	<div class="toggle_menu"><li><a href="A2B_entity_card.php?atmenu=password&form_action=ask-edit&stitle=Personal+Information"><strong>{php} echo gettext("MY PROFILE");{/php}</strong></a></li></div>
-	{/if}
-	
+
 	{if $ACXVOICEMAIL>0 }
 	<div class="toggle_menu"><li><a href="A2B_entity_voicemail.php"><strong>{php} echo gettext("VOICEMAIL");{/php}</strong></a></li></div>
 	{/if}
 
-	{if $ACXSIP_IAX>0 }
-	<div class="toggle_menu"><li><a href="A2B_entity_sipiax_info.php"><strong>{php} echo gettext("SIP/IAX INFO");{/php}</strong></a></li></div>
-	{/if}
-
-	{if $ACXDID >0 }
-	<div class="toggle_menu"><li><a href="A2B_entity_did.php?form_action=list"><strong>{php} echo gettext("DID");{/php}</strong></a></li></div>
-	{/if}
-
 	{if $ACXCALL_HISTORY >0 }
 	<div class="toggle_menu"><li><a href="call-history.php"><strong>{php} echo gettext("CALL HISTORY");{/php}</strong></a></li></div>
+
+	<div class="toggle_menu"><li><a href="fax-history.php"><strong>{php} echo gettext("FAX HISTORY");{/php}</strong></a></li></div>
 	{/if}
-	
-	{if $ACXVOUCHER >0 }
-	<div class="toggle_menu"><li><a href="A2B_entity_voucher.php?form_action=list"><strong>{php} echo gettext("VOUCHERS");{/php}</strong></a></li></div>
+
+	{if $ACXDID >0 or $ACXSIP_IAX >0 }
+	<div class="toggle_menu"><li>
+	<a href="javascript:;" class="toggle_menu" target="_self"> <div> <div id="menutitlebutton"> <img id="img5"
+	{if ($section == "15")}
+	src="templates/{$SKIN_NAME}/images/minus.gif"
+	{else}
+	src="templates/{$SKIN_NAME}/images/plus.gif"
+	{/if} onmouseover="this.style.cursor='hand';" ></div> <div id="menutitlesection"><strong>{php} echo gettext("MY PBX");{/php}</strong></div></div></a></li></div>
+		<div class="tohide"
+	{if ($section =="15")}
+		style="">
+	{else}
+	style="display:none;">
+	{/if}
+	<ul>
+		<li><ul>
+			<li><a href="A2B_entity_fax.php?section=15&form_action=list"><strong>{php} echo gettext("VIRTUAL FAX");{/php}</strong></a></li>
+
+			{if $ACXSIP_IAX >0 }
+				<li><a href="A2B_entity_sipiax_info.php?section=15"><strong>{php} echo gettext("EXTENSIONS ");{/php}</strong></a></li>
+				<li><a href="A2B_entity_sipiax_info.php?section=15"><strong>{php} echo gettext("Outbound call plan");{/php}</strong></a></li>
+			{/if}
+			{if $ACXDID >0 }
+				<li><a href="A2B_entity_did_info.php?section=15"><strong>{php} echo gettext("EXTERNAL LINES");{/php}</strong></a></li>
+				<li><a href="A2B_entity_did.php?section=15&form_action=list"><strong>{php} echo gettext("Incoming call plan and IVR");{/php}</strong></a></li>
+			{/if}
+
+		</ul></li>
+	</ul>
+	</div>
+	{/if}
+
+	{if $ACXDISTRIBUTION >0 }
+	<div class="toggle_menu"><li>
+	<a href="javascript:;" class="toggle_menu" target="_self"> <div> <div id="menutitlebutton"> <img id="img5"
+	{if ($section == "14")}
+	src="templates/{$SKIN_NAME}/images/minus.gif"
+	{else}
+	src="templates/{$SKIN_NAME}/images/plus.gif"
+	{/if} onmouseover="this.style.cursor='hand';" ></div> <div id="menutitlesection"><strong>{php} echo gettext("MY CUSTOMERS");{/php}</strong></div></div></a></li></div>
+		<div class="tohide"
+	{if ($section =="14")}
+		style="">
+	{else}
+	style="display:none;">
+	{/if}
+	<ul>
+		<li><ul>
+			<li><a href="A2B_entity_moneysituation.php?section=14"><strong>{php} echo gettext("LIST CUSTOMERS");{/php}</strong></a></li>
+			<li><a href="A2B_entity_moneysituation.php?section=14"><strong>{php} echo gettext("COMMISSION ACCRUED");{/php}</strong></a></li>
+		</ul></li>
+	</ul>
+	</div>
+	{/if}
+
+	{if $ACXSURVEILLANCE >0 }
+	<div class="toggle_menu"><li><a href="A2B_entity_surveillance.php"><strong>{php} echo gettext("SURVEILLANCE");{/php}</strong></a></li></div>
 	{/if}
 
 	{if $ACXSPEED_DIAL >0 }
@@ -50,7 +95,7 @@
 	{if $ACXCALL_BACK >0 }
 	<div class="toggle_menu"><li><a href="callback.php"><strong>{php} echo gettext("CALLBACK");{/php}</strong></a></li></div>
 	{/if}
-	
+
 	{if $ACXCALLER_ID >0 }
 	<div class="toggle_menu"><li><a href="A2B_entity_callerid.php?atmenu=callerid&stitle=CallerID"><strong>{php} echo gettext("ADD CALLER ID");{/php}</strong></a></li></div>
 	{/if}
@@ -58,41 +103,13 @@
 	{if $ACXPASSWORD>0 }
 	<div class="toggle_menu"><li><a href="A2B_entity_password.php?atmenu=password&form_action=ask-edit&stitle=Password"><strong>{php} echo gettext("PASSWORD");{/php}</strong></a></li></div>
 	{/if}
-	
+
 	{if $ACXSUPPORT >0 }
 	<div class="toggle_menu"><li><a href="A2B_support.php"><strong>{php} echo gettext("SUPPORT");{/php}</strong></a></li></div>
 	{/if}
-	
-	{if $ACXNOTIFICATION >0 }
-	<div class="toggle_menu"><li><a href="A2B_notification.php?form_action=ask-edit"><strong>{php} echo gettext("NOTIFICATION");{/php}</strong></a></li></div>
-	{/if}
 
-	{if $ACXPAYMENT_HISTORY >0 }
-	<div class="toggle_menu"><li><a href="payment-history.php"><strong>{php} echo gettext("PAYMENT HISTORY");{/php}</strong></a></li></div>
-	{/if}
-
-	{if $ACXINVOICES >0 }
-	<div class="toggle_menu"><li>
-	<a href="javascript:;" class="toggle_menu" target="_self"> <div> <div id="menutitlebutton"> <img id="img5"
-	{if ($section == "5")}
-	src="templates/{$SKIN_NAME}/images/minus.gif"
-	{else}
-	src="templates/{$SKIN_NAME}/images/plus.gif"
-	{/if} onmouseover="this.style.cursor='hand';" ></div> <div id="menutitlesection"><strong>{php} echo gettext("INVOICES");{/php}</strong></div></div></a></li></div>
-		<div class="tohide"
-	{if ($section =="5")}
-		style="">
-	{else}
-	style="display:none;">
-	{/if}
-	<ul>
-		<li><ul>
-				<li><a href="A2B_entity_receipt.php?section=5"><strong>{php} echo gettext("View Receipts");{/php}</strong></a></li>
-				<li><a href="A2B_entity_invoice.php?section=5"><strong>{php} echo gettext("View Invoices");{/php}</strong></a></li>
-				<li><a href="A2B_billing_preview.php?section=5"><strong>{php} echo gettext("Preview Next Billing");{/php}</strong></a></li>
-		</ul></li>
-	</ul>
-	</div>
+	{if $ACXVOUCHER >0 }
+	<div class="toggle_menu"><li><a href="A2B_entity_voucher.php?form_action=list"><strong>{php} echo gettext("VOUCHERS");{/php}</strong></a></li></div>
 	{/if}
 
 	{if $ACXAUTODIALER>0 }
@@ -118,6 +135,43 @@
 		</ul></li>
 	</ul>
 	</div>
+	{/if}
+
+	{if $ACXINVOICES >0 or $ACXPAYMENT_HISTORY >0 or $ACXNOTIFICATION >0}
+	<div class="toggle_menu"><li>
+	<a href="javascript:;" class="toggle_menu" target="_self"> <div> <div id="menutitlebutton"> <img id="img5"
+	{if ($section == "5")}
+	src="templates/{$SKIN_NAME}/images/minus.gif"
+	{else}
+	src="templates/{$SKIN_NAME}/images/plus.gif"
+	{/if} onmouseover="this.style.cursor='hand';" ></div> <div id="menutitlesection"><strong>{php} echo gettext("BILLING");{/php}</strong></div></div></a></li></div>
+		<div class="tohide"
+	{if ($section =="5")}
+		style="">
+	{else}
+	style="display:none;">
+	{/if}
+	<ul>
+		<li><ul>
+			{if $ACXPAYMENT_HISTORY >0 }
+				<li><a href="A2B_entity_logrefill.php?section=5"><strong>{php} echo gettext("ACCOUNT ACTIVITY");{/php}</strong></a></li>
+				<li><a href="payment-history.php?section=5"><strong>{php} echo gettext("PAYMENT HISTORY");{/php}</strong></a></li>
+			{/if}
+			{if $ACXINVOICES1 >0}
+				<li><a href="A2B_entity_receipt.php?section=5"><strong>{php} echo gettext("View Receipts");{/php}</strong></a></li>
+				<li><a href="A2B_entity_invoice.php?section=5"><strong>{php} echo gettext("View Invoices");{/php}</strong></a></li>
+				<li><a href="A2B_billing_preview.php?section=5"><strong>{php} echo gettext("Preview Next Billing");{/php}</strong></a></li>
+			{/if}
+			{if $ACXNOTIFICATION >0 }
+				<li><a href="A2B_notification.php?section=5&form_action=ask-edit"><strong>{php} echo gettext("NOTIFICATION");{/php}</strong></a></li>
+			{/if}
+		</ul></li>
+	</ul>
+	</div>
+	{/if}
+
+	{if $ACX_PERSONALINFO >0 }
+	<div class="toggle_menu"><li><a href="A2B_entity_card.php?atmenu=password&form_action=ask-edit&stitle=Personal+Information"><strong>{php} echo gettext("MY PROFILE");{/php}</strong></a></li></div>
 	{/if}
 
 </ul>

@@ -94,12 +94,12 @@ if (!isset ($currencies_list[strtoupper($customer_info[2])][2]) || !is_numeric($
 } else {
 	$mycur = $currencies_list[strtoupper($customer_info[2])][2];
 	$display_currency = strtoupper($customer_info[2]);
-	if (strtoupper($customer_info[22]) != strtoupper(BASE_CURRENCY))
+	if (strtoupper($customer_info[2]) != strtoupper(BASE_CURRENCY))
 		$two_currency = true;
 }
 
 $credit_cur = $customer_info[1] / $mycur;
-$credit_cur = round($credit_cur, 2).' '.gettext($customer_info[2]);
+$credit_cur = round($credit_cur, 5).' '.gettext($customer_info[2]);
 if ($credit_cur < 0) {
 	$limit_cur = $customer_info[0] / $mycur;
 	if ($limit_cur) $limit_cur = round($limit_cur, 2).' '.gettext($customer_info[2]);
@@ -113,7 +113,9 @@ if (SHOW_HELP) {
 	$CC_help_webphone = create_help(gettext("From here, you can use the web based screen phone. You need microphone and speakers on your PC."),$credit_cur,$limit_cur);
 
 	$CC_help_balance_customer = create_help(gettext("All calls are listed below. Search by month, day or status. Additionally, you can check the rate and price."),$credit_cur,$limit_cur);
-	
+
+	$CC_help_fax_customer = create_help(gettext("All faxes are listed below. Search by month, day or status. Additionally, you can download have been received faxes in pdf format."),$credit_cur,$limit_cur);
+
 	$CC_help_support = create_help(gettext("On this page, you can open a support ticket and consult the status of your existing ticket."),$credit_cur,$limit_cur);
 	
 	$CC_help_card = create_help(gettext("Personal information.") . '<br>' . gettext("You can update your personal information here."),$credit_cur,$limit_cur);
@@ -126,7 +128,7 @@ if (SHOW_HELP) {
 
 	$CC_help_password_change = create_help(gettext("On this page you will be able to change your password, You have to enter the New Password and Confirm it."),$credit_cur,$limit_cur);
 
-	$CC_help_ratecard = create_help(gettext("View Rates"),$credit_cur,$limit_cur);
+	$CC_help_ratecard = create_help(gettext("View Rates<br>Rates are subjected to change without notice"),$credit_cur,$limit_cur);
 
 	$CC_help_view_payment = create_help(gettext("Payment history - Record of payments made."),$credit_cur,$limit_cur);
 	
@@ -151,8 +153,14 @@ if (SHOW_HELP) {
 	$CC_help_release_did = create_help(gettext("After confirmation, the release of the did will be done immediately and you will not be monthly charged any more."),$credit_cur,$limit_cur);
 
 	$CC_help_speeddial = create_help(gettext("Map single digit to your most dialed numbers."),$credit_cur,$limit_cur);
-	
+
 	$CC_help_callback = create_help(gettext("Callback : Entre your phone number and the phone number you wish to call."),$credit_cur,$limit_cur);
+
+	$CC_help_money_situation = create_help(gettext("This screen shows refills and payments made against each account, along with the current credit on each card. The initial amount of credit applied to the card is not included. The amount owing is calculated by subtracting payments from refills."),$credit_cur,$limit_cur);
+
+	$CC_help_view_refill = create_help(gettext("Customers Refill history - The section below allows you to see customers refill"),$credit_cur,$limit_cur);
+
+	$CC_help_surveillance = create_help("Назначьте номер телефона, принадлежащий Вашему записывающему устройству, и частоту нарезки роликов для аудио или видео наблюдения.",$credit_cur,$limit_cur);
 
 } //ENDIF SHOW_HELP
 
@@ -166,9 +174,9 @@ if (!isset ($disable_load_conf) || !($disable_load_conf)) {
 	$SPOT['paypal'] = '<a href="https://www.paypal.com/ru/mrb/pal=PGSJEXAEXKTBU" target="_blank"><img src="' . KICON_PATH . '/paypal_logo.gif" alt="Paypal"/></a>';
 	$SPOT['moneybookers'] = '<a href="https://www.moneybookers.com/app/?rid=811621" target="_blank"><img src="' . KICON_PATH . '/moneybookers.gif" alt="Moneybookers"/></a>';
 //	$SPOT['authorizenet'] = '<a href="http://authorize.net/" target="_blank"><img src="'.KICON_PATH.'/authorize.gif" alt="Authorize.net"/></a>';
-//	$SPOT['authorizenet'] = '';
-//	$SPOT['worlpay'] = '<a href="http://www.worldpay.com/" target="_blank"><img src="'.KICON_PATH.'/worldpay.gif" alt="worldpay.com"/></a>';
-//	$SPOT['worlpay'] = '';
+	$SPOT['authorizenet'] = '';
+//	$SPOT['worldpay'] = '<a href="http://www.worldpay.com/" target="_blank"><img src="'.KICON_PATH.'/worldpay.gif" alt="worldpay.com"/></a>';
+	$SPOT['worldpay'] = '';
 	$SPOT['plugnpay'] = '<a href="http://www.plugnpay.com/" target="_blank"><img src="' . KICON_PATH . '/plugnpay.png" alt="plugnpay.com"/></a>';
 	$SPOT['webmoney'] = '<a href="http://www.webmoney.ru/" target="_blank"><img src="' . KICON_PATH . '/webmoney.gif" alt="WebMoney"/></a>';
 	$PAYMENT_METHOD = '

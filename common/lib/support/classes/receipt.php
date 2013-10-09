@@ -118,7 +118,7 @@ class Receipt {
 					$result_billing = $billing_table->Get_list($DBHandle, $billing_clause);
 					if (is_array($result_billing) && !empty ($result_billing[0]['date'])) {
 						$call_table = new Table("cc_call", "*");
-						$call_clause = " card_id = " . $this->card . " AND stoptime< '" . $result_billing[0]['date'] . "'";
+						$call_clause = " card_id = " . $this->card . " AND sessionbill > 0 AND stoptime< '" . $result_billing[0]['date'] . "'";
 						if (!empty ($result_billing[0]['start_date'])) {
 							$call_clause .= " AND stoptime >= '" . $result_billing[0]['start_date'] . "'";
 						}
@@ -126,7 +126,7 @@ class Receipt {
 						foreach ($return_calls as $call) {
 							$min = floor($call['sessiontime'] / 60);
 							$sec = $call['sessiontime'] % 60;
-							$item = new ReceiptItem(null, "CALL : " . $call['calledstation'] . " DURATION : " . $min . " min " . $sec . " sec", $call['starttime'], $call["sessionbill"], $value["VAT"], true);
+							$item = new ReceiptItem(null, gettext("CALL").": " . $call['calledstation'] . " / ".gettext("DURATION").": " . $min . " min " . $sec . " sec", $call['starttime'], $call["sessionbill"], $value["VAT"], true);
 							$result[$i] = $item;
 							$i++;
 						}
@@ -161,7 +161,7 @@ class Receipt {
 					$result_billing = $billing_table->Get_list($DBHandle, $billing_clause);
 					if (is_array($result_billing) && !empty ($result_billing[0]['date'])) {
 						$call_table = new Table("cc_call", "COUNT(*)");
-						$call_clause = " card_id = " . $this->card . " AND stoptime< '" . $result_billing[0]['date'] . "'";
+						$call_clause = " card_id = " . $this->card . " AND sessionbill > 0 AND stoptime< '" . $result_billing[0]['date'] . "'";
 						if (!empty ($result_billing[0]['start_date'])) {
 							$call_clause .= " AND stoptime >= '" . $result_billing[0]['start_date'] . "'";
 						}

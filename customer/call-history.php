@@ -138,16 +138,18 @@ $FG_TABLE_DEFAULT_ORDER = "t1.starttime";
 $FG_TABLE_DEFAULT_SENS = "DESC";
 
 $FG_TABLE_COL = array();
-$FG_TABLE_COL[]=array (gettext("Date"), "starttime", 18*$p ."%", "center", "SORT", "22", "", "", "", "", "", "");
-$FG_TABLE_COL[]=array (gettext("CallerID"), "src", 12*$p ."%", "center", "SORT", "30");
-$FG_TABLE_COL[]=array (gettext("PhoneNumber"), "calledstation", 12*$p ."%", "center", "SORT", "30", "", "", "", "", "", "");
-$FG_TABLE_COL[]=array (gettext("Destination"), "destination", 22*$p ."%", "center", "SORT", "30", "lie", "cc_prefix", "destination", "prefix='%id'", "%1" );
+$FG_TABLE_COL[]=array (gettext("Date"), "starttime", 19*$p ."%", "center", "SORT", "22", "", "", "", "", "", "");
+//$FG_TABLE_COL[]=array (gettext("RegName"), "src_peername", 4*$p ."%", "center", "SORT", "30");
+$FG_TABLE_COL[]=array (gettext("CallerID"), "src", 11*$p ."%", "center", "SORT", "40");
+$FG_TABLE_COL[]=array (gettext("PhoneNumber"), "calledstation", 11*$p ."%", "center", "SORT", "30", "", "", "", "", "", "");
+$FG_TABLE_COL[]=array (gettext("Destination"), "destination", 21*$p ."%", "center", "SORT", "30", "lie", "cc_prefix", "destination", "prefix='%id'", "%1" );
+$FG_TABLE_COL[]=array (gettext("Route"), "route", $p ."%", "center", "SORT", "10");
 $FG_TABLE_COL[]=array (gettext("Duration"), "sessiontime", 8*$p ."%", "center", "SORT", "30", "", "", "", "", "", "display_minute");
 $FG_TABLE_COL[]=array ('<acronym title="'.gettext("Terminate Cause").'">'.gettext("TC").'</acronym>', "terminatecauseid", 7*$p ."%", "center", "SORT", "", "list", $dialstatus_list);
-$FG_TABLE_COL[]=array (gettext("CallType"), "sipiax", 10*$p ."%", "center", "SORT",  "", "list", $list_calltype);
-$FG_TABLE_COL[]=array (gettext("Cost"), "sessionbill", 11*$p ."%", "center", "SORT", "30", "", "", "", "", "", "display_2bill");
+$FG_TABLE_COL[]=array (gettext("CallType"), "sipiax", 8*$p ."%", "center", "SORT",  "", "list", $list_calltype);
+$FG_TABLE_COL[]=array (gettext("Cost"), "sessionbill", 10*$p ."%", "center", "SORT", "30", "", "", "", "", "", "display_2bill");
 
-$FG_COL_QUERY = 't1.starttime, t1.src, t1.calledstation, t1.destination, t1.sessiontime, t1.terminatecauseid, t1.sipiax, t1.sessionbill';
+$FG_COL_QUERY = "t1.starttime, IF(t1.src_exten IS NULL, t1.src, t1.src_exten), IF(t1.card_id='$customer' AND t1.calledexten IS NOT NULL, t1.calledexten, t1.calledstation), t1.destination, id_ratecard as route, t1.sessiontime, t1.terminatecauseid, t1.sipiax, t1.sessionbill+margindillers ";
 
 if ($ACXSEERECORDING) {
 	$FG_TABLE_COL [] = array ('<span class="liens">' . gettext("Audio") . "</span>", "uniqueid", 100*(1-$p) ."%", "center", "", "30", "", "", "", "", "", "linkonmonitorfile_customer");
@@ -161,7 +163,7 @@ $FG_TOTAL_TABLE_COL = $FG_NB_TABLE_COL;
 if ($FG_DELETION || $FG_EDITION) $FG_TOTAL_TABLE_COL++;
 $FG_HTML_TABLE_TITLE = " - ".gettext("Call Logs")." - ";
 $FG_HTML_TABLE_WIDTH = "98%";
-
+$FG_ACTION_SIZE_COLUMN = "1%";
 
 $instance_table = new Table($FG_TABLE_NAME, $FG_COL_QUERY);
 
@@ -174,7 +176,8 @@ if ( is_null ($order) || is_null($sens) ){
 if ($posted==1) {
 	$SQLcmd = '';
 	$SQLcmd = do_field($SQLcmd, 'src', 'source');
-	$SQLcmd = do_field($SQLcmd, 'callerid', 'src');
+	$SQLcmd = do_field($SQLcmd, 'callerid', 'src', false, 1);
+	$SQLcmd = do_field($SQLcmd, 'callerid', 'src_exten', true, 2);
 	$SQLcmd = do_field($SQLcmd, 'phonenumber', 'calledstation');
 }
 
@@ -211,7 +214,8 @@ elseif ($choose_calltype != - 1) {
 
 if (!isset($terminatecauseid)) {
 	$terminatecauseid="ANSWER";
-} elseif ($terminatecauseid=="ANSWER") {
+}
+if ($terminatecauseid=="ANSWER") {
 	if (strlen($FG_TABLE_CLAUSE)>0) $FG_TABLE_CLAUSE .= " AND ";
 	$FG_TABLE_CLAUSE .= " (t1.terminatecauseid=1) ";
 }
@@ -223,7 +227,7 @@ if (!$nodisplay) {
 }
 $_SESSION["pr_sql_export"] = "SELECT $FG_COL_QUERY FROM $FG_TABLE_NAME WHERE $FG_TABLE_CLAUSE";
 
-$QUERY = "SELECT DATE(t1.starttime) AS day, sum(t1.sessiontime) AS calltime, sum(t1.sessionbill) AS cost, count(*) as nbcall FROM $FG_TABLE_NAME WHERE ".$FG_TABLE_CLAUSE." GROUP BY day ORDER BY day"; //extract(DAY from calldate)
+$QUERY = "SELECT DATE(t1.starttime) AS day, sum(t1.sessiontime) AS calltime, sum(t1.sessionbill+margindillers) AS cost, count(*) as nbcall FROM $FG_TABLE_NAME WHERE ".$FG_TABLE_CLAUSE." GROUP BY day ORDER BY day"; //extract(DAY from calldate)
 
 if (!$nodisplay) {
 	$res = $DBHandle -> Execute($QUERY);

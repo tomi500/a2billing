@@ -81,7 +81,7 @@ if ($called && $id_cc_card) {
 		$A2B->set_instance_table($instance_table);
 		$num = 0;
 
-		$result = $A2B->instance_table->SQLExec($A2B->DBHandle, "SELECT username, tariff FROM cc_card where id='$customer_info[15]'");
+		$result = $A2B->instance_table->SQLExec($A2B->DBHandle, "SELECT username, tariff, margintotal FROM cc_card where id='$customer_info[15]'");
 		if (!is_array($result) || count($result) == 0) {
 			echo gettext("Error card !!!");
 			exit ();
@@ -89,6 +89,7 @@ if ($called && $id_cc_card) {
 
 		$A2B->cardnumber = $result[0][0];
 		$A2B->credit = $balance;
+		$A2B->margintotal = $result[0][2];
 		if ($FG_DEBUG == 1)
 			echo "cardnumber = " . $result[0][0] . " - balance=$balance<br>";
 
@@ -97,7 +98,7 @@ if ($called && $id_cc_card) {
 				$RateEngine->debug_st = 1;
 
 			$RateEngine = new RateEngine();
-			$RateEngine->webui = 1;
+			$RateEngine->webui = 0;
 
 			$A2B->agiconfig['accountcode'] = $A2B->cardnumber;
 			$A2B->agiconfig['use_dnid'] = 1;
@@ -156,9 +157,9 @@ echo $CC_help_simulator_rateengine;
 	</TR>
 	<FORM NAME="theFormFilter" action="<?php echo $PHP_SELF?>">		
 	<tr>			
-	    <td height="31" class="bgcolor_009" style="padding-left: 5px; padding-right: 3px;">
+	    <td height="31" class="bgcolor_009" style="padding-left: 5px; padding-right: 3px;" nowrap>
 				<br>
-				<font class="fontstyle_008"><?php echo gettext("Enter the number you wish to call");?>&nbsp;:</font>
+				<font class="fontstyle_008"><?php echo gettext("Enter the number you wish to call");?>&nbsp;:&nbsp;</font>&nbsp;<font color="red">+</font>
 				<INPUT type="text" name="called" value="<?php echo $called;?>" class="form_input_text">
 				<br>
 				<?php if (false){ ?>
@@ -169,7 +170,7 @@ echo $CC_help_simulator_rateengine;
 				<br>
 	
 		</td>
-		<td height="31" class="bgcolor_009" style="padding-left: 5px; padding-right: 3px;">
+		<td height="31" class="bgcolor_009" style="padding-left: 5px; padding-right: 3px;" nowrap>
 			<span class="bar-search">
 			<input type="submit" class="form_input_button" value="<?php echo gettext("SEARCH");?>">
 			</span></td>
@@ -215,14 +216,14 @@ $FG_TABLE_ALTERNATE_ROW_COLOR[1]='#EEE9E9';
         	</TR>
 			<TR>
           	<td height="15" class="bgcolor_011" style="padding-left: 5px; padding-right: 3px;">
-					<b><?php echo gettext("DESTINATION");?>&nbsp;№<?php echo $RateEngine->ratecard_obj[$j][6]; $k=1;?></b>
+					<b><?php echo gettext("ROUTE");?>&nbsp;№<?php echo $RateEngine->ratecard_obj[$j][6]; $k=1;?></b>
 			</td>
-          	<td height="15" class="bgcolor_011" style="padding-left: 5px; padding-right: 3px;">
+          	<td height="15" class="bgcolor_011" style="padding-left: 5px; padding-right: 3px;" nowrap>
 					<b><?php echo gettext("PREFIX");?>&nbsp;: <?php echo $RateEngine->ratecard_obj[$j][7];?></b>
 			</td>
         	</TR>
 			<tr>
-				<td height="15" bgcolor="<?php echo $FG_TABLE_ALTERNATE_ROW_COLOR[$k]?>" style="padding-left: 5px; padding-right: 3px;">
+				<td height="15" bgcolor="<?php echo $FG_TABLE_ALTERNATE_ROW_COLOR[$k]?>" style="padding-left: 5px; padding-right: 3px;" nowrap>
 						<font color="blue"><b><?php echo gettext("CallTime available");?></b></font>				</td>
 				<td height="15" bgcolor="<?php echo $FG_TABLE_ALTERNATE_ROW_COLOR[$k]?>" style="padding-left: 5px; padding-right: 3px;">
 						<font color="blue"><i><?php echo display_minute($RateEngine->ratecard_obj[$j]['timeout']);?> <?php echo gettext("Minutes");?> </i></font>
@@ -240,7 +241,7 @@ $FG_TABLE_ALTERNATE_ROW_COLOR[1]='#EEE9E9';
 				<td height="15" bgcolor="<?php echo $FG_TABLE_ALTERNATE_ROW_COLOR[$k]?>" style="padding-left: 5px; padding-right: 3px;">
 						<b><?php echo gettext("Connection fee");?></b>			</td>
 				<td height="15" bgcolor="<?php echo $FG_TABLE_ALTERNATE_ROW_COLOR[$k]?>" style="padding-left: 5px; padding-right: 3px;">
-						<i><?php echo round($RateEngine->ratecard_obj[$j][15] / $mycur, 3); ?> <?php echo gettext($currency); ?></i>
+						<i><?php echo round($RateEngine->ratecard_obj[$j][15] / $mycur, 5); ?> <?php echo gettext($currency); ?></i>
 				</td><?php $k=($k)?0:1;?>
 			</tr>
 			<?php }
@@ -255,10 +256,10 @@ $FG_TABLE_ALTERNATE_ROW_COLOR[1]='#EEE9E9';
 			<?php } ?>
 			
 			<tr>			
-				<td height="15" bgcolor="<?php echo $FG_TABLE_ALTERNATE_ROW_COLOR[$k]?>" style="padding-left: 5px; padding-right: 3px;">
+				<td height="15" bgcolor="<?php echo $FG_TABLE_ALTERNATE_ROW_COLOR[$k]?>" style="padding-left: 5px; padding-right: 3px;" nowrap>
 						<b><?php echo $arr_ratecard[10];?></b>				</td>
 				<td height="15" bgcolor="<?php echo $FG_TABLE_ALTERNATE_ROW_COLOR[$k]?>" style="padding-left: 5px; padding-right: 3px;">
-						<i><?php echo round($RateEngine->ratecard_obj[$j][12] / $mycur, 3); ?> <?php echo gettext($currency); ?></i>
+						<i><?php echo round($A2B->margintotal * $RateEngine->ratecard_obj[$j][12] / $mycur, 5); ?> <?php echo gettext($currency); ?></i>
 				</td>
 			</tr>
 		<?php }} ?>

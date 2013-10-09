@@ -190,13 +190,13 @@ define ("MYSQL", isset($A2B->config['backup']['mysql'])?$A2B->config['backup']['
 define ("PSQL", isset($A2B->config['backup']['psql'])?$A2B->config['backup']['psql']:null);
 
 
-// GLOBAL POST/GET VARIABLE
-getpost_ifset(array('form_action', 'atmenu', 'action', 'stitle', 'sub_action', 'IDmanager', 'current_page', 'order', 'sens', 'mydisplaylimit', 'filterprefix', 'cssname', 'popup_select', 'popup_formname', 'popup_fieldname', 'ui_language', 'msg', 'section'));
-
 if (!isset($_SESSION)) {
 	session_start();
 }
- 
+
+// GLOBAL POST/GET VARIABLE
+getpost_ifset(array('form_action', 'atmenu', 'action', 'stitle', 'sub_action', 'IDmanager', 'current_page', 'order', 'sens', 'mydisplaylimit', 'filterprefix', 'cssname', 'popup_select', 'popup_formname', 'popup_fieldname', 'ui_language', 'msg', 'section'));
+
 // Language Selection
 if (isset($ui_language)) {
 	$_SESSION["ui_language"] = $ui_language;

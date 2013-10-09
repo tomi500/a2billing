@@ -64,11 +64,19 @@ getpost_ifset(array('item_id','item_type'));
 $two_currency = false;
 $currencies_list = get_currencies();
 
+if (!is_numeric($amount) || $amount < 1 || $amount > 1000) {
+	Header ("Location: checkout_payment.php");
+	die();
+}
+
 $vat_amount= $amount*$vat/100;
-$mc_fee = (strcasecmp("paypal",$payment)==0)?round(($amount)/(1-0.049)-$amount,2)+0.36:0;
+$amount_paypal = ($amount+$vat_amount+0.35)/0.961;
+//$amount_webmoney = ($amount+$vat_amount)/0.95;
+$mc_fee = (strcasecmp("paypal",$payment)==0)?round(($amount_paypal)*0.039,2)+0.35:0;
+//$mc_fee = (strcasecmp("webmoney",$payment)==0)?round(($amount_webmoney)*0.05,2):0;
+$total_amount = $amount+$vat_amount+$mc_fee;
 //Test value:
 //$mc_fee = 0;
-$total_amount = $mc_fee+$amount+($amount*$vat/100);
 if (!isset($item_id) || is_null($item_id) || $item_id == "") {
 	$item_id = 0;
 }

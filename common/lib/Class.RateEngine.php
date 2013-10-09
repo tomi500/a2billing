@@ -56,10 +56,12 @@ class RateEngine
 	var $webui			= 1;
 	var $usedtrunk			= 0;
 	var $freetimetocall_used	= 0;
+	var $margindillers		= 0;
+	var $commission			= 0;
+	var $pos_dialingnumber		= true;
 
 	// List of dialstatus
 	var $dialstatus_rev_list;
-	
 
 	/* CONSTRUCTOR */
 	function RateEngine ()
@@ -70,15 +72,15 @@ class RateEngine
 	/* Reinit */
 	function Reinit ()
 	{
-		$this -> number_trunk = 0;
-		$this -> answeredtime = 0;
-		$this -> real_answeredtime = 0;
-		$this -> dialstatus = '';
-		$this -> usedratecard = '';
-		$this -> usedtrunk = '';
-		$this -> lastcost = '';
-		$this -> lastbuycost = '';
-		
+		$this -> number_trunk		= 0;
+		$this -> answeredtime		= 0;
+		$this -> real_answeredtime	= 0;
+		$this -> dialstatus		= '';
+		$this -> usedratecard		= '';
+		$this -> usedtrunk		= '';
+		$this -> lastcost		= '';
+		$this -> lastbuycost		= '';
+		$this -> pos_dialingnumber	= true;
 	}
 
 	/*
@@ -94,14 +96,10 @@ class RateEngine
 			$A2B -> debug( DEBUG, $agi, __FILE__, __LINE__, "force the call plan : ".$A2B->agiconfig['force_callplan_id']);
 			$tariffgroupid = $A2B->tariff = $A2B->agiconfig['force_callplan_id'];
 		}
-
 		if ($this->webui) {
 			$A2B -> debug( DEBUG, $agi, __FILE__, __LINE__, "[CC_asterisk_rate-engine: ($tariffgroupid, $phonenumber)]");
 		}
-
-
 		/***  0 ) CODE TO RETURN THE DAY OF WEEK + CREATE THE CLAUSE  ***/
-
 		$daytag = date("w", time()); // Day of week ( Sunday = 0 .. Saturday = 6 )
 		$hours = date("G", time()); // Hours in 24h format ( 0-23 )
 		$minutes = date("i", time()); // Minutes (00-59)
@@ -111,19 +109,17 @@ class RateEngine
 		// Race condiction on $minutes ?!
 		$minutes_since_monday = ($daytag * 1440) + ($hours * 60) + $minutes;
 		if ($this -> debug_st) echo "$minutes_since_monday<br> ";
-		
+
 		$sql_clause_days = " AND (starttime <= ".$minutes_since_monday." AND endtime >=".$minutes_since_monday.") ";
 
 		$mydnid = $mycallerid = "";
 		if (strlen($A2B->dnid)>=1) $mydnid = $A2B->dnid;
 		if (strlen($A2B->CallerID)>=1) $mycallerid = $A2B->CallerID;
-
 		if ($this->webui) $A2B -> debug( DEBUG, $agi, __FILE__, __LINE__, "[CC_asterisk_rate-engine - CALLERID : ".$A2B->CallerID."]",0);
 
 		$DNID_SUB_QUERY = "AND 0 = (SELECT COUNT(dnidprefix) FROM cc_tariffgroup_plan RIGHT JOIN cc_tariffplan ON cc_tariffgroup_plan.idtariffplan=cc_tariffplan.id WHERE dnidprefix=SUBSTRING('$mydnid',1,length(dnidprefix)) AND idtariffgroup=$tariffgroupid ) ";
-
 		$CID_SUB_QUERY = "AND 0 = (SELECT count(calleridprefix) FROM cc_tariffgroup_plan RIGHT JOIN cc_tariffplan ON cc_tariffgroup_plan.idtariffplan=cc_tariffplan.id WHERE calleridprefix=SUBSTRING('$mycallerid',1,length(calleridprefix)) AND idtariffgroup=$tariffgroupid )";
-		
+
 		// $prefixclause to allow good DB servers to use an index rather than sequential scan
 		// justification at http://forum.asterisk2billing.org/viewtopic.php?p=9620#9620
 		$max_len_prefix = min(strlen($phonenumber), 15);	// don't match more than 15 digits (the most I have on my side is 8 digit prefixes)
@@ -133,51 +129,93 @@ class RateEngine
 			$max_len_prefix--;
 		}
 		$prefixclause .= "dialprefix='defaultprefix')";
-		
+
 		// match Asterisk/POSIX regex prefixes,  rewrite the Asterisk '_XZN.' characters to
 		// POSIX equivalents, and test each of them against the dialed number
 		$prefixclause .= " OR (dialprefix LIKE '&_%' ESCAPE '&' AND '$phonenumber' ";
 		$prefixclause .= "REGEXP REPLACE(REPLACE(REPLACE(REPLACE(REPLACE(CONCAT('^', dialprefix, '$'), ";
 		$prefixclause .= "'X', '[[:digit:]]'), 'Z', '[1-9]'), 'N', '[2-9]'), '.', '.+'), '_', ''))";
 
-        // select group by 5 ... more easy to count
-		$QUERY = "SELECT
-		tariffgroupname, lcrtype, idtariffgroup, cc_tariffgroup_plan.idtariffplan, tariffname, 
-        destination, cc_ratecard.id, dialprefix, destination, buyrate,
-        buyrateinitblock, buyrateincrement, rateinitial, initblock, billingblock,
-		connectcharge, disconnectcharge, stepchargea, chargea, timechargea,
-        billingblocka, stepchargeb, chargeb,timechargeb, billingblockb, 
-        stepchargec, chargec, timechargec, billingblockc,cc_tariffplan.id_trunk AS tp_id_trunk,
-        tp_trunk.trunkprefix AS tp_trunk, tp_trunk.providertech AS tp_providertech,tp_trunk.providerip AS tp_providerip, tp_trunk.removeprefix AS tp_removeprefix,cc_ratecard.id_trunk AS rc_id_trunk,
-        rt_trunk.trunkprefix AS rc_trunkprefix, rt_trunk.providertech AS rc_providertech,rt_trunk.providerip AS rc_providerip, rt_trunk.removeprefix AS rc_removeprefix, musiconhold,
-		tp_trunk.failover_trunk AS tp_failover_trunk, rt_trunk.failover_trunk AS rt_failover_trunk,tp_trunk.addparameter AS tp_addparameter_trunk, rt_trunk.addparameter AS rt_addparameter_trunk, id_outbound_cidgroup,
-        id_cc_package_offer, tp_trunk.status, rt_trunk.status, tp_trunk.inuse, rt_trunk.inuse,
-        IF(tp_trunk.wrapnexttime>NOW(),0,tp_trunk.maxuse), IF(rt_trunk.wrapnexttime>NOW(),0,rt_trunk.maxuse), tp_trunk.if_max_use, rt_trunk.if_max_use, cc_ratecard.rounding_calltime AS rounding_calltime,
-        cc_ratecard.rounding_threshold AS rounding_threshold, cc_ratecard.additional_block_charge AS additional_block_charge, cc_ratecard.additional_block_charge_time AS additional_block_charge_time,
-		cc_ratecard.additional_grace AS additional_grace, cc_ratecard.minimal_cost AS minimal_cost,disconnectcharge_after,announce_time_correction, rt_trunk.dialprefixmain,
-	rt_trunk.perioda, rt_trunk.maxsecperperioda, rt_trunk.periodcounta, UNIX_TIMESTAMP(rt_trunk.periodexpirya), rt_trunk.failover_trunka, UNIX_TIMESTAMP(rt_trunk.startdatea), UNIX_TIMESTAMP(rt_trunk.stopdatea), rt_trunk.timelefta,
-	rt_trunk.periodb, rt_trunk.maxsecperperiodb, rt_trunk.periodcountb, UNIX_TIMESTAMP(rt_trunk.periodexpiryb), rt_trunk.failover_trunkb, UNIX_TIMESTAMP(rt_trunk.startdateb), UNIX_TIMESTAMP(rt_trunk.stopdateb), rt_trunk.timeleftb,
-	tp_trunk.outbound_cidgroup_id, rt_trunk.outbound_cidgroup_id, rt_trunk.trunkcode, tp_trunk.wrapuptime, rt_trunk.wrapuptime
+		$QUERY = "SELECT DISTINCT
+		tariffgroupname,
+		lcrtype,
+		idtariffgroup,
+		cc_tariffgroup_plan.idtariffplan,
+		tariffname,
+		destination,
+		cc_ratecard.id,
+		dialprefix,
+		destination,
+		buyrate,
+		buyrateinitblock,
+		buyrateincrement,
+		rateinitial,
+		initblock,
+		billingblock,
+		connectcharge,
+		disconnectcharge,
+		stepchargea,
+		chargea,
+		timechargea,
+		billingblocka,
+		stepchargeb,
+		chargeb,
+		timechargeb,
+		billingblockb,
+		stepchargec,
+		chargec,
+		timechargec,
+		billingblockc,
+		cc_trunk.id_trunk,
+		cc_trunk.trunkprefix,
+		cc_trunk.providertech,
+		cc_trunk.providerip,
+		cc_trunk.removeprefix,
+		musiconhold,
+		cc_trunk.failover_trunk,
+		cc_trunk.addparameter,
+		id_outbound_cidgroup,
+		id_cc_package_offer,
+		cc_trunk.status,
+		cc_trunk.inuse,
+		IF(cc_trunk.wrapnexttime>NOW(),0,cc_trunk.maxuse),
+		cc_trunk.if_max_use,
+		cc_ratecard.rounding_calltime,
+		cc_ratecard.rounding_threshold,
+		cc_ratecard.additional_block_charge,
+		cc_ratecard.additional_block_charge_time,
+		cc_ratecard.additional_grace,
+		cc_ratecard.minimal_cost,
+		disconnectcharge_after,
+		announce_time_correction,
+		cc_trunk.dialprefixmain,
+		cc_trunk.perioda, cc_trunk.maxsecperperioda, cc_trunk.periodcounta, UNIX_TIMESTAMP(cc_trunk.periodexpirya), cc_trunk.failover_trunka, UNIX_TIMESTAMP(cc_trunk.startdatea), UNIX_TIMESTAMP(cc_trunk.stopdatea), cc_trunk.timelefta,
+		cc_trunk.periodb, cc_trunk.maxsecperperiodb, cc_trunk.periodcountb, UNIX_TIMESTAMP(cc_trunk.periodexpiryb), cc_trunk.failover_trunkb, UNIX_TIMESTAMP(cc_trunk.startdateb), UNIX_TIMESTAMP(cc_trunk.stopdateb), cc_trunk.timeleftb,
+		cc_trunk.outbound_cidgroup_id,
+		cc_trunk.cid_handover,
+		cc_trunk.trunkcode,
+		cc_trunk.wrapuptime
 
 		FROM cc_tariffgroup
-		RIGHT JOIN cc_tariffgroup_plan ON cc_tariffgroup_plan.idtariffgroup=cc_tariffgroup.id
-		INNER JOIN cc_tariffplan ON (cc_tariffplan.id=cc_tariffgroup_plan.idtariffplan )
-		LEFT JOIN cc_ratecard ON cc_ratecard.idtariffplan=cc_tariffplan.id
-		LEFT JOIN cc_trunk AS rt_trunk ON cc_ratecard.id_trunk=rt_trunk.id_trunk
-		LEFT JOIN cc_trunk AS tp_trunk ON cc_tariffplan.id_trunk=tp_trunk.id_trunk
 
-		WHERE cc_tariffgroup.id=$tariffgroupid AND ($prefixclause)
+		RIGHT JOIN cc_tariffgroup_plan ON cc_tariffgroup_plan.idtariffgroup=cc_tariffgroup.id
+		INNER JOIN cc_tariffplan ON cc_tariffplan.id=cc_tariffgroup_plan.idtariffplan OR cc_tariffplan.tariffname='$A2B->cardnumber'
+		LEFT JOIN cc_ratecard ON cc_ratecard.idtariffplan=cc_tariffplan.id
+		LEFT JOIN cc_trunk ON (cc_trunk.id_trunk = cc_ratecard.id_trunk AND cc_ratecard.id_trunk != -1) OR (cc_ratecard.id_trunk = -1 AND cc_trunk.id_trunk = cc_tariffplan.id_trunk)
+
+		WHERE ((cc_tariffgroup.id=$tariffgroupid AND idtariffgroup='$tariffgroupid') OR cc_tariffplan.tariffname='$A2B->cardnumber') AND ($prefixclause)
 		AND startingdate<= CURRENT_TIMESTAMP AND (expirationdate > CURRENT_TIMESTAMP OR expirationdate IS NULL)
 		AND startdate<= CURRENT_TIMESTAMP AND (stopdate > CURRENT_TIMESTAMP OR stopdate IS NULL)
 		$sql_clause_days
-		AND idtariffgroup='$tariffgroupid'
 		AND ( dnidprefix=SUBSTRING('$mydnid',1,length(dnidprefix)) OR (dnidprefix='all' $DNID_SUB_QUERY))
 		AND ( calleridprefix=SUBSTRING('$mycallerid',1,length(calleridprefix)) OR (calleridprefix='all' $CID_SUB_QUERY))
+		GROUP BY cc_ratecard.id
 		ORDER BY LENGTH(dialprefix) DESC";
 
 		$A2B->instance_table = new Table();
 		$result = $A2B->instance_table -> SQLExec ($A2B -> DBHandle, $QUERY);
 
+//if ($this->webui) $A2B -> debug( ERROR, $agi, "", __LINE__, "=================== QUERY:\n".$QUERY);
 
 		if (!is_array($result) || count($result)==0) return 0; // NO RATE FOR THIS NUMBER
 
@@ -187,6 +225,7 @@ class RateEngine
 		// CHECK IF THERE IS OTHER RATE THAT 'DEFAULT', IF YES REMOVE THE DEFAULT RATES
 		// NOT NOT REMOVE SHIFT THEM TO THE END :P
 		$ind_stop_default = -1;
+
 		for ($i=0 ; $i<count($result) ; $i++) {
 			if ( $result[$i][7] != 'defaultprefix') {
 				$ind_stop_default = $i;
@@ -201,8 +240,8 @@ class RateEngine
 			$result = array_slice ($result, $ind_stop_default, count($result)-$ind_stop_default);
 		}
 		
-		
-        if ($A2B->agiconfig['lcr_mode'] == 0){
+//echo "lcr_mode = ".$A2B->agiconfig['lcr_mode'];
+        if ($A2B->agiconfig['lcr_mode'] == 0) {
             //1) REMOVE THOSE THAT HAVE A SMALLER DIALPREFIX
             $max_len_prefix = strlen($result[0][7]);
             for ($i=1;$i<count($result);$i++) {
@@ -214,7 +253,8 @@ class RateEngine
             $myresult = array();
             $myresult = $result;
             $mysearchvalue = array();
-            if ($this->webui) $A2B -> debug( DEBUG, $agi, __FILE__, __LINE__, "[rate-engine: MYRESULT before sort \n".print_r($myresult, true));
+//            if ($this->webui) $A2B -> debug( DEBUG, $agi, __FILE__, __LINE__, "[rate-engine: MYRESULT before sort \n".print_r($myresult, true));
+
             // 3 - tariff plan, 7 - dialprefix, 12 - rateinitial
             foreach ($myresult as $key => $row) {
                 $sorttariffplan[$key]    = $row[3];
@@ -222,18 +262,23 @@ class RateEngine
                 $sortdialprefixnum[$key] = $row[7];
             }
             array_multisort($sorttariffplan,SORT_NUMERIC,$sortdialprefixstr,SORT_NUMERIC,SORT_DESC,$sortdialprefixnum,SORT_NUMERIC,SORT_DESC,$myresult);
-            if ($this->webui) $A2B -> debug( DEBUG, $agi, __FILE__, __LINE__, "[rate-engine: MYRESULT  after sort \n".print_r($myresult, true));
+//            if ($this->webui) $A2B -> debug( DEBUG, $agi, __FILE__, __LINE__, "[rate-engine: MYRESULT after sort \n".print_r($myresult, true));
+//if ($this->webui) $A2B -> debug( ERROR, $agi, __FILE__, __LINE__, "[rate-engine: Count MYRESULT after sort: ".count($myresult)."]");
+//echo "<br><br>MYRESULT after sort<br>".print_r($myresult, true);
             $countdelete = 0;
             $resultcount = 0;
             $mysearchvalue[$resultcount] = $myresult[0];
             for ($ii=0;$ii<count($result)-1;$ii++){
                 if (isset($myresult[$ii])) $mysearchvalue[$resultcount] = $myresult[$ii];
+/**
                 if ($this->webui) {
                     $A2B -> debug( DEBUG, $agi, __FILE__, __LINE__, "[rate-engine: Begin for ii value ".$ii."]");
                     $A2B -> debug( DEBUG, $agi, __FILE__, __LINE__, "[rate-engine: MYSEARCHCVALUE \n".print_r($mysearchvalue,true)."]");
                 };
+**/
                 if (count($myresult)>0){
                     foreach($myresult as $j=>$i){
+/**
                         if ($this->webui) {
                             $A2B -> debug( DEBUG, $agi, __FILE__, __LINE__, "[rate-engine: foreach J=".print_r($j, true));
                             if (isset($mysearchvalue[$resultcount][4])) $A2B -> debug( DEBUG, $agi, __FILE__, __LINE__, "[rate-engine:mysearchvalue[4]=".$mysearchvalue[$resultcount][4]);
@@ -243,33 +288,41 @@ class RateEngine
                             if (isset($mysearchvalue[$resultcount][7])) $A2B -> debug( DEBUG, $agi, __FILE__, __LINE__, "[rate-engine:mysearchvalue[7]=".$mysearchvalue[$resultcount][7]);
                             $A2B -> debug( DEBUG, $agi, __FILE__, __LINE__, "[rate-engine:i[7]=".$i[7]);
                         };
+**/
                         if (isset($mysearchvalue[$resultcount][3]) && $mysearchvalue[$resultcount][3] == $i[3] ) {
                             if (strlen($mysearchvalue[$resultcount][7]) != strlen($i[7])) {
                                 unset($myresult[$j]);
                                 $countdelete++;
+/**
                                 if ($this->webui) {
                                     $A2B -> debug( DEBUG, $agi, __FILE__, __LINE__, "[rate-engine: foreach: COUNTDELETE: ".$countdelete."]");
                                     $A2B -> debug( DEBUG, $agi, __FILE__, __LINE__, "[rate-engine: foreach: MYRESULT count after delete: ".count($myresult)."]");
                                 };
+**/
                             };
                         }
                     } //end foreach
                     $myresult = array_values($myresult);
-                    if ($this->webui) $A2B -> debug( DEBUG, $agi, __FILE__, __LINE__, "[rate-engine: MYRESULT  after foreach \n".print_r($myresult, true));
                     $resultcount++;
+/**
+                    if ($this->webui) $A2B -> debug( DEBUG, $agi, __FILE__, __LINE__, "[rate-engine: MYRESULT  after foreach \n".print_r($myresult, true));
                     if ($this->webui) {
                         $A2B -> debug( DEBUG, $agi, __FILE__, __LINE__, "[rate-engine: Count MYRESULT after foreach=".count($myresult)."]");
                         $A2B -> debug( DEBUG, $agi, __FILE__, __LINE__, "[rate-engine: RESULTCOUNT=".$resultcount."]");
                     };
+**/
                 }
-                if ($this->webui) $A2B -> debug( DEBUG, $agi, __FILE__, __LINE__, "[rate-engine: End for II value ".$ii."]");
+//                if ($this->webui) $A2B -> debug( DEBUG, $agi, __FILE__, __LINE__, "[rate-engine: End for II value ".$ii."]");
             }  //end for
+//$A2B -> debug( ERROR, $agi, __FILE__, __LINE__, "[rate-engine: Count MYRESULT before unset = ".count($myresult)."]");
+/**
             if ($this->webui) {
                 $A2B -> debug( DEBUG, $agi, __FILE__, __LINE__, "[rate-engine: COUNTDELETE=".$countdelete."]");
-                $A2B -> debug( DEBUG, $agi, __FILE__, __LINE__, "[rate-engine: MYRESULT  before unset \n".print_r($myresult, true));
+                $A2B -> debug( DEBUG, $agi, __FILE__, __LINE__, "[rate-engine: MYRESULT before unset \n".print_r($myresult, true));
             }
+**/
             if (count($result)>1 and $countdelete != 0) {
-                if ($this->webui) $A2B -> debug( DEBUG, $agi, __FILE__, __LINE__, "[rate-engine: LAST UNSET");
+//                if ($this->webui) $A2B -> debug( DEBUG, $agi, __FILE__, __LINE__, "[rate-engine: LAST UNSET]");
                 unset($mysearchvalue[$resultcount]);
                 foreach ($mysearchvalue as $key => $value) {
                     if (is_null($value) or $value == "") {
@@ -280,6 +333,7 @@ class RateEngine
                 unset($myresult);
                 $result = $mysearchvalue;
             }
+/**
             if ($this->webui) {
                 $A2B -> debug( DEBUG, $agi, __FILE__, __LINE__, "[rate-engine: RESULTCOUNT".$resultcount."]");
                 if (isset($myresult)) {
@@ -288,8 +342,9 @@ class RateEngine
                 }
                 $A2B -> debug( DEBUG, $agi, __FILE__, __LINE__, "[rate-engine: MYSEARCHVALUE after delete \n".print_r($mysearchvalue, true));
             }
-            unset($mysearchvalue);
             if ($this->webui) $A2B -> debug( DEBUG, $agi, __FILE__, __LINE__, "[rate-engine: RESULT  after delete \n".print_r($result, true));
+**/
+            unset($mysearchvalue);
         }
 		
 		//2) TAKE THE VALUE OF LCTYPE
@@ -315,27 +370,40 @@ class RateEngine
 		//    AND THOSE THAT ARE DISABLED.
 		$mylistoftrunk = array();
 		for ($i=0;$i<count($result);$i++) {
-
-			if ($result[$i][34] == -1) {
-				$status = $result[$i][46];
-				$mylistoftrunk_next[]= $mycurrenttrunk = $result[$i][29];
-			} else {
-				$status = $result[$i][47];
-				$mylistoftrunk_next[]= $mycurrenttrunk = $result[$i][34];
-			}
+			$status 				= $result[$i][39];
+			$mylistoftrunk_next[] = $mycurrenttrunk = $result[$i][29];
 
 			// Check if we already have the same trunk in the ratecard
 			if (($i==0 || !in_array ($mycurrenttrunk , $mylistoftrunk)) && $status == 1) {
-				$distinct_result[] = $result[$i];
+				$distinct_result[]	= $result[$i];
 			}
-
 			if ($status == 1)
-				$mylistoftrunk[]= $mycurrenttrunk;
+				$mylistoftrunk[]	= $mycurrenttrunk;
 		}
-
+/**
+for ($i=0; $i<count($result); $i++)
+{
+$ttee = "Ratecard: ".$result[$i][6]."<br>Trunk: ".$result[$i][32]."<br>Prefix: ".$result[$i][7]."<br>Rateinitial: ".$result[$i][12]."<br>";
+if ($this->webui) $A2B -> debug( ERROR, $agi, __FILE__, __LINE__, $ttee);
+else echo $ttee;
+}
+**/
 		$this -> ratecard_obj = $distinct_result;
 		$this -> number_trunk = count($distinct_result);
-		
+/**
+for ($i=0; $i<count($myresult); $i++)
+{
+$ttee = "Trunk: ".$myresult[$i][32]."<br>Prefix: ".$myresult[$i][7]."<br>Rateinitial: ".$myresult[$i][12]."<br>";
+if ($this->webui) $A2B -> debug( ERROR, $agi, __FILE__, __LINE__, $ttee);
+else echo $ttee;
+}
+**/
+/**
+for ($i=0; $i<count($this->ratecard_obj); $i++) {
+if ($this->webui) { }
+else echo "Ratecard: ".$this->ratecard_obj[$i][6]."<br>Trunk: ".$this->ratecard_obj[$i][32]."<br>Prefix: ".$this->ratecard_obj[$i][7]."<br>Rateinitial: ".$this->ratecard_obj[$i][12]."<br>";
+}
+**/
 		// if an extracharge DID number was called increase rates with the extracharge fee
 		if (strlen($A2B->dnid)>1 && is_array($A2B->agiconfig['extracharge_did']) && in_array($A2B->dnid, $A2B->agiconfig['extracharge_did'])) {
 			$fee=$A2B->agiconfig['extracharge_fee'][array_search($A2B->dnid, $A2B->agiconfig['extracharge_did'])];
@@ -389,29 +457,29 @@ class RateEngine
 	{
 		global $agi;
 
-		$rateinitial 					= a2b_round (abs($this -> ratecard_obj[$K][12]));
-		$initblock 						= $this -> ratecard_obj[$K][13];
+		$rateinitial 			 = a2b_round (abs($this -> ratecard_obj[$K][12]));
+		$initblock 					= $this -> ratecard_obj[$K][13];
 		$billingblock 					= $this -> ratecard_obj[$K][14];
-		$connectcharge 					= a2b_round (abs($this -> ratecard_obj[$K][15]));
-		$disconnectcharge 				= a2b_round (abs($this -> ratecard_obj[$K][16]));
-		$disconnectcharge_after         = $this -> ratecard_obj[$K][60];
-		$announce_time_correction		= $this -> ratecard_obj[$K][61];
+		$connectcharge 			 = a2b_round (abs($this -> ratecard_obj[$K][15]));
+		$disconnectcharge 		 = a2b_round (abs($this -> ratecard_obj[$K][16]));
 		$stepchargea 					= $this -> ratecard_obj[$K][17];
-		$chargea 						= a2b_round (abs($this -> ratecard_obj[$K][18]));
+		$chargea 			 = a2b_round (abs($this -> ratecard_obj[$K][18]));
 		$timechargea 					= $this -> ratecard_obj[$K][19];
 		$billingblocka 					= $this -> ratecard_obj[$K][20];
 		$stepchargeb 					= $this -> ratecard_obj[$K][21];
-		$chargeb 						= a2b_round (abs($this -> ratecard_obj[$K][22]));
+		$chargeb 			 = a2b_round (abs($this -> ratecard_obj[$K][22]));
 		$timechargeb 					= $this -> ratecard_obj[$K][23];
 		$billingblockb 					= $this -> ratecard_obj[$K][24];
 		$stepchargec 					= $this -> ratecard_obj[$K][25];
-		$chargec 						= a2b_round (abs($this -> ratecard_obj[$K][26]));
+		$chargec 			 = a2b_round (abs($this -> ratecard_obj[$K][26]));
 		$timechargec 					= $this -> ratecard_obj[$K][27];
 		$billingblockc 					= $this -> ratecard_obj[$K][28];
 		// ****************  PACKAGE PARAMETERS ****************
-		$id_cc_package_offer 			= $this -> ratecard_obj[$K][45];
-		$id_rate 						= $this -> ratecard_obj[$K][6];
-		$initial_credit					= $credit;
+		$id_cc_package_offer				= $this -> ratecard_obj[$K][38];
+		$id_rate					= $this -> ratecard_obj[$K][6];
+		$disconnectcharge_after 			= $this -> ratecard_obj[$K][49];
+		$announce_time_correction			= $this -> ratecard_obj[$K][50];
+		$initial_credit 				= $credit;
 		// CHANGE THIS - ONLY ALLOW FREE TIME FOR CUSTOMER THAT HAVE MINIMUM CREDIT TO CALL A DESTINATION
 		
 		
@@ -514,6 +582,7 @@ class RateEngine
 			$callbackrate['bb_c'] = $billingblockc;
 		}
 		
+		$rateinitial = a2b_round ($rateinitial * $A2B->margintotal);
 		$this -> ratecard_obj[$K]['callbackrate']=$callbackrate;
 		$this -> ratecard_obj[$K]['timeout']=0;
 		$this -> ratecard_obj[$K]['timeout_without_rules']=0;
@@ -540,7 +609,7 @@ class RateEngine
 			$this -> ratecard_obj[$K]['timeout_without_rules'] = $A2B->agiconfig['maxtime_tocall_negatif_free_route'];
 			$TIMEOUT = $A2B->agiconfig['maxtime_tocall_negatif_free_route'];
 			// 90 min
-			if ($this -> debug_st) print_r($this -> ratecard_obj[$K]);
+//			if ($this -> debug_st) print_r($this -> ratecard_obj[$K]);
 			return $TIMEOUT;
 		}
 		
@@ -557,7 +626,7 @@ class RateEngine
 				$this -> ratecard_obj[$K]['freetime_include_in_timeout']=$A2B->agiconfig['maxtime_tofree_calls'];
 			}
 			
-			if ($this -> debug_st) print_r($this -> ratecard_obj[$K]);
+//			if ($this -> debug_st) print_r($this -> ratecard_obj[$K]);
 			return $TIMEOUT;
 		}
 		
@@ -571,7 +640,7 @@ class RateEngine
 
 		// IMPROVE THE get_variable AND TRY TO RETRIEVE THEM ALL SOMEHOW
 		if ($A2B->mode == 'callback') {
-			$calling_party_rateinitial = $agi->get_variable('RI', true);
+			$calling_party_rateinitial = a2b_round ($agi->get_variable('RI', true) * $A2B->margintotal);
 			$calling_party_initblock = $agi->get_variable('IB', true);
 			$calling_party_billingblock = $agi->get_variable('BB', true);
 			$calling_party_connectcharge = $agi->get_variable('CC', true);
@@ -784,36 +853,36 @@ class RateEngine
 		global $agi;
 		$K = $this->usedratecard;
 
-		$buyrate 						= a2b_round(abs($this -> ratecard_obj[$K][9]));
+		$buyrate 			  = a2b_round(abs($this -> ratecard_obj[$K][9]));
 		$buyrateinitblock 				= $this -> ratecard_obj[$K][10];
 		$buyrateincrement 				= $this -> ratecard_obj[$K][11];
-
-		$rateinitial 					= a2b_round(abs($this -> ratecard_obj[$K][12]));
-		$initblock 						= $this -> ratecard_obj[$K][13];
+		$rateinitial 			  = a2b_round(abs($this -> ratecard_obj[$K][12]));
+//		$rateinitial 			  = a2b_round (abs($this -> ratecard_obj[$K][12]) * $A2B->margintotal);
+		$initblock 					= $this -> ratecard_obj[$K][13];
 		$billingblock 					= $this -> ratecard_obj[$K][14];
-		$connectcharge 					= a2b_round(abs($this -> ratecard_obj[$K][15]));
-		$disconnectcharge 				= a2b_round(abs($this -> ratecard_obj[$K][16]));
-		$disconnectcharge_after			= $this->ratecard_obj[$K][60];
+		$connectcharge 			  = a2b_round(abs($this -> ratecard_obj[$K][15]));
+		$disconnectcharge 		  = a2b_round(abs($this -> ratecard_obj[$K][16]));
 		$stepchargea 					= $this -> ratecard_obj[$K][17];
-		$chargea 						= a2b_round(abs($this -> ratecard_obj[$K][18]));
+		$chargea 			  = a2b_round(abs($this -> ratecard_obj[$K][18]));
 		$timechargea 					= $this -> ratecard_obj[$K][19];
 		$billingblocka 					= $this -> ratecard_obj[$K][20];
 		$stepchargeb 					= $this -> ratecard_obj[$K][21];
-		$chargeb 						= a2b_round(abs($this -> ratecard_obj[$K][22]),4);
+		$chargeb 			  = a2b_round(abs($this -> ratecard_obj[$K][22]),4);
 		$timechargeb 					= $this -> ratecard_obj[$K][23];
 		$billingblockb 					= $this -> ratecard_obj[$K][24];
 		$stepchargec 					= $this -> ratecard_obj[$K][25];
-		$chargec 						= a2b_round(abs($this -> ratecard_obj[$K][26]),4);
+		$chargec 			  = a2b_round(abs($this -> ratecard_obj[$K][26]),4);
 		$timechargec 					= $this -> ratecard_obj[$K][27];
 		$billingblockc 					= $this -> ratecard_obj[$K][28];
 		// Initialization rounding calltime and rounding threshold variables
-		$rounding_calltime 				= $this->ratecard_obj[$K][54];
-		$rounding_threshold 			= $this->ratecard_obj[$K][55];
+		$rounding_calltime 				= $this -> ratecard_obj[$K][43];
+		$rounding_threshold 				= $this -> ratecard_obj[$K][44];
 		// Initialization additional block charge and additional block charge time variables
-		$additional_block_charge 		= $this->ratecard_obj[$K][56];
-		$additional_block_charge_time 	= $this->ratecard_obj[$K][57];
-		$additional_grace_time			= $this->ratecard_obj[$K][58];
-		$minimal_call_cost 				= $this->ratecard_obj[$K][59];
+		$additional_block_charge 			= $this -> ratecard_obj[$K][45];
+		$additional_block_charge_time			= $this -> ratecard_obj[$K][46];
+		$additional_grace_time				= $this -> ratecard_obj[$K][47];
+		$minimal_call_cost 				= $this -> ratecard_obj[$K][48];
+		$disconnectcharge_after				= $this -> ratecard_obj[$K][49];
 
 		
 		if (!is_numeric($rounding_calltime))			$rounding_calltime = 0;
@@ -825,8 +894,8 @@ class RateEngine
 		
 		$A2B -> debug( DEBUG, $agi, __FILE__, __LINE__, "[CC_RATE_ENGINE_CALCULCOST: K=$K - CALLDURATION:$callduration - freetimetocall_used=$this->freetimetocall_used - freetimetocall_left=".$this->freetimetocall_left[$K]."]");
 
-		$cost = 0;
-		$cost -= $connectcharge;
+		$this -> margindillers = $this -> commission = 0;
+		$cost = -$connectcharge;
 		if (($disconnectcharge_after<=$callduration) || ($disconnectcharge_after==0)) {
             $cost -= $disconnectcharge;
         }
@@ -898,8 +967,11 @@ class RateEngine
 				$this -> freetimetocall_used = $callduration;
 				$callduration = 0;
 			}
-			
-			$cost -= ($callduration/60) * $rateinitial;
+			$tempcost = ($callduration/60) * $rateinitial;
+			$tempmargin = $tempcost * ($A2B -> margintotal - 1);
+			$cost -= $tempcost;
+			$this -> margindillers	+= $tempmargin;
+			$this -> commission	+= $A2B -> margin * ($tempcost + $tempmargin) / ($A2B -> margin + 100);
 			if ($this -> debug_st)  echo "1.a cost: $cost\n";
 			$A2B -> debug( DEBUG, $agi, __FILE__, __LINE__, "[TEMP - CC_RATE_ENGINE_CALCULCOST: 1. COST: $cost]:[ ($callduration/60) * $rateinitial ]");
 			
@@ -980,13 +1052,20 @@ class RateEngine
 					$mod_sec = $duration_report % $billingblock;
 					if ($mod_sec>0) $duration_report += ($billingblock - $mod_sec);
 				}
-				$cost -= ($duration_report/60) * $rateinitial;
+				$tempcost = ($duration_report/60) * $rateinitial;
+				$tempmargin = $tempcost * ($A2B -> margintotal - 1);
+				$cost -= $tempcost;
+				$this -> margindillers	+= $tempmargin;
+				$this -> commission	+= $A2B -> margin * ($tempcost + $tempmargin) / ($A2B -> margin + 100);
 				$A2B -> debug( DEBUG, $agi, __FILE__, __LINE__, "[TEMP - CC_RATE_ENGINE_CALCULCOST: 2. DURATION_REPORT:$duration_report - COST: $cost]");
 			}
 		}
-		$cost = a2b_round($cost);
+		$cost			= a2b_round($cost);
+//		$this -> margindillers	= a2b_round($this -> margindillers);
+//		$this -> commission	= a2b_round($this -> commission);
 		if ($this -> debug_st)  echo "FINAL COST: $cost\n\n";
 		$A2B -> debug( DEBUG, $agi, __FILE__, __LINE__, "[CC_RATE_ENGINE_CALCULCOST: K=$K - BUYCOST:$buyratecost - SELLING COST:$cost]");
+//$A2B -> debug( ERROR, $agi, __FILE__, __LINE__, "[COMMISSION: $this->commission]");
 		
 		if ($cost> (0-$minimal_call_cost)) {
 			$this -> lastcost = 0 - $minimal_call_cost;
@@ -1035,15 +1114,15 @@ class RateEngine
 		
 		// ****************  PACKAGE PARAMETERS ****************
 		if (count($this -> ratecard_obj)>0) {
-			$id_cc_package_offer = $this -> ratecard_obj[$K][45];
-			$additional_grace_time = $this -> ratecard_obj[$K][58];
+			$id_cc_package_offer   = $this -> ratecard_obj[$K][38];
+			$additional_grace_time = $this -> ratecard_obj[$K][47];
 		} else $id_cc_package_offer = 'NONE';
 		
 		$id_card_package_offer = null;
 		
 		if ($A2B -> CC_TESTING) {
 			$sessiontime = 120;
-			$dialstatus = 'ANSWERED';
+			$dialstatus = 'ANSWER';
 		} else {
 			$sessiontime = $this -> answeredtime;
 			$dialstatus = $this -> dialstatus;
@@ -1051,7 +1130,42 @@ class RateEngine
 
 		$A2B -> debug( INFO, $agi, __FILE__, __LINE__, ":[sessiontime:$sessiontime - id_cc_package_offer:$id_cc_package_offer - package2apply:".$this ->package_to_apply[$K]."]\n\n");
 		
+//$temptempqueuednid = $agi -> get_variable('CHANNEL(peeraccount)',true);
+//$A2B -> debug( ERROR, $agi, __FILE__, __LINE__, "[* CHANNEL (peeraccount)     {$temptempqueuednid}");
+//$temptempqueuednid = $agi -> get_variable('linkedid',true);
+//$A2B -> debug( ERROR, $agi, __FILE__, __LINE__, "[* linkedid                  {$temptempqueuednid}");
 		if ($sessiontime > 0) {
+//$A2B -> debug( ERROR, $agi, __FILE__, __LINE__, "======== DESTINATION =       ".$calledstation);
+//$temptempqueuednid = $agi -> get_variable('MASTER_CHANNEL(QUEUEDNID)',true);
+//$A2B -> debug( ERROR, $agi, __FILE__, __LINE__, "[* QUEUEDNID Master_channel  {$temptempqueuednid}");
+//$temptempqueuednid = $agi -> get_variable('QUEUEDNID',true);
+//$A2B -> debug( ERROR, $agi, __FILE__, __LINE__, "[* QUEUEDNID Current_channel {$temptempqueuednid}");
+//$temptempqueuednid = $agi -> get_variable('MASTER_CHANNEL(PICKUPDNID)',true);
+//$A2B -> debug( ERROR, $agi, __FILE__, __LINE__, "[* MASTER_PICKUPDNID         {$temptempqueuednid}");
+//$temptempqueuednid = $agi -> get_variable('PICKUPDNID',true);
+//$A2B -> debug( ERROR, $agi, __FILE__, __LINE__, "[* PICKUPDNID                {$temptempqueuednid}");
+//$temptempqueuednid = $agi -> get_variable('MEMBERINTERFACE',true);
+//$A2B -> debug( ERROR, $agi, __FILE__, __LINE__, "[* MEMBERINTERFACE           {$temptempqueuednid}");
+//$temptempqueuednid = $agi -> get_variable('MEMBERNAME',true);
+//$A2B -> debug( ERROR, $agi, __FILE__, __LINE__, "[* MEMBERNAME                {$temptempqueuednid}");
+//$temptempqueuednid = $agi -> get_variable('QUEUENAME',true);
+//$A2B -> debug( ERROR, $agi, __FILE__, __LINE__, "[* QUEUENAME                 {$temptempqueuednid}");
+			
+			if ($this->pos_dialingnumber !== false) {
+				$bridgepeer = $agi -> get_variable('BRIDGEPEER',true);
+//$A2B -> debug( ERROR, $agi, __FILE__, __LINE__, "[* BRIDGEPEER                {$bridgepeer}");
+			
+				preg_match("/([^\/]+)(?=-[^-]*$)/",$bridgepeer,$bridgepeer);
+//$A2B -> debug( ERROR, $agi, __FILE__, __LINE__, "[* PEER                      {$bridgepeer[0]}");
+				$QUERY = "SELECT regexten FROM cc_sip_buddies WHERE name = '{$bridgepeer[0]}' LIMIT 1";
+				$result = $A2B -> instance_table -> SQLExec ($A2B->DBHandle, $QUERY);
+				if (is_array($result) && $result[0][0] != "")	$calledstation = $bridgepeer[0];
+//				if (is_array($result) && $result[0][0] != "")	$uppeer = $bridgepeer[0];
+//				else	$uppeer = $agi->get_variable('QUEUEDNID', true);
+//				if ($uppeer) $calledstation = $uppeer;
+			}
+//$A2B -> debug( ERROR, $agi, __FILE__, __LINE__, "======== DESTINATION =       ".$calledstation);
+
 			// HANDLE FREETIME BEFORE CALCULATE THE COST
 			$this -> freetimetocall_used = 0;
 			if ($this -> debug_st) print_r($this -> freetimetocall_left[$K]);
@@ -1122,7 +1236,7 @@ class RateEngine
 			$buycost = abs($this -> lastbuycost);
 		}
 
-		if ($cost<0) {
+		if ($cost<=0) {
 			$signe = '-';
 			$signe_cc_call = '+';
 		} else {
@@ -1152,22 +1266,35 @@ class RateEngine
 			$calltype = 0;
         }
 
-		$card_id =  (!is_numeric($A2B->id_card)) ? '-1' : "'". $A2B->id_card ."'";
-		$real_sessiontime = (!is_numeric($this->real_answeredtime)) ? 'NULL' : "'". $this->real_answeredtime ."'";
-		$id_tariffgroup = (!isset($id_tariffgroup) || !is_numeric($id_tariffgroup)) ? 'NULL' : "'$id_tariffgroup'";
-		$id_tariffplan = (!isset($id_tariffplan) || !is_numeric($id_tariffplan)) ? 'NULL' : "'$id_tariffplan'";
-		$id_ratecard = (!isset($id_ratecard) || !is_numeric($id_ratecard)) ? 'NULL' : "'$id_ratecard'";
-		$trunk_id =  ($trunk_id) ? "'". $trunk_id ."'" : "'". $this->usedtrunk ."'";
-		$id_card_package_offer = (!is_numeric($id_card_package_offer)) ? 'NULL' : "'$id_card_package_offer'";
-		$calldestination = (!isset($calldestination) || !is_numeric($calldestination) || ($didcall && $dialstatus != 'ANSWERED')) ? -1 : $calldestination;
-		$card_caller = (isset($A2B->card_caller)) ? "'$A2B->card_caller'" : "'0'";
-		$id_did = (!isset($A2B->id_did) || !is_numeric($A2B->id_did)) ? 'NULL' : "'$A2B->id_did'";
+		$card_id		= (!is_numeric($A2B->id_card)) ? '-1' : "'". $A2B->id_card ."'";
+		$real_sessiontime	= (!is_numeric($this->real_answeredtime)) ? 'NULL' : "'". $this->real_answeredtime ."'";
+		$id_tariffgroup 	= (!isset($id_tariffgroup) || !is_numeric($id_tariffgroup)) ? 'NULL' : "'$id_tariffgroup'";
+		$id_tariffplan		= (!isset($id_tariffplan) || !is_numeric($id_tariffplan)) ? 'NULL' : "'$id_tariffplan'";
+		$id_ratecard		= (!isset($id_ratecard) || !is_numeric($id_ratecard)) ? 'NULL' : "'$id_ratecard'";
+		$trunk_id		= ($trunk_id) ? "'". $trunk_id ."'" : "'". $this->usedtrunk ."'";
+		$id_card_package_offer	= (!is_numeric($id_card_package_offer)) ? 'NULL' : "'$id_card_package_offer'";
+		$calldestination	= (!isset($calldestination) || !is_numeric($calldestination) || ($didcall && $dialstatus != 'ANSWER')) ? -1 : $calldestination;
+		$card_caller		= (isset($A2B->card_caller)) ? "'$A2B->card_caller'" : "'0'";
+		$id_did			= (!isset($A2B->id_did) || !is_numeric($A2B->id_did)) ? 'NULL' : "'$A2B->id_did'";
+		$src_peername		= (isset($A2B->src_peername) && is_numeric($A2B->src_peername)) ? $A2B->src_peername : 'NULL';
+		if ($A2B->CallerIDext)
+			$src_exten	= "'". $A2B->CallerIDext ."'";
+		else $src_exten 	= (isset($A2B->src_exten) && is_numeric($A2B->src_exten)) ? $A2B->src_exten : 'NULL';
+
+		$QUERY = "SELECT regexten FROM cc_sip_buddies
+				LEFT JOIN cc_card_concat bb ON id_cc_card = bb.concat_card_id
+				LEFT JOIN ( SELECT aa.concat_id FROM cc_card_concat aa WHERE aa.concat_card_id = $card_id ) AS v ON bb.concat_id = v.concat_id
+				WHERE (id_cc_card = $card_id OR v.concat_id IS NOT NULL) AND name = '$calledstation' LIMIT 1";
+		$result = $A2B -> instance_table -> SQLExec ($A2B->DBHandle, $QUERY);
+		$calledexten = (is_array($result) && $result[0][0] != "") ? $result[0][0] : 'NULL';
 
 		$QUERY_COLUMN = "uniqueid, sessionid, card_id, card_caller, nasipaddress, starttime, sessiontime, real_sessiontime, calledstation, ".
 			" terminatecauseid, stoptime, sessionbill, id_tariffgroup, id_tariffplan, id_ratecard, " .
-			" id_trunk, src, sipiax, buycost, id_card_package_offer, dnid, destination, id_did";
+			" id_trunk, src, sipiax, buycost, id_card_package_offer, dnid, destination, id_did, src_peername, src_exten, calledexten, margindillers, margindiller";
 		$QUERY = "INSERT INTO cc_call ($QUERY_COLUMN) VALUES ('".$A2B->uniqueid."', '".$A2B->channel."', ".
 			"$card_id, $card_caller, '".$A2B->hostname."', ";
+
+//$A2B -> debug( ERROR, $agi, __FILE__, __LINE__, "======================== [src_peername =$src_peername] [src_exten =$src_exten] [calledexten =$calledexten] [calledstation =$calledstation] [dnid ={$A2B->dnid}]");
 
 		if ($A2B->config["global"]['cache_enabled']) {
 			$QUERY .= " datetime( strftime('%s','now') - $sessiontime, 'unixepoch','localtime')";	
@@ -1184,7 +1311,7 @@ class RateEngine
 
 		$QUERY .= " , '$signe_cc_call".a2b_round(abs($cost))."', ".
 					" $id_tariffgroup, $id_tariffplan, $id_ratecard, $trunk_id, '".$A2B->CallerID."', '$calltype', ".
-					" '$buycost', $id_card_package_offer, '".$A2B->dnid."', $calldestination, $id_did)";
+					" '$buycost', $id_card_package_offer, '".$A2B->dnid."', $calldestination, $id_did, $src_peername, $src_exten, $calledexten, ".a2b_round($this->margindillers).", ".a2b_round($this->commission).")";
 
 		if ($A2B->config["global"]['cache_enabled']) {
 			 //insert query in the cache system
@@ -1220,14 +1347,19 @@ class RateEngine
 			$A2B -> credit = $A2B -> credit + $cost;
 			
 			if ($A2B->nbused>0) {
-				$QUERY = "UPDATE cc_card SET credit= credit$signe".a2b_round(abs($cost))." $myclause_nodidcall,  lastuse=now(), nbused=nbused+1 WHERE username='".$A2B->username."'";
+				$QUERY = "UPDATE cc_card SET commission=commission+".a2b_round($this->commission).", credit= credit-".a2b_round($this->margindillers)."$signe".a2b_round(abs($cost))." $myclause_nodidcall,  lastuse=now(), nbused=nbused+1 WHERE username='".$A2B->username."'";
 			} else {
-				$QUERY = "UPDATE cc_card SET credit= credit$signe".a2b_round(abs($cost))." $myclause_nodidcall,  lastuse=now(), firstusedate=now(), nbused=nbused+1 WHERE username='".
-				$A2B->username."'";
+				$QUERY = "UPDATE cc_card SET commission=commission+".a2b_round($this->commission).", credit= credit-".a2b_round($this->margindillers)."$signe".a2b_round(abs($cost))." $myclause_nodidcall,  lastuse=now(), firstusedate=now(), nbused=nbused+1 WHERE username='".$A2B->username."'";
 			}
-			
+//$A2B -> debug(ERROR, $agi, __FILE__, __LINE__, "[id_custom: ".$A2B->id_card."] margindillers=".a2b_round($this->margindillers));
+//$A2B -> debug(ERROR, $agi, __FILE__, __LINE__, "[id_custom: ".$A2B->id_card."] commission+=".a2b_round($this->commission));
+
 			$A2B -> debug( DEBUG, $agi, __FILE__, __LINE__, "[CC_asterisk_stop 1.2: SQL: $QUERY]");
 			$result = $A2B->instance_table -> SQLExec ($A2B -> DBHandle, $QUERY, 0);
+
+			if (!$A2B->cid_verify) {
+				$A2B->instance_table -> SQLExec ($A2B -> DBHandle, "UPDATE cc_callerid SET verify=1 WHERE cid='$A2B->CallerID' AND activated='t' AND id_cc_card=$card_id", 0);
+			}
 
 			$QUERY = "SELECT period$td, UNIX_TIMESTAMP(periodexpiry$td), periodcount$td FROM cc_trunk WHERE id_trunk=$trunk_id LIMIT 1";
 			$result = $A2B->instance_table -> SQLExec ($A2B -> DBHandle, $QUERY);
@@ -1265,13 +1397,39 @@ class RateEngine
 					$limitsessiontime = $sessiontime;
 				}
 				$QUERY .= "$periodcount + ceil($limitsessiontime" . $tqr . "WHERE id_trunk=$trunk_id";
-			} else $QUERY = "UPDATE cc_trunk SET secondusedreal = secondusedreal + $sessiontime WHERE id_trunk=$trunk_id";
+			} else {
+				$QUERY = "UPDATE cc_trunk SET secondusedreal = secondusedreal + $sessiontime WHERE id_trunk=$trunk_id";
+			}
 			$A2B -> debug( DEBUG, $agi, __FILE__, __LINE__, $QUERY);
 			$result = $A2B->instance_table -> SQLExec ($A2B -> DBHandle, $QUERY, 0);
 
 			$QUERY = "UPDATE cc_tariffplan SET secondusedreal = secondusedreal + $sessiontime WHERE id=$id_tariffplan";
 			$A2B -> debug( DEBUG, $agi, __FILE__, __LINE__, $QUERY);
 			$result = $A2B->instance_table -> SQLExec ($A2B -> DBHandle, $QUERY, 0);
+
+			$id_diller = $A2B->id_diller;
+			if ($this->margindillers && $id_diller && $cost<0) do {
+				if ($this->commission > 0) {
+					$QUERY = "UPDATE cc_card SET credit= credit+".a2b_round($this->commission)." WHERE id=$id_diller";
+					$result = $A2B->instance_table -> SQLExec ($A2B -> DBHandle, $QUERY, 0);
+					$this->margindillers -= $this->commission;
+				}
+//$A2B -> debug(ERROR, $agi, __FILE__, __LINE__, "[id_diller: ".$id_diller."] credit+=".a2b_round($this->commission));
+				$QUERY = "SELECT id_diller, margin FROM cc_card WHERE id=$id_diller";
+				$result = $A2B->instance_table -> SQLExec ($A2B -> DBHandle, $QUERY);
+				$id_diller_next = $result[0][0];
+				$margin 	= $result[0][1];
+				if ($id_diller_next) {
+//$A2B -> debug(ERROR, $agi, __FILE__, __LINE__, "[id_diller: ".$id_diller."] margindillers=".a2b_round($this->margindillers));
+					$this->commission = $margin * (abs($cost) + $this->margindillers) / ($margin + 100);
+//$A2B -> debug(ERROR, $agi, __FILE__, __LINE__, "[id_diller: ".$id_diller."] commission+=".a2b_round($this->commission));
+					if ($this->commission > 0) {
+						$QUERY = "UPDATE cc_card SET commission= commission+".a2b_round($this->commission)." WHERE id=$id_diller";
+						$result = $A2B->instance_table -> SQLExec ($A2B -> DBHandle, $QUERY, 0);
+					}
+				}
+				$id_diller = $id_diller_next;
+			} while ($id_diller);
 		}
 		monitor_recognize($A2B);
 	}
@@ -1319,38 +1477,37 @@ class RateEngine
 			    && $periodcount >= $maxsecperperiod - $timeleft && $periodexpiry > time()) || $periodexpiry <= time()))) {
 
 				$this -> td = $this -> prefixclause = '';
+				$CID_handover = NULL;
 				$this -> real_answeredtime = $this -> answeredtime = $wrapuptime = 0;
 				$destination=$old_destination;
 
+//$A2B -> debug( ERROR, $agi, __FILE__, __LINE__, "[A2B->CID_handover: ={$A2B->CID_handover}]");
 				if ($loop_failover == 0 && $intellect_count == -1) {
-				    if ($this -> ratecard_obj[$k][34]!='-1') {
-					$usetrunk=35;
-					$this -> usedtrunk = $this -> ratecard_obj[$k][34];
-					$usetrunk_failover=1;
-				    } else {
-					$usetrunk=30;
-					$this -> usedtrunk = $this -> ratecard_obj[$k][29];
-					$usetrunk_failover=0;
-				    }
-				    $failover_trunk	= $this->usedtrunk;
-				    $prefix		= $this -> ratecard_obj[$k][$usetrunk];
-				    $tech		= $this -> ratecard_obj[$k][$usetrunk+1];
-				    $ipaddress		= $this -> ratecard_obj[$k][$usetrunk+2];
-				    $removeprefix	= explode(",",$this -> ratecard_obj[$k][$usetrunk+3]);
-				    if ($typecall==1) $timeout = $A2B -> config["callback"]['predictivedialer_maxtime_tocall'];
+				    $this -> usedtrunk	= $this -> ratecard_obj[$k][29];
+				    $failover_trunk	= $this -> usedtrunk;
+				    $prefix		= $this -> ratecard_obj[$k][30];
+				    $tech		= $this -> ratecard_obj[$k][31];
+				    $ipaddress		= $this -> ratecard_obj[$k][32];
+				    $removeprefix	= explode(",",$this -> ratecard_obj[$k][33]);
+				    if ($typecall==1)
+					$timeout	= $A2B -> config["callback"]['predictivedialer_maxtime_tocall'];
 				    else $timeout	= $this -> ratecard_obj[$k]['timeout'];
-				    $musiconhold	= $this -> ratecard_obj[$k][39];
-				    $next_failover_trunk= $this -> ratecard_obj[$k][40+$usetrunk_failover];
-				    $addparameter	= $this -> ratecard_obj[$k][42+$usetrunk_failover];
-				    $cidgroupidrate	= $this -> ratecard_obj[$k][44];
-				    $inuse		= $this -> ratecard_obj[$k][48+$usetrunk_failover];
-				    $maxuse		= $this -> ratecard_obj[$k][50+$usetrunk_failover];
-				    $ifmaxuse		= $this -> ratecard_obj[$k][52+$usetrunk_failover];
-				    $cidgroupid		= $this -> ratecard_obj[$k][79+$usetrunk_failover];
-				    $wrapuprange	= explode(",",$this -> ratecard_obj[$k][82+$usetrunk_failover]);
+				    $musiconhold	= $this -> ratecard_obj[$k][34];
+				    $next_failover_trunk= $this -> ratecard_obj[$k][35];
+				    $addparameter	= $this -> ratecard_obj[$k][36];
+				    $cidgroupidrate	= $this -> ratecard_obj[$k][37];
+				    $inuse		= $this -> ratecard_obj[$k][40];
+				    $maxuse		= $this -> ratecard_obj[$k][41];
+				    $ifmaxuse		= $this -> ratecard_obj[$k][42];
+				    $cidgroupid		= $this -> ratecard_obj[$k][68];
+				    $trunkcode		= $this -> ratecard_obj[$k][70];
+				    $wrapuprange	= explode(",",$this -> ratecard_obj[$k][71]);
+//$A2B -> debug( ERROR, $agi, __FILE__, __LINE__, "ratecard_obj[{$k}][69] = ".$this -> ratecard_obj[$k][69]);
+				    if ($this -> ratecard_obj[$k][69])
+					$CID_handover	= $A2B -> CID_handover;
 				} else {
 				    $this -> usedtrunk = $failover_trunk;
-				    $QUERY = "SELECT trunkprefix, providertech, providerip, removeprefix, failover_trunk, status, inuse, IF(wrapnexttime>NOW(),0,maxuse), if_max_use, outbound_cidgroup_id, addparameter, wrapuptime FROM cc_trunk WHERE id_trunk='$this->usedtrunk' LIMIT 1";
+				    $QUERY = "SELECT trunkprefix, providertech, providerip, removeprefix, failover_trunk, status, inuse, IF(wrapnexttime>NOW(),0,maxuse), if_max_use, outbound_cidgroup_id, addparameter, cid_handover, wrapuptime FROM cc_trunk WHERE id_trunk='$this->usedtrunk' LIMIT 1";
 				    $A2B->instance_table = new Table();
 				    $result = $A2B->instance_table -> SQLExec ($A2B -> DBHandle, $QUERY);
 
@@ -1367,7 +1524,10 @@ class RateEngine
 					$ifmaxuse		= $result[0][8];
 					$cidgroupid		= $result[0][9];
 					$addparameter		= $result[0][10];
-					$wrapuprange		= explode(",",$result[0][11]);
+					$wrapuprange		= explode(",",$result[0][12]);
+//$A2B -> debug( ERROR, $agi, __FILE__, __LINE__, "trunk_result[0][11] = ".$result[0][11]);
+					if ($result[0][11])
+						$CID_handover	= $A2B -> CID_handover;
 				    } else break;
 				}
 				if ($cidgroupid == -1) $cidgroupid = $cidgroupidrate;
@@ -1484,15 +1644,15 @@ class RateEngine
 					}
 				    }
 				    if ($loop_failover == 0 && $intellect_count == -1) {
-					$next_failover_trunk	= $this -> ratecard_obj[$k][67+$usetrunk_failover];
-					$startdate		= $this -> ratecard_obj[$k][68+$usetrunk_failover];
-					$stopdate		= $this -> ratecard_obj[$k][69+$usetrunk_failover];
+					$next_failover_trunk	= $this -> ratecard_obj[$k][56+$usetrunk_failover];
+					$startdate		= $this -> ratecard_obj[$k][57+$usetrunk_failover];
+					$stopdate		= $this -> ratecard_obj[$k][58+$usetrunk_failover];
 					if ($startdate <= $timecur && $timecur <= $stopdate) {
-					    $periodcur		= $this -> ratecard_obj[$k][63+$usetrunk_failover];
-					    $maxsecperperiod	= $this -> ratecard_obj[$k][64+$usetrunk_failover];
-					    $periodcount	= $this -> ratecard_obj[$k][65+$usetrunk_failover];
-					    $periodexpiry	= $this -> ratecard_obj[$k][66+$usetrunk_failover];
-					    $timeleft		= $this -> ratecard_obj[$k][70+$usetrunk_failover];
+					    $periodcur		= $this -> ratecard_obj[$k][52+$usetrunk_failover];
+					    $maxsecperperiod	= $this -> ratecard_obj[$k][53+$usetrunk_failover];
+					    $periodcount	= $this -> ratecard_obj[$k][54+$usetrunk_failover];
+					    $periodexpiry	= $this -> ratecard_obj[$k][55+$usetrunk_failover];
+					    $timeleft		= $this -> ratecard_obj[$k][59+$usetrunk_failover];
 					    if ($maxsecperperiod != -1) {
 						if ($periodexpiry > $timecur) {
 						    $trunktimeout = $maxsecperperiod - $periodcount;
@@ -1554,29 +1714,52 @@ class RateEngine
 						continue 2;
 					}
 				}
-				$pos_dialingnumber = max(strpos($ipaddress, '%dialingnumber%'),strpos($ipaddress, '%none%'));
+				$this->pos_dialingnumber = max(strpos($ipaddress, '%dialingnumber%'),strpos($ipaddress, '%none%'));
 				$ipaddress = str_replace("%cardnumber%", $A2B->cardnumber, $ipaddress);
 				$ipaddress = str_replace("%none%", '', $ipaddress);
 				if (strncmp($destination, $prefix, strlen($prefix)) == 0 && strlen($prefix) > 1) $prefix="";
 				$ipaddress = str_replace("%dialingnumber%", $prefix.$destination, $ipaddress);
 
-				if ($pos_dialingnumber !== false) $channel = "$tech/$ipaddress";
+				if ($this->pos_dialingnumber !== false) $channel = "$tech/$ipaddress";
 				elseif ($A2B->agiconfig['switchdialcommand'] == 1) $channel = "$tech/$prefix$destination@$ipaddress";
 					else $channel = "$tech/$ipaddress/$prefix$destination";
 
-				$QUERY = "SELECT cid FROM cc_outbound_cid_list WHERE activated = 1 AND outbound_cid_group = $cidgroupid ORDER BY RAND() LIMIT 1";
+//$A2B -> debug( ERROR, $agi, __FILE__, __LINE__, "[CID_handover: ={$CID_handover}]");
 				$A2B->instance_table = new Table();
-				$cidresult = $A2B->instance_table -> SQLExec ($A2B -> DBHandle, $QUERY);
+				$QUERY = "SELECT countryprefix FROM cc_country WHERE '{$A2B->destination}' LIKE concat(countryprefix,'%') ORDER BY countryprefix DESC LIMIT 1";
+				$result = $A2B->instance_table -> SQLExec ($A2B -> DBHandle, $QUERY);
+				if (is_array($result) && count($result)>0) {
+					$outprefix			= $result[0][0];
+					$outprefixrequest		= "cid LIKE '{$outprefix}%' DESC,";
+				} else {
+					$outprefix = $outprefixrequest	= "";
+				}
+				if (!is_null($CID_handover) && $CID_handover=='' && $outprefix) {
+					$QUERY = "SELECT cid FROM cc_callerid
+							WHERE id_cc_card = {$A2B->id_card} AND verify = 1 AND cid != '{$A2B->destination}'
+								AND ((cli_localreplace = 1 AND cid LIKE '$outprefix%') OR (cli_otherreplace = 1 AND cid NOT LIKE '$outprefix%') OR cli_prefixreplace LIKE '%$outprefix%')
+							ORDER BY cli_localreplace = 1 AND cid LIKE '$outprefix%' DESC, cli_prefixreplace NOT LIKE '%$outprefix%', RAND() LIMIT 1";
+//	AND ((cli_localreplace = 1 AND cid LIKE '$outprefix%') OR (cli_otherreplace = 1 AND cid NOT LIKE '$outprefix%') OR cli_prefixreplace LIKE '%$outprefix%')
+//								AND (cli_localreplace = 1 OR cli_otherreplace = 1 OR cli_prefixreplace !='')
+//							ORDER BY cli_localreplace = 1 AND cid LIKE '$outprefix%' DESC, cli_prefixreplace LIKE '%$outprefix%' DESC, cli_otherreplace = 1 AND cid NOT LIKE '$outprefix%' DESC, RAND()";
+//$A2B -> debug( ERROR, $agi, __FILE__, __LINE__, $QUERY);
+					$result = $A2B->instance_table -> SQLExec ($A2B -> DBHandle, $QUERY);
+					if (is_array($result) && count($result)>0) {
+						$CID_handover = $result[0][0];
+//for ($t=0;$t<count($result);$t++) {
+//	$A2B -> debug( ERROR, $agi, __FILE__, __LINE__, $result[$t][0]);
+//}
+					}
+				}
+				if ($CID_handover) {
+					$cidresult[0][0] = $CID_handover;
+				} else {
+//					$outprefix = (is_array($result) && count($result)>0) ? "cid LIKE '{$result[0][0]}%' DESC," : "";
+					$QUERY = "SELECT cid FROM cc_outbound_cid_list WHERE activated = 1 AND outbound_cid_group = $cidgroupid AND cid != '{$A2B->destination}' ORDER BY $outprefixrequest RAND() LIMIT 1";
+					$cidresult = $A2B->instance_table -> SQLExec ($A2B -> DBHandle, $QUERY);
+				}
 				if (is_array($cidresult) && count($cidresult)>0) {
 					$outcid = $cidresult[0][0];
-					//Uncomment this line if you want to save the outbound_cid in the CDR
-					//$A2B -> CallerID = $outcid;
-					if ($agi) {
-					    $calleridname = $agi -> get_variable('CALLERID(name)', true);
-					    $agi -> set_callerid($outcid);
-					    $agi -> set_variable('CALLERID(ani)', $outcid);
-					    $A2B -> debug( DEBUG, $agi, __FILE__, __LINE__, "[EXEC SetCallerID : $outcid]");
-					}
 				}
 
 				if ($typecall != 8 && (!$agi || $typecall == 9)) return array( $channel, $outcid, $this -> usedtrunk, $this -> td, $k );
@@ -1584,8 +1767,9 @@ class RateEngine
 				if ($agi) $A2B -> debug( DEBUG, $agi, __FILE__, __LINE__, "app_callingcard: CIDGROUPID='$cidgroupid' OUTBOUND CID SELECTED IS '$outcid'.");
 
 				if ($trunktimeout < 0)  $trunktimeout = $timeout;
-				if ($A2B->recalltime) $dialparams = str_replace("%timeout%", min($timeout * 1000, $max_long, $trunktimeout * 1000, $A2B->recalltime * 1000), $A2B->agiconfig['dialcommand_param']);
-					else $dialparams = str_replace("%timeout%", min($timeout * 1000, $max_long, $trunktimeout * 1000), $A2B->agiconfig['dialcommand_param']);
+				$trunktimeout = min($timeout * 1000, $max_long, $trunktimeout * 1000);
+				if ($A2B->recalltime) $trunktimeout = min($trunktimeout, $A2B->recalltime * 1000);
+				$dialparams = str_replace("%timeout%", $trunktimeout, $A2B->agiconfig['dialcommand_param']);
 
 				if ($agi && strlen($musiconhold)>0 && $musiconhold!="selected") {
 					$dialparams.= "m";
@@ -1605,34 +1789,74 @@ class RateEngine
 
 				$this -> trunk_start_inuse($agi, $A2B, 1);
 				if ($agi) {
-				    $A2B -> debug( INFO, $agi, __FILE__, __LINE__, "FAILOVER app_callingcard: Dialing '$dialstr' with timeout of '$timeout'.\n");
-				    if ($A2B->monitor == 1 || $A2B -> agiconfig['record_call'] == 1) {
-					$A2B->dl_short = MONITOR_PATH . "/" . $A2B->username . "/" . date('Y') . "/" . date('n') . "/" . date('j') . "/";
-					$dl_short = $A2B->dl_short . $A2B->uniqueid . ".";
-					while (file_exists($dl_short . "WAV") || file_exists($dl_short . "wav") || file_exists($dl_short . "gsm") || file_exists($dl_short . "mp3")
-					|| file_exists($dl_short . "sln") || file_exists($dl_short . "g723") || file_exists($dl_short . "g729")) {
-						$A2B->uniqueid++;
-						$dl_short = $A2B->dl_short . $A2B->uniqueid . ".";
+				    if ($this -> ratecard_obj[$k][12] > 0 || ($this -> ratecard_obj[$k][12] == 0 && $A2B->extext && $this -> ratecard_obj[$k][4] != $A2B->cardnumber && $ipaddress != $prefix.$destination)) {
+					if (!isset($trunkcode) || strpos($trunkcode,"-INFOLINE") === false) {
+						$A2B -> fct_say_time_2_call($agi, $trunktimeout, $this -> ratecard_obj[$k][12]);
 					}
-					$command_mixmonitor = $A2B -> format_parameters ("MixMonitor {$dl_short}{$A2B->agiconfig['monitor_formatfile']}|b");
-					$myres = $agi->exec($command_mixmonitor);
-					$A2B -> debug( INFO, $agi, __FILE__, __LINE__, "EXEC ". $command_mixmonitor);
+					if ($A2B->auth_through_accountcode) {
+						$A2B -> debug( DEBUG, $agi, __FILE__, __LINE__, "[A2Billing] SAY BALANCE : $A2B->credit");
+						$A2B -> fct_say_balance ($agi, $A2B->credit);
+						$A2B -> auth_through_accountcode = false;
+					}
 				    }
-				    // Count this call on the trunk
-				    $agi -> set_variable('MASTER_CHANNEL(CHANNELCIDNUM)', $destination);
-				    $agi -> set_variable('MASTER_CHANNEL(CALACCOUNT)', $A2B->cardnumber);
-				    $myres = $A2B -> run_dial($agi, $dialstr);
-				    $A2B -> debug( DEBUG, $agi, __FILE__, __LINE__, "DIAL FAILOVER $dialstr");
+				    $A2B -> debug( INFO, $agi, __FILE__, __LINE__, "FAILOVER app_callingcard: Dialing '$dialstr' with timeout of '$timeout'.\n");
+//				    if (array_search($agi -> channel_status('',true), array(AST_STATE_DOWN)) === false) {}
+				    if ($agi -> channel_status('',true) != AST_STATE_DOWN) {
+					if ($A2B->monitor == 1 || $A2B -> agiconfig['record_call'] == 1) {
+						$A2B->dl_short = MONITOR_PATH . "/" . $A2B->username . "/" . date('Y') . "/" . date('n') . "/" . date('j') . "/";
+						$dl_short = $A2B->dl_short . $A2B->uniqueid . ".";
+						while (file_exists($dl_short . "WAV") || file_exists($dl_short . "wav") || file_exists($dl_short . "gsm") || file_exists($dl_short . "mp3")
+						|| file_exists($dl_short . "sln") || file_exists($dl_short . "g723") || file_exists($dl_short . "g729")) {
+							$A2B->uniqueid++;
+							$dl_short = $A2B->dl_short . $A2B->uniqueid . ".";
+						}
+						$command_mixmonitor = $A2B -> format_parameters ("MixMonitor {$dl_short}{$A2B->agiconfig['monitor_formatfile']}|b");
+						$myres = $agi->exec($command_mixmonitor);
+						$A2B -> debug( INFO, $agi, __FILE__, __LINE__, "EXEC ". $command_mixmonitor);
+					}
+//				    $agi -> set_variable('MASTER_CHANNEL(TEMPONFORWARDCIDEXT1)', $A2B -> CallerID);
+//				    $agi -> set_variable('MASTER_CHANNEL(ONFORWARDCID2)', $destination);
+//				    $agi -> set_variable('MASTER_CHANNEL(CALACCOUNT)', $A2B->cardnumber);
+//					if (is_array($cidresult) && count($cidresult)>0) {
+//$A2B -> debug( ERROR, $agi, __FILE__, __LINE__, " [===================                                      CALLERID(num): ".$agi -> get_variable('CALLERID(num)', true)." ]");
+//$A2B -> debug( ERROR, $agi, __FILE__, __LINE__, " [===================                                       agi_callerid: ".$agi -> request['agi_callerid']." ]");
+//$A2B -> debug( ERROR, $agi, __FILE__, __LINE__, " [===================                                    A2B -> CallerID: ".$A2B -> CallerID." ]");
+//$A2B -> debug( ERROR, $agi, __FILE__, __LINE__, " [===================                                   A2B -> src_exten: ".$A2B -> src_exten." ]");
+//$A2B -> debug( ERROR, $agi, __FILE__, __LINE__, " [===================                                             OUTCID: ".$outcid." ]");
+
+					if ($outcid != 0 && $agi -> request['agi_callerid'] != $outcid) {
+					//Uncomment this line if you want to save the outbound_cid in the CDR
+					//$A2B -> CallerID = $outcid;
+//					    if ($A2B -> CallerID != $outcid) {
+						$calleridname = $agi -> get_variable('CALLERID(name)', true);
+						$agi -> set_callerid($outcid);
+						$agi -> set_variable('CALLERID(ani)', $outcid);
+						$A2B -> debug( DEBUG, $agi, __FILE__, __LINE__, "[EXEC SetCallerID : $outcid]");
+					    } else {
+						$outcid = 0;
+					    }
+//					}
+					// Count this call on the trunk
+					$myres = $A2B -> run_dial($agi, $dialstr);
+					$A2B -> debug( DEBUG, $agi, __FILE__, __LINE__, "DIAL FAILOVER $dialstr");
+					if ($outcid != 0) {
+						$outcid = 0;
+						$agi -> set_callerid($A2B -> CallerID);
+						$agi -> set_variable('CALLERID(ani)', $A2B -> CallerID);
+						$agi -> set_variable('CALLERID(name)', $calleridname);
+					}
+					if ($A2B->monitor == 1 || $A2B -> agiconfig['record_call'] == 1) {
+						$myres = $agi->exec($A2B -> format_parameters ("StopMixMonitor"));
+						$A2B -> debug( INFO, $agi, __FILE__, __LINE__, "EXEC StopMixMonitor (".$A2B->uniqueid.")");
+					}
+				    }
 
 				    // check connection after dial(long pause) 
 				    $A2B -> DbReConnect($agi);
 
-				    if ($outcid <> 0) {
-					$outcid = 0;
-					$agi -> set_callerid($A2B -> CallerID);
-					$agi -> set_variable('CALLERID(ani)', $A2B -> CallerID);
-					$agi -> set_variable('CALLERID(name)', $calleridname);
-				    }
+				    $this -> dialstatus = $agi -> get_variable("DIALSTATUS",true);
+$A2B -> debug( ERROR, $agi, __FILE__, __LINE__, " [===================                           DIALSTATUS: $this->dialstatus ]");
+
 				} elseif (is_array($amicmd)) {
 				    write_log(LOGFILE_API_CALLBACK, basename(__FILE__) . ' line:' . __LINE__ . " ActionID = {$amicmd[5]} [#### Starting AMI ORIGINATE ####] $channel");
 				    $ast->log("ActionID = {$amicmd[5]} [#### Starting AMI ORIGINATE ####] $channel");
@@ -1661,32 +1885,26 @@ class RateEngine
 				    write_log(LOGFILE_API_CALLBACK, basename(__FILE__) . ' line:' . __LINE__ . " ActionID = {$amicmd[5]} [####  RESULT AMI WAIT RESPONSE  ####] $channel  ".var_export($res, true)." = $this->dialstatus");
 				    $ast->log("ActionID = {$amicmd[5]} [####  RESULT AMI WAIT RESPONSE  ####] $channel  ".var_export($res, true)." = $this->dialstatus");
 				}
-				if ($agi) {
-				    if ($A2B->monitor == 1 || $A2B -> agiconfig['record_call'] == 1) {
-					$myres = $agi->exec($A2B -> format_parameters ("StopMixMonitor"));
-					$A2B -> debug( INFO, $agi, __FILE__, __LINE__, "EXEC StopMixMonitor (".$A2B->uniqueid.")");
-				    }
-
-				    $answeredtime = $agi->get_variable("ANSWEREDTIME",true);
-				    if ($answeredtime == "")		$answeredtime = $agi->get_variable("CDR(billsec)",true);
-				    $this -> real_answeredtime = $this -> answeredtime = $answeredtime;
-
-				    $this -> dialstatus = $agi -> get_variable("DIALSTATUS",true);
-
-				    $A2B -> debug( INFO, $agi, __FILE__, __LINE__, "[FAILOVER K=$k]:[ANSWEREDTIME=".$this->answeredtime."]:[DIALSTATUS=".$this->dialstatus."]");
-
-				    if (is_array($wrapuprange)) {
-					if (count($wrapuprange)==1) {
-						$wrapuptime = $wrapuprange[0];
-					} else {
-						$wrapuptime = mt_rand($wrapuprange[0],$wrapuprange[1]);
-					}
+				if (is_array($wrapuprange)) {
+				    if (count($wrapuprange)==1) {
+					$wrapuptime = $wrapuprange[0];
+				    } else {
+					$wrapuptime = mt_rand($wrapuprange[0],$wrapuprange[1]);
 				    }
 				}
 				// Count this call on the trunk
 				$this -> trunk_start_inuse($agi, $A2B, 0, $wrapuptime);
 
-//				if (($this->dialstatus  == "CHANUNAVAIL" || $this->dialstatus  == "CONGESTION") && $intellect_count > 0) 
+				if ($agi) {
+
+				    $answeredtime								= $agi->get_variable("ANSWEREDTIME",true);
+				    if ($answeredtime == "")					$answeredtime	= $agi->get_variable("CDR(billsec)",true);
+				    if ($answeredtime == 0 && $this->dialstatus == "ANSWER")	$answeredtime	= 1;
+				    $this -> real_answeredtime = $this -> answeredtime				= $answeredtime;
+
+				    $A2B -> debug( INFO, $agi, __FILE__, __LINE__, "[FAILOVER K=$k]:[ANSWEREDTIME=".$this->answeredtime."]:[DIALSTATUS=".$this->dialstatus."]");
+				}
+//				if (($this->dialstatus  == "CHANUNAVAIL" || $this->dialstatus  == "CONGESTION") && $intellect_count > 0)
 				if ($this->dialstatus  == "CHANUNAVAIL" && $intellect_count > 0) {
 					$firstrand = false;
 					$failover_trunk = $trunkrand;
@@ -1709,26 +1927,35 @@ class RateEngine
 			if (!$agi || $typecall == 9) continue;
 			
 			//# Ooh, something actually happened!
-
 			if ($this->dialstatus  == "BUSY") {
 				$this -> real_answeredtime = $this -> answeredtime = 0;
-				if ($A2B->agiconfig['busy_timeout'] > 0)
+				if ($A2B->agiconfig['busy_timeout'] > 0 && !(!$A2B->extext && $A2B->voicemail && !is_null($A2B->voicebox))) {
 					$res_busy = $agi->exec("Busy ".$A2B->agiconfig['busy_timeout']);
-				if (array_search($agi -> channel_status('',true), array(AST_STATE_UP, AST_STATE_DOWN)) === false) $A2B -> let_stream_listening($agi);
-				$agi-> stream_file('prepaid-isbusy', '#');
+				} elseif (!(!$A2B->extext && $A2B->voicemail && !is_null($A2B->voicebox))) {
+					$A2B -> let_stream_listening($agi);
+					$agi-> stream_file('prepaid-isbusy', '#');
+				}
 			} elseif ($this->dialstatus == "NOANSWER") {
 				$this -> real_answeredtime = $this -> answeredtime = 0;
-				if (array_search($agi -> channel_status('',true), array(AST_STATE_UP, AST_STATE_DOWN)) === false) $A2B -> let_stream_listening($agi);
-				$agi-> stream_file('prepaid-noanswer', '#');
+				$A2B -> let_stream_listening($agi);
+				if (isset($trunkcode) && strpos($trunkcode,"-INFOLINE") !== false) {
+					$agi-> stream_file('the-number-u-dialed', '#');
+					$agi-> say_digits($A2B->oldphonenumber, '#');
+					$agi-> stream_file('pbx-invalid-number', '#');
+				} else {
+					if (!(!$A2B->extext && $A2B->voicemail && !is_null($A2B->voicebox))) {
+						$agi-> stream_file('prepaid-noanswer', '#');
+					}
+				}
 			} elseif ($this->dialstatus == "CANCEL") {
 				$this -> real_answeredtime = $this -> answeredtime = 0;
-			} elseif (($this->dialstatus  == "CHANUNAVAIL") || 
-					  ($this->dialstatus  == "CONGESTION")) {
+			} elseif (($this->dialstatus == "CHANUNAVAIL") || ($this->dialstatus == "CONGESTION")) {
 				$this -> real_answeredtime = $this -> answeredtime = 0;
 				// Check if we will failover for LCR/LCD prefix - better false for an exact billing on resell
 				if ($A2B->agiconfig['failover_lc_prefix'] || $ifmaxuse == 1) {
 					continue;
 				}
+				$this->usedratecard = $k-$loop_failover;
 				return false;
 			} elseif ($this->dialstatus == "ANSWER") {
 				$A2B -> debug( DEBUG, $agi, __FILE__, __LINE__, "-> dialstatus : ".$this->dialstatus.", answered time is ".$this->answeredtime." \n");

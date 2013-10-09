@@ -33,7 +33,7 @@
 
 
 
-getpost_ifset(array('id', 'destination', 'id_cc_card', 'id_cc_did', 'activated', 'priority', 'id_trunk', 'voip_call'));
+getpost_ifset(array('id', 'destination', 'id_cc_card', 'id_cc_did', 'activated', 'priority', 'id_trunk', 'voip_call', 'answer', 'playsound'));
 
 if ( (empty($form_action) || $form_action=="list")) {
 	$HD_Form = new FormHandler("cc_did_destination LEFT JOIN cc_did ON cc_did.id = cc_did_destination.id_cc_did","Did Destination");
@@ -69,7 +69,7 @@ $validated_list["1"] = array( gettext("Validated"), "1");
 $validated_list["0"] = array( gettext("Pending"), "0");
 
 
-$HD_Form -> AddViewElement(gettext("DID"), "did", "12%", "center", "sort", "15");
+$HD_Form -> AddViewElement(gettext("DID"), "did", "12%", "center", "sort", "26");
 $HD_Form -> AddViewElement(gettext("ACTIVE"), "activated", "5%", "center", "sort", "", "list", $actived_list);
 $HD_Form -> AddViewElement(gettext("PRIOR"), "priority", "5%", "center", "sort", "", "list", $priority_list);
 $HD_Form -> AddViewElement(gettext("DESTINATION"), "destination", "15%", "center", "sort");
@@ -143,31 +143,28 @@ $HD_Form -> AddEditElement (gettext("VOIP_CALL"),
 	gettext("Choose if you want to not use the trunk and let the asterisk go to QUEUE or call directly the destination (ie, Destination : SIP/jeremy@182.212.1.45)"),
 	"", "",  "", gettext("Yes").":1, - ".gettext("No").":0", "", "", "", gettext("If the call is VoIP or QUEUE, that must be set to 'Yes'"));
 
-if ($form_action!='ask-edit' && $form_action!='edit') {
-	
-	$HD_Form -> AddEditElement (gettext("CUSTOMER ID"),
-		"id_cc_card",
-		'',
-		"POPUPVALUE",
-		"size=30 maxlength=50",
-		"4",
-		gettext("Insert the Id Customer ID"),
-		"" , "", "", "", "",
-		"A2B_entity_card.php?popup_select=1&"
-		, ", 'CardNumberSelection','width=550,height=550,top=100,left=100,scrollbars=1'" ,
-		gettext("Set the Customer ID."));
+$HD_Form -> AddEditElement (gettext("CUSTOMER ID"),
+	"id_cc_card",
+	'',
+	"POPUPVALUE",
+	"size=30 maxlength=50",
+	"4",
+	gettext("Insert the Id Customer ID"),
+	"", "", "", "", "",
+	"A2B_entity_card.php?popup_select=1&",
+	", 'CardNumberSelection','width=550,height=550,top=100,left=100,scrollbars=1'" ,
+	gettext("Set the Customer ID."));
 
 
-	$HD_Form -> AddEditElement (gettext("DID"),
-		"id_cc_did",
-		'$value',
-		"SELECT",
-		"", "", "",
-		"sql",
-		"cc_did",
-		"did, id",
-		"", "", "%1", "" , "");
-}
+$HD_Form -> AddEditElement (gettext("DID"),
+	"id_cc_did",
+	'$value',
+	"SELECT",
+	"", "", "",
+	"sql",
+	"cc_did",
+	"did, id",
+	"", "", "%1", "" , "");
 
 $HD_Form -> AddEditElement (gettext("VALIDATED"),
 	"validated",
@@ -204,13 +201,17 @@ $HD_Form -> AddEditElement (gettext("PLAY_SOUND"),
 	"",
 	gettext("Insert the path and name of sound file"),
 	"" , "", "", "", "", "", "", gettext("Play sound before calling DESTINATION. ie 'ivr/wait-please'"));
-
-
-if ($form_action!='ask-edit' && $form_action!='edit') {
+/**
+$HD_Form -> AddEditElement (gettext("CID_PRESENT"),
+	"outbound_cidgroup_ignore",
+	'0',
+	"RADIOBUTTON",
+	"",
+	"",
+	gettext("Choose 'Yes' if you want to present real CID though CID_GROUP applied"),
+	"" , "", "", gettext("Yes").":1, - ".gettext("No").":0", "", "", "", gettext("Choose 'Yes' if you want to present real CID though CID_GROUP applied"));
+**/
 	$HD_Form -> FieldEditElement ('activated, destination, timeout, voip_call, id_cc_card, id_cc_did, validated, priority, answer, playsound');
-} else {
-	$HD_Form -> FieldEditElement ('activated, destination, timeout, voip_call, validated, priority, answer, playsound');
-}
 
 // Set the filter variables
 $HD_Form -> FG_FILTER_APPLY = true;
@@ -237,6 +238,7 @@ $HD_Form -> FG_BUTTON_EDITION_BOTTOM_TEXT = $HD_Form -> FG_BUTTON_ADITION_BOTTOM
 
 $HD_Form -> FG_ADDITIONAL_FUNCTION_AFTER_ADD = 'did_destination_add';
 $HD_Form -> FG_ADDITIONAL_FUNCTION_AFTER_DELETE = 'did_destination_del';
+$HD_Form -> FG_ADDITIONAL_FUNCTION_AFTER_EDITION = 'did_destination_edit';
 
 $HD_Form -> FG_GO_LINK_AFTER_ACTION_ADD = $_SERVER['PHP_SELF']."?id=";
 $HD_Form -> FG_GO_LINK_AFTER_ACTION_EDIT = $_SERVER['PHP_SELF']."?id=";

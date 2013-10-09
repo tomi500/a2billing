@@ -38,6 +38,16 @@ if ($this->FG_FK_DELETE_CONFIRM && $form_action == "ask-del-confirm" && $this-> 
 	<INPUT type="hidden" name="current_page" value="<?php echo $processed['current_page'];?>">
 	<INPUT type="hidden" name="order" value="<?php echo $processed['order'];?>">
 	<INPUT type="hidden" name="sens" value="<?php echo $processed['sens'];?>">
+
+<?php
+	if (!empty($this->FG_EDITION_HIDDEN_PARAM)) {
+		$split_hidden_fields = preg_split("/,/",trim($this->FG_EDITION_HIDDEN_PARAM));
+		$split_hidden_fields_value = preg_split("/,/",trim($this->FG_EDITION_HIDDEN_PARAM_VALUE));
+		for ($cur_hidden=0;$cur_hidden<count($split_hidden_fields);$cur_hidden++){
+			echo "<INPUT type=\"hidden\" name=\"".trim($split_hidden_fields[$cur_hidden])."\" value=\"".trim($split_hidden_fields_value[$cur_hidden])."\">\n";
+		}
+	}
+?>
 	<table cellspacing="2"  class="tablestyle_001">
     <tr>
         <td>
@@ -85,7 +95,7 @@ else
 <FORM action=<?php echo $_SERVER['PHP_SELF']?> id="myForm" method="post" name="myForm">
 	<INPUT type="hidden" name="id" value="<?php echo $id?>">
 	<INPUT type="hidden" name="atmenu" value="<?php echo $atmenu?>">
-    <INPUT type="hidden" name="fkCount" value="<?php echo $this -> FG_FK_RECORDS_COUNT;?>">
+	<INPUT type="hidden" name="fkCount" value="<?php echo $this -> FG_FK_RECORDS_COUNT;?>">
 	<INPUT type="hidden" name="current_page" value="<?php echo $processed['current_page'];?>">
 	<INPUT type="hidden" name="order" value="<?php echo $processed['order'];?>">
 	<INPUT type="hidden" name="sens" value="<?php echo $processed['sens'];?>">
@@ -96,6 +106,14 @@ else
     <?php }  ?>
 
 	<?php
+	if (!empty($this->FG_EDITION_HIDDEN_PARAM)) {
+		$split_hidden_fields = preg_split("/,/",trim($this->FG_EDITION_HIDDEN_PARAM));
+		$split_hidden_fields_value = preg_split("/,/",trim($this->FG_EDITION_HIDDEN_PARAM_VALUE));
+		for ($cur_hidden=0;$cur_hidden<count($split_hidden_fields);$cur_hidden++){
+			echo "<INPUT type=\"hidden\" name=\"".trim($split_hidden_fields[$cur_hidden])."\" value=\"".trim($split_hidden_fields_value[$cur_hidden])."\">\n";
+		}
+	}
+
 	if (!is_null($this->FG_QUERY_EDITION_HIDDEN_FIELDS) && $this->FG_QUERY_EDITION_HIDDEN_FIELDS!=""){
 		$split_hidden_fields = preg_split("/,/",trim($this->FG_QUERY_EDITION_HIDDEN_FIELDS));
 		$split_hidden_fields_value = preg_split("/,/",trim($this->FG_QUERY_EDITION_HIDDEN_VALUE));

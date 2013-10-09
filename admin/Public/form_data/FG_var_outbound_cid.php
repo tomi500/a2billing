@@ -18,7 +18,7 @@ $HD_Form ->FG_LIST_ADDING_BUTTON_IMG1 = Images_Path ."/server_connect.png" ;
 $actived_list = Constants::getActivationList();
 
 $HD_Form -> AddViewElement(gettext("CID"), "cid", "30%", "center", "sort");
-$HD_Form -> AddViewElement(gettext("CIDGROUP"), "outbound_cid_group", "30%", "center", "sort", "15", "lie", "cc_outbound_cid_group", "group_name", "id='%id'", "%1");
+$HD_Form -> AddViewElement(gettext("CIDGROUP"), "outbound_cid_group", "30%", "center", "sort", "40", "lie", "cc_outbound_cid_group", "group_name", "id='%id'", "%1");
 $HD_Form -> AddViewElement(gettext("STATUS"), "activated", "15%", "center", "sort", "", "list", $actived_list);
 
 $HD_Form -> FieldViewElement ('cid, outbound_cid_group, activated');

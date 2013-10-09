@@ -603,7 +603,7 @@ msgstr "Fügen Sie den Kode von oben Bild ein"
 
 #: form_data/FG_var_signup.inc:425
 msgid "You can modify, through the following form, the different properties of your "
-msgstr "Sie können über das folgende Formular aus, die unterschiedlichen Eigenschaften ändern"
+msgstr "Sie können über das folgende Formular aus, die unterschiedlichen Eigenschaften ändern "
 
 #: form_data/FG_var_signup.inc:426
 msgid "If you really want remove this "
@@ -869,9 +869,12 @@ msgstr "TELEFONBUCH"
 
 #: form_data/FG_var_campaign.inc:294 form_data/FG_var_speeddial.inc:117
 #: form_data/FG_var_phonebook.inc:108 form_data/FG_var_phonenumber.inc:143
-#: form_data/FG_var_callerid.inc:115 lib/Form/Class.FormHandler.inc.php:553
 msgid "You can modify, through the following form, the different properties of your"
 msgstr "Sie können ändern, durch den unteren Form,  die unterschiedlichen Eigenschaften von Ihr"
+
+#: form_data/FG_var_callerid.inc:115 lib/Form/Class.FormHandler.inc.php:553
+msgid "You can modify, through the following form, the different properties of your CallerID"
+msgstr "Sie können ändern, durch den unteren Form,  die unterschiedlichen Eigenschaften von Ihr AnruferID"
 
 #: form_data/FG_var_campaign.inc:299
 msgid "Add a "
@@ -2403,7 +2406,7 @@ msgstr ""
 msgid "Personal information."
 msgstr "Personal Information"
 
-#: lib/customer.help.php:53
+#: lib/customer.help.php:54
 msgid "You can update your personal information here."
 msgstr "Sie können Ihre persönlichen Informationen hier aktualisieren."
 
@@ -2487,6 +2490,10 @@ msgstr ""
 #: lib/customer.help.php:89
 msgid "Callback : Entre your phone number and the phone number you wish to call."
 msgstr "Tippen Sie für den Rückruf, Ihre Telefonnummer und die Nummer, die Sie anrufen möchten! "
+
+#: lib/customer.help.php
+msgid "Your balance"
+msgstr "Ihr kontostand"
 
 #: A2B_ticket_view.php:58
 msgid "Ticket updated successfully"
@@ -2890,7 +2897,7 @@ msgstr "LOGIN ZU SEITE"
 
 #: A2B_billing_preview.php:83
 msgid "Cost of calls between the "
-msgstr "Kosten für die Gespräche zwischen den"
+msgstr "Kosten für die Gespräche zwischen den "
 
 #: A2B_billing_preview.php:87
 msgid "Cost of calls before the "
@@ -3511,8 +3518,8 @@ msgid "An activation email has been sent to"
 msgstr "Ein Aktivierungs-E-Mail wurde an"
 
 #: A2B_entity_did.php:82
-msgid "The following Destinaton-DID has been relesed:"
-msgstr "Die folgenden Destinaton-DID wurde freigegeben:"
+msgid "The following Destination-DID has been released:"
+msgstr "Die folgenden Destination-DID wurde freigegeben:"
 
 #: A2B_entity_did.php:108
 #, fuzzy

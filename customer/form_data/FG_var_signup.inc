@@ -33,8 +33,9 @@
 
 
 
-getpost_ifset(array('id','subscriber_signup', 'username', 'useralias', 'uipass', 'credit', 'language', 'tariff', 'activated', 'simultaccess', 'currency', 'typepaid', 'creditlimit', 'lastname', 'firstname', 'email', 'address', 'city', 'state', 'id_timezone',
-	'country', 'zipcode', 'phone', 'fax', 'inuse', 'cid', 'runservice', 'firstusedate', 'expirationdate', 'enableexpire', 'expiredays','company_name' , 'company_website' , 'vat_rn' , 'vat', 'traffic' , 'traffic_target','captchacode','groupid', 'key'));
+getpost_ifset(array('id','subscriber_signup', 'username', 'useralias', 'uipass', 'credit', 'language', 'tariff', 'activated', 'simultaccess', 'currency', 'typepaid', 'creditlimit', 'lastname',
+	'firstname', 'email', 'address', 'city', 'state', 'id_timezone', 'country', 'zipcode', 'phone', 'fax', 'inuse', 'cid', 'runservice', 'firstusedate', 'expirationdate', 'enableexpire',
+	'expiredays','company_name' , 'company_website' , 'vat_rn' , 'vat', 'traffic' , 'traffic_target','captchacode','groupid', 'key', 'id_diller', 'margin', 'paypal'));
 
 //put parameter in session
 $HD_Form = new FormHandler("cc_card", "User");
@@ -48,8 +49,7 @@ $HD_Form->setDBHandler(DbConnect());
 
 $agent_conf = false;
 if (!empty ($key)) {
-	$agentkey = $key;
-	$_SESSION["key"] = $agentkey;
+	$_SESSION["key"] = $agentkey = $key;
 }
 elseif (!empty ($_SESSION["key"])) {
 	$agentkey = $_SESSION["key"];
@@ -114,6 +114,7 @@ $currency_list_r = array ();
 $indcur = 0;
 
 $currencies_list = get_currencies();
+$yesno_list = array(array(gettext('yes').'&nbsp','1'),array(gettext('no').'&nbsp','0'));
 
 foreach ($currencies_list as $key => $cur_value) {
 	$currency_list[$key] = array (
@@ -186,7 +187,7 @@ if (isset ($form_action) && $form_action == "ask-add") {
 	$end_date = date("-m-d H:i:s");
 	$comp_date = "value='" . $begin_date . $end_date . "'";
 	$comp_date_plus = "value='" . $begin_date_plus . $end_date . "'";
-	$comp_zero = "value='0'";
+	$paypal = 1;
 }
 if (LASTNAME_ENABLE)  {
 $HD_Form->AddEditElement(gettext("LASTNAME")." *",
@@ -206,6 +207,7 @@ $HD_Form->AddEditElement(gettext("FIRSTNAME")." *",
 		gettext("Insert your firstname"), "", "", "", "", "", "", "", "");
 $firstname_editFG = "firstname,";
 }
+
 if (COMP_ENABLE)  {
 $HD_Form->AddEditElement(gettext("COMPANY NAME"),
 		"company_name",
@@ -215,12 +217,14 @@ $HD_Form->AddEditElement(gettext("COMPANY NAME"),
 		gettext("Insert Company name of this customer"), "", "", "", "", "", "", "NO", "");
 $company_name_editFG = "company_name,";
 }
+
 $HD_Form->AddEditElement(gettext("EMAIL")." *",
 		"email",
 		'$value',
 		"INPUT",
 		"size=30 maxlength=70", "1",
 		gettext("Insert your email"), "", "", "", "", "", "", "", "");
+
 if (ADDRESS_ENABLE)  {
 $HD_Form->AddEditElement(gettext("ADRESS")." *",
 		"address",
@@ -228,158 +232,217 @@ $HD_Form->AddEditElement(gettext("ADRESS")." *",
 		"INPUT",
 		"size=30 maxlength=100", "0",
 		gettext("Insert your address"), "", "", "", "", "", "", "", "");
-$address_editFG = "address,";
+$address_editFG = ",address";
 }
+
 if (CITY_ENABLE)  {
-$HD_Form->AddEditElement(gettext("CITY")." *",
-		"city",
-		'$value',
-		"INPUT",
-		"size=30 maxlength=40", "0",
-		gettext("Insert your city"), "", "", "", "", "", "", "", "");
-$city_editFG = "city,";
+	$HD_Form->AddEditElement(gettext("CITY")." *",
+								"city",
+								'$value',
+								"INPUT",
+								"size=30 maxlength=40", "0",
+								gettext("Insert your city"), "", "", "", "", "", "", "", "");
+	$city_editFG = ",city";
 }
+
 if (STATE_ENABLE)  {
-$HD_Form->AddEditElement(gettext("STATE/PROVINCE"),
-		"state",
-		'$value',
-		"INPUT",
-		"size=30 maxlength=40", "11",
-		gettext("Insert your state"), "", "", "", "", "", "", "NO", "");
-$state_editFG = "state,";
+	$HD_Form->AddEditElement(gettext("STATE/PROVINCE"),
+								"state",
+								'$value',
+								"INPUT",
+								"size=30 maxlength=40", "11",
+								gettext("Insert your state"), "", "", "", "", "", "", "NO", "");
+	$state_editFG = ",state";
 }
-if ($form_action == 'ask-add') {
-// -= Need to install GeoIP http://ua2.php.net/manual/en/geoip.setup.php =-
-	$country = (function_exists('geoip_country_code3_by_name'))?geoip_country_code3_by_name($_SERVER['REMOTE_ADDR']):'USA';
-}
+//if ($_SERVER['REMOTE_ADDR'] == '188.231.191.208') $_SERVER['REMOTE_ADDR'] = '217.10.79.9';
+
 if (COUNTRY_ENABLE)  {
-$HD_Form->AddEditElement(gettext("COUNTRY")." *",
-		"country",
-		"$country",
-		"SELECT", "", "", "",
-		"sql",
-		"cc_country", "countryname, countrycode", 
-		"", "", "%1", "", "", "", '');
-$country_editFG = "country,";
+	if (isset($form_action) && $form_action == 'ask-add') {
+	// -= Need to install GeoIP http://ua2.php.net/manual/en/geoip.setup.php =-
+		$country = (function_exists('geoip_country_code3_by_name'))?geoip_country_code3_by_name($_SERVER['REMOTE_ADDR']):'USA';
+	}
+	$HD_Form->AddEditElement(gettext("COUNTRY")." *",
+								"country",
+								"$country",
+								"SELECT", "", "", "",
+								"sql",
+								"cc_country", "countryname, countrycode", 
+								"", "", "%1", "", "", "", '');
+	$country_editFG = ",country";
 }
+
 if (ZIPCODE_ENABLE)  {
-$HD_Form->AddEditElement(gettext("ZIP/POSTAL CODE")." *",
-		"zipcode",
-		'$value',
-		"INPUT",
-		"size=30 maxlength=20","0",
-		gettext("Insert your zipcode"), "", "", "", "", "", "", "", "");
-$zipcode_editFG = "zipcode,";
+	$HD_Form->AddEditElement(gettext("ZIP/POSTAL CODE")." *",
+								"zipcode",
+								'$value',
+								"INPUT",
+								"size=30 maxlength=20","0",
+								gettext("Insert your zipcode"), "", "", "", "", "", "", "", "");
+	$zipcode_editFG = ",zipcode";
 }
-$timezone_list = get_timezones();
-$one_select = false;
-if (function_exists('geoip_time_zone_by_country_and_region')) {
-$UserDateTimeZone = new DateTimeZone(geoip_time_zone_by_country_and_region(geoip_country_code_by_name($_SERVER['REMOTE_ADDR']),geoip_region_by_name($_SERVER['REMOTE_ADDR'])));
-$UserDateTime = new DateTime("now", $UserDateTimeZone);
-$servergmt = $UserDateTimeZone->getOffset($UserDateTime);
-} else $servergmt = SERVER_GMT;
-foreach ($timezone_list as $key => $cur_value) {
-	$timezone_list[$key] = array (
-		$cur_value[2],
-		$key
-	);
-	if ($form_action == 'ask-add') {
-		if (in_array($servergmt, $cur_value) && !$one_select) {
-			$id_timezone = $key;
-			$one_select = true;
+
+if (TIMEZONE_ENABLE)  {
+	if (isset($form_action)) {
+	// -= Need to install GeoIP http://ua2.php.net/manual/en/geoip.setup.php =-
+		$timezone_list = get_timezones();
+		$one_select = false;
+		if (function_exists('geoip_time_zone_by_country_and_region') && $form_action == 'ask-add') {
+			if (geoip_db_avail(GEOIP_REGION_EDITION_REV0) || geoip_db_avail(GEOIP_REGION_EDITION_REV1)) {
+				$countryregion = geoip_region_by_name($_SERVER['REMOTE_ADDR']);
+				$country = $countryregion['country_code'];
+				$region = $countryregion['region'];
+			} else $region = "";
+			if ($region == "") {
+				$country = geoip_country_code_by_name($_SERVER['REMOTE_ADDR']);
+				$region = '01';
+			}
+//			$UserDateTimeZone	= new DateTimeZone(geoip_time_zone_by_country_and_region($country,$region));
+//			$UserDateTime		= new DateTime(null, $UserDateTimeZone);
+//			$servergmt		= $UserDateTimeZone->getOffset($UserDateTime);
+			$UserDateTime		= new DateTime('2013-12-21', new DateTimeZone(geoip_time_zone_by_country_and_region($country,$region)));
+			$servergmt		= $UserDateTime->getOffset();
+		} else $servergmt = SERVER_GMT;
+		foreach ($timezone_list as $key => $cur_value) {
+			$timezone_list[$key] = array (
+				$cur_value[2],
+				$key
+			);
+			if ($form_action == 'ask-add') {
+				if (in_array($servergmt, $cur_value) && !$one_select) {
+					$id_timezone = $key;
+					$one_select = true;
+				}
+			}
 		}
 	}
+	$HD_Form->AddEditElement(gettext("TIMEZONE")." *",
+								"id_timezone",
+								"$id_timezone",
+								"SELECT",
+								"", "", "",
+								"list", "", "", "",
+								$timezone_list,
+								"%1", "", "");
+	$id_timezone_editFG = ",id_timezone";
 }
-if (TIMEZONE_ENABLE)  {
-$HD_Form->AddEditElement(gettext("TIMEZONE")." *",
-		"id_timezone",
-		"$id_timezone",
-		"SELECT",
-		"", "", "",
-		"list", "", "", "",
-		$timezone_list,
-		"%1", "", "");
-$id_timezone_editFG = "id_timezone,";
-}
+
 if (PHONE_ENABLE)  {
-$HD_Form->AddEditElement(gettext("PHONE NUMBER")." *",
+	$HD_Form->AddEditElement(gettext("PHONE NUMBER")." *",
 								"phone",
 								'$value',
 								"INPUT", "size=30 maxlength=20",
 								"7", "", "", "", "", "", "", "", "", "");
-$phone_editFG = "phone,";
+	$phone_editFG = ",phone";
 }
+
 if (FAX_ENABLE)  {
-$HD_Form->AddEditElement(gettext("FAXNUMBER"), 
+	$HD_Form->AddEditElement(gettext("FAXNUMBER"), 
 								"fax", 
 								'$value', 
 								"INPUT", "size=30 maxlength=20", 
 								"", gettext("Insert your fax number"), "", "", "", "", "", "", "", "");
-$fax_editFG = "fax,";
+	$fax_editFG = ",fax";
 }
+
 if (COMP_WEB_ENABLE)  {
-$HD_Form->AddEditElement(gettext("COMPANY WEBSITE"), 
-								"company_website", 
-								'$value', 
-								"INPUT", "size=40 maxlength=60", 
-								"", gettext("Insert the company website of this customer"), "", "", "", "", "", "", "NO", "");
-$company_website_editFG = "company_website,";
+	$HD_Form->AddEditElement(gettext("COMPANY WEBSITE"), 
+								"company_website",
+								'$value',
+								"INPUT", "size=40 maxlength=60",
+								"8", gettext("Insert the company website of this customer"), "", "", "", "", "", "", "NO", "");
+	$company_website_editFG = ",company_website";
 }
+
 if (VAT_RN_ENABLE)  {
-$HD_Form->AddEditElement(gettext("VAT REGISTRATION NUMBER "), 
+	$HD_Form->AddEditElement(gettext("VAT REGISTRATION NUMBER "), 
 								"vat_rn", 
 								'$value', 
 								"INPUT", "size=40 maxlength=40",
 								"", gettext("Insert the VAT registration number of this customer"), "", "", "", "", "", "", "NO", "");
-$VAT_RN_editFG = "vat_rn,";
+	$VAT_RN_editFG = ",vat_rn";
 
-$HD_Form -> AddEditElement (gettext("VAT"),
+	$HD_Form -> AddEditElement (gettext("VAT").", %%",
 								"vat",
 								'$value',
 								"INPUT",
-								"size=10 maxlength=6 $vat_init",
+								"size=10 maxlength=6",
 								"12", "%%",
 								"", "", "", "", "", "", "NO", "");
-$VAT_editFG = "vat,";
+	$VAT_editFG = ",vat";
 }
+
 if (TRAFFIC_ENABLE)  {
-$HD_Form->AddEditElement(gettext("TRAFFIC PER MONTH"), 
+	$HD_Form->AddEditElement(gettext("TRAFFIC PER MONTH"), 
 								"traffic", 
 								'$value', 
 								"INPUT", "size=30 maxlength=20", 
 								"4", gettext("Insert the traffic per month for this customer"), "", "", "", "", "", "", "NO", "");
-$traffic_editFG = "traffic,";
+	$traffic_editFG = ",traffic";
 }
+
 if (TRAFFIC_TARGET_ENABLE)  {
-$HD_Form->AddEditElement(gettext("TARGET TRAFFIC"),
+	$HD_Form->AddEditElement(gettext("TARGET TRAFFIC"),
 								"traffic_target",
 								'',
 								"TEXTAREA", "cols=50 rows=4",
 								"", gettext("Insert the target traffic description"), "", "", "", "", "", "", "", "");
-$traffic_target_editFG = "traffic_target,";
+	$traffic_target_editFG = ",traffic_target";
 }
+
+if (has_rights (ACX_DISTRIBUTION) || (isset($id_diller) && $id_diller > 0))  {
+	$HD_Form -> AddEditElement (gettext("SUBSCRIBER"),
+								"id_diller",
+								'$value',
+								"INPUT",
+								'size=30 maxlength=20 readonly style="color: gray;"',
+								"6",
+								"", "", "", "", "", "", "", "", "");
+
+	$HD_Form -> AddEditElement (gettext("MARGIN").", %%",
+								"margin",
+								'$value',
+								"INPUT",
+								"size=10 maxlength=3",
+								"27", "(0..100)%",
+								"", "", "", "", "", "", "NO", "");
+
+	$distribution_editFG = ",id_diller,margin";
+
+	$HD_Form -> AddEditElement (gettext("PAYPAL PAYMENT"),
+								"paypal",
+								$paypal,
+								"SELECT",
+								"",
+								"",
+								"",
+								"list", "", "", "", $yesno_list, "%1", "", gettext("Apply PayPal payment to this customer"));
+	$distribution_editFG .= ",paypal";
+
+}
+
 if (CAPTCHA_ENABLE) {
 	$HD_Form->AddEditElement(gettext("VERIFICATION"),
 								"captchacode",
 								'$value',
 								"CAPTCHAIMAGE",
-								"size=10 maxlength=6", "19",
+								"size=10 maxlength=6",
+								"19",
 								gettext("Insert code from above picture"), "", "", "", "", "", "", "", "", CAPTCHA_ENABLE);
-	$captcha = "captchacode,";
+	$captcha = ",captchacode";
 }
 
 if (!$agent_conf && strpos($callPlan_idlist, ',') !== false && !($subscriber_signup>0)) {
 	$HD_Form->FieldEditElement('username, useralias, uipass, credit, ' . $language_editFG . ' tariff, id_didgroup, id_campaign,' .
 	'callback, activated, simultaccess, ' . $currency_editFG . ' runservice, typepaid, creditlimit, firstusedate, enableexpire,' .
-	'expirationdate, expiredays, vat, ' . $lastname_editFG . $firstname_editFG . $company_name_editFG . ' email,' . $address_editFG .
+	'expirationdate, expiredays, vat, ' . $lastname_editFG . $firstname_editFG . $company_name_editFG . ' email' . $address_editFG .
 	$city_editFG . $state_editFG . $country_editFG . $zipcode_editFG . $id_timezone_editFG . $phone_editFG . $fax_editFG .
-	$company_website_editFG . $VAT_RN_editFG . $VAT_editFG . $traffic_editFG . $traffic_target_editFG . $captcha . ' sip_buddy, iax_buddy, inuse');
+	$company_website_editFG . $VAT_RN_editFG . $VAT_editFG . $traffic_editFG . $traffic_target_editFG . $distribution_editFG . $captcha);
 } else {
 	$HD_Form->FieldEditElement('username, useralias, uipass, credit, ' . $language_editFG .		' id_didgroup, id_campaign,' .
 	'callback, activated, simultaccess, ' . $currency_editFG . ' runservice, typepaid, creditlimit, firstusedate, enableexpire,' .
-	'expirationdate, expiredays, vat, ' . $lastname_editFG . $firstname_editFG . $company_name_editFG . ' email,' . $address_editFG .
+	'expirationdate, expiredays, vat, ' . $lastname_editFG . $firstname_editFG . $company_name_editFG . ' email' . $address_editFG .
 	$city_editFG . $state_editFG . $country_editFG . $zipcode_editFG . $id_timezone_editFG . $phone_editFG . $fax_editFG .
-	$company_website_editFG . $VAT_RN_editFG . $VAT_editFG . $traffic_editFG . $traffic_target_editFG . $captcha . ' sip_buddy, iax_buddy, inuse');
+	$company_website_editFG . $VAT_RN_editFG . $VAT_editFG . $traffic_editFG . $traffic_target_editFG . $distribution_editFG . $captcha);
 }
 
 if (!isset ($myusername))
@@ -414,7 +477,9 @@ $iax_account = $A2B->config["signup"]['iax_account'] ? 1 : 0;
 $amaflag = $A2B->config["signup"]['amaflag'];
 $context = $A2B->config["signup"]['context'];
 
-if ($A2B->config["signup"]['activated']) {
+if (has_rights (ACX_DISTRIBUTION))
+	$status = 1;
+elseif ($A2B->config["signup"]['activated']) {
 	// Status : 1 - Active
 	$status = $A2B->config["signup"]['activatedbyuser'] ? '1' : '3';
 } else {
@@ -464,7 +529,7 @@ if (is_numeric($subscriber_signup)) {
 	$HD_Form->FG_ADITION_HIDDEN_PARAM_VALUE = "$subscriber_signup";
 }
 
-$HD_Form->FG_FILTER_APPLY = true;
+$HD_Form->FG_FILTER_APPLY = false;
 $HD_Form->FG_FILTERFIELD = 'cardnumber';
 $HD_Form->FG_FILTERFIELDNAME = 'cardnumber';
 $HD_Form->FG_FILTER_FORM_ACTION = 'list';
@@ -474,14 +539,13 @@ $HD_Form->FG_INTRO_TEXT_ASK_DELETION = gettext("If you really want remove this "
 $HD_Form->FG_INTRO_TEXT_ADD = gettext("you can add easily a new " . $HD_Form->FG_INSTANCE_NAME . ".<br>Fill the following fields and confirm by clicking on the button add.");
 
 $HD_Form->FG_INTRO_TEXT_ADITION = '';
-$HD_Form->FG_TEXT_ADITION_CONFIRMATION = "<font>" . gettext("Thanks for registering with us.<br>A email with your information has been sent to your account ") . $_POST["email"] . "<br><br><b>" . gettext("Your card number is ") . $maxi . "</b><br><b>" . gettext("Your password is ") . $pass . "</b></font>";
+$HD_Form->FG_TEXT_ADITION_CONFIRMATION = "<font>" . gettext("Thanks for registering with us.<br>A email with information about your account has been sent to ") . $_POST["email"] . "<br><br><b>" . gettext("Your card number is ") . $maxi . "</b><br><b>" . gettext("Your login is ") . $maxi2 . "</b><br><b>" . gettext("Your password is ") . $pass . "</b></font>";
 
 $HD_Form->FG_BUTTON_EDITION_SRC = $HD_Form->FG_BUTTON_ADITION_SRC = Images_Path . "/cormfirmboton.gif";
 $HD_Form->FG_ADD_PAGE_CONFIRM_BUTTON = gettext("SIGNUP");
 
+//$HD_Form->FG_ADDITIONAL_FUNCTION_BEFORE_ADD = 'convert_username_to_id';
 $HD_Form->FG_ADDITIONAL_FUNCTION_AFTER_ADD = 'processing_card_signup';
 
 $HD_Form->FG_GO_LINK_AFTER_ACTION_EDIT = $_SERVER['PHP_SELF'] . "?atmenu=document&stitle=Document&wh=AC&id=";
 $HD_Form->FG_GO_LINK_AFTER_ACTION_DELETE = $_SERVER['PHP_SELF'] . "?atmenu=document&stitle=Document&wh=AC&id=";
-
-

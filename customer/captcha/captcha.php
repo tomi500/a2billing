@@ -8,7 +8,7 @@ $code = MDP_STRING(6);
 $_SESSION["captcha_code"] = $code;
 $seed = MDP_NUMERIC(6);
 
-$captcha_gd = 1;
+$captcha_gd = true;
 
 if ($captcha_gd)
 {

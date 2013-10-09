@@ -115,7 +115,10 @@
 	    $show_logo .= '<a href="http://www.wmtransfer.com/" target="_blank"><img src="' . KICON_PATH . '/webmoney_virified.png" alt="WebMoney"/></a>' . ' &nbsp; ';
 	}
     }
-if (true==false) $show_logo .= <<<'EOD'
+
+    $show_logo .= '<a href="http://www.gnu.org/licenses/agpl.html" target="_blank"><img src="' . KICON_PATH . '/agplv3-155x51.png" alt="AGPLv3"/></a> &nbsp; ';
+
+    $show_logo .= <<<'EOD'
 <!--LiveInternet counter-->
 <script type="text/javascript">
 document.write("<a href='http://www.liveinternet.ru/click' "+
@@ -129,9 +132,86 @@ screen.colorDepth:screen.pixelDepth))+";u"+escape(document.URL)+
 </script>
 <!--/LiveInternet-->
 EOD;
+
     echo '<table style="width:100%;margin:0 auto;" align="center">
     <tr><td valign="top" align="center" class="tableBodyRight">' . $show_logo . '
     </td></tr></table>';
+
+// -= Need to install GeoIP http://ua2.php.net/manual/en/geoip.setup.php =-
+    $country = (function_exists('geoip_country_code3_by_name'))?geoip_country_code3_by_name($_SERVER['REMOTE_ADDR']):'USA';
+    if (array_search($country,array('UKR','RUS','BLR','GEO','KAZ'))!==false && true==false) echo <<<'EOT'
+
+    <table style='width:708;height:60;display:block;border:0;margin:0;padding:0;margin-left:auto;margin-right:auto;'>
+    <tr><td valign='top'>
+<!-- Ukrainian Banner Network 120х60 START -->
+    <center><script>
+//<!--
+    ubn_user = "99874";
+    ubn_page = "1";
+    ubn_pid = Math.round((Math.random() * (10000000 - 1)));
+    document.write("<iframe src='http://banner.kiev.ua/cgi-bin/bi.cgi?h" +
+    ubn_user + "&amp;"+ ubn_pid + "&amp;" + ubn_page +
+    "&amp;4' frameborder=0 vspace=0 hspace=0 " +
+    " width=120 height=60 marginwidth=0 marginheight=0 scrolling=no>");
+    document.write("<a href='http://banner.kiev.ua/cgi-bin/bg.cgi?" +
+    ubn_user + "&amp;"+ ubn_pid + "&amp;" + ubn_page + "' target=_top>");
+    document.write("<img border=0 src='http://banner.kiev.ua/" +
+    "cgi-bin/bi.cgi?i" + ubn_user + "&amp;" + ubn_pid + "&amp;" + ubn_page +
+    "&amp;4' width=120 height=60 alt='Ukrainian Banner Network'></a>");
+    document.write("</iframe>");
+//-->
+    </script>
+    </center>
+<!-- Ukrainian Banner Network 120х60 END -->
+    </td>
+    <td valign='top'>
+<!-- Ukrainian Banner Network 468x60 START -->
+    <center><script>
+//<!--
+    ubn_user = "99874";
+    ubn_page = "1";
+    ubn_pid = Math.round((Math.random() * (10000000 - 1)));
+    document.write("<iframe src='http://banner.kiev.ua/cgi-bin/bi.cgi?h" +
+    ubn_user + "&amp;"+ ubn_pid + "&amp;" + ubn_page +
+    "' frameborder=0 vspace=0 hspace=0 " +
+    " width=468 height=60 marginwidth=0 marginheight=0 scrolling=no>");
+    document.write("<a href='http://banner.kiev.ua/cgi-bin/bg.cgi?" +
+    ubn_user + "&amp;"+ ubn_pid + "&amp;" + ubn_page + "' target=_top>");
+    document.write("<img border=0 src='http://banner.kiev.ua/" +
+    "cgi-bin/bi.cgi?i" + ubn_user + "&amp;" + ubn_pid + "&amp;" + ubn_page +
+    "' width=468 height=60 alt='Украинская Баннерная Сеть'></a>");
+    document.write("</iframe>");
+//-->
+    </script>
+    </a></small>
+    </center>
+<!-- Ukrainian Banner Network 468x60 END -->
+    </td>
+    <td valign='top'>
+<!-- Ukrainian Banner Network 120х60 START -->
+    <center><script>
+//<!--
+    ubn_user = "99874";
+    ubn_page = "1";
+    ubn_pid = Math.round((Math.random() * (10000000 - 1)));
+    document.write("<iframe src='http://banner.kiev.ua/cgi-bin/bi.cgi?h" +
+    ubn_user + "&amp;"+ ubn_pid + "&amp;" + ubn_page +
+    "&amp;4' frameborder=0 vspace=0 hspace=0 " +
+    " width=120 height=60 marginwidth=0 marginheight=0 scrolling=no>");
+    document.write("<a href='http://banner.kiev.ua/cgi-bin/bg.cgi?" +
+    ubn_user + "&amp;"+ ubn_pid + "&amp;" + ubn_page + "' target=_top>");
+    document.write("<img border=0 src='http://banner.kiev.ua/" +
+    "cgi-bin/bi.cgi?i" + ubn_user + "&amp;" + ubn_pid + "&amp;" + ubn_page +
+    "&amp;4' width=120 height=60 alt='Ukrainian Banner Network'></a>");
+    document.write("</iframe>");
+//-->
+    </script>
+    </center>
+<!-- Ukrainian Banner Network 120х60 END -->
+
+    </td></tr>
+    </table>
+EOT;
 {/php}
 
     </div>

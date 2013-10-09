@@ -122,16 +122,16 @@ $FG_TABLE_COL [] = array (gettext ( "Date" ), "starttime", "11%", "center", "SOR
 $FG_TABLE_COL [] = array (gettext ( "CallerID" ), "src", "6%", "center", "SORT", "30" );
 $FG_TABLE_COL [] = array (gettext ( "DNID" ), "dnid", "6%", "center", "SORT", "30" );
 $FG_TABLE_COL [] = array (gettext ( "Phone Number" ), "calledstation", "6%", "center", "SORT", "30", "", "", "", "", "", "" );
-$FG_TABLE_COL [] = array (gettext ( "Destination" ), "dest","9%", "center", "SORT", "15", "lie", "cc_prefix", "destination,prefix", "prefix='%id'", "%1" );
-$FG_TABLE_COL [] = array (gettext ( "Buy Rate" ), "buyrate", "5%", "center", "SORT", "30", "", "", "", "", "", "display_2bill" );
-$FG_TABLE_COL [] = array (gettext ( "Sell Rate" ), "rateinitial", "5%", "center", "SORT", "30", "", "", "", "", "", "display_2bill" );
+$FG_TABLE_COL [] = array (gettext ( "Destination" ), "dest","9%", "center", "SORT", "20", "lie", "cc_prefix", "destination,prefix", "prefix='%id'", "%1" );
+$FG_TABLE_COL [] = array (gettext ( "Buy Rate" ), "buyrate", "5%", "center", "SORT", "30", "", "", "", "", "", "display_money_nocur" );
+$FG_TABLE_COL [] = array (gettext ( "Sell Rate" ), "rateinitial", "5%", "center", "SORT", "30", "", "", "", "", "", "display_money_nocur" );
 $FG_TABLE_COL [] = array (gettext ( "Duration" ), "sessiontime", "3%", "center", "SORT", "30", "", "", "", "", "", "display_minute" );
 $FG_TABLE_COL [] = array (gettext ( "Account" ), "card_id", "5%", "center", "sort", "", "lie_link", "cc_card", "username,id", "id='%id'", "%1", "", "A2B_entity_card.php" );
 $FG_TABLE_COL [] = array (gettext ( "Trunk" ), "trunkcode", "11%", "center", "SORT", "30" );
 $FG_TABLE_COL [] = array ('<acronym title="' . gettext ( "Terminate Cause" ) . '">' . gettext ( "TC" ) . '</acronym>', "terminatecauseid", "2%", "center", "SORT", "", "list", $dialstatus_list );
 $FG_TABLE_COL [] = array (gettext ( "CallType" ), "sipiax", "1%", "center", "SORT", "", "list", $list_calltype );
-$FG_TABLE_COL [] = array (gettext ( "Buy" ), "buycost", "5%", "center", "SORT", "30", "", "", "", "", "", "display_2bill" );
-$FG_TABLE_COL [] = array (gettext ( "Sell" ), "sessionbill", "5%", "center", "SORT", "30", "", "", "", "", "", "display_2bill" );
+$FG_TABLE_COL [] = array (gettext ( "Buy" ), "buycost", "5%", "center", "SORT", "30", "", "", "", "", "", "display_money_nocur" );
+$FG_TABLE_COL [] = array (gettext ( "Sell" ), "sessionbill", "5%", "center", "SORT", "30", "", "", "", "", "", "display_money_nocur" );
 $FG_TABLE_COL [] = array (gettext ( "Margin" ), "margin", "3%", "center", "SORT", "30", "", "", "", "", "", "display_2dec_percentage" );
 $FG_TABLE_COL [] = array (gettext ( "Markup" ), "markup", "3%", "center", "SORT", "30", "", "", "", "", "", "display_2dec_percentage" );
 

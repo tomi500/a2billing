@@ -797,7 +797,7 @@ class SOAP_A2Billing
 	 */
     //Default values ($activated = true, $status = 1, $simultaccess = 0, $typepaid =0, $sip=1, $iax=1, $voicemail_enabled = true)
     //$status : 1 Active
-    function Create_Customer($security_key, $instance, $id_callplan, $id_didgroup, $units, $accountnumber_len, $balance, $activated, $status,  $simultaccess, $currency, $typepaid, $sip, $iax,  $language, $voicemail_enabled, $country)
+    function Create_Customer($security_key, $instance, $id_callplan, $id_didgroup, $units, $accountnumber_len, $balance, $activated, $status, $simultaccess, $currency, $typepaid, $sip, $iax,  $language, $voicemail_enabled, $country, $diller=0, $margin=0)
     {
         $arr_check = $this->Check_KeyInstance($security_key, $instance);
 		if ($arr_check[0] == 'ERROR') {
@@ -815,7 +815,7 @@ class SOAP_A2Billing
 		
 		if (strlen($country)==3)
 			$country = strtoupper($country);
-		else 
+		else
 			$country = 'USA';
 		
 		if (strlen($language)==2)
@@ -825,13 +825,19 @@ class SOAP_A2Billing
 		
 		if ($activated)
 			$activated = 't';
-	    else
-	        $activated = 'f';
-		
+		else
+			$activated = 'f';
+
+		$QUERY = "SELECT id FROM cc_card WHERE username='$diller'";
+		$result = $this->instance_table -> SQLExec ($this->DBHandle, $QUERY);
+		if (!is_array($result)) {
+		    $diller = $result[0][0];
+		}
+
 		$instance_realtime = new Realtime();
         
 	    $FG_ADITION_SECOND_ADD_TABLE = "cc_card";
-	    $FG_ADITION_SECOND_ADD_FIELDS = "username, useralias, credit, tariff, country, language, activated, simultaccess, currency, typepaid, uipass, id_group, id_didgroup, sip_buddy, iax_buddy";
+	    $FG_ADITION_SECOND_ADD_FIELDS = "username, useralias, credit, tariff, country, language, activated, simultaccess, currency, typepaid, uipass, id_group, id_didgroup, sip_buddy, iax_buddy, id_diller, margin";
 
 	    if (DB_TYPE != "postgres") {
 		    $FG_ADITION_SECOND_ADD_FIELDS .= ",creationdate ";
@@ -844,7 +850,7 @@ class SOAP_A2Billing
 	    if (isset ($sip) && $sip == 1)
             $sip_buddy = 1;
         
-        if (isset ($iax) && $iax == 1)
+	    if (isset ($iax) && $iax == 1)
             $iax_buddy = 1;
         
 	    //initialize refill parameter
@@ -862,7 +868,7 @@ class SOAP_A2Billing
 		    $passui_secret = MDP_NUMERIC(10);
 		
 		    $FG_ADITION_SECOND_ADD_VALUE = "'$accountnumber', '$useralias', '$balance', '$id_callplan', '$country', '$language', '$activated', ".
-		                         " $simultaccess, '$currency', $typepaid, '$passui_secret', '$id_group', '$id_didgroup', $sip_buddy, $iax_buddy";
+		                         "$simultaccess, '$currency', $typepaid, '$passui_secret', '$id_group', '$id_didgroup', $sip_buddy, $iax_buddy, $diller, $margin";
             
 		    if (DB_TYPE != "postgres")
 			    $FG_ADITION_SECOND_ADD_VALUE .= ", now() ";
@@ -949,7 +955,7 @@ class SOAP_A2Billing
 		$arr_did = array();
 		
 		$begin_date = date("Y");
-	    $begin_date_plus = date("Y")+25;	
+	    $begin_date_plus = date("Y")+25;
 	    $end_date = date("-m-d H:i:s");
 	    $startingdate = $begin_date.$end_date;
 	    $expirationdate = $begin_date_plus.$end_date;

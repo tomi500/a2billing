@@ -163,6 +163,51 @@ class FormBO {
 		return false;
 	}
 
+	static public function check_add_card_refill_diller()
+	{
+		$FormHandler = FormHandler::GetInstance();
+		$processed = $FormHandler->getProcessed();
+		$credit = $processed['credit'];
+		$card_id = $processed['card_id'];
+		$id_diller = $_SESSION['card_id'];
+
+		//check if enought credit
+		$instance_table = new Table("cc_card", "credit");
+		$FG_TABLE_CLAUSE_DILLER = "id='$id_diller'";
+		$diller_info = $instance_table -> Get_list ($FormHandler -> DBHandle, $FG_TABLE_CLAUSE_DILLER, null, null, null, null, null, null);
+		$credit_diller = $diller_info[0][0];
+		$FG_TABLE_CLAUSE_CUSTOMER = "id='$card_id'";
+		$customer_info = $instance_table -> Get_list ($FormHandler -> DBHandle, $FG_TABLE_CLAUSE_CUSTOMER, null, null, null, null, null, null);
+		$credit_customer = $customer_info[0][0];
+		if ($id_diller == $processed['diller_id'] && (($credit > 0 && $credit_diller >= $credit) || ($credit < 0 && -$credit <= $credit_customer))) return true;
+
+		return false;
+	}
+
+	static public function add_card_refill_diller()
+	{
+		global $A2B;
+		$FormHandler = FormHandler::GetInstance();
+		$processed = $FormHandler->getProcessed();
+		$credit = $processed['credit'];
+		$card_id = $processed['card_id'];
+		$id_diller = $_SESSION['card_id'];
+
+		$instance_table = new Table("cc_card");
+
+		//  Substract credit for diller
+		$param_update_diller = "credit = credit - '".$credit."'";
+		$FG_TABLE_CLAUSE_DILLER = "id='$id_diller'";
+		$instance_table -> Update_table ($FormHandler -> DBHandle, $param_update_diller, $FG_TABLE_CLAUSE_DILLER, $func_table = null);
+
+		// REFILL CARD
+		$param_update_card = "credit = credit + '".$credit."'";
+		$clause_update_card = "id='$card_id'";
+		$instance_table -> Update_table ($FormHandler->DBHandle, $param_update_card, $clause_update_card, $func_table = null);
+
+		return true;
+	}
+
 	static public function ticket_add()
 	{
 		global $A2B;
@@ -358,18 +403,36 @@ class FormBO {
 		$credit = $processed['credit'];
 		
 		if ($credit>0) {
-			$field_insert = " credit,agent_id, description";
+			$field_insert = " credit, agent_id, description";
 			$agent_id = $FormHandler -> RESULT_QUERY;
 			$description = gettext("CREATION AGENT REFILL");
 			$value_insert = "'$credit', '$agent_id', '$description' ";
 			$instance_refill_table = new Table("cc_logrefill_agent", $field_insert);
-			$instance_refill_table -> Add_table ($FormHandler->DBHandle, $value_insert, null, null);	
+			$instance_refill_table -> Add_table ($FormHandler->DBHandle, $value_insert, null, null);
 		}
 	}
 	
 	static public function processing_card_signup()
 	{
 		$FormHandler = FormHandler::GetInstance();
+		$processed = $FormHandler->getProcessed();
+		$diller = $processed['id_diller'];
+		$margin = $processed['margin'] / 100 + 1;
+		sleep(1);
+		$table_card = new Table('cc_card','id, margintotal');
+		$card_clause = "username = ".$diller;
+		$card_result = $table_card -> Get_list($FormHandler->DBHandle, $card_clause, 0);
+		if (is_array($card_result) && count($card_result)>0) {
+			$id_diller = $card_result[0][0];
+			$margintotal = $margin * $card_result[0][1];
+		} else {
+			$id_diller = 0;
+			$margintotal = 1;
+		}
+		$param_update_card = "id_diller = $id_diller, margintotal = $margintotal";
+		$clause_update_card = " id_diller = $diller ORDER BY id DESC LIMIT 1";
+		$table_card -> Update_table ($FormHandler->DBHandle, $param_update_card, $clause_update_card, 'LOW_PRIORITY cc_card');
+
 		if (RELOAD_ASTERISK_IF_SIPIAX_CREATED) {
 			self::create_sipiax_friends_reload();
 		} else {
@@ -378,6 +441,65 @@ class FormBO {
 		
 		self::create_subscriptions();
 		self::create_notification_signup();
+	}
+	
+	static public function processing_sipiax_generate()
+	{
+		$FormHandler = FormHandler::GetInstance();
+		require_once (dirname(__FILE__)."/../phpagi/phpagi-asmanager.php");
+		$as = new AGI_AsteriskManager();
+		if (USE_REALTIME) {
+			$res =@  $as->connect(MANAGER_HOST,MANAGER_USERNAME,MANAGER_SECRET);
+			if ($res) {
+				$processed = $FormHandler->getProcessed();
+				$peername = $processed['name'];
+				if ($FormHandler->FG_TABLE_NAME == 'cc_sip_buddies')	{
+					$res = $as->Command('sip unregister '.$peername);
+					$res = $as->Command('sip prune realtime peer '.$peername);
+				} else	$res = $as->Command('iax2 prune realtime '.$peername);
+				$as->disconnect();
+			} else {
+				echo "Error : Manager Connection";
+			}
+		} else {
+			$instance_realtime = new Realtime();
+			if ($FormHandler->FG_TABLE_NAME == 'cc_sip_buddies')
+				$instance_realtime -> create_trunk_config_file ('sip');
+			else	$instance_realtime -> create_trunk_config_file ('iax');
+		}
+		if (RELOAD_ASTERISK_IF_SIPIAX_CREATED) {
+	// RELOAD SIP & IAX CONF && CONNECTING  connect($server=NULL, $username=NULL, $secret=NULL)
+			$res =@  $as->connect(MANAGER_HOST,MANAGER_USERNAME,MANAGER_SECRET);
+			if ($res) {
+				if ($FormHandler->FG_TABLE_NAME == 'cc_sip_buddies')	$res = $as->Command('sip reload');
+				else							$res = $as->Command('iax2 reload');
+	// && DISCONNECTING
+				$as->disconnect();
+			} else {
+				echo "Error : Manager Connection";
+			}
+		}
+	}
+	
+	static public function processing_sipiax_generate_by_admin()
+	{
+		if (USE_REALTIME) {
+			$FormHandler = FormHandler::GetInstance();
+			require_once (dirname(__FILE__)."/../phpagi/phpagi-asmanager.php");
+			$as = new AGI_AsteriskManager();
+			$res =@  $as->connect(MANAGER_HOST,MANAGER_USERNAME,MANAGER_SECRET);
+			if ($res) {
+				$processed = $FormHandler->getProcessed();
+				$peername = $processed['name'];
+				if ($FormHandler->FG_TABLE_NAME == 'cc_sip_buddies')	{
+					$res = $as->Command('sip unregister '.$peername);
+					$res = $as->Command('sip prune realtime peer '.$peername);
+				} else	$res = $as->Command('iax2 prune realtime '.$peername);
+				$as->disconnect();
+			} else {
+				echo "Error : Manager Connection";
+			}
+		}
 	}
 	
 	static public function create_subscriptions()
@@ -519,6 +641,27 @@ class FormBO {
 		self::create_invoice_after_refill();
 	}
 	
+	static public function processing_diller_refill_add()
+	{
+		$FormHandler = FormHandler::GetInstance();
+		self::add_card_refill_diller();
+	}
+	
+	/*
+	 * static public function to edit a DID Destination and set the DID user
+	 */
+	static public function did_destination_edit()
+	{
+		global $A2B;
+		$FormHandler = FormHandler::GetInstance();
+		$processed = $FormHandler->getProcessed();
+		
+		$instance_table = new Table();
+		$id_cc_did = $processed['id_cc_did'];
+		$id_cc_card = $processed['id_cc_card'];
+		$QUERY1 = "UPDATE cc_did set iduser = " . $id_cc_card . ",reserved=1 where id = '" . $id_cc_did . "'";
+		$result = $instance_table->SQLExec($FormHandler->DBHandle, $QUERY1, 0);
+	}
 	/*
 	 * static public function to add a new DID Destination and set the DID use & Charge correctly
 	 */
@@ -537,7 +680,7 @@ class FormBO {
 		// the DID is used by an other user, we might want to change
 		// the DID is new nothing in cc_did_use
 				
-		$QUERY_DID = "SELECT cc_did_use.id, cc_did_use.id_cc_card, cc_did.fixrate, billingtype, releasedate ".
+		$QUERY_DID = "SELECT cc_did_use.id, cc_did_use.id_cc_card, cc_did.fixrate, billingtype, releasedate, did ".
 		             "FROM cc_did_use ".
 		             "LEFT JOIN cc_did ON cc_did.id = cc_did_use.id_did ".
 		             "WHERE id_did ='".$id_cc_did."'" .
@@ -567,8 +710,8 @@ class FormBO {
 			// The did ownership has changed and we need to update. (regardless of how it's billed)
 			if( $result_did[0]['billingtype'] == 0 || $result_did[0]['billingtype'] == 1 ) {
 				$rate = $result_did[0]['fixrate'];
-				$QUERY1 = "INSERT INTO cc_charge (id_cc_card, amount, chargetype, id_cc_did) VALUES ".
-				           "('" . $id_cc_card . "', '" . $rate . "', '2','" . $id_cc_did . "')";
+				$QUERY1 = "INSERT INTO cc_charge (id_cc_card, amount, description, chargetype, id_cc_did, charged_status) VALUES ".
+				           "('" . $id_cc_card . "', '" . $rate . "', 'DID: ".$result_did[0]['did']."', '2','" . $id_cc_did . "', '1')";
 				$result = $instance_table->SQLExec($FormHandler->DBHandle, $QUERY1, 0);
 
 				$QUERY1 = "UPDATE cc_card set credit = credit -" . $rate . " where id = '" . $id_cc_card . "'";
@@ -619,7 +762,7 @@ class FormBO {
 				// < 2, not 1 because destination is deleted after this call.
 				$choose_did = $result_did_dest[0]['did_id'];
 				
-				$QUERY = "UPDATE cc_did SET iduser = 0, reserved=0 WHERE id=$choose_did";
+				$QUERY = "UPDATE cc_did SET iduser = 0, reserved = 0, voicebox = NULL WHERE id=$choose_did";
 				$result = $instance_table->SQLExec($FormHandler->DBHandle, $QUERY, 0);
 
 				$QUERY = "UPDATE cc_did_use SET releasedate = now() WHERE id_did =$choose_did and activated = 1";
@@ -709,7 +852,7 @@ class FormBO {
 		$table_charge = new Table("cc_charge", "*");
 		$result =  $table_charge -> Get_list($FormHandler->DBHandle, $clause_charge." AND charged_status = 1");
 		if (is_array($result)) {
-			$field_insert = "date, id_card, title, description,status";
+			$field_insert = "date, id_card, title, description, status";
 			$title = gettext("SUMMARY OF CHARGE");
 			$date = date("Y-m-d h:i:s");
 			$description = gettext("Summary of the charge charged since the last billing.");
@@ -1127,6 +1270,7 @@ class FormBO {
 		global $A2B;
 		$FormHandler = FormHandler::GetInstance();
 		$id_card = $FormHandler -> RESULT_QUERY;
+//		echo "id_card==========".$id_card;
 		NotificationsDAO::AddNotification("added_new_signup",Notification::$MEDIUM,Notification::$CUST,$id_card,Notification::$LINK_CARD,$id_card);
 	}
 }

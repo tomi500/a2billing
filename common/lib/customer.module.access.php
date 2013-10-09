@@ -38,25 +38,27 @@ error_reporting(E_ALL & ~E_NOTICE);
 define ("MODULE_ACCESS_DOMAIN",		"A2Billing - VoIP Billing Software");
 define ("MODULE_ACCESS_DENIED",		"./Access_denied.htm");
 
-define ("ACX_ACCESS",						1);	
-define ("ACX_PASSWORD",						2);	
-define ("ACX_SIP_IAX",						4);			// 1 << 1
-define ("ACX_CALL_HISTORY",					8);			// 1 << 2
-define ("ACX_PAYMENT_HISTORY",   			16);		// 1 << 3
-define ("ACX_VOUCHER",   					32);		// 1 << 4
-define ("ACX_INVOICES",   					64);		// 1 << 5
-define ("ACX_DID",   						128);		// 1 << 6
-define ("ACX_SPEED_DIAL",   				256);		// 1 << 7
-define ("ACX_RATECARD",   				    512);		// 1 << 8
-define ("ACX_SIMULATOR",   					1024);		// 1 << 9
-define ("ACX_CALL_BACK",   					2048);		// 1 << 10
-define ("ACX_WEB_PHONE",					4096);		// 1 << 11
-define ("ACX_CALLER_ID",					8192);		// 1 << 12
-define ("ACX_SUPPORT",						16384);		// 1 << 14
-define ("ACX_NOTIFICATION",					32768);		// 1 << 15
-define ("ACX_AUTODIALER",					65536);		// 1 << 16
-define ("ACX_PERSONALINFO",					131072);	
-define ("ACX_SEERECORDING",					262144);
+define ("ACX_ACCESS",						      1);
+define ("ACX_PASSWORD", 					      2);
+define ("ACX_SIP_IAX",						      4);	// 1 << 1
+define ("ACX_CALL_HISTORY",					      8);	// 1 << 2
+define ("ACX_PAYMENT_HISTORY",					     16);	// 1 << 3
+define ("ACX_VOUCHER",						     32);	// 1 << 4
+define ("ACX_INVOICES", 					     64);	// 1 << 5
+define ("ACX_DID",						    128);	// 1 << 6
+define ("ACX_SPEED_DIAL",					    256);	// 1 << 7
+define ("ACX_RATECARD", 					    512);	// 1 << 8
+define ("ACX_SIMULATOR",					   1024);	// 1 << 9
+define ("ACX_CALL_BACK",					   2048);	// 1 << 10
+define ("ACX_WEB_PHONE",					   4096);	// 1 << 11
+define ("ACX_CALLER_ID",					   8192);	// 1 << 12
+define ("ACX_SUPPORT",						  16384);	// 1 << 14
+define ("ACX_NOTIFICATION",					  32768);	// 1 << 15
+define ("ACX_AUTODIALER",					  65536);	// 1 << 16
+define ("ACX_PERSONALINFO",					 131072);
+define ("ACX_SEERECORDING",					 262144);
+define ("ACX_DISTRIBUTION",					 524288);
+define ("ACX_SURVEILLANCE",					1048576);
 
 header("Expires: Sat, Jan 01 2000 01:01:01 GMT");
 
@@ -136,6 +138,8 @@ if ((!isset($_SESSION['pr_login']) || !isset($_SESSION['pr_password']) || !isset
 			$_SESSION["gmtoffset"]		= $return[7];
 			$_SESSION["currency"]		= $return["currency"];
 			$_SESSION["voicemail"]		= $return[8];
+			$_SESSION["email"]		= $return[12];
+			$_SESSION["margin_diller"]	= $return[13];
 		}
 	} else {
 		$_SESSION["cus_rights"]=0;
@@ -156,7 +160,7 @@ function login ($user, $pass)
     $pass = filter_var($pass, FILTER_SANITIZE_STRING);
 
 	$QUERY = "SELECT cc.username, cc.credit, cc.status, cc.id, cc.id_didgroup, cc.tariff, cc.vat, ct.gmtoffset, cc.voicemail_permitted, " .
-			 "cc.voicemail_activated, cc_card_group.users_perms, cc.currency " .
+			 "cc.voicemail_activated, cc_card_group.users_perms, cc.currency, cc.email, cc.margin_diller " .
 			 "FROM cc_card cc LEFT JOIN cc_timezone AS ct ON ct.id = cc.id_timezone LEFT JOIN cc_card_group ON cc_card_group.id=cc.id_group " .
 			 "WHERE (cc.email = '".$user."' OR cc.useralias = '".$user."') AND cc.uipass = '".$pass."'";
 			 
@@ -175,7 +179,7 @@ function login ($user, $pass)
 		else
 			return -1;
 	}
-	
+	$_SESSION["user_alias"] = $user;
 	return ($row[0]);
 }
 
@@ -187,24 +191,26 @@ function has_rights ($condition)
 }
 
 
-$ACXPASSWORD 				= has_rights (ACX_PASSWORD);
-$ACXSIP_IAX 				= has_rights (ACX_SIP_IAX);
-$ACXCALL_HISTORY 			= has_rights (ACX_CALL_HISTORY);
+$ACXPASSWORD				= has_rights (ACX_PASSWORD);
+$ACXSIP_IAX				= has_rights (ACX_SIP_IAX);
+$ACXCALL_HISTORY			= has_rights (ACX_CALL_HISTORY);
 $ACXPAYMENT_HISTORY			= has_rights (ACX_PAYMENT_HISTORY);
 $ACXVOUCHER				= has_rights (ACX_VOUCHER);
 $ACXINVOICES				= has_rights (ACX_INVOICES);
 $ACXDID					= has_rights (ACX_DID);
-$ACXSPEED_DIAL 				= has_rights (ACX_SPEED_DIAL);
-$ACXRATECARD 				= has_rights (ACX_RATECARD);
-$ACXSIMULATOR 				= has_rights (ACX_SIMULATOR);
+$ACXSPEED_DIAL				= has_rights (ACX_SPEED_DIAL);
+$ACXRATECARD				= has_rights (ACX_RATECARD);
+$ACXSIMULATOR				= has_rights (ACX_SIMULATOR);
 $ACXWEB_PHONE				= has_rights (ACX_WEB_PHONE);
 $ACXCALL_BACK				= has_rights (ACX_CALL_BACK);
 $ACXCALLER_ID				= has_rights (ACX_CALLER_ID);
-$ACXSUPPORT 				= has_rights (ACX_SUPPORT);
-$ACXNOTIFICATION 			= has_rights (ACX_NOTIFICATION);
-$ACXAUTODIALER 				= has_rights (ACX_AUTODIALER);
-$ACXSEERECORDING 			= has_rights (ACX_SEERECORDING);
-$ACX_PERSONALINFO 			= has_rights (ACX_PERSONALINFO);
+$ACXSUPPORT				= has_rights (ACX_SUPPORT);
+$ACXNOTIFICATION			= has_rights (ACX_NOTIFICATION);
+$ACXAUTODIALER				= has_rights (ACX_AUTODIALER);
+$ACXSEERECORDING			= has_rights (ACX_SEERECORDING);
+$ACX_PERSONALINFO			= has_rights (ACX_PERSONALINFO);
+$ACXDISTRIBUTION			= has_rights (ACX_DISTRIBUTION);
+$ACXSURVEILLANCE			= has_rights (ACX_SURVEILLANCE);
 
 if (ACT_VOICEMAIL) {
     $ACXVOICEMAIL 				= $_SESSION["voicemail"];

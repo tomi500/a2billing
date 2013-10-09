@@ -3531,7 +3531,7 @@ msgid "An activation email has been sent to"
 msgstr "Un E-mail de confirmare a fost trimis la"
 
 #: A2B_entity_did.php:82
-msgid "The following Destinaton-DID has been relesed:"
+msgid "The following Destination-DID has been released:"
 msgstr "Destinatia pentru DID stearsa"
 
 #: A2B_entity_did.php:108

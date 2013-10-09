@@ -78,13 +78,13 @@ $HD_Form -> FG_DELETION = true;
 
 
 $HD_Form -> AddEditElement (gettext("SPEEDDIAL"),
-				   "speeddial",
-				   "",
-				   "SELECT",
-				   "",
-				   "",
-				   "",
-				   "list" , "", "",	"", $speeddial_list, "%1", "", "" );
+			   "speeddial",
+			   "",
+			   "SELECT",
+			   "",
+			   "",
+			   "",
+			   "list" , "", "",	"", $speeddial_list, "%1", "", "" );
 
 
 $HD_Form -> AddEditElement (gettext("NAME"),

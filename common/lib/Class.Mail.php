@@ -31,6 +31,7 @@
  * 
  * 
 **/
+//include (dirname(__FILE__)."/Class.Connection.php");
 
 class A2bMailException extends Exception {
 }
@@ -43,6 +44,7 @@ class Mail {
 	private $from_email = '';
 	private $from_name = '';
 	private $to_email = '';
+	private $attachfile = '';
 	
 	//mail type
 	static public $TYPE_PAYMENT = 'payment';
@@ -62,6 +64,18 @@ class Mail {
 	static public $TYPE_TICKET_NEW = 'new_ticket';
 	static public $TYPE_TICKET_MODIFY = 'modify_ticket';
 	static public $TYPE_INVOICE_TO_PAY = 'invoice_to_pay';
+
+	static public $TYPE_FAX_SUCCESS = 'fax_success';
+	static public $TYPE_FAX_FAILED = 'fax_failed';
+
+	//Used by mail type = fax_success AND fax_failed
+	static public $FAX_CID_NUMBER = '$cid_number$';
+	static public $FAX_CID_NAME = '$cid_name$';
+	static public $FAX_COUNT = '$count$';
+	static public $FAX_DEST_EXTEN = '$dest_exten$';
+	static public $FAX_DATETIME = '$datetime$';
+	static public $FAX_RESULT = '$fax_result$';
+	static public $FAX_FORMAT = '$format$';
 
 	//Used by mail type = invoice_to_pay
 	static public $INVOICE_TITLE_KEY = '$invoice_title$';
@@ -107,6 +121,11 @@ class Mail {
 	static public $ITEM_ID_KEY = '$itemID$';
 	static public $PAYMENT_METHOD_KEY = '$paymentMethod$';
 	static public $PAYMENT_STATUS_KEY = '$paymentStatus$';
+	static public $PAYMENT_FEE_KEY = '$paymentFee$';
+	static public $PAYMENT_VAT_KEY = '$paymentVAT$';
+	static public $PAYMENT_VATAMOUNT_KEY = '$paymentVATamount$';
+	static public $PAYMENT_AMOUNT_KEY = '$paymentAmount$';
+	static public $PAYMENT_CURCURRENCY_KEY = '$paymentCurCurrency$';
 
 	//used by type = payment and type = epaymentverify
 	static public $ITEM_AMOUNT_KEY = '$itemAmount$';
@@ -128,9 +147,9 @@ class Mail {
 	//used in all mail
 	static public $SYSTEM_CURRENCY = '$base_currency$';
 
-	function __construct($type, $id_card = null, $lg = null, $msg = null, $title = null)
+	function __construct($type, $id_card = null, $lg = null, $msg = null, $title = null, &$DBHandle = null)
 	{		
-		$DBHandle = Connection::GetDBHandler();
+		if ($DBHandle === null) $DBHandle = Connection::GetDBHandler();
 		
 		if (!empty ($type)) {
 			$tmpl_table = new Table("cc_templatemail", "*");
@@ -282,6 +301,11 @@ class Mail {
 	{
 		$this->from_name = $from_name;
 	}
+	
+	function AddAttachment($attachfile)
+	{
+		$this->attachfile = $attachfile;
+	}
 
 	function send($to_email = null)
 	{
@@ -289,7 +313,7 @@ class Mail {
 			$this->to_email = $to_email;
 		}
 		try {
-			a2b_mail($this->to_email, $this->title, $this->message, $this->from_email, $this->from_name);
+			a2b_mail($this->to_email, $this->title, $this->message, $this->from_email, $this->from_name, null, $this->attachfile);
 		} catch (phpmailerException $e) {
         	throw new A2bMailException("Error sent mail : ".$e->getMessage()."\n");
         }

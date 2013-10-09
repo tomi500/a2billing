@@ -123,7 +123,7 @@ $FG_COL_QUERY='t1.dnid ,count(*) as count,avg(rc.buyrate) as buyrate ,avg(rc.rat
 
 $FG_COL_QUERY_GRAPH='t1.callstart, t1.duration';
 
-$FG_LIMITE_DISPLAY=10000;
+$FG_LIMITE_DISPLAY=20000;
 $FG_NB_TABLE_COL=count($FG_TABLE_COL);
 $FG_EDITION=true;
 $FG_TOTAL_TABLE_COL = $FG_NB_TABLE_COL;
