@@ -1016,7 +1016,7 @@ class FormHandler
 		
 		// 10
 		$this -> FG_regular[]  = array("^(19|20)\d\d-((0[1-9]|1[012])-(0[1-9]|[12]\d)|(0[13-9]|1[012])-30|(0[13578]|1[02])-31) (([0,1]\d)|(2[0-3])):[0-5]\d:[0-5]\d$",
-						"(YYYY-MM-DD HH:MM:SS)");
+						gettext("(YYYY-MM-DD HH:MM:SS)"));
 
 		// 11
 		$this -> FG_regular[]  = array(    "^.{2}",

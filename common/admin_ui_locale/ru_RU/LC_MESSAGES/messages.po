@@ -1525,6 +1525,30 @@ msgstr ""
 msgid "(PERCENT FORMAT WITH/WITHOUT DECIMAL, use '.' for decimal and don't use '%' character. e.g.: 12.4 )"
 msgstr ""
 
+#: lib/Form/Class.FormHandler.inc.php:1067
+msgid "('-1' OR NUMBER)"
+msgstr "('-1' или ЧИСЛО)"
+
+#: lib/Form/Class.FormHandler.inc.php:1077
+msgid "(ONLY MAX TWO NUMBERS WITH COMMA SEPARATED)"
+msgstr "(ОДНО или ДВА ЧИСЛА, РАЗДЕЛЁННЫЕ ЗАПЯТОЙ)"
+
+#: lib/Form/Class.FormHandler.inc.php:1087
+msgid "(ONLY NUMERIC CHARACTERS WITH/WITHOUT COMMA SEPARATED)"
+msgstr "(ТОЛЬКО ОДНО или НЕСКОЛЬКО чисел, РАЗДЕЛЁННЫХ ЗАПЯТОЙ)"
+
+#: lib/Form/Class.FormHandler.inc.php:1097
+msgid "(INTEGER NUMBER)"
+msgstr "(ЦЕЛОЕ ЧИСЛО)"
+
+#: lib/Form/Class.FormHandler.inc.php:1107
+msgid "Correct the expiry period"
+msgstr "Формат ввода"
+
+#: lib/Form/Class.FormHandler.inc.php:1117
+msgid "(YYYY-MM-DD HH:MM:SS)"
+msgstr "(ГГГГ-ММ-ДД ЧЧ:ММ:СС)"
+
 #: lib/Form/Class.FormHandler.inc.php:1737
 msgid "error deletion"
 msgstr "ошибка удаления"
@@ -4623,11 +4647,11 @@ msgstr "УДАЛИТЬ ПРЕФИКС"
 
 #: Public/form_data/FG_var_trunk.inc:184
 msgid "Insert the removeprefix"
-msgstr ""
+msgstr "Введите префикс/ы удаления"
 
 #: Public/form_data/FG_var_trunk.inc:185
 msgid "Remove prefix from the dialed digits."
-msgstr ""
+msgstr "Список префиксов, которые будут отрезаны от набираемого номера"
 
 #: Public/form_data/FG_var_trunk.inc:187
 msgid "PROVIDER TECH"
