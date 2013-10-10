@@ -1031,7 +1031,7 @@ class FormHandler
 						"(NUMBER FORMAT OR 'defaultprefix' OR ASTERISK/POSIX REGEX FORMAT)");
 		
 		// 14  - DNID PREFIX FOR RATECARD
-		$this -> FG_regular[]  = array(	"^(all|[0-9]+)$",
+		$this -> FG_regular[]  = array(	"^(all|\d+)$",
 						"(NUMBER FORMAT OR 'all')");
 		
 		// 15 - RATECARD TIME
@@ -1074,20 +1074,32 @@ class FormHandler
 						gettext("(ONLY 1 NUMERIC CHARACTER [1-9] OR NOTHING)"));
 		
 		// 24
-		$this -> FG_regular[]  = array(	"^0|(([1-9]+\d*|0[1-9]+\d*)(\,([1-9]+\d*|0[1-9]+\d*))?)$",
-						gettext("(ONLY NUMERIC CHARACTERS WITH/WITHOUT COMMA SEPARATED)"));
+		$this -> FG_regular[]  = array(	"^(0|(([1-9]+\d*|0[1-9]+\d*)(\,([1-9]+\d*|0[1-9]+\d*))?))$",
+						gettext("(ONLY MAX TWO NUMBERS WITH COMMA SEPARATED)"));
 		
-		// 25
+		// 25 - Check numeric array with comma, eg. 34,56,056,39
 		$this -> FG_regular[]  = array(	"^\d+(\,\d+)*$",
 						gettext("(ONLY NUMERIC CHARACTERS WITH/WITHOUT COMMA SEPARATED)"));
 		
-		// 26
+		// 26 - Password check for correct
 		$this -> FG_regular[]  = array(	"(?=^.{8,}$)((?=.*\d)|(?=.*\W+))(?![.\n])(?=.*[A-Z])(?=.*[a-z]).*$",
 						gettext("(AT LEAST 8 CHARACTERS)"));
 		
 		// 27 -> Check integer percent from 0 to 100
 		$this -> FG_regular[]  = array(	"^(\d|[1-9]\d|100)$",
 						"");
+		
+		// 28
+		$this -> FG_regular[]  = array(	"^[1-9]+\d*(\,[1-9]+\d*)*$",
+						gettext("(ONLY MAX TWO NUMBERS WITH COMMA SEPARATED)"));
+		
+		// 29
+		$this -> FG_regular[]  = array(	"^((-1)|\d+)$",
+						gettext("('-1' OR NUMBER)"));
+		
+		// 30
+		$this -> FG_regular[]  = array(	"^[1-9]+\d*$",
+						gettext("(INTEGER NUMBER)"));
 		
 	}
 	

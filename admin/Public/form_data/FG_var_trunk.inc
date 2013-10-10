@@ -248,7 +248,7 @@ $HD_Form -> AddEditElement (gettext("CURRENT CONNECTIONS"),
 	"",
 	"INPUT",
 	"size=30 $def_value_inuse maxlength=30",
-	"12",
+	"4",
 	gettext("Number of current connections"),
 	"" , "", "", "", "", "", "", gettext("Updated to show the number of channels currently in use on this trunk.If there are no channels in use, and the system shows that there are, manually reset this field back to zero.") );
 
@@ -257,7 +257,7 @@ $HD_Form -> AddEditElement (gettext("MAXIMUM CONNECTIONS"),
 	"",
 	"INPUT",
 	"size=30 $def_value_maxuse maxlength=30",
-	"12",
+	"29",
 	gettext("Number of maximum simultaneous connections"),
 	"" , "", "", "", "", "", "", gettext("The maximum number of channels available to this trunk. Set to -1 to have an unlimited number of channels") );
 
@@ -373,9 +373,9 @@ $HD_Form -> AddEditElement(gettext("BILLING BLOCK")." A",
 	'$value',
 	"INPUT",
 	"size=30 $def_billblocksec maxlength=20",
-	"4",
+	"30",
 	gettext("Insert the billing block"),
-	"" , "", "", "", "", "", "NO", gettext("Set the billing increment in seconds"));
+	"", "", "", "", "", "", "", gettext("Set the billing increment in seconds"));
 
 $HD_Form -> AddEditElement(gettext("PERIOD")." A",
 	"perioda",
@@ -384,7 +384,7 @@ $HD_Form -> AddEditElement(gettext("PERIOD")." A",
 	"size=30 $def_billblocksec maxlength=20",
 	"4",
 	gettext("Insert the period")." A",
-	"" , "", "", "", "", "" , "NO", gettext("Define period in days. Set '0' if you want define EXPIRY PERIOD only. Set '31' for per month period."));
+	"", "", "", "", "", "", "", gettext("Define period in days. Set '0' if you want define EXPIRY PERIOD only. Set '31' for per month period."));
 
 $HD_Form -> AddEditElement(gettext("EXPIRY PERIOD")." A",
 	"periodexpirya",
@@ -401,7 +401,7 @@ $HD_Form -> AddEditElement (gettext("MIN TIME LEFT FOR CALL")." A",
 	"",
 	"INPUT",
 	"size=30 $def_timeleft maxlength=30",
-	"12",
+	"4",
 	gettext("Number of time left in seconds"),
 	"" , "", "", "", "", "", "", gettext("Goto selected random trunks if time left less than seconds defined."));
 
@@ -410,7 +410,7 @@ $HD_Form -> AddEditElement(gettext("MAXIMUM SECONDS PER PERIOD")." A",
 	"",
 	"INPUT",
 	"size=30 $def_maxsecperperiod maxlength=30",
-	"12",
+	"29",
 	gettext("Number of maximum seconds per period"),
 	"" , "", "", "", "", "", "", gettext("Maximum q-ty of seconds allowed for current dial-prefix. Set '-1' for unlimited."));
 
@@ -493,7 +493,7 @@ $HD_Form -> AddEditElement(gettext("BILLING BLOCK")." B",
 	'$value',
 	"INPUT",
 	"size=30 $def_billblocksec maxlength=20",
-	"4",
+	"30",
 	gettext("Insert the billing block"),
 	"" , "", "", "", "", "", "NO", gettext("Set the billing increment in seconds"));
 
@@ -521,7 +521,7 @@ $HD_Form -> AddEditElement (gettext("MIN TIME LEFT FOR CALL")." B",
 	"",
 	"INPUT",
 	"size=30 $def_timeleft maxlength=30",
-	"12",
+	"4",
 	gettext("Number of time left in seconds"),
 	"" , "", "", "", "", "", "", gettext("Goto selected random trunks if time left less than seconds defined."));
 
@@ -530,7 +530,7 @@ $HD_Form -> AddEditElement (gettext("MAXIMUM SECONDS PER PERIOD")." B",
 	"",
 	"INPUT",
 	"size=30 $def_maxsecperperiod maxlength=30",
-	"12",
+	"29",
 	gettext("Number of maximum seconds per period"),
 	"" , "", "", "", "", "", "", gettext("Maximum q-ty of seconds allowed for current dial-prefix. Set '-1' for unlimited."));
 

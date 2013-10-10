@@ -212,7 +212,7 @@ $HD_Form -> AddEditElement (gettext("REPLACE BY PREFIX"),
 			"$value",
 			"INPUT",
 			"size=30 maxlength=30 ",
-			"",
+			"28",
 			"",
 			"" , "", "", "", "" , "" , "", gettext("Present this CallerID, when calls are made to countries from listed prefixes. Insert the replaceable prefixes separated by comma, e.g. for UK,IT,RU,UA are '44,39,7,380'."));
 
