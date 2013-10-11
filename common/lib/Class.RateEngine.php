@@ -1931,7 +1931,7 @@ $A2B -> debug( ERROR, $agi, __FILE__, __LINE__, " [===================          
 				$this -> real_answeredtime = $this -> answeredtime = 0;
 				if ($A2B->agiconfig['busy_timeout'] > 0 && !(!$A2B->extext && $A2B->voicemail && !is_null($A2B->voicebox))) {
 					$res_busy = $agi->exec("Busy ".$A2B->agiconfig['busy_timeout']);
-				} elseif (!(!$A2B->extext && $A2B->voicemail && !is_null($A2B->voicebox))) {
+				} elseif (!(!$A2B->extext && $A2B->voicemail && !is_null($A2B->voicebox)) && !isset($A2B->transferername[0])) {
 					$A2B -> let_stream_listening($agi);
 					$agi-> stream_file('prepaid-isbusy', '#');
 				}

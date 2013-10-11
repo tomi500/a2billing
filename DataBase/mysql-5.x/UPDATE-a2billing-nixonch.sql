@@ -150,9 +150,10 @@ ALTER TABLE cc_sip_buddies
   CHANGE `fullcontact` `fullcontact` VARCHAR( 80 ) CHARACTER SET utf8 COLLATE utf8_bin NULL DEFAULT NULL ,
   CHANGE `type` `type` ENUM( 'friend', 'user', 'peer' ) CHARACTER SET utf8 COLLATE utf8_bin NULL DEFAULT 'friend' ,
   CHANGE `callingpres` `callingpres` ENUM( 'allowed_not_screened', 'allowed_passed_screen', 'allowed_failed_screen', 'allowed', 'prohib_not_screened', 'prohib_passed_screen', 'prohib_failed_screen', 'prohib' ) CHARACTER SET utf8 COLLATE utf8_bin NULL DEFAULT NULL ,
-  CHANGE `usereqphone` `usereqphone` ENUM('yes','no') CHARACTER SET utf8 COLLATE utf8_bin NULL DEFAULT NULL;
-ALTER TABLE cc_sip_buddies
-  CHANGE `DEFAULTip` `defaultip` CHAR( 50 ) CHARACTER SET utf8 COLLATE utf8_bin NULL DEFAULT NULL;
+  CHANGE `usereqphone` `usereqphone` ENUM('yes','no') CHARACTER SET utf8 COLLATE utf8_bin NULL DEFAULT NULL,
+  CHANGE `DEFAULTip` `defaultip` CHAR( 50 ) CHARACTER SET utf8 COLLATE utf8_bin NULL DEFAULT NULL,
+  CHANGE `allowtransfer` `allowtransfer` ENUM('yes','no') CHARACTER SET utf8 COLLATE utf8_bin NULL DEFAULT NULL,
+  CHANGE `subscribemwi` `subscribemwi` ENUM('yes','no') CHARACTER SET utf8 COLLATE utf8_bin NULL DEFAULT NULL;
 
 ALTER TABLE cc_iax_buddies ADD `forceencryption` varchar(20) COLLATE utf8_bin NOT NULL;
 ALTER TABLE cc_iax_buddies ADD `external` INT( 11 ) NOT NULL DEFAULT '0';
