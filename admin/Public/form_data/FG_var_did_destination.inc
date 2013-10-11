@@ -132,7 +132,7 @@ $HD_Form -> AddEditElement (gettext("TIMEOUT"),
 	"size=50 maxlength=3",
 	"22",
 	gettext("Insert max 3 digits"),
-	"", "", "", "", "", "", "", gettext("Maximum time, in seconds, that the Dial command is to wait for a channel to answer"));
+	"", "", "", "", "", "", "", gettext("Maximum time, in seconds, that the Dial command is to wait for a channel to answer.</br><font color=red>Affect for QUEUE!</font>"));
 
 $HD_Form -> AddEditElement (gettext("VOIP_CALL"),
 	"voip_call",

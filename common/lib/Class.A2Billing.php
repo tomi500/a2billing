@@ -4210,7 +4210,7 @@ $this -> debug( ERROR, $agi, __FILE__, __LINE__, "FAXRESOLUTION: ".$faxresolutio
 		$sepafter = ($this->config['global']['asterisk_version'] == "1_2" || $this->config['global']['asterisk_version'] == "1_4")?'|':',';
 		$sepbefore = ($sepafter == "|")?',':'|';
 		$parameters = str_replace($sepbefore, $sepafter, $parameters);
-		if (isset($this->time_out) && $this->time_out != "" && !strpos($parameters, $this -> agiconfig['monitor_formatfile']) && $parameters != "StopMixMonitor") {
+		if (isset($this->time_out) && $this->time_out != "" && !strpos($parameters, $this -> agiconfig['monitor_formatfile']) && $parameters != "StopMixMonitor" && stripos($parameters,"QUEUE ") !== 0) {
 			$wer = explode($sepafter, $parameters);
 			$wer[1] = $this->time_out;
 			$parameters = implode($sepafter, $wer);
