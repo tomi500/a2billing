@@ -162,9 +162,9 @@ $HD_Form -> AddEditElement (gettext("PHONE NUMBER"),
 			    '$value',
 			    "INPUT",
 			    "size=50 maxlength=50",
-			    "22",
+			    "18",
 			    gettext("Enter the phone"),
-			    "", "", "", "", "", "", "", gettext("Enter the phone number for immediatly dial instead prompt to dial"));
+			    "", "", "", "", "", "", "NO", gettext("Enter the phone number for immediatly dial instead prompt to dial"));
 
 $HD_Form -> AddEditElement (gettext("CALLBACK"),
 			   "callback",

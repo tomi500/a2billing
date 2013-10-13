@@ -1091,7 +1091,7 @@ class FormHandler
 		
 		// 28
 		$this -> FG_regular[]  = array(	"^[1-9]+\d*(\,[1-9]+\d*)*$",
-						gettext("(ONLY MAX TWO NUMBERS WITH COMMA SEPARATED)"));
+						gettext("(ONLY NUMERIC CHARACTERS WITH/WITHOUT COMMA SEPARATED)"));
 		
 		// 29
 		$this -> FG_regular[]  = array(	"^((-1)|\d+)$",

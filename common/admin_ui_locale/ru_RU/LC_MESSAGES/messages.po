@@ -806,7 +806,7 @@ msgstr ""
 #: Public/form_data/FG_var_payment.inc:63
 #: Public/form_data/FG_var_payment_agent.inc:65
 msgid "REFILL"
-msgstr "ЗАПОЛНИТЬ"
+msgstr "ПОПОЛНЕНИЕ"
 
 #: lib/Form/Class.FormBO.php:840 lib/Form/Class.FormBO.php:949
 msgid "Invoice for refill"
@@ -1548,6 +1548,10 @@ msgstr "Формат ввода"
 #: lib/Form/Class.FormHandler.inc.php:1117
 msgid "(YYYY-MM-DD HH:MM:SS)"
 msgstr "(ГГГГ-ММ-ДД ЧЧ:ММ:СС)"
+
+#: lib/Form/Class.FormHandler.inc.php:1127
+msgid "(Phone Number format or Skype nickname)"
+msgstr "(допускается номер телефона или Skype имя)"
 
 #: lib/Form/Class.FormHandler.inc.php:1737
 msgid "error deletion"
@@ -11446,7 +11450,7 @@ msgstr ""
 
 #: Public/templates/default/main.tpl:315 Public/templates/default/main.tpl:323
 msgid "Refills"
-msgstr ""
+msgstr "Пополнения"
 
 #: Public/templates/default/main.tpl:316 Public/templates/default/main.tpl:324
 msgid "Payments"
@@ -11458,7 +11462,7 @@ msgstr ""
 
 #: Public/templates/default/main.tpl:318
 msgid "Charges"
-msgstr ""
+msgstr "Списания"
 
 #: Public/templates/default/main.tpl:319
 #, fuzzy

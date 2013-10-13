@@ -34,7 +34,7 @@ if ($type == 'payment') {
 	$HD_Form->AddViewElement(gettext("PAYMENT INCL FEE"), "payment", "40%", "center", "sort", "", "", "", "", "", "", "display_2bill");
 	$HD_Form->AddViewElement(gettext("DESCRIPTION"), "description", "30%", "center", "sort");
 
-	$HD_Form->FieldViewElement("t2.date, t2.payment, t2.description");
+	$HD_Form->FieldViewElement("t2.date + INTERVAL UNIX_TIMESTAMP('".display_GMT('1970-01-02', $_SESSION['gmtoffset'], 1)."')-75600 SECOND AS date, t2.payment, t2.description");
 
 } elseif ($type == 'invoice') {
 	$list_sql = "cc_invoice " .
@@ -48,7 +48,7 @@ if ($type == 'payment') {
 	$HD_Form->AddViewElement(gettext("DATE"), "date", "50%", "center", "sort", "30", "", "", "", "", "", "display_dateformat");
 	$HD_Form->AddViewElement(gettext("AMOUNT INCL VAT"), "total_price", "50%", "center", "sort", "", "", "", "", "", "", "display_2bill");
 
-	$HD_Form->FieldViewElement("cc_invoice.date, total_price");
+	$HD_Form->FieldViewElement("cc_invoice.date + INTERVAL UNIX_TIMESTAMP('".display_GMT('1970-01-02', $_SESSION['gmtoffset'], 1)."')-75600 SECOND AS date, total_price");
 
 } elseif ($type == 'sipiax') {
 	$atmenu = ($atmenu=='IAX')?$atmenu:'SIP';
@@ -79,87 +79,3 @@ $HD_Form->CV_FOLLOWPARAMETERS = "&popup_select=" . $popup_select . "&id=$id&type
 $HD_Form->FG_EDITION = false;
 $HD_Form->FG_DELETION = false;
 $HD_Form->FG_ADDITION = false;
-
-/**
-
-getpost_ifset(array('id', 'card_id', 'date', 'payment','description','added_refill','refill_type'));
-
-
-if (!isset($form_action) || $form_action=="list") {
-	$HD_Form = new FormHandler("cc_logpayment LEFT JOIN cc_card ON cc_card.id=card_id","Payment");
-} else {
-	$HD_Form = new FormHandler("cc_logpayment","Payment");
-}
-
-$HD_Form -> FG_TABLE_ID = 'cc_logpayment.id';
-
-$HD_Form -> FG_DEBUG = 0;
-$HD_Form -> FG_TABLE_DEFAULT_SENS = "DESC";
-
-if (has_rights (ACX_MODIFY_PAYMENTS)) {
-	$HD_Form ->FG_LIST_ADDING_BUTTON1 = true;
-	$HD_Form ->FG_LIST_ADDING_BUTTON_LINK1 = "A2B_entity_payment.php?form_action=ask-add&section=".$_SESSION["menu_section"];
-	$HD_Form ->FG_LIST_ADDING_BUTTON_ALT1 = $HD_Form ->FG_LIST_ADDING_BUTTON_MSG1 = gettext("Add Payment");
-	$HD_Form ->FG_LIST_ADDING_BUTTON_IMG1 = Images_Path ."/money_add.png";
-}
-
-$list_refill_type = Constants::getRefillType_List();
-$HD_Form -> AddViewElement(gettext("ID"), "cc_logpayment.id", "10%", "center", "sort");
-$HD_Form -> AddViewElement(gettext("ACCOUNT"), "username", "17%", "center", "sort", "", "30", "", "", "", "", "linktocustomer_id");
-$HD_Form -> AddViewElement(gettext("PAYMENT DATE"), "date", "17%", "center", "sort", "30", "", "", "", "", "", "display_dateformat");
-$HD_Form -> AddViewElement(gettext("PAYMENT AMOUNT"), "payment", "15%", "center", "sort","", "", "", "", "", "", "display_money");
-$HD_Form -> AddViewElement(gettext("PAYMENT TYPE"),"payment_type", "13%", "center", "sort", "", "list", $list_refill_type);
-$HD_Form -> AddViewElement(gettext("REFILL"), "id_logrefill", "17%", "center", "sort", "", "lie_link", "cc_logrefill", "TRUNCATE(credit,2), id", "id='%id'", "%1 ".BASE_CURRENCY." (id:%2)", "", "A2B_refill_info.php");
-
-$HD_Form -> FieldViewElement ('cc_logpayment.id, card_id, date, payment ,payment_type,id_logrefill');
-
-
-$HD_Form -> CV_NO_FIELDS  = gettext("THERE IS NO ".strtoupper($HD_Form->FG_INSTANCE_NAME)." CREATED!"); 
-$HD_Form -> CV_DISPLAY_LINE_TITLE_ABOVE_TABLE = false;
-$HD_Form -> CV_TEXT_TITLE_ABOVE_TABLE = '';
-$HD_Form -> CV_DISPLAY_FILTER_ABOVE_TABLE = false;
-$HD_Form -> FG_INFO = true;
-$HD_Form -> FG_INFO_LINK = "A2B_payment_info.php?id=";
-
-
-
-$HD_Form -> FG_FILTER_SEARCH_TOP_TEXT = gettext('Define specific criteria to search for payments created.');
-$HD_Form -> FG_FILTER_SEARCH_1_TIME = true;
-$HD_Form -> FG_FILTER_SEARCH_1_TIME_TEXT = gettext('DATE');
-$HD_Form -> FG_FILTER_SEARCH_1_TIME_FIELD = 'date';
-$HD_Form -> FG_FILTER_SEARCH_DELETE_ALL =false;
-
-if (!($popup_select>=1))	 $HD_Form -> FG_FILTER_SEARCH_FORM = true;
-
-$HD_Form -> FG_FILTER_SEARCH_SESSION_NAME = 'payment_cust_selection';
-
-$HD_Form -> FG_FILTER_SEARCH_TOP_TEXT = gettext('Define specific criteria to search for payments created.');
-$HD_Form -> FG_FILTER_SEARCH_1_TIME = true;
-$HD_Form -> FG_FILTER_SEARCH_1_TIME_TEXT = gettext('DATE');
-$HD_Form -> FG_FILTER_SEARCH_1_TIME_FIELD = 'date';
-
-$HD_Form -> AddSearchElement_C1(gettext("ACCOUNT NUMBER"), 'username','usernametype');
-$HD_Form -> AddSearchElement_C1(gettext("LASTNAME"),'lastname','lastnametype');
-$HD_Form -> AddSearchElement_C1(gettext("FIRSTNAME"),'firstname','firstnametype');
-
-
-$HD_Form -> FG_FILTER_APPLY = false;
-$HD_Form -> FG_FILTERFIELD = 'cardnumber';
-$HD_Form -> FG_FILTERFIELDNAME = 'account number';
-$HD_Form -> FG_FILTER_FORM_ACTION = 'list';
-
-if (isset($filterprefix)  &&  (strlen($filterprefix)>0)) {
-	if (strlen($HD_Form -> FG_TABLE_CLAUSE)>0) $HD_Form -> FG_TABLE_CLAUSE.=" AND ";
-	$HD_Form -> FG_TABLE_CLAUSE.="username like '$filterprefix%'";
-}
-
-
-if (has_rights (ACX_MODIFY_PAYMENTS)) {
-	
-	$HD_Form -> FG_ADDITION = true;
-	$HD_Form -> FG_EDITION = true;
-	$HD_Form -> FG_DELETION = true;
-	
-
-}
-**/

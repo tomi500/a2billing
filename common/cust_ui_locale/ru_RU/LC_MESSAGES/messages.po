@@ -2119,14 +2119,13 @@ msgstr "УДАЛИТЬ"
 
 #: lib/Form/Class.FormHandler.inc.php:619
 #: lib/Form/Class.FormHandler.inc.php:837
-#, fuzzy
 msgid "Delete this "
-msgstr "Удалить"
+msgstr "Удалить "
 
 #: lib/Form/Class.FormHandler.inc.php:620
 #: lib/Form/Class.FormHandler.inc.php:831
 msgid "Edit this "
-msgstr "Редактировать"
+msgstr "Редактировать "
 
 #: lib/Form/Class.FormHandler.inc.php:651
 #, fuzzy
@@ -2224,6 +2223,14 @@ msgstr "(как минимум 6 символов)"
 #, php-format
 msgid "(PERCENT FORMAT WITH/WITHOUT DECIMAL, use '.' for decimal and don't use '%' character. e.g.: 12.4 )"
 msgstr "(В ПРОЦЕНТАХ С ЛИБО БЕЗ РАЗДЕЛИТЕЛЯ, . для разделителя, без символа )"
+
+#: lib/Form/Class.FormHandler.inc.php:1065
+msgid "(ONLY NUMERIC CHARACTERS WITH/WITHOUT COMMA SEPARATED)"
+msgstr "(ДОПУСКАЕТСЯ ОДНО или НЕСКОЛЬКО чисел, РАЗДЕЛЁННЫХ ЗАПЯТОЙ)"
+
+#: lib/Form/Class.FormHandler.inc.php:1075
+msgid "(Phone Number format or Skype nickname)"
+msgstr "(допускается номер телефона или Skype имя)"
 
 #: lib/Form/Class.FormHandler.inc.php:1737
 #: CC_entity_edit_did_destination.php:233
