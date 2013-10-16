@@ -96,7 +96,7 @@ if (!$A2B->DbConnect()) {
 $instance_table = new Table();
 
 // CHECK THE CARD WITH DID'S
-$QUERY = "SELECT id_did, reservationdate, month_payed, fixrate, cc_card.id, credit, email, did, typepaid, creditlimit, reminded" .
+$QUERY = "SELECT id_did, reservationdate, month_payed, fixrate, cc_card.id, credit, email, did, typepaid, creditlimit, reminded, UNIX_TIMESTAMP(cc_did.expirationdate) expirationdate" .
 		 " FROM (cc_did_use INNER JOIN cc_card on cc_card.id=id_cc_card) INNER JOIN cc_did ON (id_did=cc_did.id)" .
 		 " WHERE ( releasedate IS NULL OR releasedate < '1984-01-01 00:00:00') AND cc_did_use.activated=1 AND cc_did.billingtype < 2" .
 		 " ORDER BY cc_card.id ASC";
@@ -158,12 +158,10 @@ foreach ($result as $mydids) {
 	write_log(LOGFILE_CRONT_BILL_DIDUSE, basename(__FILE__) . ' line:' . __LINE__ . " day_remaining=$day_remaining <=" . (intval($daytopay) * $oneday));
 	
 	if ($day_remaining >= 0) {
-		if ($day_remaining <= (intval($daytopay) * $oneday) || ($mydids[8] * $mydids[9] + $mydids[5]) >= $mydids[3]) {
-			//type of user prepaid 
-//			if ($mydids['reminded'] == 0) {
+		if (($day_remaining <= (intval($daytopay) * $oneday) || ($mydids[8] * $mydids[9] + $mydids[5]) >= $mydids[3] || $mydids[3] == 0) && $mydids[11] > time()) {
+
 				// THE USER HAVE TO PAY FOR HIS DID NOW
-				
-				if (($mydids[8] * $mydids[9] + $mydids[5]) >= $mydids[3]) {
+				if (($mydids[8] * $mydids[9] + $mydids[5]) >= $mydids[3] || $mydids[3] == 0) {
 					
 					// USER HAVE ENOUGH CREDIT TO PAY FOR THE DID
 					$QUERY = "UPDATE cc_card SET credit = credit - {$mydids[3]} WHERE id=" . $mydids[4];
@@ -194,7 +192,8 @@ foreach ($result as $mydids) {
 					$mail -> replaceInEmail(Mail::$BALANCE_REMAINING_KEY,$mydids[5] - $mydids[3]);
 					$mail -> replaceInEmail(Mail::$DID_NUMBER_KEY,$mydids[7]);
 					$mail -> replaceInEmail(Mail::$DID_COST_KEY,$mydids[3]);
-					
+
+				//type of user prepaid
 				} elseif ($mydids['reminded'] == 0) {
 					// USER DONT HAVE ENOUGH CREDIT TO PAY FOR THE DID - WE WILL WARN HIM
 
@@ -252,7 +251,6 @@ foreach ($result as $mydids) {
 					if ($verbose_level >= 1)
 						echo "==> UPDATE DID USE QUERY: $QUERY\n";
 				}
-//			}
 			
 		} else {
 			// RELEASE THE DID 
