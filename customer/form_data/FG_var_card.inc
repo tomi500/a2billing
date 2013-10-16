@@ -106,8 +106,8 @@ $HD_Form -> AddEditElement (gettext("COUNTRY"),
 			   "", "", "",
 			   "sql",
 			   "cc_country",
-			   "countryname, countrycode",
-			   "", "", "%1", "", "", "", '' );
+			   "countryname, countrycode, countryprefix",
+			   "", "", "%1 +%3", "", "", "", '' );
 
 
 $HD_Form -> AddEditElement (gettext("ZIP/POSTAL CODE"),

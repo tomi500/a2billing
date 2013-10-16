@@ -214,7 +214,7 @@ $HD_Form -> AddEditElement (gettext("REPLACE BY PREFIX"),
 			"size=30 maxlength=30 ",
 			"28",
 			"",
-			"" , "", "", "", "" , "" , "", gettext("Present this CallerID, when calls are made to countries from listed prefixes. Insert the replaceable prefixes separated by comma, e.g. for UK,IT,RU,UA are '44,39,7,380'."));
+			"", "", "", "", "", "", "NO", gettext("Present this CallerID, when calls are made to countries from listed prefixes. Insert the replaceable prefixes separated by comma, e.g. for UK,IT,RU,UA are '44,39,7,380'."));
 
 $HD_Form -> FieldEditElement ('activated, cid, verify, id_cc_card, callback, phonenumber, warning_threshold, say_rateinitial, say_balance_after_call, cli_replace, cli_localreplace, cli_otherreplace, cli_prefixreplace');
 

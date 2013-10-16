@@ -53,8 +53,13 @@ $actived_list = Constants::getActivationList();
 $billingtype_list = Constants::getBillingTypeList();
 // -- billtype: 0 = fix per month + dialoutrate, 1= fix per month, 2 = dialoutrate, 3 = free
 $billingtype_list_short = Constants::getBillingTypeShortList();
-$yesno = Constants::getYesNoList();
-
+$scu = $yesno = Constants::getYesNoList();
+$scu[0][0] = gettext("Personal CIDs");
+$scu[1][0] = gettext("All CIDs");
+//For future
+//$scu[] = array( gettext("Client`s & Personal CIDs").'&nbsp;', "2");
+//
+$scu[] = array( gettext("CID Ignore"), "3");
 
 $HD_Form -> AddViewElement(gettext("DID"), "did", "13%", "center", "sort");
 $HD_Form -> AddViewElement(gettext("CUSTOMER"), "iduser", "15%", "center", "sort", "", "lie_link", "cc_card", "lastname, id, firstname", "id='%id'", "%1 %3", "", "A2B_entity_card.php");
@@ -143,11 +148,12 @@ $HD_Form -> AddEditElement (gettext("DID AFTER RECALL"),
 $HD_Form -> AddEditElement (gettext("SUPER CID USE"),
 	"allciduse",
 	'0',
-	"RADIOBUTTON",
+	"SELECT",
 	"",
 	"",
 	"",
-	"" , "", "", gettext("Yes").":1, - ".gettext("No").":0", "", "", "" , gettext("Allow for all active CallerIDs at system to use that DID for direct access (DISA), rather than just for active CallerIDs of customer."));
+	"list", "", "", "", $scu, "%1", "",
+	gettext("Allow for all active CallerIDs at system to use that DID for direct access (DISA), rather than just for active CallerIDs of customer."));
 
 $HD_Form -> AddEditElement (gettext("VERIFY CALLERID"),
 	"verify_callerid",
@@ -231,8 +237,8 @@ $HD_Form -> AddEditElement (gettext("COUNTRY"),
 	"", "", "",
 	"sql",
 	"cc_country",
-	"countryname, id",
-	"", "", "%1", "", "");
+	"countryname, id, countryprefix",
+	"", "", "%1 +%3", "", "");
 
 $HD_Form -> AddEditElement (gettext("MONTHLY RATE"),
 	"fixrate",

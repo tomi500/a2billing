@@ -262,7 +262,7 @@ begin
 	insert into cc_voicemail_users(customer_id, context, mailbox, password, fullname, email, language)
 	select S.id_cc_card, S.accountcode, S.regexten, '0000', concat(C.lastname,' ',C.firstname) fullname, C.email, S.language
 	from cc_sip_buddies S, cc_card C
-	where S.regexten IS NOT NULL AND S.regexten != '' AND S.id_cc_card =C.id;
+	where S.regexten IS NOT NULL AND S.regexten<>'' AND S.id_cc_card=C.id;
     end if;
 end //
 

@@ -252,11 +252,11 @@ $A2B -> debug( ERROR, $agi, __FILE__, __LINE__, "cc_did.id=".$result[0][3]);
 **/
 		$didyes = true;
 		$A2B -> CID_handover = $A2B->CallerID = $A2B->did_apply_add_countryprefixfrom($result[0], $A2B->CallerID);
-		$QUERY = "SELECT 1 FROM cc_did, cc_callerid WHERE cc_did.id = {$result[0][3]} AND cid = '$A2B->CallerID' AND cc_callerid.activated = 't' AND (id_cc_card = iduser OR iduser = 0 OR allciduse = 1) LIMIT 1";
-//$A2B -> debug( ERROR, $agi, __FILE__, __LINE__, $QUERY);
+		$QUERY = "SELECT 1 FROM cc_did, cc_callerid WHERE cc_did.id = {$result[0][3]} AND cid = '$A2B->CallerID' AND cc_callerid.activated = 't' AND ((id_cc_card = iduser AND allciduse <> 3) OR iduser = 0 OR allciduse = 1) LIMIT 1";
+$A2B -> debug( ERROR, $agi, __FILE__, __LINE__, $QUERY);
 		$result = $A2B -> instance_table -> SQLExec ($A2B->DBHandle, $QUERY);
 		if (is_array($result)) {
-//$A2B -> debug( ERROR, $agi, __FILE__, __LINE__, "RESULT OK");
+$A2B -> debug( ERROR, $agi, __FILE__, __LINE__, "RESULT OK");
 			$didyes = false;
 		}
 	    }

@@ -467,8 +467,8 @@ if (has_rights (ACX_MODIFY_CUSTOMERS) && !($popup_select>=1)) {
 				   "", "", "",
 				   "sql",
 				   "cc_country",
-				   "countryname, countrycode",
-				   "", "", "%1", "", "", "", '' );
+				   "countryname, countrycode, countryprefix",
+				   "", "", "%1 +%3", "", "", "", '' );
 	
 	$HD_Form -> AddEditElement (gettext("ZIP/POSTAL CODE"),
 				   "zipcode",

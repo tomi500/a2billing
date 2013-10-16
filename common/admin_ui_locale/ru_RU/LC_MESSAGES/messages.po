@@ -1535,7 +1535,7 @@ msgstr "(ОДНО или ДВА ЧИСЛА, РАЗДЕЛЁННЫЕ ЗАПЯТО�
 
 #: lib/Form/Class.FormHandler.inc.php:1087
 msgid "(ONLY NUMERIC CHARACTERS WITH/WITHOUT COMMA SEPARATED)"
-msgstr "(ТОЛЬКО ОДНО или НЕСКОЛЬКО чисел, РАЗДЕЛЁННЫХ ЗАПЯТОЙ)"
+msgstr "(Допускается ОДНО или НЕСКОЛЬКО чисел, РАЗДЕЛЁННЫХ ЗАПЯТОЙ)"
 
 #: lib/Form/Class.FormHandler.inc.php:1097
 msgid "(INTEGER NUMBER)"
