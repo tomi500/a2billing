@@ -1212,8 +1212,9 @@ if ($mode == 'standard') {
 			$A2B -> agiconfig['say_timetocall']=0;
 			$A2B -> agiconfig['say_balance_after_auth']=0;
 			$A2B -> extension = $A2B -> dnid = $A2B -> destination = $caller_areacode.$A2B -> apply_rules($A2B -> CallerID);
-			
-			$QUERY = "SELECT callback FROM cc_callerid WHERE cid=$A2B->destination AND (callback=0 OR activated='f')";
+// !!!!!!!!!!!!!!!!!!!!!!!!!!!
+// Accountcode of incoming trunk & cid_card_id are not compare now !!!!!!!
+			$QUERY = "SELECT callback FROM cc_callerid WHERE cid=$A2B->destination AND (activated='f' OR (activated='t' AND (callback=0 OR blacklist=1)))";
 			$result = $A2B -> instance_table -> SQLExec ($A2B->DBHandle, $QUERY);
 
 			$instance_table = new Table("cc_callback_spool");

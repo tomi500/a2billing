@@ -181,6 +181,7 @@ ALTER TABLE cc_callerid ADD cli_replace SMALLINT( 6 ) NOT NULL DEFAULT '0';
 ALTER TABLE cc_callerid ADD cli_localreplace SMALLINT( 6 ) NOT NULL DEFAULT '0';
 ALTER TABLE cc_callerid ADD cli_otherreplace SMALLINT( 6 ) NOT NULL DEFAULT '0';
 ALTER TABLE cc_callerid ADD cli_prefixreplace CHAR( 30 ) CHARACTER SET utf8 COLLATE utf8_bin NOT NULL DEFAULT '';
+ALTER TABLE cc_callerid ADD blacklist SMALLINT( 6 ) NOT NULL DEFAULT '0';
 
 ALTER TABLE cc_did_destination ADD answer INT( 11 ) NOT NULL DEFAULT '0';
 ALTER TABLE cc_did_destination ADD playsound VARCHAR( 100 ) CHARACTER SET utf8 COLLATE utf8_bin NOT NULL;

@@ -32,7 +32,7 @@
 **/
 
 
-getpost_ifset(array('IDCust', 'id', 'cid', 'activated', 'verify'));
+getpost_ifset(array('IDCust', 'id', 'cid', 'activated', 'blacklist', 'verify'));
 
 $HD_Form = new FormHandler("cc_callerid", gettext("CallerID"));
 
@@ -106,6 +106,16 @@ $HD_Form -> AddEditElement (gettext("CALLERID"),
 			"",
 			gettext("Insert the CallerID"),
 			"", "", "", "", "", "", "", "");
+
+$HD_Form -> AddEditElement (gettext("BLACKLIST"),
+			"blacklist",
+			'0',
+			"RADIOBUTTON",
+			"",
+			"",
+			"",
+			"", "", "", gettext("Yes").":1, - ".gettext("No").":0", "", "", "",
+			gettext("Choose 'Yes' if you want to place this CallerID to Black List. This will break any attempts of call from this CallerID exlude DID calls."));
 
 $HD_Form -> AddEditElement (gettext("VERIFY"),
 			"verify",
@@ -216,7 +226,7 @@ $HD_Form -> AddEditElement (gettext("REPLACE BY PREFIX"),
 			"",
 			"", "", "", "", "", "", "NO", gettext("Present this CallerID, when calls are made to countries from listed prefixes. Insert the replaceable prefixes separated by comma, e.g. for UK,IT,RU,UA are '44,39,7,380'."));
 
-$HD_Form -> FieldEditElement ('activated, cid, verify, id_cc_card, callback, phonenumber, warning_threshold, say_rateinitial, say_balance_after_call, cli_replace, cli_localreplace, cli_otherreplace, cli_prefixreplace');
+$HD_Form -> FieldEditElement ('activated, cid, blacklist, verify, id_cc_card, callback, phonenumber, warning_threshold, say_rateinitial, say_balance_after_call, cli_replace, cli_localreplace, cli_otherreplace, cli_prefixreplace');
 
 // Set the filter variables
 $HD_Form -> FG_FILTER_APPLY = true;

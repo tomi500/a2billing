@@ -4063,7 +4063,7 @@ msgstr ""
 #: Public/form_data/FG_var_voucher.inc:164
 #: Public/form_data/FG_var_callerid.inc:89
 msgid "Choose if you want to activate this card"
-msgstr ""
+msgstr "Выберите 'Да' для активации этого аккаунта"
 
 #: Public/form_data/FG_var_did.inc:123
 msgid "You can associate trunk for selective routing incoming calls through that DID. View word of word help for parameter 'RECALL DAYS' in customer account."
@@ -9420,6 +9420,10 @@ msgstr "Правила, которые будут автоматически и�
 #: Public/form_data/FG_var_callerid.inc
 msgid "CONSPIRATION"
 msgstr "КОНСПИРАЦИЯ"
+
+#: Public/form_data/FG_var_callerid.inc
+msgid "Choose 'Yes' if you want to place this CallerID to Black List. This will break any attempts of call from this CallerID exlude DID calls."
+msgstr "Выберите 'Да' если нужно поместить этот CallerID в Чёрный список, чтобы обрывать любые попытки звонков с этого номера исключая входящие звонки на DID номера."
 
 #: Public/form_data/FG_var_callerid.inc
 msgid "Local"

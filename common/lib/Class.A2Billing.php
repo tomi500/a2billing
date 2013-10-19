@@ -2951,7 +2951,7 @@ $this -> debug( ERROR, $agi, __FILE__, __LINE__, "FAXRESOLUTION: ".$faxresolutio
 			$QUERY .=  "SELECT cc_callerid.cid ".
 				  " FROM cc_callerid ".
 				  " JOIN cc_card ON cc_callerid.id_cc_card=cc_card.id ".
-				  " WHERE (cc_callerid.activated=1 OR cc_callerid.activated='t') AND cc_card.username='".$this -> username."' ";
+				  " WHERE (cc_callerid.activated=1 OR cc_callerid.activated='t') AND blacklist = 0 AND cc_card.username='".$this -> username."' ";
 			$QUERY .= "ORDER BY 1";
 			$result1 = $this->instance_table -> SQLExec ($this->DBHandle, $QUERY);
 			$this -> debug( DEBUG, $agi, __FILE__, __LINE__, print_r($result1,true));
@@ -3109,7 +3109,7 @@ $this -> debug( ERROR, $agi, __FILE__, __LINE__, "FAXRESOLUTION: ".$faxresolutio
 				    " expiredays, nbused, UNIX_TIMESTAMP(firstusedate), UNIX_TIMESTAMP(cc_card.creationdate), cc_card.currency, " .
 				    " cc_card.lastname, cc_card.firstname, cc_card.email, cc_card.uipass, cc_card.id_campaign, cc_card.id, useralias, " .
 				    " cc_card.status, cc_card.voicemail_permitted, cc_card.voicemail_activated, cc_card.restriction, cc_country.countryprefix, " .
-				    " cc_card.monitor, phonenumber, warning_threshold, say_rateinitial, say_balance_after_call, margintotal, margin, id_diller".
+				    " cc_card.monitor, phonenumber, warning_threshold, say_rateinitial, say_balance_after_call, margintotal, margin, id_diller, blacklist".
 				    " FROM cc_callerid ".
 				    " LEFT JOIN cc_card ON cc_callerid.id_cc_card=cc_card.id ".
 				    " LEFT JOIN cc_tariffgroup ON cc_card.tariff=cc_tariffgroup.id ".
@@ -3180,7 +3180,7 @@ $this -> debug( ERROR, $agi, __FILE__, __LINE__, "FAXRESOLUTION: ".$faxresolutio
 				    $language = 'en';
 				    $this->accountcode = $card_gen;
 				    
-				    if ($this->typepaid==1) 
+				    if ($this->typepaid==1)
 				    	$this->credit = $this->credit + $this->creditlimit;
 
 				} else {
@@ -3233,6 +3233,7 @@ $this -> debug( ERROR, $agi, __FILE__, __LINE__, "FAXRESOLUTION: ".$faxresolutio
 				$this->margintotal			=  $result[0][38];
 				$this->margin				=  $result[0][39];
 				$this->id_diller			=  $result[0][40];
+				$blacklist				=  $result[0][41];
 
 				if (strlen($language)==2 && !($this->languageselected>=1)) {
 
@@ -3248,18 +3249,15 @@ $this -> debug( ERROR, $agi, __FILE__, __LINE__, "FAXRESOLUTION: ".$faxresolutio
 				
 				if ($this->typepaid==1)
 					$this->credit = $this->credit + $this->creditlimit;
-				
-				// CHECK IF CALLERID ACTIVATED
-				if ( $result[0][2] != "t" )	$prompt = "prepaid-auth-fail";
 
 				// CHECK credit < min_credit_2call / you have zero balance
 				if (!$this -> enough_credit_to_call()) {
 					$prompt = "prepaid-no-enough-credit-stop";
 				}
-				
-				// CHECK activated=t / CARD NOT ACTIVE, CONTACT CUSTOMER SUPPORT
-				if ( $this->status != "1") 	$prompt = "prepaid-auth-fail";	// not expired but inactive.. probably not yet sold.. find better prompt
-				
+				// CHECK IF CALLERID ACTIVATED OR CARD NOT ACTIVE, CONTACT CUSTOMER SUPPORT
+				elseif ( ($result[0][2] == "t" && $blacklist == 1) || $result[0][2] != "t" || $this->status != "1")
+					$prompt = "prepaid-auth-fail";
+
 				// CHECK IF THE CARD IS USED
 				if (($isused>0) && ($simultaccess!=1))	$prompt="prepaid-card-in-use";
 				
@@ -3292,7 +3290,8 @@ $this -> debug( ERROR, $agi, __FILE__, __LINE__, "FAXRESOLUTION: ".$faxresolutio
 
 				}
 
-				if (strlen($prompt)>0) {
+				if (strlen($prompt)>0 || $blacklist) {
+				    if ($blacklist == 0) {
 					$this -> let_stream_listening($agi);
 					$agi-> stream_file($prompt, '#'); // Added because was missing the prompt
 					$this -> debug( DEBUG, $agi, __FILE__, __LINE__, "[ERROR CHECK CARD : $prompt (cardnumber:".$this->cardnumber.")]");
@@ -3307,6 +3306,7 @@ $this -> debug( ERROR, $agi, __FILE__, __LINE__, "FAXRESOLUTION: ".$faxresolutio
 							$this -> debug( DEBUG, $agi, __FILE__, __LINE__, "[NOTENOUGHCREDIT - refill_card_withvoucher fail] ");
 						}
 					}
+				    }
 					if ($prompt == "prepaid-no-enough-credit-stop" && $this->agiconfig['notenoughcredit_cardnumber']==1) {
 						$this->accountcode = '';
 						$callerID_enable = 0;
@@ -3320,7 +3320,7 @@ $this -> debug( ERROR, $agi, __FILE__, __LINE__, "FAXRESOLUTION: ".$faxresolutio
 					    $this -> accountcode=''; $callerID_enable=0;
 					    $this -> ask_other_cardnumber = 1;
 					    $this -> update_callerid = 1;
-					}else {
+					} else {
 						return -2;
 					}
 				} else {
@@ -3358,12 +3358,12 @@ $this -> debug( ERROR, $agi, __FILE__, __LINE__, "FAXRESOLUTION: ".$faxresolutio
 								" UNIX_TIMESTAMP(cc_card.creationdate), currency, lastname, firstname, email, uipass, id_campaign, cc_card.id," .
 								" useralias, status, voicemail_permitted, voicemail_activated, restriction, countryprefix, monitor, " .
 								" cc_sip_buddies.warning_threshold, cc_sip_buddies.say_rateinitial, cc_sip_buddies.say_balance_after_call," .
-								" margintotal, margin, id_diller, cc_callerid.activated" .
+								" margintotal, margin, id_diller, cc_callerid.activated, blacklist" .
 								" FROM cc_card" .
 								" LEFT JOIN cc_tariffgroup ON tariff = cc_tariffgroup.id" .
 								" LEFT JOIN cc_country ON country = countrycode" .
 								" LEFT JOIN cc_sip_buddies ON cc_sip_buddies.id_cc_card = cc_card.id AND cc_sip_buddies.name = '{$this->src_peername}'" .
-								" LEFT JOIN cc_callerid ON (cc_callerid.id_cc_card = cc_card.id OR cc_callerid.id_cc_card = -1) AND cid = '".$this->CallerID."'" .
+								" LEFT JOIN cc_callerid ON cid = '".$this->CallerID."' AND (cc_callerid.id_cc_card = cc_card.id OR cc_callerid.id_cc_card = -1)" .
 								" WHERE cc_card.username = '".$this->cardnumber."' LIMIT 1";
 					$result = $this->instance_table -> SQLExec ($this->DBHandle, $QUERY);
 					$this -> debug( DEBUG, $agi, __FILE__, __LINE__, ' - Retrieve account info SQL ::> '.$QUERY);
@@ -3411,6 +3411,7 @@ $this -> debug( ERROR, $agi, __FILE__, __LINE__, "FAXRESOLUTION: ".$faxresolutio
 					$this->margin			= $result[0][34];
 					$this->id_diller		= $result[0][35];
 					$this->cidactivated		= $result[0][36];
+					$blacklist			= $result[0][37];
 					
 					if ($this->typepaid==1) $this->credit = $this->credit + $this->creditlimit;
 				}
@@ -3433,7 +3434,7 @@ $this -> debug( ERROR, $agi, __FILE__, __LINE__, "FAXRESOLUTION: ".$faxresolutio
 				// CHECK credit > min_credit_2call / you have zero balance
 				if ( !$this -> enough_credit_to_call() ) $prompt = "prepaid-no-enough-credit-stop";
 				// CHECK activated=t / CARD NOT ACTIVE, CONTACT CUSTOMER -%-%- AND CHECK IF THE CALLERID IS CORRECT FOR THIS CARD	-%-%-%-
-				if ( $this->status != "1" || $this->cidactivated == "f" || ($this->agiconfig['callerid_authentication_over_cardnumber']==1 && is_null($this->cidactivated))) {
+				if ( $this->status != "1" || ($this->cidactivated == "t" && $blacklist == 1) || ($this->agiconfig['callerid_authentication_over_cardnumber']==1 && is_null($this->cidactivated))) {
 					$prompt = "prepaid-auth-fail";	// not expired but inactive.. probably not yet sold.. find better prompt
 					$res = -2;
 					break;
