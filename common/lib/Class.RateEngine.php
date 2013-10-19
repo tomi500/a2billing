@@ -1344,7 +1344,7 @@ else echo "Ratecard: ".$this->ratecard_obj[$i][6]."<br>Trunk: ".$this->ratecard_
 				$myclause_nodidcall = null;
 			}
 			//Update the global credit
-			$A2B -> credit = $A2B -> credit + $cost;
+			$A2B -> credit = $A2B -> credit + $cost - a2b_round($this->margindillers);
 			
 			if ($A2B->nbused>0) {
 				$QUERY = "UPDATE cc_card SET commission=commission+".a2b_round($this->commission).", credit= credit-".a2b_round($this->margindillers)."$signe".a2b_round(abs($cost))." $myclause_nodidcall,  lastuse=now(), nbused=nbused+1 WHERE username='".$A2B->username."'";

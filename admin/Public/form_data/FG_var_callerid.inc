@@ -94,7 +94,7 @@ $HD_Form -> AddEditElement (gettext("ACTIVATED"),
 			"RADIOBUTTON",
 			"",
 			"",
-			gettext("Choose if you want to activate this card"),
+			gettext("Choose if you want to activate this CallerID"),
 			"", "", "", gettext("Yes").":t, - ".gettext("No").":f", "", "", "",
 			gettext("... for incoming calls from this number"));
 

@@ -253,10 +253,10 @@ $A2B -> debug( ERROR, $agi, __FILE__, __LINE__, "cc_did.id=".$result[0][3]);
 		$didyes = true;
 		$A2B -> CID_handover = $A2B->CallerID = $A2B->did_apply_add_countryprefixfrom($result[0], $A2B->CallerID);
 		$QUERY = "SELECT 1 FROM cc_did, cc_callerid WHERE cc_did.id = {$result[0][3]} AND cid = '$A2B->CallerID' AND cc_callerid.activated = 't' AND ((id_cc_card = iduser AND allciduse <> 3) OR iduser = 0 OR allciduse = 1) LIMIT 1";
-$A2B -> debug( ERROR, $agi, __FILE__, __LINE__, $QUERY);
+//$A2B -> debug( ERROR, $agi, __FILE__, __LINE__, $QUERY);
 		$result = $A2B -> instance_table -> SQLExec ($A2B->DBHandle, $QUERY);
 		if (is_array($result)) {
-$A2B -> debug( ERROR, $agi, __FILE__, __LINE__, "RESULT OK");
+//$A2B -> debug( ERROR, $agi, __FILE__, __LINE__, "RESULT OK");
 			$didyes = false;
 		}
 	    }
@@ -916,7 +916,7 @@ if ($mode == 'standard') {
                     " aleg_carrier_initblock_offp, aleg_carrier_increment_offp, aleg_retail_initblock_offp, aleg_retail_increment_offp,".
                     " cc_did_destination.answer, playsound, timeout, margintotal, margin, id_diller, voicebox".
 			        " FROM cc_did, cc_did_destination, cc_card, cc_country".
-			        " WHERE id_cc_did=cc_did.id and cc_card.status=1 and cc_card.id=id_cc_card and cc_did_destination.activated=1  and cc_did.activated=1 and did='$mydnid' ".
+			        " WHERE id_cc_did=cc_did.id and cc_card.status=1 and cc_card.id=id_cc_card and cc_did_destination.activated=1 and cc_did.activated=1 and did='$mydnid' ".
 			        " AND cc_country.id=id_cc_country AND cc_did.startingdate<= CURRENT_TIMESTAMP AND (cc_did.expirationdate > CURRENT_TIMESTAMP OR cc_did.expirationdate IS NULL ".
 			        " AND cc_did_destination.validated=1";
 		if ($A2B->config["database"]['dbtype'] != "postgres") {
