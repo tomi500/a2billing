@@ -33,7 +33,7 @@
 
 
 
-getpost_ifset(array('IDCust', 'id', 'idcust', 'id_cc_card', 'cid', 'activated'));
+getpost_ifset(array('IDCust', 'id', 'idcust', 'id_cc_card', 'cid', 'blacklist', 'activated', 'atmenub'));
 
 if (strlen($HD_Form -> FG_TABLE_CLAUSE)>0)
 	$HD_Form -> FG_TABLE_CLAUSE.=" AND ";
@@ -41,16 +41,23 @@ if (strlen($HD_Form -> FG_TABLE_CLAUSE)>0)
 //$idcard = (has_rights(ACX_DISTRIBUTION) && ($popup_select>=1)) ? $idcust : $_SESSION["card_id"];
 $idcard = (!isset($idcust) || $idcust == "") ? $_SESSION["card_id"] : $idcust ;
 
+$atmenub = ($atmenub=='')?'ALL':$atmenub;
+switch($atmenub) {
+	case 'ALL'	: $listclause = '';break;
+	case 'WHITE'	: $listclause = ' AND blacklist = 0';break;
+	case 'BLACK'	: $listclause = ' AND blacklist = 1';break;
+}
+
 if (has_rights(ACX_DISTRIBUTION) && $popup_select>=1 && (!isset($form_action) || $form_action=="list")) {
 	$HD_Form = new FormHandler("cc_callerid LEFT JOIN cc_card AS t2 ON t2.id=id_cc_card", gettext("CallerID"));
-	$HD_Form -> FG_TABLE_CLAUSE = "t2.id = $idcust AND t2.id_diller = {$_SESSION['card_id']}";
+	$HD_Form -> FG_TABLE_CLAUSE = "t2.id = $idcust AND t2.id_diller = {$_SESSION['card_id']}".$listclause;
 	$HD_Form -> FG_TABLE_ID = 'cc_callerid.id';
 } elseif (!isset($form_action) || $form_action=="list") {
 	$HD_Form = new FormHandler("cc_callerid", gettext("CallerID"));
-	$HD_Form -> FG_TABLE_CLAUSE .= "id_cc_card = ".$_SESSION['card_id'];
+	$HD_Form -> FG_TABLE_CLAUSE .= "id_cc_card = ".$_SESSION['card_id'].$listclause;
 } else {
 	$HD_Form = new FormHandler("cc_callerid", gettext("CallerID"));
-	$HD_Form -> FG_TABLE_CLAUSE .= "id_cc_card = ".$idcard;
+	$HD_Form -> FG_TABLE_CLAUSE .= "id_cc_card = ".$idcard.$listclause;
 }
 
 $HD_Form -> FG_DEBUG = 0;
@@ -157,6 +164,16 @@ $HD_Form -> AddEditElement (gettext("ACTIVATED"),
 			   "", "", "", gettext("Yes").":t, - ".gettext("No").":f", "", "", "",
 			   gettext("... for incoming calls from this number"));
 
+$HD_Form -> AddEditElement (gettext("BLACKLIST"),
+			    "blacklist",
+			    '0',
+			    "RADIOBUTTON",
+			    "",
+			    "",
+			    "",
+			    "", "", "", gettext("Yes").":1, - ".gettext("No").":0", "", "", "",
+			    gettext("Choose 'Yes' if you want to place this CallerID to Black List. This will break any attempts of call from this CallerID exlude DID calls."));
+
 $HD_Form -> AddEditElement (gettext("PHONE NUMBER"),
 			    "phonenumber",
 			    '$value',
@@ -246,7 +263,7 @@ $HD_Form -> AddEditElement (gettext("REPLACE BY PREFIX"),
 			    "",
 			    "" , "", "", "", "" , "" , "NO", gettext("Present this CallerID, when calls are made to countries from listed prefixes. Insert the replaceable prefixes separated by comma, e.g. for UK,IT,RU,UA are '44,39,7,380'."));
 
-$HD_Form -> FieldEditElement ('cid, activated, phonenumber, callback, warning_threshold, say_rateinitial, say_balance_after_call, cli_replace, cli_localreplace, cli_otherreplace, cli_prefixreplace');
+$HD_Form -> FieldEditElement ('cid, activated, blacklist, phonenumber, callback, warning_threshold, say_rateinitial, say_balance_after_call, cli_replace, cli_localreplace, cli_otherreplace, cli_prefixreplace');
 
 $HD_Form->FG_ADITION_HIDDEN_PARAM = $HD_Form->FG_EDITION_HIDDEN_PARAM = 'popup_select, idcust';
 $HD_Form->FG_ADITION_HIDDEN_PARAM = $HD_Form->FG_EDITION_HIDDEN_PARAM_VALUE = "$popup_select, $idcust";

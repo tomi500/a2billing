@@ -40,6 +40,8 @@ include ("lib/customer.smarty.php");
 
 getpost_ifset(array('add_callerid'));
 
+if ($atmenub == "")	$atmenub = "ALL";
+
 $HD_Form -> setDBHandler (DbConnect());
 
 if (!isset($form_action))  $form_action="list"; //ask-add
@@ -115,6 +117,31 @@ if (has_rights(ACX_DISTRIBUTION) && ($popup_select>=1)) {
 }
 
 if ($form_action == "list") {
+?>
+<br/>
+<center>
+<table border="0" align="center" cellpadding="0" cellspacing="1">
+	<tr>
+	  <td  class="bgcolor_021">
+	  <table width="100%" border="0" cellspacing="1" cellpadding="0">
+		  <tr>
+			<td bgcolor="#FFFFFF" class="fontstyle_006">&nbsp;<?php echo gettext("LIST TYPE")?>&nbsp;</td>
+			<td bgcolor="#FFFFFF" class="fontstyle_006" align="right">
+			    <form name="form1" method="post" action="">
+				<select name="atmenub" id="col_configtype" onChange="window.document.form1.elements['PMChange'].value='Change';window.document.form1.submit();">
+				<option value="WHITE"<?php if($atmenub == "WHITE") echo " selected"?>>WHITELIST&nbsp;</option>
+				<option value="BLACK"<?php if($atmenub == "BLACK") echo " selected"?>>BLACKLIST&nbsp;</option>
+				<option value="ALL"<?php if($atmenub == "ALL") echo " selected"?>>ALL&nbsp;</option>
+				</select>
+				<input name="PMChange" type="hidden" id="PMChange">
+			    </form>
+			</td>
+		  </tr>
+	  </table></td>
+	</tr>
+</table>
+</center>
+<?php
     // My code for Creating two functionalities in a page
     $HD_Form -> create_toppage ("ask-add");
     if (isset($update_msg) && strlen($update_msg)>0) echo $update_msg;

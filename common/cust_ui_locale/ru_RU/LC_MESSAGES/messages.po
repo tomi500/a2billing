@@ -425,6 +425,10 @@ msgstr "Введите здесь номер, на который хотите �
 msgid "Choose if you want to activate this card"
 msgstr "Выберите, если хотите активировать эту карту"
 
+#: form_data/FG_var_callerid.inc
+msgid "Choose 'Yes' if you want to place this CallerID to Black List. This will break any attempts of call from this CallerID exlude DID calls."
+msgstr "Выберите 'Да' если нужно поместить этот CallerID в Чёрный список, чтобы обрывать любые попытки звонков с этого номера, исключая входящие звонки на DID номера."
+
 #: form_data/FG_var_did.inc:149
 msgid "TIMEOUT"
 msgstr "ТАЙМАУТ"
