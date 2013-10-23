@@ -115,7 +115,7 @@ $HD_Form -> AddEditElement (gettext("BLACKLIST"),
 			"",
 			"",
 			"", "", "", gettext("Yes").":1, - ".gettext("No").":0", "", "", "",
-			gettext("Choose 'Yes' if you want to place this CallerID to Black List. This will break any attempts of call from this CallerID exlude DID calls."));
+			gettext("Choose 'Yes' if you want to place this CallerID to Black List. This will break any autorization attempts from this CallerID."));
 
 $HD_Form -> AddEditElement (gettext("VERIFY"),
 			"verify",

@@ -2380,7 +2380,7 @@ msgstr "Направление"
 #: Public/graph_statbar.php:59 Public/call-dnid.php:112
 #: Public/call-daily-load.php:71
 msgid "Duration"
-msgstr "Длительность"
+msgstr "Длит."
 
 #: Public/call-comp.php:76 Public/A2B_call_archiving.php:77
 #: Public/graph_stat.php:59 Public/graph_statbar.php:60
@@ -3441,6 +3441,10 @@ msgstr ""
 msgid "PREDICT"
 msgstr "КРЕДИТ"
 
+#: Public/call-log-customers.php
+msgid "WaitUp"
+msgstr "Ожидал"
+
 #: Public/call-log-customers.php:103
 msgid "AUTO DIALER"
 msgstr ""
@@ -3934,6 +3938,14 @@ msgstr "Все DID"
 #: Public/form_data/FG_var_did.inc:42
 msgid "Add DID"
 msgstr ""
+
+#: Public/form_data/FG_var_did.inc
+msgid "Set area code where is DID from (i.e. 30 for Berlin)"
+msgstr "Код города, к которому принадлежит DID номер (например '44' для Киева)"
+
+#: Public/form_data/FG_var_did.inc
+msgid "Set length of city numbers"
+msgstr "Количество цифр (длина) городского номера (например '7' для Киева)"
 
 #: Public/form_data/FG_var_did.inc:59 Public/form_data/FG_var_did.inc:104
 #: Public/form_data/FG_var_did_destination.inc:73
@@ -9422,8 +9434,8 @@ msgid "CONSPIRATION"
 msgstr "КОНСПИРАЦИЯ"
 
 #: Public/form_data/FG_var_callerid.inc
-msgid "Choose 'Yes' if you want to place this CallerID to Black List. This will break any attempts of call from this CallerID exlude DID calls."
-msgstr "Выберите 'Да' если нужно поместить этот CallerID в Чёрный список, чтобы обрывать любые попытки звонков с этого номера, исключая входящие звонки на DID номера."
+msgid "Choose 'Yes' if you want to place this CallerID to Black List. This will break any autorization attempts from this CallerID."
+msgstr "Выберите 'Да' если нужно поместить этот CallerID в Чёрный список, чтобы обрывать любые попытки авторизации с этого номера."
 
 #: Public/form_data/FG_var_callerid.inc
 msgid "Local"
