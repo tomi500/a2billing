@@ -15,6 +15,10 @@ msgstr ""
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
 
+#: FG_var_surveillance.inc
+msgid "PhoneNumber "
+msgstr "Номер"
+
 #: A2B_notification.php:76
 msgid "Your notification settings has successfully been updated."
 msgstr ""

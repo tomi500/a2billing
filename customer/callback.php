@@ -128,6 +128,7 @@ if ($A2B -> callingcard_ivr_authenticate_light ($error_msg) && $callback) {
 					$application='';
 					if ($channeloutcid[1]) $callerid = $channeloutcid[1];
 					    else $callerid = $A2B -> config["callback"]['callerid'];
+					$callerid .= "<".$callerid.">";
 					$account = $_SESSION["pr_login"];
 					
 					$uniqueid 	=  MDP_NUMERIC(5).'-'.MDP_STRING(7);

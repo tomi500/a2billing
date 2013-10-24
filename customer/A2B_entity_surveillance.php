@@ -160,7 +160,7 @@ if ($form_action == "list") {
 		<form name="theForm" action="<?php  $_SERVER["PHP_SELF"]?>">
 		<tr class="bgcolor_001">
 		<td align="center" valign="top">
-				<font class="fontstyle_002"><?php echo gettext("PhoneNumber");?> :</font>
+				<font class="fontstyle_002"><?php echo gettext("PhoneNumber ");?> :</font>
 				<input class="form_input_text" name="phone" size="15" maxlength="6" >
 				- <font class="fontstyle_002"><?php echo gettext("Duration");?> :</font>
 				<input class="form_input_text" name="duration" size="15" maxlength="2" >

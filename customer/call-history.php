@@ -178,7 +178,8 @@ if ($posted==1) {
 	$SQLcmd = do_field($SQLcmd, 'src', 'source');
 	$SQLcmd = do_field($SQLcmd, 'callerid', 'src', false, 1);
 	$SQLcmd = do_field($SQLcmd, 'callerid', 'src_exten', true, 2);
-	$SQLcmd = do_field($SQLcmd, 'phonenumber', 'calledstation');
+	$SQLcmd = do_field($SQLcmd, 'phonenumber', 'calledstation', false, 1);
+	$SQLcmd = do_field($SQLcmd, 'phonenumber', 'calledexten', true, 2);
 }
 
 

@@ -831,7 +831,7 @@ if ($mode == 'standard') {
 					// INSERT CDR  & UPDATE SYSTEM
 					$RateEngine->rate_engine_updatesystem($A2B, $agi, $A2B-> destination);
 
-					if (!$A2B->extext && $A2B->voicemail && !is_null($A2B->voicebox)) {
+					if (!$A2B->extext && $A2B->voicemail && !is_null($A2B->voicebox) && !isset($A2B->transferername[0])) {
 						if ($RateEngine->dialstatus =="CHANUNAVAIL" || $RateEngine->dialstatus == "NOANSWER" || $RateEngine->dialstatus == "CONGESTION") {
 							$A2B->voicebox .= "|su";
 						} elseif ($RateEngine->dialstatus =="BUSY") {

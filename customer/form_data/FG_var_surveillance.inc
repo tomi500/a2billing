@@ -10,9 +10,9 @@ $HD_Form -> FG_TABLE_DEFAULT_ORDER = "exten_leg_a";
 $HD_Form -> FG_TABLE_DEFAULT_SENS = "ASC";
 
 $HD_Form -> AddViewElement(gettext("PHONENUMBER"), "exten_leg_a", "20%", "center", "sort", "", "lie_link", "", "", "", "", "", "call-history.php?s=1&t=0&order=t1.starttime&sens=DESC&current_page=0&posted=1&Period=&frommonth=&fromstatsmonth=&tomonth=&tostatsmonth=&fromday=true&fromstatsday_sday=1&fromstatsmonth_sday=".date('Y')."-".date('m')."&today=&tostatsday_sday=".date('d')."&tostatsmonth_sday=".date('Y')."-".date('m')."&calleridtype=1&phonenumbertype=1&sourcetype=&clidtype=&channel=&resulttype=min&callerid=&phonenumber=%0&src=&clid=&terminatecauseid=ANSWER&choose_calltype=-1&choose_currency=");
-$HD_Form -> AddViewElement(gettext("DURATION"), "surveillance", "20%", "center", "sort", "26");
+$HD_Form -> AddViewElement(gettext("DURATION"), "surveillance", "20%", "center", "sort", "26", "", "", "", "", "", "display_minute");
 $HD_Form -> AddViewElement(gettext("TIME LEFT"), "timeleft", "20%", "center", "sort", "", "timeleft", "%1");
-$HD_Form -> FieldViewElement ('exten_leg_a, surveillance, surveillance*60-UNIX_TIMESTAMP(now())+UNIX_TIMESTAMP(last_attempt_time) timeleft');
+$HD_Form -> FieldViewElement ('exten_leg_a, surveillance*60 surveillance, surveillance*60-UNIX_TIMESTAMP(now())+UNIX_TIMESTAMP(last_attempt_time) timeleft');
 
 
 $HD_Form -> CV_NO_FIELDS  = gettext("There are no surveillance created.");
