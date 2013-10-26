@@ -773,10 +773,9 @@ class A2Billing {
 	function get_agi_request_parameter($agi)
 	{
 		$this -> CallerID = $this -> src_exten	= $agi -> request['agi_callerid'];
-//$this -> debug( ERROR, $agi, __FILE__, __LINE__, ' get_agi_request_parameter = '.$this->CallerID);
 		if (!is_numeric($this -> src_exten) || strlen($this -> src_exten) > 4)
 			$this -> src_exten		= 'NULL';
-		$this -> src_peername 			= $agi -> get_variable("CHANNEL(peername)",true);
+		$this -> src_peername 			= $agi -> request['agi_type'] == 'Dongle' ? '' : $agi -> get_variable("CHANNEL(peername)",true);
 		if (!is_numeric($this -> src_peername))
 			$this -> src_peername		= 'NULL';
 		$this -> channel			= $agi -> request['agi_channel'];
@@ -787,11 +786,7 @@ class A2Billing {
 
 //		Call function to find the cid number
 		$this -> isolate_cid();
-//		$this -> CID_handover			= $this->CallerID;
-//		if (!is_numeric($this -> CID_handover) || strlen($this -> CID_handover) < 7)
-//			$this -> CID_handover		= '';
 		$this -> realdestination		= $this -> dnid;
-//$this -> debug( ERROR, $agi, __FILE__, __LINE__, "[A2B->CID_handover: ={$this->CID_handover}]");
 		$this -> debug( INFO, $agi, __FILE__, __LINE__, ' get_agi_request_parameter = '.$this->CallerID.' ; '.$this->channel.' ; '.$this->uniqueid.' ; '.$this->accountcode.' ; '.$this->dnid);
 	}
 
