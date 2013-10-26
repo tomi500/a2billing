@@ -234,7 +234,7 @@ CREATE TABLE IF NOT EXISTS cc_voicemail_users (
 	imapflags VARCHAR(80),
 	stamp timestamp,
 	KEY `mailbox_context` (`mailbox`,`context`)
-) TYPE=MyISAM;
+) ENGINE=MyISAM;
 
 CREATE TABLE IF NOT EXISTS cc_voicemail_data (
 	filename CHAR(255) NOT NULL PRIMARY KEY,
