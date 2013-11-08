@@ -286,7 +286,7 @@ if (TIMEZONE_ENABLE)  {
 	// -= Need to install GeoIP http://ua2.php.net/manual/en/geoip.setup.php =-
 		$timezone_list = get_timezones();
 		$one_select = false;
-		if (function_exists('geoip_time_zone_by_country_and_region') && $form_action == 'ask-add') {
+		if (function_exists('geoip_time_zone_by_country_and_region') && ($form_action == 'ask-add' || $form_action == 'add')) {
 			if (geoip_db_avail(GEOIP_REGION_EDITION_REV0) || geoip_db_avail(GEOIP_REGION_EDITION_REV1)) {
 				$countryregion = geoip_region_by_name($_SERVER['REMOTE_ADDR']);
 				$country = $countryregion['country_code'];
@@ -296,10 +296,11 @@ if (TIMEZONE_ENABLE)  {
 				$country = geoip_country_code_by_name($_SERVER['REMOTE_ADDR']);
 				$region = '01';
 			}
-//			$UserDateTimeZone	= new DateTimeZone(geoip_time_zone_by_country_and_region($country,$region));
+			$UserDateTimeZone	= new DateTimeZone(geoip_time_zone_by_country_and_region($country,$region));
+			$zonename		= $UserDateTimeZone->getName();
 //			$UserDateTime		= new DateTime(null, $UserDateTimeZone);
 //			$servergmt		= $UserDateTimeZone->getOffset($UserDateTime);
-			$UserDateTime		= new DateTime('2013-12-21', new DateTimeZone(geoip_time_zone_by_country_and_region($country,$region)));
+			$UserDateTime		= new DateTime('2013-12-21', $UserDateTimeZone);
 			$servergmt		= $UserDateTime->getOffset();
 		} else $servergmt = SERVER_GMT;
 		foreach ($timezone_list as $key => $cur_value) {
@@ -307,9 +308,12 @@ if (TIMEZONE_ENABLE)  {
 				$cur_value[2],
 				$key
 			);
-			if ($form_action == 'ask-add') {
+			if ($form_action == 'ask-add' || $form_action == 'add') {
 				if (in_array($servergmt, $cur_value) && !$one_select) {
-					$id_timezone = $key;
+					$cur_id_timezone = $key.";".$zonename;
+					$timezone_list[$key][1] = $cur_id_timezone;
+					if (!isset($id_timezone) || $key == $id_timezone)
+						$id_timezone = $cur_id_timezone;
 					$one_select = true;
 				}
 			}
@@ -418,9 +422,8 @@ if (has_rights (ACX_DISTRIBUTION) || (isset($id_diller) && $id_diller > 0))  {
 								"list", "", "", "", $yesno_list, "%1", "", gettext("Apply PayPal payment to this customer"));
 	$distribution_editFG .= ",paypal";
 
-}
+} elseif (CAPTCHA_ENABLE) {
 
-if (CAPTCHA_ENABLE) {
 	$HD_Form->AddEditElement(gettext("VERIFICATION"),
 								"captchacode",
 								'$value',

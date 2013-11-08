@@ -174,8 +174,9 @@ $date_clause = '';
 
 normalize_day_of_month($fromstatsday_sday, $fromstatsmonth_sday, 1);
 normalize_day_of_month($tostatsday_sday, $tostatsmonth_sday, 1);
-if ($fromday && isset($fromstatsday_sday) && isset($fromstatsmonth_sday)) $date_clause.=" AND t1.stoptime >= '".display_GMT($fromstatsmonth_sday."-".$fromstatsday_sday." 03:00:00", -$_SESSION["gmtoffset"], 1)."'";
-if ($today && isset($tostatsday_sday) && isset($tostatsmonth_sday)) $date_clause.=" AND t1.stoptime <= '".display_GMT($tostatsmonth_sday."-".sprintf("%02d",intval($tostatsday_sday)+1)." 02:59:59", -$_SESSION["gmtoffset"], 1)."'";
+if ($fromday && isset($fromstatsday_sday) && isset($fromstatsmonth_sday)) $date_clause.=" AND t1.stoptime >= ('$fromstatsmonth_sday-$fromstatsday_sday')";
+if ($today && isset($tostatsday_sday) && isset($tostatsmonth_sday)) $date_clause.=" AND t1.stoptime <= ('$tostatsmonth_sday-".sprintf("%02d",intval($tostatsday_sday)/*+1*/)." 23:59:59')";
+
 
 
 if (strpos($SQLcmd, 'WHERE') > 0) {
@@ -415,9 +416,8 @@ echo $CC_help_fax_customer;
                 </TR>
 				<?php
 				  	 $ligne_number=0;					 
-				  	 foreach ($list as $recordset){ 
+				  	 foreach ($list as $recordset){
 						 $ligne_number++;
-						 $recordset[0] = display_GMT($recordset[0], $_SESSION["gmtoffset"], 1);
 				?>
 				
                		 <TR bgcolor="<?php echo $FG_TABLE_ALTERNATE_ROW_COLOR[$ligne_number%2]?>"  onMouseOver="bgColor='#C4FFD7'" onMouseOut="bgColor='<?php echo $FG_TABLE_ALTERNATE_ROW_COLOR[$ligne_number%2]?>'"> 

@@ -35,7 +35,6 @@
 
 getpost_ifset(array('id', 'lastname', 'firstname', 'email', 'address','city', 'state', 'country', 'zipcode','id_timezone', 'phone', 'fax','message', 'voicemail_activated', 'monitor', 'recalldays', 'recalltime'));
 
-
 $HD_Form = new FormHandler("cc_card","Card");
 
 $HD_Form -> FG_DEBUG = 0;
@@ -48,7 +47,6 @@ $HD_Form -> FG_INTRO_TEXT_EDITION = '';
 
 $HD_Form -> FG_EDITION = true;
 $HD_Form -> FG_ADDITION = false;
-
 
 $HD_Form -> AddEditElement (gettext("LASTNAME"),
 			   "lastname",
@@ -119,16 +117,17 @@ $HD_Form -> AddEditElement (gettext("ZIP/POSTAL CODE"),
 			   gettext("Insert the zipcode"),
 			   "" , "", "",	"", "", "" , "NO", "");
 
+
 $HD_Form -> AddEditElement (gettext("TIMEZONE"),
 			   "id_timezone",
-			   '',
+			   "",
 			   "SELECT",
 			   "", "", "",
-			   "sql",
+			   "SQL",
 			   "cc_timezone",
 			   "gmtzone, id",
 			   "", "", "%1", "", "", "", "" );
-			   
+
 $HD_Form -> AddEditElement (gettext("PHONE NUMBER"),
 			   "phone",			
 			   '$value',	

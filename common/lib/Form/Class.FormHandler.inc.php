@@ -1514,7 +1514,7 @@ class FormHandler
 						}
 					}
 					// CHECK IF THIS IS A SPLITABLE FIELD LIKE 012-014 OR 15;16;17
-				 	if ($fields_name == $this -> FG_SPLITABLE_FIELD && substr($processed[$fields_name],0,1) != '_' ) {
+				 	if ($fields_name == $this -> FG_SPLITABLE_FIELD && substr($processed[$fields_name],0,1) != '_') {
 				 		$splitable_value = $processed[$fields_name];
 						$arr_splitable_value = explode(",", $splitable_value);
 						foreach ($arr_splitable_value as $arr_value) {

@@ -384,7 +384,6 @@ function MM_openBrWindow(theURL,winName,features) { //v2.0
 				  	 $ligne_number=0;					 
 				  	 foreach ($list as $recordset){ 
 						 $ligne_number++;
-						 $recordset[1] = display_GMT($recordset[1], $_SESSION["gmtoffset"], 1);
 				?>
 				
                		 <TR bgcolor="<?php echo $FG_TABLE_ALTERNATE_ROW_COLOR[$ligne_number%2]?>"  onMouseOver="bgColor='#C4FFD7'" onMouseOut="bgColor='<?php echo $FG_TABLE_ALTERNATE_ROW_COLOR[$ligne_number%2]?>'"> 

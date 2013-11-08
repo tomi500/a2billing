@@ -268,3 +268,8 @@ define ("ENABLE_LOG", 0);
 //SQLi
 $DBHandle  = DbConnect();
 include (dirname(__FILE__)."/protect_sqli.php");
+if (isset($_SESSION["timezone"]) && $_SESSION["timezone"] != "") {
+	$DBHandle -> Execute("SET time_zone = '".$_SESSION["timezone"]."'");
+	date_default_timezone_set( $_SESSION["timezone"] );
+//	define ("SERVER_GMT", 'GMT');
+}

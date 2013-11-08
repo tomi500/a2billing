@@ -3533,6 +3533,10 @@ msgstr ""
 msgid "Invoice Payment Ref: "
 msgstr ""
 
+#: A2B_entity_callerid.php
+msgid "... for incoming calls from this number"
+msgstr "Использовать для аутентификации при входящем звонке"
+
 #: A2B_entity_callerid.php:98
 #, fuzzy
 msgid "CALLER ID :"

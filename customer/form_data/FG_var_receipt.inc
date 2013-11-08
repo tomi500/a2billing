@@ -67,8 +67,8 @@ $HD_Form -> AddViewElement(gettext("ACCOUNT"), "username", "10%", "center", "sor
 $HD_Form -> AddViewElement(gettext("DATE"), "date", "15%", "center", "sort", "30", "", "", "", "", "", "display_dateformat");
 $HD_Form -> AddViewElement(gettext("TITLE"), "title", "21%", "center", "sort");
 $HD_Form -> AddViewElement(gettext("AMOUNT INCL VAT"), "price", "10%", "center", "sort","", "", "", "", "", "", "display_2bill");
-$HD_Form -> FieldViewElement ("cc_receipt.id, username, cc_receipt.date + INTERVAL UNIX_TIMESTAMP('".display_GMT('1970-01-02', $_SESSION['gmtoffset'], 1)."')-75600 SECOND AS date, title, total_price");
 
+$HD_Form -> FieldViewElement ("cc_receipt.id, username, cc_receipt.date, title, total_price");
 
 $HD_Form -> CV_NO_FIELDS  = gettext("THERE IS NO RECEIPT CREATED!"); 
 $HD_Form -> CV_DISPLAY_LINE_TITLE_ABOVE_TABLE = false;

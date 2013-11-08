@@ -77,17 +77,13 @@ function Service_Get_Rates($activation_code)
 	
 	list($accountnumber, $password) = (preg_split("{_}",$activation_code));
 	
-	$QUERY = "SELECT cc.username, cc.credit, cc.status, cc.id, cc.id_didgroup, cc.tariff, cc.vat, ct.gmtoffset, cc.voicemail_permitted, " .
-			 "cc.voicemail_activated, cc_card_group.users_perms, cc.currency " .
-			 "FROM cc_card cc LEFT JOIN cc_timezone AS ct ON ct.id = cc.id_timezone LEFT JOIN cc_card_group ON cc_card_group.id=cc.id_group " .
-			 "WHERE cc.username = '".$accountnumber."' AND cc.uipass = '".$password."'";
+	$QUERY = "SELECT id FROM cc_card WHERE username = '".$accountnumber."' AND uipass = '".$password."'";
 	$res = $DBHandle -> Execute($QUERY);
 	
 	if (!$res) {
 		return array('400', ' ERROR - AUTHENTICATE CODE');
 	}
-	$row [] = $res -> fetchRow();
-	$card_id = $row[0][3];
+	$card_id = $res[0][0];
 	
 	if (!$card_id || $card_id < 0) {
 		return array('400', ' ERROR - AUTHENTICATE CODE');

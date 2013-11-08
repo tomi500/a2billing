@@ -419,7 +419,7 @@ if ($form_action<>"ask-add") {
 		"periodcounta",
 		"$value",
 		"INPUT",
-		"size=30 maxlength=20 readonly",
+		"size=30 maxlength=20",
 		"",
 		gettext("period count"),
 		"" , "", "", "", "" , "" , "", gettext("Indicate for used seconds per period"));
@@ -539,7 +539,7 @@ if ($form_action<>"ask-add") {
 		"periodcountb",
 		"$value",
 		"INPUT",
-		"size=30 maxlength=20 readonly",
+		"size=30 maxlength=20",
 		"",
 		gettext("period count"),
 		"" , "", "", "", "" , "" , "", gettext("Indicate for used seconds per period"));

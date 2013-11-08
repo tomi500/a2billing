@@ -144,14 +144,13 @@ $processed = $this->getProcessed();
 						} else {
 							$value_display = $select_recordset[0];
 						}
-	?>
-	<OPTION  value='<?php echo $select_recordset[1]?>' 
-	<?php							
-						if ($this->FG_TABLE_ADITION[$i][2] == $select_recordset[1]) echo "selected";
-							
+						$temprecordset = "<OPTION  value='";
+						if ($this->FG_TABLE_ADITION[$i][2] == $select_recordset[1])
+							$temprecordset .= $this->FG_TABLE_ADITION[$i][2] . "' selected";
+						else $temprecordset .= $select_recordset[1] . "'";
+						
 						// CLOSE THE <OPTION
-						echo '> ';						
-						echo $value_display.'</OPTION>';
+						echo $temprecordset . '> ' . $value_display.'</OPTION>';
 						
 					 } // END_FOREACH
 				 } else {

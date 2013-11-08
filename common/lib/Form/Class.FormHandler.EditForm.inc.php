@@ -208,27 +208,38 @@ function updatecontent(id_el, record, field_inst, instance)
 						
 						if (count($select_list)>0) {
 							$select_number=0;
-							foreach ($select_list as $select_recordset){ 
+							foreach ($select_list as $select_recordset){
 								$select_number++;
-								?>
-								<OPTION  value='<?php echo $select_recordset[1]?>' <?php 
-									
-									if ($this->VALID_SQL_REG_EXP) { 
-										if (strpos($this->FG_TABLE_EDITION[$i][4], "multiple")) {									
-											if (intval($select_recordset[1]) & intval($list[0][$i])) echo "selected"; 
+								$recordshow = "<OPTION  value='";
+									if ($this->VALID_SQL_REG_EXP) {
+										if (strpos($this->FG_TABLE_EDITION[$i][4], "multiple")) {
+											$recordshow .= $select_recordset[1]."' ";
+											if (intval($select_recordset[1]) & intval($list[0][$i])) $recordshow .= "selected";
 										} else {
-											if (strcmp($list[0][$i],$select_recordset[1])==0) echo "selected";  
+											$temprecord = explode(';', $list[0][$i]);
+											if (strcmp($temprecord[0],$select_recordset[1])==0) {
+												$recordshow .= $list[0][$i]."' selected";
+											} else {
+												$recordshow .= $select_recordset[1]."' ";
+											}
 										}
 									} else {
 										if (strpos($this->FG_TABLE_EDITION[$i][4], "multiple")) {
-											if (is_array($processed[$this->FG_TABLE_EDITION[$i][1]]) && (intval($select_recordset[1]) & array_sum($processed[$this->FG_TABLE_EDITION[$i][1]]))) echo "selected"; 
+											$recordshow .= $select_recordset[1]."' ";
+											if (is_array($processed[$this->FG_TABLE_EDITION[$i][1]]) && (intval($select_recordset[1]) & array_sum($processed[$this->FG_TABLE_EDITION[$i][1]])))
+												$recordshow .= "selected";
 										} else {
-											if (strcmp($processed[$this->FG_TABLE_EDITION[$i][1]],$select_recordset[1])==0){ echo "selected"; } 
+											$temprecord = explode(';', $processed[$this->FG_TABLE_EDITION[$i][1]]);
+											if (strcmp($temprecord[0],$select_recordset[1])==0) {
+												$recordshow .= $processed[$this->FG_TABLE_EDITION[$i][1]]."' selected";
+											} else {
+												$recordshow .= $select_recordset[1]."' ";
+											}
 										}
 									}
-									  
+									echo $recordshow.'> ';
+									
 									// CLOSE THE <OPTION
-									echo '> ';
 									if ($this->FG_TABLE_EDITION[$i][12] != "") {
 										$value_display = $this->FG_TABLE_EDITION[$i][12];
 										$nb_recor_k = count($select_recordset);
@@ -240,7 +251,7 @@ function updatecontent(id_el, record, field_inst, instance)
 									}
 									
 									// DISPLAY THE VALUE
-									echo $value_display;									
+									echo $value_display;
 									?>
 								</OPTION>
                           		<?php 

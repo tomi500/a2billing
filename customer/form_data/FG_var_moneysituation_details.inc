@@ -34,7 +34,7 @@ if ($type == 'payment') {
 	$HD_Form->AddViewElement(gettext("PAYMENT INCL FEE"), "payment", "40%", "center", "sort", "", "", "", "", "", "", "display_2bill");
 	$HD_Form->AddViewElement(gettext("DESCRIPTION"), "description", "30%", "center", "sort");
 
-	$HD_Form->FieldViewElement("t2.date + INTERVAL UNIX_TIMESTAMP('".display_GMT('1970-01-02', $_SESSION['gmtoffset'], 1)."')-75600 SECOND AS date, t2.payment, t2.description");
+	$HD_Form->FieldViewElement("t2.date, t2.payment, t2.description");
 
 } elseif ($type == 'invoice') {
 	$list_sql = "cc_invoice " .
@@ -48,7 +48,7 @@ if ($type == 'payment') {
 	$HD_Form->AddViewElement(gettext("DATE"), "date", "50%", "center", "sort", "30", "", "", "", "", "", "display_dateformat");
 	$HD_Form->AddViewElement(gettext("AMOUNT INCL VAT"), "total_price", "50%", "center", "sort", "", "", "", "", "", "", "display_2bill");
 
-	$HD_Form->FieldViewElement("cc_invoice.date + INTERVAL UNIX_TIMESTAMP('".display_GMT('1970-01-02', $_SESSION['gmtoffset'], 1)."')-75600 SECOND AS date, total_price");
+	$HD_Form->FieldViewElement("cc_invoice.date, total_price");
 
 } elseif ($type == 'sipiax') {
 	$atmenu = ($atmenu=='IAX')?$atmenu:'SIP';

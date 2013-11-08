@@ -54,8 +54,7 @@ $HD_Form -> AddViewElement(gettext("PAYMENT DATE"), "date", "20%", "center", "so
 $HD_Form -> AddViewElement(gettext("PAYMENT INCL FEE"), "payment", "35%", "center", "sort", "", "", "", "", "", "", "display_refill_money");
 $HD_Form -> AddViewElement(gettext("DESCRIPTION"), "description", "45%", "center", "sort");
 
-//$HD_Form -> FieldViewElement ("cc_logpayment.id, date + INTERVAL UNIX_TIMESTAMP('".display_GMT('1970-01-02', $_SESSION['gmtoffset'], 1)."')-75600 SECOND AS date, CONCAT_WS(' ',payment,'".BASE_CURRENCY."') AS payment, description ");
-$HD_Form -> FieldViewElement ("date + INTERVAL UNIX_TIMESTAMP('".display_GMT('1970-01-02', $_SESSION['gmtoffset'], 1)."')-75600 SECOND AS date, payment, description ");
+$HD_Form -> FieldViewElement ("date, payment, description ");
 
 $HD_Form -> CV_TITLE_TEXT = gettext("Payment list");
 $HD_Form -> CV_NO_FIELDS  = gettext("No payments have been made!"); 

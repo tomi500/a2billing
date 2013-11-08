@@ -269,7 +269,7 @@ function sanitize_data($input) {
 		// remove whitespaces (not a must though)  
 		$input = trim($input);
 		$input = str_replace('--', '', $input);
-		$input = str_replace(';', '', $input);
+//		$input = str_replace(';', '', $input);
 //		$input = str_replace('#', '', $input);
 		$input = str_replace('/*', '', $input);
 		
@@ -1082,7 +1082,7 @@ function getAcceptLanguage($languages)
             // Переводим ru-RU в ru_RU (т.к. локаль ru_RU)
             $lang .= '_'.$matches[2][$i];
         }
-//echo $lang."<br>";
+
         // Определяем приоритет
         if (!empty($matches[3][$i])) {
             $q = (float)$matches[3][$i];
@@ -1464,8 +1464,6 @@ function currencies_update_yahoo ($DBHandle, $instance_table)
 			// if the currency is base_currency then set to exactly 1.00000
 			if ($i == $index_base_currency)
 				$currency = 1;
-
-if ($old_currencies[$i][1] == 'UAH')		$currency = '0.085';
 
 			$QUERY = "UPDATE cc_currencies SET value='$currency'";
 

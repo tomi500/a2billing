@@ -69,7 +69,8 @@ $HD_Form -> AddViewElement(gettext("DATE"), "date", "15%", "center", "sort", "30
 $HD_Form -> AddViewElement(gettext("TITLE"), "title", "25%", "center", "sort");
 $HD_Form -> AddViewElement(gettext("STATUS"), "paid_status", "5%", "center", "sort", "", "list", $status_list);
 $HD_Form -> AddViewElement(gettext("AMOUNT INCL VAT"), "price", "10%", "center", "sort","", "", "", "", "", "", "display_2bill");
-$HD_Form -> FieldViewElement ("cc_invoice.reference, cc_invoice.date + INTERVAL UNIX_TIMESTAMP('".display_GMT('1970-01-02', $_SESSION['gmtoffset'], 1)."')-75600 SECOND AS date, title, cc_invoice.paid_status, total_price, id, cc_invoice.paid_status");
+
+$HD_Form -> FieldViewElement ("cc_invoice.reference, cc_invoice.date, title, cc_invoice.paid_status, total_price, id, cc_invoice.paid_status");
 
 
 $HD_Form -> CV_NO_FIELDS  = gettext("THERE IS NO INVOICE CREATED!"); 

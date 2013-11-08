@@ -133,13 +133,14 @@ if ((!isset($_SESSION['pr_login']) || !isset($_SESSION['pr_password']) || !isset
 			$_SESSION["user_type"]		= "CUST";
 			$_SESSION["card_id"]		= $return[3];
 			$_SESSION["id_didgroup"]	= $return[4];
-			$_SESSION["tariff"]			= $return[5];
-			$_SESSION["vat"]			= $return[6];
+			$_SESSION["tariff"]		= $return[5];
+			$_SESSION["vat"]		= $return[6];
 			$_SESSION["gmtoffset"]		= $return[7];
 			$_SESSION["currency"]		= $return["currency"];
 			$_SESSION["voicemail"]		= $return[8];
 			$_SESSION["email"]		= $return[12];
 			$_SESSION["margin_diller"]	= $return[13];
+			$_SESSION["timezone"]		= $return[14];
 		}
 	} else {
 		$_SESSION["cus_rights"]=0;
@@ -159,8 +160,9 @@ function login ($user, $pass)
     $user = filter_var($user, FILTER_SANITIZE_STRING);
     $pass = filter_var($pass, FILTER_SANITIZE_STRING);
 
-	$QUERY = "SELECT cc.username, cc.credit, cc.status, cc.id, cc.id_didgroup, cc.tariff, cc.vat, ct.gmtoffset, cc.voicemail_permitted, " .
-			 "cc.voicemail_activated, cc_card_group.users_perms, cc.currency, cc.email, cc.margin_diller " .
+//	$QUERY = "SELECT cc.username, cc.credit, cc.status, cc.id, cc.id_didgroup, cc.tariff, cc.vat, IF(CONCAT(cc.id_timezone+0) = cc.id_timezone, ct.gmtoffset, (UNIX_TIMESTAMP() - UNIX_TIMESTAMP(CONVERT_TZ(NOW(), SUBSTRING_INDEX(cc.id_timezone, ';', -1), 'UTC')))), cc.voicemail_permitted, " .
+	$QUERY = "SELECT cc.username, cc.credit, cc.status, cc.id, cc.id_didgroup, cc.tariff, cc.vat, IF(CONCAT(cc.id_timezone+0) = cc.id_timezone, ct.gmtoffset, 0), cc.voicemail_permitted, " .
+			 "cc.voicemail_activated, cc_card_group.users_perms, cc.currency, cc.email, cc.margin_diller, IF(CONCAT(cc.id_timezone+0) = cc.id_timezone, IF(ct.gmttime='GMT', ct.gmttime, SUBSTRING(ct.gmttime,4,6)), SUBSTRING_INDEX(cc.id_timezone, ';', -1)) " .
 			 "FROM cc_card cc LEFT JOIN cc_timezone AS ct ON ct.id = cc.id_timezone LEFT JOIN cc_card_group ON cc_card_group.id=cc.id_group " .
 			 "WHERE (cc.email = '".$user."' OR cc.useralias = '".$user."') AND cc.uipass = '".$pass."'";
 			 

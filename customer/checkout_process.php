@@ -328,7 +328,7 @@ $newkey = securitykey(EPAYMENT_TRANSACTION_KEY, $transaction_data[0][8]."^".$tra
 if($newkey == $key) {
 	write_log(LOGFILE_EPAYMENT, basename(__FILE__).' line:'.__LINE__." ----------- Transaction Key Verified ------------");
 } else {
-	write_log(LOGFILE_EPAYMENT, basename(__FILE__).' line:'.__LINE__." ----NEW KEY =".$newkey." OLD KEY= ".$key." ------- Transaction Key Verification Failed:".$transaction_data[0][8]."^".$transactionID."^".$transaction_data[0][2]."^".$transaction_data[0][1]." ------------\n");
+	write_log(LOGFILE_EPAYMENT, basename(__FILE__).' line:'.__LINE__." ---- NEWKEY=".$newkey." OLDKEY= ".$key." ---- Transaction Key Verification Failed: ".$transaction_data[0][8]." TransactionID=".$transactionID." Amount=".$transaction_data[0][2]." CardID=".$transaction_data[0][1]." ------------\n");
 	exit();
 }
 write_log(LOGFILE_EPAYMENT, basename(__FILE__).' line:'.__LINE__." - transactionID=$transactionID"." ---------- TRANSACTION INFO ------------\n".print_r($transaction_data,1));

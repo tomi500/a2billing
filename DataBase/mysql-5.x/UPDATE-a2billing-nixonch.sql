@@ -60,6 +60,7 @@ ALTER TABLE cc_card ADD margintotal DECIMAL( 15, 5 ) NOT NULL DEFAULT 1 AFTER `m
 ALTER TABLE cc_card ADD commission DECIMAL( 15, 5 ) NOT NULL DEFAULT 0 AFTER `margintotal`;
 
 ALTER TABLE cc_card CHANGE id_campaign id_campaign  INT( 11 ) NULL DEFAULT '-1';
+ALTER TABLE cc_card CHANGE id_timezone id_timezone CHAR( 40 ) NULL DEFAULT '0';
 
 ALTER TABLE cc_logrefill ADD diller_id bigint(20) NULL DEFAULT NULL;
 
