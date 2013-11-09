@@ -100,7 +100,16 @@ define ("BASE_CURRENCY", isset($A2B->config['global']['base_currency'])?$A2B->co
 define ("MANAGER_HOST", isset($A2B->config['global']['manager_host'])?$A2B->config['global']['manager_host']:null);
 define ("MANAGER_USERNAME", isset($A2B->config['global']['manager_username'])?$A2B->config['global']['manager_username']:null);
 define ("MANAGER_SECRET", isset($A2B->config['global']['manager_secret'])?$A2B->config['global']['manager_secret']:null);
-define ("SERVER_GMT", isset($A2B->config['global']['server_GMT'])?$A2B->config['global']['server_GMT']:null);
+if (strlen(DATE_TIMEZONE) > 2) {
+	$UserDateTime	= new DateTime('2013-12-21', new DateTimeZone(DATE_TIMEZONE));
+	$offset 	= $UserDateTime->getOffset();
+	$offsetHours	= round(abs($offset)/3600);
+	$offsetMinutes	= round((abs($offset) - $offsetHours * 3600) / 60);
+	$servergmt	= 'GMT'.($offset < 0 ? '-' : '+') . ($offsetHours < 10 ? '0' : '') . $offsetHours . ':' . ($offsetMinutes < 10 ? '0' : '') . $offsetMinutes;
+	define ("SERVER_GMT", $servergmt);
+} else {
+	define ("SERVER_GMT", isset($A2B->config['global']['server_GMT'])?$A2B->config['global']['server_GMT']:null);
+}
 define ("CUSTOMER_UI_URL", isset($A2B->config['global']['customer_ui_url'])?$A2B->config['global']['customer_ui_url']:null);
 
 define ("API_SECURITY_KEY", isset($A2B->config['webui']['api_security_key'])?$A2B->config['webui']['api_security_key']:null);
