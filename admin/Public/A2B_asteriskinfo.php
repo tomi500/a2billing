@@ -120,7 +120,7 @@ $arr_channels = array(
 	"IAX2 Channel(s)" => "iax2 show channels",
 );
 $arr_codecs = array(
-        "Codecs" => "show translation",
+        "Codecs" => "core show translation",
 );
 $arr_peers = array(
 	"Sip Peers" => "sip show peers",

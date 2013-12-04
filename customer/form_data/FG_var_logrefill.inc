@@ -17,7 +17,7 @@ LEFT JOIN cc_card ON cc_card.id=id_cc_card WHERE id_cc_card = ".$_SESSION["card_
 UNION (
 SELECT cc_logrefill.id, `date`, cc_logrefill.credit, lastname, firstname, company_name, card_id, refill_type, description FROM cc_logrefill
 LEFT JOIN cc_card ON cc_card.id=card_id WHERE cc_card.id = ".$_SESSION["card_id"].$QUERY_CLAUSE.")) aa";
-	$HD_Form = new FormHandler($QUERY,"Refill");
+	$HD_Form = new FormHandler($QUERY,gettext("Refill"));
 //	if (strlen($HD_Form -> FG_TABLE_CLAUSE)>0)
 //		$HD_Form -> FG_TABLE_CLAUSE.=" AND ";
 //	$HD_Form -> FG_TABLE_CLAUSE.="(";
@@ -25,7 +25,7 @@ LEFT JOIN cc_card ON cc_card.id=card_id WHERE cc_card.id = ".$_SESSION["card_id"
 	$HD_Form -> FG_TABLE_ID = 'aa.id';
 	$HD_Form -> FG_TABLE_DEFAULT_ORDER = 'date';
 } else {
-	$HD_Form = new FormHandler("cc_logrefill","Refill");
+	$HD_Form = new FormHandler("cc_logrefill",gettext("Refill"));
 	unset($list_refill_type[0]);
 	$HD_Form -> FG_TABLE_ID = 'cc_logrefill.id';
 }

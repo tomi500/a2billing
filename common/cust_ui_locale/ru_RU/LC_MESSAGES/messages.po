@@ -15,9 +15,37 @@ msgstr ""
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
 
+#: FG_var_moneysituation_details.inc
+msgid "THERE IS NO PAYMENTS CREATED!"
+msgstr "ПЛАТЕЖЕЙ ЕЩЁ НЕ БЫЛО!"
+
+#: FG_var_logrefill.inc
+msgid "Enter the amount in the currency base: "
+msgstr "Введите сумму +пополнения или -списания в базовой валюте: "
+
+#: FG_var_logrefill.inc
+msgid ". <b>Available "
+msgstr ". <b>Доступно "
+
+#: FG_var_moneysituation_details.inc
+msgid "Payments"
+msgstr "Платежи"
+
 #: FG_var_surveillance.inc
-msgid "PhoneNumber "
+msgid " PhoneNumber"
 msgstr "Номер"
+
+#: A2B_entity_surveillance.php
+msgid "Your surveillance request has been queued correctly"
+msgstr "Задание наблюдения успешно добавлено"
+
+#: A2B_entity_surveillance.php
+msgid "Error : You have to specify at least phonenumber1 and duration!"
+msgstr "ОШИБКА! Введите правильно хотя бы 1-й номер и длительность роликов!"
+
+#: A2B_entity_surveillance.php
+msgid "TIME LEFT"
+msgstr "ОСТАЛОСЬ"
 
 #: A2B_notification.php:76
 msgid "Your notification settings has successfully been updated."
@@ -487,7 +515,7 @@ msgstr "Заполните поля, и поддвердите нажава кн
 #: lib/Form/Class.FormHandler.inc.php:559
 #: lib/Form/Class.FormHandler.inc.php:560
 msgid "Your new"
-msgstr "Новый"
+msgstr "Новое"
 
 msgid "Your new Refill has been inserted.<br>"
 msgstr "Перевод средств осуществлён успешно.<br>"
@@ -535,9 +563,8 @@ msgid "AMOUNT INCL VAT"
 msgstr "ВСЕГО с НДС"
 
 #: form_data/FG_var_invoice.inc:75
-#, fuzzy
 msgid "THERE IS NO INVOICE CREATED!"
-msgstr "THERE IS NO"
+msgstr "СЧЕТА ЕЩЁ НЕ ВЫСТАВЛЯЛИСЬ!"
 
 #: form_data/FG_var_signup.inc:88
 msgid "No Call Plan id are defined"
@@ -2104,9 +2131,8 @@ msgid "has been inserted.<br>"
 msgstr "зарегистрирован.<br>"
 
 #: lib/Form/Class.FormHandler.inc.php:560
-#, fuzzy
 msgid "hasn't been inserted."
-msgstr "не зарегистрирован."
+msgstr "ОТКЛОНЕНО."
 
 #: lib/Form/Class.FormHandler.inc.php:561
 msgid "You cannot choose more than one !"
@@ -3560,7 +3586,7 @@ msgstr ""
 
 #: checkout_payment.php:248
 msgid "Refill"
-msgstr "Cумма пополнения"
+msgstr "пополнение"
 
 #: checkout_payment.php:306
 #, fuzzy

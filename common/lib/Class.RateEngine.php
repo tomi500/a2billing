@@ -178,7 +178,7 @@ class RateEngine
 		id_cc_package_offer,
 		cc_trunk.status,
 		cc_trunk.inuse,
-		IF(cc_trunk.wrapnexttime>NOW(),0,cc_trunk.maxuse),
+		IF(cc_trunk.wrapnexttime>NOW(),0,cc_trunk.maxuse) maxuse,
 		cc_trunk.if_max_use,
 		cc_ratecard.rounding_calltime,
 		cc_ratecard.rounding_threshold,
@@ -354,7 +354,7 @@ class RateEngine
 		$LCtype = $result[0][1];
 
 		foreach ($result as $key => $row) {
-		    $strprefix[$key]  = (ctype_digit($row[7]))?0:(($row[12] != 100)?strlen($row[7]):0);
+		    $strprefix[$key]  = (ctype_digit($row[7]))?1:(($row[12] != 100)?strlen($row[7]):0);
 		    $lcrsort[$key] = ($LCtype==0)?$row[9]:$row[12];
 		}
 		array_multisort($strprefix, SORT_DESC, $lcrsort, $result);
@@ -363,8 +363,13 @@ class RateEngine
 		if ($ind_stop_default > 0) {
 			$result = array_merge ((array)$result, (array)$result_defaultprefix);
 		}
-		if (count($result) > 1 && $result[count($result)-1][12] == 100) unset($result[count($result)-1]);
-		if (count($result) > 0 && $result[count($result)-1][12] == 100) $result[count($result)-1][12] = 0;
+		$cres = count($result)-1;
+		if ($cres > 0 && $result[$cres][12] == 100) {
+			unset($result[$cres]);
+			$cres--;
+		}
+		if ($cres > -1 && $result[$cres][12] == 100) $result[$cres][12] = 0;
+
 		
 		// 3) REMOVE THOSE THAT USE THE SAME TRUNK - MAKE A DISTINCT
 		//    AND THOSE THAT ARE DISABLED.
@@ -1442,7 +1447,7 @@ else echo "Ratecard: ".$this->ratecard_obj[$i][6]."<br>Trunk: ".$this->ratecard_
 		if ($inuse) {
 			$QUERY = "UPDATE cc_trunk SET inuse=inuse+1 WHERE id_trunk='".$this -> usedtrunk."'";
 		} else {
-			$QUERY = "UPDATE cc_trunk SET inuse=inuse-1, wrapnexttime = DATE_ADD(NOW(), INTERVAL $wrapuptime SECOND) WHERE id_trunk='".$this -> usedtrunk."'";
+			$QUERY = "UPDATE cc_trunk SET inuse=inuse-1, wrapnexttime = DATE_ADD(NOW(), INTERVAL '".$wrapuptime."' SECOND) WHERE id_trunk='".$this -> usedtrunk."'";
 		}
 
 		if ($agi) $A2B -> debug( DEBUG, $agi, __FILE__, __LINE__, "[TRUNK STATUS UPDATE : $QUERY]");
@@ -1701,16 +1706,17 @@ else echo "Ratecard: ".$this->ratecard_obj[$i][6]."<br>Trunk: ".$this->ratecard_
 						if ($intellect_count > 0) {
 						    $failover_trunk = $this -> usedtrunk;
 						    $firstrand = false;
-						} elseif ($next_failover_trunk == $failover_trunk) break;
-						    else {
-							if ($next_failover_trunk == -1 && $ifmaxuse == 1) continue 2;
-							$intellect_count = -1;
-							$loop_failover++;
-							$failover_trunk = $next_failover_trunk;
-						    }
+						} elseif ($next_failover_trunk == $failover_trunk) {
+						    break;
+						} else {
+						    if ($next_failover_trunk == -1 && $ifmaxuse == 1) continue 2;
+						    $intellect_count = -1;
+						    $loop_failover++;
+						    $failover_trunk = $next_failover_trunk;
+						}
 						continue;
 					} else {
-						if ($agi) $A2B -> debug( DEBUG, $agi, __FILE__, __LINE__, "Now using next trunk\n");
+						if ($agi)	$A2B -> debug( DEBUG, $agi, __FILE__, __LINE__, "Now using next trunk\n");
 						continue 2;
 					}
 				}
@@ -1855,7 +1861,7 @@ else echo "Ratecard: ".$this->ratecard_obj[$i][6]."<br>Trunk: ".$this->ratecard_
 				    $A2B -> DbReConnect($agi);
 
 				    $this -> dialstatus = $agi -> get_variable("DIALSTATUS",true);
-$A2B -> debug( ERROR, $agi, __FILE__, __LINE__, " [===================                           DIALSTATUS: $this->dialstatus ]");
+//$A2B -> debug( ERROR, $agi, __FILE__, __LINE__, " [===================                           DIALSTATUS: $this->dialstatus ]");
 
 				} elseif (is_array($amicmd)) {
 				    write_log(LOGFILE_API_CALLBACK, basename(__FILE__) . ' line:' . __LINE__ . " ActionID = {$amicmd[5]} [#### Starting AMI ORIGINATE ####] $channel");
@@ -1868,8 +1874,8 @@ $A2B -> debug( ERROR, $agi, __FILE__, __LINE__, " [===================          
 				    write_log(LOGFILE_API_CALLBACK, basename(__FILE__) . ' line:' . __LINE__ . " ActionID = {$amicmd[5]} [####  RESULT AMI ORIGINATE  ####] {$res['Response']}");
 				    $ast->log("ActionID = {$amicmd[5]} [#### RESULT AMI ORIGINATE  ####] {$res['Response']}");
 				    if ($res['Response'] == "Success") {
-				    write_log(LOGFILE_API_CALLBACK, basename(__FILE__) . ' line:' . __LINE__ . " ActionID = {$amicmd[5]} [#### Starting AMI WAIT_RESPONSE ####]");
-				    $ast->log("ActionID = {$amicmd[5]} [#### Starting AMI WAIT_RESPONSE ####]");
+					write_log(LOGFILE_API_CALLBACK, basename(__FILE__) . ' line:' . __LINE__ . " ActionID = {$amicmd[5]} Channel = {$res['Channel']} [#### Starting AMI WAIT_RESPONSE ####]");
+					$ast->log("ActionID = {$amicmd[5]} [#### Starting AMI WAIT_RESPONSE ####]");
 					$res = $ast -> wait_response(true);
 				    }
 				    switch($res)

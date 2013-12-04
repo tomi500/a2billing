@@ -65,6 +65,21 @@ if (DELETE_FK_CARD) {
 //$HD_Form -> FG__DELETION_LINK = $_SERVER['PHP_SELF']."?form_action=ask-delete&atmenu=$atmenu&regexten=|$FN_COLUMN_REGEXTEN|&id=";
 
 $values_list['nat'] = array(array(gettext('yes'),'force_rport,comedia'),array(gettext('no'),'no'),array(null,null));
+$yesno = Constants::getYesNoList();
+// Possible value to notify the user
+$instance_config_table = new Table("cc_config", "id, config_value");
+$QUERY = " config_key = 'values_notifications' ";
+//$return = null;
+$return = $instance_config_table -> Get_list($DBHandle, $QUERY, 0);
+$values = explode(":",$return[0]["config_value"]);
+$limits_notify = array();
+$idx = 0;
+$limits_notify [$idx] = array(gettext("NEVER").'&nbsp;', -2);
+foreach ($values as $val) {
+        $idx++;
+        $val_display = round($val,2);
+        $limits_notify [$idx] = array($val_display,$val);
+}
 
 $HD_Form -> AddViewElement(gettext("EXTENSION"), "regexten", "10%", "center", "sort", "25");
 $HD_Form -> AddViewElement(gettext("CALLERID NAME"), "callerid", "22%", "center", "sort");
@@ -157,7 +172,34 @@ $HD_Form -> AddEditElement (gettext("NAT"),
 					"",
 					"list", "", "", "", $values_list['nat'], "%1", "NO-NULL", gettext("Is this extension behind the nat?"));
 
-$field_list_edit = 'regexten, name, secret, callerid, nat';
+$HD_Form -> AddEditElement (gettext("SAY BALANCE AFTER AUTH"),
+                                        "warning_threshold",
+                                        '',
+                                        "SELECT",
+                                        "",
+                                        "",
+                                        "",
+                                        "list", "", "", "", $limits_notify , "%1", "", gettext('currency : ').strtoupper(BASE_CURRENCY)." (".gettext("with the warning threshold").")", "", '<OPTION  value="-1" selected>'.gettext("ALWAYS").'&nbsp;</OPTION>');
+
+$HD_Form -> AddEditElement (gettext("SAY RATE BEFORE CALL"),
+                                        "say_rateinitial",
+                                        '0',
+                                        "SELECT",
+                                        "",
+                                        "",
+                                        "",
+                                        "list", "", "", "", $yesno, "%1");
+
+$HD_Form -> AddEditElement (gettext("SAY BALANCE AFTER CALL"),
+                                        "say_balance_after_call",
+                                        '0',
+                                        "SELECT",
+                                        "",
+                                        "",
+                                        "",
+                                        "list", "", "", "", $yesno, "%1");
+
+$field_list_edit = 'regexten, name, secret, callerid, nat, warning_threshold, say_rateinitial, say_balance_after_call';
 
 $HD_Form -> FieldEditElement ($field_list_edit);
 

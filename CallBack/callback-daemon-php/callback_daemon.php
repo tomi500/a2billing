@@ -100,11 +100,11 @@ $A2B -> set_instance_table ($instance_table);
 while(true)
 {
     pcntl_wait($status, WNOHANG);
-    $query="SELECT `id`,`status`,`exten_leg_a`,`account`,`callerid`,`exten`,`context`,`priority`,`variable`,`timeout`,`reason`,`num_attempts_unavailable`,`num_attempts_busy`,`num_attempts_noanswer`,TIMEDIFF(now(),`callback_time`),`id_server_group`";
-    $query.=" FROM `cc_callback_spool` WHERE `status`='PENDING' AND (`next_attempt_time`<=now() OR ISNULL(`next_attempt_time`))";
+    $query="SELECT `id`,`status`,`exten_leg_a`,`account`,`callerid`,`exten`,`context`,`priority`,`variable`,`timeout`,`reason`,`num_attempts_unavailable`,`num_attempts_busy`,`num_attempts_noanswer`,TIMEDIFF(now(),`callback_time`),`id_server_group`, `surveillance`";
+    $query.=" FROM `cc_callback_spool` WHERE (`status`='PENDING' OR (`status`<>'SENT' AND `status`<>'PROCESSING' AND `surveillance` <> 0)) AND (`next_attempt_time`<=now() OR ISNULL(`next_attempt_time`))";
     $result=$instance_table->SQLExec($A2B->DBHandle, $query);
     foreach ($result as $value) {
-	list($cc_id,$cc_status,$cc_exten_leg_a,$cc_account,$cc_callerid,$cc_exten,$cc_context,$cc_priority,$cc_variable,$cc_timeout,$cc_reason,$cc_num_attempts_unavailable,$cc_num_attempts_busy,$cc_num_attempts_noanswer,$cc_timediff,$id_server_group)=$value;
+	list($cc_id,$cc_status,$cc_exten_leg_a,$cc_account,$cc_callerid,$cc_exten,$cc_context,$cc_priority,$cc_variable,$cc_timeout,$cc_reason,$cc_num_attempts_unavailable,$cc_num_attempts_busy,$cc_num_attempts_noanswer,$cc_timediff,$id_server_group,$duration)=$value;
 	$query="SELECT `id`,`manager_host`,`manager_username`,`manager_secret` FROM `cc_server_manager` WHERE `id_group`=$id_server_group LIMIT 1";
 	$result1=$instance_table->SQLExec($A2B->DBHandle, $query);
 	if (!(is_array($result1) && count($result1)>0)) {
@@ -119,6 +119,9 @@ while(true)
 	$result1=$instance_table->SQLExec($A2B->DBHandle, $query);
 	if (!(is_array($result1) && count($result1)>0)) die("Can't execute query '$query'\n");
 	list($acc_tariff,$acc_to_unav,$acc_max_unav,$acc_to_busy,$acc_max_busy,$acc_to_noansw,$acc_max_noansw,$acc_max_timeout,$acc_timeout_res)=$result1[0];
+	if ($duration > 0) {
+		$acc_to_unav=$acc_to_busy=$acc_to_noansw=$cc_num_attempts_unavailable=$cc_num_attempts_busy=$cc_num_attempts_noanswer=0;
+	}
 	if ($acc_timeout_res < 0)
 	{
 	    $query="UPDATE `cc_callback_spool` SET `status`='ERROR_TIMEOUT',`id_server`='$manager_id' WHERE `id`=$cc_id";

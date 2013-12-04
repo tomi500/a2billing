@@ -1067,6 +1067,7 @@ for ($t=0;$t<count($result);$t++) {
 			if (is_array($result)) {
 				// NUMBER NOT AUHTORIZED
 				$this -> debug( INFO, $agi, __FILE__, __LINE__, "[NUMBER NOT AUHTORIZED - NOT ALLOW TO CALL RESTRICTED NUMBERS]");
+				$this -> let_stream_listening($agi);
 				$agi-> stream_file('prepaid-not-authorized-phonenumber', '#');
 				return -1;
 			}
@@ -1075,6 +1076,7 @@ for ($t=0;$t<count($result);$t++) {
 			if (!is_array($result)) {
 				//NUMBER NOT AUHTORIZED
 				$this -> debug( INFO, $agi, __FILE__, __LINE__, "[NUMBER NOT AUHTORIZED - ALLOW TO CALL ONLY RESTRICTED NUMBERS]");
+				$this -> let_stream_listening($agi);
 				$agi-> stream_file('prepaid-not-authorized-phonenumber', '#');
 				return -1;
 			}
@@ -1231,21 +1233,19 @@ for ($t=0;$t<count($result);$t++) {
 				}
 				return -1;
 	        }
-	
-	        if ($this->destination<=0) {
-                $prompt = "prepaid-invalid-digits";
+	        if ($this->destination<=0 && $this->destination!='RECORDER') {
+			$prompt = "prepaid-invalid-digits";
                 // do not play the error message if the destination number is not numeric
                 // because most probably it wasn't entered by user (he has a phone keypad remember?)
                 // it helps with using "use_dnid" and extensions.conf routing
-                if (is_numeric($this->destination)) $agi-> stream_file($prompt, '#');
-                return -1;
+			if (is_numeric($this->destination)) $agi-> stream_file($prompt, '#');
+			return -1;
 	        }
-			
 	        // STRIP * FROM DESTINATION NUMBER
 	        $this->destination = str_replace('*', '', $this->destination);
-	
+
 	        $this->save_redial_number($agi, $this->destination);
-			
+
 	        // LOOKUP RATE : FIND A RATE FOR THIS DESTINATION
 	        $resfindrate = $RateEngine->rate_engine_findrates($this, $this->destination,$this->tariff);
 	        if ($resfindrate==0) {
@@ -1253,7 +1253,7 @@ for ($t=0;$t<count($result);$t++) {
 			} else {
 				$this -> debug( DEBUG, $agi, __FILE__, __LINE__, "OK - RESFINDRATE::> ".$resfindrate);
 			}
-	
+
 	        // IF DONT FIND RATE
 	        if ($resfindrate==0) {
 			$this -> let_stream_listening($agi);
@@ -1271,10 +1271,10 @@ for ($t=0;$t<count($result);$t++) {
 			$agi-> stream_file($prompt, '#');
 			return -1;
 	        }
-	
+
 	        // calculate timeout
 	        //$this->timeout = intval(($this->credit * 60*100) / $rate);  // -- RATE is millime cents && credit is 1cents
-	
+
 /**
 	        $this->timeout = $RateEngine-> ratecard_obj[0]['timeout'];
 	        $timeout = $this->timeout;

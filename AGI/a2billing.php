@@ -162,17 +162,33 @@ define ("WRITELOG_QUERY", true);
 $instance_table = new Table();
 $A2B -> set_instance_table ($instance_table);
 
-//preg_match("/up (.+), (\\d+) user/", `uptime`, $matches);
-//$uptime = $matches[1];
-//$A2B -> debug( ERROR, $agi, __FILE__, __LINE__, 'uptimeFreeBSD='.$uptime);
-$uptime = exec("cat /proc/uptime");
-if ($uptime == '') {
-	$uptime = explode(" ", exec("/sbin/sysctl -n kern.boottime"));
-	$startUpSystem = str_replace( ",", "", $uptime[3]);
-} else {
-	$uptime = explode(" ", $uptime);
-	$startUpSystem = time() - $uptime[0];
+$startUpSystem = $agi -> get_variable('SYSUPTIME', true);
+if ($startUpSystem == '') {
+	define ("MANAGER_HOST", isset($A2B->config['global']['manager_host'])?$A2B->config['global']['manager_host']:null);
+	define ("MANAGER_USERNAME", isset($A2B->config['global']['manager_username'])?$A2B->config['global']['manager_username']:null);
+	define ("MANAGER_SECRET", isset($A2B->config['global']['manager_secret'])?$A2B->config['global']['manager_secret']:null);
+	$as = new AGI_AsteriskManager();
+	$res =@  $as->connect(MANAGER_HOST,MANAGER_USERNAME,MANAGER_SECRET);
+	if ($res) {
+	    $res = $as->send_request('Command',array('Command'=>'core show uptime seconds'));
+	    $as->disconnect();
+//	    $nv = rtrim(array_pop(explode(' ',$res['data'])));
+	    preg_match('/\d+$/', $res['data'], $uptime);
+	    $startUpSystem = time() - $uptime[0];
+//$A2B -> debug( ERROR, $agi, __FILE__, __LINE__, $startUpSystem);
+	} else {
+	    $uptime = exec("cat /proc/uptime");
+	    if ($uptime == '') {
+		$uptime = explode(" ", exec("/sbin/sysctl -n kern.boottime"));
+		$startUpSystem = str_replace( ",", "", $uptime[3]);
+	    } else {
+		$uptime = explode(" ", $uptime);
+		$startUpSystem = time() - $uptime[0];
+	    }
+	}
+unset($as);
 }
+//$A2B -> debug( ERROR, $agi, __FILE__, __LINE__, "StartUpSystem=".$startUpSystem);
 if ($startUpSystem) {
 	$startUpTime = $A2B->config['global']['startup_time'];
 	if ($startUpTime == 0) {
@@ -206,6 +222,9 @@ if ($startUpSystem) {
 		$QUERY = "UPDATE cc_config SET config_value=$startUpSystem WHERE config_key='startup_time' AND config_group_title='global'";
 		$A2B -> DBHandle -> Execute($QUERY);
 		$QUERY = "UPDATE cc_card,cc_trunk SET cc_card.inuse=0, cc_trunk.inuse=0";
+		$A2B -> DBHandle -> Execute($QUERY);
+		$QUERY = "UPDATE cc_callback_spool SET status='PENDING', last_attempt_time='1980-01-01 00:00:00', next_attempt_time=NOW() WHERE surveillance > 0";
+//		$QUERY = "UPDATE cc_callback_spool SET status='PENDING', last_attempt_time=NOW(), next_attempt_time=NOW() WHERE surveillance > 0";
 		$A2B -> DBHandle -> Execute($QUERY);
 	}
 }
@@ -1336,8 +1355,6 @@ if ($mode == 'standard') {
 //	if (is_numeric($called_party) && strlen($called_party > 6))
 	$A2B -> CID_handover		= $called_party;
 
-$A2B -> debug( ERROR, $agi, __FILE__, __LINE__, "[CALLBACK CALLERID: ={$A2B->CID_handover}]");
-
 	$QUERY = "UPDATE cc_trunk SET inuse=inuse+1 WHERE id_trunk=".$callback_usedtrunk;
 	$res = $A2B -> DBHandle -> Execute($QUERY);
 
@@ -1358,6 +1375,11 @@ $A2B -> debug( ERROR, $agi, __FILE__, __LINE__, "[CALLBACK CALLERID: ={$A2B->CID
 		$A2B -> agiconfig['cid_enable'] = 0;
 
 	} else {
+		if (is_numeric($callback_mode)) {
+			$A2B->recalltime = $callback_mode * 60;
+			$A2B -> agiconfig['number_try']=1;
+			$A2B -> agiconfig['play_audio'] = 0;
+		}
 		$charge_callback = 1;
 		// FOR THE WEB-CALLBACK
 		$A2B -> agiconfig['use_dnid'] = 1;
@@ -1428,9 +1450,11 @@ $A2B -> debug( ERROR, $agi, __FILE__, __LINE__, "[CALLBACK CALLERID: ={$A2B->CID
 			} else $A2B -> src_exten = 'NULL';
 
 			$calling_party = $agi -> get_variable('CALLERID(name)', true);
-			$agi -> set_callerid($calling_num);
 //			$agi -> set_variable('__TEMPONFORWARDCIDEXT1', $calling_num);
-			$agi -> set_variable('CALLERID(name)', ($calling_party) ? $calling_party : $A2B -> config['callback']['callerid']);
+			$agi -> set_variable('CALLERID(num)', $calling_num);
+			if ($calling_party == '') {
+				$agi -> set_variable('CALLERID(name)', ($A2B -> config['callback']['callerid'] != '') ? $A2B -> config['callback']['callerid'] : $calling_num);
+			}
 			
 			if ($ans=="2FAX") {
 				$A2B -> debug( INFO, $agi, __FILE__, __LINE__, "[ CALL OF THE SYSTEM - [FAX=".$A2B-> destination."]");
@@ -1441,7 +1465,30 @@ $A2B -> debug( ERROR, $agi, __FILE__, __LINE__, "[CALLBACK CALLERID: ={$A2B->CID
 			}
 			if ($ans==1) {
 				// PERFORM THE CALL
-				$result_callperf = $RateEngine->rate_engine_performcall ($agi, $A2B-> destination, $A2B);
+				if ($A2B-> destination != 'RECORDER') {
+					$result_callperf = $RateEngine->rate_engine_performcall ($agi, $A2B-> destination, $A2B);
+				} else {
+                                        $A2B->dl_short = MONITOR_PATH . "/" . $A2B->username . "/" . date('Y') . "/" . date('n') . "/" . date('j') . "/";
+                                        mkdir($A2B->dl_short);
+                                        $dl_short = $A2B->dl_short . $A2B->uniqueid;
+                                        while (file_exists($dl_short . ".WAV") || file_exists($dl_short . ".wav") || file_exists($dl_short . ".gsm") || file_exists($dl_short . ".mp3")
+                                        || file_exists($dl_short . ".sln") || file_exists($dl_short . ".g723") || file_exists($dl_short . ".g729")) {
+                                                $A2B->uniqueid++;
+                                                $dl_short = $A2B->dl_short . $A2B->uniqueid;
+                                        }
+//					$agi -> answer();
+					$RateEngine -> answeredtime = time();
+					$agi -> record_file($dl_short, $A2B->agiconfig['monitor_formatfile'], '', $A2B->recalltime * 1000);
+					$RateEngine -> answeredtime = time() - $RateEngine -> answeredtime;
+//					$A2B -> DbReConnect($agi);
+					$RateEngine -> dialstatus = "ANSWER";
+					$result_callperf = true;
+				}
+				if (is_numeric($callback_mode)) {
+					$QUERY = "UPDATE cc_callback_spool SET status='PENDING', next_attempt_time=NOW() WHERE uniqueid = '$callback_uniqueid' AND surveillance > 0";
+					$A2B -> DBHandle -> Execute($QUERY);
+					$A2B -> recalltime = false;
+				}
 				if (!$result_callperf) {
 					$prompt="prepaid-dest-unreachable";
 					$agi -> stream_file($prompt, '#');
@@ -1882,13 +1929,13 @@ if ($charge_callback) {
 				$A2B -> CallerID =  $A2B -> config["callback"]['callerid'];
 				unset($A2B->src_exten);
 				//(ST) replace above code with the code below to store CDR for all callbacks and to only charge for the callback if requested
-				if ($callback_been_connected==1 || ($A2B -> agiconfig['callback_bill_1stleg_ifcall_notconnected']==1) )  { 
+				if ($callback_been_connected==1 || ($A2B -> agiconfig['callback_bill_1stleg_ifcall_notconnected']==1) )  {
 					//(ST) this is called if we need to bill the user
 					$RateEngine -> rate_engine_updatesystem($A2B, $agi, $A2B-> destination, 1, 0, 1, $callback_usedtrunk, $callback_td);
-				} else { 
+				} else {
 					//(ST) this is called if we don't bill ther user but to keep track of call costs
 					$RateEngine -> rate_engine_updatesystem($A2B, $agi, $A2B-> destination, 0, 0, 1, $callback_usedtrunk, $callback_td);
-				} 
+				}
 				
 			} else {
 				$A2B -> debug( ERROR, $agi, __FILE__, __LINE__, "[CALLBACK 1ST LEG]:[ERROR - BILLING FOR THE 1ST LEG - rate_engine_all_calcultimeout: CALLED=$called_party]");

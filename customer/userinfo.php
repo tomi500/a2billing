@@ -198,7 +198,7 @@ if(!empty($subscribe)){
 	</tr>
 	<tr>
 		<td align="center" colspan="2" class="tableBodyRight" >
-			<form action="checkout_payment.php" method="post">
+			<form action="checkout_payment.php" method="post" target="_blank">
 
 				<input type="submit" class="form_input_button" value="<?php echo gettext("BUY NOW");?>">
 				<br>
