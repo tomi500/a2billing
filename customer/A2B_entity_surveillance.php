@@ -106,17 +106,17 @@ if ($A2B -> callingcard_ivr_authenticate_light ($error_msg) && $callback) {
 					
 					$QUERY = " INSERT INTO cc_callback_spool (uniqueid, status, server_ip, num_attempt, last_attempt_time, channel, exten, context, priority," .
 							 " variable, id_server_group, callback_time, account, callerid, timeout, next_attempt_time, exten_leg_a, surveillance) " .
-							 " VALUES ('$uniqueid', '$status', '$server_ip', '$num_attempt', now()+INTERVAL 1 SECOND, '$channel', '$exten', '$context'," .
+							 " VALUES ('$uniqueid', '$status', '$server_ip', '$num_attempt', now(), '$channel', '$exten', '$context'," .
 							 " '$priority', '$variable', '$id_server_group', now(), '$account', '$callerid'," .
 							 " '$timeout', now(), '$A2B->dnid', '$duration')";
 					$res = $A2B -> DBHandle -> Execute($QUERY);
-					sleep(1);
 					if (!$res) {
 						$error_msg = gettext("Cannot insert the surveillance request in the spool!")."</br>";
 					} else {
 						$error_msg = gettext("Your surveillance request has been queued correctly")."!</br>";
 						$color_msg = 'green';
 					}
+					sleep(1);
 				    } else $error_msg = gettext("Error : Sorry, not enough free trunk for make call. Try again later!")."</br>";
 				} else $error_msg = gettext("Error : You don t have enough credit to set surveillance!")."</br>";
 			} else $error_msg = gettext("Error : There is no route to call for surveillance your phonenumber!")."</br>";
