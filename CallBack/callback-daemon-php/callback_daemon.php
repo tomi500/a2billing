@@ -101,10 +101,13 @@ while(true)
 {
     pcntl_wait($status, WNOHANG);
     $query="SELECT `id`,`status`,`exten_leg_a`,`account`,`callerid`,`exten`,`context`,`priority`,`variable`,`timeout`,`reason`,`num_attempts_unavailable`,`num_attempts_busy`,`num_attempts_noanswer`,TIMEDIFF(now(),`callback_time`),`id_server_group`, `surveillance`";
-    $query.=" FROM `cc_callback_spool` WHERE (`status`='PENDING' OR (`status`<>'SENT' AND `status`<>'PROCESSING' AND `surveillance` <> 0)) AND (`next_attempt_time`<=now() OR ISNULL(`next_attempt_time`))";
+    $query.=" FROM `cc_callback_spool` WHERE `status`='PENDING' AND (`next_attempt_time`<=now() OR ISNULL(`next_attempt_time`))";
     $result=$instance_table->SQLExec($A2B->DBHandle, $query);
     foreach ($result as $value) {
 	list($cc_id,$cc_status,$cc_exten_leg_a,$cc_account,$cc_callerid,$cc_exten,$cc_context,$cc_priority,$cc_variable,$cc_timeout,$cc_reason,$cc_num_attempts_unavailable,$cc_num_attempts_busy,$cc_num_attempts_noanswer,$cc_timediff,$id_server_group,$duration)=$value;
+	if ($duration > 0) {
+		$cc_timediff = 0;
+	}
 	$query="SELECT `id`,`manager_host`,`manager_username`,`manager_secret` FROM `cc_server_manager` WHERE `id_group`=$id_server_group LIMIT 1";
 	$result1=$instance_table->SQLExec($A2B->DBHandle, $query);
 	if (!(is_array($result1) && count($result1)>0)) {
@@ -179,8 +182,9 @@ while(true)
 		    case  8: $last_status="ERROR_CONGESTION_OR_CHANNEL-UNAVAILABLE";$fatal=0;$timeout=$acc_to_unav;break;
 		    default: $last_status="ERROR_UNKNOWN (#$return)";$fatal=1;break;
 		}
-		if($fatal) $status=$last_status;
-		    else $status='PENDING';
+		if($fatal && ($duration == 0 || $return == 4)) {
+			$status=$last_status;
+		} else	$status='PENDING';
 		$query="UPDATE `cc_callback_spool` SET `status`='$status',`last_status`='$last_status',`manager_result`='$last_status'";
 		if($return==-2 || $return==0 || $return==8) $query.=",`num_attempts_unavailable`=`num_attempts_unavailable`+1";
 		if($return==1) $query.=",`num_attempts_busy`=`num_attempts_busy`+1";

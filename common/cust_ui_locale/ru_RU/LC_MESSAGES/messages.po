@@ -4392,7 +4392,7 @@ msgstr "ФАКС МАШИНА"
 
 #:
 msgid "SURVEILLANCE"
-msgstr "ВИДЕОНАБЛЮДЕНИЕ"
+msgstr "РЕГИСТРАТОР"
 
 #:
 msgid "CALL"

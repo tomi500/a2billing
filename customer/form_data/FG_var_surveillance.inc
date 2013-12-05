@@ -13,7 +13,7 @@ $HD_Form -> AddViewElement(gettext(" PhoneNumber")."1", "leg_a", "18%", "center"
 $HD_Form -> AddViewElement(gettext(" PhoneNumber")."2", "leg_b", "18%", "center", "sort", "", "lie_link", "", "", "", "", "", "call-history.php?s=1&t=0&order=t1.starttime&sens=DESC&current_page=0&posted=1&Period=&frommonth=&fromstatsmonth=&tomonth=&tostatsmonth=&fromday=true&fromstatsday_sday=1&fromstatsmonth_sday=".date('Y')."-".date('m')."&today=&tostatsday_sday=".date('d')."&tostatsmonth_sday=".date('Y')."-".date('m')."&calleridtype=1&phonenumbertype=1&sourcetype=&clidtype=&channel=&resulttype=min&callerid=&phonenumber=%1&src=&clid=&terminatecauseid=ANSWER&choose_calltype=-1&choose_currency=");
 $HD_Form -> AddViewElement(gettext("DURATION"), "surveillance", "18%", "center", "sort", "26", "", "", "", "", "", "display_minute");
 $HD_Form -> AddViewElement(gettext("TIME LEFT"), "timeleft", "18%", "center", "sort", "", "timeleft", "%2");
-$HD_Form -> AddViewElement(gettext("STATUS"), "status", "18%", "center", "sort");
+$HD_Form -> AddViewElement(gettext("STATUS"), "last_status", "18%", "center", "sort");
 $HD_Form -> FieldViewElement ("IFNULL((SELECT regexten FROM cc_sip_buddies
                                         LEFT JOIN cc_card_concat bb ON id_cc_card = bb.concat_card_id
                                         LEFT JOIN ( SELECT aa.concat_id FROM cc_card_concat aa WHERE aa.concat_card_id = {$_SESSION['card_id']} ) AS v ON v.concat_id = bb.concat_id
@@ -22,7 +22,7 @@ $HD_Form -> FieldViewElement ("IFNULL((SELECT regexten FROM cc_sip_buddies
                                         LEFT JOIN cc_card_concat bb ON id_cc_card = bb.concat_card_id
                                         LEFT JOIN ( SELECT aa.concat_id FROM cc_card_concat aa WHERE aa.concat_card_id = {$_SESSION['card_id']} ) AS v ON v.concat_id = bb.concat_id
                                         WHERE (id_cc_card = {$_SESSION['card_id']} OR v.concat_id IS NOT NULL) AND (regexten = cc_callback_spool.exten OR name = cc_callback_spool.exten) LIMIT 1),exten) AS leg_b, ".
-				"surveillance*60 surveillance, IF(status='SENT',surveillance*60-UNIX_TIMESTAMP(NOW())+UNIX_TIMESTAMP(last_attempt_time),-1) timeleft, status");
+				"surveillance*60 surveillance, IF(status='SENT',surveillance*60-UNIX_TIMESTAMP(NOW())+UNIX_TIMESTAMP(last_attempt_time),-1) timeleft, last_status");
 
 $HD_Form -> CV_NO_FIELDS  = gettext("There are no surveillance created.");
 $HD_Form -> CV_DISPLAY_LINE_TITLE_ABOVE_TABLE = false;

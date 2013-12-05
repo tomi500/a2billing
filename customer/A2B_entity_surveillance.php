@@ -42,6 +42,8 @@ if ($A2B -> callingcard_ivr_authenticate_light ($error_msg) && $callback) {
 	$called  = $A2B -> apply_rules($called);
 	$calling = $A2B -> apply_rules($calling);
 	if (strlen($called)>1 && is_numeric($called) && ($calling == "" || (strlen($calling)>1 && is_numeric($calling))) && is_numeric($duration)) {
+		if ($calling=='')
+			$calling = 'RECORDER';
 		$virtcalled = $called;
 		$virtcalling = $calling;
 			$QUERY = "SELECT name, regexten FROM cc_sip_buddies
@@ -82,11 +84,7 @@ if ($A2B -> callingcard_ivr_authenticate_light ($error_msg) && $callback) {
 				    $channeloutcid = $RateEngine->rate_engine_performcall(false, $A2B -> dnid, $A2B);
 				    if ($channeloutcid) {
 					$channel = $channeloutcid[0];
-					if ($virtcalling=='') {
-						$exten = $virtcalling = 'RECORDER';
-					} else {
-						$exten = $virtcalling;
-					}
+					$exten = $virtcalling;
 					$context = $A2B -> config["callback"]['context_callback'];
 					$id_server_group = $A2B -> config["callback"]['id_server_group'];
 					$priority=1;

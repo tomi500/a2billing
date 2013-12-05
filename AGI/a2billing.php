@@ -1476,11 +1476,8 @@ if ($mode == 'standard') {
                                                 $A2B->uniqueid++;
                                                 $dl_short = $A2B->dl_short . $A2B->uniqueid;
                                         }
-//					$agi -> answer();
-					$RateEngine -> answeredtime = time();
 					$agi -> record_file($dl_short, $A2B->agiconfig['monitor_formatfile'], '', $A2B->recalltime * 1000);
-					$RateEngine -> answeredtime = time() - $RateEngine -> answeredtime;
-//					$A2B -> DbReConnect($agi);
+					$RateEngine -> answeredtime = $agi->get_variable("CDR(billsec)",true);
 					$RateEngine -> dialstatus = "ANSWER";
 					$result_callperf = true;
 				}
@@ -1931,10 +1928,10 @@ if ($charge_callback) {
 				//(ST) replace above code with the code below to store CDR for all callbacks and to only charge for the callback if requested
 				if ($callback_been_connected==1 || ($A2B -> agiconfig['callback_bill_1stleg_ifcall_notconnected']==1) )  {
 					//(ST) this is called if we need to bill the user
-					$RateEngine -> rate_engine_updatesystem($A2B, $agi, $A2B-> destination, 1, 0, 1, $callback_usedtrunk, $callback_td);
+					$RateEngine -> rate_engine_updatesystem($A2B, $agi, $A2B-> destination, 1, 0, 1, $callback_usedtrunk, $callback_td, $callback_mode);
 				} else {
 					//(ST) this is called if we don't bill ther user but to keep track of call costs
-					$RateEngine -> rate_engine_updatesystem($A2B, $agi, $A2B-> destination, 0, 0, 1, $callback_usedtrunk, $callback_td);
+					$RateEngine -> rate_engine_updatesystem($A2B, $agi, $A2B-> destination, 0, 0, 1, $callback_usedtrunk, $callback_td, $callback_mode);
 				}
 				
 			} else {

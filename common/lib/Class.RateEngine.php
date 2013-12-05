@@ -240,7 +240,6 @@ class RateEngine
 			$result = array_slice ($result, $ind_stop_default, count($result)-$ind_stop_default);
 		}
 		
-//echo "lcr_mode = ".$A2B->agiconfig['lcr_mode'];
         if ($A2B->agiconfig['lcr_mode'] == 0) {
             //1) REMOVE THOSE THAT HAVE A SMALLER DIALPREFIX
             $max_len_prefix = strlen($result[0][7]);
@@ -1113,7 +1112,7 @@ else echo "Ratecard: ".$this->ratecard_obj[$i][6]."<br>Trunk: ".$this->ratecard_
 	 * RATE ENGINE - UPDATE SYSTEM (DURATIONCALL)
 	 * Calcul the duration allowed for the caller to this number
 	 */
-	function rate_engine_updatesystem (&$A2B, &$agi, $calledstation, $doibill = 1, $didcall=0, $callback=0, $trunk_id=0, $td=NULL)
+	function rate_engine_updatesystem (&$A2B, &$agi, $calledstation, $doibill = 1, $didcall=0, $callback=0, $trunk_id=0, $td=NULL, $callback_mode=0)
 	{
 		$K = $this->usedratecard;
 		
@@ -1293,32 +1292,32 @@ else echo "Ratecard: ".$this->ratecard_obj[$i][6]."<br>Trunk: ".$this->ratecard_
 		$result = $A2B -> instance_table -> SQLExec ($A2B->DBHandle, $QUERY);
 		$calledexten = (is_array($result) && $result[0][0] != "") ? $result[0][0] : 'NULL';
 
-		$QUERY_COLUMN = "uniqueid, sessionid, card_id, card_caller, nasipaddress, starttime, sessiontime, real_sessiontime, calledstation, ".
+		if ($callback_mode == 0 || $cost != 0 || !is_numeric($callback_mode) || $A2B->CallerID != $A2B -> config["callback"]['callerid']) {
+
+		    $QUERY_COLUMN = "uniqueid, sessionid, card_id, card_caller, nasipaddress, starttime, sessiontime, real_sessiontime, calledstation, ".
 			" terminatecauseid, stoptime, sessionbill, id_tariffgroup, id_tariffplan, id_ratecard, " .
 			" id_trunk, src, sipiax, buycost, id_card_package_offer, dnid, destination, id_did, src_peername, src_exten, calledexten, margindillers, margindiller";
-		$QUERY = "INSERT INTO cc_call ($QUERY_COLUMN) VALUES ('".$A2B->uniqueid."', '".$A2B->channel."', ".
+		    $QUERY = "INSERT INTO cc_call ($QUERY_COLUMN) VALUES ('".$A2B->uniqueid."', '".$A2B->channel."', ".
 			"$card_id, $card_caller, '".$A2B->hostname."', ";
 
-//$A2B -> debug( ERROR, $agi, __FILE__, __LINE__, "======================== [src_peername =$src_peername] [src_exten =$src_exten] [calledexten =$calledexten] [calledstation =$calledstation] [dnid ={$A2B->dnid}]");
-
-		if ($A2B->config["global"]['cache_enabled']) {
+		    if ($A2B->config["global"]['cache_enabled']) {
 			$QUERY .= " datetime( strftime('%s','now') - $sessiontime, 'unixepoch','localtime')";	
-		} else {
+		    } else {
 			$QUERY .= "SUBDATE(CURRENT_TIMESTAMP, INTERVAL $sessiontime SECOND) ";
-		}
+		    }
 
-		$QUERY .= 	", '$sessiontime', $real_sessiontime, '$calledstation', $terminatecauseid, ";
-		if ($A2B->config["global"]['cache_enabled']) {
+		    $QUERY .= 	", '$sessiontime', $real_sessiontime, '$calledstation', $terminatecauseid, ";
+		    if ($A2B->config["global"]['cache_enabled']) {
 			$QUERY .= "datetime('now','localtime')";
-		} else {
+		    } else {
 			$QUERY .= "now()";
-		}
+		    }
 
-		$QUERY .= " , '$signe_cc_call".a2b_round(abs($cost))."', ".
+		    $QUERY .= " , '$signe_cc_call".a2b_round(abs($cost))."', ".
 					" $id_tariffgroup, $id_tariffplan, $id_ratecard, $trunk_id, '".$A2B->CallerID."', '$calltype', ".
 					" '$buycost', $id_card_package_offer, '".$A2B->dnid."', $calldestination, $id_did, $src_peername, $src_exten, $calledexten, ".a2b_round($this->margindillers).", ".a2b_round($this->commission).")";
 
-		if ($A2B->config["global"]['cache_enabled']) {
+		    if ($A2B->config["global"]['cache_enabled']) {
 			 //insert query in the cache system
 			$create = false;
 			if (! file_exists( $A2B -> config["global"]['cache_path']))
@@ -1331,10 +1330,11 @@ else echo "Ratecard: ".$this->ratecard_obj[$i][6]."<br>Trunk: ".$this->ratecard_
 			} else {
 				$A2B -> debug( ERROR, $agi, __FILE__, __LINE__, "[Error to connect to cache : $sqliteerror]\n");
 			}
-		} else {
+		    } else {
 			$result = $A2B->instance_table -> SQLExec ($A2B -> DBHandle, $QUERY, 0);
 			$A2B -> debug( INFO, $agi, __FILE__, __LINE__, "[CC_asterisk_stop : SQL: DONE : result=".$result."]");
 			$A2B -> debug( DEBUG, $agi, __FILE__, __LINE__, "[CC_asterisk_stop : SQL: $QUERY]");
+		    }
 		}
 		if ($sessiontime>0) {
 			
