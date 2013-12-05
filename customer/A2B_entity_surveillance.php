@@ -110,7 +110,7 @@ if ($A2B -> callingcard_ivr_authenticate_light ($error_msg) && $callback) {
 							 " '$priority', '$variable', '$id_server_group', now(), '$account', '$callerid'," .
 							 " '$timeout', now(), '$A2B->dnid', '$duration')";
 					$res = $A2B -> DBHandle -> Execute($QUERY);
-					
+					sleep(1);
 					if (!$res) {
 						$error_msg = gettext("Cannot insert the surveillance request in the spool!")."</br>";
 					} else {

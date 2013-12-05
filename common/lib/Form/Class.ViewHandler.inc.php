@@ -305,7 +305,7 @@ function openURLFilter(theLINK)
 									}
 								    }
 								    timer{$ligne_number}();
-								    setInterval(timer{$ligne_number}, 999);
+								    setInterval(timer{$ligne_number}, 997);
 								</script>
 							";
 						}

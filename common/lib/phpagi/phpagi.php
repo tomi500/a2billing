@@ -269,7 +269,7 @@
         case AST_STATE_PRERING: $ret['data'] = 'Channel has detected an incoming call and is waiting for ring'; break;
         default: $ret['data'] = "Unknown ({$ret['result']})"; break;
       }
-$this->Verbose("=================CHANNEL STATUS: ".$ret['result']." ".$ret['data']);
+//$this->Verbose("=================CHANNEL STATUS: ".$ret['result']." ".$ret['data']);
       if ($get_value) {
 	return $ret['result'];
       } else {
@@ -633,7 +633,7 @@ $this->Verbose("=================CHANNEL STATUS: ".$ret['result']." ".$ret['data
     */
     function set_callerid($cid)
     {
-$this->Verbose("=================SET CALLERID $cid");
+//$this->Verbose("=================SET CALLERID $cid");
       return $this->evaluate("SET CALLERID $cid");
     }
 
@@ -1292,7 +1292,7 @@ $this->Verbose("=================SET CALLERID $cid");
 
       $ret = array('name'=>'', 'protocol'=>'', 'username'=>'', 'host'=>'', 'port'=>'');
       $callerid = trim($callerid);
-$this->Verbose("================= CallerID =  \"$callerid\"");
+//$this->Verbose("================= CallerID =  \"$callerid\"");
 
       if($callerid{0} == '"' || $callerid{0} == "'")
       {
