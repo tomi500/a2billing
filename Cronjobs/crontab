@@ -13,7 +13,7 @@ MAILTO=""
 # |  |  |  |  |
 # *  *  *  *  * user-name  command to be executed
 
-27 4 * * * root /usr/sbin/ntpdate -s ntp.colocall.net && /sbin/hwclock -w
+27 4 * * * root /usr/sbin/ntpdate -s us.pool.ntp.org && /sbin/hwclock -w
 * * * * * root /usr/local/asterisk/bin/check_ip.sh
 #* * * * * root /usr/local/asterisk/bin/callback_check.sh
 * * * * * root /usr/local/src/a2billing/CallBack/callback-daemon-php/callback_daemon_check.php

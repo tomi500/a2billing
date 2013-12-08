@@ -33,9 +33,9 @@
 
 
 
-getpost_ifset(array('id_cc_card', 'cardnumber', 'id', 'name', 'amaflags', 'callgroup', 'namedcallgroup', 'namedpickupgroup', 'accountcode', 'callerid', 'canreinvite', 'context', 'defaultip', 'dtmfmode', 
-'fromuser', 'fromdomain', 'host', 'insecure', 'language', 'mailbox', 'md5secret', 'directmedia', 'nat', 'permit', 'deny', 'mask', 'pickupgroup', 'port', 'qualify', 
-'restrictcid', 'rtptimeout', 'rtpholdtimeout', 'secret', 'type', 'username', 'disallow', 'allow', 'musiconhold', 'regseconds', 'ipaddr', 'regexten','friend_id', 'callbackextension'));
+getpost_ifset(array('id_cc_card', 'cardnumber', 'id', 'name', 'amaflags', 'callgroup', 'namedcallgroup', 'namedpickupgroup', 'accountcode', 'callerid', 'canreinvite', 'context', 'defaultip', 'dtmfmode', 'videosupport', 
+'fromuser', 'fromdomain', 'host', 'insecure', 'language', 'mailbox', 'md5secret', 'directmedia', 'nat', 'permit', 'deny', 'mask', 'pickupgroup', 'port', 'qualify', 'warning_threshold', 'say_rateinitial', 'say_balance_after_call', 
+'restrictcid', 'rtptimeout', 'rtpholdtimeout', 'secret', 'type', 'username', 'disallow', 'allow', 'musiconhold', 'regseconds', 'ipaddr', 'regexten','friend_id', 'callbackextension', 'callcounter', 'external'));
 
 getpost_ifset(array('defaultuser', 'subscribemwi', 'vmexten', 'cid_number', 'callingpres', 'usereqphone', 'incominglimit', 'subscribecontext', 'musicclass', 
 'allowtransfer', 'autoframing', 'maxcallbitrate', 'outboundproxy', 'regserver', 'rtpkeepalive', 'dbsecret ', 'regcontext ', 'sourceaddress ', 'mohinterpret ', 
@@ -154,10 +154,6 @@ $maxi=$acc='';
 
 if ($form_action=="ask-add" || $form_action == "add_sip" || $form_action == "add_iax") {
 	$AMAFLAGS_default= "value='".$A2B->config["peer_friend"]['amaflag']."'";
-	$TYPE_default= "value='".$A2B->config["peer_friend"]['type']."'";
-	$DIRECTMEDIA_default= 'update,nonat';
-	$NAT_default= $A2B->config["peer_friend"]['nat'];
-	$DTMFMODE_default= "value='".$A2B->config["peer_friend"]['dtmfmode']."'";
 	$CANREINVITE_default= "value=''";
 	$DISALLOW_default= "value='all'";
 	$ALLOW_default= "value='".$A2B->config["peer_friend"]['allow']."'";
@@ -171,6 +167,12 @@ if ($form_action=="ask-add" || $form_action == "add_sip" || $form_action == "add
 	$RTPHOLDTIMEOUT_default= "value='300'";
 	$RTPKEEPALIVE_default= "value='30'";
 	$QUALIFY_default= "value='".$A2B->config["peer_friend"]['qualify']."'";
+	$warning_threshold	='-2';
+	$say_rateinitial = $external = $say_balance_after_call	='0';
+	$type			= $A2B->config["peer_friend"]['type'];
+	$directmedia		= 'update,nonat';
+	$nat			= $A2B->config["peer_friend"]['nat'];
+	$dtmfmode		= $A2B->config["peer_friend"]['dtmfmode'];
 }
 
 // Possible value to notify the user
@@ -189,26 +191,66 @@ foreach ($values as $val) {
 }
 
 $HD_Form -> AddEditElement (gettext("ID CARD"),
-							"id_cc_card",
-							'',
-							"POPUPVALUE",
-							"size=30 maxlength=50 readonly",
-							"4",
-							gettext("Insert the Id CardNumber"),
-							"", "", "", "", "",
-							"A2B_entity_card.php?popup_select=1&"
-							, ", 'CardNumberSelection','width=590,height=550,top=100,left=100,scrollbars=1'",
-							gettext("Insert the card ID."));
+						    "id_cc_card",
+						    '',
+						    "POPUPVALUE",
+						    "size=30 maxlength=50 readonly",
+						    "4",
+						    gettext("Insert the Id CardNumber"),
+						    "", "", "", "", "",
+						    "A2B_entity_card.php?popup_select=1&",
+						    ", 'CardNumberSelection','width=590,height=550,top=100,left=100,scrollbars=1'",
+						    gettext("Insert the card ID."));
 
 
-$HD_Form -> AddEditElement (gettext("NAME"),
-						   "name",			
-						   "$value",	
-						   "INPUT",	
-							"size=40 $maxi maxlength=40",	 
-						   "9",	
+$HD_Form -> AddEditElement (gettext("EXTERNAL"),
+						    "external",
+						    $external,
+						    "SELECT",
+						    "",
+						    "",
+						    "",
+						    "list", "", "", "", $yesno, "%1", "", gettext("'Yes' for external line or 'No' for extension"));
+
+if ($atmenu=='sip') {
+	$HD_Form -> AddEditElement (gettext("SAY BALANCE AFTER AUTH"),
+						    "warning_threshold",
+						    $warning_threshold,
+						    "SELECT",
+						    "",
+						    "",
+						    "",
+						    "list", "", "", "", $limits_notify , "%1", "", gettext('currency : ').strtoupper(BASE_CURRENCY)." (".gettext("with the warning threshold").")", "", '<OPTION  value="-1">'.gettext("ALWAYS").'&nbsp;</OPTION>');
+
+
+	$HD_Form -> AddEditElement (gettext("SAY RATE BEFORE CALL"),
+						    "say_rateinitial",
+						    $say_rateinitial,
+						    "SELECT",
+						    "",
+						    "",
+						    "",
+						    "list", "", "", "", $yesno, "%1");
+
+
+	$HD_Form -> AddEditElement (gettext("SAY BALANCE AFTER CALL"),
+						    "say_balance_after_call",
+						    $say_balance_after_call,
+						    "SELECT",
+						    "",
+						    "",
+						    "",
+						    "list", "", "", "", $yesno, "%1");
+}
+
+$HD_Form -> AddEditElement ("NAME",
+						   "name",
+						   "$value",
+						   "INPUT",
+						    "size=40 $maxi maxlength=40",
+						   "9",
 						   gettext("Insert the name"),
-						   "", "", "",	"", "", "",	"", "" );
+						   "", "", "", "", "", "", "", "", null, null, gettext("Device configuration as ").$atmenu.".conf");
 
 
 $HD_Form -> AddEditElement (gettext("ACCOUNTCODE"),
@@ -261,9 +303,9 @@ $HD_Form -> AddEditElement (gettext("AMAFLAGS"),
 			   "", "", "", "", "", "", "NO-NULL", "(default : billing)" );
 
 
-$HD_Form -> AddEditElement (gettext("TYPE"),
+$HD_Form -> AddEditElement ("TYPE",
                            "type",
-                           '',
+                           $type,
                            "SELECT",
                            "",
                            "",
@@ -281,7 +323,7 @@ if ($atmenu=='sip') {
                            "" , "", "", "", "", "", "NO-NULL" );
 }
 
-$HD_Form -> AddEditElement (gettext("SECRET"),
+$HD_Form -> AddEditElement ("SECRET",
                            "secret",
                            '',
                            "INPUT",
@@ -333,7 +375,7 @@ $HD_Form -> AddEditElement (gettext("PERMIT"),
 if ($atmenu=='sip') {
 	$HD_Form -> AddEditElement (gettext("DTMFMODE"),
                            "dtmfmode",
-                           $DTMFMODE_default,
+                           $dtmfmode,
                            "SELECT",
                            "",
                            "",
@@ -341,7 +383,7 @@ if ($atmenu=='sip') {
                            "list", "", "", "", $values_list['dtmfmode'], "%1", "NO-NULL" );
 }
 
-$HD_Form -> AddEditElement (gettext("DISALLOW"),
+$HD_Form -> AddEditElement ("DISALLOW",
                            "disallow",
                            '',
                            "INPUT",
@@ -351,7 +393,7 @@ $HD_Form -> AddEditElement (gettext("DISALLOW"),
                            "", "", "", "", "", "", "NO-NULL", gettext("need to disallow=all before we can use allow. ( default : all )"));
 
 
-$HD_Form -> AddEditElement (gettext("ALLOW"),
+$HD_Form -> AddEditElement ("ALLOW",
                            "allow",
                            '',
                            "INPUT",
@@ -360,18 +402,28 @@ $HD_Form -> AddEditElement (gettext("ALLOW"),
                            gettext("Insert the allow"),
                            "", "", "", "", "", "", "NO-NULL", gettext("Set allow codecs separated by a comma, e.g. gsm,alaw,ulaw ( default : ulaw,alaw,gsm,g729)"));
 
+if ($atmenu=='sip') {
+	$HD_Form -> AddEditElement ("VIDEOSUPPORT",
+						   "videosupport",
+						   $videosupport,
+						   "SELECT",
+						   "",
+						   "",
+						   "",
+						   "list", "", "", "", $values_list['videosupport'], "%1", "NO-NULL" );
+}
 
-$HD_Form -> AddEditElement (gettext("HOST"),
-                           "host",
-                           '',
-                           "INPUT",
-                           "size=40 maxlength=31 $HOST_default",
-                           "",
-                           gettext("Insert the host"),
-                           "", "", "", "", "", "", "NO-NULL", gettext("Use dynamic or set an IP ( default : dynamic )"));
+$HD_Form -> AddEditElement ("HOST",
+						   "host",
+						   '',
+						   "INPUT",
+						   "size=40 maxlength=31 $HOST_default",
+						   "",
+						   gettext("Insert the host"),
+						   "", "", "", "", "", "", "NO-NULL", gettext("Use dynamic or set an IP ( default : dynamic )"));
 
 
-$HD_Form -> AddEditElement (gettext("PORT"),
+$HD_Form -> AddEditElement ("PORT",
 						   "port",
 						   '',
 						   "INPUT",
@@ -380,22 +432,23 @@ $HD_Form -> AddEditElement (gettext("PORT"),
 						   gettext("Insert the port"),
 						   "", "", "", "", "", "", "NO-NULL" );
 
-$HD_Form -> AddEditElement (gettext("CONTEXT"),
-						   "context",		
-						   '',	
-						   "INPUT",	
-						   "size=40 maxlength=40 $CONTEXT_default",	
-						   "",	
+
+$HD_Form -> AddEditElement ("CONTEXT",
+						   "context",
+						   '',
+						   "INPUT",
+						   "size=40 maxlength=40 $CONTEXT_default",
+						   "",
 						   gettext("Insert the context"),
 						   "", "", "", "", "", "", "NO-NULL", gettext("set the context for this user (default : a2billing )"));
-						   
 
-$HD_Form -> AddEditElement (gettext("LANGUAGE"),
-						   "language",		
-						   '',	
-						   "INPUT",	
+
+$HD_Form -> AddEditElement ("LANGUAGE",
+						   "language",
+						   '',
+						   "INPUT",
 						   "size=10 maxlength=4 $LANGUAGE_default",
-						   "",	
+						   "",
 						   gettext("Insert the language"),
 						   "", "", "", "", "", "", "NO-NULL" );
 
@@ -563,7 +616,7 @@ if ($atmenu=='sip') {
 
 	$HD_Form -> AddEditElement (gettext("IGNORECRYPTOLIFETIME"),
 	                           "ignorecryptolifetime",
-	                           '',
+	                           $ignorecryptolifetime,
 	                           "SELECT",
 	                           "",
 	                           "",
@@ -573,7 +626,7 @@ if ($atmenu=='sip') {
 	
 	$HD_Form -> AddEditElement (gettext("TRANSPORT"),
 	                           "transport",
-	                           '',
+	                           $transport,
 	                           "SELECT",
 	                           "",
 	                           "",
@@ -583,7 +636,7 @@ if ($atmenu=='sip') {
 	
 	$HD_Form -> AddEditElement (gettext("T38PT_UDPTL"),
 	                           "t38pt_udptl",
-	                           '',
+	                           $t38pt_udptl,
 	                           "SELECT",
 	                           "",
 	                           "",
@@ -614,7 +667,7 @@ if ($atmenu=='sip') {
 	
 	$HD_Form -> AddEditElement (gettext("DIRECTMEDIA"),
 	                           "directmedia",
-	                           $DIRECTMEDIA_default,
+	                           $directmedia,
 	                           "SELECT",
 	                           "",
 	                           "",
@@ -624,7 +677,7 @@ if ($atmenu=='sip') {
 	
 	$HD_Form -> AddEditElement (gettext("NAT"),
 	                           "nat",
-	                           $NAT_default,
+	                           $nat,
 	                           "SELECT",
 	                           "",
 	                           "",
@@ -703,8 +756,8 @@ if ($atmenu=='sip') {
 	
 	
 	$HD_Form -> AddEditElement (gettext("ALLOWTRANSFER"),
-							   "allowtransfer",		
-							   '',
+							   "allowtransfer",
+							   $allowtransfer,
 							   "SELECT",
 							   "",
 							   "",
@@ -724,7 +777,7 @@ if ($atmenu=='sip') {
 	
 	$HD_Form -> AddEditElement (gettext("SUBSCRIBEMWI"),
 							   "subscribemwi",
-							   '',
+							   $subscribemwi,
 							   "SELECT",
 							   "",
 							   "",
@@ -744,7 +797,7 @@ if ($atmenu=='sip') {
 	
 	$HD_Form -> AddEditElement (gettext("CALLINGPRES"),
 							   "callingpres",
-							   '',
+							   $callingpres,
 							   "SELECT",
 							   "",
 							   "",
@@ -754,7 +807,7 @@ if ($atmenu=='sip') {
 	
 	$HD_Form -> AddEditElement (gettext("USEREQPHONE"),
 							   "usereqphone",
-							   '',
+							   $usereqphone,
 							   "SELECT",
 							   "",
 							   "",
@@ -762,14 +815,14 @@ if ($atmenu=='sip') {
 							   "list", "", "", "", $values_list['usereqphone'], "%1", "NO-NULL" );
 	
 	
-	$HD_Form -> AddEditElement (gettext("INCOMINGLIMIT"),
-							   "incominglimit",		
-							   '',	
-							   "INPUT",	
-							   "size=10 maxlength=10",	
-							   "",	
+	$HD_Form -> AddEditElement ("CALLCOUNTER",
+							   "callcounter",
+							   $callcounter,
+							   "SELECT",
 							   "",
-							   "", "", "", "", "", "", "NO-NULL" );
+							   "",
+							   "",
+							   "list", "", "", "", $values_list['callcounter'], "%1", "NO-NULL" );
 	
 	
 	$HD_Form -> AddEditElement (gettext("MUSICCLASS"),
@@ -818,33 +871,6 @@ if ($atmenu=='sip') {
 							   "",
 							   "",
 							   "", "", "", "", "", "", "NO-NULL" );
-
-	$HD_Form -> AddEditElement (gettext("SAY BALANCE AFTER AUTH"),
-							    "warning_threshold",
-							    '',
-							    "SELECT",
-							    "",
-							    "",
-							    "",
-							    "list", "", "", "", $limits_notify , "%1", "", gettext('currency : ').strtoupper(BASE_CURRENCY)." (".gettext("with the warning threshold").")", "", '<OPTION  value="-1" selected>'.gettext("ALWAYS").'&nbsp;</OPTION>');
-
-	$HD_Form -> AddEditElement (gettext("SAY RATE BEFORE CALL"),
-							    "say_rateinitial",
-							    '0',
-							    "SELECT",
-							    "",
-							    "",
-							    "",
-							    "list", "", "", "", $yesno, "%1");
-
-	$HD_Form -> AddEditElement (gettext("SAY BALANCE AFTER CALL"),
-							    "say_balance_after_call",
-							    '0',
-							    "SELECT",
-							    "",
-							    "",
-							    "",
-							    "list", "", "", "", $yesno, "%1");
 
 } else {
 
@@ -1076,13 +1102,13 @@ if ($atmenu=='sip') {
 
 
 if ($atmenu=='sip') {
-	$field_list_edit = 'id_cc_card, name, accountcode, regexten, callerid, cid_number, amaflags, type, defaultuser, secret, qualify, defaultip, deny, permit, dtmfmode, disallow, allow, host, port, ' .
-			'context, language, subscribecontext, mailbox, fromuser, fromdomain, insecure, auth, callgroup, pickupgroup, namedcallgroup, namedpickupgroup, mohsuggest, setvar, encryption, ' .
-			'ignorecryptolifetime, transport, t38pt_udptl, username, md5secret, directmedia, nat, canreinvite, mask, restrictcid, rtpkeepalive, rtptimeout, rtpholdtimeout, musiconhold,  ' .
-			'allowtransfer, subscribemwi, vmexten, callingpres, usereqphone, incominglimit, musicclass, autoframing, maxcallbitrate, outboundproxy, callbackextension, warning_threshold, ' .
-			'say_rateinitial, say_balance_after_call';
+	$field_list_edit = 'id_cc_card, external, warning_threshold, say_rateinitial, say_balance_after_call, name, accountcode, regexten, callerid, cid_number, amaflags, type, defaultuser, secret, qualify, ' .
+			'defaultip, deny, permit, dtmfmode, disallow, allow, videosupport, host, port, context, language, subscribecontext, mailbox, fromuser, fromdomain, insecure, auth, callgroup, pickupgroup, ' .
+			'namedcallgroup, namedpickupgroup, mohsuggest, setvar, encryption, ignorecryptolifetime, transport, t38pt_udptl, username, md5secret, directmedia, nat, canreinvite, mask, restrictcid, ' .
+			'rtpkeepalive, rtptimeout, rtpholdtimeout, musiconhold, allowtransfer, subscribemwi, vmexten, callingpres, usereqphone, callcounter, musicclass, autoframing, maxcallbitrate, outboundproxy, ' .
+			'callbackextension';
 } else {
-	$field_list_edit = 'id_cc_card, name, accountcode, regexten, callerid, cid_number, amaflags, type, secret, qualify, defaultip, deny, permit, disallow, allow, host, port, context, language, ' .
+	$field_list_edit = 'id_cc_card, external, name, accountcode, regexten, callerid, cid_number, amaflags, type, secret, qualify, defaultip, deny, permit, disallow, allow, host, port, context, language, ' .
 			'auth, mohsuggest, setvar, encryption, username, forceencryption, trunk, dbsecret, regcontext, sourceaddress, mohinterpret, inkeys, outkey,  sendani, fullname,  maxauthreq, transfer, ' .
 			'jitterbuffer, forcejitterbuffer, codecpriority, qualifysmoothing, qualifyfreqok, qualifyfreqnotok, timezone, adsi, requirecalltoken, maxcallnumbers, maxcallnumbers_nonvalidated';
 }

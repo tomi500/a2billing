@@ -7,5 +7,6 @@ myoldip=`awk -F= '{ print $2 }' < /etc/asterisk/additional_a2billing_externaddr.
 if test .$myoldip != .$mynewip && !(test -z $mynewip) then
     echo "externaddr=$mynewip:5060" > /etc/asterisk/additional_a2billing_externaddr.conf
     echo `date` "$myoldip -> $mynewip" >> /var/log/asterisk/sip_externaddr.log
-    /usr/local/asterisk/sbin/asterisk -rx 'sip reload'
+#    /usr/local/asterisk/sbin/asterisk -rx 'sip reload'
+    sed -i -e "s/^.*myexternaddr$/$mynewip\tmyexternaddr/g" /etc/hosts
 fi

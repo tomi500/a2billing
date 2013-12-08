@@ -85,7 +85,7 @@ ALTER TABLE cc_sip_buddies ADD `directmedia` enum('yes', 'no', 'nonat', 'update'
 ALTER TABLE cc_sip_buddies ADD `encryption` varchar( 20 ) COLLATE utf8_bin DEFAULT NULL;
 ALTER TABLE cc_sip_buddies ADD `encryption_taglen` enum('32','80') DEFAULT NULL AFTER `encryption`;
 ALTER TABLE cc_sip_buddies ADD `ignorecryptolifetime` enum( 'yes', 'no' ) DEFAULT NULL;
-ALTER TABLE cc_sip_buddies ADD `transport` enum( 'tls', 'udp', 'tcp', 'udp,tcp', 'tcp,udp' ) DEFAULT NULL;
+ALTER TABLE cc_sip_buddies ADD `transport` enum('tls','udp','tcp','udp,tcp','tcp,udp','tls,tcp,udp') DEFAULT NULL;
 ALTER TABLE cc_sip_buddies ADD `remotesecret` VARCHAR( 40 ) NULL DEFAULT NULL AFTER `secret`;
 ALTER TABLE cc_sip_buddies ADD `trustrpid` enum('yes','no') DEFAULT NULL AFTER `insecure`;
 ALTER TABLE cc_sip_buddies ADD `progressinband` enum('yes','no','never') DEFAULT NULL AFTER `trustrpid`;
@@ -95,7 +95,7 @@ ALTER TABLE cc_sip_buddies ADD `callcounter` enum('yes','no') DEFAULT NULL;
 ALTER TABLE cc_sip_buddies ADD `busylevel` int(11) DEFAULT NULL;
 ALTER TABLE cc_sip_buddies ADD `allowoverlap` enum('yes','no') DEFAULT NULL;
 ALTER TABLE cc_sip_buddies ADD `allowsubscribe` enum('yes','no') DEFAULT NULL;
-ALTER TABLE cc_sip_buddies ADD `videosupport` enum('yes','no') DEFAULT NULL;
+ALTER TABLE cc_sip_buddies ADD `videosupport` enum('yes','no','always') DEFAULT NULL;
 ALTER TABLE cc_sip_buddies ADD `rfc2833compensate` enum('yes','no') DEFAULT NULL;
 ALTER TABLE cc_sip_buddies ADD `session-timers` enum('accept','refuse','originate') DEFAULT NULL;
 ALTER TABLE cc_sip_buddies ADD `session-expires` int(11) DEFAULT NULL;
@@ -154,7 +154,8 @@ ALTER TABLE cc_sip_buddies
   CHANGE `usereqphone` `usereqphone` ENUM('yes','no') CHARACTER SET utf8 COLLATE utf8_bin NULL DEFAULT NULL,
   CHANGE `DEFAULTip` `defaultip` CHAR( 50 ) CHARACTER SET utf8 COLLATE utf8_bin NULL DEFAULT NULL,
   CHANGE `allowtransfer` `allowtransfer` ENUM('yes','no') CHARACTER SET utf8 COLLATE utf8_bin NULL DEFAULT NULL,
-  CHANGE `subscribemwi` `subscribemwi` ENUM('yes','no') CHARACTER SET utf8 COLLATE utf8_bin NULL DEFAULT NULL;
+  CHANGE `subscribemwi` `subscribemwi` ENUM('yes','no') CHARACTER SET utf8 COLLATE utf8_bin NULL DEFAULT NULL,
+  CHANGE `videosupport` `videosupport` ENUM('yes','no','always') CHARACTER SET utf8 COLLATE utf8_bin NULL DEFAULT NULL;
 
 ALTER TABLE cc_iax_buddies ADD `forceencryption` varchar(20) COLLATE utf8_bin NOT NULL;
 ALTER TABLE cc_iax_buddies ADD `external` INT( 11 ) NOT NULL DEFAULT '0';
@@ -370,27 +371,6 @@ begin
     elseif a>1 then
 	select id into a from cc_config where config_key='startup_time' order by id limit 0,1;
 	delete from cc_config where config_key='startup_time' and id>a;
-    end if;
-end //
-
-delimiter ;
-
-call a2b_trf_check;
-
-drop procedure if exists a2b_trf_check;
-
-delimiter //
-
-create procedure a2b_trf_check()
-begin
-    declare a int;
-    select count(*) into a from cc_config where config_key='context_surveillance';
-    if a=0 then
-	INSERT INTO `cc_config` (`id`, `config_title`, `config_key`, `config_value`, `config_description`, `config_valuetype`, `config_listvalues`, `config_group_title`)
-	VALUES (NULL, 'Context Surveillance', 'context_surveillance', 'surveillance', 'Context to use in Surveillance', '0', NULL, 'callback');
-    elseif a>1 then
-	select id into a from cc_config where config_key='context_surveillance' order by id limit 0,1;
-	delete from cc_config where config_key='context_surveillance' and id>a;
     end if;
 end //
 

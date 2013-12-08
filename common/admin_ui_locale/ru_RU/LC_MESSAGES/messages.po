@@ -3510,11 +3510,11 @@ msgstr "Куплено за"
 #: Public/call-log-customers.php:127 Public/call-pnl-report.php:490
 #: Public/call-pnl-report.php:564
 msgid "Margin"
-msgstr "Повышение"
+msgstr "Маржа"
 
 #: Public/call-log-customers.php:128
 msgid "Markup"
-msgstr "Маржа"
+msgstr "Прибыль"
 
 #: Public/call-log-customers.php:156 Public/call-daily-load.php:89
 msgid " - Call Logs - "
@@ -3686,7 +3686,7 @@ msgstr "МАРЖА"
 
 #: Public/call-log-customers.php:1231 Public/call-dnid.php:856
 msgid "MARKUP"
-msgstr ""
+msgstr "ПРИБЫЛЬНОСТЬ"
 
 #: Public/A2B_entity_password.php:79
 msgid "No value in New Password entered"
@@ -8298,6 +8298,18 @@ msgstr "ПЛАТЕЖ"
 #: Public/form_data/FG_var_moneysituation.inc:50
 msgid "TO PAY"
 msgstr "ОПЛАТИТЬ"
+
+#: Public/form_data/FG_var_friend.inc
+msgid "Device configuration as "
+msgstr "Настройки подключения как в "
+
+#: Public/form_data/FG_var_friend.inc
+msgid "EXTERNAL"
+msgstr "ВНЕШНЯЯ ЛИНИЯ"
+
+#: Public/form_data/FG_var_friend.inc
+msgid "'Yes' for external line or 'No' for extension"
+msgstr "Выберите 'Да' для внешней линии или 'Нет' если это внутренний номер"
 
 #: Public/form_data/FG_var_friend.inc:48
 msgid "SIP Config"
