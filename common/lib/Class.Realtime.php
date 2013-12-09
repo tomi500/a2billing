@@ -83,11 +83,10 @@ class Realtime {
         } else {
             $buddyfile = BUDDY_SIP_FILE;
             $table_name = $this -> FG_TABLE_SIP_NAME;
-            
+
             $this -> instance_table = new Table($table_name, 'id, ' . $this -> FG_QUERY_ADITION_SIP);
 			$list_friend = $this -> instance_table -> Get_list($this->DBHandler, '', null, null, null, null);
-			$list_names = explode(",",$this -> FG_QUERY_ADITION_SIP);
-			
+			$list_names = explode(",",str_replace("`","",$this -> FG_QUERY_ADITION_SIP));
         }
 		
 		
