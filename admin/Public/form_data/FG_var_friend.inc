@@ -35,12 +35,12 @@
 
 getpost_ifset(array('id_cc_card', 'cardnumber', 'id', 'name', 'amaflags', 'callgroup', 'namedcallgroup', 'namedpickupgroup', 'accountcode', 'callerid', 'canreinvite', 'context', 'defaultip', 'dtmfmode', 'videosupport', 
 'fromuser', 'fromdomain', 'host', 'insecure', 'language', 'mailbox', 'md5secret', 'directmedia', 'nat', 'permit', 'deny', 'mask', 'pickupgroup', 'port', 'qualify', 'warning_threshold', 'say_rateinitial', 'say_balance_after_call', 
-'restrictcid', 'rtptimeout', 'rtpholdtimeout', 'secret', 'type', 'username', 'disallow', 'allow', 'musiconhold', 'regseconds', 'ipaddr', 'regexten','friend_id', 'callbackextension', 'callcounter', 'external'));
+'restrictcid', 'rtptimeout', 'rtpholdtimeout', 'secret', 'type', 'username', 'disallow', 'allow', 'musiconhold', 'regseconds', 'ipaddr', 'regexten','friend_id', 'callbackextension', 'callcounter', 'call-limit', 'external'));
 
 getpost_ifset(array('defaultuser', 'subscribemwi', 'vmexten', 'cid_number', 'callingpres', 'usereqphone', 'incominglimit', 'subscribecontext', 'musicclass', 
 'allowtransfer', 'autoframing', 'maxcallbitrate', 'outboundproxy', 'regserver', 'rtpkeepalive', 'dbsecret ', 'regcontext ', 'sourceaddress ', 'mohinterpret ', 
 'mohsuggest ', 'inkeys', 'outkey', 'sendani', 'fullname', 'maxauthreq', 'encryption', 'ignorecryptolifetime', 'transport', 't38pt_udptl', 'forceencryption', 'transfer', 'jitterbuffer', 
-'forcejitterbuffer', 'codecpriority', 'qualifysmoothing', 'qualifyfreqok ', 'qualifyfreqnotok ', 'timezone', 'adsi'));
+'forcejitterbuffer', 'codecpriority', 'qualifysmoothing', 'qualifyfreqok ', 'qualifyfreqnotok ', 'timezone', 'adsi', 'filterprefix', 'current_page'));
 
 
 
@@ -825,6 +825,16 @@ if ($atmenu=='sip') {
 							   "list", "", "", "", $values_list['callcounter'], "%1", "NO-NULL" );
 	
 	
+	$HD_Form -> AddEditElement ("CALL-LIMIT",
+							   "`call-limit`",
+							   '',
+							   "INPUT",
+							   "size=20 maxlength=11",
+							   "4",
+							   "",
+							   "", "", "", "", "", "", "NO-NULL" );
+	
+	
 	$HD_Form -> AddEditElement (gettext("MUSICCLASS"),
 							   "musicclass",		
 							   '',	
@@ -1105,8 +1115,8 @@ if ($atmenu=='sip') {
 	$field_list_edit = 'id_cc_card, external, warning_threshold, say_rateinitial, say_balance_after_call, name, accountcode, regexten, callerid, cid_number, amaflags, type, defaultuser, secret, qualify, ' .
 			'defaultip, deny, permit, dtmfmode, disallow, allow, videosupport, host, port, context, language, subscribecontext, mailbox, fromuser, fromdomain, insecure, auth, callgroup, pickupgroup, ' .
 			'namedcallgroup, namedpickupgroup, mohsuggest, setvar, encryption, ignorecryptolifetime, transport, t38pt_udptl, username, md5secret, directmedia, nat, canreinvite, mask, restrictcid, ' .
-			'rtpkeepalive, rtptimeout, rtpholdtimeout, musiconhold, allowtransfer, subscribemwi, vmexten, callingpres, usereqphone, callcounter, musicclass, autoframing, maxcallbitrate, outboundproxy, ' .
-			'callbackextension';
+			'rtpkeepalive, rtptimeout, rtpholdtimeout, musiconhold, allowtransfer, subscribemwi, vmexten, callingpres, usereqphone, callcounter, `call-limit`, musicclass, autoframing, maxcallbitrate, ' .
+			'outboundproxy, callbackextension';
 } else {
 	$field_list_edit = 'id_cc_card, external, name, accountcode, regexten, callerid, cid_number, amaflags, type, secret, qualify, defaultip, deny, permit, disallow, allow, host, port, context, language, ' .
 			'auth, mohsuggest, setvar, encryption, username, forceencryption, trunk, dbsecret, regcontext, sourceaddress, mohinterpret, inkeys, outkey,  sendani, fullname,  maxauthreq, transfer, ' .
@@ -1116,16 +1126,10 @@ if ($atmenu=='sip') {
 
 $HD_Form -> FieldEditElement ($field_list_edit);
 
-$HD_Form -> FG_FILTER_APPLY = true;
-$HD_Form -> FG_FILTERFIELD = 'accountcode';
-$HD_Form -> FG_FILTERFIELDNAME = gettext('accountcode');
-$HD_Form -> FG_FILTER_FORM_ACTION = 'list';
+$HD_Form -> FG_ADITION_HIDDEN_PARAM		= $HD_Form -> FG_EDITION_HIDDEN_PARAM		= 'filterprefix';
+$HD_Form -> FG_ADITION_HIDDEN_PARAM_VALUE	= $HD_Form -> FG_EDITION_HIDDEN_PARAM_VALUE	= "$filterprefix";
 
-
-if (isset($filterprefix)  &&  (strlen($filterprefix)>0)){
-	if (strlen($HD_Form -> FG_TABLE_CLAUSE)>0) $HD_Form -> FG_TABLE_CLAUSE.=" AND ";
-	$HD_Form -> FG_TABLE_CLAUSE.="accountcode like '$filterprefix%'";
-}
+//$HD_Form -> FG_SPLITABLE_FIELD = 'accountcode';
 
 $HD_Form -> FG_INTRO_TEXT_EDITION= '';
 $HD_Form -> FG_INTRO_TEXT_ASK_DELETION = gettext("If you really want remove this")." ".$HD_Form->FG_INSTANCE_NAME.", ".gettext("click on the delete button.");
@@ -1141,6 +1145,16 @@ $HD_Form -> FG_BUTTON_EDITION_BOTTOM_TEXT = $HD_Form -> FG_BUTTON_ADITION_BOTTOM
 
 $HD_Form -> FG_ADDITIONAL_FUNCTION_AFTER_DELETE = $HD_Form->FG_ADDITIONAL_FUNCTION_AFTER_EDITION = 'processing_sipiax_generate_by_admin';
 
-$HD_Form -> FG_GO_LINK_AFTER_ACTION_ADD = $_SERVER['PHP_SELF']."?atmenu=$atmenu&stitle=Document&wh=AC&id=";
-$HD_Form -> FG_GO_LINK_AFTER_ACTION_EDIT = $_SERVER['PHP_SELF']."?atmenu=$atmenu&stitle=Document&wh=AC&id=";
-$HD_Form -> FG_GO_LINK_AFTER_ACTION_DELETE = $_SERVER['PHP_SELF']."?atmenu=$atmenu&stitle=Document&wh=AC&id=";
+$HD_Form -> FG_FILTER_APPLY = true;
+$HD_Form -> FG_FILTERFIELD = 'accountcode';
+$HD_Form -> FG_FILTERFIELDNAME = 'accountcode';
+$HD_Form -> FG_FILTER_FORM_ACTION = 'list';
+
+if (isset($filterprefix)  &&  (strlen($filterprefix)>0)){
+	if (strlen($HD_Form -> FG_TABLE_CLAUSE)>0) $HD_Form -> FG_TABLE_CLAUSE.=" AND ";
+	$HD_Form -> FG_TABLE_CLAUSE.="accountcode like '$filterprefix%'";
+}
+
+$HD_Form -> FG_GO_LINK_AFTER_ACTION_ADD = $_SERVER['PHP_SELF']."?atmenu=$atmenu&stitle=Document&wh=AC&filterprefix=$filterprefix&id=";
+$HD_Form -> FG_GO_LINK_AFTER_ACTION_EDIT = $_SERVER['PHP_SELF']."?atmenu=$atmenu&stitle=Document&wh=AC&filterprefix=$filterprefix&id=";
+$HD_Form -> FG_GO_LINK_AFTER_ACTION_DELETE = $_SERVER['PHP_SELF']."?atmenu=$atmenu&stitle=Document&wh=AC&filterprefix=$filterprefix&id=";

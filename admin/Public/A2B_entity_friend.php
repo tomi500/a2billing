@@ -44,13 +44,11 @@ if (! has_rights (ACX_CUSTOMER)) {
 	die();
 }
 
+/********************************* BATCH UPDATE ***********************************/
+getpost_ifset(array('upd_callerid', 'upd_context', 'batchupdate', 'check', 'type', 'mode'));
 
 $HD_Form -> setDBHandler (DbConnect());
 $HD_Form -> init();
-
-
-/********************************* BATCH UPDATE ***********************************/
-getpost_ifset(array('upd_callerid', 'upd_context', 'batchupdate', 'check', 'type', 'mode'));
 
 
 // CHECK IF REQUEST OF BATCH UPDATE
@@ -167,12 +165,8 @@ if ( (isset ($id_cc_card) && (is_numeric($id_cc_card)  != "")) && ( $form_action
 	$HD_Form->_vars = array_merge((array)$_GET, (array)$_POST);
 }
 
-
-
-
-$HD_Form -> FG_EDITION_LINK	= $_SERVER['PHP_SELF']."?form_action=ask-edit&atmenu=$atmenu&id=";
-$HD_Form -> FG_DELETION_LINK = $_SERVER['PHP_SELF']."?form_action=ask-delete&atmenu=$atmenu&id=";
-
+$HD_Form -> FG_EDITION_LINK	= $_SERVER['PHP_SELF']."?form_action=ask-edit&atmenu=$atmenu&current_page=$current_page&filterprefix=$filterprefix&id=";
+$HD_Form -> FG_DELETION_LINK	= $_SERVER['PHP_SELF']."?form_action=ask-delete&atmenu=$atmenu&current_page=$current_page&filterprefix=$filterprefix&id=";
 
 if ($id!="" || !is_null($id)) {
 	$HD_Form -> FG_EDITION_CLAUSE = str_replace("%id", "$id", $HD_Form -> FG_EDITION_CLAUSE);	
@@ -275,6 +269,7 @@ if ($form_action=='list') {
         <tbody>
 		<form name="updateForm" action="<?php echo $_SERVER['PHP_SELF']?>" method="post">
 		<INPUT type="hidden" name="batchupdate" value="1">
+		<INPUT type="hidden" name="filterprefix" value="<?php echo $filterprefix?>">
 		<tr>
           <td align="left" class="bgcolor_001" >
 		  		<input name="check[upd_callerid]" type="checkbox" <?php if ($check["upd_callerid"]=="on") echo "checked"?>>

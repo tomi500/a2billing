@@ -33,7 +33,7 @@
 
 
 
-getpost_ifset(array('id', 'username', 'useralias', 'uipass', 'credit', 'language', 'tariff',
+getpost_ifset(array('id', 'username', 'useralias', 'uipass', 'credit', 'language', 'tariff', 'filterprefix', 'current_page',
 'id_didgroup','id_campaign', 'callback', 'simultaccess', 'currency','typepaid', 'creditlimit',
 'lastname', 'firstname', 'email', 'address','city', 'state', 'country', 'zipcode', 'phone', 'fax', 'inuse', 'recalldays',
 'recalltime', 'cid', 'runservice', 'paypal', 'firstusedate', 'expirationdate', 'enableexpire', 'expiredays', 'sip_buddy',
@@ -1060,19 +1060,21 @@ if (has_rights (ACX_MODIFY_CUSTOMERS) && !($popup_select>=1)) {
 			' firstusedate, enableexpire, expirationdate, expiredays, sip_buddy, iax_buddy, mac_addr, inuse, recalldays, recalltime, ' .
 			' cbtimeoutunavailable, cbattemptunavailable, cbtimeoutbusy, cbattemptbusy, cbtimeoutnoanswer, cbattemptnoanswer, cbtimeoutmax, ' .
 			' autorefill, initialbalance, invoiceday, vat, vat_rn, discount, traffic, traffic_target, restriction' );
-	
-	
+
+	$HD_Form -> FG_ADITION_HIDDEN_PARAM		= $HD_Form -> FG_EDITION_HIDDEN_PARAM		= "filterprefix";
+	$HD_Form -> FG_ADITION_HIDDEN_PARAM_VALUE	= $HD_Form -> FG_EDITION_HIDDEN_PARAM_VALUE	= "$filterprefix";
+
 	if(!isset($myusername)) 
 		$myusername='';
-	
+
 	if ($form_action == "ask-edit") {
 		$table_card = new Table("cc_card","status");
 		$result_card = $table_card ->Get_list(DbConnect(),"id=$id");
-		$HD_Form -> FG_EDITION_HIDDEN_PARAM = "oldstatus";
-		$HD_Form -> FG_EDITION_HIDDEN_PARAM_VALUE = "".$result_card[0][0];
+		$HD_Form -> FG_EDITION_HIDDEN_PARAM .= ",oldstatus";
+		$HD_Form -> FG_EDITION_HIDDEN_PARAM_VALUE .= ",".$result_card[0][0];
 	}
-	
-	
+
+
 	$HD_Form -> FG_INTRO_TEXT_EDITION= gettext("You can modify, through the following form, the different properties of your")." ".$HD_Form->FG_INSTANCE_NAME;
 	$HD_Form -> FG_INTRO_TEXT_ASK_DELETION = gettext("If you really want remove this")." ".$HD_Form->FG_INSTANCE_NAME.", ".gettext("click on the delete button.");
 	$HD_Form -> FG_INTRO_TEXT_ADD = gettext("you can add easily a new")." ".$HD_Form->FG_INSTANCE_NAME.".<br>".gettext("Fill the following fields and confirm by clicking on the button add.");
@@ -1113,9 +1115,7 @@ if (has_rights (ACX_MODIFY_CUSTOMERS) && !($popup_select>=1)) {
 		NotificationsDAO::AddNotification($key,Notification::$HIGH,$who,$who_id);
 	}
 	
-	$HD_Form -> FG_GO_LINK_AFTER_ACTION_ADD = $_SERVER['PHP_SELF']."?section=".$_SESSION["menu_section"]."&id=";
-	$HD_Form -> FG_GO_LINK_AFTER_ACTION_EDIT = $_SERVER['PHP_SELF']."?section=".$_SESSION["menu_section"]."&id=";
-	$HD_Form -> FG_GO_LINK_AFTER_ACTION_DELETE = $_SERVER['PHP_SELF']."?section=".$_SESSION["menu_section"]."&id=";
+	$HD_Form -> FG_GO_LINK_AFTER_ACTION_ADD = $_SERVER['PHP_SELF']."?section=".$_SESSION["menu_section"]."&filterprefix=$filterprefix&id=";
+	$HD_Form -> FG_GO_LINK_AFTER_ACTION_EDIT = $_SERVER['PHP_SELF']."?section=".$_SESSION["menu_section"]."&filterprefix=$filterprefix&id=";
+	$HD_Form -> FG_GO_LINK_AFTER_ACTION_DELETE = $_SERVER['PHP_SELF']."?section=".$_SESSION["menu_section"]."&filterprefix=$filterprefix&id=";
 }
-
-

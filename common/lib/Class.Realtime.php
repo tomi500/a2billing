@@ -54,7 +54,7 @@ class Realtime {
 		$this -> FG_QUERY_ADITION_SIP = 'name, accountcode, regexten, amaflags, callgroup, callerid, canreinvite, context, defaultip, dtmfmode, fromuser, fromdomain, host, insecure, language, ' .
 				'mailbox, md5secret, encryption, ignorecryptolifetime, transport, directmedia, nat, deny, permit, mask, pickupgroup, port, qualify, restrictcid, rtptimeout, rtpholdtimeout, ' .
 				'secret, type, username, disallow, allow, videosupport, t38pt_udptl, musiconhold, regseconds, ipaddr, cancallforward, ' .
-				'fullcontact, setvar, lastms, regserver, defaultuser, auth, subscribemwi, vmexten, cid_number, callingpres, usereqphone, callcounter, incominglimit, subscribecontext, ' .
+				'fullcontact, setvar, lastms, regserver, defaultuser, auth, subscribemwi, vmexten, cid_number, callingpres, usereqphone, callcounter, call-limit, incominglimit, subscribecontext, ' .
 				'musicclass, mohsuggest, allowtransfer, autoframing, maxcallbitrate, outboundproxy, rtpkeepalive, callbackextension';
 
 		$this -> FG_QUERY_ADITION_IAX = 'name, accountcode, regexten, amaflags, callerid, context, defaultip, host, language, mask, port, qualify, secret, username, disallow, allow, regseconds, ' .

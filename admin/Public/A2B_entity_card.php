@@ -49,12 +49,16 @@ if (! has_rights (ACX_CUSTOMER)) {
 $HD_Form -> setDBHandler (DbConnect());
 $HD_Form -> init();
 
+$HD_Form -> FG_EDITION_LINK	= $_SERVER['PHP_SELF']."?form_action=ask-edit&current_page=$current_page&filterprefix=$filterprefix&id=";
+$HD_Form -> FG_DELETION_LINK  = $_SERVER['PHP_SELF']."?form_action=ask-delete&current_page=$current_page&filterprefix=$filterprefix&id=";
 
 /********************************* BATCH UPDATE ***********************************/
 getpost_ifset(array('popup_select', 'popup_formname', 'popup_fieldname', 'upd_inuse', 'upd_status', 'upd_language', 'upd_tariff', 'upd_credit',
  	'upd_credittype', 'upd_simultaccess', 'upd_currency', 'upd_typepaid', 'upd_creditlimit', 'upd_enableexpire', 'upd_expirationdate', 
 	'upd_expiredays', 'upd_runservice', 'upd_runservice', 'batchupdate', 'check', 'type', 'mode', 'addcredit', 'cardnumber','description',
 	'upd_id_group','upd_discount','upd_refill_type','upd_description','upd_id_seria', 'upd_vat', 'upd_country'));
+
+
 
 // CHECK IF REQUEST OF BATCH UPDATE
 if ($batchupdate == 1 && is_array($check)) {
