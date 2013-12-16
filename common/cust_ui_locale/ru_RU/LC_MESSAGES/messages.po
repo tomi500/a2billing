@@ -418,7 +418,7 @@ msgstr ""
 
 #: form_data/FG_var_did.inc:68 templates/default/main.tpl:62
 msgid "DID"
-msgstr "ВНЕШНИЕ НОМЕРА"
+msgstr "ВНЕШНИЙ НОМЕР"
 
 #: form_data/FG_var_did.inc:69 form_data/FG_var_did.inc:132
 #: form_data/FG_var_callerid.inc:49 form_data/FG_var_callerid.inc:91
