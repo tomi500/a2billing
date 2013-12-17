@@ -223,8 +223,7 @@ if ($startUpSystem) {
 		$A2B -> DBHandle -> Execute($QUERY);
 		$QUERY = "UPDATE cc_card,cc_trunk SET cc_card.inuse=0, cc_trunk.inuse=0";
 		$A2B -> DBHandle -> Execute($QUERY);
-		$QUERY = "UPDATE cc_callback_spool SET status='PENDING', last_attempt_time='1980-01-01 00:00:00', next_attempt_time=NOW() WHERE surveillance > 0";
-//		$QUERY = "UPDATE cc_callback_spool SET status='PENDING', last_attempt_time=NOW(), next_attempt_time=NOW() WHERE surveillance > 0";
+		$QUERY = "UPDATE cc_callback_spool SET status='PENDING', last_attempt_time='1980-01-01 00:00:00', next_attempt_time=NOW() WHERE surveillance > 0 AND agi_result='AGI PROCESSING'";
 		$A2B -> DBHandle -> Execute($QUERY);
 	}
 }
@@ -1482,7 +1481,7 @@ if ($mode == 'standard') {
 					$result_callperf = true;
 				}
 				if (is_numeric($callback_mode)) {
-					$QUERY = "UPDATE cc_callback_spool SET status='PENDING', next_attempt_time=NOW() WHERE uniqueid = '$callback_uniqueid' AND surveillance > 0";
+					$QUERY = "UPDATE cc_callback_spool SET status='PENDING', next_attempt_time=NOW(), agi_result='AGI ENDED' WHERE uniqueid = '$callback_uniqueid' AND surveillance > 0";
 					$A2B -> DBHandle -> Execute($QUERY);
 					$A2B -> recalltime = false;
 				}
