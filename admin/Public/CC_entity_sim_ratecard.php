@@ -97,8 +97,8 @@ if ($called  && ($id_cc_card > 0 || $username > 0)) {
 			$A2B ->agiconfig['lcr_mode']=1;
 			$A2B ->dnid = $A2B ->destination = $calling;
 			
-			if ($A2B->removeinterprefix) $A2B->destination = $A2B -> apply_rules ($A2B->destination);			
-			
+			if ($A2B->removeinterprefix) $A2B->destination = $A2B -> apply_rules ($A2B->destination);
+			$A2B->destination = $A2B->apply_add_countryprefixto($A2B->destination);
 			$resfindrate = $RateEngine->rate_engine_findrates($A2B, $A2B->destination, $row[0][1]);
 			if ($FG_DEBUG == 1) echo "resfindrate=$resfindrate";
 			

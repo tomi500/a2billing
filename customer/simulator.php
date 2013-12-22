@@ -107,6 +107,7 @@ if ($called && $id_cc_card) {
 			$A2B->dnid = $A2B->destination = $calling;
 			if ($A2B->removeinterprefix)
 				$A2B->destination = $A2B->apply_rules($A2B->destination);
+			$A2B->destination = $A2B->apply_add_countryprefixto($A2B->destination);
 
 			$resfindrate = $RateEngine->rate_engine_findrates($A2B, $A2B->destination, $result[0][1]);
 			if ($FG_DEBUG == 1)

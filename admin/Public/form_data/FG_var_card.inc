@@ -34,8 +34,8 @@
 
 
 getpost_ifset(array('id', 'username', 'useralias', 'uipass', 'credit', 'language', 'tariff', 'filterprefix', 'current_page',
-'id_didgroup','id_campaign', 'callback', 'simultaccess', 'currency','typepaid', 'creditlimit',
-'lastname', 'firstname', 'email', 'address','city', 'state', 'country', 'zipcode', 'phone', 'fax', 'inuse', 'recalldays',
+'id_didgroup','id_campaign', 'callback', 'simultaccess', 'currency','typepaid', 'creditlimit', 'lastname', 'firstname',
+'email', 'address','city', 'state', 'areaprefix', 'citylength', 'country', 'zipcode', 'phone', 'fax', 'inuse', 'recalldays',
 'recalltime', 'cid', 'runservice', 'paypal', 'firstusedate', 'expirationdate', 'enableexpire', 'expiredays', 'sip_buddy',
 'iax_buddy','popup_select', 'vat', 'autorefill', 'initialbalance', 'mac_addr', 'cardnumberlenght_list',
 'status', 'block', 'lock_pin', 'template_invoice', 'template_outstanding', 'description', 'voicemail_activated',
@@ -455,7 +455,25 @@ if (has_rights (ACX_MODIFY_CUSTOMERS) && !($popup_select>=1)) {
 				   "11",
 				   gettext("Insert the state"),
 				   "" , "", "",	"", "", "" , "NO", "");
-	
+
+$HD_Form -> AddEditElement(gettext("AREA CODE"),
+				    "areaprefix",
+				    '$value',
+				    "INPUT",
+				    "size=30 maxlength=6",
+				    "22",
+				    "",
+				    "", "", "", "", "", "", "NO-NULL", gettext("Set prefix of the city by default (i.e. 30 for Berlin)"));
+
+$HD_Form -> AddEditElement(gettext("CITY LENGTH"),
+				    "citylength",
+				    '$value',
+				    "INPUT",
+				    "size=30 maxlength=1",
+				    "23",
+				    "",
+				    "", "", "", "", "", "", "NO-NULL", gettext("Set length of city numbers"));
+
 	if ($form_action == 'ask-add') {
 		$country_default_val = 'USA';
 	}
@@ -1052,8 +1070,8 @@ if (has_rights (ACX_MODIFY_CUSTOMERS) && !($popup_select>=1)) {
 	if (ACT_VOICEMAIL)
 		$add_fields_voicemail = 'voicemail_permitted, voicemail_activated, ';
 	
-	$HD_Form -> FieldEditElement ('username, useralias, uipass, credit, id_group, id_seria, id_diller, lastname, firstname, email, '.
-			' address, city, state, country, zipcode, phone, fax,company_name, company_website, ' .$update_field_typepaid.
+	$HD_Form -> FieldEditElement ('username, useralias, uipass, credit, id_group, id_seria, id_diller, lastname, firstname, email, address, city, '.
+			' state, areaprefix, citylength, country, zipcode, phone, fax,company_name, company_website, ' .$update_field_typepaid.
 			' tariff, id_didgroup, id_timezone, language, currency, status, block, lock_pin, simultaccess,  runservice, paypal, creditlimit, ' .
 			' credit_notification, notify_email, email_notification, ' .$add_fields_voicemail.
 			' id_campaign, ' .

@@ -5773,6 +5773,10 @@ msgstr ""
 msgid "CARD GROUP"
 msgstr "ГРУППА КАРТЫ"
 
+#: Public/form_data/FG_var_card.inc
+msgid "Set prefix of the city by default (i.e. 30 for Berlin)"
+msgstr "Префикс города по умолчанию (например '44' для Киева)"
+
 #: Public/form_data/FG_var_card.inc:45
 msgid "Card"
 msgstr "Карта"
