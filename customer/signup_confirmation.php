@@ -125,6 +125,7 @@ $smarty->display('signup_header.tpl');
 			  <?php echo gettext("Card alias (login) is "); ?> <b><font color="#00AA00"><?php echo $list[0][6]; ?></font></b><br>
 			  <?php echo gettext("Password is "); ?> <b><font color="#00AA00"><?php echo $list[0][4]; ?></font></b><br>
 			</h3>
+			<script type="text/javascript">window.opener.location.reload();</script>
 	<?php }else {
 			echo $list[0][2]; ?> <?php echo $list[0][1]; ?>, <?php echo gettext("Thank you for registering with us !");?><br>
 		  <?php echo gettext("An email confirming your information has been sent to"); ?> <b><?php echo $list[0][3]; ?></b><br><br>

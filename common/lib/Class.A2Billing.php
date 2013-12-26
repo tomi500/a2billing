@@ -865,6 +865,18 @@ class A2Billing {
 		}
 	}
 
+	function margin_calculate($cardid = NULL, $margin = 1)
+	{
+		if (is_null($cardid)) $cardid = $this->id_card;
+		while ($cardid > 0) {
+			$QUERY	= "SELECT id_diller, margin FROM cc_card WHERE id=$cardid LIMIT 1";
+			$result = $this->instance_table -> SQLExec ($this -> DBHandle, $QUERY);
+			$cardid = $result[0][0];
+			$margin = $margin * ($result[0][1] / 100 + 1);
+		}
+		return $margin;
+	}
+
 	/**
 	 *	Function callingcard_ivr_authorize : check the dialed/dialing number and play the time to call
 	 *
@@ -1502,13 +1514,9 @@ for ($t=0;$t<count($result);$t++) {
 			$this->time_out 				= $inst_listdestination[30];
 			$this->id_did					= $inst_listdestination[0];
 			$this->dnid					= $inst_listdestination[10];
-			$this->margintotal				= $inst_listdestination[31];
-			$this->margin					= $inst_listdestination[32];
-			$this->id_diller				= $inst_listdestination[33];
-			$this->voicebox 			= is_null($inst_listdestination[34]) ? NULL : $inst_listdestination[34]."@".$this->username;
-//			$this->areaprefix				= $inst_listdestination[34];
-//			$this->citylength				= $inst_listdestination[35];
-//			$this->didcountryprefix				= $inst_listdestination[36];
+			$this->margin					= $inst_listdestination[31];
+			$this->id_diller				= $inst_listdestination[32];
+			$this->voicebox 			= is_null($inst_listdestination[33]) ? NULL : $inst_listdestination[33]."@".$this->username;
 			
 			if ($this -> set_inuse) $this -> callingcard_acct_start_inuse($agi,0);
 			
@@ -1576,16 +1584,17 @@ for ($t=0;$t<count($result);$t++) {
 					//# Ooh, something actually happend!
 					if ($dialstatus == "BUSY") {
 						$answeredtime = 0;
-						if ($this->agiconfig['busy_timeout'] > 0)
+						if ($this->agiconfig['busy_timeout'] > 0) {
 							$res_busy = $agi->exec("Busy ".$this->agiconfig['busy_timeout']);
-						$agi-> stream_file('prepaid-isbusy', '#');
-						if (count($listdestination) > $callcount)
+						}
+						if (count($listdestination) > $callcount) {
 							continue;
+						} else $agi-> stream_file('prepaid-isbusy', '#');
 					} elseif ($dialstatus == "NOANSWER") {
 						$answeredtime = 0;
-						$agi-> stream_file('prepaid-noanswer', '#');
-						if (count($listdestination) > $callcount)
+						if (count($listdestination) > $callcount) {
 							continue;
+						} else $agi-> stream_file('prepaid-noanswer', '#');
 					} elseif ($dialstatus == "CANCEL") {
 						// Call cancelled, no need to follow-me
 //						return 1;
@@ -1594,12 +1603,13 @@ for ($t=0;$t<count($result);$t++) {
 						$this -> debug( DEBUG, $agi, __FILE__, __LINE__,"[A2Billing] DID call friend: dialstatus : $dialstatus, answered time is ".$answeredtime." \n");
 					} elseif (($dialstatus  == "CHANUNAVAIL") || ($dialstatus  == "CONGESTION")) {
 						$answeredtime = 0;
-						if (count($listdestination)>$callcount)
+						if (count($listdestination)>$callcount) {
 							continue;
+						}
 					} else {
-						$agi-> stream_file('prepaid-callfollowme', '#');
-						if (count($listdestination) > $callcount)
+						if (count($listdestination) > $callcount) {
 							continue;
+						} else $agi-> stream_file('prepaid-callfollowme', '#');
 					}
 
 					$this -> debug( INFO, $agi, __FILE__, __LINE__, "[DID CALL - LOG CC_CALL: FOLLOWME=$callcount - (answeredtime=$answeredtime :: dialstatus=$dialstatus)]");
@@ -1819,23 +1829,18 @@ for ($t=0;$t<count($result);$t++) {
 
 	    $callcount++;
 	    $this -> debug( INFO, $agi, __FILE__, __LINE__, "[A2Billing] DID call friend: FOLLOWME=$callcount (cardnumber:".$inst_listdestination[6]."|destination:".$inst_listdestination[4]."|tariff:".$inst_listdestination[3].")\n");
-//$this -> debug( ERROR, $agi, __FILE__, __LINE__, "[A2Billing] DID call friend: FOLLOWME=$callcount (cardnumber:".$inst_listdestination[6]."|destination:".$inst_listdestination[4]."|tariff:".$inst_listdestination[3].")\n");
 	    $this->agiconfig['cid_enable']			= 0;
 	    $this->accountcode= $this->username = $new_username = $inst_listdestination[6];
 	    $this->tariff 					= $inst_listdestination[3];
 	    $this->destination					= $inst_listdestination[10];
-//	    $new_username					= $inst_listdestination[6];
 	    $this->useralias					= $inst_listdestination[7];
 	    $this->id_card					= $inst_listdestination[28];
 	    $this->time_out					= $inst_listdestination[30];
 	    $this->id_did					= $inst_listdestination[0];
-	    $this->margintotal					= $inst_listdestination[31];
-	    $this->margin					= $inst_listdestination[32];
-	    $this->id_diller					= $inst_listdestination[33];
-	    $this->voicebox 				= is_null($inst_listdestination[34]) ? NULL : $inst_listdestination[34]."@".$this->username;
-//	    $this->areaprefix					= $inst_listdestination[34];
-//	    $this->citylength					= $inst_listdestination[35];
-//	    $this->didcountryprefix				= $inst_listdestination[36];
+	    $this->margin					= $inst_listdestination[31];
+	    $this->id_diller					= $inst_listdestination[32];
+	    $this->voicebox 				= is_null($inst_listdestination[33]) ? NULL : $inst_listdestination[33]."@".$this->username;
+	    $this->margintotal					= $this->margin_calculate();
 
 	    // CHECK IF DESTINATION IS SET
 	    if (strlen($inst_listdestination[4])==0)
@@ -1908,23 +1913,25 @@ for ($t=0;$t<count($result);$t++) {
 					$answeredtime = 0;
 					if ($this->agiconfig['busy_timeout'] > 0)
 						$res_busy = $agi->exec("Busy ".$this->agiconfig['busy_timeout']);
-					$this -> let_stream_listening($agi);
-					$agi-> stream_file('prepaid-isbusy', '#');
-					if (count($listdestination)>$callcount)
+					if (count($listdestination)>$callcount) {
 						continue;
+					} else {
+						$this -> let_stream_listening($agi);
+						$agi-> stream_file('prepaid-isbusy', '#');
+					}
                 } elseif ($dialstatus == "NOANSWER") {
 					$answeredtime = 0;
-					$this -> let_stream_listening($agi);
-					$agi-> stream_file('prepaid-noanswer', '#');
-					if (count($listdestination) > $callcount)
+					if (count($listdestination) > $callcount) {
 						continue;
+					} else {
+						$this -> let_stream_listening($agi);
+						$agi-> stream_file('prepaid-noanswer', '#');
+					}
                 } elseif ($dialstatus == "CANCEL") {
-					// Call cancelled, no need to follow-me
-//					return 1;
 					$answeredtime = 0;
                 } elseif ($dialstatus == "ANSWER") {
 					$this -> debug( DEBUG, $agi, __FILE__, __LINE__,"[A2Billing] DID call friend: dialstatus : $dialstatus, answered time is ".$answeredtime." \n");
-                } elseif (($dialstatus  == "CHANUNAVAIL") || ($dialstatus  == "CONGESTION")) {
+                } elseif (($dialstatus == "CHANUNAVAIL") || ($dialstatus == "CONGESTION")) {
 					$answeredtime = 0;
 					if (count($listdestination)>$callcount) continue;
                 } else {
@@ -2039,7 +2046,6 @@ $this -> debug( ERROR, $agi, __FILE__, __LINE__, "[* QUEUEDNID Current_channel {
                 $this->extension = $this->destination = $inst_listdestination[4];
                 if ($this->CC_TESTING) $this->extension = $this->dnid = $this->destination = "011324885";
 				
-$this -> debug( ERROR, $agi, __FILE__, __LINE__,"[A2Billing] DID call friend: dialstatus : $dialstatus, answered time is ".$answeredtime." \n========================///================= ".count($listdestination)." = ".$callcount);
                 if ($this -> callingcard_ivr_authorize($agi, $RateEngine, 0)==1) {
 /**
 		// check the min to call
@@ -3118,7 +3124,7 @@ $this -> debug( ERROR, $agi, __FILE__, __LINE__, "FAXRESOLUTION: ".$faxresolutio
 				    " expiredays, nbused, UNIX_TIMESTAMP(firstusedate), UNIX_TIMESTAMP(cc_card.creationdate), cc_card.currency, " .
 				    " cc_card.lastname, cc_card.firstname, cc_card.email, cc_card.uipass, cc_card.id_campaign, cc_card.id, useralias, " .
 				    " cc_card.status, cc_card.voicemail_permitted, cc_card.voicemail_activated, cc_card.restriction, cc_country.countryprefix, " .
-				    " cc_card.monitor, phonenumber, warning_threshold, say_rateinitial, say_balance_after_call, margintotal, margin, id_diller, ".
+				    " cc_card.monitor, phonenumber, warning_threshold, say_rateinitial, say_balance_after_call, margin, id_diller, ".
 				    " blacklist, areaprefix, citylength".
 				    " FROM cc_callerid ".
 				    " LEFT JOIN cc_card ON cc_callerid.id_cc_card=cc_card.id ".
@@ -3240,12 +3246,11 @@ $this -> debug( ERROR, $agi, __FILE__, __LINE__, "FAXRESOLUTION: ".$faxresolutio
 				$this->warning_threshold	=  is_null($result[0][35]) ? -2 : $result[0][35];
 				$this->say_rateinitial			= ($result[0][36]) ? 1 : 0 ;
 				$this->say_balance_after_call		= ($result[0][37]) ? 1 : 0 ;
-				$this->margintotal			=  $result[0][38];
-				$this->margin				=  $result[0][39];
-				$this->id_diller			=  $result[0][40];
-				$blacklist				=  $result[0][41];
-				$this->areaprefix			=  $result[0][42];
-				$this->citylength			=  $result[0][43];
+				$this->margin				=  $result[0][38];
+				$this->id_diller			=  $result[0][39];
+				$blacklist				=  $result[0][40];
+				$this->areaprefix			=  $result[0][41];
+				$this->citylength			=  $result[0][42];
 
 				if (strlen($language)==2 && !($this->languageselected>=1)) {
 
@@ -3370,7 +3375,7 @@ $this -> debug( ERROR, $agi, __FILE__, __LINE__, "FAXRESOLUTION: ".$faxresolutio
 								" UNIX_TIMESTAMP(cc_card.creationdate), currency, lastname, firstname, email, uipass, id_campaign, cc_card.id," .
 								" useralias, status, voicemail_permitted, voicemail_activated, restriction, countryprefix, monitor, " .
 								" cc_sip_buddies.warning_threshold, cc_sip_buddies.say_rateinitial, cc_sip_buddies.say_balance_after_call," .
-								" margintotal, margin, id_diller, cc_callerid.activated, blacklist, areaprefix, citylength" .
+								" margin, id_diller, cc_callerid.activated, blacklist, areaprefix, citylength" .
 								" FROM cc_card" .
 								" LEFT JOIN cc_tariffgroup ON tariff = cc_tariffgroup.id" .
 								" LEFT JOIN cc_country ON country = countrycode" .
@@ -3419,13 +3424,12 @@ $this -> debug( ERROR, $agi, __FILE__, __LINE__, "FAXRESOLUTION: ".$faxresolutio
 					$this->warning_threshold =is_null($result[0][30]) ? -2 : $result[0][30];
 					$this->say_rateinitial		=($result[0][31]) ? 1 : 0 ;
 					$this->say_balance_after_call	=($result[0][32]) ? 1 : 0 ;
-					$this->margintotal		= $result[0][33];
-					$this->margin			= $result[0][34];
-					$this->id_diller		= $result[0][35];
-					$this->cidactivated		= $result[0][36];
-					$blacklist			= $result[0][37];
-					$this->areaprefix		= $result[0][38];
-					$this->citylength		= $result[0][39];
+					$this->margin			= $result[0][33];
+					$this->id_diller		= $result[0][34];
+					$this->cidactivated		= $result[0][35];
+					$blacklist			= $result[0][36];
+					$this->areaprefix		= $result[0][37];
+					$this->citylength		= $result[0][38];
 					
 					if ($this->typepaid==1) $this->credit = $this->credit + $this->creditlimit;
 				}
@@ -3760,6 +3764,7 @@ $this -> debug( ERROR, $agi, __FILE__, __LINE__, "FAXRESOLUTION: ".$faxresolutio
 			$res = -1;
 		}
 
+		$this->margintotal = $this->margin_calculate();
 		return $res;
 	}
 

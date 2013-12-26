@@ -877,7 +877,7 @@ if ($mode == 'standard') {
 						" aleg_timeinterval, ".
 						" aleg_carrier_connect_charge_offp, aleg_carrier_cost_min_offp, aleg_retail_connect_charge_offp, aleg_retail_cost_min_offp, ".
 						" aleg_carrier_initblock_offp, aleg_carrier_increment_offp, aleg_retail_initblock_offp, aleg_retail_increment_offp, ".
-						" cc_card.id, playsound, timeout, margintotal, margin, id_diller, voicebox".
+						" cc_card.id, playsound, timeout, margin, id_diller, voicebox".
 						" FROM cc_did, cc_did_destination, cc_card, cc_country".
 						" WHERE id_cc_did=cc_did.id AND cc_card.status=1 AND cc_card.id=id_cc_card AND cc_did_destination.activated=1 AND cc_did.activated=1 AND did='".$A2B->destination."' ".
 						" AND cc_country.id=id_cc_country AND cc_did.startingdate <= CURRENT_TIMESTAMP".
@@ -934,7 +934,7 @@ if ($mode == 'standard') {
                     " aleg_timeinterval, ".
                     " aleg_carrier_connect_charge_offp, aleg_carrier_cost_min_offp, aleg_retail_connect_charge_offp, aleg_retail_cost_min_offp, ".
                     " aleg_carrier_initblock_offp, aleg_carrier_increment_offp, aleg_retail_initblock_offp, aleg_retail_increment_offp,".
-                    " cc_did_destination.answer, playsound, timeout, margintotal, margin, id_diller, voicebox".
+                    " cc_did_destination.answer, playsound, timeout, margin, id_diller, voicebox".
 			        " FROM cc_did, cc_did_destination, cc_card, cc_country".
 			        " WHERE id_cc_did=cc_did.id and cc_card.status=1 and cc_card.id=id_cc_card and cc_did_destination.activated=1 and cc_did.activated=1 and did='$mydnid' ".
 			        " AND cc_country.id=id_cc_country AND cc_did.startingdate<= CURRENT_TIMESTAMP AND (cc_did.expirationdate > CURRENT_TIMESTAMP OR cc_did.expirationdate IS NULL ".
@@ -1513,7 +1513,7 @@ if ($mode == 'standard') {
 					" aleg_timeinterval, ".
 					" aleg_carrier_connect_charge_offp, aleg_carrier_cost_min_offp, aleg_retail_connect_charge_offp, aleg_retail_cost_min_offp, ".
 					" aleg_carrier_initblock_offp, aleg_carrier_increment_offp, aleg_retail_initblock_offp, aleg_retail_increment_offp, ".
-					" cc_card.id, playsound, timeout, margintotal, margin, id_diller, voicebox".
+					" cc_card.id, playsound, timeout, margin, id_diller, voicebox".
 					" FROM cc_did, cc_did_destination, cc_card, cc_country".
 					" WHERE id_cc_did=cc_did.id AND cc_card.status=1 AND cc_card.id=id_cc_card and cc_did_destination.activated=1 AND cc_did.activated=1 AND did='".$A2B-> destination."' ".
 					" AND cc_country.id=id_cc_country AND cc_did.startingdate <= CURRENT_TIMESTAMP AND (cc_did.expirationdate > CURRENT_TIMESTAMP OR cc_did.expirationdate IS NULL ".

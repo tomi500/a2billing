@@ -81,7 +81,7 @@ if ($called && $id_cc_card) {
 		$A2B->set_instance_table($instance_table);
 		$num = 0;
 
-		$result = $A2B->instance_table->SQLExec($A2B->DBHandle, "SELECT username, tariff, margintotal FROM cc_card where id='$customer_info[15]'");
+		$result = $A2B->instance_table->SQLExec($A2B->DBHandle, "SELECT username, tariff FROM cc_card where id='$customer_info[15]'");
 		if (!is_array($result) || count($result) == 0) {
 			echo gettext("Error card !!!");
 			exit ();
@@ -89,7 +89,8 @@ if ($called && $id_cc_card) {
 
 		$A2B->cardnumber = $result[0][0];
 		$A2B->credit = $balance;
-		$A2B->margintotal = $result[0][2];
+		$A2B->margintotal = $A2B->margin_calculate($customer_info[15]);
+//		$A2B->margintotal = $result[0][2];
 		if ($FG_DEBUG == 1)
 			echo "cardnumber = " . $result[0][0] . " - balance=$balance<br>";
 

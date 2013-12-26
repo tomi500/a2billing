@@ -1587,10 +1587,10 @@ class FormHandler
 			if (strpos($param_add_value, '%TAGPREFIX%')) {
 				foreach ($arr_value_to_import as $current_value) {
 					$param_add_value_replaced = str_replace("%TAGPREFIX%", $current_value, $param_add_value);				
-					if ($this->VALID_SQL_REG_EXP) $this -> RESULT_QUERY = $instance_table -> Add_table ($this->DBHandle, $param_add_value_replaced, null, null, $this->FG_TABLE_ID);
+					if ($this->VALID_SQL_REG_EXP) $this -> RESULT_QUERY = $instance_table -> Add_table ($this->DBHandle, $param_add_value_replaced, null, null, $this->FG_TABLE_ID, false, "LOW_PRIORITY");
 				}
 			} else {
-				if ($this->VALID_SQL_REG_EXP) $this -> RESULT_QUERY = $instance_table -> Add_table ($this->DBHandle, $param_add_value, null, null, $this->FG_TABLE_ID);
+				if ($this->VALID_SQL_REG_EXP) $this -> RESULT_QUERY = $instance_table -> Add_table ($this->DBHandle, $param_add_value, null, null, $this->FG_TABLE_ID, false, "LOW_PRIORITY");
 			}
 			if($this -> FG_ENABLE_LOG == 1) {
 				$this -> logger -> insertLog_Add($_SESSION["admin_id"], 2, "NEW ".strtoupper($this->FG_INSTANCE_NAME)." CREATED" , "User added a new record in database", $this->FG_TABLE_NAME, $_SERVER['REMOTE_ADDR'], $_SERVER['REQUEST_URI'], $param_add_fields, $param_add_value);

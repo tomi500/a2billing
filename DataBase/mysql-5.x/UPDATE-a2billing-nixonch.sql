@@ -56,8 +56,7 @@ ALTER TABLE cc_card ADD paypal int(1) NOT NULL DEFAULT '0';
 ALTER TABLE cc_card ADD id_diller bigint(20) NOT NULL DEFAULT 0 AFTER `id`;
 ALTER TABLE cc_card ADD margin int(3) NOT NULL DEFAULT 0 AFTER `id_diller`;
 ALTER TABLE cc_card ADD margin_diller int(3) NOT NULL DEFAULT 10 AFTER `margin`;
-ALTER TABLE cc_card ADD margintotal DECIMAL( 15, 5 ) NOT NULL DEFAULT 1 AFTER `margin_diller`;
-ALTER TABLE cc_card ADD commission DECIMAL( 15, 5 ) NOT NULL DEFAULT 0 AFTER `margintotal`;
+ALTER TABLE cc_card ADD commission DECIMAL( 15, 5 ) NOT NULL DEFAULT 0 AFTER `margin_diller`;
 ALTER TABLE cc_card ADD areaprefix SMALLINT( 6 ) NULL DEFAULT NULL AFTER `country`;
 ALTER TABLE cc_card ADD citylength SMALLINT( 6 ) NULL DEFAULT NULL AFTER `areaprefix`;
 

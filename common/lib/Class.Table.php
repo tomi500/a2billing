@@ -298,7 +298,7 @@ class Table {
 	}
 
 
-	function Add_table ($DBHandle, $value, $func_fields = null, $func_table = null, $id_name = null, $subquery = false) {
+	function Add_table ($DBHandle, $value, $func_fields = null, $func_table = null, $id_name = null, $subquery = false, $priority = null) {
 		if ($func_fields!="") {
 			$this -> fields = $func_fields;
 		}
@@ -307,14 +307,14 @@ class Table {
 			$this -> table = $func_table;
 		}
 		if ($subquery) {
-			$QUERY = "INSERT INTO ".$this -> table." (".$this -> fields.") (".trim ($value).")";
+			$QUERY = "INSERT ".$priority." INTO ".$this -> table." (".$this -> fields.") (".trim ($value).")";
 		} else {
-			$QUERY = "INSERT INTO ".$this -> table." (".$this -> fields.") values (".trim ($value).")";
+			$QUERY = "INSERT ".$priority." INTO ".$this -> table." (".$this -> fields.") values (".trim ($value).")";
 		}
-		
+
 		$res = $this -> ExecuteQuery ($DBHandle, $QUERY, 0);
 		if (!$res) return false;
-		
+
 		// Fix that , make PEAR complaint
 		if ($id_name != "") {
 
@@ -329,7 +329,7 @@ class Table {
 				if (!$res) {
 					return (false);
 				}
-				$row [] =$res -> fetchRow();
+				$row[] = $res -> fetchRow();
 				if ($this -> debug_st)
 					echo "\n <br> psql_insert_id = ".$row[0][0];
 				

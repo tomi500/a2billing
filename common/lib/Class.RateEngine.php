@@ -861,7 +861,6 @@ else echo "Ratecard: ".$this->ratecard_obj[$i][6]."<br>Trunk: ".$this->ratecard_
 		$buyrateinitblock 				= $this -> ratecard_obj[$K][10];
 		$buyrateincrement 				= $this -> ratecard_obj[$K][11];
 		$rateinitial 			  = a2b_round(abs($this -> ratecard_obj[$K][12]));
-//		$rateinitial 			  = a2b_round (abs($this -> ratecard_obj[$K][12]) * $A2B->margintotal);
 		$initblock 					= $this -> ratecard_obj[$K][13];
 		$billingblock 					= $this -> ratecard_obj[$K][14];
 		$connectcharge 			  = a2b_round(abs($this -> ratecard_obj[$K][15]));

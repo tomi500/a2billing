@@ -29,7 +29,6 @@ LEFT JOIN cc_card ON cc_card.id=card_id WHERE cc_card.id = ".$_SESSION["card_id"
 	unset($list_refill_type[0]);
 	$HD_Form -> FG_TABLE_ID = 'cc_logrefill.id';
 }
-//echo $HD_Form -> FG_TABLE_CLAUSE;
 
 $HD_Form -> FG_DEBUG = 0;
 $HD_Form -> FG_TABLE_DEFAULT_SENS = "DESC";
@@ -100,8 +99,8 @@ $HD_Form -> AddEditElement (gettext("REFILL DATE"),
 			   gettext("Insert the current date"),
 			   "", "", "", "", "", "", "", "" );
 **/
-$QUERY = "SELECT credit FROM cc_card WHERE username = '" . $_SESSION["pr_login"] . "' AND uipass = '" . $_SESSION["pr_password"] . "'";
-$resmax = $DBHandle->Execute($QUERY);
+$QUERYpop = "SELECT credit FROM cc_card WHERE username = '" . $_SESSION["pr_login"] . "' AND uipass = '" . $_SESSION["pr_password"] . "'";
+$resmax = $DBHandle->Execute($QUERYpop);
 if ($resmax) {
 	$row = $resmax->fetchRow();
 	$credit = $row[0];
@@ -143,8 +142,8 @@ $HD_Form -> AddEditElement (gettext("REFILL TYPE"),
 	$HD_Form -> FG_INTRO_TEXT_ADD = gettext("you can add easily a new ".$HD_Form->FG_INSTANCE_NAME.".<br>Fill the following fields and confirm by clicking on the button add.");
 
 if ($popup_select>=1) {
-	$QUERY = "SELECT lastname, firstname FROM cc_card WHERE id = $card_id AND id_diller = " . $_SESSION["card_id"];
-	$resmax = $DBHandle->Execute($QUERY);
+	$QUERYpop = "SELECT lastname, firstname FROM cc_card WHERE id = $card_id AND id_diller = " . $_SESSION["card_id"];
+	$resmax = $DBHandle->Execute($QUERYpop);
 	if ($resmax) {
 		$row = $resmax->fetchRow();
 //		?><center><?php

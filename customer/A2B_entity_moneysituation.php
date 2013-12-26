@@ -191,11 +191,11 @@ if (!isset($filterprefix) || (strlen($filterprefix)==0)) {
 			$list_invoice_count[$i] = 0;
 	}
 	?>
-	<br/>
-	<table border="1" cellpadding="4" cellspacing="2" width="90%" align="center" class="bgcolor_017" >		
+	<br/><center>
+	<table border="1" cellpadding="4" cellspacing="2" align="center" class="bgcolor_017" >		
 		<tr>
 			<td>		
-				<table border="2" cellpadding="3" cellspacing="5" width="450" align="right" class="bgcolor_018">		
+				<table border="2" cellpadding="3" cellspacing="5" align="right" class="bgcolor_018">		
 					<tr class="form_head">      
 						<td>&nbsp;</td> 
 						<td width="20%" align="center" class="tableBodyRight" style="padding: 2px;"><strong><?php echo gettext("NB TOTAL INVOICE");?></strong></td>            					
@@ -218,7 +218,7 @@ if (!isset($filterprefix) || (strlen($filterprefix)==0)) {
 				</table>
 			</td>
 		</tr>
-	</table>
+	</table></center>
 		<br></br>
 <?php
     }

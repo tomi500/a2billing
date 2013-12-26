@@ -73,18 +73,90 @@ if ($form_action == "list") {
 
 // #### TOP SECTION PAGE
 $HD_Form->create_toppage($form_action);
-/**
-if ($popup_select>=1) {
-	$QUERY = "SELECT lastname, firstname FROM cc_card WHERE id = $card_id AND id_diller = " . $_SESSION["card_id"];
-	$resmax = $DBHandle->Execute($QUERY);
-	if ($resmax) {
-		$row = $resmax->fetchRow();
-		?><center><?php
-		echo gettext("To: ").$row[0]." ".$row[1];
+
+$HD_Form->create_form($form_action, $list, $id = null);
+
+if ($form_action == "list") {
+
+	$table = new Table();
+
+	$temp = date("Y-m-01");
+	$now_month = date("m");
+	$nb_month = 5;
+	$datetime = new DateTime($temp);
+	$datetime->modify("-$nb_month month");
+	$checkdate = $datetime->format("Y-m-d");
+
+	$undoQuery = "";
+	for ($i = 0; $i < count($list_refill_type); $i++) {
+		$undoQuery .= ", SUM(IF(refill_type='$i',IF(card_id=".$_SESSION['card_id'].",credit,-credit),0)) A$i";
+	}
+	$QUERY = "SELECT DATE_FORMAT(`date`,'%c') A".$undoQuery." FROM ".$QUERY." WHERE ";
+	if (strlen($HD_Form -> FG_TABLE_CLAUSE)>0) $QUERY .= $HD_Form -> FG_TABLE_CLAUSE." AND";
+	$QUERY .= " `date` >= TIMESTAMP('$checkdate') AND `date` <= CURRENT_TIMESTAMP";
+	$QUERY .= " GROUP BY MONTH(`date`) ORDER BY `date` DESC";
+	$result_refills_unmonth = $table->SQLExec($HD_Form->DBHandle, $QUERY);
+	$result_column = $result_refills = array ();
+	$j = 0;
+	for ($i = 0; $i <= $nb_month; $i++) {
+		if (sizeof($result_refills_unmonth) > $j) {
+			$val = array_intersect_key($result_refills_unmonth[$j],array('0'=>0,'1'=>1,'2'=>2,'3'=>3,'4'=>4,'5'=>5,'6'=>6,'7'=>7,'8'=>8,'9'=>9));
+			if ($now_month > $i)
+				$month_test = intval($now_month - $i);
+			else
+				$month_test = $now_month + (12 - $i);
+			if ($val[0] == $month_test) {
+				$result_refills[] = $val;
+				$j++;
+			} else
+				$result_refills[] = 0;
+		} else {
+			$result_refills[] = 0;
+		}
+	}
+	for ($i = 1; $i <= count($list_refill_type); $i++) {
+		$result_column[$i] = 0;
+		foreach ($result_refills as $row) {
+			$result_column[$i] += $row[$i];
+		}
+	}
+	if (array_sum($result_column) != 0) {
+		$list_month = Constants :: getMonth();
+?>
+	<br/><center>
+	<table border="1" cellpadding="4" cellspacing="2" class="bgcolor_017" >		
+		<tr>
+			<td>		
+				<table border="2" cellpadding="3" cellspacing="5" class="bgcolor_018">		
+					<tr class="form_head">
+						<td>&nbsp;</td><?php
+						for ($i = 1; $i <= count($list_refill_type); $i++) {
+//							if ($result_column[$i]!=0) {
+						?><td width="20%" align="center" nowrap="nowrap" class="tableBodyRight" style="padding: 2px;"><strong><?php echo $list_refill_type[$i-1][0];?></strong></td><?php
+//							}
+						} ?>
+					</tr>
+					<?php for($i=0;$i<=$nb_month;$i++){
+						if($now_month>$i) $month_display=intval($now_month-$i);
+						else $month_display = $now_month + (12-$i)
+						?>
+					<tr>
+						<td valign="top" align="center" class="tableBody" bgcolor="#c3c0ec"><b><?php echo $list_month[$month_display][0]; ?></b></td><?php
+						for ($k = 1; $k <= count($list_refill_type); $k++) {
+//							if ($result_column[$k]!=0) {
+						?><td valign="top" align="center" class="tableBody" bgcolor="#ecd9c0"><b>&nbsp;<?php echo display_money_nocur($result_refills[$i][$k]); ?>&nbsp;</b></td><?php
+//							}
+						} ?>
+					</tr>
+					<?php } ?>
+				</table>
+			</td>
+		</tr>
+	</table></center>
+		<br></br>
+<?php
 	}
 }
-**/
-$HD_Form->create_form($form_action, $list, $id = null);
 
 // #### FOOTER SECTION
 $smarty->display('footer.tpl');

@@ -35,8 +35,20 @@
 
 getpost_ifset(array('destination', 'dialprefix', 'rateinitial','posted','tariffplan'));
 
+$cardid = $_SESSION['card_id'];
+$margin = 1;
+$DBHandle_max = DbConnect();
+while ($cardid > 0) {
+	$QUERY  = "SELECT id_diller, margin FROM cc_card WHERE id=$cardid LIMIT 1";
+	$resmax = $DBHandle_max->Execute($QUERY);
+	if ($resmax) {
+		$row = $resmax->fetchRow();
+		$cardid = $row[0];
+		$margin = $margin * ($row[1] / 100 + 1);
+	}
+}
 
-$HD_Form = new FormHandler("cc_callplan_lcr, cc_card", "Rates");
+$HD_Form = new FormHandler("cc_callplan_lcr", "Rates");
 $HD_Form -> FG_TABLE_ID = 'ratecard_id';
 
 
@@ -49,7 +61,7 @@ $HD_Form -> FG_TABLE_DEFAULT_SENS = "ASC";
 $HD_Form -> FG_VIEW_TABLE_WITDH = "65%";
 $HD_Form -> FG_FILTER_SEARCH_SESSION_NAME = 'entity_ratecard_selection';
 
-$HD_Form -> FG_TABLE_CLAUSE = "(tariffgroup_id = '".$_SESSION["tariff"]."' OR tariffname = '".$_SESSION["pr_login"]."') AND SUBSTRING(dialprefix,1,1) != '_' AND cc_card.id=".$_SESSION['card_id']." ";
+$HD_Form -> FG_TABLE_CLAUSE = "(tariffgroup_id = '".$_SESSION["tariff"]."' OR tariffname = '".$_SESSION["pr_login"]."') AND SUBSTRING(dialprefix,1,1) != '_' ";
 $HD_Form -> SQL_GROUP = "GROUP BY dialprefix";
 
 $HD_Form -> AddViewElement("<acronym title=\"DIALING PREFIX\">".gettext("PREFIX")."</acronym>", "dialprefix", "20%", "center", "sort", "");
@@ -58,7 +70,8 @@ $HD_Form -> AddViewElement("<acronym title=\"".gettext("SELLING RATE")."\">".get
 
 //$HD_Form -> FieldViewElement ('dialprefix, destination, FORMAT(cc_card.margintotal*MIN(rateinitial),5) as rateinitial');
 //$HD_Form -> FieldViewElement ("dialprefix, destination, IF((MIN(rateinitial)=MAX(rateinitial) AND MAX(rateinitial)=100),'not in service',CONCAT(FORMAT(cc_card.margintotal*MIN(rateinitial),3),' - ',FORMAT(cc_card.margintotal*MAX(rateinitial),3))) as rateinitial");
-$HD_Form -> FieldViewElement ("dialprefix, destination, IF(MIN(rateinitial)=MAX(rateinitial),IF(MAX(rateinitial)=100,'not in service',FORMAT(cc_card.margintotal*rateinitial,3)),CONCAT(FORMAT(cc_card.margintotal*MIN(rateinitial),3),' - ',FORMAT(cc_card.margintotal*MAX(rateinitial),3))) as rateinitial");
+//$HD_Form -> FieldViewElement ("dialprefix, destination, IF(MIN(rateinitial)=MAX(rateinitial),IF(MAX(rateinitial)=100,'not in service',FORMAT(cc_card.margintotal*rateinitial,3)),CONCAT(FORMAT(cc_card.margintotal*MIN(rateinitial),3),' - ',FORMAT(cc_card.margintotal*MAX(rateinitial),3))) as rateinitial");
+$HD_Form -> FieldViewElement ("dialprefix, destination, IF(MIN(rateinitial)=MAX(rateinitial),IF(MAX(rateinitial)=100,'not in service',FORMAT($margin*rateinitial,3)),CONCAT(FORMAT($margin*MIN(rateinitial),3),' - ',FORMAT($margin*MAX(rateinitial),3))) as rateinitial");
 
 
 $HD_Form -> CV_NO_FIELDS  = gettext("THERE IS NO RATECARD CREATED!");

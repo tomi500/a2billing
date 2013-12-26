@@ -418,7 +418,6 @@ class FormBO {
 		$processed = $FormHandler->getProcessed();
 		$diller = $processed['id_diller'];
 		$margin = $processed['margin'] / 100 + 1;
-		sleep(1);
 		$table_card = new Table('cc_card','id, margintotal');
 		$card_clause = "username = ".$diller;
 		$card_result = $table_card -> Get_list($FormHandler->DBHandle, $card_clause, 0);
@@ -427,10 +426,11 @@ class FormBO {
 			$margintotal = $margin * $card_result[0][1];
 		} else {
 			$id_diller = 0;
-			$margintotal = 1;
+			$margintotal = $margin;
 		}
 		$param_update_card = "id_diller = $id_diller, margintotal = $margintotal";
 		$clause_update_card = " id_diller = $diller ORDER BY id DESC LIMIT 1";
+		sleep(1);
 		$table_card -> Update_table ($FormHandler->DBHandle, $param_update_card, $clause_update_card, 'LOW_PRIORITY cc_card');
 
 		if (RELOAD_ASTERISK_IF_SIPIAX_CREATED) {
