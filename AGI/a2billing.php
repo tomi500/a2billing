@@ -162,7 +162,8 @@ define ("WRITELOG_QUERY", true);
 $instance_table = new Table();
 $A2B -> set_instance_table ($instance_table);
 
-$startUpSystem = $agi -> get_variable('SYSUPTIME', true);
+$startUpSystem = $agi -> get_variable('ASTUPTIME', true);
+$startUpOS = $agi -> get_variable('SYSUPTIME', true);
 if ($startUpSystem == '') {
 	define ("MANAGER_HOST", isset($A2B->config['global']['manager_host'])?$A2B->config['global']['manager_host']:null);
 	define ("MANAGER_USERNAME", isset($A2B->config['global']['manager_username'])?$A2B->config['global']['manager_username']:null);
@@ -189,7 +190,7 @@ if ($startUpSystem == '') {
 unset($as);
 }
 //$A2B -> debug( ERROR, $agi, __FILE__, __LINE__, "StartUpSystem=".$startUpSystem);
-if ($startUpSystem) {
+if ($startUpSystem && $startUpOS == "") {
 	$startUpTime = $A2B->config['global']['startup_time'];
 	if ($startUpTime == 0) {
 		$QUERY = "UPDATE cc_config SET config_value=$startUpSystem WHERE config_key='startup_time' AND config_group_title='global'";
@@ -843,7 +844,7 @@ if ($mode == 'standard') {
 					// PERFORM THE CALL
 					$result_callperf = $RateEngine->rate_engine_performcall ($agi, $A2B-> destination, $A2B);
 
-					if (!$result_callperf) {
+					if (!$result_callperf && !(!$A2B->extext && $A2B->voicemail && !is_null($A2B->voicebox) && !isset($A2B->transferername[0]))) {
 						$A2B -> let_stream_listening($agi);
 						$prompt = "prepaid-dest-unreachable";
 						$agi -> stream_file($prompt, '#');

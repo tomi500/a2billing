@@ -428,9 +428,9 @@ class FormBO {
 			$id_diller = 0;
 			$margintotal = $margin;
 		}
-		$param_update_card = "id_diller = $id_diller, margintotal = $margintotal";
-		$clause_update_card = " id_diller = $diller ORDER BY id DESC LIMIT 1";
-		sleep(1);
+		$param_update_card = "id_diller = '$id_diller', margintotal = '$margintotal'";
+		$clause_update_card = "id_diller = '$diller' ORDER BY id DESC LIMIT 1";
+		sleep(3);
 		$table_card -> Update_table ($FormHandler->DBHandle, $param_update_card, $clause_update_card, 'LOW_PRIORITY cc_card');
 
 		if (RELOAD_ASTERISK_IF_SIPIAX_CREATED) {
