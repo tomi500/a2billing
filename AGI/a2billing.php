@@ -286,7 +286,7 @@ $A2B -> debug( ERROR, $agi, __FILE__, __LINE__, "cc_did.id=".$result[0][3]);
 		$QUERY = "SELECT IF(src=src_exten,src_peername,src), cc_card.username, cc_card.recalltime, continuewithdid
 			FROM cc_card, cc_call
 			LEFT JOIN cc_did ON cc_did.id_trunk=cc_call.id_trunk
-			WHERE cc_card.id=card_id AND did='$mydnid' AND DATEDIFF(NOW(),stoptime) < cc_card.recalldays
+			WHERE cc_card.id=card_id AND did LIKE '$mydnid' AND starttime > DATE_SUB(NOW(), INTERVAL cc_card.recalldays DAY)
 			AND ('$A2B->CallerID' LIKE CONCAT('%',SUBSTRING(calledstation,2)) OR calledstation LIKE CONCAT('%','$A2B->CallerID'))
 			AND LENGTH(calledstation) > 6 AND LENGTH(TRIM(LEADING '+' FROM '$A2B->CallerID'))-LENGTH(calledstation) < 3 ORDER BY cc_call.id DESC LIMIT 1";
 		$result = $A2B -> instance_table -> SQLExec ($A2B->DBHandle, $QUERY);
