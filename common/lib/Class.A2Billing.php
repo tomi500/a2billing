@@ -968,6 +968,7 @@ class A2Billing {
 		$this->destination = $this->apply_add_countryprefixto ($this->destination);
 		if ($this->removeinterprefix) $this->destination = $this -> apply_rules ($this->destination);
 	}
+	if ($this->destination) {
 	if (isset($this->transferername[0])) {
 		$this -> agiconfig['number_try']=1;
 $this -> debug( ERROR, $agi, __FILE__, __LINE__, "[===================[ Processed Transfer...  {$this->transferername[0]}  {$this->transfererchannel}]");
@@ -1044,7 +1045,7 @@ $this -> debug( ERROR, $agi, __FILE__, __LINE__, "[==================[ A2B->cide
 
 
 			$QUERY = "SELECT cid FROM cc_callerid, cc_country aa
-				WHERE '{$this->destination}' LIKE concat(aa.countryprefix,'%') AND id_cc_card={$this->id_card} AND activated='t' AND cid='$this->CID_handover' AND (cli_replace=1
+				WHERE '{$this->destination}' LIKE concat(aa.countryprefix,'%') AND id_cc_card={$this->id_card} AND activated='t' AND cid LIKE '$this->CID_handover' AND (cli_replace=1
 				OR (cli_replace=2 AND (SELECT cid FROM cc_callerid, cc_country bb WHERE cid LIKE concat(bb.countryprefix,'%') AND id_cc_card = {$this->id_card} AND verify = 1 AND cid != '{$this->destination}'
 					AND ((cli_localreplace = 1 AND bb.countryprefix LIKE aa.countryprefix) OR cli_prefixreplace LIKE concat(aa.countryprefix,'%')) ORDER BY bb.countryprefix DESC LIMIT 1) IS NOT NULL)
 				) ORDER BY aa.countryprefix DESC LIMIT 1";
@@ -1059,6 +1060,7 @@ for ($t=0;$t<count($result);$t++) {
 **/
 			}
 		}
+	}
 	}
 //	$agi -> set_variable('MASTER_CHANNEL(ONFORWARDCID2)', $this->destination);
 
@@ -1126,7 +1128,7 @@ for ($t=0;$t<count($result);$t++) {
 		$this -> debug( INFO, $agi, __FILE__, __LINE__, "[CALL 2 DID]");
 		$QUERY =  "SELECT cc_did.id, iduser".
 			" FROM cc_did, cc_card ".
-			" WHERE cc_card.status=1 and cc_card.id=iduser  and cc_did.activated=1 and did='$this->destination' ".
+			" WHERE cc_card.status=1 and cc_card.id=iduser  and cc_did.activated=1 and did LIKE '$this->destination' ".
 			" AND cc_did.startingdate<= CURRENT_TIMESTAMP AND (cc_did.expirationdate > CURRENT_TIMESTAMP OR cc_did.expirationdate IS NULL";
 		if ($this->config["database"]['dbtype'] != "postgres") {
 			$QUERY .= " OR cc_did.expirationdate = '0000-00-00 00:00:00'";
@@ -1147,7 +1149,7 @@ for ($t=0;$t<count($result);$t++) {
 			if ($this->removeinterprefix) $this->destination = $this -> apply_rules ($this->destination);
 		}
 **/
-		$agi -> set_variable('MASTER_CHANNEL(__TEMPONFORWARDCID2)', $this->destination);
+		if ($this->destination) $agi -> set_variable('MASTER_CHANNEL(__TEMPONFORWARDCID2)', $this->destination);
 
 //		$this -> debug( DEBUG, $agi, __FILE__, __LINE__, "RULES APPLY ON DESTINATION ::> ".$this->destination);
 
@@ -1492,6 +1494,7 @@ for ($t=0;$t<count($result);$t++) {
 		$res=0;
 		$this->agiconfig['say_balance_after_auth'] = 0;
 		$this->agiconfig['say_timetocall'] = 0;
+		$didvoicebox = NULL;
 
 		$callcount=0;
 		foreach ($listdestination as $inst_listdestination) {
@@ -1516,7 +1519,7 @@ for ($t=0;$t<count($result);$t++) {
 			$this->dnid					= $inst_listdestination[10];
 			$this->margin					= $inst_listdestination[31];
 			$this->id_diller				= $inst_listdestination[32];
-			$this->voicebox 			= is_null($inst_listdestination[33]) ? NULL : $inst_listdestination[33]."@".$this->username;
+			$didvoicebox				= is_null($inst_listdestination[33]) ? NULL : $inst_listdestination[33]."@".$this->username;
 			
 			if ($this -> set_inuse) $this -> callingcard_acct_start_inuse($agi,0);
 			
@@ -1692,8 +1695,10 @@ for ($t=0;$t<count($result);$t++) {
 						$result_callperf = $RateEngine->rate_engine_performcall ($agi, $this -> destination, $this);
 						if (!$result_callperf) {
 							if (count($listdestination) == $callcount) {
-							    $prompt="prepaid-callfollowme";
-							    $agi-> stream_file($prompt, '#');
+							    if (is_null($didvoicebox) && is_null($this->voicebox)) {
+								$prompt="prepaid-callfollowme";
+								$agi-> stream_file($prompt, '#');
+							    }
 							} else continue;
 						}
 						
@@ -1753,6 +1758,8 @@ for ($t=0;$t<count($result);$t++) {
 
 		}// END FOR
 
+		if (!is_null($didvoicebox))
+			$this->voicebox = $didvoicebox;
 		if ($this->voicemail && !is_null($this->voicebox)) {
 			if ($dialstatus =="CHANUNAVAIL" || $dialstatus == "NOANSWER" || $dialstatus == "CONGESTION") {
 				$this->voicebox .= "|su";
@@ -1824,7 +1831,8 @@ for ($t=0;$t<count($result);$t++) {
 	$useralias = $this->useralias;
 	$set_inuse = $this->set_inuse;
 	$my_id_card = $this->id_card;
-		
+	$didvoicebox = NULL;
+
 	foreach ($listdestination as $inst_listdestination) {
 
 	    $callcount++;
@@ -1839,7 +1847,7 @@ for ($t=0;$t<count($result);$t++) {
 	    $this->id_did					= $inst_listdestination[0];
 	    $this->margin					= $inst_listdestination[31];
 	    $this->id_diller					= $inst_listdestination[32];
-	    $this->voicebox 				= is_null($inst_listdestination[33]) ? NULL : $inst_listdestination[33]."@".$this->username;
+	    $didvoicebox 				= is_null($inst_listdestination[33]) ? NULL : $inst_listdestination[33]."@".$this->username;
 	    $this->margintotal					= $this->margin_calculate();
 
 	    // CHECK IF DESTINATION IS SET
@@ -2059,7 +2067,7 @@ $this -> debug( ERROR, $agi, __FILE__, __LINE__, "[* QUEUEDNID Current_channel {
                     // PERFORM THE CALL
                     $this->agiconfig['dialcommand_param'] = $this->agiconfig['dialcommand_param_call_2did'];
                     $result_callperf = $RateEngine->rate_engine_performcall ($agi, $this -> destination, $this);
-                    if (!$result_callperf && count($listdestination) == $callcount) {
+                    if (!$result_callperf && count($listdestination) == $callcount && is_null($didvoicebox) && is_null($this->voicebox)) {
 	                    $prompt="prepaid-callfollowme";
 	                    $agi-> stream_file($prompt, '#');
                     }
@@ -2119,6 +2127,8 @@ $this -> debug( ERROR, $agi, __FILE__, __LINE__, "[* QUEUEDNID Current_channel {
             }
 		}// END FOR
 
+		if (!is_null($didvoicebox))
+			$this->voicebox = $didvoicebox;
 		if ($this->voicemail && !is_null($this->voicebox)) {
 			if ($dialstatus =="CHANUNAVAIL" || $dialstatus == "NOANSWER" || $dialstatus == "CONGESTION") {
 				$this->voicebox .= "|su";
@@ -3130,7 +3140,7 @@ $this -> debug( ERROR, $agi, __FILE__, __LINE__, "FAXRESOLUTION: ".$faxresolutio
 				    " LEFT JOIN cc_card ON cc_callerid.id_cc_card=cc_card.id ".
 				    " LEFT JOIN cc_tariffgroup ON cc_card.tariff=cc_tariffgroup.id ".
 				    " LEFT JOIN cc_country ON cc_card.country=cc_country.countrycode ".
-				    " WHERE cc_callerid.cid='".$this->CallerID."'";
+				    " WHERE cc_callerid.cid LIKE '$this->CallerID'";
 			$result = $this->instance_table -> SQLExec ($this->DBHandle, $QUERY);
 			$this -> debug( DEBUG, $agi, __FILE__, __LINE__, print_r($result,true));
 			
@@ -3380,7 +3390,7 @@ $this -> debug( ERROR, $agi, __FILE__, __LINE__, "FAXRESOLUTION: ".$faxresolutio
 								" LEFT JOIN cc_tariffgroup ON tariff = cc_tariffgroup.id" .
 								" LEFT JOIN cc_country ON country = countrycode" .
 								" LEFT JOIN cc_sip_buddies ON cc_sip_buddies.id_cc_card = cc_card.id AND cc_sip_buddies.name = '{$this->src_peername}'" .
-								" LEFT JOIN cc_callerid ON cid = '".$this->CallerID."' AND (cc_callerid.id_cc_card = cc_card.id OR cc_callerid.id_cc_card = -1)" .
+								" LEFT JOIN cc_callerid ON cid LIKE '$this->CallerID' AND (cc_callerid.id_cc_card = cc_card.id OR cc_callerid.id_cc_card = -1)" .
 								" WHERE cc_card.username = '".$this->cardnumber."' LIMIT 1";
 					$result = $this->instance_table -> SQLExec ($this->DBHandle, $QUERY);
 					$this -> debug( DEBUG, $agi, __FILE__, __LINE__, ' - Retrieve account info SQL ::> '.$QUERY);
@@ -3602,7 +3612,7 @@ $this -> debug( ERROR, $agi, __FILE__, __LINE__, "FAXRESOLUTION: ".$faxresolutio
 						}
 
 						$QUERY = " SELECT cid, id_cc_card, activated FROM cc_callerid "
-								." WHERE cc_callerid.cid='".$this->CallerID."' AND cc_callerid.id_cc_card='".$result[0][23]."'";
+								." WHERE cc_callerid.cid LIKE '$this->CallerID' AND cc_callerid.id_cc_card='".$result[0][23]."'";
 
 						$result_check_cid = $this->instance_table -> SQLExec ($this->DBHandle, $QUERY);
 						$this -> debug( DEBUG, $agi, __FILE__, __LINE__, print_r($result_check_cid,true));
@@ -3731,7 +3741,7 @@ $this -> debug( ERROR, $agi, __FILE__, __LINE__, "FAXRESOLUTION: ".$faxresolutio
 				//UPDATE THE CARD ASSIGN TO THIS CC_CALLERID
 				if ($this->update_callerid==1 && strlen($this->CallerID)>1 && $this -> ask_other_cardnumber==1) {
 					$this -> ask_other_cardnumber=0;
-					$QUERY = "UPDATE cc_callerid SET id_cc_card='$the_card_id' WHERE cid='".$this->CallerID."'";
+					$QUERY = "UPDATE cc_callerid SET id_cc_card='$the_card_id' WHERE cid LIKE '$this->CallerID'";
 					$this -> debug( DEBUG, $agi, __FILE__, __LINE__, "[QUERY UPDATE : $QUERY]");
 					$result = $this -> instance_table -> SQLExec ($this->DBHandle, $QUERY, 0);
 				}

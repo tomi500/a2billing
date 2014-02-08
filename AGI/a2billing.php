@@ -256,7 +256,7 @@ if ($mode == 'auto') {
 
 	if (strlen($mydnid) > 0){
 	    $QUERY = "SELECT areaprefix, citylength, countryprefix, cc_did.id FROM cc_country, cc_did
-			WHERE activated=1 AND did='$mydnid' AND startingdate<=CURRENT_TIMESTAMP AND (expirationdate>CURRENT_TIMESTAMP OR expirationdate IS NULL";
+			WHERE activated=1 AND did LIKE '$mydnid' AND startingdate<=CURRENT_TIMESTAMP AND (expirationdate>CURRENT_TIMESTAMP OR expirationdate IS NULL";
 	    // if MYSQL
 	    if ($A2B->config["database"]['dbtype'] != "postgres") $QUERY .= " OR expirationdate = '0000-00-00 00:00:00'";
 	    $QUERY .= ") AND cc_country.id=id_cc_country LIMIT 1";
@@ -273,7 +273,7 @@ $A2B -> debug( ERROR, $agi, __FILE__, __LINE__, "cc_did.id=".$result[0][3]);
 		$A2B -> CID_handover = $A2B->CallerID = $A2B->did_apply_add_countryprefixfrom($result[0], $A2B->CallerID);
 		if ($A2B->CallerID != $agi -> request['agi_callerid'])
 			$agi -> set_callerid($A2B -> CallerID);
-		$QUERY = "SELECT 1 FROM cc_did, cc_callerid WHERE cc_did.id = {$result[0][3]} AND cid = '$A2B->CallerID' AND cc_callerid.activated = 't' AND ((id_cc_card = iduser AND allciduse <> 3) OR iduser = 0 OR allciduse = 1) LIMIT 1";
+		$QUERY = "SELECT 1 FROM cc_did, cc_callerid WHERE cc_did.id = {$result[0][3]} AND cid LIKE '$A2B->CallerID' AND cc_callerid.activated = 't' AND ((id_cc_card = iduser AND allciduse <> 3) OR iduser = 0 OR allciduse = 1) LIMIT 1";
 //$A2B -> debug( ERROR, $agi, __FILE__, __LINE__, $QUERY);
 		$result = $A2B -> instance_table -> SQLExec ($A2B->DBHandle, $QUERY);
 		if (is_array($result)) {
@@ -348,7 +348,7 @@ $A2B -> debug( ERROR, $agi, __FILE__, __LINE__, "cc_did.id=".$result[0][3]);
 		    $A2B -> agiconfig['number_try']=1;
 		}
 	    } else {
-		$QUERY = "SELECT callback, phonenumber, username, verify FROM cc_callerid, cc_card WHERE cid='$A2B->CallerID' AND cc_callerid.activated='t' AND status=1 AND cc_card.id=id_cc_card LIMIT 1";
+		$QUERY = "SELECT callback, phonenumber, username, verify FROM cc_callerid, cc_card WHERE cid LIKE '$A2B->CallerID' AND cc_callerid.activated='t' AND status=1 AND cc_card.id=id_cc_card LIMIT 1";
 		$result = $A2B -> instance_table -> SQLExec ($A2B->DBHandle, $QUERY);
 		if (is_array($result)) {
 		    $A2B -> agiconfig['cid_enable'] = 1;
@@ -879,7 +879,7 @@ if ($mode == 'standard') {
 						" aleg_carrier_initblock_offp, aleg_carrier_increment_offp, aleg_retail_initblock_offp, aleg_retail_increment_offp, ".
 						" cc_card.id, playsound, timeout, margin, id_diller, voicebox".
 						" FROM cc_did, cc_did_destination, cc_card, cc_country".
-						" WHERE id_cc_did=cc_did.id AND cc_card.status=1 AND cc_card.id=id_cc_card AND cc_did_destination.activated=1 AND cc_did.activated=1 AND did='".$A2B->destination."' ".
+						" WHERE id_cc_did=cc_did.id AND cc_card.status=1 AND cc_card.id=id_cc_card AND cc_did_destination.activated=1 AND cc_did.activated=1 AND did LIKE '$A2B->destination'".
 						" AND cc_country.id=id_cc_country AND cc_did.startingdate <= CURRENT_TIMESTAMP".
 						" AND (cc_did.expirationdate > CURRENT_TIMESTAMP OR cc_did.expirationdate IS NULL AND cc_did_destination.validated = 1";
 					if ($A2B->config["database"]['dbtype'] == "mysql") {
@@ -936,7 +936,7 @@ if ($mode == 'standard') {
                     " aleg_carrier_initblock_offp, aleg_carrier_increment_offp, aleg_retail_initblock_offp, aleg_retail_increment_offp,".
                     " cc_did_destination.answer, playsound, timeout, margin, id_diller, voicebox".
 			        " FROM cc_did, cc_did_destination, cc_card, cc_country".
-			        " WHERE id_cc_did=cc_did.id and cc_card.status=1 and cc_card.id=id_cc_card and cc_did_destination.activated=1 and cc_did.activated=1 and did='$mydnid' ".
+			        " WHERE id_cc_did=cc_did.id and cc_card.status=1 and cc_card.id=id_cc_card and cc_did_destination.activated=1 and cc_did.activated=1 and did LIKE '$mydnid' ".
 			        " AND cc_country.id=id_cc_country AND cc_did.startingdate<= CURRENT_TIMESTAMP AND (cc_did.expirationdate > CURRENT_TIMESTAMP OR cc_did.expirationdate IS NULL ".
 			        " AND cc_did_destination.validated=1";
 		if ($A2B->config["database"]['dbtype'] != "postgres") {
@@ -1234,7 +1234,7 @@ if ($mode == 'standard') {
 			$A2B -> extension = $A2B -> dnid = $A2B -> destination = $caller_areacode.$A2B -> apply_rules($A2B -> CallerID);
 // !!!!!!!!!!!!!!!!!!!!!!!!!!!
 // Accountcode of incoming trunk & cid_card_id are not compare now !!!!!!!
-			$QUERY = "SELECT callback FROM cc_callerid WHERE cid=$A2B->destination AND (activated='f' OR (activated='t' AND (callback=0 OR blacklist=1)))";
+			$QUERY = "SELECT callback FROM cc_callerid WHERE cid LIKE '$A2B->destination' AND (activated='f' OR (activated='t' AND (callback=0 OR blacklist=1)))";
 			$result = $A2B -> instance_table -> SQLExec ($A2B->DBHandle, $QUERY);
 
 			$instance_table = new Table("cc_callback_spool");
@@ -1515,7 +1515,7 @@ if ($mode == 'standard') {
 					" aleg_carrier_initblock_offp, aleg_carrier_increment_offp, aleg_retail_initblock_offp, aleg_retail_increment_offp, ".
 					" cc_card.id, playsound, timeout, margin, id_diller, voicebox".
 					" FROM cc_did, cc_did_destination, cc_card, cc_country".
-					" WHERE id_cc_did=cc_did.id AND cc_card.status=1 AND cc_card.id=id_cc_card and cc_did_destination.activated=1 AND cc_did.activated=1 AND did='".$A2B-> destination."' ".
+					" WHERE id_cc_did=cc_did.id AND cc_card.status=1 AND cc_card.id=id_cc_card and cc_did_destination.activated=1 AND cc_did.activated=1 AND did LIKE '$A2B-> destination' ".
 					" AND cc_country.id=id_cc_country AND cc_did.startingdate <= CURRENT_TIMESTAMP AND (cc_did.expirationdate > CURRENT_TIMESTAMP OR cc_did.expirationdate IS NULL ".
 					" AND cc_did_destination.validated = 1 ";
 				if ($A2B->config["database"]['dbtype'] == "mysql") {
