@@ -840,6 +840,7 @@ if ($mode == 'standard') {
 					}
 				}
 				if ($ans==1) {
+				    do {
 					// PERFORM THE CALL
 					$result_callperf = $RateEngine->rate_engine_performcall ($agi, $A2B-> destination, $A2B);
 
@@ -850,6 +851,20 @@ if ($mode == 'standard') {
 					}
 					// INSERT CDR  & UPDATE SYSTEM
 					$RateEngine->rate_engine_updatesystem($A2B, $agi, $A2B-> destination);
+
+					if ($A2B->backaftertransfer && isset($A2B->transferername[0]) && $RateEngine->dialstatus != "ANSWER") {
+						$A2B-> extension = $A2B-> dnid = $A2B-> destination = $A2B-> backafter;
+						unset($A2B->transferername);
+						$A2B->backaftertransfer = false;
+						$A2B-> CallerIDext = $A2B->cidextafter . "<b>&#9100;</b>";
+						$agi-> set_callerid('<'. $A2B-> cidextafter .'>');
+						$A2B-> agiconfig['number_try'] = 1;
+						$A2B-> CallerID = $A2B-> cidafter;
+						$agi-> evaluate("STREAM FILE one-moment-please \"#\" 0");
+						$ans = $A2B-> callingcard_ivr_authorize($agi, $RateEngine, $i,true);
+					} else	$ans = 0;
+				    } while ($ans==1);
+
 
 					if (!$A2B->extext && $A2B->voicemail && !is_null($A2B->voicebox) && !isset($A2B->transferername[0])) {
 						if ($RateEngine->dialstatus =="CHANUNAVAIL" || $RateEngine->dialstatus == "NOANSWER" || $RateEngine->dialstatus == "CONGESTION") {

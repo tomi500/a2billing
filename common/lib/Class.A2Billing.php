@@ -182,6 +182,7 @@ class A2Billing {
 	
 	var $creditlimit = 0;
 
+	var $backaftertransfer = false;
 	var $languageselected;
 	var $current_language;
 	var $streamfirst = true;
@@ -924,7 +925,10 @@ class A2Billing {
 //	} else {
 	if (!$this->CallerIDext) {
 		$this->transferername = $this->transfererchannel = $agi->get_variable("TRANSFERERNAME", true);
-		if ($this->transferername == "") $this->transferername = $this->transfererchannel = $agi->get_variable("BLINDTRANSFER", true);
+		if ($this->transferername == "") {
+			$this->transferername = $this->transfererchannel = $agi->get_variable("BLINDTRANSFER", true);
+			$this->backaftertransfer = ($this->transferername)?true:false;
+		}
 		preg_match("/([^\/]+)(?=-[^-]*$)/",$this->transferername,$this->transferername);
 		if (isset($this->transferername[0])) {
 			$this->src_peername = $this->transferername[0];
