@@ -1530,7 +1530,7 @@ if ($mode == 'standard') {
 					" aleg_carrier_initblock_offp, aleg_carrier_increment_offp, aleg_retail_initblock_offp, aleg_retail_increment_offp, ".
 					" cc_card.id, playsound, timeout, margin, id_diller, voicebox".
 					" FROM cc_did, cc_did_destination, cc_card, cc_country".
-					" WHERE id_cc_did=cc_did.id AND cc_card.status=1 AND cc_card.id=id_cc_card and cc_did_destination.activated=1 AND cc_did.activated=1 AND did LIKE '$A2B-> destination' ".
+					" WHERE id_cc_did=cc_did.id AND cc_card.status=1 AND cc_card.id=id_cc_card and cc_did_destination.activated=1 AND cc_did.activated=1 AND did LIKE '$A2B->destination'".
 					" AND cc_country.id=id_cc_country AND cc_did.startingdate <= CURRENT_TIMESTAMP AND (cc_did.expirationdate > CURRENT_TIMESTAMP OR cc_did.expirationdate IS NULL ".
 					" AND cc_did_destination.validated = 1 ";
 				if ($A2B->config["database"]['dbtype'] == "mysql") {
