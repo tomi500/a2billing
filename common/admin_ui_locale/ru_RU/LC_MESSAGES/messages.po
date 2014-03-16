@@ -4499,6 +4499,14 @@ msgstr "ЗАГОЛОВОК"
 msgid "DESCRIPTION"
 msgstr "ОПИСАНИЕ"
 
+#: Public/form_data/FG_var_trunk.inc
+msgid "Number of last days"
+msgstr "Количество последних дней"
+
+#: Public/form_data/FG_var_trunk.inc
+msgid "Attract choice of trunk calls to the numbers that have called this trunk, for this number of days past"
+msgstr "Притягивать выбор этого транка при звонках на номера, на которые уже звонили через этот транк, за указанное здесь количество последних дней"
+
 #: Public/form_data/FG_var_trunk.inc:46
 msgid "Add Trunk"
 msgstr "Добавить транк"

@@ -178,7 +178,7 @@ class RateEngine
 		id_cc_package_offer,
 		cc_trunk.status,
 		cc_trunk.inuse,
-		IF(cc_trunk.wrapnexttime>NOW(),0,cc_trunk.maxuse) maxuse,
+		IF(cc_trunk.wrapnexttime>NOW() AND cc_trunk.lastdial NOT LIKE '$A2B->destination',0,cc_trunk.maxuse) maxuse,
 		cc_trunk.if_max_use,
 		cc_ratecard.rounding_calltime,
 		cc_ratecard.rounding_threshold,
@@ -1444,7 +1444,7 @@ else echo "Ratecard: ".$this->ratecard_obj[$i][6]."<br>Trunk: ".$this->ratecard_
 	function trunk_start_inuse($agi, $A2B, $inuse, $wrapuptime=0) {
 
 		if ($inuse) {
-			$QUERY = "UPDATE cc_trunk SET inuse=inuse+1 WHERE id_trunk='".$this -> usedtrunk."'";
+			$QUERY = "UPDATE cc_trunk SET inuse=inuse+1, lastdial = '$A2B->destination' WHERE id_trunk='".$this -> usedtrunk."'";
 		} else {
 			$QUERY = "UPDATE cc_trunk SET inuse=inuse-1, wrapnexttime = DATE_ADD(NOW(), INTERVAL '".$wrapuptime."' SECOND) WHERE id_trunk='".$this -> usedtrunk."'";
 		}
@@ -1511,7 +1511,7 @@ else echo "Ratecard: ".$this->ratecard_obj[$i][6]."<br>Trunk: ".$this->ratecard_
 					$CID_handover	= $A2B -> CID_handover;
 				} else {
 				    $this -> usedtrunk = $failover_trunk;
-				    $QUERY = "SELECT trunkprefix, providertech, providerip, removeprefix, failover_trunk, status, inuse, IF(wrapnexttime>NOW(),0,maxuse), if_max_use, outbound_cidgroup_id, addparameter, cid_handover, wrapuptime FROM cc_trunk WHERE id_trunk='$this->usedtrunk' LIMIT 1";
+				    $QUERY = "SELECT trunkprefix, providertech, providerip, removeprefix, failover_trunk, status, inuse, IF(wrapnexttime>NOW() AND lastdial NOT LIKE '$A2B->destination',0,maxuse), if_max_use, outbound_cidgroup_id, addparameter, cid_handover, wrapuptime FROM cc_trunk WHERE id_trunk='$this->usedtrunk' LIMIT 1";
 				    $A2B->instance_table = new Table();
 				    $result = $A2B->instance_table -> SQLExec ($A2B -> DBHandle, $QUERY);
 
@@ -1587,14 +1587,20 @@ else echo "Ratecard: ".$this->ratecard_obj[$i][6]."<br>Trunk: ".$this->ratecard_
 					    $prefixclause  = preg_replace('/dialprefixa/','bn.dialprefixa',$prefixclausemain);
 					    $prefixclausec = preg_replace('/dialprefixa/','cn.dialprefixa',$prefixclausemain);
 					    $prefixclaused = preg_replace('/dialprefixa/','cn.dialprefixb',$prefixclausemain);
-					    $QUERY = "SELECT IF(cn.status,-1,IFNULL(IF(an.maxsecperperioda<0,IF(an.periodexpirya>NOW(),-an.periodcounta-2,-2),an.maxsecperperioda-(an.periodcounta*(an.periodexpirya>NOW()))),
-										    IF(bn.maxsecperperiodb<0,IF(bn.periodexpiryb>NOW(),-bn.periodcountb-2,-2),bn.maxsecperperiodb-(bn.periodcountb*(bn.periodexpiryb>NOW()))))) AS duration,
-					                     trunkpercentage,
-					                     trunk_depend$td FROM cc_trunk_rand
+					    $QUERY =
+						"SELECT	IF(cn.status,-1,IFNULL( IF(an.maxsecperperioda<0,IF(an.periodexpirya>NOW(),-an.periodcounta-2,-2),an.maxsecperperioda-(an.periodcounta*(an.periodexpirya>NOW()))),
+										IF(bn.maxsecperperiodb<0,IF(bn.periodexpiryb>NOW(),-bn.periodcountb-2,-2),bn.maxsecperperiodb-(bn.periodcountb*(bn.periodexpiryb>NOW()))))) AS duration,
+							trunkpercentage,
+							trunk_depend$td,
+							COUNT(calledstation) AS offen
+						FROM cc_trunk_rand
 						LEFT JOIN cc_trunk AS an ON an.id_trunk=trunk_depend$td AND ($prefixclausea) AND an.startdatea<=NOW() AND an.stopdatea>NOW() AND (((an.maxsecperperioda-an.periodcounta>=an.timelefta OR an.maxsecperperioda<0) AND an.periodexpirya>NOW()) OR an.perioda>0) AND (an.maxuse>an.inuse OR an.maxuse<0) AND an.status=1
 						LEFT JOIN cc_trunk AS bn ON bn.id_trunk=trunk_depend$td AND ($prefixclauseb) AND bn.startdateb<=NOW() AND bn.stopdateb>NOW() AND (((bn.maxsecperperiodb-bn.periodcountb>=bn.timeleftb OR bn.maxsecperperiodb<0) AND bn.periodexpiryb>NOW()) OR bn.periodb>0) AND (bn.maxuse>bn.inuse OR bn.maxuse<0) AND bn.status=1 AND NOT ($prefixclause)
 						LEFT JOIN cc_trunk AS cn ON cn.id_trunk=trunk_depend$td AND cn.status=1 AND (cn.maxuse>cn.inuse OR cn.maxuse<0) AND NOT (($prefixclausec) OR ($prefixclaused))
-						WHERE trunk_id=$this->usedtrunk AND trunk_depend$td<>0 ORDER BY IF(duration AND trunkpercentage>0,trunkpercentage,32768)";
+						LEFT JOIN cc_call ON calledstation LIKE '$A2B->destination' AND cc_call.id_trunk=trunk_depend$td AND (starttime > DATE_SUB(NOW(), INTERVAL an.attract DAY) OR starttime > DATE_SUB(NOW(), INTERVAL bn.attract DAY))
+						WHERE trunk_id=$this->usedtrunk AND trunk_depend$td<>0
+						GROUP BY trunk_depend$td
+						ORDER BY IF(duration AND trunkpercentage>0,trunkpercentage,32768), IF(duration IS NULL, 1, 0), offen DESC, duration DESC";
 					    $resultrand = $A2B->instance_table -> SQLExec ($A2B -> DBHandle, $QUERY);
 					} else $resultrand = $intellecttrunks;
 					if (is_array($resultrand) && count($resultrand)>0) {
@@ -1604,6 +1610,7 @@ else echo "Ratecard: ".$this->ratecard_obj[$i][6]."<br>Trunk: ".$this->ratecard_
 						$sum_percent = 0;
 						$count_minus = 0;
 						foreach ($resultrand as $valu_key => $valu_val) {
+$A2B -> debug( ERROR, $agi, __FILE__, __LINE__, "TRUNK=".$valu_val[2]." / ".$valu_val[3]." times / ".$valu_val[0]." secs free");
 							if (is_numeric($valu_val[0]) && $valu_val[1]>0) $resultrand[$valu_key][1] = $sum_percent += $valu_val[1];
 							else $resultrand[$valu_key][1] = 0;
 							if (!is_numeric($valu_val[0])) $count_minus++;
@@ -1623,7 +1630,7 @@ else echo "Ratecard: ".$this->ratecard_obj[$i][6]."<br>Trunk: ".$this->ratecard_
 								}
 							}
 						} else {
-							rsort($resultrand);
+//							rsort($resultrand);
 							$intellecttrunks = $resultrand;
 							$intellectmarker = true;
 							foreach ($resultrand as $intellect_key => $valu_val)	{
@@ -1744,16 +1751,9 @@ else echo "Ratecard: ".$this->ratecard_obj[$i][6]."<br>Trunk: ".$this->ratecard_
 							WHERE id_cc_card = {$A2B->id_card} AND verify = 1 AND cid != '{$A2B->destination}'
 								AND ((cli_localreplace = 1 AND cid LIKE '$outprefix%') OR (cli_otherreplace = 1 AND cid NOT LIKE '$outprefix%') OR cli_prefixreplace LIKE '%$outprefix%')
 							ORDER BY cli_localreplace = 1 AND cid LIKE '$outprefix%' DESC, cli_prefixreplace NOT LIKE '%$outprefix%', RAND() LIMIT 1";
-//	AND ((cli_localreplace = 1 AND cid LIKE '$outprefix%') OR (cli_otherreplace = 1 AND cid NOT LIKE '$outprefix%') OR cli_prefixreplace LIKE '%$outprefix%')
-//								AND (cli_localreplace = 1 OR cli_otherreplace = 1 OR cli_prefixreplace !='')
-//							ORDER BY cli_localreplace = 1 AND cid LIKE '$outprefix%' DESC, cli_prefixreplace LIKE '%$outprefix%' DESC, cli_otherreplace = 1 AND cid NOT LIKE '$outprefix%' DESC, RAND()";
-//$A2B -> debug( ERROR, $agi, __FILE__, __LINE__, $QUERY);
 					$result = $A2B->instance_table -> SQLExec ($A2B -> DBHandle, $QUERY);
 					if (is_array($result) && count($result)>0) {
 						$CID_handover = $result[0][0];
-//for ($t=0;$t<count($result);$t++) {
-//	$A2B -> debug( ERROR, $agi, __FILE__, __LINE__, $result[$t][0]);
-//}
 					}
 				}
 				if ($CID_handover) {

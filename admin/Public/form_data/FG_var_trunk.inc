@@ -33,7 +33,7 @@
 
 
 
-getpost_ifset(array('id', 'trunkcode', 'trunkprefix', 'removeprefix', 'providertech', 'providerip', 'addparameter', 'dialprefixmain', 'failover_trunk', 'id_provider', 'popup_select', 'inuse', 'maxuse', 'status', 'if_max_use', 'cid_handover', 'outbound_cidgroup_id',
+getpost_ifset(array('id', 'trunkcode', 'trunkprefix', 'removeprefix', 'providertech', 'providerip', 'addparameter', 'dialprefixmain', 'failover_trunk', 'id_provider', 'popup_select', 'inuse', 'maxuse', 'status', 'if_max_use', 'cid_handover', 'outbound_cidgroup_id', 'attract',
 	'dialprefixa', 'failover_trunka', 'secondusedcarrier',  'startdatea', 'stopdatea', 'billblockseca', 'perioda', 'periodexpirya', 'timelefta', 'maxsecperperioda', 'periodcounta', 'lastcallstoptimea',
 	'dialprefixb', 'failover_trunkb', 'secondusedratecard', 'startdateb', 'stopdateb', 'billblocksecb', 'periodb', 'periodexpiryb', 'timeleftb', 'maxsecperperiodb', 'periodcountb', 'lastcallstoptimeb'));
 
@@ -307,6 +307,15 @@ $HD_Form -> AddEditElement (gettext("TIMEOUT"),
 	gettext("Insert the timeout"),
 	"" , "", "", "", "" , "" , "", gettext("Add a timeout range before next call in seconds, eg. '400,600' or '600'"));
 
+$HD_Form -> AddEditElement (gettext("ATTRACTING DAYS"),
+	"attract",
+	"",
+	"INPUT",
+	"size=30 $def_value_inuse maxlength=3",
+	"4",
+	gettext("Number of last days"),
+	"" , "", "", "", "", "", "", gettext("Attract choice of trunk calls to the numbers that have called this trunk, for this number of days past") );
+
 $HD_Form -> AddEditElement(gettext("DIALPREFIX")." A",
 	"dialprefixa",
 	'$value',
@@ -554,7 +563,7 @@ if ($form_action<>"ask-add") {
 		"" , "" , "", "", "", "", "NO-NULL", "", "", "res_display_dateformat");
 }
 
-$HD_Form -> FieldEditElement ('id_provider, trunkcode, trunkprefix, removeprefix, providertech, providerip, addparameter, dialprefixmain, failover_trunk, inuse, maxuse, if_max_use, status, cid_handover, outbound_cidgroup_id, wrapuptime,
+$HD_Form -> FieldEditElement ('id_provider, trunkcode, trunkprefix, removeprefix, providertech, providerip, addparameter, dialprefixmain, failover_trunk, inuse, maxuse, if_max_use, status, cid_handover, outbound_cidgroup_id, wrapuptime, attract,
 	dialprefixa, failover_trunka, secondusedcarrier,  startdatea, stopdatea, billblockseca, perioda, periodexpirya, timelefta, maxsecperperioda, periodcounta, lastcallstoptimea,
 	dialprefixb, failover_trunkb, secondusedratecard, startdateb, stopdateb, billblocksecb, periodb, periodexpiryb, timeleftb, maxsecperperiodb, periodcountb, lastcallstoptimeb');
 

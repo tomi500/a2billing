@@ -38,6 +38,8 @@ ALTER TABLE cc_trunk
   CHANGE removeprefix removeprefix CHAR( 30 ) CHARACTER SET utf8 COLLATE utf8_bin NULL DEFAULT NULL,
   CHANGE stopdatea    stopdatea    DATETIME NOT NULL DEFAULT '0000-00-00 00:00:00',
   CHANGE stopdateb    stopdateb    DATETIME NOT NULL DEFAULT '0000-00-00 00:00:00';
+ALTER TABLE cc_trunk ADD lastdial VARCHAR( 50 ) COLLATE utf8_bin NOT NULL;
+ALTER TABLE cc_trunk ADD attract int(3) NOT NULL DEFAULT '0';
 
 ALTER TABLE cc_card ADD monitor int(11) DEFAULT '0';
 ALTER TABLE cc_card ADD recalldays int(11) NOT NULL DEFAULT '10';
