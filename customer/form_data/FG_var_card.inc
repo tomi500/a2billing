@@ -33,7 +33,7 @@
 
 
 
-getpost_ifset(array('id', 'lastname', 'firstname', 'email', 'address','city', 'state', 'country', 'zipcode','id_timezone', 'phone', 'fax','message', 'voicemail_activated', 'monitor', 'recalldays', 'recalltime'));
+getpost_ifset(array('id', 'lastname', 'firstname', 'email', 'address','city', 'state', 'country', 'zipcode', 'id_timezone', 'phone', 'fax', 'message', 'voicemail_activated', 'monitor', 'recalldays', 'recalltime'));
 
 $HD_Form = new FormHandler("cc_card","Card");
 

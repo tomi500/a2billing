@@ -58,7 +58,8 @@ if (!isset ($form_action))
 if (!isset ($action))
 	$action = $form_action;
 
-$list = $HD_Form->perform_action($form_action);
+if ($message != "success")
+	$list = $HD_Form->perform_action($form_action);
 
 // #### HEADER SECTION
 $smarty->display('main.tpl');
@@ -74,9 +75,15 @@ if ($form_action == "list") {
 // #### TOP SECTION PAGE
 $HD_Form->create_toppage($form_action);
 
-$HD_Form->create_form($form_action, $list, $id = null);
+if ($message != "success") {
+	$HD_Form->create_form($form_action, $list, $id = null);
+?>	<script type="text/javascript">
+	document.getElementById('credit').focus();
+	</script>
+<?php
+}
 
-if ($form_action == "list") {
+if ($form_action == "list" && $message != "success") {
 
 	$table = new Table();
 
@@ -156,6 +163,49 @@ if ($form_action == "list") {
 		<br></br>
 <?php
 	}
+}
+
+if ($message == "success") {
+?>
+<TABLE cellSpacing=2 class="toppage_actionfinish">
+    <TR>
+	<TD class="form_head"> 
+	  <?php echo gettext("INSERT NEW Refill")." ".$HD_Form -> FG_INTRO_TEXT_ADITION;?>
+	</TD>
+    </TR><TR>
+	<TD width="516" valign="top" class="tdstyle_001"> <br>
+	    <div align="center"><strong>
+		<?php echo gettext("Transaction was completed succesully")?><br>
+	    </strong></div>
+	    <br>
+	</TD>
+    </TR>
+</TABLE>
+<br>
+<center>
+<form runat="server">
+    <div>
+        <input id="button1" onclick="self.close()" class="form_input_button" type="button" value="" />
+    </div>
+</form>
+<script type="text/javascript">
+    objbutton=document.getElementById('button1');
+    objbutton.focus();
+    timeleft=10;
+    function buttontimer(){
+	timeleft--;
+	if(timeleft==0) {
+	    objbutton.click();
+	}
+        objbutton.value = '<?php echo gettext("Close Window")?> ('+timeleft+')';
+    }
+    window.opener.location.reload();
+    buttontimer();
+    window.resizeBy(0, -120);
+    setInterval(function() {buttontimer()}, 1000);
+</script>
+
+<?php
 }
 
 // #### FOOTER SECTION

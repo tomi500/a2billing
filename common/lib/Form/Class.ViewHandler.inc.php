@@ -206,16 +206,16 @@ function openURLFilter(theLINK)
 				$k=0;
 				for($i=0;$i<$this->FG_NB_TABLE_COL;$i++) {
 					/**********************   select the mode to browse define the column value : lie, list, value, eval.... ************************/
+					$record_clear = null;
 					if ($this->FG_TABLE_COL[$i][6]=="lie") {
 
 						$instance_sub_table = new Table($this->FG_TABLE_COL[$i][7], $this->FG_TABLE_COL[$i][8]);
 						$sub_clause = str_replace("%id", $list[$ligne_number][$i-$k], $this->FG_TABLE_COL[$i][9]);
 
 						$select_list = $instance_sub_table -> Get_list ($this->DBHandle, $sub_clause, null, null, null, null, null, null, null, 10);
-						$field_list_sun = preg_split('/,/', $this->FG_TABLE_COL[$i][8]);
 						$record_display = $this->FG_TABLE_COL[$i][10];
 
-						for ($l=1;$l<=count($field_list_sun);$l++){
+						for ($l=count($select_list[0]);$l>=1;$l--) {
 							$record_display = str_replace("%$l", $select_list[0][$l-1], $record_display);
 						}
 
@@ -225,33 +225,53 @@ function openURLFilter(theLINK)
 						$sub_clause = str_replace("%id", $list[$ligne_number][$i-$k], $this->FG_TABLE_COL[$i][9]);
 						$select_list = $instance_sub_table -> Get_list ($this->DBHandle, $sub_clause, null, null, null, null, null, null, null, 10);
 						if (is_array($select_list)) {
-							$field_list_sun = preg_split('/,/',$this->FG_TABLE_COL[$i][8]);
 							$record_display = $this->FG_TABLE_COL[$i][10];
 							$link = $this->FG_TABLE_COL[$i][12] . "?";
 							if (stripos($this->FG_TABLE_COL[$i][12],'form_action')===false)
 								$link .= "form_action=ask-edit&";
 							$link.= "id=".$select_list[0][1];
-							for ($l=1;$l<=count($field_list_sun);$l++){
-								$val = str_replace("%$l", $select_list[0][$l-1], $record_display);
-								$record_display = "<a href='$link'>$val</a>";
+							for ($l=count($select_list[0]);$l>=1;$l--){
+								$record_display = str_replace("%$l", $select_list[0][$l-1], $record_display);
 							}
+							$record_display = "<a href=\"$link\">$record_display</a>";
 						} elseif ($list[$ligne_number][$i-$k] != 0) {
 							$record_display = "<a href='{$this->FG_TABLE_COL[$i][12]}'>{$list[$ligne_number][$i-$k]}</a>";
 							$string_to_eval = $this->FG_TABLE_COL[$i][7];
-							for ($ll=15;$ll>=0;$ll--){
-								if ($list[$ligne_number][$ll]=='')
-									$list[$ligne_number][$ll]=0;
-								$record_display = str_replace("%$ll", $list[$ligne_number][$ll], $record_display);
+							for ($l=count($list[$ligne_number])-1;$l>=0;$l--){
+								if ($list[$ligne_number][$l]=='')
+									$list[$ligne_number][$l]=0;
+								$record_display = str_replace("%$l", $list[$ligne_number][$l], $record_display);
 							}
 						} else {
-							$record_display="";
+							$record_display = "";
 						}
+
+					} elseif($this->FG_TABLE_COL[$i][6]=="link2cust") {
+
+						$instance_sub_table = new Table($this->FG_TABLE_COL[$i][7], $this->FG_TABLE_COL[$i][8]);
+						$sub_clause = str_replace("%id", $list[$ligne_number][$i-$k], $this->FG_TABLE_COL[$i][9]);
+						$select_list = $instance_sub_table -> Get_list ($this->DBHandle, $sub_clause, null, null, null, null, null, null, null, 10);
+						if (is_array($select_list)) {
+							$record_clear = $this->FG_TABLE_COL[$i][10];
+							$link_display = $this->FG_TABLE_COL[$i][12];
+							$record_display = "<a href=\"".$this->FG_TABLE_COL[$i][12]."\">".$this->FG_TABLE_COL[$i][10]."</a>";
+							for ($l=count($select_list[0]);$l>=1;$l--){
+								$record_clear = str_replace("%$l", $select_list[0][$l-1], $record_clear);
+								$link_display = str_replace("%$l", $select_list[0][$l-1], $link_display);
+							}
+							$record_display = "<a href=\"".$link_display."\">".$record_clear."</a>";
+						} elseif ($list[$ligne_number][$i-$k] != 0) {
+							$record_display = $this->FG_TABLE_COL[$i][13];
+						} else {
+							$record_display = "";
+						}
+
 					} elseif ($this->FG_TABLE_COL[$i][6]=="eval") {
 
 						$string_to_eval = $this->FG_TABLE_COL[$i][7]; // %4-%3
-						for ($ll=15;$ll>=0;$ll--){
-							if ($list[$ligne_number][$ll]=='') $list[$ligne_number][$ll]=0;
-							$string_to_eval = str_replace("%$ll", $list[$ligne_number][$ll], $string_to_eval);
+						for ($l=count($list[$ligne_number])-1;$l>=0;$l--){
+							if ($list[$ligne_number][$l]=='') $list[$ligne_number][$l]=0;
+							$string_to_eval = str_replace("%$l", $list[$ligne_number][$l], $string_to_eval);
 						}
 						eval("\$eval_res = $string_to_eval;");
 						$record_display = $eval_res;
@@ -279,9 +299,9 @@ function openURLFilter(theLINK)
 							$record_display = "<span style='color: red'>00:00</span>";
 						} else {
 							$string_to_eval = $this->FG_TABLE_COL[$i][7]; // %4-%3
-							for ($ll=15;$ll>=0;$ll--){
-								if ($list[$ligne_number][$ll]=='') $list[$ligne_number][$ll]=0;
-								$string_to_eval = str_replace("%$ll", $list[$ligne_number][$ll], $string_to_eval);
+							for ($l=count($list[$ligne_number])-1;$l>=0;$l--) {
+								if ($list[$ligne_number][$l]=='') $list[$ligne_number][$l]=0;
+								$string_to_eval = str_replace("%$l", $list[$ligne_number][$l], $string_to_eval);
 							}
 							eval("\$eval_res = $string_to_eval;");
 
@@ -322,7 +342,7 @@ function openURLFilter(theLINK)
 					} ?>
 					<TD vAlign="top" align="<?php echo $this->FG_TABLE_COL[$i][3]?>" class="tableBody"><?php
 						$origlist[$ligne_number][$i-$k] = $list[$ligne_number][$i-$k];
-						$list[$ligne_number][$i-$k] = $record_display;
+						$list[$ligne_number][$i-$k] = is_null($record_clear) ? $record_display : $record_clear;
 
 						if (isset ($this->FG_TABLE_COL[$i][11]) && strlen($this->FG_TABLE_COL[$i][11])>1) {
 							print call_user_func($this->FG_TABLE_COL[$i][11], $record_display);

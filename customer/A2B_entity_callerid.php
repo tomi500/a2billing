@@ -47,21 +47,17 @@ $HD_Form -> setDBHandler (DbConnect());
 if (!isset($form_action))  $form_action="list"; //ask-add
 if (!isset($action)) $action = $form_action;
 
-//if ($idcust == "") $idcust = $_SESSION["card_id"];
-$result_security = true;
 if (is_numeric($idcust) && $idcust != $_SESSION['card_id'] && (array_search($form_action, array("ask-edit", "ask-delete")) !== false || array_search($action, array("edit", "delete")) !== false)) {
 	$table_diller_security = new Table("cc_callerid LEFT JOIN cc_card ON cc_card.id=id_cc_card", "cc_callerid.id");
 	$clause_diller_security = "id_cc_card=$idcust AND cc_card.id_diller = {$_SESSION['card_id']}";
 	$result_security = $table_diller_security -> Table_count ($HD_Form -> DBHandle, $clause_diller_security);
-}
+} else	$result_security = true;
 
 if (!has_rights(ACX_CALLER_ID) || !$result_security) {
 	Header ("HTTP/1.0 401 Unauthorized");
 	Header ("Location: PP_error.php?c=accessdenied");
 	die();
 }
-
-//echo "result_security = ".$result_security."<br>";
 
 // ADD SPEED DIAL
 if (strlen($add_callerid)>0) {

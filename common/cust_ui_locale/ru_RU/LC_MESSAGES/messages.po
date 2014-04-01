@@ -20,12 +20,28 @@ msgid "THERE IS NO PAYMENTS CREATED!"
 msgstr "ПЛАТЕЖЕЙ ЕЩЁ НЕ БЫЛО!"
 
 #: FG_var_logrefill.inc
+msgid "INSERT NEW Refill"
+msgstr "Транзакция"
+
+#: FG_var_logrefill.inc
+msgid "USER DELETED"
+msgstr "КОНТРАГЕНТ УДАЛЁН"
+
+#: FG_var_logrefill.inc
+msgid "Transaction was completed succesully"
+msgstr "Транзакция совершена успешно"
+
+#: FG_var_logrefill.inc
+msgid "Close Window"
+msgstr "Закрыть окно"
+
+#: FG_var_logrefill.inc
 msgid "Enter the amount in the currency base: "
 msgstr "Введите сумму +пополнения или -списания в базовой валюте: "
 
 #: FG_var_logrefill.inc
-msgid ". <b>Available "
-msgstr ". <b>Доступно "
+msgid "<b>Available "
+msgstr "<b>Доступно "
 
 #: FG_var_moneysituation_details.inc
 msgid "Payments"
@@ -265,9 +281,21 @@ msgstr "Максимальный размер файла "
 msgid "Import Phonebook"
 msgstr "Телефон"
 
+#: A2B_entity_moneysituation_details.php:74
+msgid "Information has successfully been updated"
+msgstr "Информация в учётной записи клиента успешно обновлена"
+
+#: A2B_entity_moneysituation_details.php
+msgid "Set prefix of the city by default (i.e. 30 for Berlin)"
+msgstr "Префикс города по умолчанию (например '44' для Киева)"
+
+#: A2B_entity_moneysituation_details.php
+msgid "Set length of city numbers"
+msgstr "Количество цифр (длина) городского номера (например '7' для Киева)"
+
 #: A2B_entity_card.php:77
 msgid "Your personal information has successfully been updated."
-msgstr ""
+msgstr "Ваша персональная информация успешно обновлена"
 
 #: simulator.php:86
 msgid "Error card !!!"

@@ -1,6 +1,6 @@
 <?php
 
-getpost_ifset(array('id', 'card_id', 'date', 'credit', 'description', 'added_invoice', 'refill_type'));
+getpost_ifset(array('id', 'card_id', 'date', 'credit', 'description', 'added_invoice', 'refill_type', 'idcust', 'popup_select', 'message'));
 
 $list_refill_type = Constants::getRefillType_List();
 $list_refill_type[] = array( gettext("Connection charge for DID setup"), "4");
@@ -42,9 +42,8 @@ $HD_Form ->FG_LIST_ADDING_BUTTON_IMG1 = Images_Path . "/money.png";
 //$HD_Form -> AddViewElement(gettext("ID"), "cc_logrefill.id", "4%", "center", "sort");
 $HD_Form -> AddViewElement(gettext("REFILL DATE"), "date", "17%", "center", "sort", "30", "", "", "", "", "", "display_dateformat");
 if (has_rights(ACX_DISTRIBUTION)) {
-	$HD_Form -> AddViewElement(gettext("PARTNER"), "name", "17%", "center", "sort");
-//	$HD_Form -> AddViewElement(gettext("LASTNAME")." ".gettext("NAME"), "name", "17%", "center", "sort");
-	$QUERY_ADD = "IF(card_id = ".$_SESSION['card_id'].",'',CONCAT_WS(' ',lastname,firstname,IF(company_name='','',CONCAT('(',company_name,')')))) AS name, ";
+	$HD_Form -> AddViewElement(gettext("PARTNER"), "name", "17%", "center", "sort", "", "link2cust", "cc_card", "IF(id = ".$_SESSION['card_id'].",'',CONCAT_WS(' ',lastname,firstname,IF(company_name='','',CONCAT('(',company_name,')')))), id", "id='%id'", "%1", "", "javascript:;\" onClick=\"MM_openBrWindow('A2B_entity_moneysituation_details.php?type=card&form_action=ask-edit&atmenu=card&displayheader=0&popup_select=1&idcust=%2','','scrollbars=yes,resizable=yes,width=660,height=810,left=600,top=50,screenX=430,screenY=50')\"", gettext("USER DELETED"));
+	$QUERY_ADD = "card_id, ";
 }
 $HD_Form -> AddViewElement(gettext("REFILL AMOUNT"), "credit", "15%", "center", "sort","", "", "", "", "", "", "display_refill_money");
 $HD_Form -> AddViewElement(gettext("REFILL TYPE"),"refill_type", "13%", "center", "sort", "", "list", $list_refill_type);
@@ -110,11 +109,11 @@ $HD_Form -> AddEditElement (gettext("REFILL AMOUNT "),
 			   "credit",
 			   '$value',
 			   "INPUT",
-			   "size=52 maxlength=10",
+			   "id=credit size=52 maxlength=10",
 			   "12",
 			   gettext("Insert the credit amount"),
-			   "", "", "", "", "", "", "", gettext("Enter the amount in the currency base: ").BASE_CURRENCY.gettext(". <b>Available ").$credit." ".BASE_CURRENCY.".</b>" );
-	
+			   "", "", "", "", "", "", "", gettext("Enter the amount in the currency base: ").BASE_CURRENCY.".<BR>".gettext("<b>Available ").$credit." ".BASE_CURRENCY.".</b>" );
+
 $HD_Form -> AddEditElement (gettext("DESCRIPTION"),
 			    "description",
 			    '',
@@ -163,6 +162,10 @@ if ($popup_select>=1) {
 	$HD_Form -> FG_ADITION_HIDDEN_PARAM = "popup_select";
 	$HD_Form -> FG_ADITION_HIDDEN_PARAM_VALUE = 1;
 
+//$HD_Form->FG_ADITION_HIDDEN_PARAM = $HD_Form->FG_EDITION_HIDDEN_PARAM = 'popup_select, idcust';
+//$HD_Form->FG_ADITION_HIDDEN_PARAM = $HD_Form->FG_EDITION_HIDDEN_PARAM_VALUE = "$popup_select, $idcust";
+
+$HD_Form -> FG_GO_LINK_AFTER_ACTION_ADD = $_SERVER['PHP_SELF']."?idcust=$card_id&message=success&popup_select=$popup_select&card_id=$card_id&id=";
 
 //	$HD_Form -> FG_GO_LINK_AFTER_ACTION_ADD = $_SERVER['PHP_SELF']."?atmenu=document&stitle=Document&wh=AC&id=";
 	$HD_Form -> FG_GO_LINK_AFTER_ACTION_EDIT = $_SERVER['PHP_SELF']."?atmenu=document&stitle=Document&wh=AC&id=";

@@ -344,7 +344,7 @@ if (FAX_ENABLE)  {
 								"fax", 
 								'$value', 
 								"INPUT", "size=30 maxlength=20", 
-								"", gettext("Insert your fax number"), "", "", "", "", "", "", "", "");
+								"7", gettext("Insert your fax number"), "", "", "", "", "", "", "NO");
 	$fax_editFG = ",fax";
 }
 

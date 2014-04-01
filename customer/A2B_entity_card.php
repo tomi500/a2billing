@@ -70,7 +70,7 @@ echo $CC_help_card;
 $HD_Form -> create_toppage ($form_action);
 
 if($message == "success") {
-	
+
 ?>
 <table width="50%" align="center">
 <tr height="100px">
