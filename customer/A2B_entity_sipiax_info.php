@@ -155,8 +155,8 @@ if ($form_action == "list") {
 			<td bgcolor="#FFFFFF" class="fontstyle_006" align="right">
 			    <form name="form1" method="post" action="">
 				<select name="atmenu" id="col_configtype" onChange="window.document.form1.elements['PMChange'].value='Change';window.document.form1.submit();">
-				<option value="IAX"<?php if($atmenu == "IAX")echo " selected"?>>IAX</option>
-				<option value="SIP"<?php if($atmenu == "SIP")echo " selected"?>>SIP</option>
+				<option value="IAX"<?php if($atmenu == "IAX")echo " selected"?>>IAX&nbsp;</option>
+				<option value="SIP"<?php if($atmenu == "SIP")echo " selected"?>>SIP&nbsp;</option>
 				</select>
 				<input name="PMChange" type="hidden" id="PMChange">
 			    </form>

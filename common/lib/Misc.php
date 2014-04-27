@@ -1337,9 +1337,9 @@ function do_field($sql, $fld, $dbfld, $oro=false, $sko=0) {
 	
 	if ($$fld) {
 		if (strpos($sql, 'WHERE') > 0) {
-			if ($sko==1) $sql .= "(";
 			if ($oro) $sql .= " OR ";
 			else $sql .= " AND ";
+			if ($sko==1) $sql .= "(";
 		} else {
 			$sql .= " WHERE ";
 			if ($sko==1) $sql .= "(";

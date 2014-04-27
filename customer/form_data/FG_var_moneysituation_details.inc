@@ -1,6 +1,6 @@
 <?php
 
-getpost_ifset(array('message', 'id', 'idcust', 'displayheader', 'type', 'popup_select', 'popup_formname', 'popup_fieldname', 'atmenu'));
+getpost_ifset(array('message', 'id', 'idcust', 'displayheader', 'type', 'popup_formname', 'popup_fieldname', 'atmenu'));
 
 if ($form_action == "ask-edit" || $form_action == "edit" || $message == "success") {
 

@@ -10,6 +10,7 @@
  * 
  * @copyright   Copyright (C) 2004-2009 - Star2billing S.L. 
  * @author      Belaid Arezqui <areski@gmail.com>
+ * @author      Nick Mitin <nixon@sipde.net>
  * @license     http://www.fsf.org/licensing/licenses/agpl-3.0.html
  * @package     A2Billing
  *
@@ -52,16 +53,16 @@ if (has_rights (ACX_DISTRIBUTION) && !($popup_select>=1)) {
 //$HD_Form -> AddViewElement(gettext("ID"), "cc_card.id", "7%", "center", "sort", "");
 //$HD_Form -> AddViewElement(gettext("CardNumber"), "username", "7%", "center", "sort", "", "30", "", "", "", "", "linktocustomer");
 //$HD_Form -> AddViewElement(gettext("CUSTOMER"), "customer", "18%", "center", "sort");
-$HD_Form -> AddViewElement(gettext("CUSTOMER"), "customer", "23%", "center", "sort", "", "link2cust", "cc_card", "CONCAT_WS(' ',lastname,firstname,IF(company_name='','',CONCAT('(',company_name,')'))), id", "id='%id'", "%1", "", "javascript:;\" onClick=\"MM_openBrWindow('A2B_entity_moneysituation_details.php?form_action=ask-edit&displayheader=0&popup_select=1&idcust=%2','','status=no,toolbar=no,menubar=no,location=no,directories=no,scrollbars=yes,resizable=yes,width=675,height=680,left=500,top=40,screenX=500,screenY=40')\"");
+$HD_Form -> AddViewElement(gettext("CUSTOMER"), "lastname", "25%", "center", "sort", "", "link2cust", "cc_card", "CONCAT_WS(' ',lastname,firstname,IF(company_name='','',CONCAT('(',company_name,')'))), id", "id='%id'", "%1", "", "javascript:;\" onClick=\"MM_openBrWindow('A2B_entity_moneysituation_details.php?form_action=ask-edit&displayheader=0&popup_select=1&idcust=%2','','status=no,toolbar=no,menubar=no,location=no,directories=no,scrollbars=yes,resizable=yes,width=675,height=680,left=500,top=40,screenX=500,screenY=40')\"");
 $HD_Form -> AddViewElement(gettext("BALANCE"), "credit", "11%", "center", "sort", "", "", "", "", "", "", "display_refill_money");
-$HD_Form -> AddViewElement(gettext("COMMISSION ACCRUED"), "commission", "19%", "center", "sort", "", "", "", "", "", "", "display_refill_money");
+$HD_Form -> AddViewElement(gettext("COMMISSION ACCRUED"), "commission", "17%", "center", "sort", "", "", "", "", "", "", "display_refill_money");
 $HD_Form -> AddViewElement(gettext("MARGIN"), "margin", "7%", "center", "sort");
 //$HD_Form -> AddViewElement(gettext("INVOICE "), "invoice", "5%", "center", "sort", "15", "lie", "cc_invoice LEFT JOIN cc_invoice_item ON cc_invoice_item.id_invoice=cc_invoice.id", "ROUND(SUM(CEIL(cc_invoice_item.price*(1+(cc_invoice_item.vat/100))*100)/100),2)", "cc_invoice.id_card='%id' GROUP BY cc_invoice.id_card", "%1");
-$HD_Form -> AddViewElement(gettext("INVOICE "), "invoice", "5%", "center", "sort", "", "link2cust", "cc_invoice LEFT JOIN cc_invoice_item ON cc_invoice_item.id_invoice=cc_invoice.id", "SUM(ROUND(cc_invoice_item.price*(1+(cc_invoice_item.vat/100)),2)), cc_invoice.id_card", "cc_invoice.id_card='%id' GROUP BY cc_invoice.id_card", "%1", "", "javascript:;\" onClick=\"MM_openBrWindow('A2B_entity_moneysituation_details.php?type=invoice&form_action=list&atmenu=card&displayheader=0&popup_select=1&idcust=%2','','scrollbars=yes,resizable=yes,width=500,height=415,left=600,top=200,screenX=600,screenY=200')\"");
-$HD_Form -> AddViewElement(gettext("AMOUNT "), "payment", "5%", "center", "sort", "", "link2cust", "cc_logpayment as t2", "SUM(ROUND(t2.payment-t2.fee,2)),t2.card_id", "t2.card_id='%id' GROUP BY t2.card_id", "%1", "", "javascript:;\" onClick=\"MM_openBrWindow('A2B_entity_moneysituation_details.php?type=payment&form_action=list&atmenu=card&displayheader=0&popup_select=1&idcust=%2','','scrollbars=yes,resizable=yes,width=550,height=415,left=600,top=200,screenX=600,screenY=200')\"");
-$HD_Form -> AddViewElement(gettext("TO PAY"), "to pay", "10%", "center", "sort", "", "eval","number_format((%4-%5+abs(%5-%4))/2, 2, '.', ' ')");
+$HD_Form -> AddViewElement(gettext("INVOICE "), "invoice", "5%", "center", "", "", "link2cust", "cc_invoice LEFT JOIN cc_invoice_item ON cc_invoice_item.id_invoice=cc_invoice.id", "SUM(ROUND(cc_invoice_item.price*(1+(cc_invoice_item.vat/100)),2)), cc_invoice.id_card", "cc_invoice.id_card='%id' GROUP BY cc_invoice.id_card", "%1", "", "javascript:;\" onClick=\"MM_openBrWindow('A2B_entity_moneysituation_details.php?type=invoice&form_action=list&atmenu=card&displayheader=0&popup_select=1&idcust=%2','','scrollbars=yes,resizable=yes,width=500,height=415,left=600,top=200,screenX=600,screenY=200')\"");
+$HD_Form -> AddViewElement(gettext("AMOUNT "), "payment", "5%", "center", "", "", "link2cust", "cc_logpayment as t2", "SUM(ROUND(t2.payment-t2.fee,2)),t2.card_id", "t2.card_id='%id' GROUP BY t2.card_id", "%1", "", "javascript:;\" onClick=\"MM_openBrWindow('A2B_entity_moneysituation_details.php?type=payment&form_action=list&atmenu=card&displayheader=0&popup_select=1&idcust=%2','','scrollbars=yes,resizable=yes,width=550,height=415,left=600,top=200,screenX=600,screenY=200')\"");
+$HD_Form -> AddViewElement(gettext("TO PAY"), "to_pay", "10%", "center", "", "", "eval", "number_format((%4-%5+abs(%5-%4))/2, 2, '.', ' ')");
 
-//$HD_Form -> FieldViewElement ("CONCAT_WS(' ',lastname,firstname,IF(company_name='','',CONCAT('(',company_name,')'))) AS customer, credit, commission, CONCAT_WS(' ',margin,'%'), cc_card.id, cc_card.id, cc_card.id");
+//$HD_Form -> FieldViewElement ("CONCAT_WS(' ',lastname,firstname,IF(company_name='','',CONCAT('(',company_name,')'))) AS customer, credit, commission, CONCAT_WS(' ',margin,'%') margin, cc_card.id, cc_card.id, cc_card.id");
 $HD_Form -> FieldViewElement ("cc_card.id, credit, commission, CONCAT_WS(' ',margin,'%'), cc_card.id, cc_card.id, cc_card.id");
 
 $HD_Form -> FG_ACTION_SIZE_COLUMN = '10%';

@@ -1139,7 +1139,7 @@ class FormHandler
 		
 		
   		$fldtype = $fld.'type';
-        if(empty($processed)) { 
+        if(empty($processed)) {
         	$processed = $this->getProcessed();
         }
   		

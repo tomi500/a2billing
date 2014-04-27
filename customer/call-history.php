@@ -149,7 +149,7 @@ $FG_TABLE_COL[]=array ('<acronym title="'.gettext("Terminate Cause").'">'.gettex
 $FG_TABLE_COL[]=array (gettext("CallType"), "sipiax", 8*$p ."%", "center", "SORT",  "", "list", $list_calltype);
 $FG_TABLE_COL[]=array (gettext("Cost"), "sessionbill", 10*$p ."%", "center", "SORT", "30", "", "", "", "", "", "display_2bill");
 
-$FG_COL_QUERY = "t1.starttime, IF(t1.src_exten IS NULL, t1.src, t1.src_exten), IF(t1.card_id='$customer' AND t1.calledexten IS NOT NULL, t1.calledexten, t1.calledstation), t1.destination, id_ratecard as route, t1.sessiontime, t1.terminatecauseid, t1.sipiax, t1.sessionbill+margindillers ";
+$FG_COL_QUERY = "t1.starttime, IF(t1.src_exten IS NULL, t1.src, t1.src_exten) src, IF(t1.card_id='$customer', IF(t1.calledexten IS NOT NULL, t1.calledexten, t1.calledstation), t1.dnid) calledstation, t1.destination, id_ratecard as route, t1.sessiontime, t1.terminatecauseid, t1.sipiax, IF(t1.card_id='$customer', t1.sessionbill+margindillers, 0) sessionbill";
 
 if ($ACXSEERECORDING) {
 	$FG_TABLE_COL [] = array ('<span class="liens">' . gettext("Audio") . "</span>", "uniqueid", 100*(1-$p) ."%", "center", "", "30", "", "", "", "", "", "linkonmonitorfile_customer");
@@ -179,9 +179,9 @@ if ($posted==1) {
 	$SQLcmd = do_field($SQLcmd, 'callerid', 'src', false, 1);
 	$SQLcmd = do_field($SQLcmd, 'callerid', 'src_exten', true, 2);
 	$SQLcmd = do_field($SQLcmd, 'phonenumber', 'calledstation', false, 1);
-	$SQLcmd = do_field($SQLcmd, 'phonenumber', 'calledexten', true, 2);
+	$SQLcmd = do_field($SQLcmd, 'phonenumber', 'calledexten', true);
+	$SQLcmd = do_field($SQLcmd, 'phonenumber', 'dnid', true, 2);
 }
-
 
 $date_clause = '';
 
@@ -228,7 +228,7 @@ if (!$nodisplay) {
 }
 $_SESSION["pr_sql_export"] = "SELECT $FG_COL_QUERY FROM $FG_TABLE_NAME WHERE $FG_TABLE_CLAUSE";
 
-$QUERY = "SELECT DATE(t1.starttime) AS day, sum(t1.sessiontime) AS calltime, sum(t1.sessionbill+margindillers) AS cost, count(*) as nbcall FROM $FG_TABLE_NAME WHERE ".$FG_TABLE_CLAUSE." GROUP BY day ORDER BY day"; //extract(DAY from calldate)
+$QUERY = "SELECT DATE(t1.starttime) AS day, sum(t1.sessiontime) AS calltime, sum(IF(t1.card_id='$customer',t1.sessionbill+margindillers,0)) AS cost, count(*) as nbcall FROM $FG_TABLE_NAME WHERE ".$FG_TABLE_CLAUSE." GROUP BY day ORDER BY day"; //extract(DAY from calldate)
 
 if (!$nodisplay) {
 	$res = $DBHandle -> Execute($QUERY);

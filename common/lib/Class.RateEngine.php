@@ -1229,6 +1229,7 @@ else echo "Ratecard: ".$this->ratecard_obj[$i][6]."<br>Trunk: ".$this->ratecard_
 			$id_ratecard	 = $this -> ratecard_obj[$K][6];
 			$buyrateapply	 = $this -> ratecard_obj[$K][9];
 			$rateapply	 = $this -> ratecard_obj[$K][12];
+			$trunkcode	 = $this -> ratecard_obj[$K][70];
 		}
 		$buycost = 0;
 		if ($doibill==0 || $sessiontime < $A2B->agiconfig['min_duration_2bill']) {
@@ -1335,32 +1336,31 @@ else echo "Ratecard: ".$this->ratecard_obj[$i][6]."<br>Trunk: ".$this->ratecard_
 			$A2B -> debug( DEBUG, $agi, __FILE__, __LINE__, "[CC_asterisk_stop : SQL: $QUERY]");
 		    }
 		}
-		if ($sessiontime>0) {
-			
-			if (!isset($td)) $td = (isset($this->td))?$this->td:"";
+		if (!isset($trunkcode) || strpos($trunkcode,"-INFOLINE") === false) {
 			if ($didcall==0 && $callback==0) {
-				$myclause_nodidcall = " , redial='".$calledstation."' ";
+				$myclause_nodidcall = "redial='$A2B->oldphonenumber'";
+				$A2B->redial = $A2B->oldphonenumber;
 			} else {
 				$myclause_nodidcall='';
 			}
+		}
+		if (!isset($myclause_nodidcall)) {
+			$myclause_nodidcall = NULL;
+		}
+		//Update the global credit
+		if ($sessiontime>0) {
 			
-			if (!defined($myclause_nodidcall)) {
-				$myclause_nodidcall = null;
-			}
-			//Update the global credit
+			if (!isset($td)) $td = (isset($this->td))?$this->td:"";
 			$A2B -> credit = $A2B -> credit + $cost - a2b_round($this->margindillers);
-			
-			if ($A2B->nbused>0) {
-				$QUERY = "UPDATE cc_card SET commission=commission+".a2b_round($this->commission).", credit= credit-".a2b_round($this->margindillers)."$signe".a2b_round(abs($cost))." $myclause_nodidcall,  lastuse=now(), nbused=nbused+1 WHERE username='".$A2B->username."'";
-			} else {
-				$QUERY = "UPDATE cc_card SET commission=commission+".a2b_round($this->commission).", credit= credit-".a2b_round($this->margindillers)."$signe".a2b_round(abs($cost))." $myclause_nodidcall,  lastuse=now(), firstusedate=now(), nbused=nbused+1 WHERE username='".$A2B->username."'";
+			if (!is_null($myclause_nodidcall)) {
+				$myclause_nodidcall .= ", ";
+			}
+			$myclause_nodidcall .= "commission=commission+".a2b_round($this->commission).", credit=credit-".a2b_round($this->margindillers)."$signe".a2b_round(abs($cost)).", lastuse=now(), nbused=nbused+1";
+			if ($A2B->nbused == 0) {
+				$myclause_nodidcall .= ", firstusedate=now()";
 			}
 //$A2B -> debug(ERROR, $agi, __FILE__, __LINE__, "[id_custom: ".$A2B->id_card."] margindillers=".a2b_round($this->margindillers));
 //$A2B -> debug(ERROR, $agi, __FILE__, __LINE__, "[id_custom: ".$A2B->id_card."] commission+=".a2b_round($this->commission));
-
-			$A2B -> debug( DEBUG, $agi, __FILE__, __LINE__, "[CC_asterisk_stop 1.2: SQL: $QUERY]");
-			$result = $A2B->instance_table -> SQLExec ($A2B -> DBHandle, $QUERY, 0);
-
 			if (!$A2B->cid_verify) {
 				$A2B->instance_table -> SQLExec ($A2B -> DBHandle, "UPDATE cc_callerid SET verify=1 WHERE cid='$A2B->CallerID' AND activated='t' AND id_cc_card=$card_id", 0);
 			}
@@ -1434,6 +1434,11 @@ else echo "Ratecard: ".$this->ratecard_obj[$i][6]."<br>Trunk: ".$this->ratecard_
 				}
 				$id_diller = $id_diller_next;
 			} while ($id_diller);
+		}
+		if ($myclause_nodidcall) {
+			$myclause_nodidcall = "UPDATE cc_card SET $myclause_nodidcall WHERE username='$A2B->username'";
+			$A2B -> debug( DEBUG, $agi, __FILE__, __LINE__, "[CC_asterisk_stop 1.2: SQL: $myclause_nodidcall]");
+			$A2B->instance_table -> SQLExec ($A2B -> DBHandle, $myclause_nodidcall, 0);
 		}
 		monitor_recognize($A2B);
 	}
@@ -1794,14 +1799,18 @@ $A2B -> debug( ERROR, $agi, __FILE__, __LINE__, "TRUNK=".$valu_val[2]." / ".$val
 
 				$this -> trunk_start_inuse($agi, $A2B, 1);
 				if ($agi) {
+				    if ($A2B->dtmf_destination && $A2B->oldphonenumber && (!isset($trunkcode) || strpos($trunkcode,"-INFOLINE") === false)) {
+					$agi -> say_digits($A2B->oldphonenumber, '#');
+					$A2B -> dtmf_destination = false;
+				    }
 				    if ($this -> ratecard_obj[$k][12] > 0 || ($this -> ratecard_obj[$k][12] == 0 && $A2B->extext && $this -> ratecard_obj[$k][4] != $A2B->cardnumber && $ipaddress != $prefix.$destination)) {
-					if (!isset($trunkcode) || strpos($trunkcode,"-INFOLINE") === false) {
-						$A2B -> fct_say_time_2_call($agi, $trunktimeout, $this -> ratecard_obj[$k][12]);
-					}
 					if ($A2B->auth_through_accountcode) {
 						$A2B -> debug( DEBUG, $agi, __FILE__, __LINE__, "[A2Billing] SAY BALANCE : $A2B->credit");
 						$A2B -> fct_say_balance ($agi, $A2B->credit);
 						$A2B -> auth_through_accountcode = false;
+					}
+					if (!isset($trunkcode) || strpos($trunkcode,"-INFOLINE") === false) {
+						$A2B -> fct_say_time_2_call($agi, $trunktimeout, $this -> ratecard_obj[$k][12]);
 					}
 				    }
 				    $A2B -> debug( INFO, $agi, __FILE__, __LINE__, "FAILOVER app_callingcard: Dialing '$dialstr' with timeout of '$timeout'.\n");

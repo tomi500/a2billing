@@ -154,7 +154,9 @@ $HD_Form -> AddEditElement (gettext("CALLERID"),
 			   "18",
 			   gettext("Insert the CallerID"));
 
-$HD_Form -> AddEditElement (gettext("ACTIVATED"),
+if ($form_action != 'ask-delete') {
+
+	$HD_Form -> AddEditElement (gettext("ACTIVATED"),
 			   "activated",
 			   't',
 			   "RADIOBUTTON",
@@ -164,7 +166,7 @@ $HD_Form -> AddEditElement (gettext("ACTIVATED"),
 			   "", "", "", gettext("Yes").":t, - ".gettext("No").":f", "", "", "",
 			   gettext("... for incoming calls from this number"));
 
-$HD_Form -> AddEditElement (gettext("BLACKLIST"),
+	$HD_Form -> AddEditElement (gettext("BLACKLIST"),
 			    "blacklist",
 			    '0',
 			    "RADIOBUTTON",
@@ -174,7 +176,7 @@ $HD_Form -> AddEditElement (gettext("BLACKLIST"),
 			    "", "", "", gettext("Yes").":1, - ".gettext("No").":0", "", "", "",
 			    gettext("Choose 'Yes' if you want to place this CallerID to Black List. This will break any autorization attempts from this CallerID."));
 
-$HD_Form -> AddEditElement (gettext("PHONE NUMBER"),
+	$HD_Form -> AddEditElement (gettext("PHONE NUMBER"),
 			    "phonenumber",
 			    '$value',
 			    "INPUT",
@@ -183,7 +185,7 @@ $HD_Form -> AddEditElement (gettext("PHONE NUMBER"),
 			    gettext("Enter the phone"),
 			    "", "", "", "", "", "", "NO", gettext("Enter the phone number for immediatly dial instead prompt to dial"));
 
-$HD_Form -> AddEditElement (gettext("CALLBACK"),
+	$HD_Form -> AddEditElement (gettext("CALLBACK"),
 			   "callback",
 			   '0',
 			   "SELECT",
@@ -193,8 +195,8 @@ $HD_Form -> AddEditElement (gettext("CALLBACK"),
 			   "list", "", "", "", $yesno, "%1", "",
 			   gettext("Choose 'Yes' if you want to callback to this CallerID"));
 
-$showcur = (!$two_currency)?gettext('currency : ').strtoupper(BASE_CURRENCY):'';
-$HD_Form -> AddEditElement (gettext("SAY BALANCE AFTER AUTH"),
+	$showcur = (!$two_currency)?gettext('currency : ').strtoupper(BASE_CURRENCY):'';
+	$HD_Form -> AddEditElement (gettext("SAY BALANCE AFTER AUTH"),
 			   "warning_threshold",
 			   '',
 			   "SELECT",
@@ -203,7 +205,7 @@ $HD_Form -> AddEditElement (gettext("SAY BALANCE AFTER AUTH"),
 			   "",
 			   "list", "", "", "", $limits_notify , "%1", "", $showcur." (".gettext("with the warning threshold").")", "", '<OPTION  value="-1" selected>'.gettext("ALWAYS").'&nbsp;</OPTION>');
 
-$HD_Form -> AddEditElement (gettext("SAY RATE BEFORE CALL"),
+	$HD_Form -> AddEditElement (gettext("SAY RATE BEFORE CALL"),
 			   "say_rateinitial",
 			   '0',
 			   "SELECT",
@@ -212,7 +214,7 @@ $HD_Form -> AddEditElement (gettext("SAY RATE BEFORE CALL"),
 			   "",
 			   "list", "", "", "", $yesno, "%1");
 
-$HD_Form -> AddEditElement (gettext("SAY BALANCE AFTER CALL"),
+	$HD_Form -> AddEditElement (gettext("SAY BALANCE AFTER CALL"),
 			   "say_balance_after_call",
 			   '0',
 			   "SELECT",
@@ -221,7 +223,7 @@ $HD_Form -> AddEditElement (gettext("SAY BALANCE AFTER CALL"),
 			   "",
 			   "list", "", "", "", $yesno, "%1");
 
-$HD_Form -> AddEditElement (gettext("CONSPIRATION"),
+	$HD_Form -> AddEditElement (gettext("CONSPIRATION"),
 			   "cli_replace",
 			   '0',
 			   "SELECT",
@@ -233,7 +235,7 @@ $HD_Form -> AddEditElement (gettext("CONSPIRATION"),
 			   "", '<OPTION  value="2">'.gettext("Local").'&nbsp;</OPTION>',
 			   gettext("If your CallerID number was verified you can use the remaining options..."));
 
-$HD_Form -> AddEditElement (gettext("LOCAL REPLACE"),
+	$HD_Form -> AddEditElement (gettext("LOCAL REPLACE"),
 			   "cli_localreplace",
 			   '0',
 			   "SELECT",
@@ -244,7 +246,7 @@ $HD_Form -> AddEditElement (gettext("LOCAL REPLACE"),
 			   gettext("Present this CallerID, when calls are made to a country relevant to this CallerID."),
 			   null, null, gettext("Settings for general Caller Line Identity (CLI)"));
 
-$HD_Form -> AddEditElement (gettext("OTHER REPLACE"),
+	$HD_Form -> AddEditElement (gettext("OTHER REPLACE"),
 			   "cli_otherreplace",
 			   '0',
 			   "SELECT",
@@ -254,7 +256,7 @@ $HD_Form -> AddEditElement (gettext("OTHER REPLACE"),
 			   "list", "", "", "", $yesno, "%1", "",
 			   gettext("Present this CallerID, when calls are made to countries not relevant to this CallerID."));
 
-$HD_Form -> AddEditElement (gettext("REPLACE BY PREFIX"),
+	$HD_Form -> AddEditElement (gettext("REPLACE BY PREFIX"),
 			    "cli_prefixreplace",
 			    "$value",
 			    "INPUT",
@@ -263,8 +265,11 @@ $HD_Form -> AddEditElement (gettext("REPLACE BY PREFIX"),
 			    "",
 			    "" , "", "", "", "" , "" , "NO", gettext("Present this CallerID, when calls are made to countries from listed prefixes. Insert the replaceable prefixes separated by comma, e.g. for UK,IT,RU,UA are '44,39,7,380'."));
 
-$HD_Form -> FieldEditElement ('cid, activated, blacklist, phonenumber, callback, warning_threshold, say_rateinitial, say_balance_after_call, cli_replace, cli_localreplace, cli_otherreplace, cli_prefixreplace');
+	$HD_Form -> FieldEditElement ('cid, activated, blacklist, phonenumber, callback, warning_threshold, say_rateinitial, say_balance_after_call, cli_replace, cli_localreplace, cli_otherreplace, cli_prefixreplace');
 
+} else {
+	$HD_Form -> FieldEditElement ('cid');
+}
 $HD_Form->FG_ADITION_HIDDEN_PARAM = $HD_Form->FG_EDITION_HIDDEN_PARAM = 'popup_select, idcust';
 $HD_Form->FG_ADITION_HIDDEN_PARAM = $HD_Form->FG_EDITION_HIDDEN_PARAM_VALUE = "$popup_select, $idcust";
 

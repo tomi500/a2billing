@@ -150,9 +150,9 @@ if ($form_action == "list" && $message != "success") {
 					<tr>
 						<td valign="top" align="center" class="tableBody" bgcolor="#c3c0ec"><b><?php echo $list_month[$month_display][0]; ?></b></td><?php
 						for ($k = 1; $k <= count($list_refill_type); $k++) {
-//							if ($result_column[$k]!=0) {
-						?><td valign="top" align="center" class="tableBody" bgcolor="#ecd9c0"><b>&nbsp;<?php echo display_money_nocur($result_refills[$i][$k]); ?>&nbsp;</b></td><?php
-//							}
+							if ($result_column[$k]!=0) {
+						?><td valign="top" align="center" class="tableBody" nowrap="nowrap" bgcolor="#ecd9c0"><b>&nbsp;<?php echo display_money_nocur($result_refills[$i][$k]); ?>&nbsp;</b></td><?php
+							}
 						} ?>
 					</tr>
 					<?php } ?>

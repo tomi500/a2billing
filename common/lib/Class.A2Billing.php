@@ -150,6 +150,7 @@ class A2Billing {
 	var $ipaddress;
 	var $rate;
 	var $destination;
+	var $dtmf_destination = false;
 	var $sip_iax_buddy;
 	var $credit;
 	var $tariff;
@@ -900,20 +901,42 @@ class A2Billing {
 			} else {
 				$this->destination = $this->extension;
 			}
+			$this->oldphonenumber = $this->destination;
 			$this -> debug( DEBUG, $agi, __FILE__, __LINE__, "[USE_DNID DESTINATION ::> ".$this->destination."]");
 		} else {
-			if ($this->first_dtmf)
+//$this -> debug( ERROR, $agi, __FILE__, __LINE__, "FIRST DTMF 1 : ".$this->first_dtmf);
+			if ($this->first_dtmf != '') {
 				$prompt_enter_dest = '#';
-			else	$prompt_enter_dest = $this->callback_beep_to_enter_destination ? 'beep' : $this->agiconfig['file_conf_enter_destination'];
-			$res_dtmf = $agi->get_data($prompt_enter_dest, 6000, 20);
-			$this->destination = $this->first_dtmf . $res_dtmf ["result"];
+				if ($this->first_dtmf == '0') {
+					$max_digits = 1;
+				} else $max_digits = 0;
+			} else {
+				$prompt_enter_dest = $this->callback_beep_to_enter_destination ? 'beep' : $this->agiconfig['file_conf_enter_destination'];
+				$this->first_dtmf = '';
+				$max_digits = 2;
+			}
+			if ($max_digits) {
+				$res_dtmf = $agi->get_data($prompt_enter_dest, 6000, $max_digits);
+//$this -> debug( ERROR, $agi, __FILE__, __LINE__, "  RES DTMF 1 : ".$res_dtmf["result"]);
+				$prompt_enter_dest = '#';
+			} else	$res_dtmf["result"] = '';
+			if ($res_dtmf["result"] != -1) {
+				$this->first_dtmf .= $res_dtmf["result"];
+//$this -> debug( ERROR, $agi, __FILE__, __LINE__, "FIRST DTMF 2 : ".$this->first_dtmf);
+				if ($this->first_dtmf != '0*' && strlen($res_dtmf["result"]) == $max_digits) {
+					$res_dtmf = $agi->get_data($prompt_enter_dest, 6000, 18);
+				} else	$res_dtmf["result"] = '';
+			}
+			$this->destination = $this->oldphonenumber = $this->first_dtmf . $res_dtmf["result"];
+			$this->dtmf_destination = true;
 			$this->first_dtmf = '';
 			$this -> debug( DEBUG, $agi, __FILE__, __LINE__, "RES DTMF : ".$this->destination);
+$this -> debug( ERROR, $agi, __FILE__, __LINE__, " DESTINATION : ".$this->destination);
 		}
 
         //REDIAL FIND THE LAST DIALED NUMBER (STORED IN THE DATABASE)
         if ( $this->destination == '0*' ) {
-            $this->destination = $this->redial;
+            $this->destination = $this->oldphonenumber = $this->redial;
             $this -> debug( DEBUG, $agi, __FILE__, __LINE__, "[REDIAL : DTMF DESTINATION ::> ".$this->destination."]");
         }
 

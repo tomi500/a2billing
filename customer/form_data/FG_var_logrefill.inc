@@ -1,6 +1,6 @@
 <?php
 
-getpost_ifset(array('id', 'card_id', 'date', 'credit', 'description', 'added_invoice', 'refill_type', 'idcust', 'popup_select', 'message'));
+getpost_ifset(array('id', 'card_id', 'date', 'credit', 'description', 'added_invoice', 'refill_type', 'idcust', 'message'));
 
 $list_refill_type = Constants::getRefillType_List();
 $list_refill_type[] = array( gettext("Connection charge for DID setup"), "4");
@@ -42,7 +42,7 @@ $HD_Form ->FG_LIST_ADDING_BUTTON_IMG1 = Images_Path . "/money.png";
 //$HD_Form -> AddViewElement(gettext("ID"), "cc_logrefill.id", "4%", "center", "sort");
 $HD_Form -> AddViewElement(gettext("REFILL DATE"), "date", "17%", "center", "sort", "30", "", "", "", "", "", "display_dateformat");
 if (has_rights(ACX_DISTRIBUTION)) {
-	$HD_Form -> AddViewElement(gettext("PARTNER"), "name", "17%", "center", "sort", "", "link2cust", "cc_card", "IF(id = ".$_SESSION['card_id'].",'',CONCAT_WS(' ',lastname,firstname,IF(company_name='','',CONCAT('(',company_name,')')))), id", "id='%id'", "%1", "", "javascript:;\" onClick=\"MM_openBrWindow('A2B_entity_moneysituation_details.php?type=card&form_action=ask-edit&atmenu=card&displayheader=0&popup_select=1&idcust=%2','','scrollbars=yes,resizable=yes,width=660,height=810,left=600,top=50,screenX=430,screenY=50')\"", gettext("USER DELETED"));
+	$HD_Form -> AddViewElement(gettext("PARTNER"), "lastname", "17%", "center", "sort", "", "link2cust", "cc_card", "IF(id = ".$_SESSION['card_id'].",'',CONCAT_WS(' ',lastname,firstname,IF(company_name='','',CONCAT('(',company_name,')')))), id", "id='%id'", "%1", "", "javascript:;\" onClick=\"MM_openBrWindow('A2B_entity_moneysituation_details.php?type=card&form_action=ask-edit&atmenu=card&displayheader=0&popup_select=1&idcust=%2','','scrollbars=yes,resizable=yes,width=660,height=810,left=600,top=50,screenX=430,screenY=50')\"", gettext("USER DELETED"));
 	$QUERY_ADD = "card_id, ";
 }
 $HD_Form -> AddViewElement(gettext("REFILL AMOUNT"), "credit", "15%", "center", "sort","", "", "", "", "", "", "display_refill_money");
