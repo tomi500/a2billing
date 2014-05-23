@@ -787,10 +787,12 @@ function gen_card_with_alias($table = "cc_card", $api = 0, $length_cardnumber = 
 	}
 
 	for ($k = 0; $k <= 200; $k++) {
-		$card_gen = MDP($length_cardnumber);
+		do {
+			$card_gen = MDP($length_cardnumber);
+		} while ($card_gen < pow(10,$length_cardnumber-1));
 		do {
 			$alias_gen = ($k==0 && LEN_ALIASNUMBER==strlen($alias_static))?$alias_static:MDP(LEN_ALIASNUMBER);
-		} while ($alias_static == 0 && $alias_gen < pow(10,LEN_ALIASNUMBER-1));
+		} while ($alias_gen != $alias_static && $alias_gen < pow(10,LEN_ALIASNUMBER-1));
 		if ($k == 200) {
 			if ($api) {
 				global $mail_content, $email_alarm, $logfile;

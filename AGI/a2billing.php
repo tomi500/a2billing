@@ -422,7 +422,7 @@ if ($mode == 'standard') {
 			// CHECK IF THE CHANNEL IS UP
 //			if (($A2B -> agiconfig['answer_call']==1) && ($stat_channel["result"]!=$status_channel) && ($A2B -> CC_TESTING!=1))
 			if (array_search($stat_channel["result"], array(AST_STATE_UP, AST_STATE_RING)) === false && $A2B -> CC_TESTING!=1) {
-				if ($A2B->set_inuse==1) $A2B->callingcard_acct_start_inuse($agi,0);
+				if ($A2B->set_inuse_username) $A2B->callingcard_acct_start_inuse($agi,0);
 				$A2B -> write_log("[STOP - EXIT]", 0);
 				break;
 			}
@@ -453,7 +453,7 @@ if ($mode == 'standard') {
                             $return = TRUE;
                         }
                         if ($try > 3) {
-                            if ($A2B->set_inuse==1)
+                            if ($A2B->set_inuse_username)
                                 $A2B -> callingcard_acct_start_inuse($agi,0);
                             $agi -> hangup();
                             exit();
@@ -553,7 +553,7 @@ if ($mode == 'standard') {
                                     case '*' :
 					$A2B -> let_stream_listening($agi);
                                         $agi -> stream_file('prepaid-final', '#');
-                                        if ($A2B->set_inuse==1)
+                                        if ($A2B->set_inuse_username)
                                             $A2B -> callingcard_acct_start_inuse($agi,0);
                                         $agi -> hangup();
                                         exit();
@@ -617,7 +617,7 @@ if ($mode == 'standard') {
                                 case '*' :
 				    $A2B -> let_stream_listening($agi);
                                     $agi -> stream_file('prepaid-final', '#');
-                                    if ($A2B->set_inuse==1)
+                                    if ($A2B->set_inuse_username)
                                         $A2B -> callingcard_acct_start_inuse($agi,0);
                                     $agi -> hangup();
                                     exit();
@@ -640,7 +640,7 @@ if ($mode == 'standard') {
 				
 				if (($A2B -> agiconfig['notenoughcredit_cardnumber']==1) && (($i+1)< $A2B -> agiconfig['number_try'])) {
 
-					if ($A2B->set_inuse==1)
+					if ($A2B->set_inuse_username)
 						$A2B->callingcard_acct_start_inuse($agi,0);
 
 					$A2B -> agiconfig['cid_enable'] = 0;
@@ -835,7 +835,7 @@ if ($mode == 'standard') {
 //$A2B -> debug( ERROR, $agi, __FILE__, __LINE__, "UNIQUEID + 1000000000 = ".$A2B-> uniqueid);
 						$agi-> evaluate("STREAM FILE one-moment-please \"#\" 0");
 						$ans = $A2B-> callingcard_ivr_authorize($agi, $RateEngine, $i,true);
-					} elseif ($A2B->set_inuse==1) {
+					} elseif ($A2B->set_inuse_username) {
 						$A2B -> callingcard_acct_start_inuse($agi,0);
 					}
 				}
@@ -908,7 +908,7 @@ if ($mode == 'standard') {
 					if (is_array($result)) {
 						//On Net
 						$A2B -> call_2did($agi, $RateEngine, $result);
-						if ($A2B->set_inuse==1)
+						if ($A2B->set_inuse_username)
 							$A2B -> callingcard_acct_start_inuse($agi,0);
 					}
 				}
@@ -967,7 +967,7 @@ if ($mode == 'standard') {
 		if (is_array($result)) {
 		    //Off Net
 			$A2B -> call_did($agi, $RateEngine, $result);
-			if ($A2B->set_inuse==1) $A2B -> callingcard_acct_start_inuse($agi,0);
+			if ($A2B->set_inuse_username) $A2B -> callingcard_acct_start_inuse($agi,0);
 		}
 	}
 
@@ -1010,7 +1010,7 @@ if ($mode == 'standard') {
 	if ($A2B -> agiconfig['say_goodbye']==1) $agi -> stream_file('prepaid-final', '#');
 
 	$agi -> hangup();
-	if ($A2B->set_inuse==1) $A2B->callingcard_acct_start_inuse($agi,0);
+	if ($A2B->set_inuse_username) $A2B->callingcard_acct_start_inuse($agi,0);
 	$A2B -> write_log("[STOP - EXIT]", 0);
 	exit();
 
@@ -1105,7 +1105,7 @@ if ($mode == 'standard') {
                                     $A2B -> debug( DEBUG, $agi, __FILE__, __LINE__, "[MENU OF CONFIRM (".$res_dtmf ["result"].")]" );
                                     $res_dtmf = $agi -> get_data('prepaid-re-enter-press1-confirm	', 4000, 1);
                                     if ($subtry >= 3) {
-                                        if ($A2B->set_inuse==1)
+                                        if ($A2B->set_inuse_username)
                                             $A2B -> callingcard_acct_start_inuse($agi,0);
                                         $agi -> hangup();
                                         exit();
@@ -1126,7 +1126,7 @@ if ($mode == 'standard') {
                         } while($return && $try < 3);
                         
                         if (strlen($outbound_destination)<=0) {
-                            if ($A2B->set_inuse==1)
+                            if ($A2B->set_inuse_username)
                                 $A2B -> callingcard_acct_start_inuse($agi,0);
                             $agi -> hangup();
                             exit();
@@ -1473,7 +1473,7 @@ if ($mode == 'standard') {
 			if ($ans=="2FAX") {
 				$A2B -> debug( INFO, $agi, __FILE__, __LINE__, "[ CALL OF THE SYSTEM - [FAX=".$A2B-> destination."]");
 				$A2B -> call_fax($agi);
-				if ($A2B->set_inuse==1) {
+				if ($A2B->set_inuse_username) {
 					$A2B -> callingcard_acct_start_inuse($agi,0);
 				}
 			}
@@ -1542,12 +1542,12 @@ if ($mode == 'standard') {
 				$result = $A2B -> instance_table -> SQLExec ($A2B->DBHandle, $QUERY);
 				if (is_array($result)) {
 					$A2B -> call_2did($agi, $RateEngine, $result);
-					if ($A2B->set_inuse==1) $A2B -> callingcard_acct_start_inuse($agi,0);
+					if ($A2B->set_inuse_username) $A2B -> callingcard_acct_start_inuse($agi,0);
 				}
 			}
 		}//END FOR
 
-		if ($A2B->set_inuse==1) {
+		if ($A2B->set_inuse_username) {
 			$A2B->callingcard_acct_start_inuse($agi,0);
 		}
 
@@ -1768,7 +1768,7 @@ if ($mode == 'standard') {
 **/
 		}//END FOR
 
-		if ($A2B->set_inuse==1) {
+		if ($A2B->set_inuse_username) {
 			$A2B->callingcard_acct_start_inuse($agi,0);
 		}
 
@@ -1879,7 +1879,7 @@ if ($mode == 'standard') {
 			
 		}//END FOR
 
-		if ($A2B->set_inuse==1) {
+		if ($A2B->set_inuse_username) {
 			$A2B->callingcard_acct_start_inuse($agi,0);
 		}
 
@@ -1984,7 +1984,7 @@ if (isset($send_reminder) && $send_reminder == 1 && $A2B -> agiconfig['send_remi
 	}
 }
 
-if ($A2B->set_inuse==1) {
+if ($A2B->set_inuse_username) {
 	$A2B->callingcard_acct_start_inuse($agi,0);
 }
 

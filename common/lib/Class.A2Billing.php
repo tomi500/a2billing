@@ -220,7 +220,7 @@ class A2Billing {
 	var $cardnumber_range;
 
 	// Define if we have changed the status of the card
-	var $set_inuse = 0;
+	var $set_inuse_username = 0;
 
     var $callback_beep_to_enter_destination = False;
 
@@ -822,14 +822,14 @@ class A2Billing {
 		if (is_numeric($this->agiconfig['dial_balance_reservation'])) {
 			$upd_balance = $this->agiconfig['dial_balance_reservation'];	
 		}
-			
 		$this -> debug( DEBUG, $agi, __FILE__, __LINE__, "[CARD STATUS UPDATE]");
 		if ($inuse) {
 			$QUERY = "UPDATE cc_card SET inuse=inuse+1, credit=credit-$upd_balance WHERE username='".$this->username."'";
-			$this -> set_inuse = 1;
+			$this -> set_inuse_username = $this->username;
 		} else {
-			$QUERY = "UPDATE cc_card SET inuse=inuse-1, credit=credit+$upd_balance WHERE username='".$this->username."'";
-			$this -> set_inuse = 0;
+			$username = $this->set_inuse_username ? $this->set_inuse_username : $this->username;
+			$QUERY = "UPDATE cc_card SET inuse=inuse-1, credit=credit+$upd_balance WHERE username='".$username."'";
+			$this -> set_inuse_username = 0;
 		}
 		if (!$this -> CC_TESTING) $result = $this -> instance_table -> SQLExec ($this->DBHandle, $QUERY, 0);
 		   $this -> debug( DEBUG, $agi, __FILE__, __LINE__, "[QUERY USING CARD UPDATE::> ".$QUERY."]");
@@ -931,7 +931,7 @@ class A2Billing {
 			$this->dtmf_destination = true;
 			$this->first_dtmf = '';
 			$this -> debug( DEBUG, $agi, __FILE__, __LINE__, "RES DTMF : ".$this->destination);
-$this -> debug( ERROR, $agi, __FILE__, __LINE__, " DESTINATION : ".$this->destination);
+//if ($this->destination)	$this -> debug( ERROR, $agi, __FILE__, __LINE__, " DESTINATION : ".$this->destination);
 		}
 
         //REDIAL FIND THE LAST DIALED NUMBER (STORED IN THE DATABASE)
@@ -998,24 +998,24 @@ $this -> debug( ERROR, $agi, __FILE__, __LINE__, " DESTINATION : ".$this->destin
 	if ($this->destination) {
 	if (isset($this->transferername[0])) {
 		$this -> agiconfig['number_try']=1;
-$this -> debug( ERROR, $agi, __FILE__, __LINE__, "[===================[ Processed Transfer...  {$this->transferername[0]}  {$this->transfererchannel}]");
+//$this -> debug( ERROR, $agi, __FILE__, __LINE__, "[===================[ Processed Transfer...  {$this->transferername[0]}  {$this->transfererchannel}]");
 //		$onforwardcid1sql = $onforwardcid1asterisk = $agi->get_fullvariable('${ONFORWARDCIDEXT1}', $this->transfererchannel, true);
 		$onforwardcidtemp = $agi->get_fullvariable('${ONFORWARDCID1}', $this->transfererchannel, true);
-$temptemp = $agi->get_variable('ONFORWARDCID1', true);
-$this -> debug( ERROR, $agi, __FILE__, __LINE__, "[* CID1 Master_channel {$this->transfererchannel} * $onforwardcidtemp ]");
-$this -> debug( ERROR, $agi, __FILE__, __LINE__, "[* CID1 Current_channel                    * $temptemp ]");
+//$temptemp = $agi->get_variable('ONFORWARDCID1', true);
+//$this -> debug( ERROR, $agi, __FILE__, __LINE__, "[* CID1 Master_channel {$this->transfererchannel} * $onforwardcidtemp ]");
+//$this -> debug( ERROR, $agi, __FILE__, __LINE__, "[* CID1 Current_channel                    * $temptemp ]");
 		if (!$onforwardcidtemp) {
 			$onforwardcidtemp = $agi->get_variable('ONFORWARDCID1', true);
-$this -> debug( ERROR, $agi, __FILE__, __LINE__, "[===================[ Current_channel                           * ONFORWARDCID1 = $onforwardcidtemp ]");
+//$this -> debug( ERROR, $agi, __FILE__, __LINE__, "[===================[ Current_channel                           * ONFORWARDCID1 = $onforwardcidtemp ]");
 		} else {
-$this -> debug( ERROR, $agi, __FILE__, __LINE__, "[===================[ Master_channel {$this->transfererchannel} * ONFORWARDCID1 = $onforwardcidtemp ]");
+//$this -> debug( ERROR, $agi, __FILE__, __LINE__, "[===================[ Master_channel {$this->transfererchannel} * ONFORWARDCID1 = $onforwardcidtemp ]");
 		}
 		$QUERY = "SELECT regexten FROM cc_sip_buddies WHERE id_cc_card = {$this->id_card} AND name = '{$onforwardcidtemp}' LIMIT 1";
 		$result = $this -> instance_table -> SQLExec ($this->DBHandle, $QUERY);
 		if (is_array($result) && $result[0][0] != "")
 			$onforwardcid1sql = $onforwardcid1asterisk = $result[0][0];
 		else $onforwardcid1sql = $onforwardcid1asterisk = $onforwardcidtemp;
-$this -> debug( ERROR, $agi, __FILE__, __LINE__, "[===================[ CID1=$onforwardcidtemp ] [ CIDEXT1=$onforwardcid1sql ]");
+//$this -> debug( ERROR, $agi, __FILE__, __LINE__, "[===================[ CID1=$onforwardcidtemp ] [ CIDEXT1=$onforwardcid1sql ]");
 //		if ($onforwardcid1sql == "") $onforwardcid1sql = $onforwardcid1asterisk = $onforwardcidtemp;
 		if ($onforwardcidtemp == $this->transferername[0] || $onforwardcidtemp == $this->CallerID) {
 			$this->backafter = $onforwardcidtemp;
@@ -1029,21 +1029,21 @@ $this -> debug( ERROR, $agi, __FILE__, __LINE__, "[===================[ CID1=$on
 		}
 //		$onforwardcid2sql = $onforwardcid2asterisk = $agi->get_fullvariable('${ONFORWARDCIDEXT2}', $this->transfererchannel, true);
 		$onforwardcidtemp = $agi->get_fullvariable('${ONFORWARDCID2}', $this->transfererchannel, true);
-$temptemp = $agi->get_variable('ONFORWARDCID2', true);
-$this -> debug( ERROR, $agi, __FILE__, __LINE__, "[* CID2 Master_channel {$this->transfererchannel} * $onforwardcidtemp ]");
-$this -> debug( ERROR, $agi, __FILE__, __LINE__, "[* CID2 Current_channel                    * $temptemp ]");
+//$temptemp = $agi->get_variable('ONFORWARDCID2', true);
+//$this -> debug( ERROR, $agi, __FILE__, __LINE__, "[* CID2 Master_channel {$this->transfererchannel} * $onforwardcidtemp ]");
+//$this -> debug( ERROR, $agi, __FILE__, __LINE__, "[* CID2 Current_channel                    * $temptemp ]");
 		if (!$onforwardcidtemp) {
 			$onforwardcidtemp = $agi->get_variable('ONFORWARDCID2', true);
-$this -> debug( ERROR, $agi, __FILE__, __LINE__, "[===================[ Current_channel                           * ONFORWARDCID2 = $onforwardcidtemp ]");
+//$this -> debug( ERROR, $agi, __FILE__, __LINE__, "[===================[ Current_channel                           * ONFORWARDCID2 = $onforwardcidtemp ]");
 		} else {
-$this -> debug( ERROR, $agi, __FILE__, __LINE__, "[===================[ Master_channel {$this->transfererchannel} * ONFORWARDCID2 = $onforwardcidtemp ]");
+//$this -> debug( ERROR, $agi, __FILE__, __LINE__, "[===================[ Master_channel {$this->transfererchannel} * ONFORWARDCID2 = $onforwardcidtemp ]");
 		}
 		$QUERY = "SELECT regexten FROM cc_sip_buddies WHERE id_cc_card = {$this->id_card} AND name = '{$onforwardcidtemp}' LIMIT 1";
 		$result = $this -> instance_table -> SQLExec ($this->DBHandle, $QUERY);
 		if (is_array($result) && $result[0][0] != "")
 			$onforwardcid2sql = $onforwardcid2asterisk = $result[0][0];
 		else $onforwardcid2sql = $onforwardcid2asterisk = $onforwardcidtemp;
-$this -> debug( ERROR, $agi, __FILE__, __LINE__, "[===================[ CID2=$onforwardcidtemp ] [ CIDEXT2=$onforwardcid2sql ]");
+//$this -> debug( ERROR, $agi, __FILE__, __LINE__, "[===================[ CID2=$onforwardcidtemp ] [ CIDEXT2=$onforwardcid2sql ]");
 //		if ($onforwardcid2sql == "") $onforwardcid2sql = $onforwardcid2asterisk = $onforwardcidtemp;
 		if ($onforwardcidtemp == $this->transferername[0] || $onforwardcidtemp == $this->CallerID) {
 			$this->backafter = $onforwardcidtemp;
@@ -1055,8 +1055,8 @@ $this -> debug( ERROR, $agi, __FILE__, __LINE__, "[===================[ CID2=$on
 			$this->cidafter = $onforwardcidtemp;
 			$this->cidextafter = $onforwardcid2sql;
 		}
-$this -> debug( ERROR, $agi, __FILE__, __LINE__, "[==================[ A2B->cidafter ]    = ".$this->cidafter);
-$this -> debug( ERROR, $agi, __FILE__, __LINE__, "[==================[ A2B->cidextafter ] = ".$this->cidextafter);
+//$this -> debug( ERROR, $agi, __FILE__, __LINE__, "[==================[ A2B->cidafter ]    = ".$this->cidafter);
+//$this -> debug( ERROR, $agi, __FILE__, __LINE__, "[==================[ A2B->cidextafter ] = ".$this->cidextafter);
 		$this->CallerIDext = $onforwardcid1sql . "&#8660;" . $onforwardcid2sql;
 		$agi -> set_callerid('<'. $onforwardcid1asterisk . "⇔" . $onforwardcid2asterisk .'>');
 	} else {
@@ -1548,7 +1548,7 @@ for ($t=0;$t<count($result);$t++) {
 			$this->id_diller				= $inst_listdestination[32];
 			$didvoicebox				= is_null($inst_listdestination[33]) ? NULL : $inst_listdestination[33]."@".$this->username;
 			
-			if ($this -> set_inuse) $this -> callingcard_acct_start_inuse($agi,0);
+			if ($this -> set_inuse_username) $this -> callingcard_acct_start_inuse($agi,0);
 			
 			// MAKE THE AUTHENTICATION TO GET ALL VALUE : CREDIT - EXPIRATION - ...
 			if ($this -> callingcard_ivr_authenticate($agi)!=0) {
@@ -1761,7 +1761,7 @@ for ($t=0;$t<count($result);$t++) {
 **/						$answeredtime = $this -> call_fax($agi, 2);
 //$this -> debug( ERROR, $agi, __FILE__, __LINE__,"[A2Billing] DID call FAX ended: dialstatus : $dialstatus, answered time is ".$answeredtime." \n");
 //						$agi -> set_variable('FAXOPT(faxdetect)', 'no');
-						if ($this->set_inuse==1)
+						if ($this->set_inuse_username)
 							$this -> callingcard_acct_start_inuse($agi,0);
 //						break;
 					    }
@@ -1818,6 +1818,7 @@ for ($t=0;$t<count($result);$t++) {
 	
 	if (($listdestination[0][2]==0) || ($listdestination[0][2]==2)) {
 		$doibill = 1;
+//		$nosayratecost = 44;
 	} else {
 		$doibill = 0;
 	}
@@ -1856,7 +1857,7 @@ for ($t=0;$t<count($result);$t++) {
 	$accountcode = $this->accountcode;
 	$username = $this->username;
 	$useralias = $this->useralias;
-	$set_inuse = $this->set_inuse;
+	$set_inuse_username = $this->set_inuse_username;
 	$my_id_card = $this->id_card;
 	$didvoicebox = NULL;
 
@@ -2093,7 +2094,7 @@ $this -> debug( ERROR, $agi, __FILE__, __LINE__, "[* QUEUEDNID Current_channel {
 		    if ($agi -> channel_status('',true) == AST_STATE_DOWN) break;
                     // PERFORM THE CALL
                     $this->agiconfig['dialcommand_param'] = $this->agiconfig['dialcommand_param_call_2did'];
-                    $result_callperf = $RateEngine->rate_engine_performcall ($agi, $this -> destination, $this);
+                    $result_callperf = $RateEngine->rate_engine_performcall ($agi, $this -> destination, $this, 44); // 44 = For not to play announce seconds and call cost
                     if (!$result_callperf && count($listdestination) == $callcount && is_null($didvoicebox) && is_null($this->voicebox)) {
 	                    $prompt="prepaid-callfollowme";
 	                    $agi-> stream_file($prompt, '#');
@@ -2180,11 +2181,11 @@ $this -> debug( ERROR, $agi, __FILE__, __LINE__, "[STATUS] CHANNEL ($dialstatus)
 			}
 		}
 **/
-		$this->accountcode = $accountcode;
-		$this->username = $username;
-		$this->useralias = $useralias;
-		$this->set_inuse = $set_inuse;
-		$this->id_card = $my_id_card;
+		$this->accountcode		= $accountcode;
+		$this->username 		= $username;
+		$this->useralias		= $useralias;
+		$this->set_inuse_username	= $set_inuse_username;
+		$this->id_card			= $my_id_card;
     }
 
 

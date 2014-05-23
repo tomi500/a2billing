@@ -1441,6 +1441,7 @@ else echo "Ratecard: ".$this->ratecard_obj[$i][6]."<br>Trunk: ".$this->ratecard_
 			$A2B->instance_table -> SQLExec ($A2B -> DBHandle, $myclause_nodidcall, 0);
 		}
 		monitor_recognize($A2B);
+//$A2B -> debug(ERROR, $agi, __FILE__, __LINE__, "[CC_asterisk_stop 1.2: SQL: $myclause_nodidcall]");
 	}
 	
 	/*
@@ -1809,7 +1810,7 @@ $A2B -> debug( ERROR, $agi, __FILE__, __LINE__, "TRUNK=".$valu_val[2]." / ".$val
 						$A2B -> fct_say_balance ($agi, $A2B->credit);
 						$A2B -> auth_through_accountcode = false;
 					}
-					if (!isset($trunkcode) || strpos($trunkcode,"-INFOLINE") === false) {
+					if ((!isset($trunkcode) || strpos($trunkcode,"-INFOLINE") === false) && $typecall != 44) {
 						$A2B -> fct_say_time_2_call($agi, $trunktimeout, $this -> ratecard_obj[$k][12]);
 					}
 				    }
