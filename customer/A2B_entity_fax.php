@@ -80,10 +80,12 @@ getpost_ifset(array('startnumber'));
 		}
 		$exten_include = array();
 		for ($k=0;$k<count($resmax);$k++) {
-			if (is_numeric($resmax[$k][0]) && $resmax[$k][0] == $extstart)	$extstart++;
-			$exten_include[$resmax[$k][2]] = $resmax[$k][0];
-			if ($startnumber == $resmax[$k][0]) unset($startnumber);
+			if (is_numeric($resmax[$k][0])) {
+				if ($resmax[$k][0] == $extstart)	$extstart++;
+				$exten_include[$resmax[$k][2]] = $resmax[$k][0];
+				if ($startnumber == $resmax[$k][0])	unset($startnumber);
 //echo $resmax[$k][2]." = ".$exten_include[$resmax[$k][2]]."<br/>";
+			}
 		}
 	}
 // ADD VIRTUAL FAX

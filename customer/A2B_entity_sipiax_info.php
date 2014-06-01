@@ -83,9 +83,11 @@ if ($atmenu == "SIP")
 		$exten_include = array();
 		for ($k=0;$k<count($resmax);$k++) {
 			if ($resmax[$k][1] == $cardid) $extquantity--;
-			if (is_numeric($resmax[$k][0]) && $resmax[$k][0] == $extstart)	$extstart++;
-			$exten_include[$resmax[$k][2]] = $resmax[$k][0];
+			if (is_numeric($resmax[$k][0])) {
+				if ($resmax[$k][0] == $extstart)	$extstart++;
+				$exten_include[$resmax[$k][2]] = $resmax[$k][0];
 //echo $resmax[$k][2]." = ".$exten_include[$resmax[$k][2]]."<br/>";
+			}
 		}
 	}
 	if ($form_action == "addexten") {
