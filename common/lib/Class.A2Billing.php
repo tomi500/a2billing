@@ -297,7 +297,9 @@ class A2Billing {
 		//$tobuffer = 0;
 
 		if (strlen($this->log_file) > 1) {
-			$string_log = "[".date("d/m/Y H:i:s")."]:".$line_file_info."[CallerID:".$this->CallerID."]:[CN:".$this->cardnumber."]:[$output]\n";
+			if (is_array($output))
+				$output = 'Array';
+			$string_log = "[".date("d/m/Y H:i:s")."]:".$line_file_info."[CallerID:".$this->CallerID."]:[CN:".$this->cardnumber."]:[".$output."]\n";
 			if ($this->CC_TESTING) echo $string_log;
 
 			$this -> BUFFER .= $string_log;
@@ -1654,15 +1656,16 @@ for ($t=0;$t<count($result);$t++) {
 						$bridgepeer = $agi -> get_variable('BRIDGEPEER',true);
 //$this -> debug( ERROR, $agi, __FILE__, __LINE__, "[* BRIDGEPEER                {$bridgepeer} ]");
 
-						preg_match("/([^\/]+)(?=-[^-]*$)/",$bridgepeer,$bridgepeer);
+						if (preg_match("/([^\/]+)(?=-[^-]*$)/",$bridgepeer,$bridgepeer)) {
 
 //$this -> debug( ERROR, $agi, __FILE__, __LINE__, "[* PEER                      {$bridgepeer[0]} ]");
 
-						$QUERY = "SELECT regexten FROM cc_sip_buddies WHERE name = '{$bridgepeer[0]}' LIMIT 1";
-						$result = $this -> instance_table -> SQLExec ($this->DBHandle, $QUERY);
-						if (is_array($result) && $result[0][0] != "")	$uppeer = $bridgepeer[0];
-						else	$uppeer = $agi->get_variable('QUEUEDNID', true);
-						if ($uppeer) $inst_listdestination[4] = $uppeer;
+							$QUERY = "SELECT regexten FROM cc_sip_buddies WHERE name = '{$bridgepeer[0]}' LIMIT 1";
+							$result = $this -> instance_table -> SQLExec ($this->DBHandle, $QUERY);
+							if (is_array($result) && $result[0][0] != "")	$uppeer = $bridgepeer[0];
+							else	$uppeer = $agi->get_variable('QUEUEDNID', true);
+							if ($uppeer) $inst_listdestination[4] = $uppeer;
+						}
 		
 //$temptempqueuednid = $agi -> get_variable('MASTER_CHANNEL(QUEUEDNID)',true);
 //$this -> debug( ERROR, $agi, __FILE__, __LINE__, "[* QUEUEDNID Master_channel  {$temptempqueuednid} ]");

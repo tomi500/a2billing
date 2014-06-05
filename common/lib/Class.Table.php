@@ -287,7 +287,7 @@ class Table {
 
 		$QUERY = $sql.$sql_clause;
 		
-		if (preg_replace("/[ ]+group[ ]+by[ ]+/i",$sql_clause)) $QUERY="SELECT count(*) FROM (".$QUERY.") as tmp";
+		if (preg_match("/[ ]+group[ ]+by[ ]+/i",$sql_clause)) $QUERY="SELECT count(*) FROM (".$QUERY.") as tmp";
 		
 		$res = $this -> ExecuteQuery ($DBHandle, $QUERY, $cache);
 		if (!$res) return false;

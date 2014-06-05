@@ -495,10 +495,7 @@ CREATE TABLE IF NOT EXISTS `cc_trunk_credit` (
   PRIMARY KEY (`trunk_id`)
 ) ENGINE=MyISAM DEFAULT CHARSET=utf8 COLLATE=utf8_bin;
 
-DROP TABLE IF EXISTS `cc_callplan_lcr`;
-DROP VIEW `cc_callplan_lcr`;
-
-CREATE ALGORITHM=UNDEFINED DEFINER=`root`@`localhost` SQL SECURITY DEFINER VIEW `cc_callplan_lcr` AS SELECT
+CREATE OR REPLACE ALGORITHM=UNDEFINED DEFINER=`root`@`localhost` SQL SECURITY DEFINER VIEW `cc_callplan_lcr` AS SELECT
 `cc_ratecard`.`id` AS `id`,
 `cc_prefix`.`destination` AS `destination`,
 `cc_ratecard`.`dialprefix` AS `dialprefix`,

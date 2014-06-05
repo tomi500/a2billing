@@ -1116,11 +1116,13 @@ else echo "Ratecard: ".$this->ratecard_obj[$i][6]."<br>Trunk: ".$this->ratecard_
 		$K = $this->usedratecard;
 		
 		// ****************  PACKAGE PARAMETERS ****************
-		if (count($this -> ratecard_obj)>0) {
+		if ($K>=0 && count($this -> ratecard_obj)>0) {
 			$id_cc_package_offer   = $this -> ratecard_obj[$K][38];
 			$additional_grace_time = $this -> ratecard_obj[$K][47];
-		} else $id_cc_package_offer = 'NONE';
-		
+		} else {
+			$id_cc_package_offer = 'NONE';
+			$additional_grace_time = 0;
+		}
 		$id_card_package_offer = null;
 		
 		if ($A2B -> CC_TESTING) {
@@ -1131,7 +1133,7 @@ else echo "Ratecard: ".$this->ratecard_obj[$i][6]."<br>Trunk: ".$this->ratecard_
 			$dialstatus = $this -> dialstatus;
 		}
 
-		$A2B -> debug( INFO, $agi, __FILE__, __LINE__, ":[sessiontime:$sessiontime - id_cc_package_offer:$id_cc_package_offer - package2apply:".$this ->package_to_apply[$K]."]\n\n");
+		if ($K>=0) $A2B -> debug( INFO, $agi, __FILE__, __LINE__, ":[sessiontime:$sessiontime - id_cc_package_offer:$id_cc_package_offer - package2apply:".$this ->package_to_apply[$K]."]\n\n");
 		
 //$temptempqueuednid = $agi -> get_variable('CHANNEL(peeraccount)',true);
 //$A2B -> debug( ERROR, $agi, __FILE__, __LINE__, "[* CHANNEL (peeraccount)     {$temptempqueuednid}");
@@ -1158,14 +1160,15 @@ else echo "Ratecard: ".$this->ratecard_obj[$i][6]."<br>Trunk: ".$this->ratecard_
 				$bridgepeer = $agi -> get_variable('BRIDGEPEER',true);
 //$A2B -> debug( ERROR, $agi, __FILE__, __LINE__, "[* BRIDGEPEER                {$bridgepeer}");
 			
-				preg_match("/([^\/]+)(?=-[^-]*$)/",$bridgepeer,$bridgepeer);
+				if (preg_match("/([^\/]+)(?=-[^-]*$)/",$bridgepeer,$bridgepeer)) {
 //$A2B -> debug( ERROR, $agi, __FILE__, __LINE__, "[* PEER                      {$bridgepeer[0]}");
-				$QUERY = "SELECT regexten FROM cc_sip_buddies WHERE name = '{$bridgepeer[0]}' LIMIT 1";
-				$result = $A2B -> instance_table -> SQLExec ($A2B->DBHandle, $QUERY);
-				if (is_array($result) && $result[0][0] != "")	$calledstation = $bridgepeer[0];
-//				if (is_array($result) && $result[0][0] != "")	$uppeer = $bridgepeer[0];
-//				else	$uppeer = $agi->get_variable('QUEUEDNID', true);
-//				if ($uppeer) $calledstation = $uppeer;
+					$QUERY = "SELECT regexten FROM cc_sip_buddies WHERE name = '{$bridgepeer[0]}' LIMIT 1";
+					$result = $A2B -> instance_table -> SQLExec ($A2B->DBHandle, $QUERY);
+					if (is_array($result) && $result[0][0] != "")	$calledstation = $bridgepeer[0];
+//						if (is_array($result) && $result[0][0] != "")	$uppeer = $bridgepeer[0];
+//						else	$uppeer = $agi->get_variable('QUEUEDNID', true);
+//						if ($uppeer) $calledstation = $uppeer;
+				}
 			}
 //$A2B -> debug( ERROR, $agi, __FILE__, __LINE__, "======== DESTINATION =       ".$calledstation);
 
@@ -1222,13 +1225,13 @@ else echo "Ratecard: ".$this->ratecard_obj[$i][6]."<br>Trunk: ".$this->ratecard_
 		} else {
 			$sessiontime = 0;
 		}
-		if (count($this -> ratecard_obj)>0) {
+		if ($K>=0 && count($this -> ratecard_obj)>0) {
 			$calldestination = $this -> ratecard_obj[$K][5];
 			$id_tariffgroup  = $this -> ratecard_obj[$K][2];
 			$id_tariffplan	 = $this -> ratecard_obj[$K][3];
 			$id_ratecard	 = $this -> ratecard_obj[$K][6];
-			$buyrateapply	 = $this -> ratecard_obj[$K][9];
-			$rateapply	 = $this -> ratecard_obj[$K][12];
+//			$buyrateapply	 = $this -> ratecard_obj[$K][9];
+//			$rateapply	 = $this -> ratecard_obj[$K][12];
 			$trunkcode	 = $this -> ratecard_obj[$K][70];
 		}
 		$buycost = 0;
@@ -1250,7 +1253,7 @@ else echo "Ratecard: ".$this->ratecard_obj[$i][6]."<br>Trunk: ".$this->ratecard_
 
 		$A2B -> debug( DEBUG, $agi, __FILE__, __LINE__, "[CC_RATE_ENGINE_UPDATESYSTEM: usedratecard K=$K - (sessiontime=$sessiontime :: dialstatus=$dialstatus :: buycost=$buycost :: cost=$cost : signe_cc_call=$signe_cc_call: signe=$signe)]");
 
-		if (strlen($this -> dialstatus_rev_list[$dialstatus]) > 0) {
+		if ($dialstatus && strlen($this -> dialstatus_rev_list[$dialstatus]) > 0) {
 			$terminatecauseid = $this -> dialstatus_rev_list[$dialstatus];
         } else {
 			$terminatecauseid = 0;
@@ -1594,19 +1597,21 @@ else echo "Ratecard: ".$this->ratecard_obj[$i][6]."<br>Trunk: ".$this->ratecard_
 					    $prefixclausec = preg_replace('/dialprefixa/','cn.dialprefixa',$prefixclausemain);
 					    $prefixclaused = preg_replace('/dialprefixa/','cn.dialprefixb',$prefixclausemain);
 					    $QUERY =
-						"SELECT	IF(cn.status,-1,IFNULL( IF(an.maxsecperperioda<0,IF(an.periodexpirya>NOW(),-an.periodcounta-2,-2),an.maxsecperperioda-(an.periodcounta*(an.periodexpirya>NOW()))),
-										IF(bn.maxsecperperiodb<0,IF(bn.periodexpiryb>NOW(),-bn.periodcountb-2,-2),bn.maxsecperperiodb-(bn.periodcountb*(bn.periodexpiryb>NOW()))))) AS duration,
-							trunkpercentage,
-							trunk_depend$td,
-							COUNT(calledstation) AS offen
-						FROM cc_trunk_rand
-						LEFT JOIN cc_trunk AS an ON an.id_trunk=trunk_depend$td AND ($prefixclausea) AND an.startdatea<=NOW() AND an.stopdatea>NOW() AND (((an.maxsecperperioda-an.periodcounta>=an.timelefta OR an.maxsecperperioda<0) AND an.periodexpirya>NOW()) OR an.perioda>0) AND (an.maxuse>an.inuse OR an.maxuse<0) AND an.status=1
-						LEFT JOIN cc_trunk AS bn ON bn.id_trunk=trunk_depend$td AND ($prefixclauseb) AND bn.startdateb<=NOW() AND bn.stopdateb>NOW() AND (((bn.maxsecperperiodb-bn.periodcountb>=bn.timeleftb OR bn.maxsecperperiodb<0) AND bn.periodexpiryb>NOW()) OR bn.periodb>0) AND (bn.maxuse>bn.inuse OR bn.maxuse<0) AND bn.status=1 AND NOT ($prefixclause)
-						LEFT JOIN cc_trunk AS cn ON cn.id_trunk=trunk_depend$td AND cn.status=1 AND (cn.maxuse>cn.inuse OR cn.maxuse<0) AND NOT (($prefixclausec) OR ($prefixclaused))
-						LEFT JOIN cc_call ON calledstation LIKE '$A2B->destination' AND cc_call.id_trunk=trunk_depend$td AND (starttime > DATE_SUB(NOW(), INTERVAL an.attract DAY) OR starttime > DATE_SUB(NOW(), INTERVAL bn.attract DAY))
-						WHERE trunk_id=$this->usedtrunk AND trunk_depend$td<>0
-						GROUP BY trunk_depend$td
-						ORDER BY IF(duration AND trunkpercentage>0,trunkpercentage,32768), IF(duration IS NULL, 1, 0), offen DESC, duration DESC";
+						"SELECT IF(cn.status, -1,IFNULL( IF(an.maxsecperperioda<0,IF(an.periodexpirya>NOW(),-an.periodcounta-2,-2),an.maxsecperperioda-(an.periodcounta*(an.periodexpirya>NOW()))),
+".										"IF(bn.maxsecperperiodb<0,IF(bn.periodexpiryb>NOW(),-bn.periodcountb-2,-2),bn.maxsecperperiodb-(bn.periodcountb*(bn.periodexpiryb>NOW()))))) AS duration,
+".							"trunkpercentage,
+".							"trunk_depend$td,
+".							"COUNT(od.calledstation) AS offen
+".						"FROM cc_trunk_rand
+".						"LEFT JOIN cc_trunk AS an ON an.id_trunk=trunk_depend$td AND ($prefixclausea) AND an.startdatea<=NOW() AND an.stopdatea>NOW() AND (((an.maxsecperperioda-an.periodcounta>=an.timelefta OR an.maxsecperperioda<0) AND an.periodexpirya>NOW()) OR an.perioda>0) AND (an.maxuse>an.inuse OR an.maxuse<0) AND an.status=1
+".						"LEFT JOIN cc_trunk AS bn ON bn.id_trunk=trunk_depend$td AND ($prefixclauseb) AND bn.startdateb<=NOW() AND bn.stopdateb>NOW() AND (((bn.maxsecperperiodb-bn.periodcountb>=bn.timeleftb OR bn.maxsecperperiodb<0) AND bn.periodexpiryb>NOW()) OR bn.periodb>0) AND (bn.maxuse>bn.inuse OR bn.maxuse<0) AND bn.status=1 AND NOT ($prefixclause)
+".						"LEFT JOIN cc_trunk AS cn ON cn.id_trunk=trunk_depend$td AND cn.status=1 AND (cn.maxuse>cn.inuse OR cn.maxuse<0) AND NOT (($prefixclausec) OR ($prefixclaused))
+".						"LEFT JOIN (SELECT calledstation, starttime, id_trunk FROM cc_call WHERE calledstation LIKE '$A2B->destination') AS od ON (od.starttime > DATE_SUB(NOW(), INTERVAL an.attract DAY) OR od.starttime > DATE_SUB(NOW(), INTERVAL bn.attract DAY)) AND od.id_trunk=trunk_depend$td
+".						"WHERE trunk_id=$this->usedtrunk AND trunk_depend$td<>0
+".						"GROUP BY trunk_depend$td
+".						"ORDER BY IF(duration AND trunkpercentage>0,trunkpercentage,32768), IF(duration IS NULL, 1, 0), offen DESC, duration DESC";
+//".						"LEFT JOIN cc_call ON calledstation LIKE '$A2B->destination' AND cc_call.id_trunk=trunk_depend$td AND (starttime > DATE_SUB(NOW(), INTERVAL an.attract DAY) OR starttime > DATE_SUB(NOW(), INTERVAL bn.attract DAY))
+//if ($agi) $A2B -> debug(ERROR, $agi, __FILE__, __LINE__, "[$QUERY]");
 					    $resultrand = $A2B->instance_table -> SQLExec ($A2B -> DBHandle, $QUERY);
 					} else $resultrand = $intellecttrunks;
 					if (is_array($resultrand) && count($resultrand)>0) {
@@ -1616,7 +1621,7 @@ else echo "Ratecard: ".$this->ratecard_obj[$i][6]."<br>Trunk: ".$this->ratecard_
 						$sum_percent = 0;
 						$count_minus = 0;
 						foreach ($resultrand as $valu_key => $valu_val) {
-$A2B -> debug( ERROR, $agi, __FILE__, __LINE__, "TRUNK=".$valu_val[2]." / ".$valu_val[3]." times / ".$valu_val[0]." secs free");
+if ($agi) $A2B -> debug( ERROR, $agi, __FILE__, __LINE__, "TRUNK=".$valu_val[2]." / ".$valu_val[3]." times / ".$valu_val[0]." secs free");
 							if (is_numeric($valu_val[0]) && $valu_val[1]>0) $resultrand[$valu_key][1] = $sum_percent += $valu_val[1];
 							else $resultrand[$valu_key][1] = 0;
 							if (!is_numeric($valu_val[0])) $count_minus++;
@@ -1742,7 +1747,7 @@ $A2B -> debug( ERROR, $agi, __FILE__, __LINE__, "TRUNK=".$valu_val[2]." / ".$val
 				elseif ($A2B->agiconfig['switchdialcommand'] == 1) $channel = "$tech/$prefix$destination@$ipaddress";
 					else $channel = "$tech/$ipaddress/$prefix$destination";
 
-//$A2B -> debug( ERROR, $agi, __FILE__, __LINE__, "[CID_handover: ={$CID_handover}]");
+//if ($agi) $A2B -> debug( ERROR, $agi, __FILE__, __LINE__, "[CID_handover: ={$CID_handover}]");
 				$A2B->instance_table = new Table();
 				$QUERY = "SELECT countryprefix FROM cc_country WHERE '{$A2B->destination}' LIKE concat(countryprefix,'%') ORDER BY countryprefix DESC LIMIT 1";
 				$result = $A2B->instance_table -> SQLExec ($A2B -> DBHandle, $QUERY);
@@ -1870,7 +1875,7 @@ $A2B -> debug( ERROR, $agi, __FILE__, __LINE__, "TRUNK=".$valu_val[2]." / ".$val
 				    $A2B -> DbReConnect($agi);
 
 				    $this -> dialstatus = $agi -> get_variable("DIALSTATUS",true);
-//$A2B -> debug( ERROR, $agi, __FILE__, __LINE__, " [===================                           DIALSTATUS: $this->dialstatus ]");
+//if ($agi) $A2B -> debug( ERROR, $agi, __FILE__, __LINE__, " [===================                           DIALSTATUS: $this->dialstatus ]");
 
 				} elseif (is_array($amicmd)) {
 				    write_log(LOGFILE_API_CALLBACK, basename(__FILE__) . ' line:' . __LINE__ . " ActionID = {$amicmd[5]} [#### Starting AMI ORIGINATE ####] $channel");
