@@ -779,7 +779,7 @@ class A2Billing {
 		$this -> CallerID = $this -> src_exten	= $agi -> request['agi_callerid'];
 		if (!is_numeric($this -> src_exten) || strlen($this -> src_exten) > 4)
 			$this -> src_exten		= 'NULL';
-		$this -> src_peername 			= array_search($agi -> request['agi_type'], array('Dongle','Dahdi')) === false ? $agi -> get_variable("CHANNEL(peername)",true) : '';
+		$this -> src_peername 			= array_search($agi -> request['agi_type'], array('Dongle','Dahdi','Local')) === false ? $agi -> get_variable("CHANNEL(peername)",true) : '';
 		if (!is_numeric($this -> src_peername))
 			$this -> src_peername		= 'NULL';
 		$this -> channel			= $agi -> request['agi_channel'];

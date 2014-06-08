@@ -261,41 +261,29 @@ if ($mode == 'auto') {
 	    if ($A2B->config["database"]['dbtype'] != "postgres") $QUERY .= " OR expirationdate = '0000-00-00 00:00:00'";
 	    $QUERY .= ") AND cc_country.id=id_cc_country LIMIT 1";
 	    $result = $A2B -> instance_table -> SQLExec ($A2B->DBHandle, $QUERY);
-//$A2B -> debug( ERROR, $agi, __FILE__, __LINE__, $QUERY);
 	    if (is_array($result)) {
-/**
-$A2B -> debug( ERROR, $agi, __FILE__, __LINE__, "areaprefix=".$result[0][0]);
-$A2B -> debug( ERROR, $agi, __FILE__, __LINE__, "citylength=".$result[0][1]);
-$A2B -> debug( ERROR, $agi, __FILE__, __LINE__, "countryprefix=".$result[0][2]);
-$A2B -> debug( ERROR, $agi, __FILE__, __LINE__, "cc_did.id=".$result[0][3]);
-**/
 		$didyes = true;
 		$A2B -> CID_handover = $A2B->CallerID = $A2B->did_apply_add_countryprefixfrom($result[0], $A2B->CallerID);
 		if ($A2B->CallerID != $agi -> request['agi_callerid'])
 			$agi -> set_callerid($A2B -> CallerID);
 		$QUERY = "SELECT 1 FROM cc_did, cc_callerid WHERE cc_did.id = {$result[0][3]} AND cid LIKE '$A2B->CallerID' AND cc_callerid.activated = 't' AND ((id_cc_card = iduser AND allciduse <> 3) OR iduser = 0 OR allciduse = 1) LIMIT 1";
-//$A2B -> debug( ERROR, $agi, __FILE__, __LINE__, $QUERY);
 		$result = $A2B -> instance_table -> SQLExec ($A2B->DBHandle, $QUERY);
 		if (is_array($result)) {
-//$A2B -> debug( ERROR, $agi, __FILE__, __LINE__, "RESULT OK");
 			$didyes = false;
 		}
 	    }
 	    if ($didyes) {
 		if ($caller_areacode == 'recalldidless') break;
 		$QUERY="SELECT IF(src=src_exten,src_peername,src) src, cc_card.username, cc_card.recalltime, continuewithdid FROM cc_card
-			INNER JOIN cc_call ON starttime > DATE_SUB( NOW( ) , INTERVAL recalldays DAY ) AND card_id = cc_card.id
-			INNER JOIN cc_did ON cc_did.id_trunk = cc_call.id_trunk
-			WHERE did LIKE '$mydnid' AND ('$A2B->CallerID' LIKE CONCAT('%',SUBSTRING(calledstation,2)) OR calledstation LIKE '%$A2B->CallerID')
-				AND LENGTH(calledstation) > 6 AND LENGTH(TRIM(LEADING '+' FROM '$A2B->CallerID'))-LENGTH(calledstation) < 3 ORDER BY cc_call.id DESC LIMIT 1";
+".			"INNER JOIN cc_call ON starttime > DATE_SUB(NOW(), INTERVAL recalldays DAY) AND card_id = cc_card.id
+".			"INNER JOIN cc_did ON cc_did.id_trunk = cc_call.id_trunk
+".			"WHERE did LIKE '$mydnid' AND calledstation LIKE '$A2B->CallerID' AND LENGTH(calledstation) > 6 ORDER BY cc_call.id DESC LIMIT 1";
 		$result = $A2B -> instance_table -> SQLExec ($A2B->DBHandle, $QUERY);
-
 		if (is_array($result)) {
 			$RateEngine->Reinit();
 			$A2B -> agiconfig['answer_call'] = 0;
 			$A2B -> agiconfig['play_audio'] = 0;
 			$A2B -> agiconfig['use_dnid'] = 1;
-//			$A2B -> destination = $A2B -> dnid = $A2B -> extension = preg_replace('/\+/','',$result[0][0]);
 			$A2B -> destination = $A2B -> extension = preg_replace('/\+/','',$result[0][0]);
 			$accountback = $result[0][1];
 			$A2B -> recalltime = $result[0][2];

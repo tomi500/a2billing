@@ -412,24 +412,19 @@ class FormBO {
 		}
 	}
 	
-	static public function processing_card_signup()
+	static public function processing_card_signup($id_diller = 0)
 	{
 		$FormHandler = FormHandler::GetInstance();
 		$processed = $FormHandler->getProcessed();
 		$diller = $processed['id_diller'];
-		$margin = $processed['margin'] / 100 + 1;
-		$table_card = new Table('cc_card','id, margintotal');
-		$card_clause = "username = ".$diller;
+		$table_card = new Table('cc_card','id');
+		$card_clause = "username = '{$diller}'";
 		$card_result = $table_card -> Get_list($FormHandler->DBHandle, $card_clause, 0);
 		if (is_array($card_result) && count($card_result)>0) {
 			$id_diller = $card_result[0][0];
-			$margintotal = $margin * $card_result[0][1];
-		} else {
-			$id_diller = 0;
-			$margintotal = $margin;
 		}
-		$param_update_card = "id_diller = '$id_diller', margintotal = '$margintotal'";
-		$clause_update_card = "id_diller = '$diller' ORDER BY id DESC LIMIT 1";
+		$param_update_card = "id_diller = ".$id_diller;
+		$clause_update_card = "id_diller = '{$diller}' ORDER BY id DESC LIMIT 1";
 		sleep(3);
 		$table_card -> Update_table ($FormHandler->DBHandle, $param_update_card, $clause_update_card, 'LOW_PRIORITY cc_card');
 
