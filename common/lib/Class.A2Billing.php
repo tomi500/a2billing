@@ -968,18 +968,18 @@ class A2Billing {
 		$this -> CID_handover	= '';
 	}
 //$this -> debug( ERROR, $agi, __FILE__, __LINE__, "[=======================================[ this->src_exten ={$this->src_exten} ]");
+//$this -> debug( ERROR, $agi, __FILE__, __LINE__, "[=======================================[ this->destination ={$this->destination} ]");
 
 	$this->extext = true;
 	if ($this->destination) {
 		$QUERY = "SELECT name, regexten, accountcode FROM cc_sip_buddies
 				LEFT JOIN cc_card_concat bb ON id_cc_card = bb.concat_card_id
 				LEFT JOIN ( SELECT aa.concat_id FROM cc_card_concat aa WHERE aa.concat_card_id = {$this->id_card} ) AS v ON v.concat_id = bb.concat_id
-				WHERE (id_cc_card = {$this->id_card} OR v.concat_id IS NOT NULL) AND (regexten = '{$this->destination}' OR name = '{$this->destination}') LIMIT 1";
+				WHERE (id_cc_card = {$this->id_card} OR v.concat_id IS NOT NULL) AND (regexten = '{$this->destination}' OR (name = '{$this->destination}' AND regexten IS NOT NULL)) LIMIT 1";
 //				WHERE name = '{$this->destination}' OR ((id_cc_card = {$this->id_card} OR v.concat_id IS NOT NULL) AND regexten = '{$this->destination}') LIMIT 1";
-//$this -> debug( ERROR, $agi, __FILE__, __LINE__, "[SQL]:
-//				".$QUERY);
+//$this -> debug( ERROR, $agi, __FILE__, __LINE__, "[SQL]:\n".$QUERY);
 //$this -> debug( ERROR, $agi, __FILE__, __LINE__, "[SQL Result:]...");
-//$this -> debug( ERROR, $agi, __FILE__, __LINE__, "[SQL Result:] $result[0][1]");
+//$this -> debug( ERROR, $agi, __FILE__, __LINE__, "[SQL Result:] name=".$result[0][0].", regexten=".$result[0][1]);
 		$result = $this -> instance_table -> SQLExec ($this->DBHandle, $QUERY);
 		if (is_array($result)) {
 			$this->destination = $result[0][0];
@@ -1609,6 +1609,11 @@ for ($t=0;$t<count($result);$t++) {
 					if ($this->monitor == 1 || $this->agiconfig['record_call'] == 1) {
 						$myres = $agi->exec($this -> format_parameters ("StopMixMonitor"));
 						$this -> debug( INFO, $agi, __FILE__, __LINE__, "EXEC StopMixMonitor (".$this->uniqueid.")");
+						$monfile = $this->dl_short ."{$this->uniqueid}.";
+						$monfile.= $this->agiconfig['monitor_formatfile'] == 'wav49' ? 'WAV' : $this->agiconfig['monitor_formatfile'];
+						if (filesize($monfile) == 60) {
+							unlink($monfile);
+						}
 					}
 
 					$this -> debug( INFO, $agi, __FILE__, __LINE__, "[".$inst_listdestination[4]." Friend][followme=$callcount]:[ANSWEREDTIME=".$answeredtime."-DIALSTATUS=".$dialstatus."]");
@@ -1941,8 +1946,13 @@ for ($t=0;$t<count($result);$t++) {
 		} else		$dialstatus	= $agi->get_variable("DIALSTATUS", true);
 
 		if ($this->monitor == 1 || $this -> agiconfig['record_call'] == 1) {
-                    $myres = $agi->exec($this -> format_parameters ("StopMixMonitor"));
-                    $this -> debug( INFO, $agi, __FILE__, __LINE__, "EXEC StopMixMonitor (".$this->uniqueid.")");
+			$myres = $agi->exec($this -> format_parameters ("StopMixMonitor"));
+			$this -> debug( INFO, $agi, __FILE__, __LINE__, "EXEC StopMixMonitor (".$this->uniqueid.")");
+			$monfile = $this->dl_short ."{$this->uniqueid}.";
+			$monfile.= $this->agiconfig['monitor_formatfile'] == 'wav49' ? 'WAV' : $this->agiconfig['monitor_formatfile'];
+			if (filesize($monfile) == 60) {
+				unlink($monfile);
+			}
                 }
 
                 $this -> debug( INFO, $agi, __FILE__, __LINE__, "[".$inst_listdestination[4]." Friend][followme=$callcount]:[ANSWEREDTIME=".$answeredtime."-DIALSTATUS=".$dialstatus."]");
@@ -2208,7 +2218,7 @@ $this -> debug( ERROR, $agi, __FILE__, __LINE__, "[STATUS] CHANNEL ($dialstatus)
 		if ($this->localstationid)  $agi->set_variable('LOCALSTATIONID',$this->localstationid);
 		$myres = $agi->exec('ReceiveFAX', $tempfaxfile);
 
-		$answeredtime	= $agi->get_variable("CDR(billsec)", true);
+		$answeredtime	= ceil (microtime(TRUE) - $uniqueid);
 //		$faxstatus	= ($agi->get_variable("FAXSTATUS", true) == 'FAILED')?0:1;
 		$remotefaxid	= $agi->get_variable("REMOTESTATIONID", true);
 		$faxpages	= $agi->get_variable("FAXPAGES", true);

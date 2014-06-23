@@ -415,11 +415,6 @@ if ($mode == 'standard') {
 				break;
 			}
 
-			// CREATE A DIFFERENT UNIQUEID FOR EACH TRY
-			if ($i>0) {
-				$A2B-> uniqueid = $A2B-> uniqueid + 1000000000;
-			}
-
             if ($A2B -> agiconfig['ivr_enable_locking_option'] == 1) {
                 $QUERY = "SELECT block, lock_pin FROM cc_card WHERE username = '{$A2B->username}'";
                 $A2B -> debug( DEBUG, $agi, __FILE__, __LINE__, "[QUERY] : " . $QUERY );
@@ -794,6 +789,14 @@ if ($mode == 'standard') {
 				$ans = $A2B-> callingcard_ivr_authorize($agi, $RateEngine, $i,true);
 				$A2B -> debug( DEBUG, $agi, __FILE__, __LINE__, 'ANSWER fct callingcard_ivr authorize:> '.$ans);
 				
+				// CREATE A PERSONAL UNIQUEID FOR EACH TRY
+//$A2B -> debug( FATAL, $agi, __FILE__, __LINE__, $A2B -> uniqueid);
+				$newuniqueid = explode('.',$A2B -> uniqueid);
+				if ($newuniqueid[0] == time() && $i)		sleep(1);
+				$newuniqueid[0] = time();
+				$A2B -> uniqueid = implode('.',$newuniqueid);
+//$A2B -> debug( FATAL, $agi, __FILE__, __LINE__, $A2B -> uniqueid);
+
 				if ($ans=="2FAX") {
 //					$transferername = $agi->get_variable("TRANSFERERNAME", true);
 //					if ($transferername == "") $transferername = $agi->get_variable("BLINDTRANSFER", true);
@@ -871,7 +874,12 @@ if ($mode == 'standard') {
 						$A2B-> fct_say_balance ($agi, $A2B-> credit);
 					}
 					$A2B -> debug( DEBUG, $agi, __FILE__, __LINE__, '[a2billing account stop]');
-
+					if (!$A2B->dtmf_destination) {
+//$A2B -> debug( FATAL, $agi, __FILE__, __LINE__, "[NOT RESTART DIAL]");
+						$A2B -> agiconfig['use_dnid']=0;
+						break;
+					}
+//$A2B -> debug( FATAL, $agi, __FILE__, __LINE__, "[RESTART DIAL]");
 				} elseif ($ans=="2DID") {
 					$A2B -> debug( INFO, $agi, __FILE__, __LINE__, "[ CALL OF THE SYSTEM - [DID=".$A2B-> destination."]");
 					$QUERY = "SELECT cc_did.id, cc_did_destination.id, billingtype, tariff, destination, voip_call, username, useralias, connection_charge, selling_rate, did, ".
@@ -1324,6 +1332,11 @@ if ($mode == 'standard') {
 // MODE CALLBACK
 } elseif ($mode == 'callback') {
 
+	$callbackuniqueid = $A2B->uniqueid;
+	$newuniqueid = explode('.',$A2B->uniqueid);
+	$newuniqueid[0] = time();
+	$A2B->uniqueid = implode('.',$newuniqueid);
+	
 	$callback_been_connected = 0;
 	
 	$A2B -> debug( DEBUG, $agi, __FILE__, __LINE__, '[CALLBACK]:[MODE : CALLBACK]');
@@ -1457,7 +1470,13 @@ if ($mode == 'standard') {
 			if ($calling_party == '') {
 				$agi -> set_variable('CALLERID(name)', ($A2B -> config['callback']['callerid'] != '') ? $A2B -> config['callback']['callerid'] : $calling_num);
 			}
-			
+			// CREATE A PERSONAL UNIQUEID FOR EACH TRY
+			if ($i>0) {
+				$newuniqueid = explode('.',$A2B -> uniqueid);
+				if ($newuniqueid[0] == time())		sleep(1);
+				$newuniqueid[0] = time();
+				$A2B -> uniqueid = implode('.',$newuniqueid);
+			}
 			if ($ans=="2FAX") {
 				$A2B -> debug( INFO, $agi, __FILE__, __LINE__, "[ CALL OF THE SYSTEM - [FAX=".$A2B-> destination."]");
 				$A2B -> call_fax($agi);
@@ -1504,7 +1523,9 @@ if ($mode == 'standard') {
 				if ($RateEngine->dialstatus == "ANSWER") {
 					$callback_been_connected = 1;
 				}
-				
+				if (!$A2B->dtmf_destination) {
+					break;
+				}
 				$A2B -> debug( DEBUG, $agi, __FILE__, __LINE__, "[CALLBACK]:[a2billing end loop num_try] RateEngine->usedratecard=".$RateEngine->usedratecard);
 			} elseif ($ans=="2DID") {
 
@@ -1882,7 +1903,8 @@ if ($mode == 'standard') {
 
 // CHECK IF WE HAVE TO CHARGE CALLBACK
 if ($charge_callback) {
-	
+
+	$A2B->uniqueid = $callbackuniqueid;
 	$callback_username = $callback_leg;
 	$A2B -> accountcode = $callback_username;
 	$A2B -> agiconfig['say_balance_after_auth'] = 0;

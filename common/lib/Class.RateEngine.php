@@ -172,7 +172,7 @@ class RateEngine
 		cc_trunk.providerip,
 		cc_trunk.removeprefix,
 		musiconhold,
-		cc_trunk.failover_trunk,
+		IF(cc_trunk.dialprefixmain='',cc_trunk.failover_trunk,'-1'),
 		cc_trunk.addparameter,
 		id_outbound_cidgroup,
 		id_cc_package_offer,
@@ -1472,13 +1472,14 @@ else echo "Ratecard: ".$this->ratecard_obj[$i][6]."<br>Trunk: ".$this->ratecard_
 
 		$max_long = 36000000; //Maximum 10 hours
 		$old_destination = $destination;
+		$firstgo = true;
 
 		if ($agi) $A2B -> debug( INFO, $agi, __FILE__, __LINE__, "Count of ratecard_obj = ".count($this -> ratecard_obj));
 		for ($k=0;$k<count($this -> ratecard_obj);$k++) {
 			$loop_failover = 0;
 			$destination = $old_destination;
 			$firstrand = false;
-			$intellect_count = -1;
+			$intellect_count = $trunkrand = -1;
 			$status = 1;
 			$outcid = 0;
 			//$this->answeredtime='60';
@@ -1520,7 +1521,7 @@ else echo "Ratecard: ".$this->ratecard_obj[$i][6]."<br>Trunk: ".$this->ratecard_
 					$CID_handover	= $A2B -> CID_handover;
 				} else {
 				    $this -> usedtrunk = $failover_trunk;
-				    $QUERY = "SELECT trunkprefix, providertech, providerip, removeprefix, failover_trunk, status, inuse, IF(wrapnexttime>NOW() AND lastdial NOT LIKE '$A2B->destination',0,maxuse), if_max_use, outbound_cidgroup_id, addparameter, cid_handover, wrapuptime FROM cc_trunk WHERE id_trunk='$this->usedtrunk' LIMIT 1";
+				    $QUERY = "SELECT trunkprefix, providertech, providerip, removeprefix, IF(dialprefixmain='',failover_trunk,'-1'), status, inuse, IF(wrapnexttime>NOW() AND lastdial NOT LIKE '$A2B->destination',0,maxuse), if_max_use, outbound_cidgroup_id, addparameter, cid_handover, wrapuptime FROM cc_trunk WHERE id_trunk='$this->usedtrunk' LIMIT 1";
 				    $A2B->instance_table = new Table();
 				    $result = $A2B->instance_table -> SQLExec ($A2B -> DBHandle, $QUERY);
 
@@ -1554,17 +1555,18 @@ else echo "Ratecard: ".$this->ratecard_obj[$i][6]."<br>Trunk: ".$this->ratecard_
 					}
 				}
 
+//if ($agi) $A2B -> debug( ERROR, $agi, __FILE__, __LINE__, "this -> usedtrunk = ".$this -> usedtrunk);
 				$max_len_prefix = min(strlen($destination), 15);
 				$prefixclausemain = '(';
 				while ($max_len_prefix > 0 ) {
-					$prefixclausemain .= "dialprefixa='".substr($destination,0,$max_len_prefix)."' OR ";
+					$prefixclausemain .= "dialprefixmain='".substr($destination,0,$max_len_prefix)."' OR ";
 					$max_len_prefix--;
 				}
-				$prefixclausemain .= "dialprefixa='defaultprefix')";
-				$prefixclausemain .= " OR (dialprefixa LIKE '&_%' ESCAPE '&' AND '$destination' ";
-				$prefixclausemain .= "REGEXP REPLACE(REPLACE(REPLACE(REPLACE(REPLACE(CONCAT('^', dialprefixa, '$'), ";
+				$prefixclausemain .= "dialprefixmain='defaultprefix')";
+				$prefixclausemain .= " OR (dialprefixmain LIKE '&_%' ESCAPE '&' AND '$destination' ";
+				$prefixclausemain .= "REGEXP REPLACE(REPLACE(REPLACE(REPLACE(REPLACE(CONCAT('^', dialprefixmain, '$'), ";
 				$prefixclausemain .= "'X', '[[:digit:]]'), 'Z', '[1-9]'), 'N', '[2-9]'), '.', '.+'), '_', ''))";
-				$prefixclause = $prefixclausemain;
+				$prefixclause = preg_replace('/dialprefixmain/','dialprefixa',$prefixclausemain);
 				$periodexpiry = 0;
 				$maxsecperperiod = -1;
 				$periodcur = 1;
@@ -1575,6 +1577,13 @@ else echo "Ratecard: ".$this->ratecard_obj[$i][6]."<br>Trunk: ".$this->ratecard_
 				$trunktimeout = -10;
 				$timeleft = 0;
 				$td = 'a';
+//				$prefixclausemain = preg_replace('/dialprefixa/','dialprefixmain',$prefixclausemain);
+				$next_failover_trunk_by_clause = -1;
+				$QUERY = "SELECT failover_trunk FROM cc_trunk WHERE id_trunk='".$this -> usedtrunk."' AND ($prefixclausemain) LIMIT 1";
+				$result = $A2B->instance_table -> SQLExec ($A2B -> DBHandle, $QUERY);
+				if (is_array($result) && count($result)>0) {
+					$next_failover_trunk_by_clause = $result[0][0];
+				}
 				$QUERY = "SELECT maxsecperperioda, periodcounta, UNIX_TIMESTAMP(periodexpirya), failover_trunka, perioda, UNIX_TIMESTAMP(startdatea), UNIX_TIMESTAMP(stopdatea),timelefta
 					FROM cc_trunk WHERE id_trunk='".$this -> usedtrunk."' AND ($prefixclause) LIMIT 1";
 				$result = $A2B->instance_table -> SQLExec ($A2B -> DBHandle, $QUERY);
@@ -1586,16 +1595,19 @@ else echo "Ratecard: ".$this->ratecard_obj[$i][6]."<br>Trunk: ".$this->ratecard_
 						FROM cc_trunk WHERE id_trunk='".$this -> usedtrunk."' AND ($prefixclause) LIMIT 1";
 					$result = $A2B->instance_table -> SQLExec ($A2B -> DBHandle, $QUERY);
 				}
+//				if ((is_array($result) && count($result)>0) || ($intellect_count > 0 && $next_failover_trunk == -1 && $next_failover_trunk_by_clause == -1)) {}
 				if (is_array($result) && count($result)>0) {
-				    $this -> td = $td;
+//				    if (is_array($result) && count($result)>0) {
+					$this -> td = $td;
+//				    }
 				    $this -> prefixclause = $prefixclause;
 				    if (!$firstrand) {
-					if ($intellect_count == -1) {
-					    $prefixclausea = preg_replace('/dialprefixa/','an.dialprefixa',$prefixclausemain);
-					    $prefixclauseb = preg_replace('/dialprefixa/','bn.dialprefixb',$prefixclausemain);
-					    $prefixclause  = preg_replace('/dialprefixa/','bn.dialprefixa',$prefixclausemain);
-					    $prefixclausec = preg_replace('/dialprefixa/','cn.dialprefixa',$prefixclausemain);
-					    $prefixclaused = preg_replace('/dialprefixa/','cn.dialprefixb',$prefixclausemain);
+					if ($intellect_count == -1 || ($trunkrand != -1 && $trunkrand != $this -> usedtrunk)) {
+					    $prefixclausea = preg_replace('/dialprefixmain/','an.dialprefixa',$prefixclausemain);
+					    $prefixclauseb = preg_replace('/dialprefixmain/','bn.dialprefixb',$prefixclausemain);
+					    $prefixclause  = preg_replace('/dialprefixmain/','bn.dialprefixa',$prefixclausemain);
+					    $prefixclausec = preg_replace('/dialprefixmain/','cn.dialprefixa',$prefixclausemain);
+					    $prefixclaused = preg_replace('/dialprefixmain/','cn.dialprefixb',$prefixclausemain);
 					    $QUERY =
 		"SELECT IF(cn.status, -1,IFNULL( IF(an.maxsecperperioda<0,IF(an.periodexpirya>NOW(),-an.periodcounta-2,-2),an.maxsecperperioda-(an.periodcounta*(an.periodexpirya>NOW()))),
 ".						"IF(bn.maxsecperperiodb<0,IF(bn.periodexpiryb>NOW(),-bn.periodcountb-2,-2),bn.maxsecperperiodb-(bn.periodcountb*(bn.periodexpiryb>NOW())))))
@@ -1700,11 +1712,9 @@ if ($agi) $A2B -> debug( ERROR, $agi, __FILE__, __LINE__, "TRUNK=".$valu_val[2].
 					}
 				    }
 				}
-				$prefixclausemain = preg_replace('/dialprefixa/','dialprefixmain',$prefixclausemain);
-				$QUERY = "SELECT failover_trunk FROM cc_trunk WHERE id_trunk='".$this -> usedtrunk."' AND ($prefixclausemain) LIMIT 1";
-				$result = $A2B->instance_table -> SQLExec ($A2B -> DBHandle, $QUERY);
-				if (is_array($result) && count($result)>0) $next_failover_trunk = $result[0][0];
-
+				if ($next_failover_trunk_by_clause >=0) {
+					$next_failover_trunk = $next_failover_trunk_by_clause;
+				}
 				// Check if we will be able to use this route:
 				//  if the trunk is activated and
 				//  if there are less connection than it can support or there is an unlimited number of connections
@@ -1717,15 +1727,21 @@ if ($agi) $A2B -> debug( ERROR, $agi, __FILE__, __LINE__, "TRUNK=".$valu_val[2].
 				|| ($maxsecperperiod!=-1 && $periodcount >= $maxsecperperiod - $timeleft && $periodexpiry > $timecur) || ($periodexpiry <= $timecur && $periodcur==0))) {
 					if ($agi) $A2B -> debug( WARN, $agi, __FILE__, __LINE__, "Failover trunk cannot be used because maximum number of connections on this trunk is already reached or limited.\n");
 					// use failover trunk
-					if ($ifmaxuse == 0 || $periodexpiry != 0) {
-						if ($agi) $A2B -> debug( DEBUG, $agi, __FILE__, __LINE__, "Now using its failover trunk\n");
-						if ($intellect_count > 0) {
-						    $failover_trunk = $this -> usedtrunk;
-						    $firstrand = false;
-						} elseif ($next_failover_trunk == $failover_trunk) {
+					if ($intellect_count > 0) {
+						if ($trunkrand != $this -> usedtrunk && $next_failover_trunk != -1 && ($ifmaxuse == 0 || $periodexpiry != 0)) {
+							$loop_failover++;
+							$failover_trunk = $next_failover_trunk;
+						} else {
+							$failover_trunk = $trunkrand;
+							$firstrand = false;
+						}
+						continue;
+					} elseif ($ifmaxuse == 0 || $periodexpiry != 0) {
+						if ($next_failover_trunk == $failover_trunk) {
 						    break;
 						} else {
 						    if ($next_failover_trunk == -1 && $ifmaxuse == 1) continue 2;
+						    if ($agi) $A2B -> debug( DEBUG, $agi, __FILE__, __LINE__, "Now using its failover trunk\n");
 						    $intellect_count = -1;
 						    $loop_failover++;
 						    $failover_trunk = $next_failover_trunk;
@@ -1804,9 +1820,10 @@ if ($agi) $A2B -> debug( ERROR, $agi, __FILE__, __LINE__, "TRUNK=".$valu_val[2].
 
 				$this -> trunk_start_inuse($agi, $A2B, 1);
 				if ($agi) {
-				    if ($A2B->dtmf_destination && $A2B->oldphonenumber && (!isset($trunkcode) || strpos($trunkcode,"-INFOLINE") === false)) {
+				    if ($A2B->dtmf_destination && $A2B->oldphonenumber && $firstgo && (!isset($trunkcode) || strpos($trunkcode,"-INFOLINE") === false)) {
 					$agi -> say_digits($A2B->oldphonenumber, '#');
-					$A2B -> dtmf_destination = false;
+					$firstgo = false;
+//					$A2B -> dtmf_destination = false;
 				    }
 				    if ($this -> ratecard_obj[$k][12] > 0 || ($this -> ratecard_obj[$k][12] == 0 && $A2B->extext && $this -> ratecard_obj[$k][4] != $A2B->cardnumber && $ipaddress != $prefix.$destination)) {
 					if ($A2B->auth_through_accountcode) {
@@ -1823,11 +1840,28 @@ if ($agi) $A2B -> debug( ERROR, $agi, __FILE__, __LINE__, "TRUNK=".$valu_val[2].
 				    if ($agi -> channel_status('',true) != AST_STATE_DOWN) {
 					if ($A2B->monitor == 1 || $A2B -> agiconfig['record_call'] == 1) {
 						$A2B->dl_short = MONITOR_PATH . "/" . $A2B->username . "/" . date('Y') . "/" . date('n') . "/" . date('j') . "/";
-						$dl_short = $A2B->dl_short . $A2B->uniqueid . ".";
-						while (file_exists($dl_short . "WAV") || file_exists($dl_short . "wav") || file_exists($dl_short . "gsm") || file_exists($dl_short . "mp3")
-						|| file_exists($dl_short . "sln") || file_exists($dl_short . "g723") || file_exists($dl_short . "g729")) {
-							$A2B->uniqueid++;
-							$dl_short = $A2B->dl_short . $A2B->uniqueid . ".";
+						$monfile = $dl_short = $A2B->dl_short . $A2B->uniqueid . ".";
+						$monfile .= $A2B->agiconfig['monitor_formatfile'] == 'wav49' ? 'WAV' : $A2B->agiconfig['monitor_formatfile'];
+						$j = 100;
+						while (file_exists($monfile)) {
+							$sizemonfile = filesize($monfile);
+							if ($sizemonfile == 60 || $sizemonfile === false) {
+								if ($sizemonfile == 60) {
+									unlink($monfile);
+								}
+								$j--;
+								if ($j) {
+									continue;
+								} else {
+									$A2B -> debug( FATAL, $agi, __FILE__, __LINE__, "File corrupt: $monfile");
+								}
+								$newuniqueid = explode('.',$A2B->uniqueid);
+								if ($newuniqueid[0] == time())		sleep(1);
+								$newuniqueid[0] = time();
+								$A2B->uniqueid = implode('.',$newuniqueid);
+								$monfile = $dl_short = $A2B->dl_short . $A2B->uniqueid . ".";
+								$monfile .= $A2B->agiconfig['monitor_formatfile'] == 'wav49' ? 'WAV' : $A2B->agiconfig['monitor_formatfile'];
+							}
 						}
 						$command_mixmonitor = $A2B -> format_parameters ("MixMonitor {$dl_short}{$A2B->agiconfig['monitor_formatfile']}|b");
 						$myres = $agi->exec($command_mixmonitor);
@@ -1867,6 +1901,9 @@ if ($agi) $A2B -> debug( ERROR, $agi, __FILE__, __LINE__, "TRUNK=".$valu_val[2].
 					if ($A2B->monitor == 1 || $A2B -> agiconfig['record_call'] == 1) {
 						$myres = $agi->exec($A2B -> format_parameters ("StopMixMonitor"));
 						$A2B -> debug( INFO, $agi, __FILE__, __LINE__, "EXEC StopMixMonitor (".$A2B->uniqueid.")");
+						if (file_exists($monfile) && filesize($monfile) == 60) {
+							unlink($monfile);
+						}
 					}
 				    }
 
