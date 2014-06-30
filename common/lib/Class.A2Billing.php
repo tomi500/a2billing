@@ -1292,7 +1292,10 @@ for ($t=0;$t<count($result);$t++) {
 	        // LOOKUP RATE : FIND A RATE FOR THIS DESTINATION
 	        $resfindrate = $RateEngine->rate_engine_findrates($this, $this->destination,$this->tariff);
 	        if ($resfindrate==0) {
-				$this -> debug( ERROR, $agi, __FILE__, __LINE__, "ERROR ::> RateEngine didnt succeed to match the dialed number over the ratecard (Please check : id the ratecard is well create ; if the removeInter_Prefix is set according to your prefix in the ratecard ; if you hooked the ratecard to the Call Plan)");
+				$this -> debug( ERROR, $agi, __FILE__, __LINE__, $this->destination." ::> RateEngine didnt succeed to match the dialed number over the ratecard (Please check : id the ratecard is well create ; if the removeInter_Prefix is set according to your prefix in the ratecard ; if you hooked the ratecard to the Call Plan)");
+				$this -> let_stream_listening($agi);
+				$agi-> stream_file('the-number-u-dialed', '#');
+				$agi-> stream_file('pbx-invalid-number', '#');
 			} else {
 				$this -> debug( DEBUG, $agi, __FILE__, __LINE__, "OK - RESFINDRATE::> ".$resfindrate);
 			}
@@ -1493,7 +1496,7 @@ for ($t=0;$t<count($result);$t++) {
 				$this -> debug( INFO, $agi, __FILE__, __LINE__, "[STATUS] CHANNEL UNAVAILABLE - GOTO VOICEMAIL ($dest_username)");
 				
 				$vm_parameters = $this -> format_parameters ($dest_username.'|u');
-				$agi-> exec(VoiceMail, $vm_parameters);
+				$agi-> exec('VoiceMail', $vm_parameters);
 			}
 
 			if (($dialstatus =="BUSY")) {
@@ -1501,7 +1504,7 @@ for ($t=0;$t<count($result);$t++) {
 				$this -> debug( INFO, $agi, __FILE__, __LINE__, "[STATUS] CHANNEL BUSY - GOTO VOICEMAIL ($dest_username)");
 				
 				$vm_parameters = $this -> format_parameters ($dest_username.'|b');
-				$agi-> exec(VoiceMail, $vm_parameters);
+				$agi-> exec('VoiceMail', $vm_parameters);
 			}
 		}
 
@@ -1759,7 +1762,7 @@ for ($t=0;$t<count($result);$t++) {
 /**						if ($this->voicemail && !is_null($this->voicebox)) {
 //							$agi -> set_variable('FAXOPT(faxdetect)', 'yes');
 //$agi->exec("DIAL $dialstr");
-							$agi-> exec(VoiceMail, $this -> format_parameters ($this->voicebox."|su"));
+							$agi-> exec('VoiceMail', $this -> format_parameters ($this->voicebox."|su"));
 						}
 //						if (array_search($agi -> channel_status('',true), array(AST_STATE_UP, AST_STATE_DOWN)) === false) {
 						$answeredtime			= $agi->get_variable("ANSWEREDTIME", true);
@@ -1803,7 +1806,7 @@ for ($t=0;$t<count($result);$t++) {
 			} else return;
 			// The following section will send the caller to VoiceMail with the unavailable priority.\
 			$this -> debug( INFO, $agi, __FILE__, __LINE__, "[STATUS] CHANNEL ($dialstatus) - GOTO VOICEMAIL ($this->voicebox)");
-			$agi-> exec(VoiceMail, $this -> format_parameters ($this->voicebox));
+			$agi-> exec('VoiceMail', $this -> format_parameters ($this->voicebox));
 		}
 	}
 
@@ -2179,7 +2182,7 @@ $this -> debug( ERROR, $agi, __FILE__, __LINE__, "[* QUEUEDNID Current_channel {
 			// The following section will send the caller to VoiceMail with the unavailable priority.\
 			$this -> debug( INFO, $agi, __FILE__, __LINE__, "[STATUS] CHANNEL ($dialstatus) - GOTO VOICEMAIL ($this->voicebox)");
 $this -> debug( ERROR, $agi, __FILE__, __LINE__, "[STATUS] CHANNEL ($dialstatus) - GOTO VOICEMAIL ($this->voicebox)");
-			$agi-> exec(VoiceMail, $this -> format_parameters ($this->voicebox));
+			$agi-> exec('VoiceMail', $this -> format_parameters ($this->voicebox));
 		}
 
 /**
@@ -2190,7 +2193,7 @@ $this -> debug( ERROR, $agi, __FILE__, __LINE__, "[STATUS] CHANNEL ($dialstatus)
 				$this -> debug( INFO, $agi, __FILE__, __LINE__, "[STATUS] CHANNEL ($dialstatus) - GOTO VOICEMAIL ($dest_username)");
 				
 				$vm_parameters = $this -> format_parameters ($dest_username.'|s');
-				$agi-> exec(VoiceMail, $vm_parameters);
+				$agi-> exec('VoiceMail', $vm_parameters);
 			}
 		}
 **/

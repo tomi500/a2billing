@@ -552,7 +552,7 @@ if ($atmenu=='sip') {
 						   "size=10 maxlength=10",
 						   "",
 						   gettext("Insert the callgroup"),
-						   "", "", "", "", "", "", "" );
+						   "", "", "", "", "", "", "NO-NULL" );
 
 
 	$HD_Form -> AddEditElement (gettext("PICKUPGROUP"),
@@ -562,7 +562,7 @@ if ($atmenu=='sip') {
 						   "size=15 maxlength=10",
 						   "",
 						   gettext("Insert the pickupgroup"),
-						   "", "", "", "", "", "", "" );
+						   "", "", "", "", "", "", "NO-NULL" );
 
 	$HD_Form -> AddEditElement (gettext("NAMEDCALLGROUP"),
 						   "namedcallgroup",
@@ -571,7 +571,7 @@ if ($atmenu=='sip') {
 						   "size=40 maxlength=40",
 						   "",
 						   gettext("Insert the named callgroup"),
-						   "", "", "", "", "", "", "" );
+						   "", "", "", "", "", "", "NO-NULL" );
 
 
 	$HD_Form -> AddEditElement (gettext("NAMEDPICKUPGROUP"),
@@ -581,7 +581,7 @@ if ($atmenu=='sip') {
 						   "size=40 maxlength=40",
 						   "",
 						   gettext("Insert the named pickupgroup"),
-						   "", "", "", "", "", "", "" );
+						   "", "", "", "", "", "", "NO-NULL" );
 }
 
 $HD_Form -> AddEditElement (gettext("MOHSUGGEST"),

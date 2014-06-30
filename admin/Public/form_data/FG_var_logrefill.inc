@@ -143,7 +143,7 @@ if (has_rights (ACX_MODIFY_REFILLS)) {
 					"cols=50 rows=4",
 					"",
 					gettext("Insert the description"),
-					"" , "", "", "", "" , "", "", "");
+					"", "", "", "", "", "", "NO-NULL" );
 				   
 	$HD_Form -> AddEditElement (gettext("REFILL TYPE"),
 	               "refill_type",

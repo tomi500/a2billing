@@ -52,11 +52,11 @@ if ($message != "success")
 // #### HEADER SECTION
 $smarty->display('main.tpl');
 
-	$QUERY = "SELECT lastname, firstname FROM cc_card WHERE id = $idcust AND id_diller = " . $_SESSION["card_id"];
+	$QUERY = "SELECT lastname, firstname, username, credit FROM cc_card WHERE id = $idcust AND id_diller = " . $_SESSION["card_id"];
 	$resmax = $DBHandle->Execute($QUERY);
 	if ($resmax) {
 		$row = $resmax->fetchRow();
-		$HD_Form -> FG_INTRO_TEXT_EDITION = "<u>".$row[0]." ".$row[1]."</u>";
+		$HD_Form -> FG_INTRO_TEXT_EDITION = "<u><font color=blue>".$row[0]." ".$row[1]."</font> (".$row[2].") <font color=green>".$row[3]." ".BASE_CURRENCY."</font></u>";
 		if ($form_action != "ask-edit") {
 			?><center><?php
 			echo $HD_Form -> FG_INTRO_TEXT_EDITION;

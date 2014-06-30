@@ -867,7 +867,7 @@ if ($mode == 'standard') {
 							// The following section will send the caller to VoiceMail with the unavailable priority.\
 							$A2B -> debug( INFO, $agi, __FILE__, __LINE__, "[STATUS] CHANNEL ($RateEngine->dialstatus) - GOTO VOICEMAIL ($A2B->voicebox)");
 //$A2B -> debug( ERROR, $agi, __FILE__, __LINE__, "[STATUS] CHANNEL ($RateEngine->dialstatus) - GOTO VOICEMAIL ($A2B->voicebox)");
-							$agi-> exec(VoiceMail, $A2B -> format_parameters ($A2B->voicebox));
+							$agi-> exec('VoiceMail', $A2B -> format_parameters ($A2B->voicebox));
 						}
 					}
 					if ($A2B -> agiconfig['say_balance_after_call']==1) {

@@ -1160,14 +1160,11 @@ else echo "Ratecard: ".$this->ratecard_obj[$i][6]."<br>Trunk: ".$this->ratecard_
 				$bridgepeer = $agi -> get_variable('BRIDGEPEER',true);
 //$A2B -> debug( ERROR, $agi, __FILE__, __LINE__, "[* BRIDGEPEER                {$bridgepeer}");
 			
-				if (preg_match("/([^\/]+)(?=-[^-]*$)/",$bridgepeer,$bridgepeer)) {
+				if (preg_match("/([^\/]+)(?=-[^-]*$)/",$bridgepeer,$bridgepeer) && $callback == 0) {
 //$A2B -> debug( ERROR, $agi, __FILE__, __LINE__, "[* PEER                      {$bridgepeer[0]}");
 					$QUERY = "SELECT regexten FROM cc_sip_buddies WHERE name = '{$bridgepeer[0]}' LIMIT 1";
 					$result = $A2B -> instance_table -> SQLExec ($A2B->DBHandle, $QUERY);
 					if (is_array($result) && $result[0][0] != "")	$calledstation = $bridgepeer[0];
-//						if (is_array($result) && $result[0][0] != "")	$uppeer = $bridgepeer[0];
-//						else	$uppeer = $agi->get_variable('QUEUEDNID', true);
-//						if ($uppeer) $calledstation = $uppeer;
 				}
 			}
 //$A2B -> debug( ERROR, $agi, __FILE__, __LINE__, "======== DESTINATION =       ".$calledstation);
@@ -1293,7 +1290,7 @@ else echo "Ratecard: ".$this->ratecard_obj[$i][6]."<br>Trunk: ".$this->ratecard_
 				LEFT JOIN ( SELECT aa.concat_id FROM cc_card_concat aa WHERE aa.concat_card_id = $card_id ) AS v ON bb.concat_id = v.concat_id
 				WHERE (id_cc_card = $card_id OR v.concat_id IS NOT NULL) AND name = '$calledstation' LIMIT 1";
 		$result = $A2B -> instance_table -> SQLExec ($A2B->DBHandle, $QUERY);
-		$calledexten = (is_array($result) && $result[0][0] != "") ? $result[0][0] : 'NULL';
+		$calledexten = (is_array($result) && $result[0][0] != "") ? "'".$result[0][0]."'" : 'NULL';
 
 		if ($callback_mode == 0 || $cost != 0 || !is_numeric($callback_mode) || $A2B->CallerID != $A2B -> config["callback"]['callerid']) {
 

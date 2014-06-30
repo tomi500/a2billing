@@ -104,7 +104,7 @@ ALTER TABLE cc_sip_buddies ADD `session-timers` enum('accept','refuse','originat
 ALTER TABLE cc_sip_buddies ADD `session-expires` int(11) DEFAULT NULL;
 ALTER TABLE cc_sip_buddies ADD `session-minse` int(11) DEFAULT NULL;
 ALTER TABLE cc_sip_buddies ADD `session-refresher` enum('uac','uas') DEFAULT NULL;
-ALTER TABLE cc_sip_buddies ADD `t38pt_udptl` enum('yes','yes,fec','yes,redundancy','yes,none','yes,fec,maxdatagram=400') DEFAULT NULL;
+ALTER TABLE cc_sip_buddies ADD `t38pt_udptl` enum('yes','yes,fec','yes,redundancy','yes,none','yes,fec,maxdatagram=400','yes,redundancy,maxdatagram=400') DEFAULT NULL;
 ALTER TABLE cc_sip_buddies ADD `t38pt_usertpsource` varchar(40) DEFAULT NULL;
 ALTER TABLE cc_sip_buddies ADD `sendrpid` enum('yes','no') DEFAULT NULL;
 ALTER TABLE cc_sip_buddies ADD `timert1` int(11) DEFAULT NULL;
@@ -158,7 +158,8 @@ ALTER TABLE cc_sip_buddies
   CHANGE `DEFAULTip` `defaultip` CHAR( 50 ) CHARACTER SET utf8 COLLATE utf8_bin NULL DEFAULT NULL,
   CHANGE `allowtransfer` `allowtransfer` ENUM('yes','no') CHARACTER SET utf8 COLLATE utf8_bin NULL DEFAULT NULL,
   CHANGE `subscribemwi` `subscribemwi` ENUM('yes','no') CHARACTER SET utf8 COLLATE utf8_bin NULL DEFAULT NULL,
-  CHANGE `videosupport` `videosupport` ENUM('yes','no','always') CHARACTER SET utf8 COLLATE utf8_bin NULL DEFAULT NULL;
+  CHANGE `videosupport` `videosupport` ENUM('yes','no','always') CHARACTER SET utf8 COLLATE utf8_bin NULL DEFAULT NULL,
+  CHANGE `ipaddr` `ipaddr` CHAR( 50 ) CHARACTER SET utf8 COLLATE utf8_bin NULL DEFAULT NULL;
 
 ALTER TABLE cc_iax_buddies ADD `forceencryption` varchar(20) COLLATE utf8_bin NOT NULL;
 ALTER TABLE cc_iax_buddies ADD `external` INT( 11 ) NOT NULL DEFAULT '0';
