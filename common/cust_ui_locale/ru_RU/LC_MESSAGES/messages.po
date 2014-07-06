@@ -1995,9 +1995,13 @@ msgstr "Содержит"
 msgid "Ends with"
 msgstr "Заканчивается на"
 
-#: call-history.php
+#: call-history.php:146
 msgid "Route"
 msgstr "Маршрут"
+
+#: call-history.php:147
+msgid "WaitUp"
+msgstr "Ожидал"
 
 #: lib/Form/Class.SearchHandler.inc.php:327
 msgid "There is"

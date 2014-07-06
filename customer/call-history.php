@@ -43,7 +43,7 @@ if (! has_rights (ACX_CALL_HISTORY)) {
 	die();
 }
 
-getpost_ifset(array('posted', 'Period', 'frommonth', 'fromstatsmonth', 'tomonth', 'tostatsmonth', 'fromday', 'fromstatsday_sday', 'fromstatsmonth_sday', 'today', 'tostatsday_sday', 'tostatsmonth_sday', 'calleridtype', 'phonenumbertype', 'sourcetype', 'clidtype', 'channel', 'resulttype', 'stitle', 'atmenu', 'current_page', 'order', 'sens', 'callerid', 'phonenumber', 'src', 'clid', 'choose_currency', 'terminatecauseid', 'choose_calltype', 'download', 'file'));
+getpost_ifset(array('posted', 'Period', 'frommonth', 'fromstatsmonth', 'tomonth', 'tostatsmonth', 'fromday', 'fromstatsday_sday', 'fromstatsmonth_sday', 'today', 'tostatsday_sday', 'tostatsmonth_sday', 'fromtime', 'totime', 'fromstatsday_hour', 'tostatsday_hour', 'fromstatsday_min', 'tostatsday_min', 'calleridtype', 'phonenumbertype', 'sourcetype', 'clidtype', 'channel', 'resulttype', 'stitle', 'atmenu', 'current_page', 'order', 'sens', 'callerid', 'phonenumber', 'src', 'clid', 'choose_currency', 'terminatecauseid', 'choose_calltype', 'download', 'file'));
 
 
 if (($download == "file") && $file && $ACXSEERECORDING) {
@@ -144,12 +144,13 @@ $FG_TABLE_COL[]=array (gettext("CallerID"), "src", 11*$p ."%", "center", "SORT",
 $FG_TABLE_COL[]=array (gettext("PhoneNumber"), "calledstation", 11*$p ."%", "center", "SORT", "30", "", "", "", "", "", "");
 $FG_TABLE_COL[]=array (gettext("Destination"), "destination", 21*$p ."%", "center", "SORT", "30", "lie", "cc_prefix", "destination", "prefix='%id'", "%1" );
 $FG_TABLE_COL[]=array (gettext("Route"), "route", $p ."%", "center", "SORT", "10");
+$FG_TABLE_COL[]=array (gettext ("WaitUp"), "waitup", 2*$p, "center", "SORT", "30", "", "", "", "", "", "display_minute" );
 $FG_TABLE_COL[]=array (gettext("Duration"), "sessiontime", 8*$p ."%", "center", "SORT", "30", "", "", "", "", "", "display_minute");
 $FG_TABLE_COL[]=array ('<acronym title="'.gettext("Terminate Cause").'">'.gettext("TC").'</acronym>', "terminatecauseid", 7*$p ."%", "center", "SORT", "", "list", $dialstatus_list);
 $FG_TABLE_COL[]=array (gettext("CallType"), "sipiax", 8*$p ."%", "center", "SORT",  "", "list", $list_calltype);
-$FG_TABLE_COL[]=array (gettext("Cost"), "sessionbill", 10*$p ."%", "center", "SORT", "30", "", "", "", "", "", "display_2bill");
+$FG_TABLE_COL[]=array (gettext("Cost"), "sessionbill", 8*$p ."%", "center", "SORT", "30", "", "", "", "", "", "display_2bill");
 
-$FG_COL_QUERY = "t1.starttime, IF(t1.src_exten IS NULL, t1.src, t1.src_exten) src, IF(t1.card_id='$customer', IF(t1.calledexten IS NOT NULL, t1.calledexten, t1.calledstation), t1.dnid) calledstation, t1.destination, id_ratecard as route, t1.sessiontime, t1.terminatecauseid, t1.sipiax, IF(t1.card_id='$customer', t1.sessionbill+margindillers, 0) sessionbill";
+$FG_COL_QUERY = "t1.starttime, IF(t1.src_exten IS NULL, t1.src, t1.src_exten) src, IF(t1.card_id='$customer', IF(t1.calledexten IS NOT NULL, t1.calledexten, t1.calledstation), t1.dnid) calledstation, t1.destination, id_ratecard as route, UNIX_TIMESTAMP(t1.starttime)-INSERT(t1.uniqueid,1,1,1) AS waitup, t1.sessiontime, t1.terminatecauseid, t1.sipiax, IF(t1.card_id='$customer', t1.sessionbill+margindillers, 0) sessionbill";
 
 if ($ACXSEERECORDING) {
 	$FG_TABLE_COL [] = array ('<span class="liens">' . gettext("Audio") . "</span>", "uniqueid", 100*(1-$p) ."%", "center", "", "30", "", "", "", "", "", "linkonmonitorfile_customer");
@@ -187,22 +188,31 @@ $date_clause = '';
 
 normalize_day_of_month($fromstatsday_sday, $fromstatsmonth_sday, 1);
 normalize_day_of_month($tostatsday_sday, $tostatsmonth_sday, 1);
-if ($fromday && isset($fromstatsday_sday) && isset($fromstatsmonth_sday)) $date_clause.=" AND t1.starttime >= ('$fromstatsmonth_sday-$fromstatsday_sday')";
-if ($today && isset($tostatsday_sday) && isset($tostatsmonth_sday)) $date_clause.=" AND t1.starttime <= ('$tostatsmonth_sday-".sprintf("%02d",intval($tostatsday_sday)/*+1*/)." 23:59:59')";
-
-
-if (strpos($SQLcmd, 'WHERE') > 0) {
-	$FG_TABLE_CLAUSE = substr($SQLcmd,6).$date_clause;
-} elseif (strpos($date_clause, 'AND') > 0) {
-	$FG_TABLE_CLAUSE = substr($date_clause,5);
+// Date Clause
+if ($fromday && isset ( $fromstatsday_sday ) && isset ( $fromstatsmonth_sday )) {
+	if ($fromtime) {
+		$date_clause = " AND t1.starttime >= ('$fromstatsmonth_sday-$fromstatsday_sday $fromstatsday_hour:$fromstatsday_min')";
+	} else {
+		$date_clause = " AND t1.starttime >= ('$fromstatsmonth_sday-$fromstatsday_sday')";
+	}
+}
+if ($today && isset ( $tostatsday_sday ) && isset ( $tostatsmonth_sday )) {
+	if ($totime) {
+		$date_clause .= " AND t1.starttime <= ('$tostatsmonth_sday-" . sprintf ( "%02d", intval ( $tostatsday_sday )/*+1*/) . " $tostatsday_hour:$tostatsday_min:59')";
+	} else {
+		$date_clause .= " AND t1.starttime <= ('$tostatsmonth_sday-" . sprintf ( "%02d", intval ( $tostatsday_sday )/*+1*/) . " 23:59:59')";
+	}
+}
+if ($date_clause == '') {
+	$cc_yearmonth = sprintf ( "%04d-%02d-%02d", date ( "Y" ), date ( "n" ), date ( "d" ) );
+	$date_clause = " AND t1.starttime >= ('$cc_yearmonth')";
 }
 
-
-if (!isset ($FG_TABLE_CLAUSE) || strlen($FG_TABLE_CLAUSE)==0) {
-	$cc_yearmonth = sprintf("%04d-%02d-%02d",date("Y"),date("n"),date("d"));
-	$FG_TABLE_CLAUSE=" t1.starttime >= ('$cc_yearmonth')";
+if (strpos ( $SQLcmd, 'WHERE' ) > 0) {
+	$FG_TABLE_CLAUSE = substr ( $SQLcmd, 6 ) . $date_clause;
+} elseif (strpos ( $date_clause, 'AND' ) > 0) {
+	$FG_TABLE_CLAUSE = substr ( $date_clause, 5 );
 }
-
 
 if (strlen($FG_TABLE_CLAUSE)>0) $FG_TABLE_CLAUSE.=" AND ";
 $FG_TABLE_CLAUSE.="(t1.card_id='$customer' OR t1.card_caller='$customer')";
@@ -272,72 +282,161 @@ if ($ACXSEERECORDING && $nb_record>0){ echo '
 		<INPUT TYPE="hidden" NAME="posted" value=1>
 		<INPUT TYPE="hidden" NAME="current_page" value=0>
 		<table class="callhistory_maintable" align="center">
-			
+	<tr>
+		<td align="left" class="bgcolor_004"><font class="fontstyle_003">&nbsp;&nbsp;<?php echo gettext ( "DATE" ); ?></font>
+		</td>
+		<td align="left" class="bgcolor_005">
+		<table width="100%" border="0" cellspacing="0" cellpadding="0">
 			<tr>
-        		<td align="left" class="bgcolor_002"> &nbsp;
-					<font class="fontstyle_003"><?php echo gettext("DATE");?></b></font>
-				</td>
-      			<td align="left" class="bgcolor_003">
-					<table width="100%" border="0" cellspacing="0" cellpadding="0" >
-					<tr><td class="fontstyle_searchoptions">
-	  				<input type="checkbox" name="fromday" value="true" <?php  if ($fromday){ ?>checked<?php }?>> <?php echo gettext("FROM");?> :
-					<select name="fromstatsday_sday" class="form_input_select">
-						<?php  
-							for ($i=1;$i<=31;$i++){
-								if ($fromstatsday_sday==sprintf("%02d",$i)){$selected="selected";}else{$selected="";}
-								echo '<option value="'.sprintf("%02d",$i)."\"$selected>".sprintf("%02d",$i).'</option>';
-							}
-						?>	
-					</select>
-				 	<select name="fromstatsmonth_sday" class="form_input_select">
-					<?php 	
-						$year_actual = date("Y");
-						for ($i=$year_actual;$i >= $year_actual-1;$i--) {		   
-							$monthname = array( gettext("JANUARY"), gettext("FEBRUARY"), gettext("MARCH"), gettext("APRIL"), gettext("MAY"), gettext("JUNE"), gettext("JULY"), gettext("AUGUST"), gettext("SEPTEMBER"), gettext("OCTOBER"), gettext("NOVEMBER"), gettext("DECEMBER"));
-							if ($year_actual==$i){
-								$monthnumber = date("n")-1; // Month number without lead 0.
-							}else{
-								$monthnumber=11;
-							}		   
-							for ($j=$monthnumber;$j>=0;$j--){	
-								$month_formated = sprintf("%02d",$j+1);
-							   	if ($fromstatsmonth_sday=="$i-$month_formated"){$selected="selected";}else{$selected="";}
-								echo "<OPTION value=\"$i-$month_formated\" $selected> $monthname[$j]-$i </option>";				
-							}
-						}
-					?>
-					</select>
-					</td><td class="fontstyle_searchoptions">&nbsp;&nbsp;
-					<input type="checkbox" name="today" value="true" <?php  if ($today){ ?>checked<?php }?>> <?php echo gettext("TO");?> :
-					<select name="tostatsday_sday" class="form_input_select">
-					<?php  
-						for ($i=1;$i<=31;$i++){
-							if ($tostatsday_sday==sprintf("%02d",$i)){$selected="selected";}else{$selected="";}
-							echo '<option value="'.sprintf("%02d",$i)."\"$selected>".sprintf("%02d",$i).'</option>';
-						}
-					?>						
-					</select>
-				 	<select name="tostatsmonth_sday" class="form_input_select">
-					<?php 	$year_actual = date("Y");
-						for ($i=$year_actual;$i >= $year_actual-1;$i--)
-						{		   
-							   $monthname = array( gettext("JANUARY"), gettext("FEBRUARY"), gettext("MARCH"), gettext("APRIL"), gettext("MAY"), gettext("JUNE"), gettext("JULY"), gettext("AUGUST"), gettext("SEPTEMBER"), gettext("OCTOBER"), gettext("NOVEMBER"), gettext("DECEMBER"));
-							   if ($year_actual==$i){
-									$monthnumber = date("n")-1; // Month number without lead 0.
-							   }else{
-									$monthnumber=11;
-							   }		   
-							   for ($j=$monthnumber;$j>=0;$j--){	
-										$month_formated = sprintf("%02d",$j+1);
-							   			if ($tostatsmonth_sday=="$i-$month_formated"){$selected="selected";}else{$selected="";}
-										echo "<OPTION value=\"$i-$month_formated\" $selected> $monthname[$j]-$i </option>";				
-							   }
-						}
-					?>
-					</select>
-					</td></tr></table>
-	  			</td>
-    		</tr>
+				<td class="fontstyle_searchoptions"><input type="checkbox"
+					name="fromday" value="true" <?php
+					if ($fromday) {
+						?> checked
+					<?php
+					}
+					?>> <?php
+					echo gettext ( "From" );
+					?> :
+				<select name="fromstatsday_sday" class="form_input_select">
+					<?php
+					for($i = 1; $i <= 31; $i ++) {
+						if ($fromstatsday_sday == sprintf ( "%02d", $i ))
+							$selected = "selected";
+						else
+							$selected = "";
+						echo "<option value=\"" . sprintf ( "%02d", $i ) . "\"$selected>" . sprintf ( "%02d", $i ) . "</option>";
+					}
+					?>	
+				</select>
+				<select name="fromstatsmonth_sday"
+					class="form_input_select">
+				<?php
+				$year_actual = date ( "Y" );
+				$monthname = array (gettext ( "January" ), gettext ( "February" ), gettext ( "March" ), gettext ( "April" ), gettext ( "May" ), gettext ( "June" ), gettext ( "July" ), gettext ( "August" ), gettext ( "September" ), gettext ( "October" ), gettext ( "November" ), gettext ( "December" ) );
+				for($i = $year_actual; $i >= $year_actual - 1; $i --) {
+					if ($year_actual == $i) {
+						$monthnumber = date ( "n" ) - 1; // Month number without lead 0.
+					} else {
+						$monthnumber = 11;
+					}
+					for($j = $monthnumber; $j >= 0; $j --) {
+						$month_formated = sprintf ( "%02d", $j + 1 );
+						if ($fromstatsmonth_sday == "$i-$month_formated")
+							$selected = "selected";
+						else
+							$selected = "";
+						echo "<OPTION value=\"$i-$month_formated\" $selected> $monthname[$j]-$i </option>";
+					}
+				}
+				?>
+				</select> <br />
+				<input type="checkbox" name="fromtime" value="true"
+					<?php
+					if ($fromtime) {
+						?> checked <?php
+					}
+					?>> 
+				<?php
+				echo gettext ( "Time :" )?>
+				<select name="fromstatsday_hour" class="form_input_select">
+				<?php
+				for($i = 0; $i <= 23; $i ++) {
+					if ($fromstatsday_hour == sprintf ( "%02d", $i )) {
+						$selected = "selected";
+					} else {
+						$selected = "";
+					}
+					echo '<option value="' . sprintf ( "%02d", $i ) . "\"$selected>" . sprintf ( "%02d", $i ) . '</option>';
+				}
+				?>						
+				</select> : <select name="fromstatsday_min"
+					class="form_input_select">
+				<?php
+				for($i = 0; $i < 60; $i = $i + 5) {
+					if ($fromstatsday_min == sprintf ( "%02d", $i )) {
+						$selected = "selected";
+					} else {
+						$selected = "";
+					}
+					echo '<option value="' . sprintf ( "%02d", $i ) . "\"$selected>" . sprintf ( "%02d", $i ) . '</option>';
+				}
+				?>						
+				</select></td>
+				<td class="fontstyle_searchoptions"><input type="checkbox"
+					name="today" value="true" <?php
+					if ($today) {
+						?> checked <?php
+					}
+					?>> 
+				<?php
+				echo gettext ( "To" );
+				?>  :
+				<select name="tostatsday_sday" class="form_input_select">
+				<?php
+				for($i = 1; $i <= 31; $i ++) {
+					if ($tostatsday_sday == sprintf ( "%02d", $i )) {
+						$selected = "selected";
+					} else {
+						$selected = "";
+					}
+					echo '<option value="' . sprintf ( "%02d", $i ) . "\"$selected>" . sprintf ( "%02d", $i ) . '</option>';
+				}
+				?>						
+				</select> <select name="tostatsmonth_sday" class="form_input_select">
+				<?php
+				$year_actual = date ( "Y" );
+				for($i = $year_actual; $i >= $year_actual - 1; $i --) {
+					if ($year_actual == $i) {
+						$monthnumber = date ( "n" ) - 1; // Month number without lead 0.
+					} else {
+						$monthnumber = 11;
+					}
+					for($j = $monthnumber; $j >= 0; $j --) {
+						$month_formated = sprintf ( "%02d", $j + 1 );
+						if ($tostatsmonth_sday == "$i-$month_formated")
+							$selected = "selected";
+						else
+							$selected = "";
+						echo "<OPTION value=\"$i-$month_formated\" $selected> $monthname[$j]-$i </option>";
+					}
+				}
+				?>
+				</select> <br />
+				<input type="checkbox" name="totime" value="true"
+					<?php
+					if ($totime) {
+						?> checked <?php
+					}
+					?>> 
+				<?php
+				echo gettext ( "Time :" )?>
+				<select name="tostatsday_hour" class="form_input_select">
+				<?php
+				for($i = 0; $i <= 23; $i ++) {
+					if ($tostatsday_hour == sprintf ( "%02d", $i )) {
+						$selected = "selected";
+					} else {
+						$selected = "";
+					}
+					echo '<option value="' . sprintf ( "%02d", $i ) . "\"$selected>" . sprintf ( "%02d", $i ) . '</option>';
+				}
+				?>						
+				</select> : <select name="tostatsday_min" class="form_input_select">
+				<?php
+				for($i = 0; $i < 60; $i = $i + 5) {
+					if ($tostatsday_min == sprintf ( "%02d", $i )) {
+						$selected = "selected";
+					} else {
+						$selected = "";
+					}
+					echo '<option value="' . sprintf ( "%02d", $i ) . "\"$selected>" . sprintf ( "%02d", $i ) . '</option>';
+				}
+				?>						
+				</select></td>
+			</tr>
+		</table>
+		</td>
+	</tr>
 			<tr>
 				<td  align="left" class="bgcolor_004">
 					<font class="fontstyle_003">&nbsp;&nbsp;<?php echo gettext("CALLERID");?></font>
@@ -471,7 +570,7 @@ if ($ACXSEERECORDING && $nb_record>0){ echo '
 	                    <center><strong> 
 	                    <?php  if (strtoupper($FG_TABLE_COL[$i][4])=="SORT"){?>
 	                    <a href="<?php  echo $PHP_SELF."?s=1&t=0&stitle=$stitle&atmenu=$atmenu&current_page=$current_page&order=".$FG_TABLE_COL[$i][1]."&sens="; if ($sens=="ASC"){echo"DESC";}else{echo"ASC";} 
-						echo "&posted=$posted&Period=$Period&frommonth=$frommonth&fromstatsmonth=$fromstatsmonth&tomonth=$tomonth&tostatsmonth=$tostatsmonth&fromday=$fromday&fromstatsday_sday=$fromstatsday_sday&fromstatsmonth_sday=$fromstatsmonth_sday&today=$today&tostatsday_sday=$tostatsday_sday&tostatsmonth_sday=$tostatsmonth_sday&calleridtype=$calleridtype&phonenumbertype=$phonenumbertype&sourcetype=$sourcetype&clidtype=$clidtype&channel=$channel&resulttype=$resulttype&callerid=$callerid&phonenumber=$phonenumber&src=$src&clid=$clid&terminatecauseid=$terminatecauseid&choose_calltype=$choose_calltype&choose_currency=$choose_currency";?>"> 
+						echo "&posted=$posted&Period=$Period&frommonth=$frommonth&fromstatsmonth=$fromstatsmonth&tomonth=$tomonth&tostatsmonth=$tostatsmonth&fromday=$fromday&fromstatsday_sday=$fromstatsday_sday&fromstatsmonth_sday=$fromstatsmonth_sday&today=$today&tostatsday_sday=$tostatsday_sday&tostatsmonth_sday=$tostatsmonth_sday&calleridtype=$calleridtype&phonenumbertype=$phonenumbertype&sourcetype=$sourcetype&clidtype=$clidtype&channel=$channel&resulttype=$resulttype&callerid=$callerid&phonenumber=$phonenumber&src=$src&clid=$clid&terminatecauseid=$terminatecauseid&choose_calltype=$choose_calltype&fromtime=$fromtime&totime=$totime&fromstatsday_hour=$fromstatsday_hour&fromstatsday_min=$fromstatsday_min&tostatsday_hour=$tostatsday_hour&tostatsday_min=$tostatsday_min&choose_currency=$choose_currency";?>"> 
 	                    <span class="liens"><?php  } ?>
 	                    <?php echo $FG_TABLE_COL[$i][0]?> 
 	                    <?php if ($order==$FG_TABLE_COL[$i][1] && $sens=="ASC"){?>
@@ -567,13 +666,13 @@ if ($ACXSEERECORDING && $nb_record>0){ echo '
                   <TD align="right"><SPAN style="COLOR: #ffffff; FONT-SIZE: 11px"><B> 
                     <?php if ($current_page>0){?>
                     <img src="<?php echo Images_Path_Main ?>/fleche-g.gif" width="5" height="10"> <a href="<?php echo $PHP_SELF?>?s=1&t=0&order=<?php echo $order?>&sens=<?php echo $sens?>&current_page=<?php  echo ($current_page-1)?><?php  if (!is_null($letter) && ($letter!="")){ echo "&letter=$letter";} 
-					echo "&posted=$posted&Period=$Period&frommonth=$frommonth&fromstatsmonth=$fromstatsmonth&tomonth=$tomonth&tostatsmonth=$tostatsmonth&fromday=$fromday&fromstatsday_sday=$fromstatsday_sday&fromstatsmonth_sday=$fromstatsmonth_sday&today=$today&tostatsday_sday=$tostatsday_sday&tostatsmonth_sday=$tostatsmonth_sday&calleridtype=$calleridtype&phonenumbertype=$phonenumbertype&sourcetype=$sourcetype&clidtype=$clidtype&channel=$channel&resulttype=$resulttype&callerid=$callerid&phonenumber=$phonenumber&src=$src&clid=$clid&terminatecauseid=$terminatecauseid&choose_calltype=$choose_calltype&choose_currency=$choose_currency";?>"> 
+					echo "&posted=$posted&Period=$Period&frommonth=$frommonth&fromstatsmonth=$fromstatsmonth&tomonth=$tomonth&tostatsmonth=$tostatsmonth&fromday=$fromday&fromstatsday_sday=$fromstatsday_sday&fromstatsmonth_sday=$fromstatsmonth_sday&today=$today&tostatsday_sday=$tostatsday_sday&tostatsmonth_sday=$tostatsmonth_sday&fromtime=$fromtime&totime=$totime&fromstatsday_hour=$fromstatsday_hour&fromstatsday_min=$fromstatsday_min&tostatsday_hour=$tostatsday_hour&tostatsday_min=$tostatsday_min&calleridtype=$calleridtype&phonenumbertype=$phonenumbertype&sourcetype=$sourcetype&clidtype=$clidtype&channel=$channel&resulttype=$resulttype&callerid=$callerid&phonenumber=$phonenumber&src=$src&clid=$clid&terminatecauseid=$terminatecauseid&choose_calltype=$choose_calltype&choose_currency=$choose_currency";?>"> 
                     <?php echo gettext("PREVIOUS");?> </a> -
                     <?php }?>
                     <?php echo ($current_page+1);?> / <?php  echo $nb_record_max;?> 
                     <?php if ($current_page<$nb_record_max-1){?>
                     - <a href="<?php echo $PHP_SELF?>?s=1&t=0&order=<?php echo $order?>&sens=<?php echo $sens?>&current_page=<?php  echo ($current_page+1)?><?php  if (!is_null($letter) && ($letter!="")){ echo "&letter=$letter";} 
-					echo "&posted=$posted&Period=$Period&frommonth=$frommonth&fromstatsmonth=$fromstatsmonth&tomonth=$tomonth&tostatsmonth=$tostatsmonth&fromday=$fromday&fromstatsday_sday=$fromstatsday_sday&fromstatsmonth_sday=$fromstatsmonth_sday&today=$today&tostatsday_sday=$tostatsday_sday&tostatsmonth_sday=$tostatsmonth_sday&calleridtype=$calleridtype&phonenumbertype=$phonenumbertype&sourcetype=$sourcetype&clidtype=$clidtype&channel=$channel&resulttype=$resulttype&callerid=$callerid&phonenumber=$phonenumber&src=$src&clid=$clid&terminatecauseid=$terminatecauseid&choose_calltype=$choose_calltype&choose_currency=$choose_currency";?>"> 
+					echo "&posted=$posted&Period=$Period&frommonth=$frommonth&fromstatsmonth=$fromstatsmonth&tomonth=$tomonth&tostatsmonth=$tostatsmonth&fromday=$fromday&fromstatsday_sday=$fromstatsday_sday&fromstatsmonth_sday=$fromstatsmonth_sday&today=$today&tostatsday_sday=$tostatsday_sday&tostatsmonth_sday=$tostatsmonth_sday&fromtime=$fromtime&totime=$totime&fromstatsday_hour=$fromstatsday_hour&fromstatsday_min=$fromstatsday_min&tostatsday_hour=$tostatsday_hour&tostatsday_min=$tostatsday_min&calleridtype=$calleridtype&phonenumbertype=$phonenumbertype&sourcetype=$sourcetype&clidtype=$clidtype&channel=$channel&resulttype=$resulttype&callerid=$callerid&phonenumber=$phonenumber&src=$src&clid=$clid&terminatecauseid=$terminatecauseid&choose_calltype=$choose_calltype&choose_currency=$choose_currency";?>"> 
                     <?php echo gettext("NEXT");?> </a> <img src="<?php echo Images_Path_Main ?>/fleche-d.gif" width="5" height="10">
                     </B></SPAN> 
                     <?php }?>
@@ -696,5 +795,3 @@ foreach ($list_total_day as $data){
 <?php
 
 $smarty->display( 'footer.tpl');
-
-

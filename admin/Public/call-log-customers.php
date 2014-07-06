@@ -187,9 +187,9 @@ normalize_day_of_month($tostatsday_sday, $tostatsmonth_sday, 1);
 // Date Clause
 if ($fromday && isset ( $fromstatsday_sday ) && isset ( $fromstatsmonth_sday )) {
 	if ($fromtime) {
-		$date_clause .= " AND t1.starttime >= ('$fromstatsmonth_sday-$fromstatsday_sday $fromstatsday_hour:$fromstatsday_min')";
+		$date_clause = " AND t1.starttime >= ('$fromstatsmonth_sday-$fromstatsday_sday $fromstatsday_hour:$fromstatsday_min')";
 	} else {
-		$date_clause .= " AND t1.starttime >= ('$fromstatsmonth_sday-$fromstatsday_sday')";
+		$date_clause = " AND t1.starttime >= ('$fromstatsmonth_sday-$fromstatsday_sday')";
 	}
 }
 if ($today && isset ( $tostatsday_sday ) && isset ( $tostatsmonth_sday )) {
@@ -199,17 +199,15 @@ if ($today && isset ( $tostatsday_sday ) && isset ( $tostatsmonth_sday )) {
 		$date_clause .= " AND t1.starttime <= ('$tostatsmonth_sday-" . sprintf ( "%02d", intval ( $tostatsday_sday )/*+1*/) . " 23:59:59')";
 	}
 }
-
+if ($date_clause == '') {
+	$cc_yearmonth = sprintf ( "%04d-%02d-%02d", date ( "Y" ), date ( "n" ), date ( "d" ) );
+	$date_clause = " AND t1.starttime >= ('$cc_yearmonth')";
+}
 
 if (strpos ( $SQLcmd, 'WHERE' ) > 0) {
 	$FG_TABLE_CLAUSE = substr ( $SQLcmd, 6 ) . $date_clause;
 } elseif (strpos ( $date_clause, 'AND' ) > 0) {
 	$FG_TABLE_CLAUSE = substr ( $date_clause, 5 );
-}
-
-if (! isset ( $FG_TABLE_CLAUSE ) || strlen ( $FG_TABLE_CLAUSE ) == 0) {
-	$cc_yearmonth = sprintf ( "%04d-%02d-%02d", date ( "Y" ), date ( "n" ), date ( "d" ) );
-	$FG_TABLE_CLAUSE = " t1.starttime >= ('$cc_yearmonth')";
 }
 
 if (isset ( $customer ) && ($customer > 0)) {
@@ -486,7 +484,6 @@ if (LINK_AUDIO_FILE && $nb_record){ echo '
 				<?php
 				$year_actual = date ( "Y" );
 				$monthname = array (gettext ( "January" ), gettext ( "February" ), gettext ( "March" ), gettext ( "April" ), gettext ( "May" ), gettext ( "June" ), gettext ( "July" ), gettext ( "August" ), gettext ( "September" ), gettext ( "October" ), gettext ( "November" ), gettext ( "December" ) );
-				
 				for($i = $year_actual; $i >= $year_actual - 1; $i --) {
 					if ($year_actual == $i) {
 						$monthnumber = date ( "n" ) - 1; // Month number without lead 0.

@@ -479,6 +479,8 @@ function res_display_timeformat($mydate) {
  */
 function display_minute($sessiontime) {
 	global $resulttype;
+	if ($sessiontime < 0)
+		$sessiontime = 0;
 	if ((!isset ($resulttype)) || ($resulttype == "min")) {
 		$minutes = sprintf("%02d", intval($sessiontime / 60)) . ":" . sprintf("%02d", intval($sessiontime % 60));
 	} else {
