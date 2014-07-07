@@ -78,7 +78,7 @@ class iam_csvdump
     } else {
       while (list(,$val) = each($array)) {
         $val   = $this->_valToCsvHelper($val, $separator, $trimFunction);
-        $ret[] = $val;
+        $ret[] = strip_tags($val);
       }
       return join($separator, $ret);
     }
@@ -287,6 +287,9 @@ class iam_csvdump
           die("Error. Cannot connect to Database.");
       else
       {
+        if (isset($_SESSION["timezone"]) && $_SESSION["timezone"] != "") {
+        	mysql_query("SET time_zone = '".$_SESSION["timezone"]."'", $conn);
+        }
         $result = @mysql_query($query_string, $conn);
         if(!$result)
             die("Could not perform the Query: ".mysql_error());
@@ -294,8 +297,15 @@ class iam_csvdump
         {
             $file = "";
             $crlf = $this->_define_newline();
-            while ($str= @mysql_fetch_array($result, MYSQL_NUM))
+            while ($str= @mysql_fetch_array($result, MYSQL_ASSOC))
             {
+                if ($file == "") {
+                    foreach($str as $k=>$v)
+                    {
+                        $keys[]=gettext($k);
+                    }
+                    $file = $this->arrayToCsvString($keys,",").$crlf;
+                }
                 $file .= $this->arrayToCsvString($str,",").$crlf;
             }
             echo $file;
@@ -403,6 +413,9 @@ class iam_csvdump
         }
         else
         {
+            if (isset($_SESSION["timezone"]) && $_SESSION["timezone"] != "") {
+        	mysql_query("SET time_zone = '".$_SESSION["timezone"]."'", $conn);
+            }
             $result = @mysql_query($query_string, $conn);
             if(!$result)
             {

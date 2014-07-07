@@ -3215,7 +3215,7 @@ msgstr "почта"
 #: A2B_receipt_preview_detail.php:215 call-history.php:130
 #: A2B_receipt_view.php:179 A2B_receipt_view.php:200
 msgid "Date"
-msgstr "Дата"
+msgstr "Дата и время"
 
 #: A2B_invoice_view.php:194
 msgid "Invoice number"

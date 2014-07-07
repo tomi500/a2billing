@@ -148,9 +148,11 @@ $FG_TABLE_COL[]=array (gettext ("WaitUp"), "waitup", 2*$p, "center", "SORT", "30
 $FG_TABLE_COL[]=array (gettext("Duration"), "sessiontime", 8*$p ."%", "center", "SORT", "30", "", "", "", "", "", "display_minute");
 $FG_TABLE_COL[]=array ('<acronym title="'.gettext("Terminate Cause").'">'.gettext("TC").'</acronym>', "terminatecauseid", 7*$p ."%", "center", "SORT", "", "list", $dialstatus_list);
 $FG_TABLE_COL[]=array (gettext("CallType"), "sipiax", 8*$p ."%", "center", "SORT",  "", "list", $list_calltype);
-$FG_TABLE_COL[]=array (gettext("Cost"), "sessionbill", 8*$p ."%", "center", "SORT", "30", "", "", "", "", "", "display_2bill");
+$FG_TABLE_COL[]=array (gettext("Cost"), "sessionbill", 12*$p ."%", "center", "SORT", "30", "", "", "", "", "", "display_2bill");
 
-$FG_COL_QUERY = "t1.starttime, IF(t1.src_exten IS NULL, t1.src, t1.src_exten) src, IF(t1.card_id='$customer', IF(t1.calledexten IS NOT NULL, t1.calledexten, t1.calledstation), t1.dnid) calledstation, t1.destination, id_ratecard as route, UNIX_TIMESTAMP(t1.starttime)-INSERT(t1.uniqueid,1,1,1) AS waitup, t1.sessiontime, t1.terminatecauseid, t1.sipiax, IF(t1.card_id='$customer', t1.sessionbill+margindillers, 0) sessionbill";
+$FG_COL_QUERY = "t1.starttime, IF(t1.src_exten IS NULL, t1.src, t1.src_exten) src, IF(t1.card_id='$customer', IF(t1.calledexten IS NOT NULL, t1.calledexten, t1.calledstation), t1.dnid) calledstation, t1.destination, id_ratecard as route, ROUND(UNIX_TIMESTAMP(t1.starttime)-INSERT(t1.uniqueid,1,1,1)) AS waitup, t1.sessiontime, t1.terminatecauseid, t1.sipiax, IF(t1.card_id='$customer', t1.sessionbill+margindillers, 0) sessionbill";
+$et = $resulttype=="sec" ? "t1.sessiontime" : "sec_to_time(t1.sessiontime)";
+$FG_EXPORT_QUERY = "t1.starttime Date, IF(t1.src_exten IS NULL, t1.src, t1.src_exten) CallerID, IF(t1.card_id='$customer', IF(t1.calledexten IS NOT NULL, t1.calledexten, t1.calledstation), t1.dnid) PhoneNumber, t2.destination Destination, $et Duration, ROUND(IF(t1.card_id='$customer', t1.sessionbill+margindillers, 0),5) Cost";
 
 if ($ACXSEERECORDING) {
 	$FG_TABLE_COL [] = array ('<span class="liens">' . gettext("Audio") . "</span>", "uniqueid", 100*(1-$p) ."%", "center", "", "30", "", "", "", "", "", "linkonmonitorfile_customer");
@@ -236,7 +238,18 @@ if (!isset($resulttype)) $resulttype="min";
 if (!$nodisplay) {
 	$list = $instance_table -> Get_list ($DBHandle, $FG_TABLE_CLAUSE, $order, $sens, null, null, $FG_LIMITE_DISPLAY, $current_page*$FG_LIMITE_DISPLAY);
 }
-$_SESSION["pr_sql_export"] = "SELECT $FG_COL_QUERY FROM $FG_TABLE_NAME WHERE $FG_TABLE_CLAUSE";
+
+// EXPORT
+$FG_EXPORT_SESSION_VAR = "pr_export_entity_call";
+
+// Query Preparation for the Export Functionality
+$_SESSION [$FG_EXPORT_SESSION_VAR] = "SELECT $FG_EXPORT_QUERY FROM $FG_TABLE_NAME LEFT JOIN cc_prefix t2 ON prefix = t1.destination WHERE $FG_TABLE_CLAUSE";
+
+if (! is_null ( $order ) && ($order != '') && ! is_null ( $sens ) && ($sens != '')) {
+	$_SESSION [$FG_EXPORT_SESSION_VAR] .= " ORDER BY $order $sense";
+}
+
+//$_SESSION["pr_sql_export"] = "SELECT $FG_COL_QUERY FROM $FG_TABLE_NAME WHERE $FG_TABLE_CLAUSE";
 
 $QUERY = "SELECT DATE(t1.starttime) AS day, sum(t1.sessiontime) AS calltime, sum(IF(t1.card_id='$customer',t1.sessionbill+margindillers,0)) AS cost, count(*) as nbcall FROM $FG_TABLE_NAME WHERE ".$FG_TABLE_CLAUSE." GROUP BY day ORDER BY day"; //extract(DAY from calldate)
 
@@ -761,17 +774,17 @@ foreach ($list_total_day as $data){
 	        <td bgcolor="<?php echo $FG_TABLE_ALTERNATE_ROW_COLOR[$i]?>" align="right" nowrap="nowrap" class="fontstyle_001"><?php echo $data[3]?></td>
 	        <td bgcolor="<?php echo $FG_TABLE_ALTERNATE_ROW_COLOR[$i]?>" align="right" nowrap="nowrap" class="fontstyle_001" ><?php echo $tmc?> </td>
 			<td bgcolor="<?php echo $FG_TABLE_ALTERNATE_ROW_COLOR[$i]?>" align="right" nowrap="nowrap" class="fontstyle_001"><?php  display_2bill($data[2]) ?></td>
-     	<?php 	 
-     	}	 	 	
-	 	
+     	<?php
+     	}
+
 		if ((!isset($resulttype)) || ($resulttype=="min")){  
-			$total_tmc = sprintf("%02d",intval(($totalminutes/$totalcall)/60)).":".sprintf("%02d",intval(($totalminutes/$totalcall)%60));				
+			$total_tmc = sprintf("%02d",intval(($totalminutes/$totalcall)/60)).":".sprintf("%02d",intval(($totalminutes/$totalcall)%60));
 			$totalminutes = sprintf("%02d",intval($totalminutes/60)).":".sprintf("%02d",intval($totalminutes%60));
 		}else{
-			$total_tmc = intval($totalminutes/$totalcall);			
+			$total_tmc = intval($totalminutes/$totalcall);
 		}
-	 
-	 ?>                   	
+
+	 ?>
 	</tr>
 
 	<!-- TOTAL -->
@@ -786,11 +799,16 @@ foreach ($list_total_day as $data){
 	</table>
 	  
 </td></tr></table>
+</center>
+<br>
+<!-- SECTION EXPORT //--> &nbsp; &nbsp;
+<a href="export_csv.php?var_export=<?php echo $FG_EXPORT_SESSION_VAR?>&var_export_type=type_csv" target="_blank"><img src="<?php echo Images_Path; ?>/excel.gif" border="0" height="30" /><?php echo gettext ( "Export CSV" ); ?></a> 
+&nbsp; &nbsp; &nbsp;
+<a href="export_csv.php?var_export=<?php echo $FG_EXPORT_SESSION_VAR?>&var_export_type=type_xml" target="_blank"><img src="<?php echo Images_Path; ?>/icons_xml.gif" border="0" height="32" /><?php echo gettext ( "Export XML" ); ?></a>
 
 <?php  } else { ?>
 	<center><h3><?php echo gettext("No calls in your selection");?>.</h3></center>
 <?php  } ?>
-</center>
 
 <?php
 
