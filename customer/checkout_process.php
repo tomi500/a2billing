@@ -77,7 +77,7 @@ if (DB_TYPE == "postgres") {
 }
 
 // Status - New 0 ; Proceed 1 ; In Process 2
-$QUERY = "SELECT id, cardid, amount, vat, paymentmethod, cc_owner, cc_number, cc_expires, creationdate, status, cvv, credit_card_type, currency, item_id, item_type " .
+$QUERY = "SELECT id, cardid, amount, vat, paymentmethod, cc_owner, cc_number, cc_expires, UNIX_TIMESTAMP(creationdate), status, cvv, credit_card_type, currency, item_id, item_type " .
 		 " FROM cc_epayment_log " .
 		 " WHERE id = ".$transactionID." AND (status = 0 OR ((status = 1 OR status = 2) AND cc_expires = 'w' AND $CASHIN_7DAY) OR (status = 2 AND $NOW_7MIN))";
 $transaction_data = $paymentTable->SQLExec ($DBHandle_max, $QUERY);

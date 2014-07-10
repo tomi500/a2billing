@@ -94,7 +94,8 @@ $_SESSION["p_amount"] = 3;
 
 
 $paymentTable = new Table();
-$time_stamp = date("Y-m-d H:i:s"); 
+//$time_stamp = date("Y-m-d H:i:s");
+$time_stamp = time();
 $amount_string = sprintf("%.3F", $total_amount);
 
 $payment_modules = new payment($payment);
@@ -111,13 +112,13 @@ $paycur = $currencies_list[$getcur][2];
 
 if (strtoupper($payment)=='PLUGNPAY') {
 	$QUERY_FIELDS = "cardid, amount, vat, paymentmethod, cc_owner, cc_number, cc_expires, creationdate, cvv, credit_card_type, currency , item_id , item_type";
-	$QUERY_VALUES = "'".$_SESSION["card_id"]."','$amount_string', '".$_SESSION["vat"]."', '$payment','$plugnpay_cc_owner','".substr($plugnpay_cc_number,0,4)."XXXXXXXXXXXX','".$plugnpay_cc_expires_month."-".$plugnpay_cc_expires_year."','$time_stamp', '$cvv', '$credit_card_type', '".BASE_CURRENCY."' , '$item_id', '$item_type'";
+	$QUERY_VALUES = "'".$_SESSION["card_id"]."','$amount_string','".$_SESSION["vat"]."','$payment','$plugnpay_cc_owner','".substr($plugnpay_cc_number,0,4)."XXXXXXXXXXXX','".$plugnpay_cc_expires_month."-".$plugnpay_cc_expires_year."',FROM_UNIXTIME($time_stamp),'$cvv','$credit_card_type','".BASE_CURRENCY."','$item_id','$item_type'";
 } else if(strtoupper($payment)=='IRIDIUM'){
 	$QUERY_FIELDS = "cardid, amount, vat, paymentmethod, cc_owner, cc_number, cc_expires, creationdate, currency, item_id, item_type";
-	$QUERY_VALUES = "'".$_SESSION["card_id"]."','$amount_string', '".$_SESSION["vat"]."', '$payment','$CardName','".substr($CardNumber,0,4)."XXXXXXXXXXXX','".$ExpiryDateMonth."-".$ExpiryDateYear."','$time_stamp', '".BASE_CURRENCY."' , '$item_id','$item_type'";
+	$QUERY_VALUES = "'".$_SESSION["card_id"]."','$amount_string','".$_SESSION["vat"]."','$payment','$CardName','".substr($CardNumber,0,4)."XXXXXXXXXXXX','".$ExpiryDateMonth."-".$ExpiryDateYear."',FROM_UNIXTIME($time_stamp),'".BASE_CURRENCY."','$item_id','$item_type'";
 } else {
 	$QUERY_FIELDS = "cardid, amount, vat, paymentmethod, cc_owner, cc_number, cc_expires, creationdate, currency, item_id, item_type";
-    $QUERY_VALUES = "'".$_SESSION["card_id"]."','$amount_string', '".$_SESSION["vat"]."', '$payment','$authorizenet_cc_owner','".substr($authorizenet_cc_number,0,4)."XXXXXXXXXXXX','".$authorizenet_cc_expires_month."-".$authorizenet_cc_expires_year."','$time_stamp', '".$getcur."' , '$item_id','$item_type'";
+    $QUERY_VALUES = "'".$_SESSION["card_id"]."','$amount_string','".$_SESSION["vat"]."','$payment','$authorizenet_cc_owner','".substr($authorizenet_cc_number,0,4)."XXXXXXXXXXXX','".$authorizenet_cc_expires_month."-".$authorizenet_cc_expires_year."',FROM_UNIXTIME($time_stamp),'".$getcur."','$item_id','$item_type'";
 }
 
 $transaction_no = $paymentTable->Add_table ($HD_Form -> DBHandle, $QUERY_VALUES, $QUERY_FIELDS, 'cc_epayment_log', 'id');
@@ -156,7 +157,7 @@ if (isset($$payment->form_action_url)) {
 echo tep_draw_form('checkout_confirmation.php', $form_action_url, 'post', null, $payment);
 
 if (is_array($payment_modules->modules)) {
-    echo $payment_modules->process_button($transaction_no, $key);    
+    echo $payment_modules->process_button($transaction_no, $key);
 }
 ?>
 

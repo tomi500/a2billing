@@ -203,9 +203,9 @@ if (ACT_VOICEMAIL && $ACXVOICEMAIL) {
 			   "",
 			   gettext("Customer can choose to enable the voicemail for this card"),
 			   "" , "", "", "Yes :1, - No:0");
-}
+$add_fields_voicemail = ', voicemail_activated';
+} else $add_fields_voicemail = '';
 
-$add_fields_voicemail = ', voicemail_activated ';
 
 $HD_Form -> AddEditElement (gettext("MARGIN").", %%",
                                     "margin",
@@ -225,7 +225,7 @@ $HD_Form -> AddEditElement (gettext("PAYPAL PAYMENT"),
                                     "list", "", "", "", $yesno_list, "%1", "", gettext("Apply PayPal payment to this customer"));
 
 
-$HD_Form -> FieldEditElement ('lastname, firstname, company_name, email, company_website, address, city, state, zipcode, areaprefix, citylength, country, language, id_timezone, phone, fax'.$add_fields_monitor.', recalldays'.$add_fields_voicemail.", margin, paypal");
+$HD_Form -> FieldEditElement ('lastname, firstname, company_name, email, company_website, address, city, state, zipcode, areaprefix, citylength, country, language, id_timezone, phone, fax'.$add_fields_monitor.', recalldays'.$add_fields_voicemail.', margin, paypal');
 
 $HD_Form->FG_ADITION_HIDDEN_PARAM = $HD_Form->FG_EDITION_HIDDEN_PARAM = 'popup_select, idcust';
 $HD_Form->FG_ADITION_HIDDEN_PARAM = $HD_Form->FG_EDITION_HIDDEN_PARAM_VALUE = "$popup_select, $idcust";

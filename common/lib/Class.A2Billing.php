@@ -2016,10 +2016,10 @@ $this -> debug( ERROR, $agi, __FILE__, __LINE__, "[* PEER                      {
 //			elseif (strpos($dialstr,'&') || strpos($dialstr,'@') || stripos($dialstr,'QUEUE ') === 0) 
 //				$inst_listdestination[10] = $agi -> get_variable('QUEUEDNID',true);
 
-$temptempqueuednid = $agi -> get_variable('MASTER_CHANNEL(QUEUEDNID)',true);
-$this -> debug( ERROR, $agi, __FILE__, __LINE__, "[* QUEUEDNID Master_channel  {$temptempqueuednid} ]");
-$temptempqueuednid = $agi -> get_variable('QUEUEDNID',true);
-$this -> debug( ERROR, $agi, __FILE__, __LINE__, "[* QUEUEDNID Current_channel {$temptempqueuednid} ]");
+//$temptempqueuednid = $agi -> get_variable('MASTER_CHANNEL(QUEUEDNID)',true);
+//$this -> debug( ERROR, $agi, __FILE__, __LINE__, "[* QUEUEDNID Master_channel  {$temptempqueuednid} ]");
+//$temptempqueuednid = $agi -> get_variable('QUEUEDNID',true);
+//$this -> debug( ERROR, $agi, __FILE__, __LINE__, "[* QUEUEDNID Current_channel {$temptempqueuednid} ]");
 
 			$this -> debug( INFO, $agi, __FILE__, __LINE__, "Destination: " . $inst_listdestination[10]);
 		    }
@@ -2098,7 +2098,9 @@ $this -> debug( ERROR, $agi, __FILE__, __LINE__, "[* QUEUEDNID Current_channel {
                 $this->extension = $this->destination = $inst_listdestination[4];
                 if ($this->CC_TESTING) $this->extension = $this->dnid = $this->destination = "011324885";
 				
-                if ($this -> callingcard_ivr_authorize($agi, $RateEngine, 0)==1) {
+                $ast = $this -> callingcard_ivr_authorize($agi, $RateEngine, 0);
+                if ($ast==1 ||  $ast=='2FAX') {
+                  if ($ast==1) {
 /**
 		// check the min to call
 		    if (!$call_did_free) {
@@ -2167,8 +2169,14 @@ $this -> debug( ERROR, $agi, __FILE__, __LINE__, "[* QUEUEDNID Current_channel {
                     $this -> bill_did_aleg ($agi, $listdestination[0], $answeredtime);
                     
                     break;
-                }
-            }
+		  } elseif ($ast=='2FAX') {
+			$answeredtime = $this -> call_fax($agi, 2);
+			if ($this->set_inuse_username) {
+				$this -> callingcard_acct_start_inuse($agi,0);
+			}
+		  }
+		}
+	    }
 		}// END FOR
 
 		if (!is_null($didvoicebox))

@@ -1492,7 +1492,7 @@ else echo "Ratecard: ".$this->ratecard_obj[$i][6]."<br>Trunk: ".$this->ratecard_
 				$this -> real_answeredtime = $this -> answeredtime = $wrapuptime = 0;
 				$destination=$old_destination;
 
-//$A2B -> debug( ERROR, $agi, __FILE__, __LINE__, "[A2B->CID_handover: ={$A2B->CID_handover}]");
+//if ($agi) $A2B -> debug( ERROR, $agi, __FILE__, __LINE__, "[A2B->CID_handover: ={$A2B->CID_handover}]");
 				if ($loop_failover == 0 && $intellect_count == -1) {
 				    $this -> usedtrunk	= $this -> ratecard_obj[$k][29];
 				    $failover_trunk	= $this -> usedtrunk;
@@ -1537,9 +1537,12 @@ else echo "Ratecard: ".$this->ratecard_obj[$i][6]."<br>Trunk: ".$this->ratecard_
 					$addparameter		= $result[0][10];
 					$wrapuprange		= explode(",",$result[0][12]);
 //$A2B -> debug( ERROR, $agi, __FILE__, __LINE__, "trunk_result[0][11] = ".$result[0][11]);
-					if ($result[0][11])
+					if ($result[0][11]) {
 						$CID_handover	= $A2B -> CID_handover;
-				    } else break;
+					}
+				    } else {
+					break;
+				    }
 				}
 				if ($cidgroupid == -1) $cidgroupid = $cidgroupidrate;
 				
@@ -1621,7 +1624,9 @@ else echo "Ratecard: ".$this->ratecard_obj[$i][6]."<br>Trunk: ".$this->ratecard_
 ".		"GROUP BY trunk_depend$td
 ".		"ORDER BY IF(duration AND trunkpercentage>0,trunkpercentage,32768), IF(duration IS NULL, 1, 0), offen DESC, duration DESC";
 					    $resultrand = $A2B->instance_table -> SQLExec ($A2B -> DBHandle, $QUERY);
-					} else $resultrand = $intellecttrunks;
+					} else {
+						$resultrand = $intellecttrunks;
+					}
 					if (is_array($resultrand) && count($resultrand)>0) {
 						$trunkrand = $this -> usedtrunk;
 						$intellecttrunks = $resultrand;
@@ -1634,9 +1639,12 @@ if ($agi) $A2B -> debug( ERROR, $agi, __FILE__, __LINE__, "TRUNK=".$valu_val[2].
 							else $resultrand[$valu_key][1] = 0;
 							if (!is_numeric($valu_val[0])) $count_minus++;
 						}
-						if ($intellect_count == -1) $intellect_count = $valu_key - $count_minus;
-						else $intellect_count--;
-
+						if ($intellect_count == -1) {
+							$intellect_count = $valu_key - $count_minus;
+						} else {
+							$intellect_count--;
+						}
+//if ($agi) $A2B -> debug( ERROR, $agi, __FILE__, __LINE__, "Intellect_count =".$intellect_count);
 						if ($sum_percent>0) {
 							$randgo = rand(1,$sum_percent);
 							foreach ($resultrand as $intellect_key => $valu_val)	{
@@ -1671,6 +1679,8 @@ if ($agi) $A2B -> debug( ERROR, $agi, __FILE__, __LINE__, "TRUNK=".$valu_val[2].
 							    }
 							}
 						}
+					} else {
+						if ($agi) $A2B -> debug(FATAL, $agi, __FILE__, __LINE__, "No Trunks found for call to ".$A2B->destination);
 					}
 				    }
 				    if ($loop_failover == 0 && $intellect_count == -1) {
@@ -1737,8 +1747,10 @@ if ($agi) $A2B -> debug( ERROR, $agi, __FILE__, __LINE__, "TRUNK=".$valu_val[2].
 						if ($next_failover_trunk == $failover_trunk) {
 						    break;
 						} else {
-						    if ($next_failover_trunk == -1 && $ifmaxuse == 1) continue 2;
-						    if ($agi) $A2B -> debug( DEBUG, $agi, __FILE__, __LINE__, "Now using its failover trunk\n");
+						    if ($next_failover_trunk == -1 && $ifmaxuse == 1) {
+							if ($agi) $A2B -> debug( DEBUG, $agi, __FILE__, __LINE__, "Now using its failover trunk\n");
+							continue 2;
+						    }
 						    $intellect_count = -1;
 						    $loop_failover++;
 						    $failover_trunk = $next_failover_trunk;
@@ -1977,7 +1989,9 @@ if ($agi) $A2B -> debug( ERROR, $agi, __FILE__, __LINE__, "TRUNK=".$valu_val[2].
 			    }
 			    return $res;
 			}
-			if (!$agi || $typecall == 9) continue;
+			if (!$agi || $typecall == 9) {
+				continue;
+			}
 			
 			//# Ooh, something actually happened!
 			if ($this->dialstatus  == "BUSY") {
@@ -2011,11 +2025,11 @@ if ($agi) $A2B -> debug( ERROR, $agi, __FILE__, __LINE__, "TRUNK=".$valu_val[2].
 				$this->usedratecard = $k-$loop_failover;
 				return false;
 			} elseif ($this->dialstatus == "ANSWER") {
-				$A2B -> debug( DEBUG, $agi, __FILE__, __LINE__, "-> dialstatus : ".$this->dialstatus.", answered time is ".$this->answeredtime." \n");
+				$A2B -> debug( INFO, $agi, __FILE__, __LINE__, "-> dialstatus : ".$this->dialstatus.", answered time is ".$this->answeredtime." \n");
 			}
 
 			$this->usedratecard = $k;
-			$A2B -> debug( DEBUG, $agi, __FILE__, __LINE__, "[USEDRATECARD=".$this -> usedratecard."]");
+			$A2B -> debug( INFO, $agi, __FILE__, __LINE__, "[USEDRATECARD=".$this -> usedratecard."]");
 			return true;
 		} // End for
 
