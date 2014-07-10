@@ -188,22 +188,28 @@ normalize_day_of_month($fromstatsday_sday, $fromstatsmonth_sday, 1);
 normalize_day_of_month($tostatsday_sday, $tostatsmonth_sday, 1);
 // Date Clause
 if ($fromday && isset ( $fromstatsday_sday ) && isset ( $fromstatsmonth_sday )) {
-	if ($fromtime) {
-		$date_clause = " AND t1.starttime >= ('$fromstatsmonth_sday-$fromstatsday_sday $fromstatsday_hour:$fromstatsday_min')";
-	} else {
-		$date_clause = " AND t1.starttime >= ('$fromstatsmonth_sday-$fromstatsday_sday')";
-	}
+        if ($fromtime) {
+                $date_clause = " AND t1.starttime >= '$fromstatsmonth_sday-$fromstatsday_sday $fromstatsday_hour:$fromstatsday_min'";
+        } else {
+                $date_clause = " AND t1.starttime >= '$fromstatsmonth_sday-$fromstatsday_sday'";
+        }
+} else {
+        $cc_yearmonth = sprintf ( "%04d-%02d-%02d", date ( "Y" ), date ( "n" ), date ( "d" ) );
+        if ($fromtime) {
+                $date_clause = " AND t1.starttime >= '$cc_yearmonth $fromstatsday_hour:$fromstatsday_min'";
+        } else {
+                $date_clause = " AND t1.starttime >= '$cc_yearmonth'";
+        }
 }
 if ($today && isset ( $tostatsday_sday ) && isset ( $tostatsmonth_sday )) {
-	if ($totime) {
-		$date_clause .= " AND t1.starttime <= ('$tostatsmonth_sday-" . sprintf ( "%02d", intval ( $tostatsday_sday )/*+1*/) . " $tostatsday_hour:$tostatsday_min:59')";
-	} else {
-		$date_clause .= " AND t1.starttime <= ('$tostatsmonth_sday-" . sprintf ( "%02d", intval ( $tostatsday_sday )/*+1*/) . " 23:59:59')";
-	}
-}
-if ($date_clause == '') {
-	$cc_yearmonth = sprintf ( "%04d-%02d-%02d", date ( "Y" ), date ( "n" ), date ( "d" ) );
-	$date_clause = " AND t1.starttime >= ('$cc_yearmonth')";
+        if ($totime) {
+                $date_clause .= " AND t1.starttime <= '$tostatsmonth_sday-" . sprintf ( "%02d", intval ( $tostatsday_sday )/*+1*/) . " $tostatsday_hour:$tostatsday_min:59'";
+        } else {
+                $date_clause .= " AND t1.starttime <= '$tostatsmonth_sday-" . sprintf ( "%02d", intval ( $tostatsday_sday )/*+1*/) . " 23:59:59'";
+        }
+} elseif ($totime) {
+        $cc_yearmonth = sprintf ( "%04d-%02d-%02d", date ( "Y" ), date ( "n" ), date ( "d" ) );
+        $date_clause .= " AND t1.starttime <= '$cc_yearmonth $tostatsday_hour:$tostatsday_min:59'";
 }
 
 if (strpos ( $SQLcmd, 'WHERE' ) > 0) {

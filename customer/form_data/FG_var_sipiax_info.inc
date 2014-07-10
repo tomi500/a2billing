@@ -133,7 +133,7 @@ $HD_Form -> AddEditElement (gettext("EXTENSION "),
 					"INPUT",
 					"size=50 maxlength=$extlen",
 					regex_range($extmin,$extmax,$exten_include),
-					"Enter right number from range below exclude afore existing numbers",
+					gettext("Enter right number from range below exclude afore existing numbers"),
 					"", "", "", "", "", "", "", gettext("Extension number from ").$extmin.gettext(" to ").$extmax);
 
 $HD_Form -> AddEditElement (gettext("REGISTRATION NAME"),

@@ -15,7 +15,11 @@ msgstr ""
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
 
-#: FG_var_moneysituation_details.inc
+#: form_data/FG_var_sipiax_info.inc:136
+msgid "Enter right number from range below exclude afore existing numbers"
+msgstr "Введите номер из ниже указанного диапазона, исключая уже используемые номера"
+
+#: form_data/FG_var_moneysituation_details.inc
 msgid "THERE IS NO PAYMENTS CREATED!"
 msgstr "ПЛАТЕЖЕЙ ЕЩЁ НЕ БЫЛО!"
 
