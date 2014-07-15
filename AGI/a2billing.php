@@ -268,7 +268,7 @@ if ($mode == 'auto') {
 			$agi -> set_callerid($A2B -> CallerID);
 		$QUERY = "SELECT 1 FROM cc_did, cc_callerid WHERE cc_did.id = {$result[0][3]} AND cid LIKE '$A2B->CallerID' AND cc_callerid.activated = 't' AND ((id_cc_card = iduser AND allciduse <> 3) OR iduser = 0 OR allciduse = 1) LIMIT 1";
 		$result = $A2B -> instance_table -> SQLExec ($A2B->DBHandle, $QUERY);
-		if (is_array($result)) {
+		if (is_array($result) && count($result) > 0) {
 			$didyes = false;
 		}
 	    }
@@ -279,7 +279,7 @@ if ($mode == 'auto') {
 ".			"INNER JOIN cc_did ON cc_did.id_trunk = cc_call.id_trunk
 ".			"WHERE did LIKE '$mydnid' AND calledstation LIKE '$A2B->CallerID' AND LENGTH(calledstation) > 6 ORDER BY cc_call.id DESC LIMIT 1";
 		$result = $A2B -> instance_table -> SQLExec ($A2B->DBHandle, $QUERY);
-		if (is_array($result)) {
+		if (is_array($result) && count($result) > 0) {
 			$RateEngine->Reinit();
 			$A2B -> agiconfig['answer_call'] = 0;
 			$A2B -> agiconfig['play_audio'] = 0;
@@ -363,6 +363,9 @@ if ($mode == 'auto') {
 		    break;
 		}
 	    }
+	} else {
+		$A2B -> debug(FATAL, $agi, __FILE__, __LINE__, "'agi_extension' can not be empty");
+		break;
 	}
 }
 

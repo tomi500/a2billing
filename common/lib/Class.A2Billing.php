@@ -1441,6 +1441,11 @@ for ($t=0;$t<count($result);$t++) {
 				// Monitor(wav,kiki,m)
 				$myres = $agi->exec($this -> format_parameters ("StopMixMonitor"));
 				$this -> debug( INFO, $agi, __FILE__, __LINE__, "EXEC StopMixMonitor (".$this->uniqueid.")");
+				$monfile = $this->dl_short ."{$this->uniqueid}.";
+				$monfile.= $this->agiconfig['monitor_formatfile'] == 'wav49' ? 'WAV' : $this->agiconfig['monitor_formatfile'];
+				if (filesize($monfile) == 60) {
+					unlink($monfile);
+				}
 			}
 
 			$this -> debug( INFO, $agi, __FILE__, __LINE__, "[".$this->tech." Friend][K=$k]:[ANSWEREDTIME=".$answeredtime."-DIALSTATUS=".$dialstatus."]");
