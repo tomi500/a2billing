@@ -1627,17 +1627,22 @@ else echo "Ratecard: ".$this->ratecard_obj[$i][6]."<br>Trunk: ".$this->ratecard_
 					} else {
 						$resultrand = $intellecttrunks;
 					}
-					if (is_array($resultrand) && count($resultrand)>0) {
+					if (is_array($resultrand) && count($resultrand) > 0) {
 						$trunkrand = $this -> usedtrunk;
 						$intellecttrunks = $resultrand;
 						$firstrand = true;
 						$sum_percent = 0;
 						$count_minus = 0;
 						foreach ($resultrand as $valu_key => $valu_val) {
-if ($agi) $A2B -> debug( ERROR, $agi, __FILE__, __LINE__, "TRUNK=".$valu_val[2]." / ".$valu_val[3]." times / ".$valu_val[0]." secs free");
-							if (is_numeric($valu_val[0]) && $valu_val[1]>0) $resultrand[$valu_key][1] = $sum_percent += $valu_val[1];
-							else $resultrand[$valu_key][1] = 0;
-							if (!is_numeric($valu_val[0])) $count_minus++;
+//if ($agi) $A2B -> debug( ERROR, $agi, __FILE__, __LINE__, "TRUNK=".$valu_val[2]." / ".$valu_val[3]." times / ".$valu_val[0]." secs free");
+							if (is_numeric($valu_val[0]) && $valu_val[1] > 0) {
+								$resultrand[$valu_key][1] = $sum_percent += $valu_val[1];
+							} else {
+								$resultrand[$valu_key][1] = 0;
+							}
+							if (!is_numeric($valu_val[0])) {
+								$count_minus++;
+							}
 						}
 						if ($intellect_count == -1) {
 							$intellect_count = $valu_key - $count_minus;
@@ -1648,12 +1653,14 @@ if ($agi) $A2B -> debug( ERROR, $agi, __FILE__, __LINE__, "TRUNK=".$valu_val[2].
 						if ($sum_percent>0) {
 							$randgo = rand(1,$sum_percent);
 							foreach ($resultrand as $intellect_key => $valu_val)	{
-								if ($valu_val[1]>=$randgo) {
+								if ($valu_val[1] >= $randgo) {
 									$intellecttrunks[$intellect_key][1] = 0;
-									if ($valu_val[2]<>$this->usedtrunk) {
+									if ($valu_val[2] != $this->usedtrunk) {
 										$failover_trunk = $valu_val[2];
 										continue 2;
-									} else break;
+									} else {
+										break;
+									}
 								}
 							}
 						} else {
@@ -1661,27 +1668,31 @@ if ($agi) $A2B -> debug( ERROR, $agi, __FILE__, __LINE__, "TRUNK=".$valu_val[2].
 							$intellecttrunks = $resultrand;
 							$intellectmarker = true;
 							foreach ($resultrand as $intellect_key => $valu_val)	{
-								if ($valu_val[0]<-1 && is_numeric($valu_val[0])) {
+								if ($valu_val[0] < -1 && is_numeric($valu_val[0])) {
 									$intellecttrunks[$intellect_key][0] = 0;
 									$intellectmarker = false;
-									if ($valu_val[2]<>$this->usedtrunk) {
+									if ($valu_val[2] != $this->usedtrunk) {
 									    $failover_trunk = $valu_val[2];
 									    continue 2;
-									} else break;
+									} else {
+										break;
+									}
 								}
 							}
 							if ($intellectmarker) {
-							    if ($resultrand[$valu_key][0]>=0 || !is_numeric($resultrand[$valu_key][0])) $valu_key=0;
-							    $intellecttrunks[$valu_key][0] = 0;
-							    if ($resultrand[$valu_key][2]<>$this->usedtrunk) {
-								$failover_trunk = $resultrand[$valu_key][2];
-								continue;
-							    }
+								if ($resultrand[$valu_key][0] >= 0 || !is_numeric($resultrand[$valu_key][0])) {
+									$valu_key=0;
+								}
+								$intellecttrunks[$valu_key][0] = 0;
+								if ($resultrand[$valu_key][2] != $this->usedtrunk) {
+									$failover_trunk = $resultrand[$valu_key][2];
+									continue;
+								}
 							}
 						}
-					} else {
+					} /**else {
 						if ($agi) $A2B -> debug(FATAL, $agi, __FILE__, __LINE__, "No Trunks found for call to ".$A2B->destination);
-					}
+					} **/
 				    }
 				    if ($loop_failover == 0 && $intellect_count == -1) {
 					$next_failover_trunk	= $this -> ratecard_obj[$k][56+$usetrunk_failover];
@@ -1695,9 +1706,15 @@ if ($agi) $A2B -> debug( ERROR, $agi, __FILE__, __LINE__, "TRUNK=".$valu_val[2].
 					    $timeleft		= $this -> ratecard_obj[$k][59+$usetrunk_failover];
 					    if ($maxsecperperiod != -1) {
 						if ($periodexpiry > $timecur) {
-						    $trunktimeout = $maxsecperperiod - $periodcount;
-						    if ($timeleft > $trunktimeout || $trunktimeout < 3) $trunktimeout = 0; else $trunktimeout = $trunktimeout - 2;
-						} elseif ($periodcur >0) $trunktimeout = $maxsecperperiod -2;
+							$trunktimeout = $maxsecperperiod - $periodcount;
+							if ($timeleft > $trunktimeout || $trunktimeout < 3) {
+								$trunktimeout = 0;
+							} else {
+								$trunktimeout = $trunktimeout - 2;
+							}
+						} elseif ($periodcur > 0) {
+							$trunktimeout = $maxsecperperiod -2;
+						}
 					    }
 					}
 				    } else {
@@ -1713,13 +1730,19 @@ if ($agi) $A2B -> debug( ERROR, $agi, __FILE__, __LINE__, "TRUNK=".$valu_val[2].
 						if ($maxsecperperiod != -1) {
 							if ($periodexpiry > $timecur) {
 								$trunktimeout = $maxsecperperiod - $periodcount;
-								if ($timeleft > $trunktimeout || $trunktimeout < 3) $trunktimeout = 0; else $trunktimeout = $trunktimeout - 2;
-							} elseif ($periodcur >0) $trunktimeout = $maxsecperperiod -2;
+								if ($timeleft > $trunktimeout || $trunktimeout < 3) {
+									$trunktimeout = 0;
+								} else {
+									$trunktimeout = $trunktimeout - 2;
+								}
+							} elseif ($periodcur > 0) {
+								$trunktimeout = $maxsecperperiod -2;
+							}
 						}
 					}
 				    }
 				}
-				if ($next_failover_trunk_by_clause >=0) {
+				if ($next_failover_trunk_by_clause >= 0) {
 					$next_failover_trunk = $next_failover_trunk_by_clause;
 				}
 				// Check if we will be able to use this route:
@@ -1730,8 +1753,8 @@ if ($agi) $A2B -> debug( ERROR, $agi, __FILE__, __LINE__, "TRUNK=".$valu_val[2].
 					if ($agi) $A2B -> debug( WARN, $agi, __FILE__, __LINE__, "Failover trunk cannot be used because it is disabled. Now use next trunk\n");
 					continue 2;
 				}
-				if (($maxuse!=-1 && $inuse >= $maxuse) || ($startdate > $timecur || $timecur >= $stopdate
-				|| ($maxsecperperiod!=-1 && $periodcount >= $maxsecperperiod - $timeleft && $periodexpiry > $timecur) || ($periodexpiry <= $timecur && $periodcur==0))) {
+				if (($maxuse != -1 && $inuse >= $maxuse) || ($startdate > $timecur || $timecur >= $stopdate
+				|| ($maxsecperperiod != -1 && $periodcount >= $maxsecperperiod - $timeleft && $periodexpiry > $timecur) || ($periodexpiry <= $timecur && $periodcur == 0))) {
 					if ($agi) $A2B -> debug( WARN, $agi, __FILE__, __LINE__, "Failover trunk cannot be used because maximum number of connections on this trunk is already reached or limited.\n");
 					// use failover trunk
 					if ($intellect_count > 0) {
@@ -1745,15 +1768,15 @@ if ($agi) $A2B -> debug( ERROR, $agi, __FILE__, __LINE__, "TRUNK=".$valu_val[2].
 						continue;
 					} elseif ($ifmaxuse == 0 || $periodexpiry != 0) {
 						if ($next_failover_trunk == $failover_trunk) {
-						    break;
+							break;
 						} else {
-						    if ($next_failover_trunk == -1 && $ifmaxuse == 1) {
-							if ($agi) $A2B -> debug( DEBUG, $agi, __FILE__, __LINE__, "Now using its failover trunk\n");
-							continue 2;
-						    }
-						    $intellect_count = -1;
-						    $loop_failover++;
-						    $failover_trunk = $next_failover_trunk;
+							if ($next_failover_trunk == -1 && $ifmaxuse == 1) {
+								if ($agi)	$A2B -> debug( DEBUG, $agi, __FILE__, __LINE__, "Now using its failover trunk\n");
+								continue 2;
+							}
+							$intellect_count = -1;
+							$loop_failover++;
+							$failover_trunk = $next_failover_trunk;
 						}
 						continue;
 					} else {
@@ -1764,30 +1787,36 @@ if ($agi) $A2B -> debug( ERROR, $agi, __FILE__, __LINE__, "TRUNK=".$valu_val[2].
 				$this->pos_dialingnumber = max(strpos($ipaddress, '%dialingnumber%'),strpos($ipaddress, '%none%'));
 				$ipaddress = str_replace("%cardnumber%", $A2B->cardnumber, $ipaddress);
 				$ipaddress = str_replace("%none%", '', $ipaddress);
-				if (strncmp($destination, $prefix, strlen($prefix)) == 0 && strlen($prefix) > 1) $prefix="";
+				if (strncmp($destination, $prefix, strlen($prefix)) == 0 && strlen($prefix) > 1) {
+					$prefix="";
+				}
 				$ipaddress = str_replace("%dialingnumber%", $prefix.$destination, $ipaddress);
 
-				if ($this->pos_dialingnumber !== false) $channel = "$tech/$ipaddress";
-				elseif ($A2B->agiconfig['switchdialcommand'] == 1) $channel = "$tech/$prefix$destination@$ipaddress";
-					else $channel = "$tech/$ipaddress/$prefix$destination";
+				if ($this->pos_dialingnumber !== false) {
+					$channel = "$tech/$ipaddress";
+				} elseif ($A2B->agiconfig['switchdialcommand'] == 1) {
+					$channel = "$tech/$prefix$destination@$ipaddress";
+				} else {
+					$channel = "$tech/$ipaddress/$prefix$destination";
+				}
 
 //if ($agi) $A2B -> debug( ERROR, $agi, __FILE__, __LINE__, "[CID_handover: ={$CID_handover}]");
 				$A2B->instance_table = new Table();
 				$QUERY = "SELECT countryprefix FROM cc_country WHERE '{$A2B->destination}' LIKE concat(countryprefix,'%') ORDER BY countryprefix DESC LIMIT 1";
 				$result = $A2B->instance_table -> SQLExec ($A2B -> DBHandle, $QUERY);
-				if (is_array($result) && count($result)>0) {
+				if (is_array($result) && count($result) > 0) {
 					$outprefix			= $result[0][0];
 					$outprefixrequest		= "cid LIKE '{$outprefix}%' DESC,";
 				} else {
 					$outprefix = $outprefixrequest	= "";
 				}
-				if (!is_null($CID_handover) && $CID_handover=='' && $outprefix) {
+				if (!is_null($CID_handover) && $CID_handover == '' && $outprefix) {
 					$QUERY = "SELECT cid FROM cc_callerid
 							WHERE id_cc_card = {$A2B->id_card} AND verify = 1 AND cid != '{$A2B->destination}'
 								AND ((cli_localreplace = 1 AND cid LIKE '$outprefix%') OR (cli_otherreplace = 1 AND cid NOT LIKE '$outprefix%') OR cli_prefixreplace LIKE '%$outprefix%')
 							ORDER BY cli_localreplace = 1 AND cid LIKE '$outprefix%' DESC, cli_prefixreplace NOT LIKE '%$outprefix%', RAND() LIMIT 1";
 					$result = $A2B->instance_table -> SQLExec ($A2B -> DBHandle, $QUERY);
-					if (is_array($result) && count($result)>0) {
+					if (is_array($result) && count($result) > 0) {
 						$CID_handover = $result[0][0];
 					}
 				}
@@ -1798,7 +1827,7 @@ if ($agi) $A2B -> debug( ERROR, $agi, __FILE__, __LINE__, "TRUNK=".$valu_val[2].
 					$QUERY = "SELECT cid FROM cc_outbound_cid_list WHERE activated = 1 AND outbound_cid_group = $cidgroupid AND cid != '{$A2B->destination}' ORDER BY $outprefixrequest RAND() LIMIT 1";
 					$cidresult = $A2B->instance_table -> SQLExec ($A2B -> DBHandle, $QUERY);
 				}
-				if (is_array($cidresult) && count($cidresult)>0) {
+				if (is_array($cidresult) && count($cidresult) > 0) {
 					$outcid = $cidresult[0][0];
 				}
 
@@ -1811,7 +1840,7 @@ if ($agi) $A2B -> debug( ERROR, $agi, __FILE__, __LINE__, "TRUNK=".$valu_val[2].
 				if ($A2B->recalltime) $trunktimeout = min($trunktimeout, $A2B->recalltime * 1000);
 				$dialparams = str_replace("%timeout%", $trunktimeout, $A2B->agiconfig['dialcommand_param']);
 
-				if ($agi && strlen($musiconhold)>0 && $musiconhold!="selected") {
+				if ($agi && strlen($musiconhold) > 0 && $musiconhold != "selected") {
 					$dialparams.= "m";
 //					$myres = $agi->exec("SETMUSICONHOLD $musiconhold");
 					$agi -> set_variable('CHANNEL(musicclass)', $musiconhold);
@@ -1821,7 +1850,7 @@ if ($agi) $A2B -> debug( ERROR, $agi, __FILE__, __LINE__, "TRUNK=".$valu_val[2].
 
 				$dialstr = $channel.$dialparams;
 				//ADDITIONAL PARAMETER 			%dialingnumber%,	%cardnumber%
-				if (strlen($addparameter)>0) {
+				if (strlen($addparameter) > 0) {
 					$addparameter = str_replace("%cardnumber%", $A2B->cardnumber, $addparameter);
 					$addparameter = str_replace("%dialingnumber%", $prefix.$destination, $addparameter);
 					$dialstr .= $addparameter;
@@ -1865,7 +1894,9 @@ if ($agi) $A2B -> debug( ERROR, $agi, __FILE__, __LINE__, "TRUNK=".$valu_val[2].
 									$A2B -> debug( FATAL, $agi, __FILE__, __LINE__, "File corrupt: $monfile");
 								}
 								$newuniqueid = explode('.',$A2B->uniqueid);
-								if ($newuniqueid[0] == time())		sleep(1);
+								if ($newuniqueid[0] == time()) {
+									sleep(1);
+								}
 								$newuniqueid[0] = time();
 								$A2B->uniqueid = implode('.',$newuniqueid);
 								$monfile = $dl_short = $A2B->dl_short . $A2B->uniqueid . ".";
@@ -1887,9 +1918,8 @@ if ($agi) $A2B -> debug( ERROR, $agi, __FILE__, __LINE__, "TRUNK=".$valu_val[2].
 //$A2B -> debug( ERROR, $agi, __FILE__, __LINE__, " [===================                                             OUTCID: ".$outcid." ]");
 
 					if ($outcid != 0 && $agi -> request['agi_callerid'] != $outcid) {
-					//Uncomment this line if you want to save the outbound_cid in the CDR
-					//$A2B -> CallerID = $outcid;
-//					    if ($A2B -> CallerID != $outcid) {
+						//Uncomment this line if you want to save the outbound_cid in the CDR
+						//$A2B -> CallerID = $outcid;
 						$calleridname = $agi -> get_variable('CALLERID(name)', true);
 						$agi -> set_callerid($outcid);
 						$agi -> set_variable('CALLERID(ani)', $outcid);
@@ -1897,8 +1927,8 @@ if ($agi) $A2B -> debug( ERROR, $agi, __FILE__, __LINE__, "TRUNK=".$valu_val[2].
 					    } else {
 						$outcid = 0;
 					    }
-//					}
 					// Count this call on the trunk
+//$A2B -> debug( ERROR, $agi, __FILE__, __LINE__, "this -> usedtrunk = ".$this -> usedtrunk);
 					$myres = $A2B -> run_dial($agi, $dialstr);
 					$A2B -> debug( DEBUG, $agi, __FILE__, __LINE__, "DIAL FAILOVER $dialstr");
 					if ($outcid != 0) {
@@ -1976,23 +2006,27 @@ if ($agi) $A2B -> debug( ERROR, $agi, __FILE__, __LINE__, "TRUNK=".$valu_val[2].
 					continue;
 				}
 				// IF THE FAILOVER TRUNK IS SAME AS THE ACTUAL TRUNK WE BREAK
-				if ($next_failover_trunk == $failover_trunk) break;
-				else $failover_trunk = $next_failover_trunk;
+				if ($next_failover_trunk == $failover_trunk) {
+					break;
+				} else {
+					$failover_trunk = $next_failover_trunk;
+				}
 				$intellect_count = -1;
 				$loop_failover++;
 
 			} // END while LOOP FAILOVER
 			if ($typecall == 8) {
-			    if ($this->dialstatus  == "CHANUNAVAIL" || $this->dialstatus  == "CONGESTION") {
+			    if ($this -> dialstatus  == "CHANUNAVAIL" || $this -> dialstatus  == "CONGESTION") {
 				$this -> real_answeredtime = $this -> answeredtime = 0;
-				if ($A2B->agiconfig['failover_lc_prefix'] || $ifmaxuse == 1) continue;
+				if ($A2B->agiconfig['failover_lc_prefix'] || $ifmaxuse == 1) {
+					continue;
+				}
 			    }
 			    return $res;
 			}
 			if (!$agi || $typecall == 9) {
 				continue;
 			}
-			
 			//# Ooh, something actually happened!
 			if ($this->dialstatus  == "BUSY") {
 				$this -> real_answeredtime = $this -> answeredtime = 0;

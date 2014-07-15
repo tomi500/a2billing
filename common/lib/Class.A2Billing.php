@@ -1995,23 +1995,29 @@ for ($t=0;$t<count($result);$t++) {
                     $this -> debug( INFO, $agi, __FILE__, __LINE__, "[DID CALL - LOG CC_CALL: FOLLOWME=$callcount - (answeredtime=$answeredtime :: dialstatus=$dialstatus :: call_did_free=$call_did_free)]");
 
                     if (strlen($this -> dialstatus_rev_list[$dialstatus])>0) {
-						$terminatecauseid = $this -> dialstatus_rev_list[$dialstatus];
+			$terminatecauseid = $this -> dialstatus_rev_list[$dialstatus];
                     } else {
-						$terminatecauseid = 0;
+			$terminatecauseid = 0;
                     }
-		    if ($answeredtime == 0) $inst_listdestination[10] = $this -> realdestination;
-		    else {
+		    if ($answeredtime == 0) {
+			$inst_listdestination[10] = $this -> realdestination;
+		    } else {
 			$bridgepeer = $agi -> get_variable('BRIDGEPEER',true);
-$this -> debug( ERROR, $agi, __FILE__, __LINE__, "[* BRIDGEPEER                {$bridgepeer} ]");
+//$this -> debug( ERROR, $agi, __FILE__, __LINE__, "[* BRIDGEPEER                {$bridgepeer} ]");
 
 			preg_match("/([^\/]+)(?=-[^-]*$)/",$bridgepeer,$bridgepeer);
-$this -> debug( ERROR, $agi, __FILE__, __LINE__, "[* PEER                      {$bridgepeer[0]} ]");
+//$this -> debug( ERROR, $agi, __FILE__, __LINE__, "[* PEER                      {$bridgepeer[0]} ]");
 
 			$QUERY = "SELECT regexten FROM cc_sip_buddies WHERE name = '{$bridgepeer[0]}' LIMIT 1";
 			$result = $this -> instance_table -> SQLExec ($this->DBHandle, $QUERY);
-			if (is_array($result) && $result[0][0] != "")	$uppeer = $bridgepeer[0];
-			else	$uppeer = $agi->get_variable('QUEUEDNID', true);
-			if ($uppeer) $inst_listdestination[10] = $uppeer;
+			if (is_array($result) && $result[0][0] != "") {
+				$uppeer = $bridgepeer[0];
+			} else {
+				$uppeer = $agi->get_variable('QUEUEDNID', true);
+			}
+			if ($uppeer) {
+				$inst_listdestination[10] = $uppeer;
+			}
 		
 //			elseif (strpos($dialstr,'&') || strpos($dialstr,'@') || stripos($dialstr,'QUEUE ') === 0) 
 //				$inst_listdestination[10] = $agi -> get_variable('QUEUEDNID',true);
@@ -2023,8 +2029,9 @@ $this -> debug( ERROR, $agi, __FILE__, __LINE__, "[* PEER                      {
 
 			$this -> debug( INFO, $agi, __FILE__, __LINE__, "Destination: " . $inst_listdestination[10]);
 		    }
-		    if (!isset($this->card_caller)) $this->card_caller = $my_id_card;
-
+		    if (!isset($this->card_caller)) {
+			$this->card_caller = $my_id_card;
+		    }
                     $QUERY = "SELECT regexten FROM cc_sip_buddies WHERE id_cc_card = $my_id_card AND name = '{$inst_listdestination[10]}' LIMIT 1";
                     $result = $this -> instance_table -> SQLExec ($this->DBHandle, $QUERY);
                     $this->calledexten = (is_array($result) && $result[0][0] != "") ? "'".$result[0][0]."'" : "NULL";
