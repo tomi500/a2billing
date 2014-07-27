@@ -24,6 +24,10 @@ msgid "THERE IS NO PAYMENTS CREATED!"
 msgstr "ПЛАТЕЖЕЙ ЕЩЁ НЕ БЫЛО!"
 
 #: FG_var_logrefill.inc
+msgid "Transaction was DECLINED"
+msgstr "Операция ОТКЛОНЕНА"
+
+#: FG_var_logrefill.inc
 msgid "INSERT NEW Refill"
 msgstr "Транзакция"
 

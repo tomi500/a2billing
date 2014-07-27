@@ -1609,9 +1609,9 @@ else echo "Ratecard: ".$this->ratecard_obj[$i][6]."<br>Trunk: ".$this->ratecard_
 ".		"trunk_depend$td,
 ".		"COUNT(od.calledstation) AS offen
 ".	"FROM cc_trunk_rand
-".	"LEFT JOIN cc_trunk AS an ON an.id_trunk=trunk_depend$td AND ($prefixclausea) AND an.startdatea<=NOW() AND an.stopdatea>NOW() AND (((an.maxsecperperioda-an.periodcounta>=an.timelefta OR an.maxsecperperioda<0) AND an.periodexpirya>NOW()) OR an.perioda>0) AND (an.maxuse>an.inuse OR an.maxuse<0) AND an.status=1
-".	"LEFT JOIN cc_trunk AS bn ON bn.id_trunk=trunk_depend$td AND ($prefixclauseb) AND bn.startdateb<=NOW() AND bn.stopdateb>NOW() AND (((bn.maxsecperperiodb-bn.periodcountb>=bn.timeleftb OR bn.maxsecperperiodb<0) AND bn.periodexpiryb>NOW()) OR bn.periodb>0) AND (bn.maxuse>bn.inuse OR bn.maxuse<0) AND bn.status=1 AND NOT ($prefixclause)
-".	"LEFT JOIN cc_trunk AS cn ON cn.id_trunk=trunk_depend$td AND cn.status=1 AND (cn.maxuse>cn.inuse OR cn.maxuse<0) AND NOT (($prefixclausec) OR ($prefixclaused))
+".	"LEFT JOIN cc_trunk AS an ON an.id_trunk=trunk_depend$td AND ($prefixclausea) AND an.startdatea<=NOW() AND an.stopdatea>NOW() AND (((an.maxsecperperioda-an.periodcounta>=an.timelefta OR an.maxsecperperioda<0) AND an.periodexpirya>NOW()) OR an.perioda>0) AND an.status=1
+".	"LEFT JOIN cc_trunk AS bn ON bn.id_trunk=trunk_depend$td AND ($prefixclauseb) AND bn.startdateb<=NOW() AND bn.stopdateb>NOW() AND (((bn.maxsecperperiodb-bn.periodcountb>=bn.timeleftb OR bn.maxsecperperiodb<0) AND bn.periodexpiryb>NOW()) OR bn.periodb>0) AND bn.status=1 AND NOT ($prefixclause)
+".	"LEFT JOIN cc_trunk AS cn ON cn.id_trunk=trunk_depend$td AND cn.status=1 AND NOT (($prefixclausec) OR ($prefixclaused))
 ".	"LEFT JOIN (SELECT calledstation, starttime, id_trunk FROM cc_call WHERE calledstation LIKE '$A2B->destination') AS od ON (od.starttime > DATE_SUB(NOW(), INTERVAL an.attract DAY) OR od.starttime > DATE_SUB(NOW(), INTERVAL bn.attract DAY)) AND od.id_trunk=trunk_depend$td
 ".	"WHERE trunk_id=$this->usedtrunk AND trunk_depend$td<>0
 ".	"GROUP BY trunk_depend$td
@@ -1644,28 +1644,32 @@ else echo "Ratecard: ".$this->ratecard_obj[$i][6]."<br>Trunk: ".$this->ratecard_
 						$firstrand = true;
 						$sum_percent = 0;
 						$count_minus = 0;
+//$cc = 0; if ($intellect_count == -1)	$bb = 1; else $bb++; if ($agi) $A2B -> debug( ERROR, $agi, "", "", "\033[1;34mRound ".$bb."\33[0m");
 						foreach ($resultrand as $valu_key => $valu_val) {
-//if ($agi) $A2B -> debug( ERROR, $agi, __FILE__, __LINE__, "TRUNK=".$valu_val[2]." / ".$valu_val[3]." times / ".$valu_val[0]." secs free");
+//$vv = "";
 							if (is_numeric($valu_val[0]) && $valu_val[1] > 0) {
 								$resultrand[$valu_key][1] = $sum_percent += $valu_val[1];
 							} else {
 								$resultrand[$valu_key][1] = 0;
 							}
+//if ($valu_val[0] == 0) {$cc++; $vv = "\033[31m";}
 							if (!is_numeric($valu_val[0])) {
 								$count_minus++;
+//$vv = "\033[31m";
 							}
+//if ($agi) $A2B -> debug( ERROR, $agi, "", "", $vv."TRUNK=".$valu_val[2]."	/ ".$valu_val[3]." times	/ %% = ".$intellecttrunks[$valu_key][1]."	/ ".$valu_val[0]." secs free\33[0m");
 						}
 						if ($intellect_count == -1) {
 							$intellect_count = $valu_key - $count_minus;
 						} else {
 							$intellect_count--;
 						}
-//if ($agi) $A2B -> debug( ERROR, $agi, __FILE__, __LINE__, "Intellect_count =".$intellect_count." / count_minus = ".$count_minus);
 						if ($sum_percent>0) {
 							$randgo = rand(1,$sum_percent);
 							foreach ($resultrand as $intellect_key => $valu_val)	{
 								if ($valu_val[1] >= $randgo) {
-									$intellecttrunks[$intellect_key][1] = 0;
+//if ($agi) $A2B -> debug( ERROR, $agi, "", "", "\033[32mPassed = ".($intellect_count-$cc+$bb)." / Rejected = ".($cc+$count_minus)." / Trunk focused = ".$valu_val[2]."\33[0m");
+									$intellecttrunks[$intellect_key][1] = $intellecttrunks[$intellect_key][0] = 0;
 									if ($valu_val[2] != $this->usedtrunk) {
 										$failover_trunk = $valu_val[2];
 										continue 2;
@@ -1680,6 +1684,7 @@ else echo "Ratecard: ".$this->ratecard_obj[$i][6]."<br>Trunk: ".$this->ratecard_
 							$intellectmarker = true;
 							foreach ($resultrand as $intellect_key => $valu_val)	{
 								if ($valu_val[0] < -1 && is_numeric($valu_val[0])) {
+//if ($agi) $A2B -> debug( ERROR, $agi, "", "", "\033[32mPassed = ".($intellect_count-$cc+$bb)." / Rejected = ".($cc+$count_minus)." / Trunk focused = ".$valu_val[2]."\33[0m");
 									$intellecttrunks[$intellect_key][0] = 0;
 									$intellectmarker = false;
 									if ($valu_val[2] != $this->usedtrunk) {
@@ -1694,6 +1699,7 @@ else echo "Ratecard: ".$this->ratecard_obj[$i][6]."<br>Trunk: ".$this->ratecard_
 								if ($resultrand[$valu_key][0] >= 0 || !is_numeric($resultrand[$valu_key][0])) {
 									$valu_key=0;
 								}
+//if ($agi) $A2B -> debug( ERROR, $agi, "", "", "\033[32mPassed = ".($intellect_count-$cc+$bb)." / Rejected = ".($cc+$count_minus)." / Trunk focused = ".$resultrand[$valu_key][2]."\33[0m");
 								$intellecttrunks[$valu_key][0] = 0;
 								if ($resultrand[$valu_key][2] != $this->usedtrunk) {
 									$failover_trunk = $resultrand[$valu_key][2];
@@ -2016,11 +2022,15 @@ else echo "Ratecard: ".$this->ratecard_obj[$i][6]."<br>Trunk: ".$this->ratecard_
 
 				if ($agi) {
 
-				    $answeredtime								= $agi->get_variable("ANSWEREDTIME",true);
-				    if ($answeredtime == "")					$answeredtime	= $agi->get_variable("CDR(billsec)",true);
-				    if ($answeredtime == 0 && $this->dialstatus == "ANSWER")	$answeredtime	= 1;
-				    $this -> real_answeredtime = $this -> answeredtime				= $answeredtime;
-
+				    if ($this->dialstatus == "ANSWER") {
+					$answeredtime					= $agi->get_variable("ANSWEREDTIME",true);
+					if ($answeredtime == "")	$answeredtime	= $agi->get_variable("CDR(billsec)",true);
+					if ($answeredtime == 0) 	$answeredtime	= 1;
+//					if ($this->dialstatus == "ANSWER")	$answeredtime++;
+				    } else {
+					$answeredtime					= 0;
+				    }
+				    $this -> real_answeredtime = $this -> answeredtime	= $answeredtime;
 				    $A2B -> debug( INFO, $agi, __FILE__, __LINE__, "[FAILOVER K=$k]:[ANSWEREDTIME=".$this->answeredtime."]:[DIALSTATUS=".$this->dialstatus."]");
 				}
 				if (($this->dialstatus  == "CHANUNAVAIL" || $this->dialstatus  == "CONGESTION") && $intellect_count >= 0) {
