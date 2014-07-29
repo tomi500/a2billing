@@ -1114,8 +1114,12 @@ msgid "Message"
 msgstr "Сообщение"
 
 #: lib/Form/Class.FormHandler.DelForm.inc.php:53
+msgid " dependent records.<br>"
+msgstr " зависимых записей.<br>"
+
+#: lib/Form/Class.FormHandler.DelForm.inc.php:53
 msgid "You have "
-msgstr "У вас"
+msgstr "У вас "
 
 #: lib/Form/Class.FormHandler.DelForm.inc.php:208
 msgid "Remove this "
@@ -4498,6 +4502,10 @@ msgstr "ЗАГОЛОВОК"
 #: Public/A2B_card_info.php:815 Public/A2B_log_activity_info.php:109
 msgid "DESCRIPTION"
 msgstr "ОПИСАНИЕ"
+
+#: Public/form_data/FG_var_trunk.inc
+msgid "There are some rates attached to this Trunk and/or there are cross-links with other Trunks!<br>Please confirm that you really want to remove this Trunk and cross-links?"
+msgstr "При удалении этого Транка сотрутся все ссылки на него из других Транков и Тарифов."
 
 #: Public/form_data/FG_var_trunk.inc
 msgid "Number of last days"

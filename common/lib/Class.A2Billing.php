@@ -1424,18 +1424,17 @@ for ($t=0;$t<count($result);$t++) {
 
 			$dialparams = $this->agiconfig['dialcommand_param_sipiax_friend'];
 			$dialstr = $this->tech."/".$this->destination.$dialparams;
-            
+
 			$this -> debug( DEBUG, $agi, __FILE__, __LINE__, "app_callingcard sip/iax friend: Dialing '$dialstr' ".$this->tech." Friend.\n");
 
 			//# Channel: technology/number@ip_of_gw_to PSTN
 			// Dial(IAX2/guest@misery.digium.com/s@default)
-			$myres = $this -> run_dial($agi, $dialstr);
 			$this -> debug( INFO, $agi, __FILE__, __LINE__, "DIAL $dialstr");
-			
+			$myres = $this -> run_dial($agi, $dialstr);
+
+			$this -> DbReConnect($agi);
 			$answeredtime = $agi->get_variable("ANSWEREDTIME",true);
-//			$answeredtime = $answeredtime['data'];
 			$dialstatus = $agi->get_variable("DIALSTATUS",true);
-//			$dialstatus = $dialstatus['data'];
 
 			if ($this->monitor == 1 || $this->agiconfig['record_call'] == 1) {
 				// Monitor(wav,kiki,m)
@@ -1598,8 +1597,10 @@ for ($t=0;$t<count($result);$t++) {
 					if ($agi -> channel_status('',true) == AST_STATE_DOWN) break;
 					//# Channel: technology/number@ip_of_gw_to PSTN
 					// Dial(IAX2/guest@misery.digium.com/s@default)
-					$myres = $this -> run_dial($agi, $dialstr);
 					$this -> debug( INFO, $agi, __FILE__, __LINE__, "DIAL $dialstr");
+					$myres = $this -> run_dial($agi, $dialstr);
+
+					$this -> DbReConnect($agi);
 
 					$answeredtime			= $agi->get_variable("ANSWEREDTIME", true);
 					if ($answeredtime == "")
@@ -1937,8 +1938,10 @@ for ($t=0;$t<count($result);$t++) {
 		if ($call_did_free) $this -> debug( DEBUG, $agi, __FILE__, __LINE__, "[A2Billing] DID call friend: Dialing '$dialstr' Friend.\n");
 
 		if ($agi -> channel_status('',true) == AST_STATE_DOWN) break;
-                $myres = $this -> run_dial($agi, $dialstr);
                 $this -> debug( INFO, $agi, __FILE__, __LINE__, "DIAL $dialstr");
+                $myres = $this -> run_dial($agi, $dialstr);
+
+		$this -> DbReConnect($agi);
 
 		$answeredtime			= $agi->get_variable("ANSWEREDTIME", true);
 		if ($answeredtime == "")
@@ -3165,7 +3168,7 @@ $this -> debug( ERROR, $agi, __FILE__, __LINE__, "FAXRESOLUTION: ".$faxresolutio
 		$agi -> set_variable('CALLERID(name)', $phonenumber_id.','.$campaign_id);
 		$this -> debug( DEBUG, $agi, __FILE__, __LINE__, "[CONTEXT TO CALL : ".$context."]");
 		$agi->exec_dial("local","1@".$context);
-
+		$this -> DbReConnect($agi);
 		$duration = time() - $now;
 		///create campaign cdr
 		$QUERY_CALL = "INSERT INTO cc_call (uniqueid, sessionid, card_id,calledstation, sipiax,  sessionbill , sessiontime , stoptime ,starttime) VALUES ('".$this->uniqueid."', '".$this->channel."', '".

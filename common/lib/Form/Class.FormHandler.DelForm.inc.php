@@ -60,7 +60,7 @@ if ($this->FG_FK_DELETE_CONFIRM && $form_action == "ask-del-confirm" && $this-> 
                 </tr>
                 <tr height="50px">
                     <td align=center class="bgcolor_006">
-                    <?php echo gettext("You have "). $processed["fkCount"]." dependent records.<br>" ?>
+                    <?php echo gettext("You have ").$processed["fkCount"].gettext(" dependent records.<br>") ?>
                     <?php echo $this -> FG_FK_DELETE_MESSAGE;?>
                     </td>
                 </tr>

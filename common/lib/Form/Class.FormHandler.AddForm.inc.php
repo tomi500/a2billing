@@ -118,7 +118,7 @@ $processed = $this->getProcessed();
 			if (strtoupper ($this->FG_TABLE_ADITION[$i][7])=="SQL") {
 				
 				$instance_sub_table = new Table($this->FG_TABLE_ADITION[$i][8], $this->FG_TABLE_ADITION[$i][9]);
-				$select_list = $instance_sub_table -> Get_list ($this->DBHandle, $this->FG_TABLE_ADITION[$i][10], null, null, null, null, null, null);
+				$select_list = $instance_sub_table -> Get_list ($this->DBHandle, str_replace("%id", "$id", $this->FG_TABLE_EDITION[$i][10]), null, null, null, null, null, null);
 				if ($this->FG_DEBUG >= 2) { echo "<br>"; print_r($select_list);}
 			} elseif (strtoupper ($this->FG_TABLE_ADITION[$i][7])=="LIST") {
 				$select_list = $this->FG_TABLE_ADITION[$i][11];

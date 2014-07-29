@@ -116,14 +116,14 @@ $HD_Form -> AddEditElement (gettext("EXPIRY DATE"),
 			   "" , "", "",	"", "", "", "res_display_dateformat", gettext("Format YYYY-MM-DD HH:MM:SS. For instance, '2004-12-31 00:00:00'"));
 
 $HD_Form -> AddEditElement (gettext("TRUNK"),
-			   "id_trunk",	
-			   '$value',	
-			   "SELECT",	
-			   "", "", "",	
-			   "sql",		
-			   "cc_trunk",	
-			   "trunkcode, id_trunk",		
-			   "", "", "%1", "", "");
+			   "id_trunk",
+			   '$value',
+			   "SELECT",
+			   "", "", "",
+			   "sql",
+			   "cc_trunk",
+			   "trunkcode, id_trunk",
+			   "", "", "%1", "", gettext("You should define default Trunk for this RateCard"), "", '<OPTION  value="-1" selected>NOT DEFINED</OPTION>');
 
 $HD_Form -> AddEditElement (gettext("DESCRIPTION"),
 			   "description",		

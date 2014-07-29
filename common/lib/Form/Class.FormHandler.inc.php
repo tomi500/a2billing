@@ -1761,41 +1761,42 @@ class FormHandler
 		$res_funct = call_user_func(array('FormBO', $this->FG_ADDITIONAL_FUNCTION_AFTER_DELETE));
 		$processed = $this->getProcessed();  //$processed['firstname']
 		$this->VALID_SQL_REG_EXP = true;
-		
-        $instance_table = null;
-        $tableCount = count($this -> FG_FK_TABLENAMES);
-        $clauseCount = count($this -> FG_FK_EDITION_CLAUSE);
 
-        if(($tableCount == $clauseCount) && $clauseCount > 0 && $this-> FG_FK_DELETE_ALLOWED) {
-            if ($processed['id']!="" || !is_null($processed['id'])) {
-                $instance_table = new Table($this->FG_TABLE_NAME, $this->FG_QUERY_EDITION, $this -> FG_FK_TABLENAMES, $this -> FG_FK_EDITION_CLAUSE, $processed['id'], $this -> FG_FK_WARNONLY);
-            }
-        } else {
-		    $instance_table = new Table($this->FG_TABLE_NAME, $this->FG_QUERY_EDITION);
-        }
-		$instance_table->FK_DELETE = ($this->FG_FK_WARNONLY ? false : true);
-		
-		if ($processed['id']!="" || !is_null($processed['id'])){
-			$this->FG_EDITION_CLAUSE = str_replace("%id", $processed['id'], $this->FG_EDITION_CLAUSE);
+		$instance_table = null;
+		$tableCount = count($this -> FG_FK_TABLENAMES);
+		$clauseCount = count($this -> FG_FK_EDITION_CLAUSE);
+
+		if ($processed['id']!="" && !is_null($processed['id'])){
+		    $this->FG_EDITION_CLAUSE	= str_replace("%id", $processed['id'], $this->FG_EDITION_CLAUSE);
+		    $this->FG_FK_EDITION_CLAUSE = str_replace("%id", $processed['id'], $this->FG_FK_EDITION_CLAUSE);
 		}
-		
+
+		if (($tableCount == $clauseCount) && $clauseCount > 0 && $this-> FG_FK_DELETE_ALLOWED) {
+		    if ($processed['id']!="" && !is_null($processed['id'])) {
+			$instance_table = new Table($this->FG_TABLE_NAME, $this->FG_QUERY_EDITION, $this -> FG_FK_TABLENAMES, $this -> FG_FK_EDITION_CLAUSE, $processed['id'], $this -> FG_FK_WARNONLY);
+		    }
+		} else {
+		    $instance_table = new Table($this->FG_TABLE_NAME, $this->FG_QUERY_EDITION);
+		}
+		$instance_table->FK_DELETE = ($this->FG_FK_WARNONLY ? false : true);
+
 		$this -> RESULT_QUERY = $instance_table -> Delete_table ($this->DBHandle, $this->FG_EDITION_CLAUSE, $func_table = null);
-		if($this -> FG_ENABLE_LOG == 1) {
-			$this -> logger -> insertLog($_SESSION["admin_id"], 3, "A ".strtoupper($this->FG_INSTANCE_NAME)." DELETED" , "A RECORD IS DELETED, EDITION CLAUSE USED IS ".$this->FG_EDITION_CLAUSE, $this->FG_TABLE_NAME, $_SERVER['REMOTE_ADDR'], $_SERVER['REQUEST_URI'], $param_update);
-		}	
+		if ($this -> FG_ENABLE_LOG == 1) {
+		    $this -> logger -> insertLog($_SESSION["admin_id"], 3, "A ".strtoupper($this->FG_INSTANCE_NAME)." DELETED" , "A RECORD IS DELETED, EDITION CLAUSE USED IS ".$this->FG_EDITION_CLAUSE, $this->FG_TABLE_NAME, $_SERVER['REMOTE_ADDR'], $_SERVER['REQUEST_URI'], $param_update);
+		}
 		if (!$this -> RESULT_QUERY)  echo gettext("error deletion");
-		
+
 		$this->FG_INTRO_TEXT_DELETION = str_replace("%id", $processed['id'], $this->FG_INTRO_TEXT_DELETION);
 		$this->FG_INTRO_TEXT_DELETION = str_replace("%table", $this->FG_TABLE_NAME, $this->FG_INTRO_TEXT_DELETION);
 		if (isset($this->FG_GO_LINK_AFTER_ACTION_DELETE)) {
 			if ($this->FG_DEBUG == 1)  echo "<br> GOTO ; ".$this->FG_GO_LINK_AFTER_ACTION_DELETE.$processed['id'];
-			if( $this->FG_GO_LINK_AFTER_ACTION_DELETE){
+			if ($this->FG_GO_LINK_AFTER_ACTION_DELETE){
 				$ext_link ='';
-				if(is_numeric($processed['current_page']))$ext_link="&current_page=".$processed['current_page'];
-				if(!empty($processed['order']) && !empty($processed['sens']))$ext_link.="&order=".$processed['order']."&sens=".$processed['sens'];
-				if(substr($this->FG_GO_LINK_AFTER_ACTION_DELETE,-3)=="id="){
+				if (is_numeric($processed['current_page']))	$ext_link="&current_page=".$processed['current_page'];
+				if (!empty($processed['order']) && !empty($processed['sens']))	$ext_link.="&order=".$processed['order']."&sens=".$processed['sens'];
+				if (substr($this->FG_GO_LINK_AFTER_ACTION_DELETE,-3)=="id=") {
 					Header ("Location: ".$this->FG_GO_LINK_AFTER_ACTION_DELETE.$processed['id'].$ext_link);
-				}else{
+				} else {
 					Header ("Location: ".$this->FG_GO_LINK_AFTER_ACTION_DELETE.$ext_link);
 				}
 			}
@@ -1811,6 +1812,7 @@ class FormHandler
         $processed = $this->getProcessed();
         $tableCount = count($this -> FG_FK_TABLENAMES);
         $clauseCount = count($this -> FG_FK_EDITION_CLAUSE);
+        $this->FG_FK_EDITION_CLAUSE = str_replace("%id", $processed['id'], $this->FG_FK_EDITION_CLAUSE);
         $rowcount = 0;
         if(($tableCount == $clauseCount) && $clauseCount > 0) {
             for($i = 0; $i < $tableCount; $i++)

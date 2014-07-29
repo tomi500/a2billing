@@ -49,7 +49,7 @@ $HD_Form ->FG_LIST_ADDING_BUTTON_IMG1 = Images_Path ."/add.png" ;
 
 
 $HD_Form -> FG_DEBUG = 0;
-$HD_Form -> FG_TABLE_ID = " id_trunk";
+$HD_Form -> FG_TABLE_ID = "id_trunk";
 $HD_Form -> FG_TABLE_DEFAULT_ORDER = " trunkcode";
 $HD_Form -> FG_EDITION_CLAUSE = " id_trunk='%id' ";
 $HD_Form -> FG_TABLE_DEFAULT_SENS = "ASC";
@@ -79,10 +79,11 @@ $maxuse_behaviour_list["1"] = array( gettext("Use next trunk"), "1");
 $HD_Form -> FG_FK_DELETE_ALLOWED = true;
 $HD_Form -> FG_FK_DELETE_CONFIRM = true;
 $HD_Form -> FG_FK_WARNONLY = true;
-$HD_Form -> FG_FK_TABLENAMES = array("cc_ratecard");
-$HD_Form -> FG_FK_EDITION_CLAUSE = array(" id_trunk ");
+$HD_Form -> FG_FK_TABLENAMES = array("cc_trunk", "cc_trunk", "cc_trunk", "cc_ratecard", "cc_trunk_rand", "cc_tariffplan");
+$HD_Form -> FG_FK_EDITION_CLAUSE = array("failover_trunk", "failover_trunka", "failover_trunkb", "id_trunk", "trunk_id = '%id' OR trunk_dependa = '%id' OR trunk_dependb", "id_trunk");
 
-$HD_Form -> FG_FK_DELETE_MESSAGE = gettext("You have some rates attached to this Trunk! Please comfirm that you really want to remove this Trunk? ");
+//$HD_Form -> FG_FK_DELETE_MESSAGE = gettext("You have some rates attached to this Trunk! Please comfirm that you really want to remove this Trunk? ");
+$HD_Form -> FG_FK_DELETE_MESSAGE = gettext("There are some rates attached to this Trunk and/or there are cross-links with other Trunks!<br>Please confirm that you really want to remove this Trunk and cross-links?");
 
 
 if ($popup_select) {
@@ -241,7 +242,7 @@ $HD_Form -> AddEditElement (gettext("FAILOVER TRUNK"),
 	"sql",
 	"cc_trunk",
 	"trunkcode, id_trunk",
-	"", "", "%1", "", gettext("You can define another trunk in case of failover!"), '', '<OPTION  value="-1" selected>NOT DEFINED</OPTION>');
+	"id_trunk!='%id'", "", "%1", "", gettext("You can define another trunk in case of failover!"), "", '<OPTION  value="-1" selected>NOT DEFINED</OPTION>');
 
 $HD_Form -> AddEditElement (gettext("CURRENT CONNECTIONS"),
 	"inuse",
@@ -335,7 +336,7 @@ $HD_Form -> AddEditElement (gettext("FAILOVER TRUNK")." A",
 	"sql",
 	"cc_trunk",
 	"trunkcode, id_trunk",
-	"", "", "%1", "", gettext("You can define another trunk in case of failover for currend dialprefix"), '', '<OPTION  value="-1" selected>NOT DEFINED</OPTION>');
+	"id_trunk!='%id'", "", "%1", "", gettext("You can define another trunk in case of failover for currend dialprefix"), '', '<OPTION  value="-1" selected>NOT DEFINED</OPTION>');
 
 $DBHandle_max  = DbConnect();
 $numrow = 0;
@@ -461,7 +462,7 @@ $HD_Form -> AddEditElement (gettext("FAILOVER TRUNK")." B",
 	"sql",
 	"cc_trunk",
 	"trunkcode, id_trunk",
-	"", "", "%1", "", gettext("You can define another trunk in case of failover for currend dialprefix"), '', '<OPTION  value="-1" selected>NOT DEFINED</OPTION>');
+	"id_trunk!='%id'", "", "%1", "", gettext("You can define another trunk in case of failover for currend dialprefix"), '', '<OPTION  value="-1" selected>NOT DEFINED</OPTION>');
 
 if ($numrow>0) {
 	$HD_Form -> AddEditElement (gettext("RANDOM TRUNKS")." B",

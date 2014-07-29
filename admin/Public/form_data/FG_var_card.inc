@@ -51,7 +51,7 @@ $HD_Form -> FG_FILTER_SEARCH_SESSION_NAME = 'entity_card_selection';
 $HD_Form -> FG_FK_DELETE_CONFIRM = true;
 $HD_Form -> FG_FK_DELETE_ALLOWED = true;
 $HD_Form -> FG_FK_TABLENAMES = array('cc_iax_buddies', 'cc_sip_buddies', 'cc_callerid', 'cc_card_history','cc_status_log','cc_voicemail_users');
-$HD_Form -> FG_FK_EDITION_CLAUSE = array("id_cc_card", "id_cc_card", "id_cc_card", "id_cc_card","id_cc_card","customer_id");
+$HD_Form -> FG_FK_EDITION_CLAUSE = array("id_cc_card", "id_cc_card", "id_cc_card", "id_cc_card", "id_cc_card", "customer_id");
 // DEFINE IF WE WANT TO DELETE THE CARD OR NOT
 $HD_Form -> FG_FK_WARNONLY = (DELETE_FK_CARD == true) ? false: true;
 
@@ -1124,11 +1124,14 @@ $HD_Form -> AddEditElement(gettext("CITY LENGTH"),
 			$key = "iax_changed";
 		
 		if ($_SESSION["user_type"]=="ADMIN") {
-				$who= Notification::$ADMIN;$who_id=$_SESSION['admin_id'];
+				$who= Notification::$ADMIN;
+				$who_id=$_SESSION['admin_id'];
 		} elseif ($_SESSION["user_type"]=="AGENT") {
-			$who= Notification::$AGENT;$who_id=$_SESSION['agent_id'];
-		} else { 
-			$who=Notification::$UNKNOWN;$who_id=-1;
+			$who= Notification::$AGENT;
+			$who_id=$_SESSION['agent_id'];
+		} else {
+			$who=Notification::$UNKNOWN;
+			$who_id=-1;
 		}
 		NotificationsDAO::AddNotification($key,Notification::$HIGH,$who,$who_id);
 	}

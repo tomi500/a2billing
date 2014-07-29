@@ -369,7 +369,7 @@ class Table {
 		
         $countFK = count($this->FK_TABLES);
         for ($i = 0; $i < $countFK; $i++) {
-            if ($this -> FK_DELETE == false) {
+            if ($this -> FK_DELETE == false && strpos($this -> FK_TABLES[$i], "cc_trunk_rand") === false) {
             	$QUERY = "UPDATE ".$this -> FK_TABLES[$i]." SET ".
 							trim ($this -> FK_EDITION_CLAUSE[$i])." = -1 WHERE (".trim ($this -> FK_EDITION_CLAUSE[$i])." = ".$this -> FK_ID_VALUE." )";
             } else {
