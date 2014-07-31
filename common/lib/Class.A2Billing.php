@@ -2040,7 +2040,7 @@ for ($t=0;$t<count($result);$t++) {
 		    if (!isset($this->card_caller)) {
 			$this->card_caller = $my_id_card;
 		    }
-                    $QUERY = "SELECT regexten FROM cc_sip_buddies WHERE id_cc_card = $my_id_card AND name = '{$inst_listdestination[10]}' LIMIT 1";
+                    $QUERY = "SELECT regexten FROM cc_sip_buddies WHERE (id_cc_card = $my_id_card OR id_cc_card = $this->id_card) AND name = '{$inst_listdestination[10]}' LIMIT 1";
                     $result = $this -> instance_table -> SQLExec ($this->DBHandle, $QUERY);
                     $this->calledexten = (is_array($result) && $result[0][0] != "") ? "'".$result[0][0]."'" : "NULL";
 

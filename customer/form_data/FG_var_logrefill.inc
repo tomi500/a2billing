@@ -42,12 +42,12 @@ $HD_Form ->FG_LIST_ADDING_BUTTON_IMG1 = Images_Path . "/money.png";
 //$HD_Form -> AddViewElement(gettext("ID"), "cc_logrefill.id", "4%", "center", "sort");
 $HD_Form -> AddViewElement(gettext("REFILL DATE"), "date", "17%", "center", "sort", "30", "", "", "", "", "", "display_dateformat");
 if (has_rights(ACX_DISTRIBUTION)) {
-	$HD_Form -> AddViewElement(gettext("PARTNER"), "lastname", "17%", "center", "sort", "", "link2cust", "cc_card", "IF(id = ".$_SESSION['card_id'].",'',CONCAT_WS(' ',lastname,firstname,IF(company_name='','',CONCAT('(',company_name,')')))), id", "id='%id'", "%1", "", "javascript:;\" onClick=\"MM_openBrWindow('A2B_entity_moneysituation_details.php?type=card&form_action=ask-edit&atmenu=card&displayheader=0&popup_select=1&idcust=%2','','scrollbars=yes,resizable=yes,width=660,height=810,left=600,top=50,screenX=430,screenY=50')\"", gettext("USER DELETED"));
+	$HD_Form -> AddViewElement(gettext("PARTNER"), "lastname", "22%", "center", "sort", "", "link2cust", "cc_card", "IF(id = ".$_SESSION['card_id'].",'',CONCAT_WS(' ',lastname,firstname,IF(company_name='','',CONCAT('(',company_name,')')))), id", "id='%id'", "%1", "", "javascript:;\" onClick=\"MM_openBrWindow('A2B_entity_moneysituation_details.php?type=card&form_action=ask-edit&atmenu=card&displayheader=0&popup_select=1&idcust=%2','','scrollbars=yes,resizable=yes,width=660,height=810,left=600,top=50,screenX=430,screenY=50')\"", gettext("USER DELETED"));
 	$QUERY_ADD = "card_id, ";
 }
 $HD_Form -> AddViewElement(gettext("REFILL AMOUNT"), "credit", "15%", "center", "sort","", "", "", "", "", "", "display_refill_money");
 $HD_Form -> AddViewElement(gettext("REFILL TYPE"),"refill_type", "13%", "center", "sort", "", "list", $list_refill_type);
-$HD_Form -> AddViewElement(gettext("DESCRIPTION"), "description", "30%", "center", "sort");
+$HD_Form -> AddViewElement(gettext("DESCRIPTION"), "description", "25%", "center", "sort");
 
 $HD_Form -> FieldViewElement ("date, ".$QUERY_ADD."IF(card_id = ".$_SESSION['card_id'].", credit, -credit) AS credit, refill_type, IFNULL(description,IF(credit > 0,IF(card_id = ".$_SESSION['card_id'].",'".gettext('REFILL FROM YOUR DILLER')."','".gettext('REFILL TO YOUR CUSTOMER')."'),IF(card_id = ".$_SESSION['card_id'].",'".gettext('REFUND TO YOUR DILLER')."','".gettext('REFUND FROM YOUR CUSTOMER')."')))");
 

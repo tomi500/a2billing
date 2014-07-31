@@ -141,18 +141,20 @@ $FG_TABLE_COL = array();
 $FG_TABLE_COL[]=array (gettext("Date"), "starttime", 19*$p ."%", "center", "SORT", "22", "", "", "", "", "", "");
 //$FG_TABLE_COL[]=array (gettext("RegName"), "src_peername", 4*$p ."%", "center", "SORT", "30");
 $FG_TABLE_COL[]=array (gettext("CallerID"), "src", 11*$p ."%", "center", "SORT", "40");
+$FG_TABLE_COL[]=array (gettext("DID"), "did", 8*$p ."%", "center", "SORT", "30");
 $FG_TABLE_COL[]=array (gettext("PhoneNumber"), "calledstation", 11*$p ."%", "center", "SORT", "30", "", "", "", "", "", "");
 $FG_TABLE_COL[]=array (gettext("Destination"), "destination", 21*$p ."%", "center", "SORT", "30", "lie", "cc_prefix", "destination", "prefix='%id'", "%1" );
 $FG_TABLE_COL[]=array (gettext("Route"), "route", $p ."%", "center", "SORT", "10");
 $FG_TABLE_COL[]=array (gettext ("WaitUp"), "waitup", 2*$p, "center", "SORT", "30", "", "", "", "", "", "display_minute" );
 $FG_TABLE_COL[]=array (gettext("Duration"), "sessiontime", 8*$p ."%", "center", "SORT", "30", "", "", "", "", "", "display_minute");
 $FG_TABLE_COL[]=array ('<acronym title="'.gettext("Terminate Cause").'">'.gettext("TC").'</acronym>', "terminatecauseid", 7*$p ."%", "center", "SORT", "", "list", $dialstatus_list);
-$FG_TABLE_COL[]=array (gettext("CallType"), "sipiax", 8*$p ."%", "center", "SORT",  "", "list", $list_calltype);
+//$FG_TABLE_COL[]=array (gettext("CallType"), "sipiax", 8*$p ."%", "center", "SORT",  "", "list", $list_calltype);
 $FG_TABLE_COL[]=array (gettext("Cost"), "sessionbill", 12*$p ."%", "center", "SORT", "30", "", "", "", "", "", "display_2bill");
 
-$FG_COL_QUERY = "t1.starttime, IF(t1.src_exten IS NULL, t1.src, t1.src_exten) src, IF(t1.card_id='$customer', IF(t1.calledexten IS NOT NULL, t1.calledexten, t1.calledstation), t1.dnid) calledstation, t1.destination, id_ratecard as route, ROUND(UNIX_TIMESTAMP(t1.starttime)-INSERT(t1.uniqueid,1,1,1)) AS waitup, t1.sessiontime, t1.terminatecauseid, t1.sipiax, IF(t1.card_id='$customer', t1.sessionbill+margindillers, 0) sessionbill";
+//$FG_COL_QUERY = "t1.starttime, IF(t1.src_exten IS NULL, t1.src, IF(card_caller=$customer,t1.src_exten,t1.src)) src, IF(t1.card_id='$customer', IF(t1.calledexten IS NOT NULL, t1.calledexten, t1.calledstation), t1.dnid) calledstation, t1.destination, id_ratecard as route, ROUND(UNIX_TIMESTAMP(t1.starttime)-INSERT(t1.uniqueid,1,1,1)) AS waitup, t1.sessiontime, t1.terminatecauseid, t1.sipiax, IF(t1.card_id='$customer', t1.sessionbill+margindillers, 0) sessionbill";
+$FG_COL_QUERY = "t1.starttime, IF(t1.src_exten IS NULL, t1.src, IF(card_caller=$customer,t1.src_exten,t1.src)) src, IF(t1.card_id=$customer AND (sipiax=2 OR sipiax=3 OR sipiax=5),t1.dnid,'') did, IF(t1.card_id='$customer', IF(t1.calledexten IS NOT NULL, t1.calledexten, t1.calledstation), t1.dnid) calledstation, IF(t1.card_id=$customer,t1.destination,-1), id_ratecard as route, ROUND(UNIX_TIMESTAMP(t1.starttime)-INSERT(t1.uniqueid,1,1,1)) AS waitup, t1.sessiontime, t1.terminatecauseid, IF(t1.card_id='$customer', t1.sessionbill+margindillers, 0) sessionbill";
 $et = $resulttype=="sec" ? "t1.sessiontime" : "sec_to_time(t1.sessiontime)";
-$FG_EXPORT_QUERY = "t1.starttime Date, IF(t1.src_exten IS NULL, t1.src, t1.src_exten) CallerID, IF(t1.card_id='$customer', IF(t1.calledexten IS NOT NULL, t1.calledexten, t1.calledstation), t1.dnid) PhoneNumber, t2.destination Destination, $et Duration, ROUND(IF(t1.card_id='$customer', t1.sessionbill+margindillers, 0),5) Cost";
+$FG_EXPORT_QUERY = "t1.starttime Date, IF(t1.src_exten IS NULL, t1.src, IF(card_caller=$customer,t1.src_exten,t1.src)) CallerID, IF(t1.card_id=$customer AND (sipiax=2 OR sipiax=3 OR sipiax=5),t1.dnid,'') DID, IF(t1.card_id='$customer', IF(t1.calledexten IS NOT NULL, t1.calledexten, t1.calledstation), t1.dnid) PhoneNumber, IF(t1.card_id=$customer,t2.destination,'') Destination, $et Duration, ROUND(IF(t1.card_id='$customer', t1.sessionbill+margindillers, 0),5) Cost";
 
 if ($ACXSEERECORDING) {
 	$FG_TABLE_COL [] = array ('<span class="liens">' . gettext("Audio") . "</span>", "uniqueid", 100*(1-$p) ."%", "center", "", "30", "", "", "", "", "", "linkonmonitorfile_customer");
