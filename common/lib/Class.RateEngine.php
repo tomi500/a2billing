@@ -1999,9 +1999,11 @@ else echo "Ratecard: ".$this->ratecard_obj[$i][6]."<br>Trunk: ".$this->ratecard_
 				    if ($res['Response'] == "Success") {
 					write_log(LOGFILE_API_CALLBACK, basename(__FILE__) . ' line:' . __LINE__ . " ActionID = {$amicmd[5]} Channel = {$res['Channel']} [#### Starting AMI WAIT_RESPONSE ####]");
 					$ast->log("ActionID = {$amicmd[5]} [#### Starting AMI WAIT_RESPONSE ####]");
-					$resp = $ast -> wait_response(true);
-				    } else $resp=0;
-				    switch($resp)
+					$response = $ast -> wait_response(true);
+				    } else {
+					$response = 0;
+				    }
+				    switch($response)
 				    {
 				     case  0: $this->dialstatus = "CHANUNAVAIL"; break;
 				     case  1: $this->dialstatus = "BUSY"; break;
@@ -2077,7 +2079,7 @@ else echo "Ratecard: ".$this->ratecard_obj[$i][6]."<br>Trunk: ".$this->ratecard_
 					continue;
 				}
 			    }
-			    return $res;
+			    return $response;
 			}
 			if (!$agi || $typecall == 9) {
 				continue;
