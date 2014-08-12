@@ -2165,7 +2165,7 @@ for ($t=0;$t<count($result);$t++) {
                         $cost = a2b_round(abs(($answeredtime/60) * abs($selling_rate) + abs($connection_charge)));
 
                         //update card
-                        $QUERY = "UPDATE cc_call SET sessionbill = sessionbill + $cost, calledstation = ".$listdestination[0][10]." WHERE uniqueid=$this->uniqueid";
+                        $QUERY = "UPDATE cc_call SET sessionbill = sessionbill + $cost, calledstation = ".$listdestination[0][10]." WHERE uniqueid LIKE '$this->uniqueid'";
 
                         $result = $this -> instance_table -> SQLExec ($this->DBHandle, $QUERY, 0);
                         $this -> debug( INFO, $agi, __FILE__, __LINE__, "[DID CALL - LOG CC_CALL: SQL: $QUERY]:[result:$result]");

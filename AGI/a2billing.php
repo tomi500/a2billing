@@ -205,7 +205,7 @@ if ($startUpSystem && $startUpOS == "") {
 			    }
 			    $parts = pathinfo($value_de);
 			    $value = $parts['filename'];
-			    $QUERY = "SELECT cc_card.username, YEAR(starttime), MONTH(starttime), DAYOFMONTH(starttime) FROM cc_call LEFT JOIN cc_card ON cc_card.id=card_id WHERE uniqueid='$value' ORDER BY cc_call.id DESC LIMIT 1";
+			    $QUERY = "SELECT cc_card.username, YEAR(starttime), MONTH(starttime), DAYOFMONTH(starttime) FROM cc_call LEFT JOIN cc_card ON cc_card.id=card_id WHERE uniqueid LIKE '$value' ORDER BY cc_call.id DESC LIMIT 1";
 			    $result = $A2B -> instance_table -> SQLExec ($A2B->DBHandle, $QUERY);
 			    if (is_array($result) && count($result)>0) {
 				$dl_full = MONITOR_PATH;
@@ -274,10 +274,14 @@ if ($mode == 'auto') {
 	    }
 	    if ($didyes) {
 		if ($caller_areacode == 'recalldidless') break;
-		$QUERY="SELECT IF(src=src_exten,src_peername,src) src, cc_card.username, cc_card.recalltime, continuewithdid FROM cc_card
+/**		$QUERY="SELECT IF(src=src_exten,src_peername,src) src, cc_card.username, cc_card.recalltime, continuewithdid FROM cc_card
 ".			"INNER JOIN cc_call ON starttime > DATE_SUB(NOW(), INTERVAL recalldays DAY) AND card_id = cc_card.id
 ".			"INNER JOIN cc_did ON cc_did.id_trunk = cc_call.id_trunk
 ".			"WHERE did LIKE '$mydnid' AND calledstation LIKE '$A2B->CallerID' AND LENGTH(calledstation) > 6 ORDER BY cc_call.id DESC LIMIT 1";
+**/		$QUERY="SELECT IF(od.src=od.src_exten,od.src_peername,od.src) src, cc_card.username, cc_card.recalltime, continuewithdid FROM cc_card
+".			"INNER JOIN (SELECT id, card_id, src, src_exten, src_peername, id_trunk, starttime FROM cc_call WHERE calledstation LIKE '$A2B->CallerID' AND LENGTH(calledstation) > 6) AS od ON od.starttime > DATE_SUB(NOW(), INTERVAL recalldays DAY) AND od.card_id = cc_card.id
+".			"INNER JOIN cc_did ON cc_did.id_trunk = od.id_trunk
+".			"WHERE did LIKE '$mydnid' ORDER BY od.id DESC LIMIT 1";
 		$result = $A2B -> instance_table -> SQLExec ($A2B->DBHandle, $QUERY);
 		if (is_array($result) && count($result) > 0) {
 			$RateEngine->Reinit();
@@ -1412,7 +1416,7 @@ if ($mode == 'standard') {
 
 	$A2B -> debug( INFO, $agi, __FILE__, __LINE__, "[CALLBACK]:[GET VARIABLE : CALLED=$called_party | CALLING=$calling_party | MODE=$callback_mode | TARIFF=$callback_tariff | CBID=$callback_uniqueid | LEG=$callback_leg]");
 	
-	$QUERY = "UPDATE cc_callback_spool SET agi_result='AGI PROCESSING' WHERE uniqueid='$callback_uniqueid'";
+	$QUERY = "UPDATE cc_callback_spool SET agi_result='AGI PROCESSING' WHERE uniqueid LIKE '$callback_uniqueid'";
 	$res = $A2B -> DBHandle -> Execute($QUERY);
 	$A2B -> debug( DEBUG, $agi, __FILE__, __LINE__, "[CALLBACK : UPDATE CALLBACK AGI_RESULT : QUERY=$QUERY]");
 
@@ -1506,7 +1510,7 @@ if ($mode == 'standard') {
 					$result_callperf = true;
 				}
 				if (is_numeric($callback_mode)) {
-					$QUERY = "UPDATE cc_callback_spool SET status='PENDING', next_attempt_time=NOW(), agi_result='AGI ENDED' WHERE uniqueid = '$callback_uniqueid' AND surveillance > 0";
+					$QUERY = "UPDATE cc_callback_spool SET status='PENDING', next_attempt_time=NOW(), agi_result='AGI ENDED' WHERE uniqueid LIKE '$callback_uniqueid' AND surveillance > 0";
 					$A2B -> DBHandle -> Execute($QUERY);
 					$A2B -> recalltime = false;
 				}
@@ -1641,7 +1645,7 @@ if ($mode == 'standard') {
 		$A2B -> agiconfig['say_timetocall']=0;
 	}
     
-	$QUERY = "UPDATE cc_callback_spool SET agi_result='AGI PROCESSING' WHERE uniqueid='$callback_uniqueid'";
+	$QUERY = "UPDATE cc_callback_spool SET agi_result='AGI PROCESSING' WHERE uniqueid LIKE '$callback_uniqueid'";
 	$res = $A2B -> DBHandle -> Execute($QUERY);
 	$A2B -> debug( DEBUG, $agi, __FILE__, __LINE__, "[CALLBACK : UPDATE CALLBACK AGI_RESULT : QUERY=$QUERY]");
     
@@ -1851,7 +1855,7 @@ if ($mode == 'standard') {
 		$A2B -> agiconfig['say_timetocall']=0;
 	}
     
-	$QUERY = "UPDATE cc_callback_spool SET agi_result='AGI PROCESSING' WHERE uniqueid='$callback_uniqueid'";
+	$QUERY = "UPDATE cc_callback_spool SET agi_result='AGI PROCESSING' WHERE uniqueid LIKE '$callback_uniqueid'";
 	$res = $A2B -> DBHandle -> Execute($QUERY);
 	$A2B -> debug( DEBUG, $agi, __FILE__, __LINE__, "[CALLBACK : UPDATE CALLBACK AGI_RESULT : QUERY=$QUERY]");
     

@@ -86,9 +86,10 @@
 	<tr align="center">
 		<td colspan="2"><font class="fontstyle_007">{php} echo gettext("Forgot your password ?");{/php} <a href="forgotpassword.php">{php} echo gettext("Click here");{/php}</a></font>.</td>
     </tr>
-	<tr align="center">
+    {php}if(SIGNUPENABLE){{/php}
+    <tr align="center">
         <td colspan="2"><font class="fontstyle_007">{php} echo gettext("To sign up");{/php} <a href="signup.php">{php} echo gettext("Click here");{/php}</a></font>.</td>
-    </tr>    
+    </tr>{php}}{/php}
   	</table>
   	</center>
   	</div>

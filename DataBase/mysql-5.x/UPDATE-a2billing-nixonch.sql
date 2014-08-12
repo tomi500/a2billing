@@ -176,6 +176,7 @@ ALTER TABLE cc_call ADD faxbitrate SMALLINT( 6 ) NULL DEFAULT NULL;
 ALTER TABLE cc_call ADD faxresolution SMALLINT( 6 ) NULL DEFAULT NULL;
 ALTER TABLE cc_call ADD margindillers DECIMAL( 15, 5 ) NOT NULL DEFAULT 0 AFTER `sessionbill`;
 ALTER TABLE cc_call ADD margindiller DECIMAL( 15, 5 ) NOT NULL DEFAULT 0 AFTER `margindillers`;
+ALTER TABLE cc_call ADD INDEX `uniqueid` (`uniqueid`) COMMENT '';
 
 ALTER TABLE cc_callerid ADD callback INT( 11 ) NOT NULL DEFAULT '0';
 ALTER TABLE cc_callerid ADD phonenumber VARCHAR( 100 ) CHARACTER SET utf8 COLLATE utf8_bin NOT NULL;

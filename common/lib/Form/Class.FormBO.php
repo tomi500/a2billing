@@ -451,6 +451,7 @@ class FormBO {
 				if ($FormHandler->FG_TABLE_NAME == 'cc_sip_buddies')	{
 					$res = $as->Command('sip unregister '.$peername);
 					$res = $as->Command('sip prune realtime peer '.$peername);
+					if ($processed['callbackextension'])	$res = $as->Command('sip reload');
 				} else	$res = $as->Command('iax2 prune realtime '.$peername);
 				$as->disconnect();
 			} else {
@@ -489,6 +490,7 @@ class FormBO {
 				if ($FormHandler->FG_TABLE_NAME == 'cc_sip_buddies')	{
 					$res = $as->Command('sip unregister '.$peername);
 					$res = $as->Command('sip prune realtime peer '.$peername);
+					if ($processed['callbackextension'])	$res = $as->Command('sip reload');
 				} else	$res = $as->Command('iax2 prune realtime '.$peername);
 				$as->disconnect();
 			} else {

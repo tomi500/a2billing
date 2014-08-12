@@ -53,7 +53,7 @@ if (($download == "file") && $file) {
 	$value = $parts['filename'];
 	$handle = DbConnect();
 	$instance_table = new Table();
-	$QUERY = "SELECT YEAR(starttime), MONTH(starttime), DAYOFMONTH(starttime), cc_card.username FROM cc_call LEFT JOIN cc_card ON cc_card.id=card_id WHERE uniqueid='$value' ORDER BY cc_call.id DESC LIMIT 1";
+	$QUERY = "SELECT YEAR(starttime), MONTH(starttime), DAYOFMONTH(starttime), cc_card.username FROM cc_call LEFT JOIN cc_card ON cc_card.id=card_id WHERE uniqueid LIKE '$value' ORDER BY cc_call.id DESC LIMIT 1";
 	$result = $instance_table -> SQLExec ($handle, $QUERY);
 	if (is_array($result) && count($result)>0) {
 	    $dl_full = MONITOR_PATH . "/" . $result[0][3] . "/" . $result[0][0] . "/" . $result[0][1] . "/" . $result[0][2] . "/" . $value_de;
@@ -1208,7 +1208,7 @@ if ($profit > 500 && $rand_num==4 && SHOW_DONATION) {
 					<input type="hidden" name="cmd" value="_s-xclick">
 					<input type="hidden" name="lc" value="US">
 					<input type="hidden" name="country" value="USA">
-					<input type="hidden" name="hosted_button_id" value="3769548">
+					<input type="hidden" name="hosted_button_id" value="UPUA743XMK2BJ">
 					<input type="image" src="https://www.paypal.com/en_US/ES/i/btn/btn_donateCC_LG.gif" border="0" name="submit" alt="Make Donation with PayPal">
 					<img alt="" border="0" src="https://www.paypal.com/en_US/i/scr/pixel.gif" width="1" height="1">
 				</form>		

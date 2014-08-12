@@ -37,7 +37,7 @@ function monitor_recognize(&$ipointer) {
 	if (!isset($ipointer->dl_short)) $ipointer->dl_short="";
 	if ($ipointer->monitor == 1 || $ipointer->agiconfig['record_call'] == 1) {
 	    $dl_short = $ipointer->dl_short . $ipointer->uniqueid . ".";
-	    $QUERY = "SELECT cc_card.username, YEAR(starttime), MONTH(starttime), DAYOFMONTH(starttime) FROM cc_call LEFT JOIN cc_card ON cc_card.id=card_id WHERE uniqueid='$ipointer->uniqueid' ORDER BY cc_call.id DESC LIMIT 1";
+	    $QUERY = "SELECT cc_card.username, YEAR(starttime), MONTH(starttime), DAYOFMONTH(starttime) FROM cc_call LEFT JOIN cc_card ON cc_card.id=card_id WHERE uniqueid LIKE '$ipointer->uniqueid' ORDER BY cc_call.id DESC LIMIT 1";
 	    $result = $ipointer->instance_table -> SQLExec ($ipointer -> DBHandle, $QUERY);
 	    if (is_array($result) && count($result)>0) {
 		$dl_full = MONITOR_PATH . "/";
@@ -527,7 +527,7 @@ function remove_prefix($phonenumber) {
 function linkonmonitorfile($value) {
 	$handle = DbConnect();
 	$instance_table = new Table();
-	$QUERY = "SELECT YEAR(starttime), MONTH(starttime), DAYOFMONTH(starttime), cc_card.username FROM cc_call LEFT JOIN cc_card ON cc_card.id=card_id WHERE uniqueid='$value' ORDER BY cc_call.id DESC LIMIT 1";
+	$QUERY = "SELECT YEAR(starttime), MONTH(starttime), DAYOFMONTH(starttime), cc_card.username FROM cc_call LEFT JOIN cc_card ON cc_card.id=card_id WHERE uniqueid LIKE '$value' ORDER BY cc_call.id DESC LIMIT 1";
 	$result = $instance_table -> SQLExec ($handle, $QUERY);
 	if (is_array($result) && count($result)>0) {
 	    $dl_short = MONITOR_PATH . "/" . $result[0][3] . "/" . $result[0][0] . "/" . $result[0][1] . "/" . $result[0][2];
@@ -554,7 +554,7 @@ function linkonmonitorfile($value) {
 function linkonmonitorfile_customer($value) {
 	$handle = DbConnect();
 	$instance_table = new Table();
-	$QUERY = "SELECT YEAR(starttime), MONTH(starttime), DAYOFMONTH(starttime), cc_card.username FROM cc_call LEFT JOIN cc_card ON cc_card.id=card_id WHERE uniqueid='$value' ORDER BY cc_call.id DESC LIMIT 1";
+	$QUERY = "SELECT YEAR(starttime), MONTH(starttime), DAYOFMONTH(starttime), cc_card.username FROM cc_call LEFT JOIN cc_card ON cc_card.id=card_id WHERE uniqueid LIKE '$value' ORDER BY cc_call.id DESC LIMIT 1";
 	$result = $instance_table -> SQLExec ($handle, $QUERY);
 	if (is_array($result) && count($result)>0) {
 	    $dl_short = MONITOR_PATH . "/" . $result[0][3] . "/" . $result[0][0] . "/" . $result[0][1] . "/" . $result[0][2];
@@ -581,7 +581,7 @@ function linkonmonitorfile_customer($value) {
 function linkonfaxfile_customer($value) {
 	$handle = DbConnect();
 	$instance_table = new Table();
-	$QUERY = "SELECT YEAR(starttime), MONTH(starttime), DAYOFMONTH(starttime), cc_card.username, faxstatus FROM cc_call LEFT JOIN cc_card ON cc_card.id=card_id WHERE uniqueid='$value' ORDER BY cc_call.id DESC LIMIT 1";
+	$QUERY = "SELECT YEAR(starttime), MONTH(starttime), DAYOFMONTH(starttime), cc_card.username, faxstatus FROM cc_call LEFT JOIN cc_card ON cc_card.id=card_id WHERE uniqueid LIKE '$value' ORDER BY cc_call.id DESC LIMIT 1";
 	$result = $instance_table -> SQLExec ($handle, $QUERY);
 	if (is_array($result) && count($result)>0) {
 		$dl_short = FAX_PATH . "/" . $result[0][3] . "/" . $result[0][0] . "/" . $result[0][1] . "/" . $result[0][2];

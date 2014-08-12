@@ -1478,13 +1478,10 @@ else echo "Ratecard: ".$this->ratecard_obj[$i][6]."<br>Trunk: ".$this->ratecard_
 			$firstrand = false;
 			$intellect_count = $trunkrand = -1;
 			$status = 1;
-			//$this->answeredtime='60';
-			//$this->dialstatus='ANSWERED';
 			// LOOOOP FOR THE FAILOVER LIMITED TO failover_recursive_limit
 			while ($loop_failover == 0 || ($loop_failover <= $A2B->agiconfig['failover_recursive_limit'] && is_numeric($failover_trunk) && $failover_trunk >= 0
-			    && $this->dialstatus != "ANSWER" && $this->dialstatus != "CANCEL" && time() - $timecur < 10 && ($this->dialstatus == "CHANUNAVAIL"
-			    || $this->dialstatus == "CONGESTION" || $inuse>=$maxuse && $maxuse!=-1 || $timecur < $startdate || $stopdate <= $timecur || ($maxsecperperiod != -1
-			    && $periodcount >= $maxsecperperiod - $timeleft && $periodexpiry > time()) || $periodexpiry <= time()))) {
+			    && $this->dialstatus != "ANSWER" && $this->dialstatus != "CANCEL" && ($intellect_count>=0 || $this->dialstatus == "CHANUNAVAIL"
+			    || $this->dialstatus == "CONGESTION"))) {
 
 				$this -> td = $this -> prefixclause = '';
 				$CID_handover = NULL;
@@ -1681,14 +1678,11 @@ else echo "Ratecard: ".$this->ratecard_obj[$i][6]."<br>Trunk: ".$this->ratecard_
 								}
 							}
 						} else {
-//							rsort($resultrand);
 							$intellecttrunks = $resultrand;
-							$intellectmarker = true;
 							foreach ($resultrand as $intellect_key => $valu_val)	{
-								if ($valu_val[0] < -1 && is_numeric($valu_val[0])) {
+								if (is_numeric($valu_val[0]) && $valu_val[0] != 0) {
 //$A2B -> debug( ERROR, $agi, "", "", "\033[32mPassed = ".($intellect_count-$cc+$bb)." / Rejected = ".($cc+$count_minus)." / Trunk focused = ".$valu_val[2]."\33[0m");
 									$intellecttrunks[$intellect_key][0] = 0;
-									$intellectmarker = false;
 									if ($valu_val[2] != $this->usedtrunk) {
 									    $failover_trunk = $valu_val[2];
 									    continue 2;
@@ -1697,44 +1691,8 @@ else echo "Ratecard: ".$this->ratecard_obj[$i][6]."<br>Trunk: ".$this->ratecard_
 									}
 								}
 							}
-							if ($intellectmarker) {
-								if ($resultrand[$valu_key][0] >= 0 || !is_numeric($resultrand[$valu_key][0])) {
-									$valu_key=0;
-								}
-//$A2B -> debug( ERROR, $agi, "", "", "\033[32mPassed = ".($intellect_count-$cc+$bb)." / Rejected = ".($cc+$count_minus)." / Trunk focused = ".$resultrand[$valu_key][2]."\33[0m");
-								$intellecttrunks[$valu_key][0] = 0;
-								if ($resultrand[$valu_key][2] != $this->usedtrunk) {
-									$failover_trunk = $resultrand[$valu_key][2];
-									continue;
-								}
-							}
 						}
 					}
-//				    }
-/**				    if ($loop_failover == 0 && $intellect_count == -1) {
-					$next_failover_trunk	= $this -> ratecard_obj[$k][56+$usetrunk_failover];
-					$startdate		= $this -> ratecard_obj[$k][57+$usetrunk_failover];
-					$stopdate		= $this -> ratecard_obj[$k][58+$usetrunk_failover];
-					if ($startdate <= $timecur && $timecur <= $stopdate) {
-					    $periodcur		= $this -> ratecard_obj[$k][52+$usetrunk_failover];
-					    $maxsecperperiod	= $this -> ratecard_obj[$k][53+$usetrunk_failover];
-					    $periodcount	= $this -> ratecard_obj[$k][54+$usetrunk_failover];
-					    $periodexpiry	= $this -> ratecard_obj[$k][55+$usetrunk_failover];
-					    $timeleft		= $this -> ratecard_obj[$k][59+$usetrunk_failover];
-					    if ($maxsecperperiod != -1) {
-						if ($periodexpiry > $timecur) {
-							$trunktimeout = $maxsecperperiod - $periodcount;
-							if ($timeleft > $trunktimeout || $trunktimeout < 3) {
-								$trunktimeout = 0;
-							} else {
-								$trunktimeout = $trunktimeout - 2;
-							}
-						} elseif ($periodcur > 0) {
-							$trunktimeout = $maxsecperperiod -2;
-						}
-					    }
-					}
-				    } else {**/
 					$next_failover_trunk	= $result[0][3];
 					$startdate		= $result[0][5];
 					$stopdate		= $result[0][6];
@@ -1987,18 +1945,18 @@ else echo "Ratecard: ".$this->ratecard_obj[$i][6]."<br>Trunk: ".$this->ratecard_
 //$A2B -> debug( ERROR, $agi, __FILE__, __LINE__, " [===================                           DIALSTATUS: $this->dialstatus ]");
 
 				} elseif (is_array($amicmd)) {
-				    write_log(LOGFILE_API_CALLBACK, basename(__FILE__) . ' line:' . __LINE__ . " ActionID = {$amicmd[5]} [#### Starting AMI ORIGINATE ####] $channel");
-				    $ast->log("ActionID = {$amicmd[5]} [#### Starting AMI ORIGINATE ####] $channel");
+				    write_log(LOGFILE_API_CALLBACK, " ActionID = {$amicmd[5]} [#### Starting AMI ORIGINATE     ####] $channel ");
+				    $ast->log("ActionID = {$amicmd[5]} [#### Starting AMI ORIGINATE     ####] $channel");
 				    $ast -> add_event_handler('OriginateResponse', 'originateresponse');
 				    $ast -> actionid = $amicmd[5];
 				    $amicmd[3] = substr_replace($amicmd[3],"RATECARD={$this->ratecard_obj[$k][6]},TRUNK=$this->usedtrunk,TD=$this->td",strpos($amicmd[3],"RATECARD"));
 				    $res = $ast -> Originate($channel,$amicmd[0],$A2B -> config['callback']['context_callback'],$amicmd[1],NULL,NULL,
 					$A2B -> config['callback']['timeout']*1000,$amicmd[2],$amicmd[3],$amicmd[4],true,$amicmd[5]);
-				    write_log(LOGFILE_API_CALLBACK, basename(__FILE__) . ' line:' . __LINE__ . " ActionID = {$amicmd[5]} [####  RESULT AMI ORIGINATE  ####] {$res['Response']}");
-				    $ast->log("ActionID = {$amicmd[5]} [#### RESULT AMI ORIGINATE  ####] {$res['Response']}");
+				    write_log(LOGFILE_API_CALLBACK, " ActionID = {$amicmd[5]} [#### RESULT AMI ORIGINATE       ####] ".var_export($res, true));
+				    $ast->log("ActionID = {$amicmd[5]} [#### RESULT AMI ORIGINATE       ####] ".var_export($res, true));
 				    if ($res['Response'] == "Success") {
-					write_log(LOGFILE_API_CALLBACK, basename(__FILE__) . ' line:' . __LINE__ . " ActionID = {$amicmd[5]} Channel = {$res['Channel']} [#### Starting AMI WAIT_RESPONSE ####]");
-					$ast->log("ActionID = {$amicmd[5]} [#### Starting AMI WAIT_RESPONSE ####]");
+					write_log(LOGFILE_API_CALLBACK, " ActionID = {$amicmd[5]} [#### Starting AMI WAIT_RESPONSE ####] $channel ");
+					$ast->log("ActionID = {$amicmd[5]} [#### Starting AMI WAIT_RESPONSE ####] $channel");
 					$response = $ast -> wait_response(true);
 				    } else {
 					$response = 0;
@@ -2013,8 +1971,8 @@ else echo "Ratecard: ".$this->ratecard_obj[$i][6]."<br>Trunk: ".$this->ratecard_
 				     case  8: $this->dialstatus = "CHANUNAVAIL"; break;
 				     default: $this->dialstatus = "CONGESTION"; break;
 				    }
-				    write_log(LOGFILE_API_CALLBACK, basename(__FILE__) . ' line:' . __LINE__ . " ActionID = {$amicmd[5]} [####  RESULT AMI WAIT RESPONSE  ####] $channel  ".var_export($res, true)." = $this->dialstatus");
-				    $ast->log("ActionID = {$amicmd[5]} [####  RESULT AMI WAIT RESPONSE  ####] $channel  ".var_export($res, true)." = $this->dialstatus");
+				    write_log(LOGFILE_API_CALLBACK, " ActionID = {$amicmd[5]} [#### RESULT AMI WAIT RESPONSE   ####] $channel = $this->dialstatus ");
+				    $ast->log("ActionID = {$amicmd[5]} [#### RESULT AMI WAIT RESPONSE   ####] $channel = $this->dialstatus");
 				}
 				if (is_array($wrapuprange)) {
 				    if (count($wrapuprange)==1) {
@@ -2046,7 +2004,7 @@ else echo "Ratecard: ".$this->ratecard_obj[$i][6]."<br>Trunk: ".$this->ratecard_
 				if (($this->dialstatus  == "CHANUNAVAIL" || $this->dialstatus  == "CONGESTION") && $intellect_count >= 0) {
 //				if ($this->dialstatus  == "CHANUNAVAIL" && $intellect_count >= 0) {}
 					$errmess = "Trunk $this->usedtrunk is $this->dialstatus. ";
-					if ($next_failover_trunk != -1 && $trunkrand != $this -> usedtrunk && $intellect_count > 0) {
+					if ($next_failover_trunk != -1 && $trunkrand != $this -> usedtrunk && $intellect_count >= 0) {
 						$failover_trunk = $next_failover_trunk;
 						$A2B -> debug( DEBUG, $agi, __FILE__, __LINE__, $errmess."Now using failover trunk {$failover_trunk}.");
 					} elseif ($intellect_count > 0) {
@@ -2116,9 +2074,9 @@ else echo "Ratecard: ".$this->ratecard_obj[$i][6]."<br>Trunk: ".$this->ratecard_
 					continue;
 				}
 				$this->usedratecard = $k-$loop_failover;
-				if ($this -> usedratecard < 0) {
-					$this -> usedratecard = $k;
-				}
+//				if ($this -> usedratecard < 0) {
+//					$this -> usedratecard = $k;
+//				}
 				return false;
 			} elseif ($this->dialstatus == "ANSWER") {
 				$A2B -> debug( INFO, $agi, __FILE__, __LINE__, "-> dialstatus : ".$this->dialstatus.", answered time is ".$this->answeredtime." \n");
@@ -2130,11 +2088,11 @@ else echo "Ratecard: ".$this->ratecard_obj[$i][6]."<br>Trunk: ".$this->ratecard_
 		} // End for
 
 		$this -> usedratecard = $k-$loop_failover;
-		if ($this -> usedratecard < 0) {
-			$this -> usedratecard = 0;
-		}
+//		if ($this -> usedratecard < 0) {
+//			$this -> usedratecard = 0;
+//		}
 		$A2B -> debug( DEBUG, $agi, __FILE__, __LINE__, "[USEDRATECARD - FAIL =".$this -> usedratecard."]");
-		return false;
+		return $typecall==8?$response:false;
 
 	}
 

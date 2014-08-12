@@ -53,7 +53,7 @@ if (false) {
 include ("./form_data/FG_var_signup.inc");
 include ("./lib/customer.smarty.php");
 
-if (!$A2B->config["signup"]['enable_signup'])
+if (!$A2B->config["signup"]['enable_signup'] && !has_rights(ACX_DISTRIBUTION))
 	exit;
 
 getpost_ifset(array ('subscriber_signup'));
