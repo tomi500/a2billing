@@ -83,7 +83,7 @@ if ($message != "success") {
 <?php
 }
 
-if ($form_action == "list" && $message != "success") {
+if ($form_action == "list" && $message != "success" && has_rights (ACX_DISTRIBUTION)) {
 
 	$table = new Table();
 

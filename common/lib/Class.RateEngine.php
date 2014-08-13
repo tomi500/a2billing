@@ -1735,7 +1735,7 @@ else echo "Ratecard: ".$this->ratecard_obj[$i][6]."<br>Trunk: ".$this->ratecard_
 					// use failover trunk
 					if ($intellect_count >= 0) {
 						$errmess = "Trunk $this->usedtrunk ".(($maxuse != -1 && $inuse >= $maxuse)?"is inuse. ":"life time is expiry. ");
-						if ($next_failover_trunk != -1 && $trunkrand != $this -> usedtrunk && $intellect_count > 0 && ($ifmaxuse == 0 || $periodexpiry != 0) && $status) {
+						if ($next_failover_trunk != -1 && $trunkrand != $this -> usedtrunk && $intellect_count >= 0 && ($ifmaxuse == 0 || $periodexpiry != 0) && $status) {
 							$loop_failover++;
 							$failover_trunk = $next_failover_trunk;
 							$A2B -> debug( DEBUG, $agi, __FILE__, __LINE__, $errmess."Now using failover trunk {$failover_trunk}.");
@@ -1822,7 +1822,7 @@ else echo "Ratecard: ".$this->ratecard_obj[$i][6]."<br>Trunk: ".$this->ratecard_
 					$cidresult[0][0] = $CID_handover;
 				} else {
 //					$outprefix = (is_array($result) && count($result)>0) ? "cid LIKE '{$result[0][0]}%' DESC," : "";
-					$QUERY = "SELECT cid FROM cc_outbound_cid_list WHERE activated = 1 AND outbound_cid_group = $cidgroupid AND cid != '{$A2B->destination}' ORDER BY $outprefixrequest RAND() LIMIT 1";
+					$QUERY = "SELECT cid FROM cc_outbound_cid_list WHERE activated = 1 AND outbound_cid_group = $cidgroupid AND cid NOT LIKE '{$A2B->destination}' ORDER BY $outprefixrequest RAND() LIMIT 1";
 					$cidresult = $A2B->instance_table -> SQLExec ($A2B -> DBHandle, $QUERY);
 				}
 				if (is_array($cidresult) && count($cidresult) > 0) {
