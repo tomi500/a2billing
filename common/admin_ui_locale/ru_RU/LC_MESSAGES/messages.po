@@ -3353,7 +3353,7 @@ msgstr "ПРИБЫЛЬ"
 #: Public/call-last-month.php:175 Public/call-log-customers.php:1227
 #: Public/A2B_card_info.php:888 Public/call-dnid.php:852
 msgid "SELL"
-msgstr "ПРОДАНО"
+msgstr "ПРОДАЖА"
 
 #: Public/CC_ticket_view.php:51
 msgid "Ticket updated successfully"
@@ -3641,7 +3641,7 @@ msgstr "ВАЛЮТА"
 
 #: Public/call-log-customers.php:963 Public/call-dnid.php:648
 msgid "Number of call"
-msgstr "Номер звонка"
+msgstr "Найдено звонков"
 
 #: Public/call-log-customers.php:1132 Public/A2B_detail_package.php:527
 msgid "Previous"
@@ -3690,7 +3690,7 @@ msgstr "МАРЖА"
 
 #: Public/call-log-customers.php:1231 Public/call-dnid.php:856
 msgid "MARKUP"
-msgstr "ПРИБЫЛЬНОСТЬ"
+msgstr "ДОХОДНОСТЬ"
 
 #: Public/A2B_entity_password.php:79
 msgid "No value in New Password entered"

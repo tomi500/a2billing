@@ -2011,6 +2011,14 @@ msgstr "Маршрут"
 msgid "WaitUp"
 msgstr "Ожидал"
 
+#: call-history.php
+msgid "AVERAGE"
+msgstr "УСРЕДНЁННО"
+
+#: call-history.php:752
+msgid "WAITUP"
+msgstr "ОЖИДАНИЕ"
+
 #: lib/Form/Class.SearchHandler.inc.php:327
 msgid "There is"
 msgstr "Всего"
@@ -3893,7 +3901,7 @@ msgstr "ВАЛЮТА"
 
 #: call-history.php:416
 msgid "Number of Calls"
-msgstr "Количество Звонков"
+msgstr "Найдено Звонков"
 
 #: call-history.php:538
 msgid "PREVIOUS"
@@ -3915,13 +3923,17 @@ msgstr "Количество времени"
 msgid "DURATION"
 msgstr "ДЛИТЕЛЬНОСТЬ"
 
+#: call-history.php:
+msgid "SUBTOTAL"
+msgstr "ВСЕГО"
+
 #: call-history.php:594
 msgid "GRAPHIC"
 msgstr "ГРАФИК"
 
 #: call-history.php:595
 msgid "CALLS"
-msgstr "ЗВОНКИ"
+msgstr "ЗВОНКОВ"
 
 #: call-history.php:596
 msgid "AVERAGE LENGTH OF CALL"
@@ -3929,11 +3941,11 @@ msgstr "СРЕДНЯЯ ДЛИТЕЛЬНОСТЬ ЗВОНКА"
 
 #: call-history.php:596
 msgid "ALOC"
-msgstr "УСРЕДНЁННО"
+msgstr "ДЛИТЕЛЬНОСТЬ"
 
 #: call-history.php:597
 msgid "TOTAL COST"
-msgstr "ВСЕГО"
+msgstr "СТОИМОСТЬ"
 
 #: call-history.php:646
 msgid "TOTAL"

@@ -259,7 +259,7 @@ if (! is_null ( $order ) && ($order != '') && ! is_null ( $sens ) && ($sens != '
 
 //$_SESSION["pr_sql_export"] = "SELECT $FG_COL_QUERY FROM $FG_TABLE_NAME WHERE $FG_TABLE_CLAUSE";
 
-$QUERY = "SELECT DATE(t1.starttime) AS day, sum(t1.sessiontime) AS calltime, sum(IF(t1.card_id='$customer',t1.sessionbill+margindillers,0)) AS cost, count(*) as nbcall FROM $FG_TABLE_NAME WHERE ".$FG_TABLE_CLAUSE." GROUP BY day ORDER BY day"; //extract(DAY from calldate)
+$QUERY = "SELECT DATE(t1.starttime) AS day, sum(t1.sessiontime) AS calltime, sum(IF(t1.card_id='$customer',t1.sessionbill+margindillers,0)) AS cost, count(*) as nbcall, SUM(IF(ROUND(UNIX_TIMESTAMP(t1.starttime)-INSERT(t1.uniqueid,1,1,1))>0,ROUND(UNIX_TIMESTAMP(t1.starttime)-INSERT(t1.uniqueid,1,1,1)),0)) AS waitup FROM $FG_TABLE_NAME WHERE ".$FG_TABLE_CLAUSE." GROUP BY day ORDER BY day"; //extract(DAY from calldate)
 
 if (!$nodisplay) {
 	$res = $DBHandle -> Execute($QUERY);
@@ -710,14 +710,13 @@ if ($ACXSEERECORDING && $nb_record>0){ echo '
 
 if (is_array($list_total_day) && count($list_total_day)>0){
 
-$mmax=0;
-$totalcall==0;
-$totalminutes=0;
+$mmax = $totalwaitup = $totalcall = $totalminutes = 0;
 foreach ($list_total_day as $data){
-	if ($mmax < $data[1]) $mmax=$data[1];
+	if ($mmax < $data[1])	$mmax = $data[1];
 	$totalcall+=$data[3];
 	$totalminutes+=$data[1];
 	$totalcost+=$data[2];
+	$totalwaitup+=$data[4];
 }
 
 ?>
@@ -739,57 +738,69 @@ foreach ($list_total_day as $data){
 <tr><td bgcolor="#000000">			
 	<table border="0" cellspacing="1" cellpadding="2" width="100%">
 	<tr>
-		<td align="center" class="callhistory_td2"></td>
-    	<td class="callhistory_td3" align="center" colspan="5"><?php echo gettext("CALLING CARD MINUTES");?></td>
+	<td align="center" class="callhistory_td2"></td>
+	<td class="callhistory_td2" align="center" colspan="3"><?php echo gettext("SUBTOTAL");?></td>
+	<td class="callhistory_td3" align="center" colspan="2"><?php echo gettext("AVERAGE");?></td>
+	<td align="center" class="callhistory_td2"></td>
     </tr>
 	<tr>
 		<td align="center" class="callhistory_td3"><?php echo gettext("DATE");?></td>
-        <td align="center" class="callhistory_td2"><?php echo gettext("DURATION");?></td>
+		<td align="center" class="callhistory_td2"><?php echo gettext("DURATION");?></td>
 		<td align="center" class="callhistory_td2"><?php echo gettext("GRAPHIC");?></td>
 		<td align="center" class="callhistory_td2"><?php echo gettext("CALLS");?></td>
-		<td align="center" class="callhistory_td2"><acronym title="<?php echo gettext("AVERAGE LENGTH OF CALL");?>"><?php echo gettext("ALOC");?></acronym></font></td>
+		<td align="center" class="callhistory_td3"><acronym title="<?php echo gettext("AVERAGE LENGTH OF CALL");?>"><?php echo gettext("ALOC");?></acronym></font></td>
+		<td align="center" class="callhistory_td3"><?php echo gettext("WAITUP");?></td>
 		<td align="center" class="callhistory_td2"><?php echo gettext("TOTAL COST");?></td>
 
 		<!-- LOOP -->
 	<?php
 		$i=0;
-		foreach ($list_total_day as $data) {	
+		foreach ($list_total_day as $data) {
 			$i=($i+1)%2;
 			$tmc = $data[1]/$data[3];
-			
-			if ((!isset($resulttype)) || ($resulttype=="min")){  
-				$tmc = sprintf("%02d",intval($tmc/60)).":".sprintf("%02d",intval($tmc%60));		
+			$waitup = $data[4]/$data[3];
+
+			if ((!isset($resulttype)) || ($resulttype=="min")){
+				$tmc = sprintf("%02d",intval($tmc/60)).":".sprintf("%02d",intval($tmc%60));
 			}else{
 				$tmc =intval($tmc);
 			}
-			
-			if ((!isset($resulttype)) || ($resulttype=="min")){  
+
+			if ((!isset($resulttype)) || ($resulttype=="min")){
 				$minutes = sprintf("%02d",intval($data[1]/60)).":".sprintf("%02d",intval($data[1]%60));
 			}else{
 				$minutes = $data[1];
 			}
-			if ($mmax>0) 	$widthbar= intval(($data[1]/$mmax)*200); 
-			
-		?>
-			</tr><tr>
-			<td align="right" class="sidenav" nowrap="nowrap"><font class="callhistory_td5"><?php echo $data[0]?></font></td>
-			<td bgcolor="<?php echo $FG_TABLE_ALTERNATE_ROW_COLOR[$i]?>" align="right" nowrap="nowrap" class="fontstyle_001"><?php echo $minutes?> </td>
-	        <td bgcolor="<?php echo $FG_TABLE_ALTERNATE_ROW_COLOR[$i]?>" align="left" nowrap="nowrap" width="<?php echo $widthbar+60?>">
-		        <table cellspacing="0" cellpadding="0"><tr>
-		        	<td bgcolor="#e22424"><img src="<?php echo Images_Path_Main ?>/spacer.gif" width="<?php echo $widthbar?>" height="6"></td>
-		        </tr></table>
-	        </td>
-	        <td bgcolor="<?php echo $FG_TABLE_ALTERNATE_ROW_COLOR[$i]?>" align="right" nowrap="nowrap" class="fontstyle_001"><?php echo $data[3]?></td>
-	        <td bgcolor="<?php echo $FG_TABLE_ALTERNATE_ROW_COLOR[$i]?>" align="right" nowrap="nowrap" class="fontstyle_001" ><?php echo $tmc?> </td>
-			<td bgcolor="<?php echo $FG_TABLE_ALTERNATE_ROW_COLOR[$i]?>" align="right" nowrap="nowrap" class="fontstyle_001"><?php  display_2bill($data[2]) ?></td>
-     	<?php
-     	}
 
-		if ((!isset($resulttype)) || ($resulttype=="min")){  
+			if ((!isset($resulttype)) || ($resulttype=="min")){
+				$waitup = sprintf("%02d",intval($waitup/60)).":".sprintf("%02d",intval($waitup%60));
+			}else{
+				$waitup = intval($waitup);
+			}
+			if ($mmax>0)	$widthbar = intval(($data[1]/$mmax)*200);
+
+		?>
+	</tr><tr>
+		<td align="center" class="sidenav" nowrap="nowrap"><font class="callhistory_td5"><?php echo $data[0]?></font></td>
+		<td bgcolor="<?php echo $FG_TABLE_ALTERNATE_ROW_COLOR[$i]?>" align="right" nowrap="nowrap" class="fontstyle_001"><?php echo $minutes?> </td>
+		<td bgcolor="<?php echo $FG_TABLE_ALTERNATE_ROW_COLOR[$i]?>" align="left" nowrap="nowrap" width="<?php echo $widthbar+60?>">
+			<table cellspacing="0" cellpadding="0"><tr>
+				<td bgcolor="#e22424"><img src="<?php echo Images_Path_Main ?>/spacer.gif" width="<?php echo $widthbar?>" height="6"></td>
+			</tr></table>
+		</td>
+		<td bgcolor="<?php echo $FG_TABLE_ALTERNATE_ROW_COLOR[$i]?>" align="right" nowrap="nowrap" class="fontstyle_001"><?php echo $data[3]?></td>
+		<td bgcolor="<?php echo $FG_TABLE_ALTERNATE_ROW_COLOR[$i]?>" align="center" nowrap="nowrap" class="fontstyle_001" ><?php echo $tmc?> </td>
+		<td bgcolor="<?php echo $FG_TABLE_ALTERNATE_ROW_COLOR[$i]?>" align="center" nowrap="nowrap" class="fontstyle_001"><?php echo $waitup?> </td>
+		<td bgcolor="<?php echo $FG_TABLE_ALTERNATE_ROW_COLOR[$i]?>" align="right" nowrap="nowrap" class="fontstyle_001"><?php  display_2bill($data[2]) ?></td>
+	<?php	}
+
+		if ((!isset($resulttype)) || ($resulttype=="min")){
 			$total_tmc = sprintf("%02d",intval(($totalminutes/$totalcall)/60)).":".sprintf("%02d",intval(($totalminutes/$totalcall)%60));
+			$total_waitup = sprintf("%02d",intval(($totalwaitup/$totalcall)/60)).":".sprintf("%02d",intval(($totalwaitup/$totalcall)%60));
 			$totalminutes = sprintf("%02d",intval($totalminutes/60)).":".sprintf("%02d",intval($totalminutes%60));
 		}else{
 			$total_tmc = intval($totalminutes/$totalcall);
+			$total_waitup = intval($totalwaitup/$totalcall);
 		}
 
 	 ?>
@@ -797,10 +808,11 @@ foreach ($list_total_day as $data){
 
 	<!-- TOTAL -->
 	<tr class="callhistory_td2">
-		<td align="right" nowrap="nowrap" class="callhistory_td4"><?php echo gettext("TOTAL");?></td>
+		<td align="right" nowrap="nowrap" class="callhistory_td4"><?php echo gettext("TOTAL").":";?></td>
 		<td align="center" nowrap="nowrap" colspan="2" class="callhistory_td4"><?php echo $totalminutes?> </td>
-		<td align="center" nowrap="nowrap" class="callhistory_td4"><?php echo $totalcall?></td>
+		<td align="right" nowrap="nowrap" class="callhistory_td4"><?php echo $totalcall?></td>
 		<td align="center" nowrap="nowrap" class="callhistory_td4"><?php echo $total_tmc?></td>
+		<td align="center" nowrap="nowrap" class="callhistory_td4"><?php echo $total_waitup?></td>
 		<td align="center" nowrap="nowrap" class="callhistory_td4"><?php  display_2bill($totalcost) ?></td>
 	</tr>
 	
