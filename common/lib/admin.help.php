@@ -60,6 +60,8 @@ if (SHOW_HELP) {
 
 	$CC_help_list_group = create_help(gettext("This page shows a group list.") . gettext("The Group field is used for grouping customers for quick search, batch update and reporting."), 'ListGroup');
 
+	$CC_help_list_unions = create_help(gettext("This page shows a list of union members. The Member fields are used for grouping customer's voip extensions into unions."));
+
 	$CC_help_generate_signup = create_help(gettext("Generate a specific crypted URL to configure signup with a customer group and call plan."));
 
 	$CC_help_list_customer = create_help(gettext("Customers are listed below by account number. Each row corresponds to one customer, along with information such as their call plan, credit remaining, etc.</br>") . gettext("The SIP and IAX buttons create SIP and IAX entries to allow direct VoIP connections to the Asterisk server without further authentication."), 'ListCustomers');

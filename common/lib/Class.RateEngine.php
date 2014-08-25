@@ -1730,8 +1730,13 @@ else echo "Ratecard: ".$this->ratecard_obj[$i][6]."<br>Trunk: ".$this->ratecard_
 //				if ($next_failover_trunk_by_clause >= 0) {
 //					$next_failover_trunk = $next_failover_trunk_by_clause;
 //				}
-				if (($maxuse != -1 && $inuse >= $maxuse) || ($startdate > $timecur || $timecur >= $stopdate
-				|| ($maxsecperperiod != -1 && $periodcount >= $maxsecperperiod - $timeleft && $periodexpiry > $timecur) || ($periodexpiry <= $timecur && $periodcur == 0))) {
+
+				// Check if we will be able to use this route:
+				//  if the trunk is activated and
+				//  if there are less connection than it can support or there is an unlimited number of connections
+				// If not, use the next failover trunk or next trunk in list
+				if (($maxuse != -1 && $inuse >= $maxuse) || ($startdate > $timecur || $timecur >= $stopdate ||
+				    ($maxsecperperiod != -1 && $periodcount >= $maxsecperperiod - $timeleft && $periodexpiry > $timecur) || ($periodexpiry <= $timecur && $periodcur == 0))) {
 					// use failover trunk
 					if ($intellect_count >= 0) {
 						$errmess = "Trunk $this->usedtrunk ".(($maxuse != -1 && $inuse >= $maxuse)?"is inuse. ":"life time is expiry. ");
@@ -1760,10 +1765,6 @@ else echo "Ratecard: ".$this->ratecard_obj[$i][6]."<br>Trunk: ".$this->ratecard_
 							break;
 						}
 						continue;
-				// Check if we will be able to use this route:
-				//  if the trunk is activated and
-				//  if there are less connection than it can support or there is an unlimited number of connections
-				// If not, use the next failover trunk or next trunk in list
 					} elseif ($ifmaxuse == 0 || $periodexpiry != 0 && $status) {
 						$A2B -> debug( DEBUG, $agi, __FILE__, __LINE__, "Trunk $this->usedtrunk cannot be used because maximum number of connections on this trunk is already reached or limited.");
 						if ($next_failover_trunk == $failover_trunk) {
@@ -1810,7 +1811,7 @@ else echo "Ratecard: ".$this->ratecard_obj[$i][6]."<br>Trunk: ".$this->ratecard_
 				}
 				if (!is_null($CID_handover) && $CID_handover == '' && $outprefix) {
 					$QUERY = "SELECT cid FROM cc_callerid
-							WHERE id_cc_card = {$A2B->id_card} AND verify = 1 AND cid != '{$A2B->destination}'
+							WHERE id_cc_card = {$A2B->id_card} AND verify = 1 AND cid NOT LIKE '{$A2B->destination}'
 								AND ((cli_localreplace = 1 AND cid LIKE '$outprefix%') OR (cli_otherreplace = 1 AND cid NOT LIKE '$outprefix%') OR cli_prefixreplace LIKE '%$outprefix%')
 							ORDER BY cli_localreplace = 1 AND cid LIKE '$outprefix%' DESC, cli_prefixreplace NOT LIKE '%$outprefix%', RAND() LIMIT 1";
 					$result = $A2B->instance_table -> SQLExec ($A2B -> DBHandle, $QUERY);
@@ -2045,11 +2046,11 @@ else echo "Ratecard: ".$this->ratecard_obj[$i][6]."<br>Trunk: ".$this->ratecard_
 			//# Ooh, something actually happened!
 			if ($this->dialstatus  == "BUSY") {
 				$this -> real_answeredtime = $this -> answeredtime = 0;
+				$A2B -> let_stream_listening($agi);
 				if ($A2B->agiconfig['busy_timeout'] > 0 && !(!$A2B->extext && $A2B->voicemail && !is_null($A2B->voicebox))) {
 					$agi->exec("Playtones busy");
 					sleep($A2B->agiconfig['busy_timeout']);
 				} elseif (!(!$A2B->extext && $A2B->voicemail && !is_null($A2B->voicebox))) {
-					$A2B -> let_stream_listening($agi);
 					$agi-> stream_file('prepaid-isbusy', '#');
 				}
 			} elseif ($this->dialstatus == "NOANSWER") {

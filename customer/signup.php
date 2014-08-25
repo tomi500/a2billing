@@ -56,7 +56,7 @@ include ("./lib/customer.smarty.php");
 if (!$A2B->config["signup"]['enable_signup'] && !has_rights(ACX_DISTRIBUTION))
 	exit;
 
-getpost_ifset(array ('subscriber_signup'));
+getpost_ifset(array('subscriber_signup'));
 
 if (!is_numeric($subscriber_signup)) {
 	//check subscriber_signup

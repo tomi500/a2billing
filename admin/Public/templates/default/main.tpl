@@ -77,6 +77,7 @@
 				<li><a href="A2B_entity_callerid.php?atmenu=callerid&section=1">{php} echo gettext("Caller-ID");{/php}</a></li>
 				<li><a href="A2B_notifications.php?section=1">{php} echo gettext("Credit Notification");{/php}</a></li>
 				<li><a href="A2B_entity_card_group.php?section=1">{php} echo gettext("Groups");{/php}</a></li>
+				<li><a href="A2B_entity_card_union.php?section=1">{php} echo gettext("Unions");{/php}</a></li>
 				<li><a href="A2B_entity_card_seria.php?section=1">{php} echo gettext("Card series");{/php}</a></li>
 				<li><a href="A2B_entity_speeddial.php?atmenu=speeddial&section=1">{php} echo gettext("Speed Dial");{/php}</a></li>
 				<li><a href="card-history.php?atmenu=cardhistory&section=1">{php} echo gettext("History");{/php}</a></li>
@@ -564,7 +565,7 @@
 		<a href="PP_intro.php?ui_language=english" target="_parent"><img src="templates/{$SKIN_NAME}/images/flags/gb.gif" border="0" title="English" alt="English"></a>
 		<a href="PP_intro.php?ui_language=brazilian" target="_parent"><img src="templates/{$SKIN_NAME}/images/flags/br.gif" border="0" title="Brazilian" alt="Brazilian"></a>
 		<a href="PP_intro.php?ui_language=russian" target="_parent"><img src="templates/{$SKIN_NAME}/images/flags/ru.gif" border="0" title="Russian" alt="Russian"></a>
-		<a href="PP_intro.php?ui_language=romanian" target="_parent"><img src="templates/{$SKIN_NAME}/images/flags/ro.gif" border="0" title="Romanian"alt="Romanian"></a>
+		<a href="PP_intro.php?ui_language=romanian" target="_parent"><img src="templates/{$SKIN_NAME}/images/flags/ro.gif" border="0" title="Romanian" alt="Romanian"></a>
 		<a href="PP_intro.php?ui_language=french" target="_parent"><img src="templates/{$SKIN_NAME}/images/flags/fr.gif" border="0" title="French" alt="French"></a>
 		<a href="PP_intro.php?ui_language=spanish" target="_parent"><img src="templates/{$SKIN_NAME}/images/flags/es.gif" border="0" title="Spanish" alt="Spanish"></a>
 		<a href="PP_intro.php?ui_language=greek" target="_parent"><img src="templates/{$SKIN_NAME}/images/flags/gr.gif" border="0" title="Greek" alt="Greek"></a>

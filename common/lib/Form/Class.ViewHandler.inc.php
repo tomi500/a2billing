@@ -13,28 +13,7 @@ if (!function_exists("stripos")) {
 getpost_ifset(array('stitle', 'letter', 'current_page', 'popup_select'));
 
 $processed = $this->getProcessed();
-
-
-if( !($popup_select>=1) &&($this->FG_LIST_ADDING_BUTTON1 || $this->FG_LIST_ADDING_BUTTON2)) {
-	?>
-	<table align="right"><tr align="right">
-        <td align="right"> 
-		<?php if($this->FG_LIST_ADDING_BUTTON1) {?>
-			<a href="<?php echo $this -> FG_LIST_ADDING_BUTTON_LINK1	?>"> <?php echo $this -> FG_LIST_ADDING_BUTTON_MSG1?>&nbsp;&nbsp;<img src="<?php echo $this -> FG_LIST_ADDING_BUTTON_IMG1?>" border="0" title="<?php echo $this->FG_LIST_ADDING_BUTTON_ALT1?>" alt="<?php echo $this->FG_LIST_ADDING_BUTTON_ALT1?>"></a>
-		<?php  } //END IF ?>
-		&nbsp;
-		<?php if($this->FG_LIST_ADDING_BUTTON2) {?>
-			<a href="<?php echo $this -> FG_LIST_ADDING_BUTTON_LINK2	?>"> <?php echo $this -> FG_LIST_ADDING_BUTTON_MSG2?>&nbsp;&nbsp;<img src="<?php echo $this -> FG_LIST_ADDING_BUTTON_IMG2?>" border="0" title="<?php echo $this->FG_LIST_ADDING_BUTTON_ALT2?>" alt="<?php echo $this->FG_LIST_ADDING_BUTTON_ALT2?>"></a>
-		<?php  } //END IF ?>
-		  </td>
-	 </tr></table>
-<?php  } //END IF ?>
-<?php
-
-if ((count($list)>0) && is_array($list)){
-	$ligne_number=0;
 ?>
-
 <script language="JavaScript" type="text/JavaScript">
 <!--
 function openURLFilter(theLINK)
@@ -45,42 +24,58 @@ function openURLFilter(theLINK)
 	this.location.href = theLINK + goURL;
 }
 //-->
-
 </script>
 
-<img src="<?php echo Images_Path_Main;?>/clear.gif" width="1" height="1"/>
-       
+<div style="" align="center">
+<table width="100%" border="0" cellpadding="0" cellspacing="0">
+<?php
+if( !($popup_select>=1) &&($this->FG_LIST_ADDING_BUTTON1 || $this->FG_LIST_ADDING_BUTTON2)) {
+	?>
+	<tr><td align="right">
+		<?php if($this->FG_LIST_ADDING_BUTTON1) {?>
+			<a href="<?php echo $this -> FG_LIST_ADDING_BUTTON_LINK1	?>"> <?php echo $this -> FG_LIST_ADDING_BUTTON_MSG1?>&nbsp;&nbsp;<img src="<?php echo $this -> FG_LIST_ADDING_BUTTON_IMG1?>" border="0" title="<?php echo $this->FG_LIST_ADDING_BUTTON_ALT1?>" alt="<?php echo $this->FG_LIST_ADDING_BUTTON_ALT1?>"></a>
+		<?php  } //END IF ?>
+		<?php if($this->FG_LIST_ADDING_BUTTON2) {?>
+			&nbsp;
+			<a href="<?php echo $this -> FG_LIST_ADDING_BUTTON_LINK2	?>"> <?php echo $this -> FG_LIST_ADDING_BUTTON_MSG2?>&nbsp;&nbsp;<img src="<?php echo $this -> FG_LIST_ADDING_BUTTON_IMG2?>" border="0" title="<?php echo $this->FG_LIST_ADDING_BUTTON_ALT2?>" alt="<?php echo $this->FG_LIST_ADDING_BUTTON_ALT2?>"></a>
+		<?php  } //END IF ?>
+	</td></tr>
+	<?php
+} //END IF
 
-<div align="center" style="">
-      <table width="<?php echo $this->FG_VIEW_TABLE_WITDH; ?>" align="center" border="0" cellpadding="0" cellspacing="0">
+if ((count($list)>0) && is_array($list)){
+	$ligne_number=0;
+?>
+
+	<tr><td align="center">
+	<table width="<?php echo $this->FG_VIEW_TABLE_WITDH; ?>" border="0" cellpadding="0" cellspacing="0">
 	  <?php  IF ($this -> CV_DISPLAY_LINE_TITLE_ABOVE_TABLE){ ?>
 		<TR>
-		  <TD class="tdstyle_002"><span>
-          	  <b><?php echo $this -> CV_TEXT_TITLE_ABOVE_TABLE?></b></span>
-		  </TD>
-        </TR>
+		<TD class="tdstyle_002"><span>
+			<b><?php echo $this -> CV_TEXT_TITLE_ABOVE_TABLE?></b></span>
+		</TD>
+		</TR>
 	   <?php  } //END IF ?>
 	  <?php  IF ($this -> CV_DO_ARCHIVE_ALL){ ?>
 		<TR>
+		<td class="viewhandler_filter_td1">
 			<FORM NAME="theFormFilter" action="<?php echo $_SERVER['PHP_SELF']?>">
 			<input type="hidden" name="atmenu" value="<?php echo $processed['atmenu']?>">
 			<input type="hidden" name="popup_select" value="<?php echo $processed['popup_select']?>">
 			<input type="hidden" name="popup_formname" value="<?php echo $processed['popup_formname']?>">
 			<input type="hidden" name="popup_fieldname" value="<?php echo $processed['popup_fieldname']?>">
 			<input type="hidden" name="archive" value="true">
-            <td class="viewhandler_filter_td1">
-				<input type="SUBMIT" value="<?php echo gettext("Archiving All ");?>" class="form_input_button" onclick="return confirm('This action will archive the data, Are you sure?');"/>
-			</td>
+			<input type="SUBMIT" value="<?php echo gettext("Archiving All ");?>" class="form_input_button" onclick="return confirm('This action will archive the data, Are you sure?');"/>
 			</FORM>
-        </TR>
+		</td>
+		</TR>
 	   <?php  } //END IF ?>
 	   <?php  IF ($this -> CV_DISPLAY_FILTER_ABOVE_TABLE){ ?>
-	   <TR><FORM NAME="theFormFilter">
-	   		<input type="hidden" name="popup_select" value="<?php echo $processed['popup_select']?>">
+		<TR><FORM NAME="theFormFilter">
+			<input type="hidden" name="popup_select" value="<?php echo $processed['popup_select']?>">
 			<input type="hidden" name="popup_formname" value="<?php echo $processed['popup_formname']?>">
 			<input type="hidden" name="popup_fieldname" value="<?php echo $processed['popup_fieldname']?>">
-                        
-            <TD class="tdstyle_002"><SPAN>
+		<TD class="tdstyle_002"><SPAN>
 				<SELECT name="choose_list" size="1" class="form_input_select" style="width: 185px;" onchange="openURLFilter('<?php echo $_SERVER['PHP_SELF'].$this->CV_FILTER_ABOVE_TABLE_PARAM?>')">
 
 					<OPTION><?php echo gettext("Sort");?></OPTION>
@@ -94,21 +89,22 @@ function openURLFilter(theLINK)
 					<?php 	 }
 					?>
 				</SELECT>
-			  </SPAN></TD></FORM>
-        </TR>
+		</SPAN></TD>
+		</FORM>
+		</TR>
 		<?php  } //END IF ?>
 
 		<tr>
-          <td class="viewhandler_table2_td3">
-            <table border="0" cellpadding="0" cellspacing="0" width="100%">
-                <tr>
-                  <td><span class="viewhandler_span2"> - <?php echo $this->CV_TITLE_TEXT ?>  - </span>
-                  	  <span class="viewhandler_span1"> <?php echo $this -> FG_NB_RECORD.' '.gettext("Records"); ?></span>
-                  </td>
-                  
-                </tr>
-            </table></td>
-        </tr>
+		<td class="viewhandler_table2_td3">
+		    <table border="0" cellpadding="0" cellspacing="0" width="100%">
+		    <tr>
+		    <td><span class="viewhandler_span2"> - <?php echo $this->CV_TITLE_TEXT ?>  - </span>
+			<span class="viewhandler_span1"> <?php echo $this -> FG_NB_RECORD.' '.gettext("Records"); ?></span>
+		    </td>
+		    </tr>
+		    </table>
+		</td>
+		</tr>
 
 		<?php
 		// Add filter  FG_FILTER_APPLY , FG_FILTERFIELD and FG_FILTER_FORM_ACTION
@@ -901,6 +897,8 @@ function openURLFilter(theLINK)
 
 		</td></tr>
 		</FORM>
+      </table>
+	</td></tr>
       </table>
    </div>
 <?php

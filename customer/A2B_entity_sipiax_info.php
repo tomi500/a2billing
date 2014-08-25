@@ -60,12 +60,12 @@ if ($atmenu == "SIP")
 		$language = $row[4];
 		$extstart=1+$extmin;
 	}
-	$QUERY = "SELECT regexten AS field, id_cc_card, id FROM cc_sip_buddies
+	$QUERY = "SELECT regexten AS field, id_cc_card, cc_sip_buddies.id FROM cc_sip_buddies
 			LEFT JOIN cc_card_concat bb ON bb.concat_card_id = id_cc_card
 			LEFT JOIN ( SELECT aa.concat_id FROM cc_card_concat aa WHERE aa.concat_card_id = $cardid ) AS v ON bb.concat_id = v.concat_id
 			WHERE (id_cc_card = $cardid OR v.concat_id IS NOT NULL) AND external = 0
 		UNION ALL
-		  SELECT ext_num AS field, 0, -id FROM cc_fax
+		  SELECT ext_num AS field, 0, -cc_fax.id FROM cc_fax
 			LEFT JOIN cc_card_concat bb ON bb.concat_card_id = cc_fax.id_cc_card
 			LEFT JOIN ( SELECT aa.concat_id FROM cc_card_concat aa WHERE aa.concat_card_id = $cardid ) AS v ON bb.concat_id = v.concat_id
 			WHERE id_cc_card = $cardid OR v.concat_id IS NOT NULL

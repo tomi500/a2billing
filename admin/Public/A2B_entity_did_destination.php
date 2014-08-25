@@ -67,7 +67,7 @@ $smarty->display('main.tpl');
 // #### HELP SECTION
 if ($form_action == 'list')
 	echo $CC_help_list_did;
-else
+elseif ($form_action != 'ask-delete')
 	echo $CC_help_edit_did;
 
 // #### TOP SECTION PAGE
@@ -79,4 +79,3 @@ $HD_Form->create_form($form_action, $list, $id = null);
 
 // #### FOOTER SECTION
 $smarty->display('footer.tpl');
-

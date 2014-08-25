@@ -128,7 +128,7 @@ $FG_TABLE_COL [] = array (gettext ( "Sell Rate" ), "rateinitial", "5%", "center"
 $FG_TABLE_COL [] = array (gettext ( "WaitUp" ), "waitup", "2%", "center", "SORT", "30", "", "", "", "", "", "display_minute" );
 $FG_TABLE_COL [] = array (gettext ( "Duration" ), "sessiontime", "2%", "center", "SORT", "30", "", "", "", "", "", "display_minute" );
 $FG_TABLE_COL [] = array (gettext ( "Account" ), "card_id", "5%", "center", "sort", "", "lie_link", "cc_card", "username,id", "id='%id'", "%1", "", "A2B_entity_card.php" );
-$FG_TABLE_COL [] = array (gettext ( "Trunk" ), "trunkcode", "11%", "center", "SORT", "30" );
+$FG_TABLE_COL [] = array (gettext ( "Trunk" ), "trunkcode", "11%", "center", "SORT", "34" );
 $FG_TABLE_COL [] = array ('<acronym title="' . gettext ( "Terminate Cause" ) . '">' . gettext ( "TC" ) . '</acronym>', "terminatecauseid", "2%", "center", "SORT", "", "list", $dialstatus_list );
 $FG_TABLE_COL [] = array (gettext ( "CallType" ), "sipiax", "1%", "center", "SORT", "", "list", $list_calltype );
 $FG_TABLE_COL [] = array (gettext ( "Buy" ), "buycost", "5%", "center", "SORT", "30", "", "", "", "", "", "display_money_nocur" );

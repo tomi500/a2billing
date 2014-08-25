@@ -37,12 +37,13 @@ getpost_ifset(array('id'));
 
 $atmenu = ($atmenu=='IAX')?$atmenu:'SIP';
 if (!isset($form_action) || $form_action=="list"){
-	$HD_Form = new FormHandler("cc_".strtolower($atmenu)."_buddies LEFT JOIN cc_card_concat bb ON id_cc_card = bb.concat_card_id LEFT JOIN ( SELECT aa.concat_id FROM cc_card_concat aa WHERE aa.concat_card_id = ".$_SESSION["card_id"]." ) AS v ON bb.concat_id = v.concat_id", gettext($atmenu . " Config"));
+	$HD_Form = new FormHandler("cc_".strtolower($atmenu)."_buddies LEFT JOIN cc_card_concat bb ON id_cc_card = bb.concat_card_id LEFT JOIN ( SELECT concat_id, foreignvoipconf FROM cc_card_concat WHERE concat_card_id = ".$_SESSION["card_id"]." ) AS v ON bb.concat_id = v.concat_id", gettext($atmenu . " Config"));
 }else {
 	$HD_Form = new FormHandler("cc_".strtolower($atmenu)."_buddies", gettext($atmenu . " Config"));
 }
 
 $HD_Form -> FG_DEBUG = 0;
+$HD_Form -> FG_TABLE_ID = "cc_".strtolower($atmenu)."_buddies.id";
 $HD_Form -> FG_TABLE_DEFAULT_ORDER = "server DESC, regexten";
 $HD_Form -> FG_TABLE_DEFAULT_SENS = "ASC";
 
@@ -97,7 +98,7 @@ $HD_Form -> AddViewElement(gettext("SECRET"), "secret", "8%", "center", "sort");
 
 //$HD_Form -> FieldViewElement ("IF(regexten='',name,regexten) AS regexten, callerid, language, host, ".(($atmenu!='IAX')?"callgroup, pickupgroup, ":"")."'".SIP_IAX_INFO_HOST."', name, secret ");
 //$HD_Form -> FieldViewElement ("IF(regexten='',name,regexten) AS regexten, callerid, IF(id_cc_card = ".$_SESSION["card_id"].",language,NULL) AS language, IF(id_cc_card = ".$_SESSION["card_id"].",IF(port>0 AND UNIX_TIMESTAMP()<regseconds,concat('<font color=green>',ipaddr,':',port,'</font>'),host),IF(port>0 AND UNIX_TIMESTAMP()<regseconds,'<font color=green>ONLINE</font>','offline')) AS host, IF(id_cc_card = ".$_SESSION["card_id"].",'".SIP_IAX_INFO_HOST."',NULL) AS server, IF(id_cc_card = ".$_SESSION["card_id"].",name,NULL) AS name, IF(id_cc_card = ".$_SESSION["card_id"].",secret,NULL) AS secret ");
-$HD_Form -> FieldViewElement ("IF(regexten='',name,regexten) AS regexten, callerid, IF(id_cc_card = ".$_SESSION["card_id"].",language,NULL) AS language, IF(id_cc_card = ".$_SESSION["card_id"].",IF(port>0 AND UNIX_TIMESTAMP()<regseconds,concat('<font color=green>',ipaddr,':',port,'</font> ',IF(lastms=-1,'UNREACHABLE',IF(lastms>0,concat('(',lastms,' ms)'),'')),'<br>',useragent),host),IF(port>0 AND UNIX_TIMESTAMP()<regseconds,'<font color=green>ONLINE</font>','offline')) AS host, IF(id_cc_card = ".$_SESSION["card_id"].",'".SIP_IAX_INFO_HOST."',NULL) AS server, name, IF(id_cc_card = ".$_SESSION["card_id"].",secret,NULL) AS secret ");
+$HD_Form -> FieldViewElement ("IF(regexten='',name,regexten) AS regexten, callerid, IF(id_cc_card = ".$_SESSION["card_id"].",language,NULL) AS language, IF(id_cc_card = ".$_SESSION["card_id"]." OR v.foreignvoipconf, IF(port>0 AND UNIX_TIMESTAMP()<regseconds,concat('<font color=green>',ipaddr,':',port,'</font> ',IF(lastms=-1,'UNREACHABLE',IF(lastms>0,concat('(',lastms,' ms)'),'')),'<br>',useragent),host),IF(port>0 AND UNIX_TIMESTAMP()<regseconds,'<font color=green>ONLINE</font>','offline')) AS host, IF(id_cc_card = ".$_SESSION["card_id"].",'".SIP_IAX_INFO_HOST."',NULL) AS server, name, IF(id_cc_card = ".$_SESSION["card_id"].",secret,NULL) AS secret ");
 //$HD_Form -> FieldViewElement ("IF(regexten='',name,regexten) AS regexten, callerid, IF(id_cc_card = ".$_SESSION["card_id"].",language,NULL) AS language, IF(port>0 AND UNIX_TIMESTAMP()<regseconds,concat('<font color=green>',ipaddr,':',port,'</font>'),host) AS host, IF(id_cc_card = ".$_SESSION["card_id"].",'".SIP_IAX_INFO_HOST."',NULL) AS server, IF(id_cc_card = ".$_SESSION["card_id"].",name,NULL) AS name, IF(id_cc_card = ".$_SESSION["card_id"].",secret,NULL) AS secret ");
 
 $HD_Form -> CV_NO_FIELDS  = gettext("THERE IS NO ".strtoupper($HD_Form->FG_INSTANCE_NAME)." CREATED!");

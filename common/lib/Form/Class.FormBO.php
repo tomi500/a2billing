@@ -184,6 +184,61 @@ class FormBO {
 		return false;
 	}
 
+	static public function check_union_member()
+	{
+		$FormHandler = FormHandler::GetInstance();
+		$processed = $FormHandler->getProcessed();
+		$card_id = $processed['concat_card_id'];
+		$concat_id = $processed['concat_id'];
+		$form_action = $processed['form_action'];
+		$instance_table = new Table("cc_card_concat", "concat_id");
+		if ($form_action == 'add') {
+			$FG_TABLE_CLAUSE = "concat_card_id='$card_id'";
+			$return = $instance_table -> Table_count ($FormHandler -> DBHandle, $FG_TABLE_CLAUSE);
+			if ($return) {
+				$FormHandler -> FG_TEXT_ADITION_ERROR = '<font color="Red"> '.gettext("Your can't add existing Member").'</font><br>';
+				return false;
+			}
+		}
+		$return = $instance_table -> Get_list($FormHandler -> DBHandle,NULL,"concat_id","ASC",NULL,NULL,NULL,NULL,"GROUP BY concat_id");
+		foreach ($return as $val) {
+			$res[] = $val[0];
+		}
+		if (in_array($concat_id,$res)) {
+			$idx = $concat_id;
+		} else {
+			$idx =1;
+			foreach ($res as $val) {
+				if ($idx == $val && $val != $concat_id) {
+					$idx++;
+				}
+			}
+		}
+		$QUERY = "SELECT regexten FROM cc_sip_buddies LEFT JOIN cc_card_concat ON concat_card_id=id_cc_card WHERE concat_id=$idx AND concat_card_id != $card_id AND regexten IN (SELECT regexten FROM cc_sip_buddies WHERE id_cc_card=$card_id)";
+		$return = $instance_table ->  SQLExec($FormHandler -> DBHandle, $QUERY);
+		if ($return) {
+//			$row = array_column($return,'name');
+			foreach ($return as $val) {
+				$row[] = $val[0];
+			}
+			$nmwnc = $form_action == 'add' ? gettext("New Member was not created.") : gettext("Changes was not saved.");
+			$FormHandler -> FG_TEXT_ADITION_ERROR = gettext("Duplicate extensions REGEXTEN detected:<br/>").'<font color="Red"> '.implode("<br/>",$row).'</font><br/>'.$nmwnc;
+			return false;
+		}
+		$instance_table = new Table("cc_sip_buddies", "name");
+		$FG_TABLE_CLAUSE = "id_cc_card=$card_id AND external=0 AND regexten IS NULL";
+		$return = $instance_table -> Get_list($FormHandler -> DBHandle, $FG_TABLE_CLAUSE);
+		if ($return) {
+//			$row = array_column($return,'name');
+			foreach ($return as $val) {
+				$row[] = $val[0];
+			}
+			$FormHandler -> FG_TEXT_ADITION_ERROR = gettext("Your have extensions without internal numbering. First define REGEXTEN for next voip NAMEs:<br/>").'<font color="Red"> '.implode("<br/>",$row).'</font><br/>';
+			return false;
+		}
+		return $idx == $concat_id ? true : array('concat_id' => $idx);
+	}
+
 	static public function add_card_refill_diller()
 	{
 		global $A2B;
@@ -412,9 +467,23 @@ class FormBO {
 		}
 	}
 	
-	static public function processing_card_signup($id_diller = 0)
+	static public function convert_username_to_id($id_diller = 0)
 	{
 		$FormHandler = FormHandler::GetInstance();
+		$processed = $FormHandler->getProcessed();
+		$diller = $processed['id_diller'];
+		$table_card = new Table('cc_card','id');
+		$card_clause = "username = '{$diller}'";
+		$card_result = $table_card -> Get_list($FormHandler->DBHandle, $card_clause, 0);
+		if (is_array($card_result) && count($card_result)>0) {
+			$id_diller = $card_result[0][0];
+		}
+		return array('id_diller' => $id_diller);
+	}
+	
+	static public function processing_card_signup()
+	{
+/**		$FormHandler = FormHandler::GetInstance();
 		$processed = $FormHandler->getProcessed();
 		$diller = $processed['id_diller'];
 		$table_card = new Table('cc_card','id');
@@ -427,7 +496,7 @@ class FormBO {
 		$clause_update_card = "id_diller = '{$diller}' ORDER BY id DESC LIMIT 1";
 		sleep(3);
 		$table_card -> Update_table ($FormHandler->DBHandle, $param_update_card, $clause_update_card, 'LOW_PRIORITY cc_card');
-
+**/
 		if (RELOAD_ASTERISK_IF_SIPIAX_CREATED) {
 			self::create_sipiax_friends_reload();
 		} else {
@@ -1256,6 +1325,7 @@ class FormBO {
 				$instance_sub_table -> Update_table ($FormHandler->DBHandle, $param_update_card, $clause_update_card, $func_table = null);
 			}
 		}
+		return true;
 	}
 	
 	/**

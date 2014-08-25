@@ -611,7 +611,8 @@ class FormHandler
 			$section = $_SESSION["menu_section"];
 		}
 		$ext_link ='';
-		if (is_numeric($processed['current_page']))$ext_link.="&current_page=".$processed['current_page'];
+		if (is_numeric($processed['current_page']))	$ext_link.="&current_page=".$processed['current_page'];
+		if (strlen($processed['filterprefix'])>0)	$ext_link.="&filterprefix=".$processed['filterprefix'];
 		if (!empty($processed['order']) && !empty($processed['sens']))$ext_link.="&order=".$processed['order']."&sens=".$processed['sens'];
 		$this -> FG_EDITION_LINK	= $_SERVER['PHP_SELF']."?form_action=ask-edit".$ext_link."&id=";
 		$this -> FG_DELETION_LINK	= $_SERVER['PHP_SELF']."?form_action=ask-delete".$ext_link."&id=";
@@ -1468,7 +1469,7 @@ class FormHandler
 		include_once (FSROOT."lib/Class.Table.php");
 		
 		$processed = $this->getProcessed();  //$processed['firstname']
-		$this->VALID_SQL_REG_EXP = true;		
+		$this->VALID_SQL_REG_EXP = $res_funct = true;
 		
 		for($i=0; $i < $this->FG_NB_TABLE_ADITION; $i++) {
 			
@@ -1486,12 +1487,12 @@ class FormHandler
 					foreach ($processed[$fields_name] as $value) {
 							$total_mult_select += $value;
 					}
-					
+
 					if ($this->FG_DEBUG == 1) echo "<br>$fields_name : ".$total_mult_select;					
-					
-					if ($i>0) $param_add_fields .= ", ";
+
+					if ($i>0) $param_add_fields .= ",";
 					$param_add_fields .= $fields_name;
-					if ($i>0) $param_add_value .= ", ";
+					if ($i>0) $param_add_value .= ",";
 					$param_add_value .= "'".addslashes(trim($total_mult_select))."'";
 				
 				} else {
@@ -1538,19 +1539,19 @@ class FormHandler
 						}
 						
 						if (!is_null($processed[$fields_name]) && ($processed[$fields_name]!="") && ($this->FG_TABLE_ADITION[$i][4]!="disabled") ){
-							if ($i>0) $param_add_fields .= ", ";							
+							if ($i>0) $param_add_fields .= ",";
 							$param_add_fields .= str_replace('myfrom_', '', $fields_name);
-							if ($i>0) $param_add_value .= ", ";
-							$param_add_value .= "'%TAGPREFIX%'";							
+							if ($i>0) $param_add_value .= ",";
+							$param_add_value .= "'%TAGPREFIX%'";
 						}
 					} else {
 						if ($this->FG_DEBUG == 1) echo "<br>$fields_name : ".$processed[$fields_name];
 						if (!is_null($processed[$fields_name]) && ($processed[$fields_name]!="") && ($this->FG_TABLE_ADITION[$i][4]!="disabled") ){
 							if (strtoupper ($this->FG_TABLE_ADITION[$i][3]) != strtoupper("CAPTCHAIMAGE"))
 							{
-								if ($i>0) $param_add_fields .= ", ";							
+								if ($i>0) $param_add_fields .= ",";
 									$param_add_fields .= str_replace('myfrom_', '', $fields_name);
-								if ($i>0) $param_add_value .= ", ";
+								if ($i>0) $param_add_value .= ",";
 									$param_add_value .= "'".addslashes(trim($processed[$fields_name]))."'";
 							}
 						}
@@ -1560,9 +1561,9 @@ class FormHandler
 		}
 		
 		if (!is_null($this->FG_QUERY_ADITION_HIDDEN_FIELDS) && $this->FG_QUERY_ADITION_HIDDEN_FIELDS!=""){
-			if ($i>0) $param_add_fields .= ", ";		
+			if ($i>0) $param_add_fields .= ",";		
 			$param_add_fields .= $this->FG_QUERY_ADITION_HIDDEN_FIELDS;
-			if ($i>0) $param_add_value .= ", ";
+			if ($i>0) $param_add_value .= ",";
 			$split_hidden_fields_value = preg_split("/,/",trim($this->FG_QUERY_ADITION_HIDDEN_VALUE));
 			for ($cur_hidden=0;$cur_hidden<count($split_hidden_fields_value);$cur_hidden++){
 				$param_add_value .= "'".trim($split_hidden_fields_value[$cur_hidden])."'" ;
@@ -1573,24 +1574,30 @@ class FormHandler
 		if ($this->FG_DEBUG == 1)  echo "<br><hr> $param_add_fields";
 		if ($this->FG_DEBUG == 1)  echo "<br><hr> $param_add_value";	
 		
-		$res_funct = true;
-		
 		// CALL DEFINED FUNCTION BEFORE THE ADDITION
 		
-		if (strlen($this->FG_ADDITIONAL_FUNCTION_BEFORE_ADD)>0 && ($this->VALID_SQL_REG_EXP))
-				$res_funct = call_user_func(array('FormBO', $this->FG_ADDITIONAL_FUNCTION_BEFORE_ADD)); 
-			
+		if (strlen($this->FG_ADDITIONAL_FUNCTION_BEFORE_ADD)>0 && ($this->VALID_SQL_REG_EXP)) {
+			$res_funct = call_user_func(array('FormBO', $this->FG_ADDITIONAL_FUNCTION_BEFORE_ADD));
+			if (is_array($res_funct)) {
+				$akeys = array_keys($res_funct);
+				$afields = explode(",",$param_add_fields);
+				$avalue = explode("','",trim($param_add_value,"'"));
+				foreach ($akeys as $a_val) {
+					$avalue[array_search($a_val, $afields)] = $res_funct[$a_val];
+				}
+				$param_add_value = "'".implode("','", $avalue)."'";
+			}
+		}
 		if ($res_funct) {
-			
 			$instance_table = new Table($this->FG_TABLE_NAME, $param_add_fields);
 			// CHECK IF WE HAD FOUND A SPLITABLE FIELD THEN WE MIGHT HAVE %TAGPREFIX%
 			if (strpos($param_add_value, '%TAGPREFIX%')) {
 				foreach ($arr_value_to_import as $current_value) {
 					$param_add_value_replaced = str_replace("%TAGPREFIX%", $current_value, $param_add_value);				
-					if ($this->VALID_SQL_REG_EXP) $this -> RESULT_QUERY = $instance_table -> Add_table ($this->DBHandle, $param_add_value_replaced, null, null, $this->FG_TABLE_ID, false, "LOW_PRIORITY");
+					if ($this->VALID_SQL_REG_EXP) $this -> RESULT_QUERY = $instance_table -> Add_table ($this->DBHandle, $param_add_value_replaced, null, null, $this->FG_TABLE_ID);
 				}
 			} else {
-				if ($this->VALID_SQL_REG_EXP) $this -> RESULT_QUERY = $instance_table -> Add_table ($this->DBHandle, $param_add_value, null, null, $this->FG_TABLE_ID, false, "LOW_PRIORITY");
+				if ($this->VALID_SQL_REG_EXP) $this -> RESULT_QUERY = $instance_table -> Add_table ($this->DBHandle, $param_add_value, null, null, $this->FG_TABLE_ID);
 			}
 			if($this -> FG_ENABLE_LOG == 1) {
 				$this -> logger -> insertLog_Add($_SESSION["admin_id"], 2, "NEW ".strtoupper($this->FG_INSTANCE_NAME)." CREATED" , "User added a new record in database", $this->FG_TABLE_NAME, $_SERVER['REMOTE_ADDR'], $_SERVER['REQUEST_URI'], $param_add_fields, $param_add_value);
@@ -1623,7 +1630,7 @@ class FormHandler
 		
 		$processed = $this->getProcessed();  //$processed['firstname']
 		
-		$this->VALID_SQL_REG_EXP = true;
+		$this->VALID_SQL_REG_EXP = $res_funct = true;
 		
 		$instance_table = new Table($this->FG_TABLE_NAME, $this->FG_QUERY_EDITION);
 		
@@ -1722,29 +1729,37 @@ class FormHandler
 			}				
 		}
 		
-		if (strlen($this->FG_ADDITIONAL_FUNCTION_BEFORE_EDITION)>0 && ($this->VALID_SQL_REG_EXP))
-				$res_funct = call_user_func(array('FormBO', $this->FG_ADDITIONAL_FUNCTION_BEFORE_EDITION)); 
-
-		if ($this->FG_DEBUG == 1)
-			echo "<br><hr> PARAM_UPDATE: $param_update<br>".$this->FG_EDITION_CLAUSE;
-		
-		if ($this->VALID_SQL_REG_EXP)
-			$this -> RESULT_QUERY = $instance_table -> Update_table ($this->DBHandle, $param_update, $this->FG_EDITION_CLAUSE, $func_table = null);
-		
-		if($this -> FG_ENABLE_LOG == 1)
-			$this -> logger -> insertLog_Update($_SESSION["admin_id"], 3, "A ".strtoupper($this->FG_INSTANCE_NAME)." UPDATED" , "A RECORD IS UPDATED, EDITION CALUSE USED IS ".$this->FG_EDITION_CLAUSE, $this->FG_TABLE_NAME, $_SERVER['REMOTE_ADDR'], $_SERVER['REQUEST_URI'], $param_update);
-		
-		if ($this->FG_DEBUG == 1) echo $this -> RESULT_QUERY;
-			// CALL DEFINED FUNCTION AFTER THE ACTION ADDITION
+		if (strlen($this->FG_ADDITIONAL_FUNCTION_BEFORE_EDITION)>0 && ($this->VALID_SQL_REG_EXP)) {
+			$res_funct = call_user_func(array('FormBO', $this->FG_ADDITIONAL_FUNCTION_BEFORE_EDITION));
+			if (is_array($res_funct)) {
+				$akeys = array_keys($res_funct);
+				foreach ($akeys as $a_val) {
+					$param_update = str_replace("$a_val = '".$processed[$a_val]."'", "$a_val = '".$res_funct[$a_val]."'", $param_update);
+				}
+			}
+		}
+		if ($res_funct) {
+			if ($this->FG_DEBUG == 1)
+				echo "<br><hr> PARAM_UPDATE: $param_update<br>".$this->FG_EDITION_CLAUSE;
+			
+			if ($this->VALID_SQL_REG_EXP)
+				$this -> RESULT_QUERY = $instance_table -> Update_table ($this->DBHandle, $param_update, $this->FG_EDITION_CLAUSE, $func_table = null);
+			
+			if($this -> FG_ENABLE_LOG == 1)
+				$this -> logger -> insertLog_Update($_SESSION["admin_id"], 3, "A ".strtoupper($this->FG_INSTANCE_NAME)." UPDATED" , "A RECORD IS UPDATED, EDITION CALUSE USED IS ".$this->FG_EDITION_CLAUSE, $this->FG_TABLE_NAME, $_SERVER['REMOTE_ADDR'], $_SERVER['REQUEST_URI'], $param_update);
+			
+			if ($this->FG_DEBUG == 1) echo $this -> RESULT_QUERY;
+				// CALL DEFINED FUNCTION AFTER THE ACTION ADDITION
 			if (strlen($this->FG_ADDITIONAL_FUNCTION_AFTER_EDITION)>0 && ($this->VALID_SQL_REG_EXP))
 				$res_funct = call_user_func(array('FormBO', $this->FG_ADDITIONAL_FUNCTION_AFTER_EDITION)); 
-		
-		if (($this->VALID_SQL_REG_EXP) && (isset($this->FG_GO_LINK_AFTER_ACTION_EDIT))) {				
-			if ($this->FG_DEBUG == 1)  echo "<br> GOTO ; ".$this->FG_GO_LINK_AFTER_ACTION_EDIT.$processed['id'];
-			$ext_link ='';
-			if(is_numeric($processed['current_page']))$ext_link.="&current_page=".$processed['current_page'];
-			if(!empty($processed['order']) && !empty($processed['sens']))$ext_link.="&order=".$processed['order']."&sens=".$processed['sens'];
-			Header ("Location: ".$this->FG_GO_LINK_AFTER_ACTION_EDIT.$processed['id'].$ext_link);
+			
+			if (($this->VALID_SQL_REG_EXP) && (isset($this->FG_GO_LINK_AFTER_ACTION_EDIT))) {				
+				if ($this->FG_DEBUG == 1)  echo "<br> GOTO ; ".$this->FG_GO_LINK_AFTER_ACTION_EDIT.$processed['id'];
+				$ext_link ='';
+				if(is_numeric($processed['current_page']))$ext_link.="&current_page=".$processed['current_page'];
+				if(!empty($processed['order']) && !empty($processed['sens']))$ext_link.="&order=".$processed['order']."&sens=".$processed['sens'];
+				Header ("Location: ".$this->FG_GO_LINK_AFTER_ACTION_EDIT.$processed['id'].$ext_link);
+			}
 		}
 	}
 	
@@ -1758,7 +1773,7 @@ class FormHandler
 		include_once (FSROOT."lib/Class.Table.php");
 		
 		if (strlen($this -> FG_ADDITIONAL_FUNCTION_AFTER_DELETE) > 0)
-		$res_funct = call_user_func(array('FormBO', $this->FG_ADDITIONAL_FUNCTION_AFTER_DELETE));
+			$res_funct = call_user_func(array('FormBO', $this->FG_ADDITIONAL_FUNCTION_AFTER_DELETE));
 		$processed = $this->getProcessed();  //$processed['firstname']
 		$this->VALID_SQL_REG_EXP = true;
 
@@ -1990,6 +2005,8 @@ class FormHandler
 					 	} else {
 					 		echo $this->FG_TEXT_ADITION_ERROR;
 					 	} 
+					} elseif ($form_action == "edit") {
+						echo $this->FG_TEXT_ADITION_ERROR;
 					}
 				?>
            		</strong></div>
@@ -1997,7 +2014,7 @@ class FormHandler
 			</TD>
             </TR>
 		</TABLE>
-		<br><br><br><br><br> 
+		<br><br>
 		<?php 	
 	}
 
@@ -2207,13 +2224,11 @@ class FormHandler
 				include('Class.FormHandler.EditForm.inc.php');
 				break;
 					
-			case "ask-edit":
 			case "edit":
+//				if (strlen($this->FG_ADDITIONAL_FUNCTION_BEFORE_EDITION)>0)		
+				$this -> create_actionfinish($form_action);
+			case "ask-edit":
 				include('Class.FormHandler.EditForm.inc.php');
-				break;
-				
-			case "ask-add":					
-				include('Class.FormHandler.AddForm.inc.php');
 				break;
 				
 			case "ask-delete":
@@ -2231,6 +2246,9 @@ class FormHandler
 			case "delete":
 			case "add":
 				$this -> create_actionfinish($form_action);
+				if ($form_action=="delete")	break;
+			case "ask-add":
+				include('Class.FormHandler.AddForm.inc.php');
 				break;
 				
 			default:

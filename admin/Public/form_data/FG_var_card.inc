@@ -128,7 +128,7 @@ foreach ($show_list_temp as $i => $value) {
 $show_fields = array();
 $show_fields['id'] = array(gettext("ID"), "id", "3%", "center", "sort","", "", "", "", "", "", "");
 
-$show_fields['username'] = array(gettext("Account Number"), "username", "9%", "center", "sort", "", "30", "", "", "", "", "linktocustomer");
+$show_fields['username'] = array(gettext("ACCOUNT NUMBER"), "username", "9%", "center", "sort", "", "30", "", "", "", "", "linktocustomer");
 if (!($popup_select>=1)) 
  $show_fields['useralias'] = array("<acronym title=\"WEB UI LOGIN\">".gettext("LOGIN")."</acronym>", "useralias", "4%", "center", "sort","", "", "", "", "", "", "");
 

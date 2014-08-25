@@ -39,7 +39,7 @@ getpost_ifset(array('id', 'idtariffplan', 'dialprefix', 'destination', 'buyrate'
 'billingblockb', 'stepchargec', 'chargec', 'timechargec', 'billingblockc', 'startdate', 'stopdate',
 'starttime', 'endtime', 'id_trunk', 'musiconhold','tariffplan', 'tariffgroup','posted','id_outbound_cidgroup','rounding_calltime', 
 'rounding_threshold', 'additional_block_charge', 'additional_block_charge_time', 'additional_grace','minimal_cost','announce_time_correction',
-'cancelsearch_callplanlcr', 'deleteselected'));
+'cancelsearch_callplanlcr', 'deleteselected', 'filterprefix'));
 
 // put all the destination name to lowercase
 $destination = strtolower ($destination);
@@ -104,7 +104,7 @@ $HD_Form->FG_FILTER_SEARCH_SESSION_NAME = 'entity_ratecard_selection';
 
 if (!$popup_select) {
     $HD_Form ->FG_LIST_ADDING_BUTTON1 = true;
-    $HD_Form ->FG_LIST_ADDING_BUTTON_LINK1 = "A2B_entity_def_ratecard.php?form_action=ask-add&atmenu=ratecard&section=".$_SESSION["menu_section"];
+    $HD_Form ->FG_LIST_ADDING_BUTTON_LINK1 = "A2B_entity_def_ratecard.php?form_action=ask-add&atmenu=ratecard&current_page=$current_page&filterprefix=$filterprefix&section=".$_SESSION["menu_section"];
     $HD_Form ->FG_LIST_ADDING_BUTTON_ALT1 = $HD_Form ->FG_LIST_ADDING_BUTTON_MSG1 = gettext("Add Rate");
     $HD_Form ->FG_LIST_ADDING_BUTTON_IMG1 = Images_Path ."/world_add.png" ;
 }
@@ -113,7 +113,6 @@ if (!$popup_select) {
 $musiconhold_list = Constants::getMusicOnHold_List();
 $yesno = Constants::getYesNoList();
 
-// 
 if ($popup_select) $HD_Form -> AddViewElement(gettext("ID"), "id", "5%", "center", "sort");
 $HD_Form -> AddViewElement(gettext("DESTINATION"), "destination", "17%", "center", "", "40");
 $HD_Form -> AddViewElement("<acronym title=\"DIALING PREFIX\">".gettext("PREFIX")."</acronym>", "dialprefix", "10%", "center", "sort", "");
@@ -621,8 +620,8 @@ if (ADVANCED_MODE) {
 	$HD_Form -> FieldEditElement ('cc_ratecard.idtariffplan, dialprefix, cc_ratecard.destination, buyrate, buyrateinitblock, buyrateincrement, rateinitial, initblock, billingblock, connectcharge, disconnectcharge,disconnectcharge_after, minimal_cost, startdate, stopdate, starttime, endtime, rounding_calltime, rounding_threshold, additional_block_charge, additional_block_charge_time,additional_grace, id_trunk, id_outbound_cidgroup, tag');
 }
 
-$HD_Form->FG_ADITION_HIDDEN_PARAM		= $HD_Form->FG_EDITION_HIDDEN_PARAM		= 'filterprefix';
-$HD_Form->FG_ADITION_HIDDEN_PARAM_VALUE 	= $HD_Form->FG_EDITION_HIDDEN_PARAM_VALUE	= "$filterprefix";
+$HD_Form->FG_ADITION_HIDDEN_PARAM		= $HD_Form->FG_EDITION_HIDDEN_PARAM		= 'filterprefix,current_page';
+$HD_Form->FG_ADITION_HIDDEN_PARAM_VALUE 	= $HD_Form->FG_EDITION_HIDDEN_PARAM_VALUE	= $filterprefix.",".$current_page;
 
 $HD_Form -> FG_SPLITABLE_FIELD = 'dialprefix';
 
@@ -649,8 +648,6 @@ if (isset($filterprefix)  &&  (strlen($filterprefix)>0)) {
 	$HD_Form -> FG_TABLE_CLAUSE.="dialprefix like '$filterprefix%'";
 }
 
-$HD_Form -> FG_GO_LINK_AFTER_ACTION_ADD = $_SERVER['PHP_SELF']."?atmenu=document&stitle=Document&wh=AC&filterprefix=$filterprefix&filterfield=dialprefix&id=";
+$HD_Form -> FG_GO_LINK_AFTER_ACTION_ADD = $_SERVER['PHP_SELF']."?atmenu=document&stitle=Document&wh=AC&filterprefix=$filterprefix&current_page=$current_page&filterfield=dialprefix&id=";
 $HD_Form -> FG_GO_LINK_AFTER_ACTION_EDIT = $_SERVER['PHP_SELF']."?atmenu=document&stitle=Document&wh=AC&filterprefix=$filterprefix&filterfield=dialprefix&id=";
 $HD_Form -> FG_GO_LINK_AFTER_ACTION_DELETE = $_SERVER['PHP_SELF']."?atmenu=document&stitle=Document&wh=AC&filterprefix=$filterprefix&filterfield=dialprefix&id=";
-
-

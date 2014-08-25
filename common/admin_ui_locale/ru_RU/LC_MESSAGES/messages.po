@@ -15,6 +15,34 @@ msgstr ""
 "Content-Type: text/plain; charset=utf-8\n"
 "Content-Transfer-Encoding: 8bit\n"
 
+#: Public/form_data/FG_var_union.inc:20
+msgid "UNION"
+msgstr "СОЮЗ"
+
+#: Public/form_data/FG_var_union.inc
+msgid "Add Member"
+msgstr "Добавить Участника"
+
+#: Public/form_data/FG_var_union.inc
+msgid "MEMBER NAME"
+msgstr "ИМЯ УЧАСТНИКА"
+
+#: Public/form_data/FG_var_union.inc
+msgid "MEMBER ACCOUNT"
+msgstr "АККАУНТ УЧАСТНИКА"
+
+#: Public/form_data/FG_var_union.inc
+msgid "ROOT CONTROL"
+msgstr "УПРАВЛЕНИЕ СОЮЗОМ"
+
+#: Public/form_data/FG_var_union.inc
+msgid "ADMINISTER VoIP & DID INSIDE THE UNION"
+msgstr "АДМИНИСТРИРОВАНИЕ ЧЛЕНОВ СОЮЗА"
+
+#: Public/form_data/FG_var_union.inc
+msgid "ACCESS TO LOGS INSIDE THE UNION"
+msgstr "ДОСТУП К СТАТИСТИКЕ ЧЛЕНОВ СОЮЗА"
+
 #: lib/Class.Realtime.php:96
 msgid "Could not open buddy file"
 msgstr ""
@@ -74,6 +102,10 @@ msgstr "ЗАКРЫТ"
 #: lib/support/classes/ticket.php:382
 msgid "INVALID"
 msgstr "НЕПРАВИЛЬНЫЙ"
+
+#: lib/admin.help.php
+msgid "This page shows a list of union members. The Member fields are used for grouping customer's voip extensions into unions."
+msgstr "На этой странице отображены Клиенты, объединенные в Союзы облачных АТС, для обеспечения общей нумерации внутренних телефонов, а так же взаимного доступа к настройкам и статистике."
 
 #: lib/admin.help.php:35
 msgid "For further information please consult"
@@ -672,7 +704,7 @@ msgstr "Сортировать"
 
 #: lib/Form/Class.ViewHandler.inc.php:106
 msgid "Records"
-msgstr "Записи"
+msgstr "записей"
 
 #: lib/Form/Class.ViewHandler.inc.php:136
 msgid "FILTER ON "
@@ -2807,7 +2839,7 @@ msgstr "Дата создания / День"
 #: Public/A2B_data_archiving.php:174 Public/A2B_card_info.php:93
 #: Public/A2B_refill_info.php:77 Public/A2B_payment_info.php:77
 msgid "ACCOUNT NUMBER"
-msgstr "НОМЕР УЧ.ЗАПИСИ"
+msgstr "УЧ.ЗАПИСЬ"
 
 #: Public/A2B_mass_mail.php:84 Public/form_data/FG_var_invoice.inc:123
 #: Public/form_data/FG_var_logrefill_agent.inc:88
@@ -4283,7 +4315,7 @@ msgstr ""
 #: Public/form_data/FG_var_restore.inc:100
 #: Public/form_data/FG_var_callerid.inc:120
 msgid "click on the delete button."
-msgstr ""
+msgstr "кликните внизу по кнопке удаления."
 
 #: Public/form_data/FG_var_did.inc:299
 #: Public/form_data/FG_var_did_destination.inc:205
@@ -5022,6 +5054,18 @@ msgstr "Вставьте описание"
 #: Public/form_data/FG_var_currencies.inc:116
 msgid "If you really want remove this "
 msgstr "Если вы действительно хотите удалить этот"
+
+#: Public/form_data/FG_var_card_union.inc:118
+msgid " If you really want remove this"
+msgstr "Если вы действительно хотите удалить этого"
+
+#: Public/form_data/FG_var_card_union.inc
+msgid " Member"
+msgstr " Участника"
+
+#: Public/form_data/FG_var_card_union.inc
+msgid " from Unions list, "
+msgstr ", "
 
 #: Public/form_data/FG_var_invoice.inc:201
 #: Public/form_data/FG_var_logrefill_agent.inc:151
@@ -7517,7 +7561,7 @@ msgstr ""
 #: Public/form_data/FG_var_call.inc:143
 #: Public/form_data/FG_var_callerid.inc:136
 msgid "Click Confirm Data to apply your changes"
-msgstr ""
+msgstr "Нажмите на эту кнопку чтобы применить изменения ->"
 
 #: Public/form_data/FG_var_support_component.inc:50
 msgid "Add COMPONENT"
@@ -11316,6 +11360,10 @@ msgstr ""
 #: Public/A2B_entity_did_import_analyse.php:391
 msgid "new DID's have been imported into your Database."
 msgstr ""
+
+#: Public/templates/default/main.tpl:80
+msgid "Unions"
+msgstr "Союзы"
 
 #: Public/templates/default/main.tpl:10
 msgid "HOME"

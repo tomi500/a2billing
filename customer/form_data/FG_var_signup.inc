@@ -547,7 +547,7 @@ $HD_Form->FG_TEXT_ADITION_CONFIRMATION = "<font>" . gettext("Thanks for register
 $HD_Form->FG_BUTTON_EDITION_SRC = $HD_Form->FG_BUTTON_ADITION_SRC = Images_Path . "/cormfirmboton.gif";
 $HD_Form->FG_ADD_PAGE_CONFIRM_BUTTON = gettext("SIGNUP");
 
-//$HD_Form->FG_ADDITIONAL_FUNCTION_BEFORE_ADD = 'convert_username_to_id';
+$HD_Form->FG_ADDITIONAL_FUNCTION_BEFORE_ADD = 'convert_username_to_id';
 $HD_Form->FG_ADDITIONAL_FUNCTION_AFTER_ADD = 'processing_card_signup';
 
 $HD_Form->FG_GO_LINK_AFTER_ACTION_EDIT = $_SERVER['PHP_SELF'] . "?atmenu=document&stitle=Document&wh=AC&id=";

@@ -239,7 +239,7 @@ class Table {
 			else $sql_limit = " LIMIT $current_record,$limite";
 		}
 
-		$QUERY = $sql.$sql_clause.$sql_group;
+		$QUERY = $sql.$sql_clause." ".$sql_group;
 		
 		if (strpos($QUERY, '%ORDER%') === false) {
 			$QUERY .= $sql_orderby;

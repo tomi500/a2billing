@@ -3871,6 +3871,10 @@ msgstr "ТИП ЗВОНКА"
 msgid "ALL CALLS"
 msgstr "ВСЕ ЗВОНКИ"
 
+#: call-history.php
+msgid "MY CALLS"
+msgstr "МОИ ЗВОНКИ"
+
 #: call-history.php:360
 msgid "OPTIONS"
 msgstr "ДОПОЛНИТЕЛЬНО"

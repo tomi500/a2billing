@@ -908,7 +908,7 @@ class A2Billing {
 		} else {
 //$this -> debug( ERROR, $agi, __FILE__, __LINE__, "FIRST DTMF 1 : ".$this->first_dtmf);
 			if ($this->first_dtmf != '') {
-				$prompt_enter_dest = '#';
+				$prompt_enter_dest = '""';
 				if ($this->first_dtmf == '0') {
 					$max_digits = 1;
 				} else $max_digits = 0;
@@ -920,7 +920,7 @@ class A2Billing {
 			if ($max_digits) {
 				$res_dtmf = $agi->get_data($prompt_enter_dest, 6000, $max_digits);
 //$this -> debug( ERROR, $agi, __FILE__, __LINE__, "  RES DTMF 1 : ".$res_dtmf["result"]);
-				$prompt_enter_dest = '#';
+				$prompt_enter_dest = '""';
 			} else	$res_dtmf["result"] = '';
 			if ($res_dtmf["result"] != -1) {
 				$this->first_dtmf .= $res_dtmf["result"];

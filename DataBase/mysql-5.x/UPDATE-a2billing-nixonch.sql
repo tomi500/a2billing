@@ -461,6 +461,15 @@ CREATE TABLE IF NOT EXISTS `cc_card_concat` (
   PRIMARY KEY (`concat_id`,`concat_card_id`)
 ) ENGINE=MyISAM DEFAULT CHARSET=utf8 COLLATE=utf8_bin;
 
+ALTER TABLE `cc_card_concat` DROP PRIMARY KEY ,
+ADD PRIMARY KEY ( `concat_card_id` ),
+ADD INDEX `union` ( `concat_id` );
+
+ALTER TABLE `cc_card_concat`
+ADD `root_manager` TINYINT NOT NULL DEFAULT '0',
+ADD `foreignvoipconf` TINYINT NOT NULL DEFAULT '0',
+ADD `foreignlogs` TINYINT NOT NULL DEFAULT '0';
+
 CREATE TABLE IF NOT EXISTS `cc_fax` (
   `id` bigint(20) NOT NULL AUTO_INCREMENT,
   `id_cc_card` int(11) NOT NULL DEFAULT '0',

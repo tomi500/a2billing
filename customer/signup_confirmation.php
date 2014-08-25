@@ -36,7 +36,7 @@ include ("./lib/customer.defines.php");
 include ("./lib/customer.module.access.php");
 include ("./lib/customer.smarty.php");
 
-if (!$A2B->config["signup"]['enable_signup']) {
+if (!$A2B->config["signup"]['enable_signup'] && !has_rights(ACX_DISTRIBUTION)) {
 	exit ();
 }
 

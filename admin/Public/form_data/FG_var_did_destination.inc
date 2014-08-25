@@ -33,12 +33,12 @@
 
 
 
-getpost_ifset(array('id', 'destination', 'id_cc_card', 'id_cc_did', 'activated', 'priority', 'id_trunk', 'voip_call', 'answer', 'playsound'));
+getpost_ifset(array('id', 'destination', 'id_cc_card', 'id_cc_did', 'activated', 'priority', 'id_trunk', 'voip_call', 'answer', 'playsound', 'filterprefix'));
 
 if ( (empty($form_action) || $form_action=="list")) {
 	$HD_Form = new FormHandler("cc_did_destination LEFT JOIN cc_did ON cc_did.id = cc_did_destination.id_cc_did","Did Destination");
 } else {
-	$HD_Form = new FormHandler("cc_did_destination");
+	$HD_Form = new FormHandler("cc_did_destination","Did Destination");
 }
 
 $HD_Form -> FG_DEBUG = 0;
@@ -48,8 +48,17 @@ $HD_Form -> FG_LIMITE_DISPLAY = 20;
 
 $HD_Form -> FG_TABLE_ID = 'cc_did_destination.id';
 
+$addpost = '';
+if (isset($filterprefix)  &&  (strlen($filterprefix)>0)) {
+	if (strlen($HD_Form -> FG_TABLE_CLAUSE)>0) $HD_Form -> FG_TABLE_CLAUSE.=" AND ";
+	$HD_Form -> FG_TABLE_CLAUSE .= "cc_did.did like '$filterprefix%'";
+	$addpost .= "filterprefix=".$filterprefix."&";
+}
+if (is_numeric($current_page)) {
+	$addpost .= "current_page=".$current_page."&";
+}
 $HD_Form ->FG_LIST_ADDING_BUTTON1 = true;
-$HD_Form ->FG_LIST_ADDING_BUTTON_LINK1 = "A2B_entity_did_destination.php?form_action=ask-add&section=".$_SESSION["menu_section"];
+$HD_Form ->FG_LIST_ADDING_BUTTON_LINK1 = "A2B_entity_did_destination.php?form_action=ask-add&".$addpost."section=".$_SESSION["menu_section"];
 $HD_Form ->FG_LIST_ADDING_BUTTON_ALT1 = $HD_Form ->FG_LIST_ADDING_BUTTON_MSG1 = gettext("Add DESTINATION");
 $HD_Form ->FG_LIST_ADDING_BUTTON_IMG1 = Images_Path ."/world_add.png" ;
 
@@ -79,7 +88,6 @@ $HD_Form -> AddViewElement(gettext("ACCOUNT NUMBER"), "id_cc_card", "15%", "cent
 $HD_Form -> AddViewElement(gettext("MINUTES USED"), "secondusedreal", "10%", "center", "SORT", "30", "", "", "", "", "", "display_minute");
 $HD_Form -> AddViewElement(gettext("VALIDATED"), "validated", "10%", "center", "sort", "", "list", $validated_list);
 
-
 // added a parameter to append  FG_TABLE_ID  ( by default ) or disable 0.
 $HD_Form -> FieldViewElement ('cc_did.did, cc_did_destination.activated, priority, destination, voip_call, cc_did_destination.creationdate, id_cc_card, cc_did_destination.secondusedreal, validated');
 
@@ -90,11 +98,9 @@ $HD_Form -> CV_DISPLAY_LINE_TITLE_ABOVE_TABLE = false;
 $HD_Form -> CV_TEXT_TITLE_ABOVE_TABLE = '';
 $HD_Form -> CV_DISPLAY_FILTER_ABOVE_TABLE = false;
 
-
 $HD_Form -> FG_EDITION = true;
 $HD_Form -> FG_DELETION = true;
 $HD_Form -> FG_ADDITION = true;
-
 
 // TODO integrate in Framework
 if ($form_action=="ask-add"){
@@ -104,8 +110,6 @@ if ($form_action=="ask-add"){
 	$comp_date = "value='".$begin_date.$end_date."'";
 	$comp_date_plus = "value='".$begin_date_plus.$end_date."'";
 }
-
-
 
 $HD_Form -> AddEditElement (gettext("ACTIVATED"),
 	"activated",
@@ -213,16 +217,13 @@ $HD_Form -> AddEditElement (gettext("CID_PRESENT"),
 **/
 	$HD_Form -> FieldEditElement ('activated, destination, timeout, voip_call, id_cc_card, id_cc_did, validated, priority, answer, playsound');
 
+$HD_Form->FG_ADITION_HIDDEN_PARAM		= $HD_Form->FG_EDITION_HIDDEN_PARAM		= 'filterprefix,current_page';
+$HD_Form->FG_ADITION_HIDDEN_PARAM_VALUE 	= $HD_Form->FG_EDITION_HIDDEN_PARAM_VALUE	= $filterprefix.",".$current_page;
+
 // Set the filter variables
 $HD_Form -> FG_FILTER_APPLY = true;
 $HD_Form -> FG_FILTERFIELD = 'did';
 $HD_Form -> FG_FILTERFIELDNAME = 'did';
-
-if (isset($filterprefix)  &&  (strlen($filterprefix)>0)) {
-	if (strlen($HD_Form -> FG_TABLE_CLAUSE)>0) $HD_Form -> FG_TABLE_CLAUSE.=" AND ";
-	$HD_Form -> FG_TABLE_CLAUSE .= "cc_did.did like '$filterprefix%'";
-}
-
 
 $HD_Form -> FG_INTRO_TEXT_EDITION= gettext("You can modify, through the following form, the different properties of your ".$HD_Form->FG_INSTANCE_NAME);
 $HD_Form -> FG_INTRO_TEXT_ASK_DELETION = gettext("If you really want remove this")." ".$HD_Form->FG_INSTANCE_NAME.", ".gettext("click on the delete button.");
@@ -240,9 +241,6 @@ $HD_Form -> FG_ADDITIONAL_FUNCTION_AFTER_ADD = 'did_destination_add';
 $HD_Form -> FG_ADDITIONAL_FUNCTION_AFTER_DELETE = 'did_destination_del';
 $HD_Form -> FG_ADDITIONAL_FUNCTION_AFTER_EDITION = 'did_destination_edit';
 
-$HD_Form -> FG_GO_LINK_AFTER_ACTION_ADD = $_SERVER['PHP_SELF']."?id=";
-$HD_Form -> FG_GO_LINK_AFTER_ACTION_EDIT = $_SERVER['PHP_SELF']."?id=";
-$HD_Form -> FG_GO_LINK_AFTER_ACTION_DELETE = $_SERVER['PHP_SELF']."?id=";
-
-
-
+$HD_Form -> FG_GO_LINK_AFTER_ACTION_ADD = $_SERVER['PHP_SELF']."?".$addpost."id=";
+$HD_Form -> FG_GO_LINK_AFTER_ACTION_EDIT = $_SERVER['PHP_SELF']."?".$addpost."id=";
+$HD_Form -> FG_GO_LINK_AFTER_ACTION_DELETE = $_SERVER['PHP_SELF']."?".$addpost."id=";

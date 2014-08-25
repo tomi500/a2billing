@@ -53,27 +53,24 @@ function updatecontent(id_el, record, field_inst, instance)
 //-->
 </script>
 
-<FORM action=<?php echo $_SERVER['PHP_SELF']?> method=post name="myForm" id="myForm"> 
-
-<table class="editform_table1" cellspacing="2">
-		<INPUT type="hidden" name="id" value="<?php echo $id?>">
-		<INPUT type="hidden" name="form_action" value="edit">
-		<INPUT type="hidden" name="sub_action" value="">
-		<INPUT type="hidden" name="atmenu" value="<?php echo $atmenu?>">
-		<INPUT type="hidden" name="stitle" value="<?php echo $stitle?>">
-		<INPUT type="hidden" name="current_page" value="<?php echo $processed['current_page'];?>">
-		<INPUT type="hidden" name="order" value="<?php echo $processed['order'];?>">
-		<INPUT type="hidden" name="sens" value="<?php echo $processed['sens'];?>">
-		<INPUT type="hidden" name="percentage" value="">
-		
+<FORM action=<?php echo $_SERVER['PHP_SELF']?> method=post name="myForm" id="myForm">
+	<INPUT type="hidden" name="id" value="<?php echo $id?>">
+	<INPUT type="hidden" name="form_action" value="edit">
+	<INPUT type="hidden" name="sub_action" value="">
+	<INPUT type="hidden" name="atmenu" value="<?php echo $atmenu?>">
+	<INPUT type="hidden" name="stitle" value="<?php echo $stitle?>">
+	<INPUT type="hidden" name="current_page" value="<?php echo $processed['current_page'];?>">
+	<INPUT type="hidden" name="order" value="<?php echo $processed['order'];?>">
+	<INPUT type="hidden" name="sens" value="<?php echo $processed['sens'];?>">
+	<INPUT type="hidden" name="percentage" value="">
 <?php
 	if (!empty($this->FG_QUERY_EDITION_HIDDEN_FIELDS)){
 		$split_hidden_fields = preg_split("/,/",trim($this->FG_QUERY_EDITION_HIDDEN_FIELDS));
 		$split_hidden_fields_value = preg_split("/,/",trim($this->FG_QUERY_EDITION_HIDDEN_VALUE));
 		
 		for ($cur_hidden=0;$cur_hidden<count($split_hidden_fields);$cur_hidden++){
-			echo "<INPUT type=\"hidden\" name=\"".trim($split_hidden_fields[$cur_hidden])."\" value=\"".trim($split_hidden_fields_value[$cur_hidden])."\">\n";
-		}		
+			echo "	<INPUT type=\"hidden\" name=\"".trim($split_hidden_fields[$cur_hidden])."\" value=\"".trim($split_hidden_fields_value[$cur_hidden])."\">\n";
+		}
 	}
 	
 	if (!empty($this->FG_EDITION_HIDDEN_PARAM)){
@@ -81,10 +78,13 @@ function updatecontent(id_el, record, field_inst, instance)
 		$split_hidden_fields_value = preg_split("/,/",trim($this->FG_EDITION_HIDDEN_PARAM_VALUE));
 		
 		for ($cur_hidden=0;$cur_hidden<count($split_hidden_fields);$cur_hidden++){
-			echo "<INPUT type=\"hidden\" name=\"".trim($split_hidden_fields[$cur_hidden])."\" value=\"".trim($split_hidden_fields_value[$cur_hidden])."\">\n";
-		}		
+			echo "	<INPUT type=\"hidden\" name=\"".trim($split_hidden_fields[$cur_hidden])."\" value=\"".trim($split_hidden_fields_value[$cur_hidden])."\">\n";
+		}
 	}
+?>
 
+<table class="editform_table1" cellspacing="2">
+<?php
 	for($i=0;$i<$this->FG_NB_TABLE_EDITION;$i++) { 
 		$pos = strpos($this->FG_TABLE_EDITION[$i][14], ":"); // SQL CUSTOM QUERY		
 		if (strlen($this->FG_TABLE_EDITION[$i][16])>1) {
@@ -92,18 +92,16 @@ function updatecontent(id_el, record, field_inst, instance)
 			echo $this->FG_TABLE_EDITION[$i][16];
 			echo '</i></TD></TR>';
 		}
-		
-		if (!$pos) {			
-?>
-		<TR> 		
-		<?php if (!$this-> FG_fit_expression[$i]  &&  isset($this-> FG_fit_expression[$i]) ){ ?>
-			<TD width="%25" valign="middle" class="form_head_red"> 		<?php echo $this->FG_TABLE_EDITION[$i][0]?> 		</TD>  
-		  	<TD width="%75" valign="top" class="tableBodyRight" background="<?php echo Images_Path;?>/background_cells_red.gif" >
-        <?php } else { ?>
-			<TD width="%25" valign="middle" class="form_head"> 		<?php echo $this->FG_TABLE_EDITION[$i][0]?> 		</TD>  
+		if (!$pos) {
+?>		<TR>
+<?php		if (!$this-> FG_fit_expression[$i]  &&  isset($this-> FG_fit_expression[$i]) ){
+?>			<TD width="%25" valign="middle" class="form_head_red">		<?php echo $this->FG_TABLE_EDITION[$i][0]?>		</TD>
+			<TD width="%75" valign="top" class="tableBodyRight" background="<?php echo Images_Path;?>/background_cells_red.gif" >
+<?php		} else { ?>
+			<TD width="%25" valign="middle" class="form_head">		<?php echo $this->FG_TABLE_EDITION[$i][0]?>		</TD>
 			<TD width="%75" valign="top" class="tableBodyRight" background="<?php echo Images_Path;?>/background_cells.gif" >
-		<?php }
-		
+<?php		}
+
 			if ($this->FG_DEBUG == 1) print($this->FG_TABLE_EDITION[$i][3]);
 				if(($this->FG_DISPLAY_SELECT == true) && (strlen($this->FG_SELECT_FIELDNAME)>0) && (strlen($list[0][$this->FG_SELECT_FIELDNAME])>0) && ($this->FG_CONF_VALUE_FIELDNAME == $this->FG_TABLE_EDITION[$i][1]))
 				{
@@ -133,8 +131,8 @@ function updatecontent(id_el, record, field_inst, instance)
 						name=<?php echo $this->FG_TABLE_EDITION[$i][1]?>  <?php echo $this->FG_TABLE_EDITION[$i][4]?> value="<?php if($this->VALID_SQL_REG_EXP){ echo stripslashes($list[0][$i]); }else{ echo $processed[$this->FG_TABLE_ADITION[$i][1]];  }?>"> 
                         <?php 
 				}elseif (strtoupper ($this->FG_TABLE_EDITION[$i][3])==strtoupper ("LABEL"))
-				{								
-					if (isset ($this->FG_TABLE_EDITION[$i][15]) && strlen($this->FG_TABLE_EDITION[$i][15])>1){				
+				{
+					if (isset ($this->FG_TABLE_EDITION[$i][15]) && strlen($this->FG_TABLE_EDITION[$i][15])>1){
 						$list[0][$i] = call_user_func($this->FG_TABLE_EDITION[$i][15], $list[0][$i]);
 					}			
 			  ?>  
@@ -144,7 +142,7 @@ function updatecontent(id_el, record, field_inst, instance)
 				elseif (strtoupper ($this->FG_TABLE_EDITION[$i][3])=="POPUPVALUE"){
 			?>
 				<INPUT class="form_enter" name=<?php echo $this->FG_TABLE_EDITION[$i][1]?>  <?php echo $this->FG_TABLE_EDITION[$i][4]?> value="<?php
-					if($this->VALID_SQL_REG_EXP){ 
+					if($this->VALID_SQL_REG_EXP && is_array($list)){
 						echo stripslashes($list[0][$i]);
 					}else{ echo $processed[$this->FG_TABLE_ADITION[$i][1]]; }?>">
                                 	<a href="#" onclick="window.open('<?php echo $this->FG_TABLE_EDITION[$i][12]?>popup_formname=myForm&popup_fieldname=<?php echo $this->FG_TABLE_EDITION[$i][1]?>' <?php echo $this->FG_TABLE_EDITION[$i][13]?>);"><img src="<?php echo Images_Path_Main;?>/icon_arrow_orange.gif"/></a>
@@ -254,14 +252,13 @@ function updatecontent(id_el, record, field_inst, instance)
 									echo $value_display;
 									?>
 								</OPTION>
-                          		<?php 
+<?php
 			  				}// END_FOREACH
 						}else{
 							echo gettext("No data found !!!");
-						}//END_IF				
-			  ?>
-                        </SELECT>
-                        <?php   
+						}//END_IF
+?>			</SELECT>
+<?php
 					}elseif (strtoupper ($this->FG_TABLE_EDITION[$i][3])=="RADIOBUTTON"){
 						$radio_table = preg_split("/,/",trim($this->FG_TABLE_EDITION[$i][10]));
 						foreach ($radio_table as $radio_instance){
@@ -283,35 +280,33 @@ function updatecontent(id_el, record, field_inst, instance)
 						//  Yes <input type="radio" name="digitalized" value="t" checked>
 						//  No<input type="radio" name="digitalized" value="f">
 						
-                               		}//END_IF (RADIOBUTTON)  
-							   
-		  ?>
-                        <span class="liens">
-                        <?php 						
+					}//END_IF (RADIOBUTTON)
+?>
+			<span class="liens">
+<?php
 					if (!$this-> FG_fit_expression[$i]  &&  isset($this-> FG_fit_expression[$i]) ){
-						echo "<br>".$this->FG_TABLE_EDITION[$i][6]." - ".$this->FG_regular[$this->FG_TABLE_EDITION[$i][5]][1];								
-					}
-							   
-			  ?>
-                        </span>
-			<?php  
-					if (strlen($this->FG_TABLE_COMMENT[$i])>0){  ?><?php  echo "<br/>".$this->FG_TABLE_COMMENT[$i];?>  <?php  } ?>                        
-                        &nbsp; </TD>
-                    </TR>
-                    <?php 					
+echo "			<br>".$this->FG_TABLE_EDITION[$i][6]." - ".$this->FG_regular[$this->FG_TABLE_EDITION[$i][5]][1];
+					} ?>
+			</span>
+<?php					if (strlen($this->FG_TABLE_COMMENT[$i])>0){
+echo "			<br/>".$this->FG_TABLE_COMMENT[$i];
+					} ?>
+			&nbsp;
+			</TD>
+		</TR>
+<?php
 					} else {
 						
 						if (strtoupper ($this->FG_TABLE_EDITION[$i][3])=="SELECT") {
 							$table_split = preg_split("/:/",$this->FG_TABLE_EDITION[$i][14]);
-					?>
-                    <TR> 
+?>		<TR>
 						<!-- ******************** PARTIE EXTERN : SELECT ***************** -->
-                      	<TD width="122" class="form_head" valign="top"><br><?php echo $this->FG_TABLE_EDITION[$i][0]?></TD>
-					  	<TD align="center" valign="top" class="editform_table1_td1">
-                     		<br>
-                         
+			<TD width="122" class="form_head" valign="top"><br><?php echo $this->FG_TABLE_EDITION[$i][0]?></TD>
+			<TD align="center" valign="top" class="editform_table1_td1">
+				<br>
+
 						 	<!-- Table with list instance already inserted -->
-                        	<table cellspacing="0" align=left class="editform_table2" <?php if (is_numeric($table_split[13])) {?> style=width:auto <?php }?> >
+				<table cellspacing="0" align=left class="editform_table2" <?php if (is_numeric($table_split[13])) {?> style=width:auto <?php }?> >
 								<TR class="editform_table2_td1"> 
 								<TD height=16 style="PADDING-LEFT: 5px; PADDING-RIGHT: 3px" class="form_head"> 
 								  <TABLE border=0 cellPadding=0 cellSpacing=0 style="width: auto">
