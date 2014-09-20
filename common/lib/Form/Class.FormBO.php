@@ -207,33 +207,51 @@ class FormBO {
 		if (in_array($concat_id,$res)) {
 			$idx = $concat_id;
 		} else {
-			$idx =1;
+			$idx = 1;
 			foreach ($res as $val) {
 				if ($idx == $val && $val != $concat_id) {
 					$idx++;
 				}
 			}
 		}
-		$QUERY = "SELECT regexten FROM cc_sip_buddies LEFT JOIN cc_card_concat ON concat_card_id=id_cc_card WHERE concat_id=$idx AND concat_card_id != $card_id AND regexten IN (SELECT regexten FROM cc_sip_buddies WHERE id_cc_card=$card_id)";
+		$QUERY = "SELECT regexten FROM cc_sip_buddies
+".				"LEFT JOIN cc_card_concat ON concat_card_id = id_cc_card
+".				"WHERE concat_id = $idx AND concat_card_id != $card_id AND regexten IS NOT NULL AND regexten <> ''
+".				"AND regexten IN (SELECT regexten FROM cc_sip_buddies WHERE id_cc_card = $card_id UNION ALL SELECT ext_num FROM cc_fax WHERE id_cc_card = $card_id)";
 		$return = $instance_table ->  SQLExec($FormHandler -> DBHandle, $QUERY);
 		if ($return) {
-//			$row = array_column($return,'name');
+//			$row = array_column($return,'regexten');
 			foreach ($return as $val) {
 				$row[] = $val[0];
 			}
-			$nmwnc = $form_action == 'add' ? gettext("New Member was not created.") : gettext("Changes was not saved.");
-			$FormHandler -> FG_TEXT_ADITION_ERROR = gettext("Duplicate extensions REGEXTEN detected:<br/>").'<font color="Red"> '.implode("<br/>",$row).'</font><br/>'.$nmwnc;
-			return false;
+			$FormHandler -> FG_TEXT_ADITION_ERROR = gettext("Duplicate extensions REGEXTEN detected").':<br/><font color="Red"> '.implode("<br/>",$row).'</font><br/>';
+			unset($row);
+		}
+		$QUERY = "SELECT ext_num FROM cc_fax
+".				"LEFT JOIN cc_card_concat ON concat_card_id = id_cc_card
+".				"WHERE concat_id = $idx AND concat_card_id != $card_id
+".				"AND ext_num IN (SELECT regexten FROM cc_sip_buddies WHERE id_cc_card = $card_id UNION ALL SELECT ext_num FROM cc_fax WHERE id_cc_card = $card_id)";
+		$return = $instance_table ->  SQLExec($FormHandler -> DBHandle, $QUERY);
+		if ($return) {
+//			$row = array_column($return,'ext_num');
+			foreach ($return as $val) {
+				$row[] = $val[0];
+			}
+			$FormHandler -> FG_TEXT_ADITION_ERROR .= gettext("Duplicate FAX EXTENSIONs detected").':<br/><font color="Red"> '.implode("<br/>",$row).'</font><br/>';
+			unset($row);
 		}
 		$instance_table = new Table("cc_sip_buddies", "name");
-		$FG_TABLE_CLAUSE = "id_cc_card=$card_id AND external=0 AND regexten IS NULL";
+		$FG_TABLE_CLAUSE = "id_cc_card=$card_id AND external=0 AND (regexten IS NULL OR regexten='')";
 		$return = $instance_table -> Get_list($FormHandler -> DBHandle, $FG_TABLE_CLAUSE);
 		if ($return) {
 //			$row = array_column($return,'name');
 			foreach ($return as $val) {
 				$row[] = $val[0];
 			}
-			$FormHandler -> FG_TEXT_ADITION_ERROR = gettext("Your have extensions without internal numbering. First define REGEXTEN for next voip NAMEs:<br/>").'<font color="Red"> '.implode("<br/>",$row).'</font><br/>';
+			$FormHandler -> FG_TEXT_ADITION_ERROR .= gettext("Your have extensions without internal numbering. First define REGEXTEN for next voip NAMEs").':<br/><font color="Red"> '.implode("<br/>",$row).'</font><br/>';
+		}
+		if ($FormHandler -> FG_TEXT_ADITION_ERROR) {
+			$FormHandler -> FG_TEXT_ADITION_ERROR .= $form_action == 'add' ? gettext("New Member was not created.") : gettext("Changes was not saved.");
 			return false;
 		}
 		return $idx == $concat_id ? true : array('concat_id' => $idx);

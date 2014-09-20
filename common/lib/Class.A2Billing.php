@@ -888,7 +888,7 @@ class A2Billing {
      *  @param float $credit
      *  @return 1 if Ok ; -1 if error
 	**/
-	function callingcard_ivr_authorize($agi, &$RateEngine, $try_num, $call2did=false)
+	function callingcard_ivr_authorize($agi, &$RateEngine, $try_num, $call2did = false, $callertodidcredit = NULL)
 	{
 		$res=0;
 		
@@ -1300,18 +1300,19 @@ for ($t=0;$t<count($result);$t++) {
 				$this -> debug( DEBUG, $agi, __FILE__, __LINE__, "OK - RESFINDRATE::> ".$resfindrate);
 			}
 
-	        // IF DONT FIND RATE
-	        if ($resfindrate==0) {
+		// IF DONT FIND RATE
+		if ($resfindrate==0) {
 			$this -> let_stream_listening($agi);
 			$prompt="prepaid-dest-unreachable";
 			$agi-> stream_file($prompt, '#');
 			return -1;
-	        }
-	        // CHECKING THE TIMEOUT
-	        $res_all_calcultimeout = $RateEngine->rate_engine_all_calcultimeout($this, $this->credit);
-	
-	        $this -> debug( DEBUG, $agi, __FILE__, __LINE__, "RES_ALL_CALCULTIMEOUT ::> $res_all_calcultimeout");
-	        if (!$res_all_calcultimeout) {
+		}
+		// CHECKING THE TIMEOUT
+		$credit = is_null($callertodidcredit) ? $this->credit : $callertodidcredit;
+		$res_all_calcultimeout = $RateEngine->rate_engine_all_calcultimeout($this, $credit);
+
+		$this -> debug( DEBUG, $agi, __FILE__, __LINE__, "RES_ALL_CALCULTIMEOUT ::> $res_all_calcultimeout");
+		if (!$res_all_calcultimeout) {
 			$this -> let_stream_listening($agi);
 			$prompt="prepaid-no-enough-credit";
 			$agi-> stream_file($prompt, '#');
@@ -1733,27 +1734,27 @@ for ($t=0;$t<count($result);$t++) {
 					$ast = $this -> callingcard_ivr_authorize($agi, $RateEngine, 0);
 					if ($ast==1 || $ast=='2FAX') {
 					    if ($ast==1) {
-						if ($agi -> channel_status('',true) == AST_STATE_DOWN) break;
 						// PERFORM THE CALL
-						$this->agiconfig['dialcommand_param'] = $this->agiconfig['dialcommand_param_call_2did'];
-						$result_callperf = $RateEngine->rate_engine_performcall ($agi, $this -> destination, $this);
-						if (!$result_callperf) {
+						if ($agi -> channel_status('',true) != AST_STATE_DOWN) {
+						    $this->agiconfig['dialcommand_param'] = $this->agiconfig['dialcommand_param_call_2did'];
+						    $result_callperf = $RateEngine->rate_engine_performcall ($agi, $this -> destination, $this);
+						    if (!$result_callperf) {
 							if (count($listdestination) == $callcount) {
 							    if (is_null($didvoicebox) && is_null($this->voicebox)) {
 								$prompt="prepaid-callfollowme";
 								$agi-> stream_file($prompt, '#');
 							    }
 							} else continue;
-						}
-						
+						    }
+						} else	$RateEngine->dialstatus = 'CANCEL';
 						$dialstatus = $RateEngine->dialstatus;
 						if ((	($dialstatus == "NOANSWER") ||
 							($dialstatus == "BUSY") ||
 							($dialstatus == "CHANUNAVAIL") ||
 							($dialstatus == "CONGESTION")) &&
-						    count($listdestination) > $callcount)
-						    continue;
-						
+							count($listdestination) > $callcount) {
+								continue;
+						}
 						if ($dialstatus != "ANSWER") $this -> destination = $this -> realdestination;
 //						$this->calledexten = $this -> destination;
 //						$this -> destination = $this -> realdestination;
@@ -1799,12 +1800,12 @@ for ($t=0;$t<count($result);$t++) {
 					}
 				}
 			} // END IF AUTHENTICATE
-
+		if ($agi -> channel_status('',true) == AST_STATE_DOWN) break;
 		}// END FOR
 
 		if (!is_null($didvoicebox))
 			$this->voicebox = $didvoicebox;
-		if ($this->voicemail && !is_null($this->voicebox)) {
+		if ($this->voicemail && !is_null($this->voicebox) && $agi -> channel_status('',true) != AST_STATE_DOWN) {
 			if ($dialstatus =="CHANUNAVAIL" || $dialstatus == "NOANSWER" || $dialstatus == "CONGESTION") {
 				$this->voicebox .= "|su";
 			} elseif ($dialstatus =="BUSY") {
@@ -1839,36 +1840,22 @@ for ($t=0;$t<count($result);$t++) {
 	} else {
 		$doibill = 0;
 	}
-		
+	$credit = $listdestination[0][34];
+	$credit += $listdestination[0][35] == 0 ? 0 : abs($listdestination[0][36]);
         if (!$call_did_free) {
-			
-            if ($this->typepaid == 0) {
-                if ($this->credit < $this->agiconfig['min_credit_2call']) {
-                	$time2call = 0;
-                } else {
-					$credit_without_charge = $this->credit - abs($connection_charge);
-					if ($credit_without_charge>0 && $selling_rate!=0 ) {
-						$time2call = intval($credit_without_charge / abs($selling_rate))*60;
-					} else {
-						$time2call =  $this->agiconfig['max_call_call_2_did'];
-					}
-                }
-            } else {
-				if ($this->credit <= -$this->creditlimit) {
-					$time2call =0;
-				} else {
-					$credit_without_charge = $this->credit + abs($this->creditlimit) - abs($connection_charge);
-					if ($credit_without_charge>0 && $selling_rate!=0 ) {
-						$time2call = intval($credit_without_charge / abs($selling_rate))*60;
-					} else {
-						$time2call =  $this->agiconfig['max_call_call_2_did'];
-					}
-				}
-            }
+		if ($credit < $this->agiconfig['min_credit_2call']) {
+			$time2call = 0;
+		} else {
+			$credit -= abs($connection_charge);
+			if ($credit>0 && $selling_rate!=0 ) {
+				$time2call = intval($credit / abs($selling_rate))*60;
+			} else {
+				$time2call =  $this->agiconfig['max_call_call_2_did'];
+			}
+		}
         } else {
-            $time2call =$this->agiconfig['max_call_call_2_did'];
+            $time2call = $this->agiconfig['max_call_call_2_did'];
         }
-        
         $this->timeout = $time2call;
 	$callcount = 0;
 	$accountcode = $this->accountcode;
@@ -1883,7 +1870,7 @@ for ($t=0;$t<count($result);$t++) {
 	    $callcount++;
 	    $this -> debug( INFO, $agi, __FILE__, __LINE__, "[A2Billing] DID call friend: FOLLOWME=$callcount (cardnumber:".$inst_listdestination[6]."|destination:".$inst_listdestination[4]."|tariff:".$inst_listdestination[3].")\n");
 	    $this->agiconfig['cid_enable']			= 0;
-	    $this->accountcode= $this->username = $new_username = $inst_listdestination[6];
+	    $this->accountcode = $this->username=$new_username	= $inst_listdestination[6];
 	    $this->tariff 					= $inst_listdestination[3];
 	    $this->destination					= $inst_listdestination[10];
 	    $this->useralias					= $inst_listdestination[7];
@@ -1971,8 +1958,12 @@ for ($t=0;$t<count($result);$t++) {
                 //# Ooh, something actually happend!
                 if ($dialstatus == "BUSY") {
 					$answeredtime = 0;
-					if ($this->agiconfig['busy_timeout'] > 0)
-						$res_busy = $agi->exec("Busy ".$this->agiconfig['busy_timeout']);
+					if ($this->agiconfig['busy_timeout'] > 0) {
+						$agi->exec("Playtones busy");
+						sleep($A2B->agiconfig['busy_timeout']);
+						$res_busy = $agi->exec("Busy");
+//						$res_busy = $agi->exec("Busy ".$this->agiconfig['busy_timeout']);
+					}
 					if (count($listdestination)>$callcount) {
 						continue;
 					} else {
@@ -2112,8 +2103,7 @@ for ($t=0;$t<count($result);$t++) {
                 $this->dnid = $this->destination;
                 $this->extension = $this->destination = $inst_listdestination[4];
                 if ($this->CC_TESTING) $this->extension = $this->dnid = $this->destination = "011324885";
-				
-                $ast = $this -> callingcard_ivr_authorize($agi, $RateEngine, 0);
+                $ast = $this -> callingcard_ivr_authorize($agi, $RateEngine, 0, false, $credit);
                 if ($ast==1 ||  $ast=='2FAX') {
                   if ($ast==1) {
 /**
@@ -2124,14 +2114,15 @@ for ($t=0;$t<count($result);$t++) {
 //================================= ВНИМАНИЕ! проверить обработку fct_say_time_2_call
 		    $this -> fct_say_time_2_call($agi, $this->timeout,$selling_rate);
 **/
-		    if ($agi -> channel_status('',true) == AST_STATE_DOWN) break;
                     // PERFORM THE CALL
-                    $this->agiconfig['dialcommand_param'] = $this->agiconfig['dialcommand_param_call_2did'];
-                    $result_callperf = $RateEngine->rate_engine_performcall ($agi, $this -> destination, $this, 44); // 44 = For not to play announce seconds and call cost
-                    if (!$result_callperf && count($listdestination) == $callcount && is_null($didvoicebox) && is_null($this->voicebox)) {
+		    if ($agi -> channel_status('',true) != AST_STATE_DOWN) {
+			$this->agiconfig['dialcommand_param'] = $this->agiconfig['dialcommand_param_call_2did'];
+			$result_callperf = $RateEngine->rate_engine_performcall ($agi, $this -> destination, $this, 44); // 44 = For not to play announce seconds and call cost
+			if (!$result_callperf && count($listdestination) == $callcount && is_null($didvoicebox) && is_null($this->voicebox)) {
 	                    $prompt="prepaid-callfollowme";
 	                    $agi-> stream_file($prompt, '#');
-                    }
+			}
+		    } else	$RateEngine->dialstatus = 'CANCEL';
 
                     $dialstatus = $RateEngine->dialstatus;
                     $answeredtime = $RateEngine->answeredtime;
@@ -2192,11 +2183,12 @@ for ($t=0;$t<count($result);$t++) {
 		  }
 		}
 	    }
-		}// END FOR
+	    if ($agi -> channel_status('',true) == AST_STATE_DOWN) break;
+	}// END FOR
 
 		if (!is_null($didvoicebox))
 			$this->voicebox = $didvoicebox;
-		if ($this->voicemail && !is_null($this->voicebox)) {
+		if ($this->voicemail && !is_null($this->voicebox) && $agi -> channel_status('',true) != AST_STATE_DOWN) {
 			if ($dialstatus =="CHANUNAVAIL" || $dialstatus == "NOANSWER" || $dialstatus == "CONGESTION") {
 				$this->voicebox .= "|su";
 			} elseif ($dialstatus =="BUSY") {
@@ -3272,7 +3264,7 @@ $this -> debug( ERROR, $agi, __FILE__, __LINE__, "FAXRESOLUTION: ".$faxresolutio
 				    $this->creditlimit = $this->agiconfig['cid_auto_create_card_credit_limit'];
 				    $language = 'en';
 				    $this->accountcode = $card_gen;
-				    
+
 				    if ($this->typepaid==1)
 				    	$this->credit = $this->credit + $this->creditlimit;
 
@@ -3418,8 +3410,9 @@ $this -> debug( ERROR, $agi, __FILE__, __LINE__, "FAXRESOLUTION: ".$faxresolutio
 						return -2;
 					}
 				} else {
-					if ($this -> agiconfig['say_balance_after_auth'] == 0 && (($this -> warning_threshold >= 0 && $this -> credit < $this -> warning_threshold) || $this -> warning_threshold == -1))
+					if ($this -> agiconfig['say_balance_after_auth'] == 0 && (($this -> warning_threshold >= 0 && $this -> credit < $this -> warning_threshold) || $this -> warning_threshold == -1)) {
 						$this -> agiconfig['say_balance_after_auth']	= 1;
+					}
 					if ($this -> agiconfig['say_rateinitial'] == 0)
 						$this -> agiconfig['say_rateinitial']		= $this->say_rateinitial;
 					if ($this -> agiconfig['say_balance_after_call'] == 0)

@@ -33,7 +33,7 @@
 
 
 
-getpost_ifset(array('id', 'card_id', 'date', 'payment','description','added_refill','refill_type'));
+getpost_ifset(array('id', 'card_id', 'date', 'payment','description','added_refill','refill_type', 'payment_type'));
 
 
 if (!isset($form_action) || $form_action=="list") {
@@ -160,8 +160,8 @@ if (has_rights (ACX_MODIFY_PAYMENTS)) {
 		"cols=50 rows=4",
 		"",
 		gettext("Insert the description"),
-		"" , "", "", "", "" , "", "", "");
-	
+		"", "", "", "", "", "", "", "");
+	$added = '';
 	if ($form_action!="ask-edit" && $form_action!="edit") {	
 		$HD_Form -> AddEditElement (gettext("CREATE ASSOCIATE REFILL"),
 					   "added_refill",
@@ -171,9 +171,7 @@ if (has_rights (ACX_MODIFY_PAYMENTS)) {
 					   "",
 					   gettext("Choose if you want to create a refill with this payment account"),
 					   "" , "", "" , "Yes :1, - No:0", "", "" , "", gettext("Refill card account"));
-	}
 	
-	if ($form_action!="ask-edit" && $form_action!="edit") {	
 		$HD_Form -> AddEditElement (gettext("CREATE AGENT COMMISSION "),
 					   "added_commission",
 					   '0',
@@ -182,7 +180,8 @@ if (has_rights (ACX_MODIFY_PAYMENTS)) {
 					   "",
 					   gettext("Choose if you want to create a commission to an agent, if this customer is managed by one"),
 					   "" , "", "" , "Yes :1, - No:0", "", "" , "", gettext("Commission for agent"));
-	}
+	$added = ', added_refill, added_commission';
+	} else	$added = '';
 	
 	$HD_Form -> AddEditElement (gettext("PAYMENT TYPE"),
 	                   "payment_type",
@@ -191,15 +190,10 @@ if (has_rights (ACX_MODIFY_PAYMENTS)) {
 	                   "",
 	                   "",
 	                   "",
-	                   "list" , "", "",     "", $list_refill_type, "%1", "", gettext("Define type for payment and refill,if created.") );
+	                   "list", "", "", "", $list_refill_type, "%1", "", gettext("Define type for payment and refill,if created.") );
 	
 	
-	
-	if ($form_action!="ask-edit" && $form_action!="edit") {	
-		$HD_Form -> FieldEditElement ('card_id, date, payment, description,payment_type');
-	} else {
-		$HD_Form -> FieldEditElement ('card_id, date, payment, description, added_refill,added_commission, payment_type');
-	}
+	$HD_Form -> FieldEditElement ('card_id, date, payment, description'.$added.', payment_type');
 	
 	
 	$HD_Form -> FG_INTRO_TEXT_EDITION= gettext("You can modify, through the following form, the different properties of your ".$HD_Form->FG_INSTANCE_NAME);

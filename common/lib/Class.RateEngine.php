@@ -1441,7 +1441,6 @@ else echo "Ratecard: ".$this->ratecard_obj[$i][6]."<br>Trunk: ".$this->ratecard_
 			$A2B->instance_table -> SQLExec ($A2B -> DBHandle, $myclause_nodidcall, 0);
 		}
 		monitor_recognize($A2B);
-//$A2B -> debug(ERROR, $agi, __FILE__, __LINE__, "[CC_asterisk_stop 1.2: SQL: $myclause_nodidcall]");
 	}
 	
 	/*
@@ -1480,7 +1479,7 @@ else echo "Ratecard: ".$this->ratecard_obj[$i][6]."<br>Trunk: ".$this->ratecard_
 			$status = 1;
 			// LOOOOP FOR THE FAILOVER LIMITED TO failover_recursive_limit
 			while ($loop_failover == 0 || ($loop_failover <= $A2B->agiconfig['failover_recursive_limit'] && is_numeric($failover_trunk) && $failover_trunk >= 0
-			    && $this->dialstatus != "ANSWER" && $this->dialstatus != "CANCEL" && ($intellect_count>=0 || $this->dialstatus == "CHANUNAVAIL"
+			    && $this->dialstatus != "ANSWER" && $this->dialstatus != "CANCEL" && (!$this->dialstatus || $intellect_count>=0 || $this->dialstatus == "CHANUNAVAIL"
 			    || $this->dialstatus == "CONGESTION"))) {
 
 				$this -> td = $this -> prefixclause = '';
@@ -1496,9 +1495,12 @@ else echo "Ratecard: ".$this->ratecard_obj[$i][6]."<br>Trunk: ".$this->ratecard_
 				    $tech		= $this -> ratecard_obj[$k][31];
 				    $ipaddress		= $this -> ratecard_obj[$k][32];
 				    $removeprefix	= explode(",",$this -> ratecard_obj[$k][33]);
-				    if ($typecall==1)
-					$timeout	= $A2B -> config["callback"]['predictivedialer_maxtime_tocall'];
-				    else $timeout	= $this -> ratecard_obj[$k]['timeout'];
+//				    if ($typecall==1)
+				    $timeout		= $typecall==1 ? $A2B -> config["callback"]['predictivedialer_maxtime_tocall'] : $this -> ratecard_obj[$k]['timeout'];
+//				    else $timeout	= $this -> ratecard_obj[$k]['timeout'];
+				    if ($this -> timeout)
+					$timeout	= $this -> timeout;
+				    $timeout		*= 1000;
 				    $musiconhold	= $this -> ratecard_obj[$k][34];
 				    $next_failover_trunk= $this -> ratecard_obj[$k][35];
 				    $addparameter	= $this -> ratecard_obj[$k][36];
@@ -1552,7 +1554,7 @@ else echo "Ratecard: ".$this->ratecard_obj[$i][6]."<br>Trunk: ".$this->ratecard_
 					}
 				}
 
-//$A2B -> debug( ERROR, $agi, __FILE__, __LINE__, "this -> usedtrunk = ".$this -> usedtrunk);
+//$A2B -> debug( ERROR, $agi, __FILE__, __LINE__, "this -> usedtrunk = ".$this -> usedtrunk." (".$trunkcode.").");
 				$max_len_prefix = min(strlen($destination), 15);
 				$prefixclausemain = '(';
 				while ($max_len_prefix > 0 ) {
@@ -1574,7 +1576,6 @@ else echo "Ratecard: ".$this->ratecard_obj[$i][6]."<br>Trunk: ".$this->ratecard_
 				$trunktimeout = -10;
 				$timeleft = 0;
 				$td = 'a';
-//				$prefixclausemain = preg_replace('/dialprefixa/','dialprefixmain',$prefixclausemain);
 				$QUERY = "SELECT maxsecperperioda, periodcounta, UNIX_TIMESTAMP(periodexpirya), failover_trunka, perioda, UNIX_TIMESTAMP(startdatea), UNIX_TIMESTAMP(stopdatea),timelefta
 					FROM cc_trunk WHERE id_trunk='".$this -> usedtrunk."' AND ($prefixclause) LIMIT 1";
 				$result = $A2B->instance_table -> SQLExec ($A2B -> DBHandle, $QUERY);
@@ -1586,13 +1587,9 @@ else echo "Ratecard: ".$this->ratecard_obj[$i][6]."<br>Trunk: ".$this->ratecard_
 						FROM cc_trunk WHERE id_trunk='".$this -> usedtrunk."' AND ($prefixclause) LIMIT 1";
 					$result = $A2B->instance_table -> SQLExec ($A2B -> DBHandle, $QUERY);
 				}
-//				if ((is_array($result) && count($result)>0) || ($intellect_count > 0 && $next_failover_trunk == -1 && $next_failover_trunk_by_clause == -1)) { }
 				if (is_array($result) && count($result)>0) {
-//				    if (is_array($result) && count($result)>0) {
 					$this -> td = $td;
-//				    }
 					$this -> prefixclause = $prefixclause;
-//				    if (!$firstrand) {
 					if ($intellect_count == -1 || ($trunkrand != -1 && $trunkrand != $this -> usedtrunk)) {
 						$prefixclausea = preg_replace('/dialprefixmain/','an.dialprefixa',$prefixclausemain);
 						$prefixclauseb = preg_replace('/dialprefixmain/','bn.dialprefixb',$prefixclausemain);
@@ -1629,13 +1626,11 @@ else echo "Ratecard: ".$this->ratecard_obj[$i][6]."<br>Trunk: ".$this->ratecard_
 							$resultrand = $intellecttrunks;
 						} elseif (isset($resultrand)) {
 							unset($resultrand);
-//							$intellect_count = -1;
 						}
 					} elseif (!$firstrand && is_array($intellecttrunks)) {
 						$resultrand = $intellecttrunks;
 					} elseif (isset($resultrand)) {
 						unset($resultrand);
-//						$intellect_count = -1;
 					}
 					if (isset($resultrand) && is_array($resultrand) && count($resultrand) > 0 && !$firstrand) {
 						$trunkrand = $this -> usedtrunk;
@@ -1713,24 +1708,18 @@ else echo "Ratecard: ".$this->ratecard_obj[$i][6]."<br>Trunk: ".$this->ratecard_
 							} elseif ($periodcur > 0) {
 								$trunktimeout = $maxsecperperiod -2;
 							}
+							$trunktimeout *= 1000;
 						}
 					}
-//				    }
 				}
-//				$next_failover_trunk_by_clause = -1;
 				$QUERY = "SELECT failover_trunk FROM cc_trunk WHERE id_trunk='".$this -> usedtrunk."' AND ($prefixclausemain) LIMIT 1";
 				$result = $A2B->instance_table -> SQLExec ($A2B -> DBHandle, $QUERY);
 				if (is_array($result) && count($result)>0) {
-//					$next_failover_trunk_by_clause = $result[0][0];
 					$next_failover_trunk = $result[0][0];
 					if ($trunkrand == $this -> usedtrunk) {
 						$intellect_failover_trunk = $next_failover_trunk;
 					}
 				}
-//				if ($next_failover_trunk_by_clause >= 0) {
-//					$next_failover_trunk = $next_failover_trunk_by_clause;
-//				}
-
 				// Check if we will be able to use this route:
 				//  if the trunk is activated and
 				//  if there are less connection than it can support or there is an unlimited number of connections
@@ -1743,7 +1732,7 @@ else echo "Ratecard: ".$this->ratecard_obj[$i][6]."<br>Trunk: ".$this->ratecard_
 						if ($next_failover_trunk != -1 && $trunkrand != $this -> usedtrunk && $intellect_count >= 0 && ($ifmaxuse == 0 || $periodexpiry != 0) && $status) {
 							$loop_failover++;
 							$failover_trunk = $next_failover_trunk;
-							$A2B -> debug( DEBUG, $agi, __FILE__, __LINE__, $errmess."Now using failover trunk {$failover_trunk}.");
+							$A2B -> debug( DEBUG, $agi, __FILE__, __LINE__, $errmess."Now using failover trunk {$failover_trunk} (".$intellect_trunkcode.").");
 						} elseif ($intellect_count > 0) {
 							$failover_trunk = $trunkrand;
 							$firstrand = false;
@@ -1754,13 +1743,12 @@ else echo "Ratecard: ".$this->ratecard_obj[$i][6]."<br>Trunk: ".$this->ratecard_
 							unset($intellecttrunks);
 							$loop_failover++;
 							$failover_trunk = $intellect_failover_trunk;
-							$A2B -> debug( DEBUG, $agi, __FILE__, __LINE__, $errmess."iTrunk $trunkrand have been depleted. Now using its failover trunk {$failover_trunk}.");
+							$A2B -> debug( DEBUG, $agi, __FILE__, __LINE__, $errmess."iTrunk $trunkrand have been depleted. Now using its failover trunk {$failover_trunk} (".$intellect_trunkcode.").");
 						} else {
 							if ($A2B->agiconfig['failover_lc_prefix'] || $intellect_ifmaxuse == 1) {
 								$A2B -> debug( DEBUG, $agi, __FILE__, __LINE__, $errmess."Now using next trunk.");
 								continue 2;
 							}
-//							$failover_trunk = -1;
 							$A2B -> debug( DEBUG, $agi, __FILE__, __LINE__, $errmess."No other failover or next trunks. Call is dropped.");
 							break;
 						}
@@ -1776,6 +1764,7 @@ else echo "Ratecard: ".$this->ratecard_obj[$i][6]."<br>Trunk: ".$this->ratecard_
 							}
 							$loop_failover++;
 							$failover_trunk = $next_failover_trunk;
+							$A2B -> debug( DEBUG, $agi, __FILE__, __LINE__, "Now using failover trunk ".$failover_trunk." (".$trunkcode.").");
 						}
 						continue;
 					} else {
@@ -1822,7 +1811,6 @@ else echo "Ratecard: ".$this->ratecard_obj[$i][6]."<br>Trunk: ".$this->ratecard_
 				if ($CID_handover) {
 					$cidresult[0][0] = $CID_handover;
 				} else {
-//					$outprefix = (is_array($result) && count($result)>0) ? "cid LIKE '{$result[0][0]}%' DESC," : "";
 					$QUERY = "SELECT cid FROM cc_outbound_cid_list WHERE activated = 1 AND outbound_cid_group = $cidgroupid AND cid NOT LIKE '{$A2B->destination}' ORDER BY $outprefixrequest RAND() LIMIT 1";
 					$cidresult = $A2B->instance_table -> SQLExec ($A2B -> DBHandle, $QUERY);
 				}
@@ -1835,7 +1823,7 @@ else echo "Ratecard: ".$this->ratecard_obj[$i][6]."<br>Trunk: ".$this->ratecard_
 				$A2B -> debug( DEBUG, $agi, __FILE__, __LINE__, "app_callingcard: CIDGROUPID='$cidgroupid' OUTBOUND CID SELECTED IS '$outcid'.");
 
 				if ($trunktimeout < 0)  $trunktimeout = $timeout;
-				$trunktimeout = min($timeout * 1000, $max_long, $trunktimeout * 1000);
+				$trunktimeout = min($timeout, $max_long, $trunktimeout);
 				if ($A2B->recalltime) $trunktimeout = min($trunktimeout, $A2B->recalltime * 1000);
 				$dialparams = str_replace("%timeout%", $trunktimeout, $A2B->agiconfig['dialcommand_param']);
 
@@ -1843,7 +1831,6 @@ else echo "Ratecard: ".$this->ratecard_obj[$i][6]."<br>Trunk: ".$this->ratecard_
 					$dialparams.= "m";
 					$agi -> set_variable('CHANNEL(musicclass)', $musiconhold);
 					$A2B -> debug( DEBUG, $agi, __FILE__, __LINE__, "EXEC SETMUSICONHOLD $musiconhold");
-//					$A2B -> streamfirst = false;
 				}
 
 				$dialstr = $channel.$dialparams;
@@ -1859,11 +1846,13 @@ else echo "Ratecard: ".$this->ratecard_obj[$i][6]."<br>Trunk: ".$this->ratecard_
 				    if ($A2B->dtmf_destination && $A2B->oldphonenumber && $firstgo && (!isset($trunkcode) || strpos($trunkcode,"-INFOLINE") === false)) {
 					$agi -> say_digits($A2B->oldphonenumber, '#');
 					$firstgo = false;
-//					$A2B -> dtmf_destination = false;
 				    }
-				    if ($this -> ratecard_obj[$k][12] > 0 || ($this -> ratecard_obj[$k][12] == 0 && $A2B->extext && $this -> ratecard_obj[$k][4] != $A2B->cardnumber && $ipaddress != $prefix.$destination)) {
+//$A2B -> debug( ERROR, $agi, __FILE__, __LINE__, "\nIf (".$this -> ratecard_obj[$k][12]." || (".$this -> ratecard_obj[$k][12]." == 0 && ".($A2B->extext?"TRUE":"FALSE")." && ".$this -> ratecard_obj[$k][4]." != ".$A2B->cardnumber." && ".$ipaddress."!=".$prefix.$destination.")");
+//$A2B -> debug( ERROR, $agi, __FILE__, __LINE__, $A2B->accountcode." =? ".$A2B->cardnumber);
+				    if (($this -> ratecard_obj[$k][12] > 0 && !($A2B->cardnumber != $A2B->accountcode)) || ($this -> ratecard_obj[$k][12] == 0 && $A2B->extext && $this -> ratecard_obj[$k][4] != $A2B->cardnumber && $ipaddress != $prefix.$destination)) {
 					if ($A2B->auth_through_accountcode) {
 						$A2B -> debug( DEBUG, $agi, __FILE__, __LINE__, "[A2Billing] SAY BALANCE : $A2B->credit");
+//$A2B -> debug( ERROR, $agi, __FILE__, __LINE__, "[A2Billing] SAY BALANCE : $A2B->credit");
 						$A2B -> fct_say_balance ($agi, $A2B->credit);
 						$A2B -> auth_through_accountcode = false;
 					}
@@ -1994,8 +1983,6 @@ else echo "Ratecard: ".$this->ratecard_obj[$i][6]."<br>Trunk: ".$this->ratecard_
 				    if ($this->dialstatus == "ANSWER") {
 					$answeredtime					= $agi->get_variable("ANSWEREDTIME",true);
 					if ($answeredtime == "")	$answeredtime	= $agi->get_variable("CDR(billsec)",true);
-//					if ($answeredtime == 0) 	$answeredtime	= 1;
-//					if ($this->dialstatus == "ANSWER")	$answeredtime++;
 				    } else {
 					$answeredtime					= 0;
 				    }
@@ -2003,11 +1990,10 @@ else echo "Ratecard: ".$this->ratecard_obj[$i][6]."<br>Trunk: ".$this->ratecard_
 				    $A2B -> debug( INFO, $agi, __FILE__, __LINE__, "[FAILOVER K=$k]:[ANSWEREDTIME=".$this->answeredtime."]:[DIALSTATUS=".$this->dialstatus."]");
 				}
 				if (($this->dialstatus  == "CHANUNAVAIL" || $this->dialstatus  == "CONGESTION") && $intellect_count >= 0) {
-//				if ($this->dialstatus  == "CHANUNAVAIL" && $intellect_count >= 0) {}
 					$errmess = "Trunk $this->usedtrunk is $this->dialstatus. ";
 					if ($next_failover_trunk != -1 && $trunkrand != $this -> usedtrunk && $intellect_count >= 0) {
 						$failover_trunk = $next_failover_trunk;
-						$A2B -> debug( DEBUG, $agi, __FILE__, __LINE__, $errmess."Now using failover trunk {$failover_trunk}.");
+						$A2B -> debug( DEBUG, $agi, __FILE__, __LINE__, $errmess."Now using failover trunk {$failover_trunk} (".$intellect_trunkcode.").");
 					} elseif ($intellect_count > 0) {
 						$failover_trunk = $trunkrand;
 						$firstrand = false;
@@ -2026,6 +2012,7 @@ else echo "Ratecard: ".$this->ratecard_obj[$i][6]."<br>Trunk: ".$this->ratecard_
 					break;
 				} else {
 					$failover_trunk = $next_failover_trunk;
+					if ($this->dialstatus != "ANSWER" && $this->dialstatus != "CANCEL") $A2B -> debug( DEBUG, $agi, __FILE__, __LINE__, "Now using failover trunk ".$failover_trunk." (".$trunkcode.").");
 				}
 //				$intellect_count = -1;
 				$loop_failover++;
@@ -2075,9 +2062,6 @@ else echo "Ratecard: ".$this->ratecard_obj[$i][6]."<br>Trunk: ".$this->ratecard_
 					continue;
 				}
 				$this->usedratecard = $k-$loop_failover;
-//				if ($this -> usedratecard < 0) {
-//					$this -> usedratecard = $k;
-//				}
 				return false;
 			} elseif ($this->dialstatus == "ANSWER") {
 				$A2B -> debug( INFO, $agi, __FILE__, __LINE__, "-> dialstatus : ".$this->dialstatus.", answered time is ".$this->answeredtime." \n");
@@ -2089,9 +2073,6 @@ else echo "Ratecard: ".$this->ratecard_obj[$i][6]."<br>Trunk: ".$this->ratecard_
 		} // End for
 
 		$this -> usedratecard = $k-$loop_failover;
-//		if ($this -> usedratecard < 0) {
-//			$this -> usedratecard = 0;
-//		}
 		$A2B -> debug( DEBUG, $agi, __FILE__, __LINE__, "[USEDRATECARD - FAIL =".$this -> usedratecard."]");
 		return $typecall==8?$response:false;
 

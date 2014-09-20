@@ -255,7 +255,7 @@ echo $CC_help_fax_customer;
 				</td>
       			<td align="left" class="bgcolor_003">
 					<table width="100%" border="0" cellspacing="0" cellpadding="0" >
-					<tr><td class="fontstyle_searchoptions">
+					<tr><td class="fontstyle_searchoptions">&nbsp;
 	  				<input type="checkbox" name="fromday" value="true" <?php  if ($fromday){ ?>checked<?php }?>> <?php echo gettext("FROM");?> :
 					<select name="fromstatsday_sday" class="form_input_select">
 						<?php  
@@ -315,38 +315,38 @@ echo $CC_help_fax_customer;
 	  			</td>
     		</tr>
 			<tr>
-				<td  align="left" class="bgcolor_004">
-					<font class="fontstyle_003">&nbsp;&nbsp;<?php echo gettext("CALLERID");?></font>
+				<td  align="left" class="bgcolor_004" nowrap>
+					<font class="fontstyle_003">&nbsp;&nbsp;<?php echo gettext("CALLERID");?>&nbsp;&nbsp;</font>
 				</td>
 				<td  align="left" class="bgcolor_005">
 				<table width="100%" border="0" cellspacing="0" cellpadding="0">
-				<tr><td class="fontstyle_searchoptions">&nbsp;&nbsp;<INPUT TYPE="text" NAME="callerid" value="<?php echo $callerid?>" class="form_input_text"></td>
-				<td  align="center" class="fontstyle_searchoptions"><input type="radio" NAME="calleridtype" value="1" <?php if((!isset($calleridtype))||($calleridtype==1)){?>checked<?php }?>><?php echo gettext("Exact");?></td>
-				<td  align="center" class="fontstyle_searchoptions"><input type="radio" NAME="calleridtype" value="2" <?php if($calleridtype==2){?>checked<?php }?>><?php echo gettext("Begins with")?></td>
-				<td  align="center" class="fontstyle_searchoptions"><input type="radio" NAME="calleridtype" value="3" <?php if($calleridtype==3){?>checked<?php }?>><?php echo gettext("Contains");?></td>
-				<td  align="center" class="fontstyle_searchoptions"><input type="radio" NAME="calleridtype" value="4" <?php if($calleridtype==4){?>checked<?php }?>><?php echo gettext("Ends with");?></td>
+				<tr><td class="fontstyle_searchoptions" nowrap>&nbsp;&nbsp;<INPUT TYPE="text" NAME="callerid" value="<?php echo $callerid?>" class="form_input_text">&nbsp;</td>
+				<td  align="center" class="fontstyle_searchoptions" nowrap><input type="radio" NAME="calleridtype" value="1" <?php if((!isset($calleridtype))||($calleridtype==1)){?>checked<?php }?>><?php echo gettext("Exact");?>&nbsp;</td>
+				<td  align="center" class="fontstyle_searchoptions" nowrap><input type="radio" NAME="calleridtype" value="2" <?php if($calleridtype==2){?>checked<?php }?>><?php echo gettext("Begins with")?>&nbsp;</td>
+				<td  align="center" class="fontstyle_searchoptions" nowrap><input type="radio" NAME="calleridtype" value="3" <?php if($calleridtype==3){?>checked<?php }?>><?php echo gettext("Contains");?>&nbsp;</td>
+				<td  align="center" class="fontstyle_searchoptions" nowrap><input type="radio" NAME="calleridtype" value="4" <?php if($calleridtype==4){?>checked<?php }?>><?php echo gettext("Ends with");?>&nbsp;</td>
 				</tr></table></td>
 			</tr>		
 			<tr>
-				<td  align="left" class="bgcolor_002">
-					<font class="fontstyle_003">&nbsp;&nbsp;<?php echo gettext("PHONENUMBER");?></font>
+				<td  align="left" class="bgcolor_002" nowrap>
+					<font class="fontstyle_003">&nbsp;&nbsp;<?php echo gettext("PHONENUMBER");?>&nbsp;&nbsp;</font>
 				</td>
-				<td  align="left" class="bgcolor_003">
+				<td  align="left" class="bgcolor_003" nowrap>
 				<table width="100%" border="0" cellspacing="0" cellpadding="0">
-				<tr><td class="fontstyle_searchoptions">&nbsp;&nbsp;<INPUT TYPE="text" NAME="phonenumber" value="<?php echo $phonenumber?>" class="form_input_text"></td>
-				<td  align="center" class="fontstyle_searchoptions"><input type="radio" NAME="phonenumbertype" value="1" <?php if((!isset($phonenumbertype))||($phonenumbertype==1)){?>checked<?php }?>><?php echo gettext("Exact");?></td>
-				<td  align="center" class="fontstyle_searchoptions"><input type="radio" NAME="phonenumbertype" value="2" <?php if($phonenumbertype==2){?>checked<?php }?>><?php echo gettext("Begins with")?></td>
-				<td  align="center" class="fontstyle_searchoptions"><input type="radio" NAME="phonenumbertype" value="3" <?php if($phonenumbertype==3){?>checked<?php }?>><?php echo gettext("Contains");?></td>
-				<td  align="center" class="fontstyle_searchoptions"><input type="radio" NAME="phonenumbertype" value="4" <?php if($phonenumbertype==4){?>checked<?php }?>><?php echo gettext("Ends with");?></td>
+				<tr><td class="fontstyle_searchoptions" nowrap>&nbsp;&nbsp;<INPUT TYPE="text" NAME="phonenumber" value="<?php echo $phonenumber?>" class="form_input_text">&nbsp;</td>
+				<td  align="center" class="fontstyle_searchoptions" nowrap><input type="radio" NAME="phonenumbertype" value="1" <?php if((!isset($phonenumbertype))||($phonenumbertype==1)){?>checked<?php }?>><?php echo gettext("Exact");?>&nbsp;</td>
+				<td  align="center" class="fontstyle_searchoptions" nowrap><input type="radio" NAME="phonenumbertype" value="2" <?php if($phonenumbertype==2){?>checked<?php }?>><?php echo gettext("Begins with")?>&nbsp;</td>
+				<td  align="center" class="fontstyle_searchoptions" nowrap><input type="radio" NAME="phonenumbertype" value="3" <?php if($phonenumbertype==3){?>checked<?php }?>><?php echo gettext("Contains");?>&nbsp;</td>
+				<td  align="center" class="fontstyle_searchoptions" nowrap><input type="radio" NAME="phonenumbertype" value="4" <?php if($phonenumbertype==4){?>checked<?php }?>><?php echo gettext("Ends with");?>&nbsp;</td>
 				</tr></table></td>
 			</tr>		
 			<!-- Select Calltype: -->
 			<tr>
-			  <td class="bgcolor_004" align="left" ><font class="fontstyle_003">&nbsp;&nbsp;<?php echo gettext("FAX STATUS"); ?></font></td>
+			  <td class="bgcolor_004" align="left" nowrap><font class="fontstyle_003">&nbsp;&nbsp;<?php echo gettext("FAX STATUS"); ?>&nbsp;&nbsp;</font></td>
 			  <td class="bgcolor_005" align="center">
 			  <table width="100%" border="0" cellspacing="0" cellpadding="0">
 								<tr>
-					<td  class="fontstyle_searchoptions">&nbsp;
+					<td  class="fontstyle_searchoptions" nowrap>&nbsp;
 					<select NAME="choose_calltype" size="1" class="form_input_select" >
 							<?php
 								foreach($list_faxstatus as $key => $cur_value) {
@@ -361,8 +361,8 @@ echo $CC_help_fax_customer;
 			  </td>
 			  </tr>
 			<tr>
-        		<td class="bgcolor_004" align="left" > </td>
-				<td class="bgcolor_005" align="center" >
+        		<td class="bgcolor_002" align="left" > </td>
+				<td class="bgcolor_003" align="center" >
 					<input class="form_input_button" value=" <?php echo gettext("Search");?> " type="submit">
 	  			</td>
     		</tr>

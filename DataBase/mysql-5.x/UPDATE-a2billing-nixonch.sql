@@ -61,6 +61,7 @@ ALTER TABLE cc_card ADD margin_diller int(3) NOT NULL DEFAULT 10 AFTER `margin`;
 ALTER TABLE cc_card ADD commission DECIMAL( 15, 5 ) NOT NULL DEFAULT 0 AFTER `margin_diller`;
 ALTER TABLE cc_card ADD areaprefix SMALLINT( 6 ) NULL DEFAULT NULL AFTER `country`;
 ALTER TABLE cc_card ADD citylength SMALLINT( 6 ) NULL DEFAULT NULL AFTER `areaprefix`;
+ALTER TABLE cc_card ADD showcallstypedefault TINYINT NOT NULL DEFAULT '0';
 
 ALTER TABLE cc_card CHANGE id_campaign id_campaign  INT( 11 ) NULL DEFAULT '-1';
 ALTER TABLE cc_card CHANGE id_timezone id_timezone CHAR( 40 ) NULL DEFAULT '0';
@@ -131,7 +132,6 @@ ALTER TABLE cc_sip_buddies ADD warning_threshold INT( 11 ) NOT NULL DEFAULT '-2'
 ALTER TABLE cc_sip_buddies ADD say_rateinitial SMALLINT( 6 ) NOT NULL DEFAULT '0';
 ALTER TABLE cc_sip_buddies ADD say_balance_after_call SMALLINT( 6 ) NOT NULL DEFAULT '0';
 
-
 ALTER TABLE cc_sip_buddies
   CHANGE `canreinvite` `canreinvite` varchar( 20 ) CHARACTER SET utf8 COLLATE utf8_bin NULL DEFAULT NULL ,
   CHANGE `nat` `nat` enum( 'force_rport,comedia','no','force_rport','comedia','auto_force_rport','auto_comedia','auto_force_rport,auto_comedia' ) NULL DEFAULT 'comedia' ,
@@ -159,7 +159,9 @@ ALTER TABLE cc_sip_buddies
   CHANGE `allowtransfer` `allowtransfer` ENUM('yes','no') CHARACTER SET utf8 COLLATE utf8_bin NULL DEFAULT NULL,
   CHANGE `subscribemwi` `subscribemwi` ENUM('yes','no') CHARACTER SET utf8 COLLATE utf8_bin NULL DEFAULT NULL,
   CHANGE `videosupport` `videosupport` ENUM('yes','no','always') CHARACTER SET utf8 COLLATE utf8_bin NULL DEFAULT NULL,
-  CHANGE `ipaddr` `ipaddr` CHAR( 50 ) CHARACTER SET utf8 COLLATE utf8_bin NULL DEFAULT NULL;
+  CHANGE `ipaddr` `ipaddr` CHAR( 50 ) CHARACTER SET utf8 COLLATE utf8_bin NULL DEFAULT NULL,
+  CHANGE `regexten` `regexten` VARCHAR( 20 ) CHARACTER SET utf8 COLLATE utf8_bin NULL DEFAULT NULL;
+UPDATE `cc_sip_buddies` SET `regexten` = NULL WHERE `regexten`='';
 
 ALTER TABLE cc_iax_buddies ADD `forceencryption` varchar(20) COLLATE utf8_bin NOT NULL;
 ALTER TABLE cc_iax_buddies ADD `external` INT( 11 ) NOT NULL DEFAULT '0';

@@ -56,13 +56,14 @@ if (has_rights (ACX_MODIFY_REFILLS)) {
 
 $list_refill_type = Constants::getRefillType_List();
 
-$HD_Form -> AddViewElement(gettext("ID"), "cc_logrefill.id", "10%", "center", "sort");
-$HD_Form -> AddViewElement(gettext("ACCOUNT"), "username", "17%", "center", "sort", "", "30", "", "", "", "", "linktocustomer_id");
-$HD_Form -> AddViewElement(gettext("REFILL DATE"), "cc_logrefill.date", "17%", "center", "sort", "30", "", "", "", "", "", "display_dateformat");
-$HD_Form -> AddViewElement(gettext("REFILL AMOUNT"), "credit", "15%", "center", "sort","", "", "", "", "", "", "display_money");
-$HD_Form -> AddViewElement(gettext("REFILL TYPE"),"refill_type", "13%", "center", "sort", "", "list", $list_refill_type);
+$HD_Form -> AddViewElement(gettext("ID"), "cc_logrefill.id", "5%", "center", "sort");
+$HD_Form -> AddViewElement(gettext("ACCOUNT"), "username", "14%", "center", "sort", "", "30", "", "", "", "", "linktocustomer_id");
+$HD_Form -> AddViewElement(gettext("REFILL DATE"), "cc_logrefill.date", "20%", "center", "sort", "30", "", "", "", "", "", "display_dateformat");
+$HD_Form -> AddViewElement(gettext("REFILL AMOUNT"), "credit", "20%", "center", "sort","", "", "", "", "", "", "display_money");
+$HD_Form -> AddViewElement(gettext("REFILL TYPE"),"refill_type", "19%", "center", "sort", "", "list", $list_refill_type);
+$HD_Form -> AddViewElement(gettext("AGENT"),"agent", "14%", "center", "sort", "", "30", "", "", "", "", "linktocustomer_id");
 
-$HD_Form -> FieldViewElement ('cc_logrefill.id, cc_logrefill.card_id, cc_logrefill.date, cc_logrefill.credit , cc_logrefill.refill_type');
+$HD_Form -> FieldViewElement ('cc_logrefill.id, cc_logrefill.card_id, cc_logrefill.date, cc_logrefill.credit , cc_logrefill.refill_type, IFNULL(cc_logrefill.agent_id,cc_logrefill.diller_id)');
 
 if (!($popup_select>=1))	 $HD_Form -> FG_FILTER_SEARCH_FORM = true;
 $HD_Form -> FG_FILTER_SEARCH_SESSION_NAME = 'refill_cust_selection';
@@ -152,7 +153,7 @@ if (has_rights (ACX_MODIFY_REFILLS)) {
 	               "",
 	               "",
 	               "",
-	               "list" , "", "",     "", $list_refill_type, "%1", "", gettext("Define type for payment and refill,if created.") );
+	               "list", "", "", "", $list_refill_type, "%1", "", gettext("Define type for payment and refill,if created.") );
 	
 	if ($form_action!="ask-edit" && $form_action!="edit") {	
 		$HD_Form -> AddEditElement (gettext("CREATE ASSOCIATE INVOICE"),
@@ -163,10 +164,11 @@ if (has_rights (ACX_MODIFY_REFILLS)) {
 					   "",
 					   gettext("Choose if you want to create an invoice with this refill account"),
 					   "" , "", "" , "Yes :1, - No:0", "", "" , "", "");
-	}
+	$added_invoice = ", added_invoice";
+	} else	$added_invoice = '';
 	
 	
-	$HD_Form -> FieldEditElement ('card_id, date, credit, description, refill_type, added_invoice');
+	$HD_Form -> FieldEditElement ('card_id, date, credit, description, refill_type'.$added_invoice);
 	
 	
 	

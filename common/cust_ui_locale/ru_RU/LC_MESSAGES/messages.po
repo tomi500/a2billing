@@ -101,7 +101,7 @@ msgstr "АВТОМАТИЧЕСКИ СОЗДАННАЯ КОМИССИЯ!"
 
 #: lib/customer.help.php:159
 msgid "This screen shows refills and payments made against each account, along with the current credit on each card. The initial amount of credit applied to the card is not included. The amount owing is calculated by subtracting payments from refills."
-msgstr "Просматривайте баллансы, суммы счетов и платежей каждого Вашего клиента. В правой колонке можно выбрать информацию о других параметрах, а так же пополнить баланс клиента или вернуть средства. <u>ВНИМАНИЕ</u>! Отмена проведенного перевода средств невозможна!"
+msgstr "Просматривайте баллансы, счета и платежи своих клиентов. В правой колонке можно выбрать информацию о других параметрах, а так же пополнить баланс клиента или вернуть средства.<br/><u>ВНИМАНИЕ</u>! Отмена проведенного перевода средств невозможна!"
 
 #: paypal.php:72
 msgid "Payment for "
@@ -353,7 +353,7 @@ msgstr "МАРШРУТ"
 
 #: simulator.php:216 call-history.php:380
 msgid "Minutes"
-msgstr "мин"
+msgstr "Минутах"
 
 #: simulator.php:220
 msgid "UAH"
@@ -2671,27 +2671,24 @@ msgstr "Ответ"
 
 #: lib/interface/constants.php:296
 msgid "BUSY"
-msgstr "ЗАНЯТО"
+msgstr "Занято"
 
 #: lib/interface/constants.php:297
-#, fuzzy
 msgid "NOANSWER"
-msgstr "Ответ"
+msgstr "БезОтвета"
 
 #: lib/interface/constants.php:298 lib/interface/constants.php:341
 #: lib/interface/constants.php:366
-#, fuzzy
 msgid "CANCEL"
-msgstr "ЗВОНОК"
+msgstr "Отмена"
 
 #: lib/interface/constants.php:299
-#, fuzzy
 msgid "CONGESTION"
-msgstr "DURATION"
+msgstr "Отказ"
 
 #: lib/interface/constants.php:300
 msgid "CHANUNAVAIL"
-msgstr "КАНАЛ НЕДОСТУПЕН"
+msgstr "Недоступен"
 
 #: lib/interface/constants.php:301
 #, fuzzy
@@ -3872,8 +3869,64 @@ msgid "ALL CALLS"
 msgstr "ВСЕ ЗВОНКИ"
 
 #: call-history.php
-msgid "MY CALLS"
-msgstr "МОИ ЗВОНКИ"
+msgid "Not Completed"
+msgstr "Не завершенные"
+
+#: call-history.php
+msgid "I"
+msgstr "Я"
+
+#: call-history.php
+msgid "I & MY UNION"
+msgstr "Я и МОЙ СОЮЗ"
+
+#: call-history.php
+msgid "MY UNION"
+msgstr "МОЙ СОЮЗ"
+
+#: call-history.php
+msgid "UNION #"
+msgstr "СОЮЗ №"
+
+#: call-history.php
+msgid "MY CUSTOMER "
+msgstr "МОЙ КЛИЕНТ"
+
+#: call-history.php
+msgid "INCOMING"
+msgstr "ВХОДЯЩИЕ"
+
+#: call-history.php
+msgid "OUTGOING"
+msgstr "ИСХОДЯЩИЕ"
+
+#: call-history.php
+msgid "INTERNAL"
+msgstr "ВНУТРЕННИЕ"
+
+#: call-history.php
+msgid "CALLBACK CALLS"
+msgstr "ОБРАТНЫЕ"
+
+#: call-history.php
+msgid "TRANSIT"
+msgstr "ТРАНЗИТНЫЕ"
+
+#: call-history.php
+msgid "FREE "
+msgstr "БЕСПЛАТНЫЕ"
+
+#: call-history.php
+msgid "SURCHARGE"
+msgstr "ПЛАТНЫЕ"
+
+#: call-history.php
+msgid "BY DIRECTION"
+msgstr "ПО НАПРАВЛЕНИЮ"
+
+#: call-history.php
+msgid "BY OWNER"
+msgstr "ПО ВЛАДЕЛЬЦУ"
 
 #: call-history.php:360
 msgid "OPTIONS"
@@ -3885,11 +3938,11 @@ msgstr "ПОКАЗЫВАТЬ"
 
 #: call-history.php:368
 msgid "Answered Calls"
-msgstr "Отвеченные Вызовы"
+msgstr "Отвеченные вызовы"
 
 #: call-history.php:370
 msgid "All Calls"
-msgstr "Все Вызовы"
+msgstr "Все вызовы"
 
 #: call-history.php:377
 msgid "RESULT"
@@ -3897,7 +3950,7 @@ msgstr "ОТОБРАЖАТЬ В"
 
 #: call-history.php:380
 msgid "Seconds"
-msgstr "сек"
+msgstr "Секундах"
 
 #: call-history.php:385
 msgid "CURRENCY"

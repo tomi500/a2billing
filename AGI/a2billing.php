@@ -793,7 +793,7 @@ if ($mode == 'standard') {
 				$cia_res = $A2B-> call_sip_iax_buddy($agi, $RateEngine, $i);
 
 			} else {
-				$ans = $A2B-> callingcard_ivr_authorize($agi, $RateEngine, $i,true);
+				$ans = $A2B-> callingcard_ivr_authorize($agi, $RateEngine, $i, true);
 				$A2B -> debug( DEBUG, $agi, __FILE__, __LINE__, 'ANSWER fct callingcard_ivr authorize:> '.$ans);
 				
 				// CREATE A PERSONAL UNIQUEID FOR EACH TRY
@@ -832,7 +832,7 @@ if ($mode == 'standard') {
 //						sleep(1);
 //$A2B -> debug( ERROR, $agi, __FILE__, __LINE__, "UNIQUEID + 1000000000 = ".$A2B-> uniqueid);
 						$agi-> evaluate("STREAM FILE one-moment-please \"#\" 0");
-						$ans = $A2B-> callingcard_ivr_authorize($agi, $RateEngine, $i,true);
+						$ans = $A2B-> callingcard_ivr_authorize($agi, $RateEngine, $i, true);
 					} elseif ($A2B->set_inuse_username) {
 						$A2B -> callingcard_acct_start_inuse($agi,0);
 					}
@@ -859,7 +859,7 @@ if ($mode == 'standard') {
 						$A2B-> agiconfig['number_try'] = 1;
 						$A2B-> CallerID = $A2B-> cidafter;
 						$agi-> evaluate("STREAM FILE one-moment-please \"#\" 0");
-						$ans = $A2B-> callingcard_ivr_authorize($agi, $RateEngine, $i,true);
+						$ans = $A2B-> callingcard_ivr_authorize($agi, $RateEngine, $i, true);
 					} else	$ans = 0;
 				    } while ($ans==1);
 
@@ -895,7 +895,7 @@ if ($mode == 'standard') {
 						" aleg_timeinterval, ".
 						" aleg_carrier_connect_charge_offp, aleg_carrier_cost_min_offp, aleg_retail_connect_charge_offp, aleg_retail_cost_min_offp, ".
 						" aleg_carrier_initblock_offp, aleg_carrier_increment_offp, aleg_retail_initblock_offp, aleg_retail_increment_offp, ".
-						" cc_card.id, playsound, timeout, margin, id_diller, voicebox".
+						" cc_card.id, playsound, timeout, margin, id_diller, voicebox, credit, typepaid, creditlimit".
 						" FROM cc_did, cc_did_destination, cc_card, cc_country".
 						" WHERE id_cc_did=cc_did.id AND cc_card.status=1 AND cc_card.id=id_cc_card AND cc_did_destination.activated=1 AND cc_did.activated=1 AND did LIKE '$A2B->destination'".
 						" AND cc_country.id=id_cc_country AND cc_did.startingdate <= CURRENT_TIMESTAMP".
@@ -1544,7 +1544,7 @@ if ($mode == 'standard') {
 					" aleg_timeinterval, ".
 					" aleg_carrier_connect_charge_offp, aleg_carrier_cost_min_offp, aleg_retail_connect_charge_offp, aleg_retail_cost_min_offp, ".
 					" aleg_carrier_initblock_offp, aleg_carrier_increment_offp, aleg_retail_initblock_offp, aleg_retail_increment_offp, ".
-					" cc_card.id, playsound, timeout, margin, id_diller, voicebox".
+					" cc_card.id, playsound, timeout, margin, id_diller, voicebox, credit, typepaid, creditlimit".
 					" FROM cc_did, cc_did_destination, cc_card, cc_country".
 					" WHERE id_cc_did=cc_did.id AND cc_card.status=1 AND cc_card.id=id_cc_card and cc_did_destination.activated=1 AND cc_did.activated=1 AND did LIKE '$A2B->destination'".
 					" AND cc_country.id=id_cc_country AND cc_did.startingdate <= CURRENT_TIMESTAMP AND (cc_did.expirationdate > CURRENT_TIMESTAMP OR cc_did.expirationdate IS NULL ".

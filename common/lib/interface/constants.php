@@ -294,6 +294,28 @@ class Constants
 		return Constants::reverse_array(Constants::getUsedList());
 	}
 	
+	public static function getCallTypeList(){
+		$calltype_list = array();
+		$calltype_list["0"] = array( gettext("I"), "0");
+		$calltype_list["1"] = array( gettext("I & MY UNION").'&nbsp;', "1");
+		$calltype_list["2"] = array( gettext("MY UNION").'&nbsp;', "2");
+		$calltype_list["3"] = array( gettext("UNION #"), "3");
+		$calltype_list["4"] = array( gettext("MY CUSTOMER").'&nbsp;', "4");
+		return $calltype_list;
+	}
+	
+	public static function getListCallType(){
+		$calltype_list = array();
+		$calltype_list["0"] = array( gettext("INCOMING"), "0");
+		$calltype_list["1"] = array( gettext("OUTGOING").'&nbsp;', "1");
+		$calltype_list["2"] = array( gettext("INTERNAL").'&nbsp;', "2");
+		$calltype_list["3"] = array( gettext("CALLBACK CALLS").'&nbsp;', "3");
+		$calltype_list["4"] = array( gettext("TRANSIT").'&nbsp;', "4");
+		$calltype_list["5"] = array( gettext("FREE ").'&nbsp;', "5");
+		$calltype_list["6"] = array( gettext("SURCHARGE").'&nbsp;', "6");
+		return $calltype_list;
+	}
+	
 	public static function getDialStatusList(){
 		$dialstatus_list = array();
 		$dialstatus_list["1"] = array( gettext("ANSWER")		, "1");

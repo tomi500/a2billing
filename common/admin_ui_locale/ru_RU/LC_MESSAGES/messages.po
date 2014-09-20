@@ -2378,7 +2378,7 @@ msgstr "ДАТА СОЗДАНИЯ"
 #: Public/form_data/FG_var_payment_agent.inc:156
 #: Public/A2B_refill_info.php:107
 msgid "REFILL TYPE"
-msgstr "ТИП ЗАПОЛНЕНИЯ"
+msgstr "ТИП ПОПОЛНЕНИЯ"
 
 #: Public/A2B_refill_info_agent.php:117 Public/A2B_payment_info_agent.php:117
 #: Public/A2B_refill_info.php:117 Public/A2B_payment_info.php:117
@@ -5398,25 +5398,25 @@ msgstr ""
 #: Public/form_data/FG_var_logrefill_agent.inc:53
 #: Public/form_data/FG_var_logrefill.inc:52
 msgid "Add Refill"
-msgstr ""
+msgstr "Новое пополнение"
 
 #: Public/form_data/FG_var_logrefill_agent.inc:64
 #: Public/form_data/FG_var_logrefill_agent.inc:111
 #: Public/form_data/FG_var_logrefill.inc:60
 #: Public/form_data/FG_var_logrefill.inc:120 Public/A2B_card_info.php:809
 msgid "REFILL DATE"
-msgstr ""
+msgstr "ДАТА ПОПОЛНЕНИЯ"
 
 #: Public/form_data/FG_var_logrefill_agent.inc:66
 #: Public/form_data/FG_var_logrefill_agent.inc:120
 #: Public/form_data/FG_var_logrefill.inc:61
 #: Public/form_data/FG_var_logrefill.inc:129 Public/A2B_card_info.php:812
 msgid "REFILL AMOUNT"
-msgstr ""
+msgstr "СУММА ПОПОЛНЕНИЯ"
 
 #: Public/form_data/FG_var_logrefill_agent.inc:71
 msgid "THERE IS NO AGENT REFILL CREATED!"
-msgstr ""
+msgstr "ПОПОЛНЕНИЕ АГЕНТОМ ОТКЛОНЕНО!"
 
 #: Public/form_data/FG_var_logrefill_agent.inc:96
 #: Public/form_data/FG_var_paymentlog_agent.inc:179

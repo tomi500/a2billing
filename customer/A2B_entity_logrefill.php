@@ -107,7 +107,7 @@ if ($form_action == "list" && $message != "success" && has_rights (ACX_DISTRIBUT
 	$j = 0;
 	for ($i = 0; $i <= $nb_month; $i++) {
 		if (sizeof($result_refills_unmonth) > $j) {
-			$val = array_intersect_key($result_refills_unmonth[$j],array('0'=>0,'1'=>1,'2'=>2,'3'=>3,'4'=>4,'5'=>5,'6'=>6,'7'=>7,'8'=>8,'9'=>9,'10'=>10,'11'=>11));
+			$val = array_intersect_key($result_refills_unmonth[$j],array('0'=>0,'1'=>1,'2'=>2,'3'=>3,'4'=>4,'5'=>5,'6'=>6,'7'=>7,'8'=>8));
 			if ($now_month > $i)
 				$month_test = intval($now_month - $i);
 			else

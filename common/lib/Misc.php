@@ -322,15 +322,16 @@ function getpost_ifset($test_vars) {
 			global $$test_var;
 			$$test_var = $_POST[$test_var];
 			$$test_var = sanitize_data($$test_var);
-			if ($test_var == 'username' || $test_var == 'filterprefix') {
+			if ($test_var == 'username' || $test_var == 'filterprefix' || $test_var == 'callerid' || $test_var == 'phonenumber' || $test_var == 'src') {
 				//rebuild the search parameter to filter character to format card number
 				$filtered_char = array (
 					" ",
 					"-",
+					"+",
 					"_",
 					"(",
 					")",
-					"+"
+					"&"
 				);
 				$$test_var = str_replace($filtered_char, "", $$test_var);
 
@@ -340,11 +341,13 @@ function getpost_ifset($test_vars) {
 			$$test_var = $_GET[$test_var];
 			$$test_var = sanitize_data($$test_var);
 			//rebuild the search parameter to filter character to format card number
-			if ($test_var == 'username' || $test_var == 'filterprefix') {
+			if ($test_var == 'username' || $test_var == 'filterprefix' || $test_var == 'callerid' || $test_var == 'phonenumber' || $test_var == 'src') {
 				//rebuild the search parameter to filter character to format card number
 				$filtered_char = array (
 					" ",
 					"-",
+					"+",
+					"&",
 					"_",
 					"(",
 					")",
@@ -386,8 +389,8 @@ function display_money_nocur($var, $currency = BASE_CURRENCY) {
 		$currencies_list = get_currencies();
 	$var = round($var / $currencies_list[strtoupper($currency)][2], 5);
 	$tempval = 100*abs($var-floor($var));
-	$var = number_format($var, 5, '.', ' ');
-	$var = (round($tempval-floor($tempval),5) == 0) ? number_format($var, 2, '.', ' ') : rtrim($var, '0');
+	$var = number_format($var, 5, '.', '');
+	$var = (round($tempval-floor($tempval),5) == 0) ? number_format($var, 2, '.', ' ') : rtrim(number_format($var, 5, '.', ' '), '0');
 	echo $var;
 }
 
@@ -616,12 +619,13 @@ function linktocustomer($value) {
 
 function linktocustomer_id($id) {
 	$handle = DbConnect();
-	$inst_table = new Table("cc_card", "username");
+	$inst_table = new Table("cc_card", "username, CONCAT_WS(' ',lastname,firstname,IF(company_name='','',CONCAT('(',company_name,')'))) customer");
 	$FG_TABLE_CLAUSE = "id = '$id'";
 	$list_customer = $inst_table->Get_list($handle, $FG_TABLE_CLAUSE, "", "", "", "", "", "", "", 10);
 	$value = $list_customer[0][0];
+	$customer = $list_customer[0][1];
 	if ($id > 0) {
-		echo "<a href=\"A2B_entity_card.php?form_action=ask-edit&id=$id\">$value</a>";
+		echo "<a href=\"A2B_entity_card.php?form_action=ask-edit&id=$id\" title=\"$customer\">$value</a>";
 	} else {
 		echo $value;
 	}
@@ -1352,24 +1356,31 @@ function do_field($sql, $fld, $dbfld, $oro=false, $sko=0) {
 			$sql .= " WHERE ";
 			if ($sko==1) $sql .= "(";
 		}
-		$sql = "$sql $dbfld";
-		if (isset ($$fldtype)) {
-			switch ($$fldtype) {
+		$sql .= "($dbfld";
+		$args = explode(",", $$fld);
+		foreach ($args as $value) {
+//		    if (is_numeric($value)) {
+			if (isset ($$fldtype)) {
+			    switch ($$fldtype) {
 				case 1 :
-					$sql = "$sql='" . $$fld . "'";
+					$sql .= "='" . $value . "'";
 					break;
 				case 2 :
-					$sql = "$sql LIKE '" . $$fld . "%'";
+					$sql .= " LIKE '" . $value . "%'";
 					break;
 				case 3 :
-					$sql = "$sql LIKE '%" . $$fld . "%'";
+					$sql .= " LIKE '%" . $value . "%'";
 					break;
 				case 4 :
-					$sql = "$sql LIKE '%" . $$fld . "'";
+					$sql .= " LIKE '%" . $value . "'";
+			    }
+			} else {
+			    $sql .= " LIKE '%" . $value . "%'";
 			}
-		} else {
-			$sql = "$sql LIKE '%" . $$fld . "%'";
+			if ($value !== end($args))	$sql .= " OR $dbfld";
+//		    }
 		}
+		$sql .= ")";
 		if ($sko==2) $sql .= ")";
 	}
 	return $sql;

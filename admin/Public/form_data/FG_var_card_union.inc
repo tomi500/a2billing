@@ -71,7 +71,7 @@ $HD_Form -> AddEditElement (gettext("ID CARD"),
 			"concat_card_id",
 			"",
 			"POPUPVALUE",
-			"size=30 maxlength=50 readonly",
+			"size=25 maxlength=25 readonly",
 			"4",
 			gettext("Insert the Id CardNumber"),
 			"", "", "", "", "", "A2B_entity_card.php?popup_select=1&",
@@ -126,5 +126,6 @@ $HD_Form -> FG_BUTTON_EDITION_BOTTOM_TEXT = $HD_Form -> FG_BUTTON_ADITION_BOTTOM
 $HD_Form -> FG_ADDITIONAL_FUNCTION_BEFORE_EDITION = $HD_Form -> FG_ADDITIONAL_FUNCTION_BEFORE_ADD = 'check_union_member';
 
 $HD_Form -> FG_INTRO_TEXT_ADITION = gettext("Add a ".gettext("Member")." now.");
-$HD_Form -> FG_TEXT_ADITION_ERROR = '<font color="Red"> '.gettext("Your can't add existing Member").'</font><br>';
+//$HD_Form -> FG_TEXT_ADITION_ERROR = '<font color="Red"> '.gettext("Your can't add existing Member").'</font><br>';
+$HD_Form -> FG_TEXT_ADITION_ERROR = '';
 $HD_Form -> FG_TEXT_ADITION_CONFIRMATION = gettext("Your new")." ".gettext("Member")." ".gettext("has been inserted.")."<br>";
