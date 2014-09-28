@@ -87,7 +87,7 @@ if (($download == "file") && $file && $ACXSEERECORDING && !$accdie) {
 	exit ();
 }
 
-$QUERY = "SELECT username, credit, lastname, firstname, address, city, state, country, zipcode, phone, email, fax, lastuse, activated, status, currency, root_manager, foreignvoipconf, foreignlogs, concat_id, showcallstypedefault
+$QUERY = "SELECT username, credit, lastname, firstname, address, city, state, country, zipcode, phone, email, fax, lastuse, activated, status, currency, root_manager, foreignvoipconf, foreignlogs, concat_id, showcallstypedefault, foreignrecords
 ".		"FROM cc_card LEFT JOIN cc_card_concat ON concat_card_id=id
 ".		"WHERE username = '".$_SESSION["pr_login"]."' AND uipass = '".$_SESSION["pr_password"]."'";
 
@@ -240,7 +240,7 @@ switch ($choose_callowner) {
 			$FG_TABLE_NAME .= " LEFT JOIN cc_card_concat bb ON bb.concat_card_id=t1.card_id OR bb.concat_card_id=t1.card_caller";
 			if (strlen($FG_TABLE_CLAUSE)>0)		$FG_TABLE_CLAUSE.=" AND ";
 			$FG_TABLE_CLAUSE.="bb.concat_id=$concat_id AND (bb.mylogs=1 OR bb.concat_card_id={$sessbillquery})";
-			$FG_COL_QUERY_RECORDS = ", IF(bb.myrecords=1 OR t1.card_id={$sessbillquery} OR card_caller={$sessbillquery},t1.uniqueid,'')";
+			$FG_COL_QUERY_RECORDS = ", IF((bb.myrecords AND {$customer_info[21]}) OR t1.card_id={$sessbillquery} OR card_caller={$sessbillquery},t1.uniqueid,'')";
 			$sessbillquery = "bb.concat_card_id";
 		} else $accdie = true;
 		break;
@@ -249,7 +249,7 @@ switch ($choose_callowner) {
 			$FG_TABLE_NAME .= " LEFT JOIN cc_card_concat bb ON bb.concat_card_id=t1.card_id OR bb.concat_card_id=t1.card_caller";
 			if (strlen($FG_TABLE_CLAUSE)>0)		$FG_TABLE_CLAUSE.=" AND ";
 			$FG_TABLE_CLAUSE.="bb.concat_card_id<>'$customer' AND bb.concat_id=$concat_id AND bb.mylogs=1";
-			$FG_COL_QUERY_RECORDS = ", IF(bb.myrecords=1,t1.uniqueid,'')";
+			$FG_COL_QUERY_RECORDS = ", IF(bb.myrecords=1 AND {$customer_info[21]},t1.uniqueid,'')";
 			$sessbillquery = "bb.concat_card_id";
 		} else $accdie = true;
 		break;
@@ -284,7 +284,7 @@ switch ($choose_callowner) {
 			if (strlen($FG_TABLE_CLAUSE)>0)		$FG_TABLE_CLAUSE.=" AND ";
 			$cust = -$choose_callowner;
 			$FG_TABLE_CLAUSE.="bb.concat_card_id=-$choose_callowner AND bb.concat_id=$concat_id AND bb.mylogs=1";
-			$FG_COL_QUERY_RECORDS = ", IF(bb.myrecords=1,t1.uniqueid,'')";
+			$FG_COL_QUERY_RECORDS = ", IF(bb.myrecords AND {$customer_info[21]},t1.uniqueid,'')";
 			$sessbillquery = "bb.concat_card_id";
 			break;
 		} else $choose_callowner = 0;
