@@ -38,9 +38,9 @@ $HD_Form -> AddViewElement(gettext("MEMBER NAME"), "concat_card_id", "", "center
 //$HD_Form -> AddViewElement(gettext("ROOT CONTROL"), "rmanager", "", "center", "SORT");
 //$HD_Form -> AddViewElement(gettext("ADMINISTER VoIP & DID INSIDE THE UNION"), "foreignvoipconf", "", "center", "SORT", "", "list", $yesno);
 $HD_Form -> AddViewElement(gettext("ACCESS TO UNION'S LOGS"), "foreignlogs", "", "center", "SORT", "", "list", $yesno);
-$HD_Form -> AddViewElement(gettext("ACCESS MY LOGS"), "mylogs", "", "center", "SORT", "", "list", $yesno);
+$HD_Form -> AddViewElement(gettext("OPEN LOGS"), "mylogs", "", "center", "SORT", "", "list", $yesno);
 $HD_Form -> AddViewElement(gettext("ACCESS TO UNION'S RECORDS"), "foreignrecords", "", "center", "SORT", "", "list", $yesno);
-$HD_Form -> AddViewElement(gettext("ACCESS MY RECORDS"), "myrecords", "", "center", "SORT", "", "list", $yesno);
+$HD_Form -> AddViewElement(gettext("OPEN RECORDS"), "myrecords", "", "center", "SORT", "", "list", $yesno);
 
 //$HD_Form -> FieldViewElement ("concat_id, concat_card_id, concat_card_id, IF(root_manager=0,'".gettext("No")."','<font color=green>".gettext("Yes")."</font>') rmanager, foreignvoipconf, foreignlogs, mylogs, foreignrecords, myrecords");
 $HD_Form -> FieldViewElement ("concat_id, concat_card_id, concat_card_id, foreignlogs, mylogs, foreignrecords, myrecords");
@@ -110,16 +110,18 @@ $HD_Form -> AddEditElement (gettext("ACCESS TO UNION'S LOGS"),
 			"",
 			"",
 			"",
-			"", "", "", gettext("Yes").":1, - ".gettext("No").":0");
+			"", "", "", gettext("Yes").":1, - ".gettext("No").":0", "", "", "",
+			gettext("Define is Member have access to logs of his Union"));
 
-$HD_Form -> AddEditElement (gettext("ACCESS MY LOGS"),
+$HD_Form -> AddEditElement (gettext("OPEN LOGS"),
 			"mylogs",
 			"$value",
 			"RADIOBUTTON",
 			"",
 			"",
 			"",
-			"", "", "", gettext("Yes").":1, - ".gettext("No").":0");
+			"", "", "", gettext("Yes").":1, - ".gettext("No").":0", "", "", "",
+			gettext("Define is other members have access to logs of the Member"));
 
 $HD_Form -> AddEditElement (gettext("ACCESS TO UNION'S RECORDS"),
 			"foreignrecords",
@@ -128,16 +130,18 @@ $HD_Form -> AddEditElement (gettext("ACCESS TO UNION'S RECORDS"),
 			"",
 			"",
 			"",
-			"", "", "", gettext("Yes").":1, - ".gettext("No").":0");
+			"", "", "", gettext("Yes").":1, - ".gettext("No").":0", "", "", "",
+			gettext("Define is Member have access to recors of his Union"));
 
-$HD_Form -> AddEditElement (gettext("ACCESS MY RECORDS"),
+$HD_Form -> AddEditElement (gettext("OPEN RECORDS"),
 			"myrecords",
 			"$value",
 			"RADIOBUTTON",
 			"",
 			"",
 			"",
-			"", "", "", gettext("Yes").":1, - ".gettext("No").":0");
+			"", "", "", gettext("Yes").":1, - ".gettext("No").":0", "", "", "",
+			gettext("Define is other members have access to records of the Memeber"));
 
 //$HD_Form -> FieldEditElement ('concat_id, concat_card_id, root_manager, foreignvoipconf, foreignlogs, mylogs, foreignrecords, myrecords');
 $HD_Form -> FieldEditElement ('concat_id, concat_card_id, foreignlogs, mylogs, foreignrecords, myrecords');
