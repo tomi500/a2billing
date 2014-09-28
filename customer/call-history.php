@@ -51,9 +51,9 @@ $DBHandle_max = DbConnect();
 $instance_table = new Table("cc_card","lastname, firstname, username, credit");
 
 if (($download == "file") && $file && $ACXSEERECORDING && !$accdie) {
-	
+
 	if (strpos($file, '/') !== false) exit;
-	
+
 	$value_de = base64_decode ( $file );
 	$parts = pathinfo($value_de);
 	$value = $parts['filename'];
@@ -64,15 +64,15 @@ if (($download == "file") && $file && $ACXSEERECORDING && !$accdie) {
 ".			"ORDER BY cc_call.id DESC LIMIT 1";
 	$result = $instance_table -> SQLExec ($DBHandle_max, $QUERY);
 	if (is_array($result) && count($result)>0) {
-	    
+
 	    $dl_full = MONITOR_PATH . "/" . $result[0][3] . "/" . $result[0][0] . "/" . $result[0][1] . "/" . $result[0][2] . "/" . $value_de;
 	    $dl_name = $value_de;
-	
+
 	    if (! file_exists ( $dl_full )) {
 		echo gettext ( "ERROR: Cannot download file " . $dl_name . ", it does not exist.<br>" );
 		exit ();
 	    }
-	
+
 	    header ( "Content-Type: application/octet-stream" );
 	    header ( "Content-Disposition: attachment; filename=$dl_name" );
 	    header ( "Content-Length: " . filesize ( $dl_full ) );
@@ -81,7 +81,7 @@ if (($download == "file") && $file && $ACXSEERECORDING && !$accdie) {
 	    header ( "Expires: 0" );
 	    header ( "Cache-Control: must-revalidate, post-check=0, pre-check=0" );
 	    header ( "Content-transfer-encoding: binary" );
-	
+
 	    @readfile ( $dl_full );
 	}
 	exit ();
@@ -109,7 +109,7 @@ $dialstatus_list= Constants::getDialStatusList();
 $list_calltype	= Constants::getListCallType();
 $calltype_list	= Constants::getCallTypeList();
 
-if (!isset($choose_callowner)	|| !is_numeric($choose_callowner))	$choose_callowner	= $customer_info[20];
+if (!isset($choose_callowner)	|| !is_numeric($choose_callowner))	$choose_callowner	= $customer_info[20];// >=0 ? $customer_info[20] : 0;
 if (!isset($current_page)	|| !is_numeric($current_page	))	$current_page		= 0;
 
 if (!$customer_info[18]) {
@@ -153,7 +153,7 @@ if ( is_null ($order) || is_null($sens) ){
 
 if ($posted==1) {
 	$SQLcmd = '';
-//	$SQLcmd = do_field($SQLcmd, 'src', 'source');
+	$SQLcmd = do_field($SQLcmd, 'src', 'source');
 	$SQLcmd = do_field($SQLcmd, 'callerid', 'src', false, 1);
 	$SQLcmd = do_field($SQLcmd, 'callerid', 'src_exten', true, 2);
 	$SQLcmd = do_field($SQLcmd, 'phonenumber', 'calledstation', false, 1);
@@ -308,7 +308,7 @@ $didkey = 2;
 $FG_TABLE_COL = array();
 $FG_TABLE_COL[]=array (gettext("Date"), "starttime", 15*$p ."%", "center", "SORT", "22", "", "", "", "", "", "");
 if ($choose_callowner == 1 || $choose_callowner == 2) {
-	$FG_TABLE_COL[]=array (gettext("CallHolder"), "CallHolder", 11*$p ."%", "center nowrap", "SORT", "40");
+	$FG_TABLE_COL[]=array (gettext("CallHolder"), "CallHolder", 11*$p ."%", "center nowrap", "SORT", "79");
 	$cholder = ", CONCAT_WS(' ',lastname,firstname,IF(company_name='','',CONCAT('<br/>(',company_name,')'))) CallHolder";
 	$didkey++;
 } else	$cholder = "";
@@ -353,7 +353,7 @@ $instance_table = new Table($FG_TABLE_NAME, $FG_COL_QUERY);
 
 if (!$nodisplay) {
 	$list = $instance_table -> Get_list ($DBHandle, $FG_TABLE_CLAUSE, $order, $sens, null, null, $FG_LIMITE_DISPLAY, $current_page*$FG_LIMITE_DISPLAY);
-	if (is_array($list) && count($list)>0 && $choose_calltype != 1) {
+	if (is_array($list) && count($list)>0 && $choose_calltype != 1 && $order != "DID") {
 		foreach ($list as $key => $var) {
 			if ($var[$didkey]) {
 				break;
@@ -430,7 +430,6 @@ if ($ACXSEERECORDING && $nb_record>0){ echo '
 	    <INPUT TYPE="hidden" NAME="current_page" value=0>
 	    <INPUT TYPE="hidden" NAME="id" value="<?php echo $id; ?>">
 	    <INPUT TYPE="hidden" NAME="order" value="<?php echo $order; ?>">
-	    <INPUT TYPE="hidden" NAME="current_page" value="<?php echo $current_page; ?>">
 	    <INPUT TYPE="hidden" NAME="terminatecauseid" value="<?php echo $terminatecauseid; ?>">
 	    <table class="callhistory_maintable" align="center">
 		<tr>
@@ -851,13 +850,13 @@ if ($ACXSEERECORDING && $nb_record>0){ echo '
                   <TD align="right"><SPAN style="COLOR: #ffffff; FONT-SIZE: 11px"><B> 
                     <?php if ($current_page>0){?>
                     <img src="<?php echo Images_Path_Main ?>/fleche-g.gif" width="5" height="10"> <a href="<?php echo $PHP_SELF?>?s=1&t=0&order=<?php echo $order?>&sens=<?php echo $sens?>&current_page=<?php  echo ($current_page-1)?><?php  if (!is_null($letter) && ($letter!="")){ echo "&letter=$letter";} 
-					echo "&posted=$posted&Period=$Period&frommonth=$frommonth&fromstatsmonth=$fromstatsmonth&tomonth=$tomonth&tostatsmonth=$tostatsmonth&fromday=$fromday&fromstatsday_sday=$fromstatsday_sday&fromstatsmonth_sday=$fromstatsmonth_sday&today=$today&tostatsday_sday=$tostatsday_sday&tostatsmonth_sday=$tostatsmonth_sday&fromtime=$fromtime&totime=$totime&fromstatsday_hour=$fromstatsday_hour&fromstatsday_min=$fromstatsday_min&tostatsday_hour=$tostatsday_hour&tostatsday_min=$tostatsday_min&calleridtype=$calleridtype&phonenumbertype=$phonenumbertype&sourcetype=$sourcetype&clidtype=$clidtype&channel=$channel&resulttype=$resulttype&callerid=$callerid&phonenumber=$phonenumber&clid=$clid&terminatecauseid=$terminatecauseid&choose_calltype=$choose_calltype&choose_currency=$choose_currency";?>"> 
+					echo "&posted=$posted&Period=$Period&frommonth=$frommonth&fromstatsmonth=$fromstatsmonth&tomonth=$tomonth&tostatsmonth=$tostatsmonth&fromday=$fromday&fromstatsday_sday=$fromstatsday_sday&fromstatsmonth_sday=$fromstatsmonth_sday&today=$today&tostatsday_sday=$tostatsday_sday&tostatsmonth_sday=$tostatsmonth_sday&fromtime=$fromtime&totime=$totime&fromstatsday_hour=$fromstatsday_hour&fromstatsday_min=$fromstatsday_min&tostatsday_hour=$tostatsday_hour&tostatsday_min=$tostatsday_min&calleridtype=$calleridtype&phonenumbertype=$phonenumbertype&sourcetype=$sourcetype&clidtype=$clidtype&channel=$channel&resulttype=$resulttype&callerid=$callerid&phonenumber=$phonenumber&clid=$clid&terminatecauseid=$terminatecauseid&choose_calltype=$choose_calltype&choose_currency=$choose_currency&choose_callowner=$choose_callowner";?>"> 
                     <?php echo gettext("PREVIOUS");?> </a> -
                     <?php }?>
                     <?php echo ($current_page+1);?> / <?php  echo $nb_record_max;?> 
                     <?php if ($current_page<$nb_record_max-1){?>
                     - <a href="<?php echo $PHP_SELF?>?s=1&t=0&order=<?php echo $order?>&sens=<?php echo $sens?>&current_page=<?php  echo ($current_page+1)?><?php  if (!is_null($letter) && ($letter!="")){ echo "&letter=$letter";} 
-					echo "&posted=$posted&Period=$Period&frommonth=$frommonth&fromstatsmonth=$fromstatsmonth&tomonth=$tomonth&tostatsmonth=$tostatsmonth&fromday=$fromday&fromstatsday_sday=$fromstatsday_sday&fromstatsmonth_sday=$fromstatsmonth_sday&today=$today&tostatsday_sday=$tostatsday_sday&tostatsmonth_sday=$tostatsmonth_sday&fromtime=$fromtime&totime=$totime&fromstatsday_hour=$fromstatsday_hour&fromstatsday_min=$fromstatsday_min&tostatsday_hour=$tostatsday_hour&tostatsday_min=$tostatsday_min&calleridtype=$calleridtype&phonenumbertype=$phonenumbertype&sourcetype=$sourcetype&clidtype=$clidtype&channel=$channel&resulttype=$resulttype&callerid=$callerid&phonenumber=$phonenumber&clid=$clid&terminatecauseid=$terminatecauseid&choose_calltype=$choose_calltype&choose_currency=$choose_currency";?>"> 
+					echo "&posted=$posted&Period=$Period&frommonth=$frommonth&fromstatsmonth=$fromstatsmonth&tomonth=$tomonth&tostatsmonth=$tostatsmonth&fromday=$fromday&fromstatsday_sday=$fromstatsday_sday&fromstatsmonth_sday=$fromstatsmonth_sday&today=$today&tostatsday_sday=$tostatsday_sday&tostatsmonth_sday=$tostatsmonth_sday&fromtime=$fromtime&totime=$totime&fromstatsday_hour=$fromstatsday_hour&fromstatsday_min=$fromstatsday_min&tostatsday_hour=$tostatsday_hour&tostatsday_min=$tostatsday_min&calleridtype=$calleridtype&phonenumbertype=$phonenumbertype&sourcetype=$sourcetype&clidtype=$clidtype&channel=$channel&resulttype=$resulttype&callerid=$callerid&phonenumber=$phonenumber&clid=$clid&terminatecauseid=$terminatecauseid&choose_calltype=$choose_calltype&choose_currency=$choose_currency&choose_callowner=$choose_callowner";?>"> 
                     <?php echo gettext("NEXT");?> </a> <img src="<?php echo Images_Path_Main ?>/fleche-d.gif" width="5" height="10">
                     </B></SPAN> 
                     <?php }?>

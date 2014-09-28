@@ -69,7 +69,7 @@ msgstr "Выберите ID Участника"
 
 #: Public/form_data/FG_var_card_union.inc
 msgid "Define is Member have access to logs of his Union"
-msgstr "Разрешить доступ этому Участнику к просмотру статистики членов его Союза"
+msgstr "Разрешить доступ этому Участнику к просмотру статистики членов Союза"
 
 #: Public/form_data/FG_var_card_union.inc
 msgid "Define is other members have access to logs of the Member"
@@ -77,7 +77,7 @@ msgstr "Открыть статистику этого Участника для
 
 #: Public/form_data/FG_var_card_union.inc
 msgid "Define is Member have access to recors of his Union"
-msgstr "Разрешить доступ этому Участнику к звуковым записям членов его Союза"
+msgstr "Разрешить доступ этому Участнику к звуковым записям членов Союза"
 
 #: Public/form_data/FG_var_card_union.inc
 msgid "Define is other members have access to records of the Memeber"
