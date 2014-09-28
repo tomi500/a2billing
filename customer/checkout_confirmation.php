@@ -102,7 +102,7 @@ $payment_modules = new payment($payment);
 $order = new order($amount_string);
 if (!isset($wm_purse_type)) {
 	$paycur = 1;
-	$getcur = strtoupper(BASE_CURRENCY);
+	$getcur = mb_strtoupper(BASE_CURRENCY);
 } else {
     if (is_array($payment_modules->modules)) {
 	$getcur = $payment_modules->get_CurrentCurrency();
@@ -110,10 +110,10 @@ if (!isset($wm_purse_type)) {
 }
 $paycur = $currencies_list[$getcur][2];
 
-if (strtoupper($payment)=='PLUGNPAY') {
+if (mb_strtoupper($payment)=='PLUGNPAY') {
 	$QUERY_FIELDS = "cardid, amount, vat, paymentmethod, cc_owner, cc_number, cc_expires, creationdate, cvv, credit_card_type, currency , item_id , item_type";
 	$QUERY_VALUES = "'".$_SESSION["card_id"]."','$amount_string','".$_SESSION["vat"]."','$payment','$plugnpay_cc_owner','".substr($plugnpay_cc_number,0,4)."XXXXXXXXXXXX','".$plugnpay_cc_expires_month."-".$plugnpay_cc_expires_year."',FROM_UNIXTIME($time_stamp),'$cvv','$credit_card_type','".BASE_CURRENCY."','$item_id','$item_type'";
-} else if(strtoupper($payment)=='IRIDIUM'){
+} elseif (mb_strtoupper($payment)=='IRIDIUM') {
 	$QUERY_FIELDS = "cardid, amount, vat, paymentmethod, cc_owner, cc_number, cc_expires, creationdate, currency, item_id, item_type";
 	$QUERY_VALUES = "'".$_SESSION["card_id"]."','$amount_string','".$_SESSION["vat"]."','$payment','$CardName','".substr($CardNumber,0,4)."XXXXXXXXXXXX','".$ExpiryDateMonth."-".$ExpiryDateYear."',FROM_UNIXTIME($time_stamp),'".BASE_CURRENCY."','$item_id','$item_type'";
 } else {
@@ -130,14 +130,14 @@ if (empty($transaction_no)) {
 
 $HD_Form -> create_toppage ($form_action);
 
-if (!isset($currencies_list[strtoupper($_SESSION['currency'])][2]) || !is_numeric($currencies_list[strtoupper($_SESSION['currency'])][2])) {
+if (!isset($currencies_list[mb_strtoupper($_SESSION['currency'])][2]) || !is_numeric($currencies_list[mb_strtoupper($_SESSION['currency'])][2])) {
 	$mycur = 1;
 } else {
-	$mycur = $currencies_list[strtoupper($_SESSION['currency'])][2]/$paycur;
+	$mycur = $currencies_list[mb_strtoupper($_SESSION['currency'])][2]/$paycur;
 	if ($payment == 'webmoney') {
 		$getcur = $wm_purse_type;
 		$two_currency=true;
-	} elseif ($getcur!=strtoupper($_SESSION['currency'])) $two_currency=true;
+	} elseif ($getcur!=mb_strtoupper($_SESSION['currency'])) $two_currency=true;
 }
 
 if (is_array($payment_modules->modules)) {
@@ -173,7 +173,7 @@ if (is_array($payment_modules->modules)) {
 <tr>
     <td align=center align=left><?php echo $SPOT[$payment];?>&nbsp;</td>
     <td><div align="right"><?php echo gettext("Payment Method");?>: &nbsp;</div></td>
-    <td width=50% align="left"><?php echo strtoupper($payment)?></td>
+    <td width=50% align="left"><?php echo mb_strtoupper($payment)?></td>
 </tr>
 <?php if(strcasecmp("invoice",$item_type)!=0){?>
 <tr>
@@ -182,7 +182,7 @@ if (is_array($payment_modules->modules)) {
     <?php
      echo round($amount,2)." ".$getcur;
      if($two_currency){
-					echo " = ".round($amount/$mycur,3)." ".strtoupper($_SESSION['currency']);	
+					echo " = ".round($amount/$mycur,3)." ".mb_strtoupper($_SESSION['currency']);	
 	 }	
      ?> </td>
 </tr>
@@ -192,7 +192,7 @@ if (is_array($payment_modules->modules)) {
     <?php
      echo round($vat_amount,2)." ".$getcur;
      if($two_currency && $vat_amount){
-					echo " = ".round($vat_amount/$mycur,2)." ".strtoupper($_SESSION['currency']);	
+					echo " = ".round($vat_amount/$mycur,2)." ".mb_strtoupper($_SESSION['currency']);	
 	 }	
      ?> </td>
 </tr>

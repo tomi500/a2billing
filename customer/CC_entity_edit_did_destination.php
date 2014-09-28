@@ -333,24 +333,24 @@ function sendtolittle(direction){
                       <TD width="%75" valign="top" class="tableBodyRight" bgcolor="#CCCCCC">
                         <?php 
 								if ($FG_DEBUG == 1) print($FG_TABLE_EDITION[$i][3]);
-						  		if (strtoupper ($FG_TABLE_EDITION[$i][3])==strtoupper ("INPUT"))
+						  		if (mb_strtoupper ($FG_TABLE_EDITION[$i][3])==mb_strtoupper ("INPUT"))
 								{								
 						  ?>
                         <INPUT class="form_input_text" name=<?php echo $FG_TABLE_EDITION[$i][1]?>  <?php echo $FG_TABLE_EDITION[$i][4]?> value="<?php if($VALID_SQL_REG_EXP){ echo stripslashes($list[0][$i]); }else{ echo $$FG_TABLE_ADITION[$i][1]; }?>"> 
                         <?php 
-						  		}elseif (strtoupper ($FG_TABLE_EDITION[$i][3])==strtoupper ("TEXTAREA"))
+						  		} elseif (mb_strtoupper ($FG_TABLE_EDITION[$i][3])==mb_strtoupper ("TEXTAREA"))
 								{
 						  ?>
                         <textarea class="form_input_textarea" name=<?php echo $FG_TABLE_EDITION[$i][1]?>  <?php echo $FG_TABLE_EDITION[$i][4]?>><?php if($VALID_SQL_REG_EXP){ echo stripslashes($list[0][$i]); }else{ echo $$FG_TABLE_ADITION[$i][1]; }?></textarea> 
                         <?php 	
-								}elseif (strtoupper ($FG_TABLE_EDITION[$i][3])==strtoupper ("SELECT"))
+								}elseif (mb_strtoupper ($FG_TABLE_EDITION[$i][3])==mb_strtoupper ("SELECT"))
 								{
 								
 										if ($FG_DEBUG == 1) 
 										{ echo "<br> TYPE DE SELECT :".$FG_TABLE_EDITION[$i][7];
 										}
 											
-										if (strtoupper ($FG_TABLE_EDITION[$i][7])==strtoupper ("SQL"))
+										if (mb_strtoupper ($FG_TABLE_EDITION[$i][7])==mb_strtoupper ("SQL"))
 										{
 																					
 												$instance_sub_table = new Table($FG_TABLE_EDITION[$i][8], $FG_TABLE_EDITION[$i][9]);
@@ -358,7 +358,7 @@ function sendtolittle(direction){
 												
 												if ($FG_DEBUG >= 2) { echo "<br>"; print_r($select_list);}
 											
-										 }elseif (strtoupper ($FG_TABLE_EDITION[$i][7])==strtoupper ("LIST"))
+										 }elseif (mb_strtoupper ($FG_TABLE_EDITION[$i][7])==mb_strtoupper ("LIST"))
 										 {
 												
 												$select_list = $FG_TABLE_EDITION[$i][11];
@@ -408,7 +408,7 @@ function sendtolittle(direction){
 										  }//END_IF
 							  ?>
                         </SELECT>
-                        <?php     }elseif (strtoupper ($FG_TABLE_EDITION[$i][3])==strtoupper ("RADIOBUTTON")){
+                        <?php     }elseif (mb_strtoupper ($FG_TABLE_EDITION[$i][3])==mb_strtoupper ("RADIOBUTTON")){
 								
 										 
 												$radio_table = preg_split("/,/",trim($FG_TABLE_EDITION[$i][9]));
@@ -449,7 +449,7 @@ function sendtolittle(direction){
                     <?php 					
 							}else{
 								
-							  if (strtoupper ($FG_TABLE_EDITION[$i][3])==strtoupper ("SELECT"))
+							  if (mb_strtoupper ($FG_TABLE_EDITION[$i][3])==mb_strtoupper ("SELECT"))
 							  {
 								//"app_virtuel_content:content_id:content:id IN (select content_id from app_virtuel_content where app_virtuel_id = %id)",
 								$table_split = preg_split("/:/",$FG_TABLE_EDITION[$i][1]);								
@@ -661,7 +661,7 @@ function sendtolittle(direction){
                         <hr size="0"></TD>
                     </TR>
 					<?php } ?>
-					<?php  }elseif (strtoupper ($FG_TABLE_EDITION[$i][3])==strtoupper ("INSERT")){
+					<?php  }elseif (mb_strtoupper ($FG_TABLE_EDITION[$i][3])==mb_strtoupper ("INSERT")){
 								$table_split = spreg_plit("/:/",$FG_TABLE_EDITION[$i][1]);
 					?>
                     <TR> 
@@ -829,7 +829,7 @@ function sendtolittle(direction){
                         <hr size="0"> </TD>
                     </TR>
 					
-					<?php  }elseif (strtoupper ($FG_TABLE_EDITION[$i][3])==strtoupper ("CHECKBOX")){
+					<?php  }elseif (mb_strtoupper ($FG_TABLE_EDITION[$i][3])==mb_strtoupper ("CHECKBOX")){
 							
 							$table_split = preg_split("/:/",$FG_TABLE_EDITION[$i][1]);
 					?>
@@ -948,7 +948,7 @@ function sendtolittle(direction){
 						
 					 </TD>
                     </TR>
-                    <?php   	  }// end if if (strtoupper ($FG_TABLE_EDITION[$i][3])==strtoupper ("SELECT"))
+                    <?php   	  }// end if if (mb_strtoupper ($FG_TABLE_EDITION[$i][3])==mb_strtoupper ("SELECT"))
 							}// end if pos
 						}//END_FOR ?>
                     
@@ -1011,19 +1011,19 @@ function sendtolittle(direction){
                       <TD width="%75" valign="top" class="tableBodyRight" bgcolor="#CCCCCC"> 
                         <?php 
 								if ($FG_DEBUG == 1) print($FG_TABLE_ADITION[$i][3]);
-						  		if (strtoupper ($FG_TABLE_ADITION[$i][3])==strtoupper ("INPUT")){
+						  		if (mb_strtoupper ($FG_TABLE_ADITION[$i][3])==mb_strtoupper ("INPUT")){
 						  ?>
                         <INPUT class="form_input_text" name=<?php echo $FG_TABLE_ADITION[$i][1]?>  <?php echo $FG_TABLE_ADITION[$i][4]?> value="<?php echo $$FG_TABLE_ADITION[$i][1]?>"> 
                         <?php 
-						  		}elseif (strtoupper ($FG_TABLE_ADITION[$i][3])==strtoupper ("TEXTAREA")){
+						  		}elseif (mb_strtoupper ($FG_TABLE_ADITION[$i][3])==mb_strtoupper ("TEXTAREA")){
 						  ?>
                         <textarea class="form_input_textarea" name=<?php echo $FG_TABLE_ADITION[$i][1]?> <?php echo $FG_TABLE_ADITION[$i][4]?>><?php echo $$FG_TABLE_ADITION[$i][1]?></textarea> 
                         <?php 	
-								}elseif (strtoupper ($FG_TABLE_ADITION[$i][3])==strtoupper ("SELECT")){
+								}elseif (mb_strtoupper ($FG_TABLE_ADITION[$i][3])==mb_strtoupper ("SELECT")){
 								
 											if ($FG_DEBUG == 1) { echo "<br> TYPE DE SELECT :".$FG_TABLE_ADITION[$i][7];}
 											
-											if (strtoupper ($FG_TABLE_ADITION[$i][7])==strtoupper ("SQL")){
+											if (mb_strtoupper ($FG_TABLE_ADITION[$i][7])==mb_strtoupper ("SQL")){
 																					
 												$instance_sub_table = new Table($FG_TABLE_ADITION[$i][8], $FG_TABLE_ADITION[$i][9]);
 												//echo "---".$FG_TABLE_ADITION[$i][13];
@@ -1031,7 +1031,7 @@ function sendtolittle(direction){
 												
 												if ($FG_DEBUG >= 2) { echo "<br>"; print_r($select_list);}
 											
-											}elseif (strtoupper ($FG_TABLE_ADITION[$i][7])==strtoupper ("LIST")){
+											}elseif (mb_strtoupper ($FG_TABLE_ADITION[$i][7])==mb_strtoupper ("LIST")){
 																				
 												$select_list = $FG_TABLE_ADITION[$i][11];
 												//$select_list_nb = count($select_list);
@@ -1067,7 +1067,7 @@ function sendtolittle(direction){
 										 }//END_IF				
 							?>
                         </SELECT>
-                        <?php     }elseif (strtoupper ($FG_TABLE_ADITION[$i][3])==strtoupper ("RADIOBUTTON")){
+                        <?php     }elseif (mb_strtoupper ($FG_TABLE_ADITION[$i][3])==mb_strtoupper ("RADIOBUTTON")){
 								
 										 
 												$radio_table = preg_split("/,/",trim($FG_TABLE_EDITION[$i][9]));
@@ -1154,26 +1154,26 @@ function sendtolittle(direction){
 					  <TD width="%75" valign="top" class="tableBodyRight" bgcolor="#CCCCCC"> 
                         <?php 
 								if ($FG_DEBUG == 1) print($FG_TABLE_EDITION[$i][3]);
-						  		if (strtoupper ($FG_TABLE_EDITION[$i][3])==strtoupper ("INPUT")){
+						  		if (mb_strtoupper ($FG_TABLE_EDITION[$i][3])==mb_strtoupper ("INPUT")){
 						  ?>
                         <INPUT class="form_input_text" disabled name=<?php echo $FG_TABLE_EDITION[$i][1]?>  <?php echo $FG_TABLE_EDITION[$i][4]?> value="<?php echo stripslashes($list[0][$i])?>"> 
                         <?php 
-						  		}elseif (strtoupper ($FG_TABLE_EDITION[$i][3])==strtoupper ("TEXTAREA")){
+						  		}elseif (mb_strtoupper ($FG_TABLE_EDITION[$i][3])==mb_strtoupper ("TEXTAREA")){
 						  ?>
                         <TEXTAREA class="form_input_textarea" disabled name=<?php echo $FG_TABLE_EDITION[$i][1]?> <?php echo $FG_TABLE_EDITION[$i][4]?>><?php echo stripslashes($list[0][$i])?></textarea> 
                         <?php 	
-								}elseif (strtoupper ($FG_TABLE_EDITION[$i][3])==strtoupper ("SELECT")){
+								}elseif (mb_strtoupper ($FG_TABLE_EDITION[$i][3])==mb_strtoupper ("SELECT")){
 								
 											if ($FG_DEBUG == 1) { echo "<br> TYPE DE SELECT :".$FG_TABLE_EDITION[$i][7];}
 											
-											if (strtoupper ($FG_TABLE_EDITION[$i][7])==strtoupper ("SQL")){
+											if (mb_strtoupper ($FG_TABLE_EDITION[$i][7])==mb_strtoupper ("SQL")){
 																					
 												$instance_sub_table = new Table($FG_TABLE_EDITION[$i][8], $FG_TABLE_EDITION[$i][9]);
 												$select_list = $instance_sub_table -> Get_list ($DBHandle, $FG_TABLE_EDITION[$i][10], null, null, null, null, null, null);
 												
 												if ($FG_DEBUG >= 2) { echo "<br>"; print_r($select_list);}
 											
-											}elseif (strtoupper ($FG_TABLE_EDITION[$i][7])==strtoupper ("LIST")){
+											}elseif (mb_strtoupper ($FG_TABLE_EDITION[$i][7])==mb_strtoupper ("LIST")){
 																				
 												$select_list = $FG_TABLE_EDITION[$i][11];
 												//$select_list_nb = count($select_list);

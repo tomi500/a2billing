@@ -170,8 +170,8 @@ switch($transaction_data[0][4])
 		
 	case "moneybookers":
 		$currAmount = $transaction_data[0][2];
-		$sec_string = $merchant_id.$transaction_id.strtoupper(md5(MONEYBOOKERS_SECRETWORD)).$mb_amount.$mb_currency.$status;
-		$sig_string = strtoupper(md5($sec_string));
+		$sec_string = $merchant_id.$transaction_id.mb_strtoupper(md5(MONEYBOOKERS_SECRETWORD)).$mb_amount.$mb_currency.$status;
+		$sig_string = mb_strtoupper(md5($sec_string));
 		
 		if($sig_string == $md5sig) {
 			write_log(LOGFILE_EPAYMENT, basename(__FILE__).' line:'.__LINE__." - MoneyBookers Transaction Verification Status: Verified | md5sig =".$md5sig." Reproduced Signature = ".$sig_string." Generated String = ".$sec_string);
@@ -270,7 +270,7 @@ switch($transaction_data[0][4])
 		    case "MD 5":
 				$common_string = $LMI_PAYEE_PURSE.$LMI_PAYMENT_AMOUNT.$LMI_PAYMENT_NO.$LMI_MODE.$LMI_SYS_INVS_NO.
 						$LMI_SYS_TRANS_NO.$LMI_SYS_TRANS_DATE.MODULE_PAYMENT_WM_LMI_SECRET_KEY.$LMI_PAYER_PURSE.$LMI_PAYER_WM;
-				$hash = strtoupper(md5($common_string));
+				$hash = mb_strtoupper(md5($common_string));
 				if ($hash!=$LMI_HASH) $security_verify = false;
 				break;
 		    case "SIGN":

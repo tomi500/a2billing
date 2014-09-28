@@ -470,7 +470,10 @@ ADD INDEX `union` ( `concat_id` );
 ALTER TABLE `cc_card_concat`
 ADD `root_manager` TINYINT NOT NULL DEFAULT '0',
 ADD `foreignvoipconf` TINYINT NOT NULL DEFAULT '0',
-ADD `foreignlogs` TINYINT NOT NULL DEFAULT '0';
+ADD `foreignlogs` TINYINT NOT NULL DEFAULT '0',
+ADD `mylogs` TINYINT NOT NULL DEFAULT '0',
+ADD `foreignrecords` TINYINT NOT NULL DEFAULT '0',
+ADD `myrecords` TINYINT NOT NULL DEFAULT '0';
 
 CREATE TABLE IF NOT EXISTS `cc_fax` (
   `id` bigint(20) NOT NULL AUTO_INCREMENT,

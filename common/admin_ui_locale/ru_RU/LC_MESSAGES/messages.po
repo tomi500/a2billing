@@ -15,33 +15,57 @@ msgstr ""
 "Content-Type: text/plain; charset=utf-8\n"
 "Content-Transfer-Encoding: 8bit\n"
 
-#: Public/form_data/FG_var_union.inc:20
+#: Public/form_data/FG_var_card_union.inc:20
 msgid "UNION"
 msgstr "СОЮЗ"
 
-#: Public/form_data/FG_var_union.inc
+#: Public/form_data/FG_var_card_union.inc
 msgid "Add Member"
 msgstr "Добавить Участника"
 
-#: Public/form_data/FG_var_union.inc
+#: Public/form_data/FG_var_card_union.inc
 msgid "MEMBER NAME"
 msgstr "ИМЯ УЧАСТНИКА"
 
-#: Public/form_data/FG_var_union.inc
+#: Public/form_data/FG_var_card_union.inc
 msgid "MEMBER ACCOUNT"
 msgstr "АККАУНТ УЧАСТНИКА"
 
-#: Public/form_data/FG_var_union.inc
+#: Public/form_data/FG_var_card_union.inc
 msgid "ROOT CONTROL"
 msgstr "УПРАВЛЕНИЕ СОЮЗОМ"
 
-#: Public/form_data/FG_var_union.inc
+#: Public/form_data/FG_var_card_union.inc
 msgid "ADMINISTER VoIP & DID INSIDE THE UNION"
-msgstr "АДМИНИСТРИРОВАНИЕ ЧЛЕНОВ СОЮЗА"
+msgstr "АДМИНИСТРАТОР ЧЛЕНОВ СОЮЗА"
 
-#: Public/form_data/FG_var_union.inc
-msgid "ACCESS TO LOGS INSIDE THE UNION"
-msgstr "ДОСТУП К СТАТИСТИКЕ ЧЛЕНОВ СОЮЗА"
+#: Public/form_data/FG_var_card_union.inc
+msgid "ACCESS TO UNION'S LOGS"
+msgstr "ДОСТУП К СТАТИСТИКЕ СОЮЗА"
+
+#: Public/form_data/FG_var_card_union.inc
+msgid "ACCESS MY LOGS"
+msgstr "ДОСТУП К СТАТИСТИКЕ УЧАСТНИКА"
+
+#: Public/form_data/FG_var_card_union.inc
+msgid "ACCESS MY RECORDS"
+msgstr "ДОСТУП К ЗАПИСЯМ УЧАСТНИКА"
+
+#: Public/form_data/FG_var_card_union.inc
+msgid "ACCESS TO UNION'S RECORDS"
+msgstr "ДОСТУП К ЗАПИСЯМ СОЮЗА"
+
+#: Public/form_data/FG_var_card_union.inc
+msgid "THERE ARE NO UNIONS CREATED!"
+msgstr "НИ ОДНОГО СОЮЗА НЕ СОЗДАНО!"
+
+#: Public/form_data/FG_var_card_union.inc
+msgid "Choose Union for this Member"
+msgstr "Выберите Союз этому Участнику"
+
+#: Public/form_data/FG_var_card_union.inc
+msgid "Define the card number ID of this Member"
+msgstr "Выберите ID Участника"
 
 #: lib/Class.Realtime.php:96
 msgid "Could not open buddy file"
@@ -5609,7 +5633,7 @@ msgstr "ТРАНК"
 
 #: Public/form_data/FG_var_alarm.inc:85
 msgid "There are no Alarms Created"
-msgstr ""
+msgstr "Ни одного Оповещателя не было создано"
 
 #: Public/form_data/FG_var_alarm.inc:102
 #, fuzzy
@@ -11641,7 +11665,7 @@ msgstr "Добавить номер"
 
 #: Public/templates/default/main.tpl:477
 msgid "Alarms"
-msgstr ""
+msgstr "Оповещатели"
 
 #: Public/templates/default/main.tpl:478
 msgid "Users Activity"

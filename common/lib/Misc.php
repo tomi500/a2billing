@@ -31,8 +31,6 @@
  * 
 **/
 
-
-
 function monitor_recognize(&$ipointer) {
 	if (!isset($ipointer->dl_short)) $ipointer->dl_short="";
 	if ($ipointer->monitor == 1 || $ipointer->agiconfig['record_call'] == 1) {
@@ -219,7 +217,7 @@ function convert_currency($currencies_list, $amount, $from_cur, $to_cur) {
 function sort_currencies_list(& $currencies_list) {
 	$first_array = array (
 		strtoupper(BASE_CURRENCY
-	), 'USD', 'EUR', 'GBP', 'AUD', 'HKD', 'JPY', 'NZD', 'SGD', 'TWD', 'PLN', 'SEK', 'DKK', 'CHF', 'COP', 'MXN', 'CLP');
+	), 'USD', 'EUR', 'UAH', 'RUB', 'GBP', 'AUD', 'HKD', 'JPY', 'NZD', 'SGD', 'TWD', 'PLN', 'SEK', 'DKK', 'CHF', 'COP', 'MXN', 'CLP');
 	foreach ($first_array as $element_first_array) {
 		if (isset ($currencies_list[$element_first_array])) {
 			$currencies_list2[$element_first_array] = $currencies_list[$element_first_array];
@@ -546,35 +544,8 @@ function linkonmonitorfile($value) {
 	    }
 	    if (!$find_record) return false;
 	    $myfile = base64_encode($myfile);
-	    echo '<a href="call-log-customers.php?download=file&file=' . $myfile . '&.' . $c_format . '"></a>';
-	    echo '<a target=_blank href="call-log-customers.php?download=file&file=' . $myfile . '"><img src="' . Images_Path . '/icoDisk.gif" height="16"/></a>';
-	} else return false;
-}
-
-/*
- * function linkonmonitorfile_customer
- */
-function linkonmonitorfile_customer($value) {
-	$handle = DbConnect();
-	$instance_table = new Table();
-	$QUERY = "SELECT YEAR(starttime), MONTH(starttime), DAYOFMONTH(starttime), cc_card.username FROM cc_call LEFT JOIN cc_card ON cc_card.id=card_id WHERE uniqueid LIKE '$value' ORDER BY cc_call.id DESC LIMIT 1";
-	$result = $instance_table -> SQLExec ($handle, $QUERY);
-	if (is_array($result) && count($result)>0) {
-	    $dl_short = MONITOR_PATH . "/" . $result[0][3] . "/" . $result[0][0] . "/" . $result[0][1] . "/" . $result[0][2];
-	    $format_list = array ('WAV','wav','gsm','mp3','sln','g723','g729');
-	    $find_record = false;
-	    foreach ($format_list as $c_format){
-		$myfile = $value . "." . $c_format;
-		$dl_full = $dl_short . "/" . $myfile;
-		if (file_exists($dl_full)) {
-			$find_record = true;
-			break;
-		}
-	    }
-	    if (!$find_record) return false;
-	    $myfile = base64_encode($myfile);
-	    echo '<a href="call-history.php?download=file&file=' . $myfile . '&.' . $c_format . '"></a> ';
-	    echo '<a target=_blank href="call-history.php?download=file&file=' . $myfile . '"><img src="' . Images_Path . '/icoDisk.gif" height="16"/></a>';
+	    echo '<a href="'.$_SERVER['PHP_SELF'].'?download=file&file=' . $myfile . '&.' . $c_format . '"></a>';
+	    echo '<a target=_blank href="'.$_SERVER['PHP_SELF'].'?download=file&file=' . $myfile . '"><img src="' . Images_Path . '/icoDisk.gif" height="16"/></a>';
 	} else return false;
 }
 

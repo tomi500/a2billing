@@ -394,7 +394,7 @@ echo $CC_help_fax_customer;
 					?>
 	                  <TD width="<?php echo $FG_TABLE_COL[$i][2]?>" align=middle class="tableBody" style="PADDING-BOTTOM: 2px; PADDING-LEFT: 2px; PADDING-RIGHT: 2px; PADDING-TOP: 2px" nowrap>
 	                    <center><strong> 
-	                    <?php  if (strtoupper($FG_TABLE_COL[$i][4])=="SORT"){?>
+	                    <?php  if (mb_strtoupper($FG_TABLE_COL[$i][4])=="SORT"){?>
 	                    <a href="<?php  echo $PHP_SELF."?s=1&t=0&stitle=$stitle&atmenu=$atmenu&current_page=$current_page&order=".$FG_TABLE_COL[$i][1]."&sens="; if ($sens=="ASC"){echo"DESC";}else{echo"ASC";} 
 						echo "&posted=$posted&Period=$Period&frommonth=$frommonth&fromstatsmonth=$fromstatsmonth&tomonth=$tomonth&tostatsmonth=$tostatsmonth&fromday=$fromday&fromstatsday_sday=$fromstatsday_sday&fromstatsmonth_sday=$fromstatsmonth_sday&today=$today&tostatsday_sday=$tostatsday_sday&tostatsmonth_sday=$tostatsmonth_sday&calleridtype=$calleridtype&phonenumbertype=$phonenumbertype&sourcetype=$sourcetype&clidtype=$clidtype&channel=$channel&resulttype=$resulttype&callerid=$callerid&phonenumber=$phonenumber&src=$src&clid=$clid&choose_calltype=$choose_calltype";?>"> 
 	                    <span class="liens"><?php  } ?>
@@ -404,7 +404,7 @@ echo $CC_help_fax_customer;
 	                    <?php }elseif ($order==$FG_TABLE_COL[$i][1] && $sens=="DESC"){?>
 	                    &nbsp;<img src="<?php echo Images_Path_Main ?>/icon_down_12x12.GIF" width="12" height="12" border="0"> 
 	                    <?php }?>
-	                    <?php  if (strtoupper($FG_TABLE_COL[$i][4])=="SORT"){?>
+	                    <?php  if (mb_strtoupper($FG_TABLE_COL[$i][4])=="SORT") {?>
 	                    </span></a> 
 	                    <?php }?>
 	                    </strong></center></TD>

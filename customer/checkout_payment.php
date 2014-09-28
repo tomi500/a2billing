@@ -56,12 +56,12 @@ getpost_ifset(array ('payment_error'));
 $currencies_list = get_currencies();
 $two_currency = false;
 
-if ( !isset($currencies_list[strtoupper($_SESSION['currency'])][2]) || !is_numeric($currencies_list[strtoupper($_SESSION['currency'])][2]) ) {
+if ( !isset($currencies_list[mb_strtoupper($_SESSION['currency'])][2]) || !is_numeric($currencies_list[mb_strtoupper($_SESSION['currency'])][2]) ) {
 	$mycur = 1; 
 } else { 
-	$mycur = $currencies_list[strtoupper($_SESSION['currency'])][2];
-	$display_currency =strtoupper($_SESSION['currency']);
-	if (strtoupper($_SESSION['currency'])!=strtoupper(BASE_CURRENCY))
+	$mycur = $currencies_list[mb_strtoupper($_SESSION['currency'])][2];
+	$display_currency = mb_strtoupper($_SESSION['currency']);
+	if (mb_strtoupper($_SESSION['currency'])!=mb_strtoupper(BASE_CURRENCY))
 	    $two_currency=true;
 }
 
@@ -260,8 +260,8 @@ function rowOutEffect(object) {
 <?php
         } elseif (isset($selection[$i]['fields']) && is_array($selection[$i]['fields'])) {
           if (sizeof($selection[$i]['fields'])>1){?>
-	<input name="wm_purse_type" type=hidden value="<?php echo strtoupper(BASE_CURRENCY)?>">
-      <?php echo strtoupper(BASE_CURRENCY)?>
+	<input name="wm_purse_type" type=hidden value="<?php echo mb_strtoupper(BASE_CURRENCY)?>">
+      <?php echo mb_strtoupper(BASE_CURRENCY)?>
       </td>
       <td style="padding-right:18px;" align=right>
 	<input type="submit" class="form_input_button" value=" <?php echo '>> '.gettext("Continue")?> " alt="Continue"  title="Continue">
@@ -292,8 +292,8 @@ function rowOutEffect(object) {
        }
     } else {
 ?>
-	<input name="wm_purse_type" type=hidden value="<?php echo strtoupper(BASE_CURRENCY)?>">
-	<?php echo strtoupper(BASE_CURRENCY)?>
+	<input name="wm_purse_type" type=hidden value="<?php echo mb_strtoupper(BASE_CURRENCY)?>">
+	<?php echo mb_strtoupper(BASE_CURRENCY)?>
       </td>
       <td style="padding-right:18px;" align=right>
 	<input type="submit" class="form_input_button" value=" <?php echo '>> '.gettext("Continue")?> " alt="Continue"  title="Continue">

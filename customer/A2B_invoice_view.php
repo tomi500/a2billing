@@ -131,8 +131,8 @@ $card_country = $result[0][0];
 //Currencies check
 $curr = $card['currency'];
 $currencies_list = get_currencies();
-if (!isset($currencies_list[strtoupper($curr)][2]) || !is_numeric($currencies_list[strtoupper($curr)][2])) {$mycur = 1;$display_curr=strtoupper(BASE_CURRENCY);}
-else {$mycur = $currencies_list[strtoupper($curr)][2];$display_curr=strtoupper($curr);}
+if (!isset($currencies_list[mb_strtoupper($curr)][2]) || !is_numeric($currencies_list[mb_strtoupper($curr)][2])) {$mycur = 1;$display_curr=mb_strtoupper(BASE_CURRENCY);}
+else {$mycur = $currencies_list[mb_strtoupper($curr)][2];$display_curr=mb_strtoupper($curr);}
 
 function amount_convert($amount){
 	global $mycur;

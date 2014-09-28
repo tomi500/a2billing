@@ -107,7 +107,7 @@ class captcha
 		
 		for ($i = 0, $x = mt_rand(20, 40); $i < $len; $i++)
 		{
-			$text	= strtoupper($code[$i]);
+			$text	= mb_strtoupper($code[$i]);
 			//echo "text=$text ; code=$code -".strlen($code); exit;	
 			$angle	= mt_rand(-30, 30);
 			
