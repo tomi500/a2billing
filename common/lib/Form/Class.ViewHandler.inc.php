@@ -336,7 +336,7 @@ if ((count($list)>0) && is_array($list)){
 					if ( is_numeric($this->FG_TABLE_COL[$i][5]) && (strlen($record_display) > $this->FG_TABLE_COL[$i][5])  ){
 						$record_display = substr($record_display, 0, $this->FG_TABLE_COL[$i][5])."";
 					} ?>
-					<TD vAlign="top" align="<?php echo $this->FG_TABLE_COL[$i][3]?>" class="tableBody"><?php
+					<TD valign="top" align="<?php echo $this->FG_TABLE_COL[$i][3]?>" class="tableBody"><?php
 						$origlist[$ligne_number][$i-$k] = $list[$ligne_number][$i-$k];
 						$list[$ligne_number][$i-$k] = is_null($record_clear) ? $record_display : $record_clear;
 
@@ -351,7 +351,7 @@ if ((count($list)>0) && is_array($list)){
 		 		 <?php  } ?>
 
 				  	<?php if($this->FG_EDITION  || $this->FG_INFO || $this->FG_DELETION || $this -> FG_OTHER_BUTTON1 || $this -> FG_OTHER_BUTTON2 || $this -> FG_OTHER_BUTTON3 || $this -> FG_OTHER_BUTTON4 ){?>
-					  <TD align="center" vAlign=top class=tableBodyRight nowrap>
+					  <TD align="center" valign=top class=tableBodyRight nowrap>
 					
 						<?php if($this->FG_INFO){?>&nbsp; <a href="<?php echo $this->FG_INFO_LINK?><?php echo $list[$ligne_number][$this->FG_NB_TABLE_COL]?>"><img src="<?php echo Images_Path_Main;?>/<?php echo $this->FG_INFO_IMG?>" border="0" title="<?php echo $this->FG_INFO_ALT?>" alt="<?php echo $this->FG_INFO_ALT?>"></a><?php } ?>
 						<?php if($this->FG_EDITION){
@@ -818,9 +818,9 @@ if ((count($list)>0) && is_array($list)){
 							$REMOVE_COL = ($this->FG_OTHER_BUTTON1 || $this->FG_OTHER_BUTTON2 || $this->FG_OTHER_BUTTON3 || $this->FG_OTHER_BUTTON4 || $this->FG_EDITION || $this->FG_INFO || $this->FG_DELETION )? 0 : 1;
 							for($i=0;$i<$this->FG_NB_TABLE_COL-$REMOVE_COL;$i++){
 				 		 ?>
-                 		 <TD vAlign=top class="tableBody">&nbsp;</TD>
+                 		 <TD valign=top class="tableBody">&nbsp;</TD>
 				 		 <?php  } ?>
-                 		 <TD align="center" vAlign=top class="tableBodyRight">&nbsp;</TD>
+                 		 <TD align="center" valign=top class="tableBodyRight">&nbsp;</TD>
 					</TR>
 
 				<?php

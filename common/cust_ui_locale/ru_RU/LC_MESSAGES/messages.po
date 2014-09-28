@@ -2015,6 +2015,10 @@ msgstr "Ожидал"
 msgid "AVERAGE"
 msgstr "УСРЕДНЁННО"
 
+#: call-history.php
+msgid "CallHolder"
+msgstr "Владелец"
+
 #: call-history.php:752
 msgid "WAITUP"
 msgstr "ОЖИДАНИЕ"
