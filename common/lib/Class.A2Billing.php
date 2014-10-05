@@ -195,6 +195,8 @@ class A2Billing {
 	var $cardholder_uipass;
 	var $id_campaign;
 	var $id_card;
+//	var $card_caller = 0;
+//	var $card_called = 0;
 	var $useralias;
 	var $countryprefix;
 	var $areaprefix;
@@ -959,7 +961,6 @@ class A2Billing {
 			$this->src_peername = $this->transferername[0];
 		}
 	}
-
 //$this -> debug( ERROR, $agi, __FILE__, __LINE__, "[=======================================[ this->src_peername ={$this->src_peername} / this->CallerID ={$this->CallerID} ]");
 	$QUERY = "SELECT regexten FROM cc_sip_buddies WHERE id_cc_card = {$this->id_card} AND name = '{$this->src_peername}' AND name = '{$this->CallerID}' LIMIT 1";
 	$result = $this -> instance_table -> SQLExec ($this->DBHandle, $QUERY);
@@ -969,14 +970,13 @@ class A2Billing {
 	}
 //$this -> debug( ERROR, $agi, __FILE__, __LINE__, "[=======================================[ this->src_exten ={$this->src_exten} ]");
 //$this -> debug( ERROR, $agi, __FILE__, __LINE__, "[=======================================[ this->destination ={$this->destination} ]");
-
 	$this->extext = true;
 	if ($this->destination) {
 		$QUERY = "SELECT name, regexten, accountcode FROM cc_sip_buddies
 				LEFT JOIN cc_card_concat bb ON id_cc_card = bb.concat_card_id
 				LEFT JOIN ( SELECT aa.concat_id FROM cc_card_concat aa WHERE aa.concat_card_id = {$this->id_card} ) AS v ON v.concat_id = bb.concat_id
 				WHERE (id_cc_card = {$this->id_card} OR v.concat_id IS NOT NULL) AND (regexten = '{$this->destination}' OR (name = '{$this->destination}' AND regexten IS NOT NULL)) LIMIT 1";
-//				WHERE name = '{$this->destination}' OR ((id_cc_card = {$this->id_card} OR v.concat_id IS NOT NULL) AND regexten = '{$this->destination}') LIMIT 1";
+//"				WHERE name = '{$this->destination}' OR ((id_cc_card = {$this->id_card} OR v.concat_id IS NOT NULL) AND regexten = '{$this->destination}') LIMIT 1";
 //$this -> debug( ERROR, $agi, __FILE__, __LINE__, "[SQL]:\n".$QUERY);
 //$this -> debug( ERROR, $agi, __FILE__, __LINE__, "[SQL Result:]...");
 //$this -> debug( ERROR, $agi, __FILE__, __LINE__, "[SQL Result:] name=".$result[0][0].", regexten=".$result[0][1]);
@@ -991,7 +991,12 @@ class A2Billing {
 			}
 			$this->voicebox = $result[0][1]."@".$result[0][2];
 			$this->extext = false;
-		}
+		}/** else {
+			$QUERY = "SELECT id_cc_card, regexten FROM cc_sip_buddies WHERE name = '{$this->destination}' AND regexten IS NOT NULL";
+			$result = $this -> instance_table -> SQLExec ($this->DBHandle, $QUERY);
+			if (is_array($result))
+				$this->card_called = $result[0][0];
+		}**/
 	}
 	if ($this->extext) {
 		$this->destination = $this->apply_add_countryprefixto ($this->destination);
@@ -1692,15 +1697,22 @@ for ($t=0;$t<count($result);$t++) {
 						$this -> debug( INFO, $agi, __FILE__, __LINE__, "Destination: " . $inst_listdestination[4]);
 					}
 					
-					$QUERY = "SELECT regexten FROM cc_sip_buddies WHERE id_cc_card = $this->id_card AND name = '{$inst_listdestination[4]}' LIMIT 1";
+//					$QUERY = "SELECT regexten FROM cc_sip_buddies WHERE id_cc_card = $this->id_card AND name = '{$inst_listdestination[4]}' LIMIT 1";
+					$QUERY = "SELECT regexten, id_cc_card FROM cc_sip_buddies WHERE name = '{$inst_listdestination[4]}' LIMIT 1";
 					$result = $this -> instance_table -> SQLExec ($this->DBHandle, $QUERY);
-					$this->calledexten = (is_array($result) && $result[0][0] != "") ? "'".$result[0][0]."'" : "NULL";
-
+					if (is_array($result)) {
+						$this->calledexten = $result[0][0] != "" ? "'".$result[0][0]."'" : 'NULL';
+//					$this->calledexten = (is_array($result) && $result[0][0] != "") ? "'".$result[0][0]."'" : "NULL";
+						$card_called = "'".$result[0][1]."'";
+					} else {
+						$this->calledexten = 'NULL';
+						$card_called = "'0'";
+					}
 					$QUERY = "INSERT INTO cc_call (uniqueid, sessionid, card_id, nasipaddress, starttime, sessiontime, calledstation, ".
-						" terminatecauseid, stoptime, sessionbill, id_tariffgroup, id_tariffplan, id_ratecard, id_trunk, src, sipiax, id_did, calledexten, dnid) VALUES ".
+						" terminatecauseid, stoptime, sessionbill, id_tariffgroup, id_tariffplan, id_ratecard, id_trunk, src, sipiax, id_did, calledexten, card_called, dnid) VALUES ".
 						"('".$this->uniqueid."', '".$this->channel."',  '".$this->id_card."', '".$this->hostname."',";
 					$QUERY .= " CURRENT_TIMESTAMP - INTERVAL $answeredtime SECOND ";
-					$QUERY .= ", '$answeredtime', '".$inst_listdestination[4]."', '$terminatecauseid', now(), '0', '0', '0', '0', '0', '$this->CallerID', '3', '$this->id_did', $this->calledexten, '$this->dnid' )";
+					$QUERY .= ", '$answeredtime', '".$inst_listdestination[4]."', '$terminatecauseid', now(), '0', '0', '0', '0', '0', '$this->CallerID', '3', '$this->id_did', $this->calledexten, $card_called, '$this->dnid' )";
 					
 					$result = $this -> instance_table -> SQLExec ($this->DBHandle, $QUERY, 0);
 					$this -> debug( INFO, $agi, __FILE__, __LINE__, "[DID CALL - LOG CC_CALL: SQL: $QUERY]:[result:$result]");
@@ -1800,7 +1812,7 @@ for ($t=0;$t<count($result);$t++) {
 					}
 				}
 			} // END IF AUTHENTICATE
-		if ($agi -> channel_status('',true) == AST_STATE_DOWN) break;
+		if ($dialstatus == "ANSWER" || $dialstatus == "CANCEL" || $agi -> channel_status('',true) == AST_STATE_DOWN) break;
 		}// END FOR
 
 		if (!is_null($didvoicebox))
@@ -2031,17 +2043,25 @@ for ($t=0;$t<count($result);$t++) {
 		    if (!isset($this->card_caller)) {
 			$this->card_caller = $my_id_card;
 		    }
-                    $QUERY = "SELECT regexten FROM cc_sip_buddies WHERE (id_cc_card = $my_id_card OR id_cc_card = $this->id_card) AND name = '{$inst_listdestination[10]}' LIMIT 1";
-                    $result = $this -> instance_table -> SQLExec ($this->DBHandle, $QUERY);
-                    $this->calledexten = (is_array($result) && $result[0][0] != "") ? "'".$result[0][0]."'" : "NULL";
-
+//		    $QUERY = "SELECT regexten FROM cc_sip_buddies WHERE (id_cc_card = $my_id_card OR id_cc_card = $this->id_card) AND name = '{$inst_listdestination[10]}' LIMIT 1";
+//		    $result = $this -> instance_table -> SQLExec ($this->DBHandle, $QUERY);
+//		    $this->calledexten = (is_array($result) && $result[0][0] != "") ? "'".$result[0][0]."'" : "NULL";
+		    $QUERY = "SELECT regexten, id_cc_card FROM cc_sip_buddies WHERE name = '{$inst_listdestination[10]}' LIMIT 1";
+		    $result = $this -> instance_table -> SQLExec ($this->DBHandle, $QUERY);
+		    if (is_array($result)) {
+			$this->calledexten = $result[0][0] != "" ? "'".$result[0][0]."'" : 'NULL';
+			$card_called = "'".$result[0][1]."'";
+		    } else {
+			$this->calledexten = 'NULL';
+			$card_called = "'0'";
+		    }
                     // A-LEG below to the owner of the DID
                     if ($call_did_free || $answeredtime == 0) {
                     	//CALL2DID CDR is free
 	                    /* CDR A-LEG OF DID CALL */
-	                    $QUERY = "INSERT INTO cc_call (uniqueid, sessionid, card_id, card_caller, nasipaddress, starttime, sessiontime, calledstation, ".
+	                    $QUERY = "INSERT INTO cc_call (uniqueid, sessionid, card_id, card_caller, card_called, nasipaddress, starttime, sessiontime, calledstation, ".
 	                            " terminatecauseid, stoptime, sessionbill, id_tariffgroup, id_tariffplan, id_ratecard, id_trunk, src, sipiax, id_did, src_peername, src_exten, calledexten, dnid) VALUES ".
-	                            "('".$this->uniqueid."', '".$this->channel."',  '".$this->id_card."',  '".$this->card_caller."', '".$this->hostname."',";
+	                            "('".$this->uniqueid."', '".$this->channel."',  '".$this->id_card."',  '".$this->card_caller."', $card_called, '".$this->hostname."',";
 	                    $QUERY .= " CURRENT_TIMESTAMP - INTERVAL $answeredtime SECOND ";
 	                    $QUERY .= ", '$answeredtime', '".$inst_listdestination[10]."', '$terminatecauseid', now(), '0', '0', '0', '0', '0', '$this->CallerID', '3', '$this->id_did', $this->src_peername, $this->src_exten, $this->calledexten, '$this->destination')";
 
@@ -2057,9 +2077,9 @@ for ($t=0;$t<count($result);$t++) {
                         $cost = a2b_round(($answeredtime/60) * abs($selling_rate) + abs($connection_charge));
                         
                         /* CDR A-LEG OF DID CALL */
-                        $QUERY = "INSERT INTO cc_call (uniqueid, sessionid, card_id, card_caller, nasipaddress, starttime, sessiontime, calledstation, ".
+                        $QUERY = "INSERT INTO cc_call (uniqueid, sessionid, card_id, card_caller, card_called, nasipaddress, starttime, sessiontime, calledstation, ".
                                 " terminatecauseid, stoptime, sessionbill, id_tariffgroup, id_tariffplan, id_ratecard, id_trunk, src, sipiax, id_did, src_peername, src_exten, calledexten, dnid) VALUES ".
-                                "('".$this->uniqueid."', '".$this->channel."',  '".$my_id_card."', '".$this->card_caller."', '".$this->hostname."',";
+                                "('".$this->uniqueid."', '".$this->channel."',  '".$my_id_card."', '".$this->card_caller."', $card_called, '".$this->hostname."',";
                         $QUERY .= " CURRENT_TIMESTAMP - INTERVAL $answeredtime SECOND ";
                         $QUERY .= ", '$answeredtime', '". $listdestination[0][10]."', '$terminatecauseid', now(), '$cost', '0', '0', '0', '0', '$this->CallerID', '3', '$this->id_did', $this->src_peername, $this->src_exten, $this->calledexten, '$this->destination')";
 
@@ -2183,7 +2203,7 @@ for ($t=0;$t<count($result);$t++) {
 		  }
 		}
 	    }
-	    if ($agi -> channel_status('',true) == AST_STATE_DOWN) break;
+	    if ($dialstatus == "ANSWER" || $dialstatus == "CANCEL" || $agi -> channel_status('',true) == AST_STATE_DOWN) break;
 	}// END FOR
 
 		if (!is_null($didvoicebox))
@@ -2267,9 +2287,9 @@ $this -> debug( ERROR, $agi, __FILE__, __LINE__, "FAXRESOLUTION: ".$faxresolutio
 			if ($faxpages == 0) $faxpages = 1;
 		} else	$faxstatus = 0;
 
-		$QUERY  = "INSERT INTO cc_call (uniqueid, sessionid, card_id, card_caller, nasipaddress, starttime, sessiontime, calledstation, destination, terminatecauseid, stoptime, sessionbill, ".
+		$QUERY  = "INSERT INTO cc_call (uniqueid, sessionid, card_id, card_caller, card_called, nasipaddress, starttime, sessiontime, calledstation, destination, terminatecauseid, stoptime, sessionbill, ".
 				"id_tariffgroup, id_tariffplan, id_ratecard, id_trunk, src, sipiax, src_peername, src_exten, calledexten, dnid, faxstatus, remotefaxid, faxpages, faxbitrate, faxresolution) VALUES ";
-		$QUERY .= "('$uniqueid', '$this->channel', '$this->id_card', '$this->faxidcard', '$this->hostname', ";
+		$QUERY .= "('$uniqueid', '$this->channel', '$this->id_card', '$this->id_card', '$this->faxidcard', '$this->hostname', ";
 		$QUERY .= "CURRENT_TIMESTAMP - INTERVAL $answeredtime SECOND, ";
 		$QUERY .= "'$answeredtime', '$this->destination', '-2', '1', now(), '0', '0', '0', '0', '0', '$this->CallerID', $didcall, $this->src_peername, $this->CallerIDext, '$this->destination', '$this->dnid', ";
 		$QUERY .= "'$faxstatus', '$remotefaxid', '$faxpages', '$faxbitrate', '$faxresolution')";

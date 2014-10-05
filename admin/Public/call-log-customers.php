@@ -222,19 +222,19 @@ if (strpos ( $SQLcmd, 'WHERE' ) > 0) {
 if (isset ( $customer ) && ($customer > 0)) {
 	if (strlen ( $FG_TABLE_CLAUSE ) > 0)
 		$FG_TABLE_CLAUSE .= " AND ";
-	$FG_TABLE_CLAUSE .= "t1.card_id='$customer'";
+	$FG_TABLE_CLAUSE .= "(t1.card_id='$customer' OR t1.card_caller='$customer')";
 } else {
 	if (isset ( $entercustomer ) && ($entercustomer > 0)) {
 		if (strlen ( $FG_TABLE_CLAUSE ) > 0)
 			$FG_TABLE_CLAUSE .= " AND ";
-		$FG_TABLE_CLAUSE .= "t1.card_id='$entercustomer'";
+		$FG_TABLE_CLAUSE .= "(t1.card_id='$entercustomer' OR t1.card_caller='$entercustomer')";
 	}elseif(isset ( $entercustomer_num ) && ($entercustomer_num > 0)) {
-		$res = $DBHandle -> Execute ("select id from cc_card where username=".$entercustomer_num);
+		$res = $DBHandle -> Execute ("SELECT id FROM cc_card WHERE username=".$entercustomer_num);
 		if ($res){
 			if($res->RecordCount ()){
 				$row =$res -> fetchRow();
 				if (strlen ( $FG_TABLE_CLAUSE ) > 0)	$FG_TABLE_CLAUSE .= " AND ";
-				$FG_TABLE_CLAUSE .= "t1.card_id='$row[0]'";
+				$FG_TABLE_CLAUSE .= "(t1.card_id='$row[0]' OR t1.card_caller='$row[0]')";
 			}
 		}
 	}
@@ -1199,11 +1199,11 @@ if ($profit > 500 && $rand_num==4 && SHOW_DONATION) {
 <center>
 <table align="center" width="50%" bgcolor="white" cellpadding="5" cellspacing="5" style="border: solid 1px">
 	<tr>
-		<td align="center"> 
+		<td align="center" nowrap>
 		
 			<center>
-				<b><font color="#A00000"><?php echo gettext("Thanks to A2Billing, you have made a profit of over 500 euro !");?></font></b><BR>
-					<?php echo gettext("Support A2Billing by clicking on the Donate button below :");?>  
+				<b><font color="#A00000"><?php echo gettext("Thanks to Nixonch's A2Billing, you have made a profit of over 500 "); echo isset ( $choose_currency ) ? $choose_currency : BASE_CURRENCY; echo " !";?></font></b><br/>
+					<?php echo gettext("Support Nixonch's A2Billing by clicking on the Donate button below :");?>
 				
 				<form action="https://www.paypal.com/cgi-bin/webscr" method="post">
 					<input type="hidden" name="cmd" value="_s-xclick">

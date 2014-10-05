@@ -3720,11 +3720,11 @@ msgid "Previous"
 msgstr "Предыдущий"
 
 #: Public/call-log-customers.php:1185
-msgid "Thanks to A2Billing, you have made a profit of over 500 euro !"
-msgstr ""
+msgid "Thanks to Nixonch's A2Billing, you have made a profit of over 500 "
+msgstr "Благодаря АТС A2Billing Вам удалось заработать более 500 "
 
 #: Public/call-log-customers.php:1186
-msgid "Support A2Billing by clicking on the Donate button below :"
+msgid "Support Nixonch's A2Billing by clicking on the Donate button below :"
 msgstr "Поддержите A2Billing кликнув по кнопке Donate :"
 
 #: Public/call-log-customers.php:1215 Public/call-dnid.php:843

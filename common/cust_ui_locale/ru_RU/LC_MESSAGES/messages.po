@@ -1500,7 +1500,7 @@ msgstr "Номер звонящего"
 
 #: form_data/FG_var_callerid.inc:48 form_data/FG_var_callerid.inc:81
 msgid "CALLERID"
-msgstr "НОМЕР ЗВОНЯЩЕГО (CallerID)"
+msgstr "НОМЕР ЗВОНЯЩЕГО &lt;CallerID&gt;"
 
 #: form_data/FG_var_callerid.inc:54
 msgid "CallerID list"
@@ -2010,6 +2010,10 @@ msgstr "Маршрут"
 #: call-history.php:147
 msgid "WaitUp"
 msgstr "Ожидал"
+
+#: call-history.php
+msgid "Number"
+msgstr "На номер"
 
 #: call-history.php
 msgid "AVERAGE"

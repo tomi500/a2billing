@@ -167,8 +167,9 @@ ALTER TABLE cc_iax_buddies ADD `forceencryption` varchar(20) COLLATE utf8_bin NO
 ALTER TABLE cc_iax_buddies ADD `external` INT( 11 ) NOT NULL DEFAULT '0';
 ALTER TABLE cc_iax_buddies CHANGE `DEFAULTip` `defaultip` CHAR( 50 ) CHARACTER SET utf8 COLLATE utf8_bin NULL DEFAULT NULL;
 
-ALTER TABLE cc_call ADD card_caller INT( 11 ) NOT NULL AFTER `card_id`;
-ALTER TABLE cc_call ADD src_peername INT( 11 ) NULL DEFAULT NULL AFTER `src`;
+ALTER TABLE cc_call ADD card_caller BIGINT(20) NOT NULL AFTER `card_id`;
+ALTER TABLE cc_call ADD card_called BIGINT(20) NOT NULL AFTER `card_caller`;
+ALTER TABLE cc_call ADD src_peername INT(11) NULL DEFAULT NULL AFTER `src`;
 ALTER TABLE cc_call ADD src_exten VARCHAR( 40 ) CHARACTER SET utf8 COLLATE utf8_bin NULL DEFAULT NULL AFTER `src_peername`;
 ALTER TABLE cc_call ADD calledexten INT( 11 ) NULL DEFAULT NULL AFTER `calledstation`;
 ALTER TABLE cc_call ADD faxstatus SMALLINT( 6 ) NULL DEFAULT NULL;

@@ -540,6 +540,7 @@ class iam_csvdump
             {
                  echo "<html><body><pre>";
                  echo htmlspecialchars($this->_generate_csv($query_string, $dbname, $user, $password, $host));
+//                 echo html_entity_decode($this->_generate_csv($query_string, $dbname, $user, $password, $host));
                  echo "</PRE></BODY></HTML>";
             }
     }

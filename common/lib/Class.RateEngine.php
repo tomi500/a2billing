@@ -1270,7 +1270,7 @@ else echo "Ratecard: ".$this->ratecard_obj[$i][6]."<br>Trunk: ".$this->ratecard_
 			$calltype = 0;
         }
 
-		$card_id		= (!is_numeric($A2B->id_card)) ? '-1' : "'". $A2B->id_card ."'";
+		$card_id		= (!is_numeric($A2B->id_card)) ? "'-1'" : "'". $A2B->id_card ."'";
 		$real_sessiontime	= (!is_numeric($this->real_answeredtime)) ? 'NULL' : "'". $this->real_answeredtime ."'";
 		$id_tariffgroup 	= (!isset($id_tariffgroup) || !is_numeric($id_tariffgroup)) ? 'NULL' : "'$id_tariffgroup'";
 		$id_tariffplan		= (!isset($id_tariffplan) || !is_numeric($id_tariffplan)) ? 'NULL' : "'$id_tariffplan'";
@@ -1285,20 +1285,26 @@ else echo "Ratecard: ".$this->ratecard_obj[$i][6]."<br>Trunk: ".$this->ratecard_
 			$src_exten	= "'". $A2B->CallerIDext ."'";
 		else $src_exten 	= (isset($A2B->src_exten) && is_numeric($A2B->src_exten)) ? $A2B->src_exten : 'NULL';
 
-		$QUERY = "SELECT regexten FROM cc_sip_buddies
-				LEFT JOIN cc_card_concat bb ON id_cc_card = bb.concat_card_id
+		$QUERY = "SELECT regexten, id_cc_card FROM cc_sip_buddies WHERE name = '{$calledstation}' AND regexten IS NOT NULL LIMIT 1";
+/**				LEFT JOIN cc_card_concat bb ON id_cc_card = bb.concat_card_id
 				LEFT JOIN ( SELECT aa.concat_id FROM cc_card_concat aa WHERE aa.concat_card_id = $card_id ) AS v ON bb.concat_id = v.concat_id
 				WHERE (id_cc_card = $card_id OR v.concat_id IS NOT NULL) AND name = '$calledstation' LIMIT 1";
-		$result = $A2B -> instance_table -> SQLExec ($A2B->DBHandle, $QUERY);
-		$calledexten = (is_array($result) && $result[0][0] != "") ? "'".$result[0][0]."'" : 'NULL';
+**/		$result = $A2B -> instance_table -> SQLExec ($A2B->DBHandle, $QUERY);
+		if (is_array($result)) {
+			$calledexten = $result[0][0] != "" ? "'".$result[0][0]."'" : 'NULL';
+			$card_called = "'".$result[0][1]."'";
+		} else {
+			$calledexten = 'NULL';
+			$card_called = $calltype == 2 || $calltype == 3 || $calltype == 5 ? $card_id : "'0'";
+		}
 
 		if ($callback_mode == 0 || $cost != 0 || !is_numeric($callback_mode) || $A2B->CallerID != $A2B -> config["callback"]['callerid']) {
 
-		    $QUERY_COLUMN = "uniqueid, sessionid, card_id, card_caller, nasipaddress, starttime, sessiontime, real_sessiontime, calledstation, ".
+		    $QUERY_COLUMN = "uniqueid, sessionid, card_id, card_caller, card_called, nasipaddress, starttime, sessiontime, real_sessiontime, calledstation, ".
 			" terminatecauseid, stoptime, sessionbill, id_tariffgroup, id_tariffplan, id_ratecard, " .
 			" id_trunk, src, sipiax, buycost, id_card_package_offer, dnid, destination, id_did, src_peername, src_exten, calledexten, margindillers, margindiller";
 		    $QUERY = "INSERT INTO cc_call ($QUERY_COLUMN) VALUES ('".$A2B->uniqueid."', '".$A2B->channel."', ".
-			"$card_id, $card_caller, '".$A2B->hostname."', ";
+			"$card_id, $card_caller, $card_called, '".$A2B->hostname."', ";
 
 		    if ($A2B->config["global"]['cache_enabled']) {
 			$QUERY .= " datetime( strftime('%s','now') - $sessiontime, 'unixepoch','localtime')";	

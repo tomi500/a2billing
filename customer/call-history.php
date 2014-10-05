@@ -133,7 +133,7 @@ if (!has_rights(ACX_DISTRIBUTION) || !isset($id) || !is_numeric($id))	{
 	if ($choose_callowner == 3 || $choose_callowner == 4)		$choose_callowner	= 0;
 }
 
-$instance_table -> Update_table($DBHandle_max, "showcallstypedefault = '$choose_callowner'", "username = '".$_SESSION["pr_login"]."' AND uipass = '".$_SESSION["pr_password"]."'");
+if ($choose_callowner >= 0)	$instance_table -> Update_table($DBHandle_max, "showcallstypedefault = '$choose_callowner'", "username = '".$_SESSION["pr_login"]."' AND uipass = '".$_SESSION["pr_password"]."'");
 
 $FG_DEBUG = 0;
 // THIS VARIABLE DEFINE THE COLOR OF THE HEAD TABLE
@@ -197,37 +197,7 @@ if (strpos ( $SQLcmd, 'WHERE' ) > 0) {
 	$FG_TABLE_CLAUSE = substr ( $date_clause, 5 );
 }
 
-//if (!isset($choose_callowner)) $choose_callowner = 0;
-
-if (!isset($choose_calltype)) $choose_calltype = -1;
-elseif ($choose_calltype != - 1) {
-	if (strlen($FG_TABLE_CLAUSE)>0) $FG_TABLE_CLAUSE.=" AND";
-	switch ($choose_calltype) {
-		case 0: //INCOMING
-			$FG_TABLE_CLAUSE .= " ((t1.sipiax=2 OR t1.sipiax=3) AND t1.card_id<>t1.card_caller) ";
-			break;
-		case 1: //OUTGOING
-			$FG_TABLE_CLAUSE .= " (t1.calledexten IS NULL AND t1.id_did IS NULL) ";
-			break;
-		case 2: //INTERNAL
-			$FG_TABLE_CLAUSE .= " (t1.src=t1.src_peername AND t1.calledexten IS NOT NULL) ";
-			break;
-		case 3: //CALLBACK CALLS
-			$FG_TABLE_CLAUSE .= " (t1.sipiax=4 OR (t1.src_peername IS NULL AND t1.src_exten IS NULL AND t1.id_did IS NULL AND t1.dnid LIKE t1.calledstation)) ";
-			break;
-		case 4: //TRANSIT
-			$FG_TABLE_CLAUSE .= " ((t1.card_id=t1.card_caller OR (t1.id_did IS NOT NULL AND t1.src_peername IS NULL)) AND t1.destination>0 AND t1.src_peername IS NULL AND t1.src_exten IS NULL AND t1.calledexten IS NULL AND t1.dnid NOT LIKE t1.calledstation) ";
-			break;
-		case 5: //FREE
-			$FG_TABLE_CLAUSE .= " t1.sessionbill=0 ";
-			break;
-		case 6: //SURCHARGE
-			$FG_TABLE_CLAUSE .= " t1.sessionbill>0 ";
-			break;
-	}
-}
-
-$sessbillquery = "'$customer'";
+$calledsbquery = $sessbillquery = "='$customer'";
 $FG_TABLE_NAME = "cc_call t1";
 $FG_HTML_TABLE_TITLE = " - ".gettext("Call Logs")." - ";
 $accdie = false;
@@ -235,20 +205,26 @@ $FG_COL_QUERY_RECORDS = ", t1.uniqueid";
 switch ($choose_callowner) {
 	case 1: //I & MY UNION
 		if ($customer_info[16] || $customer_info[18]) {
-			$FG_TABLE_NAME .= " LEFT JOIN cc_card_concat bb ON bb.concat_card_id=t1.card_id OR bb.concat_card_id=t1.card_caller LEFT JOIN cc_card ON cc_card.id=t1.card_id";
+			$FG_TABLE_NAME .= " LEFT JOIN cc_card_concat bb ON bb.concat_card_id IN (t1.card_caller, t1.card_id, t1.card_called) LEFT JOIN cc_card ON cc_card.id=bb.concat_card_id";
+			$calledsbquery = " IN (SELECT concat_card_id FROM cc_card_concat WHERE concat_id=$concat_id)";
+//			$calledsbquery = " IN (SELECT concat_card_id FROM bb)";
+//			$calledsbquery = "=bb.concat_card_id";
+//			$FG_TABLE_NAME = "(SELECT * FROM cc_card_concat WHERE concat_id=$concat_id) bb, (SELECT * FROM cc_card WHERE id$calledsbquery OR id_diller$calledsbquery) ccd, cc_call t1";
 			if (strlen($FG_TABLE_CLAUSE)>0)		$FG_TABLE_CLAUSE.=" AND ";
-			$FG_TABLE_CLAUSE.="bb.concat_id=$concat_id AND (bb.mylogs=1 OR bb.concat_card_id={$sessbillquery})";
-			$FG_COL_QUERY_RECORDS = ", IF((bb.myrecords AND {$customer_info[21]}) OR t1.card_id={$sessbillquery} OR card_caller={$sessbillquery},t1.uniqueid,'')";
-			$sessbillquery = "bb.concat_card_id";
+			$FG_TABLE_CLAUSE.="bb.concat_id=$concat_id AND (bb.mylogs=1 OR bb.concat_card_id{$sessbillquery})";
+//			$FG_TABLE_CLAUSE.="((bb.mylogs=1 AND bb.concat_card_id IN (t1.card_caller, t1.card_id, t1.card_called)) OR bb.concat_card_id{$sessbillquery}) AND ((ccd.id=t1.card_caller AND t1.card_caller) OR (t1.card_caller=0 AND ccd.id=t1.card_id))";
+			$FG_COL_QUERY_RECORDS = ", IF((bb.myrecords AND {$customer_info[21]}) OR t1.card_id{$sessbillquery} OR card_caller{$sessbillquery},t1.uniqueid,'')";
+			$sessbillquery = "=bb.concat_card_id";
 		} else $accdie = true;
 		break;
 	case 2: //MY UNION
 		if ($customer_info[16] || $customer_info[18]) {
-			$FG_TABLE_NAME .= " LEFT JOIN cc_card_concat bb ON bb.concat_card_id=t1.card_id OR bb.concat_card_id=t1.card_caller LEFT JOIN cc_card ON cc_card.id=t1.card_id";
+			$FG_TABLE_NAME .= " LEFT JOIN cc_card_concat bb ON bb.concat_card_id IN (t1.card_caller, t1.card_id, t1.card_called) LEFT JOIN cc_card ON cc_card.id=bb.concat_card_id";
+			$calledsbquery = " IN (SELECT concat_card_id FROM cc_card_concat WHERE concat_id=$concat_id)";
 			if (strlen($FG_TABLE_CLAUSE)>0)		$FG_TABLE_CLAUSE.=" AND ";
 			$FG_TABLE_CLAUSE.="bb.concat_card_id<>'$customer' AND bb.concat_id=$concat_id AND bb.mylogs=1";
 			$FG_COL_QUERY_RECORDS = ", IF(bb.myrecords=1 AND {$customer_info[21]},t1.uniqueid,'')";
-			$sessbillquery = "bb.concat_card_id";
+			$sessbillquery = "=bb.concat_card_id";
 		} else $accdie = true;
 		break;
 	case 3: //OTHER UNION
@@ -258,7 +234,7 @@ switch ($choose_callowner) {
 			$FG_TABLE_NAME .= " LEFT JOIN cc_card_concat ON concat_card_id=t1.card_id OR concat_card_id=t1.card_caller";
 			if (strlen($FG_TABLE_CLAUSE)>0)		$FG_TABLE_CLAUSE.=" AND ";
 			$FG_TABLE_CLAUSE.="concat_id='$id' AND id_diller='$customer'";
-			$sessbillquery = "concat_card_id";
+			$calledsbquery = $sessbillquery = "=concat_card_id";
 			unset($calltype_list[4]);
 			$calltype_list[3][0] .= $id;
 		} else $accdie = true;
@@ -272,23 +248,25 @@ switch ($choose_callowner) {
 				$FG_TABLE_CLAUSE.="(t1.card_id='$id' OR t1.card_caller='$id')";
 				unset($calltype_list[3]);
 				$FG_HTML_TABLE_TITLE .= "&nbsp;&nbsp;&nbsp;&nbsp;<B><font color=blue>".$resmax[0][0]." ".$resmax[0][1]."</font> (".$resmax[0][2].") <font color=green>".$resmax[0][3]." ".BASE_CURRENCY."</font></B>";
-				$sessbillquery = "'$id'";
+				$calledsbquery = $sessbillquery = "='$id'";
 			} else $accdie = true;
 			break;
 		} else $id = '';
 	default:
 		if ($choose_callowner < 0) {
-			$FG_TABLE_NAME .= " LEFT JOIN cc_card_concat bb ON bb.concat_card_id=t1.card_id OR bb.concat_card_id=t1.card_caller";
+			$FG_TABLE_NAME .= " LEFT JOIN cc_card_concat bb ON bb.concat_card_id=t1.card_id OR bb.concat_card_id=t1.card_caller OR bb.concat_card_id=t1.card_called";
 			if (strlen($FG_TABLE_CLAUSE)>0)		$FG_TABLE_CLAUSE.=" AND ";
-			$cust = -$choose_callowner;
-			$FG_TABLE_CLAUSE.="bb.concat_card_id=-$choose_callowner AND bb.concat_id=$concat_id AND bb.mylogs=1";
+//			$cust = -$choose_callowner;
+			$FG_TABLE_CLAUSE.="bb.concat_card_id=-$choose_callowner AND bb.concat_id=$concat_id AND bb.mylogs";
 			$FG_COL_QUERY_RECORDS = ", IF(bb.myrecords AND {$customer_info[21]},t1.uniqueid,'')";
-			$sessbillquery = "bb.concat_card_id";
+			$sessbillquery = "=bb.concat_card_id";
+			$calledsbquery = " IN (SELECT concat_card_id FROM cc_card_concat WHERE concat_id=$concat_id)";
 			break;
 		} else $choose_callowner = 0;
 	case 0: //MY
 		if (strlen($FG_TABLE_CLAUSE)>0)		$FG_TABLE_CLAUSE.=" AND ";
-		$FG_TABLE_CLAUSE .= "(t1.card_id='$customer' OR t1.card_caller='$customer')";
+		$FG_TABLE_CLAUSE .= "'$customer' IN (t1.card_id, t1.card_caller, t1.card_called)";
+		$calledsbquery = $choose_callowner == 0 && $customer_info[19] ? " IN (SELECT concat_card_id FROM cc_card_concat WHERE concat_id=$customer_info[19])" : "$sessbillquery";
 		break;
 }
 
@@ -298,44 +276,90 @@ if ($accdie)	{
 	die();
 }
 
+//if (!isset($choose_callowner)) $choose_callowner = 0;
+
+if (!isset($choose_calltype)) $choose_calltype = -1;
+elseif ($choose_calltype != - 1) {
+	if (strlen($FG_TABLE_CLAUSE)>0) $FG_TABLE_CLAUSE.=" AND ";
+	$sssb = $choose_callowner == 0 && $customer_info[19] ? " NOT IN (SELECT concat_card_id FROM cc_card_concat WHERE concat_id='{$customer_info[19]}')" : "!".$sessbillquery;
+	switch ($choose_calltype) {
+		case 0: //INCOMING
+//			$FG_TABLE_CLAUSE .= "(t1.sipiax=2 OR t1.sipiax=3 OR t1.sipiax=5) AND (t1.card_caller=0 OR t1.card_caller=t1.card_id) AND !(t1.src_exten IS NOT NULL AND t1.card_id$sessbillquery)";
+//			$FG_TABLE_CLAUSE .= "(t1.sipiax=2 OR t1.sipiax=3 OR t1.sipiax=5)";
+//			if ($choose_callowner == 0 && $customer_info[19]) {
+//				$FG_TABLE_NAME .=  " LEFT JOIN cc_sip_buddies cc ON cc.id_cc_card$sssb";
+//			}
+			$FG_TABLE_CLAUSE .= "(t1.sipiax=2 OR t1.sipiax=3 OR t1.sipiax=5 OR t1.sipiax=0) AND t1.card_caller$sssb";
+			break;
+		case 1: //OUTGOING
+			$FG_TABLE_CLAUSE .= "t1.calledexten IS NULL AND t1.id_did IS NULL";
+			break;
+		case 2: //INTERNAL
+			$FG_TABLE_CLAUSE .= "t1.src=t1.src_peername AND t1.calledexten IS NOT NULL";
+			break;
+		case 3: //CALLBACK CALLS
+//			$FG_TABLE_CLAUSE .= "(t1.sipiax=4 OR (t1.src_peername IS NULL AND t1.src_exten IS NULL AND t1.id_did IS NULL AND t1.dnid LIKE t1.calledstation))";
+			$FG_TABLE_CLAUSE .= "(t1.sipiax=4 OR (t1.src_peername IS NULL AND t1.src_exten IS NULL AND ((t1.id_did IS NULL AND t1.dnid LIKE t1.calledstation) OR (t1.card_id=t1.card_caller AND real_sessiontime IS NULL))))";
+			break;
+		case 4: //TRANSIT
+			$FG_TABLE_CLAUSE .= "(t1.card_id=t1.card_caller OR (t1.id_did IS NOT NULL AND t1.src_peername IS NULL)) AND t1.destination>0 AND t1.src_peername IS NULL AND t1.src_exten IS NULL AND t1.calledexten IS NULL AND t1.dnid NOT LIKE t1.calledstation";
+			break;
+		case 5: //FREE
+			$FG_TABLE_CLAUSE .= "t1.sessionbill=0";
+			break;
+		case 6: //SURCHARGE
+			$FG_TABLE_CLAUSE .= "t1.sessionbill>0";
+			break;
+	}
+}
+
 if (!isset($terminatecauseid)) {
 	$terminatecauseid="ANSWER";
 }
 
-if ($ACXSEERECORDING) $p = .95;
-else $p = 1;
+//$p = ($ACXSEERECORDING) ? .95 : 1;
+$p=1;
 $didkey = 2;
 $FG_TABLE_COL = array();
-$FG_TABLE_COL[]=array (gettext("Date"), "starttime", 15*$p ."%", "center", "SORT", "22", "", "", "", "", "", "");
+$FG_TABLE_COL[]=array (gettext("Date"), "starttime", "19%", "center", "SORT", "22", "", "", "", "", "", "");
 if ($choose_callowner == 1 || $choose_callowner == 2) {
-	$FG_TABLE_COL[]=array (gettext("CallHolder"), "CallHolder", 11*$p ."%", "center nowrap", "SORT", "79");
+	$FG_TABLE_COL[]=array (gettext("CallHolder"), "CallHolder", "4%", "center nowrap", "SORT", "79");
 	$cholder = ", CONCAT_WS(' ',lastname,firstname,IF(company_name='','',CONCAT('<br/>(',company_name,')'))) CallHolder";
 	$didkey++;
 } else	$cholder = "";
-$FG_TABLE_COL[]=array (gettext("CallerID"), "src", 11*$p ."%", "center", "SORT", "40");
-if ($choose_calltype != 1) {
-	$FG_TABLE_COL[]=array (gettext("DID"), "DID", 8*$p ."%", "center", "SORT", "30");
-	$cdid = ", IF(t1.card_id=$sessbillquery AND (sipiax=2 OR sipiax=3 OR sipiax=5),t1.dnid,'') DID";
-} else $cdid = "";
-$FG_TABLE_COL[]=array (gettext("PhoneNumber"), "calledstation", 11*$p ."%", "center", "SORT", "30", "", "", "", "", "", "");
-$FG_TABLE_COL[]=array (gettext("Destination"), "destination", 21*$p ."%", "center", "SORT", "30", "lie", "cc_prefix", "destination", "prefix='%id'", "%1" );
-$FG_TABLE_COL[]=array (gettext("Route"), "route", 2*$p ."%", "center", "SORT", "10");
-$FG_TABLE_COL[]=array (gettext ("WaitUp"), "waitup", 2*$p ."%", "center", "SORT", "30", "", "", "", "", "", "display_minute" );
-$FG_TABLE_COL[]=array (gettext("Duration"), "sessiontime", 8*$p ."%", "center", "SORT", "30", "", "", "", "", "", "display_minute");
+$FG_TABLE_COL[]=array (gettext("CallerID"), "src", "13%", "center", "SORT");
+$FG_TABLE_COL[]=array (gettext("Number"), "DID", "8%", "center", "SORT", "40");
+$FG_TABLE_COL[]=array (gettext("PhoneNumber"), "calledstation", "13%", "center", "SORT", "50", "", "", "", "", "", "");
+$FG_TABLE_COL[]=array (gettext("Destination"), "destination", "21%", "center", "SORT", "30", "lie", "cc_prefix", "destination", "prefix='%id'", "%1" );
+$FG_TABLE_COL[]=array (gettext("Route"), "route", "2%", "center", "SORT", "10");
+$FG_TABLE_COL[]=array (gettext ("WaitUp"), "waitup", "2%", "center", "SORT", "30", "", "", "", "", "", "display_minute" );
+$FG_TABLE_COL[]=array (gettext("Duration"), "sessiontime", "8%", "center", "SORT", "30", "", "", "", "", "", "display_minute");
 if ($terminatecauseid!="ANSWER") {
-    $FG_TABLE_COL[]=array ('<acronym title="'.gettext("Terminate Cause").'">'.gettext("TC").'</acronym>', "terminatecauseid", 2*$p ."%", "center", "SORT", "", "list", $dialstatus_list);
+    $FG_TABLE_COL[]=array ('<acronym title="'.gettext("Terminate Cause").'">'.gettext("TC").'</acronym>', "terminatecauseid", "2%", "center", "SORT", "", "list", $dialstatus_list);
     $tc = ', t1.terminatecauseid';
 } else $tc = '';
-$FG_TABLE_COL[]=array (gettext("Cost"), "sessionbill", 8*$p ."%", "center nowrap", "SORT", "30", "", "", "", "", "", "display_2bill");
+$FG_TABLE_COL[]=array (gettext("Cost"), "sessionbill", "8%", "center nowrap", "SORT", "30", "", "", "", "", "", "display_2bill");
 
-$FG_COL_QUERY = "t1.starttime$cholder, IF(t1.src_exten IS NULL, t1.src, IF(card_caller=$sessbillquery,t1.src_exten,t1.src)) src$cdid, IF(t1.card_id=$sessbillquery, IF(t1.calledexten IS NOT NULL, t1.calledexten, t1.calledstation), t1.dnid) calledstation, IF(t1.card_id=$sessbillquery,t1.destination,-1), id_ratecard as route, ROUND(UNIX_TIMESTAMP(t1.starttime)-INSERT(t1.uniqueid,1,1,1)) AS waitup, t1.sessiontime$tc, IF(t1.card_id=$sessbillquery, t1.sessionbill+margindillers, 0) sessionbill";
+$FG_COL_QUERY = "t1.starttime starttime$cholder, 
+IF(t1.src_exten IS NULL, t1.src, IF(t1.card_caller$calledsbquery,IF(t1.src_exten=t1.src_peername,t1.src_exten,CONCAT(t1.src_peername,' &lt;<font color='
+	,IF(t1.src!=t1.src_peername AND t1.src_exten!=t1.src,CONCAT('red>',t1.src),CONCAT('green>',t1.src_exten)),'</font>&gt;')),CONCAT(t1.src_peername
+	,IF(t1.src_peername=t1.src,'',CONCAT(' &lt;<font color=red>',t1.src,'</font>&gt;'))))) src, 
+IF(t1.card_id$calledsbquery AND t1.sipiax IN (2,3,5),t1.dnid,'') DID, 
+IF(t1.sipiax IN (2,3) AND t1.terminatecauseid<>1,'',IF(t1.card_called$calledsbquery, IF(t1.calledexten IS NOT NULL
+	,IF(t1.calledexten=t1.calledstation, t1.calledexten, CONCAT(t1.calledstation,' &lt;<font color=green>',t1.calledexten,'</font>&gt;')), t1.calledstation)
+	,IF(t1.card_id$calledsbquery,t1.calledstation,t1.dnid))) calledstation, 
+IF(t1.card_called$calledsbquery OR t1.card_id$calledsbquery,t1.destination,-1), 
+id_ratecard AS route, 
+ROUND(UNIX_TIMESTAMP(t1.starttime)-INSERT(t1.uniqueid,1,1,1)) AS waitup, 
+t1.sessiontime$tc, 
+IF(t1.card_id$calledsbquery, t1.sessionbill+margindillers, 0) sessionbill";
 
 if ($ACXSEERECORDING) {
-	$FG_TABLE_COL [] = array ('<span class="liens">' . gettext("Audio") . "</span>", "uniqueid", 100*(1-$p) ."%", "center nowrap", "", "30", "", "", "", "", "", "linkonmonitorfile");
+	$FG_TABLE_COL [] = array ('<span class="liens">' . gettext("Audio") . "</span>", "uniqueid", "1%", "center nowrap", "", "30", "", "", "", "", "", "linkonmonitorfile");
 	$FG_COL_QUERY .= $FG_COL_QUERY_RECORDS;
 }
 
-$FG_LIMITE_DISPLAY = 25;
+$FG_LIMITE_DISPLAY = 100;
 $FG_EDITION = true;
 $FG_HTML_TABLE_WIDTH = "98%";
 $FG_ACTION_SIZE_COLUMN = "1%";
@@ -348,12 +372,13 @@ if ($terminatecauseid=="ANSWER") {
 	$FG_TABLE_CLAUSE .= " (t1.terminatecauseid<>1) ";
 }
 if (!isset($resulttype)) $resulttype="min";
-
+//if ($_SESSION["card_id"]==6) echo htmlentities("SELECT ".$FG_COL_QUERY." FROM ".$FG_TABLE_NAME." WHERE ".$FG_TABLE_CLAUSE);
 $instance_table = new Table($FG_TABLE_NAME, $FG_COL_QUERY);
 
+$cdid = ", IF(t1.card_id$calledsbquery AND (sipiax=2 OR sipiax=3 OR sipiax=5),t1.dnid,'') DID";
 if (!$nodisplay) {
-	$list = $instance_table -> Get_list ($DBHandle, $FG_TABLE_CLAUSE, $order, $sens, null, null, $FG_LIMITE_DISPLAY, $current_page*$FG_LIMITE_DISPLAY);
-	if (is_array($list) && count($list)>0 && $choose_calltype != 1 && $order != "DID") {
+	$list = $instance_table -> Get_list ($DBHandle, $FG_TABLE_CLAUSE, $order, $sens, null, null, $FG_LIMITE_DISPLAY, $current_page*$FG_LIMITE_DISPLAY, "GROUP BY t1.id");
+	if (is_array($list) && count($list)>0 && $order != "DID") {
 		foreach ($list as $key => $var) {
 			if ($var[$didkey]) {
 				break;
@@ -370,32 +395,72 @@ $FG_TOTAL_TABLE_COL = $FG_NB_TABLE_COL;
 if ($FG_DELETION || $FG_EDITION)	$FG_TOTAL_TABLE_COL++;
 
 $et = $resulttype=="sec" ? "t1.sessiontime" : "sec_to_time(t1.sessiontime)";
-$FG_EXPORT_QUERY = "t1.starttime Date$cholder, IF(t1.src_exten IS NULL, t1.src, IF(card_caller=$sessbillquery,t1.src_exten,t1.src)) CallerID$cdid, IF(t1.card_id=$sessbillquery, IF(t1.calledexten IS NOT NULL, t1.calledexten, t1.calledstation), t1.dnid) PhoneNumber, IF(t1.card_id=$sessbillquery,t2.destination,'') Destination, $et Duration, ROUND(IF(t1.card_id=$sessbillquery, t1.sessionbill+margindillers, 0),5) Cost";
-
+$FG_EXPORT_QUERY = "t1.starttime Date
+$cholder,
+IF(t1.src_exten IS NULL, t1.src, IF(t1.card_caller$calledsbquery,IF(t1.src_exten=t1.src_peername,t1.src_exten,CONCAT(t1.src_peername,'-'
+	,IF(t1.src!=t1.src_peername AND t1.src_exten!=t1.src,t1.src,t1.src_exten),'-')),CONCAT(t1.src_peername
+	,IF(t1.src_peername=t1.src,'',CONCAT(' -',t1.src,'-'))))) CallerID
+$cdid,
+IF(t1.sipiax IN (2,3) AND t1.terminatecauseid<>1,'',IF(t1.card_called$calledsbquery, IF(t1.calledexten IS NOT NULL
+	,IF(t1.calledexten=t1.calledstation, t1.calledexten, CONCAT(t1.calledstation,'-',t1.calledexten,'-')), t1.calledstation)
+	,IF(t1.card_id$calledsbquery,t1.calledstation,t1.dnid))) PhoneNumber,
+IF(t1.card_id$calledsbquery,t2.destination,'') Destination,
+$et Duration,
+ROUND(IF(t1.card_id$calledsbquery, t1.sessionbill+margindillers, 0),5) Cost";
+/**
+$FG_COL_QUERY = "
+t1.starttime starttime
+$cholder, 
+IF(t1.src_exten IS NULL, t1.src, IF(t1.card_caller$calledsbquery,IF(t1.src_exten=t1.src_peername,t1.src_exten,CONCAT(t1.src_peername,' &lt;<font color='
+	,IF(t1.src!=t1.src_peername AND t1.src_exten!=t1.src,CONCAT('red>',t1.src),CONCAT('green>',t1.src_exten)),'</font>&gt;')),CONCAT(t1.src_peername
+	,IF(t1.src_peername=t1.src,'',CONCAT(' &lt;<font color=red>',t1.src,'</font>&gt;'))))) src, 
+IF(t1.card_id$calledsbquery AND (sipiax=2 OR sipiax=3 OR sipiax=5),t1.dnid,'') DID, 
+IF((t1.sipiax=2 OR t1.sipiax=3) AND t1.terminatecauseid<>1,'',IF(t1.card_called$calledsbquery, IF(t1.calledexten IS NOT NULL
+	,IF(t1.calledexten=t1.calledstation, t1.calledexten, CONCAT(t1.calledstation,' &lt;<font color=green>',t1.calledexten,'</font>&gt;')), t1.calledstation)
+	,IF(t1.card_id$calledsbquery,t1.calledstation,t1.dnid))) calledstation, 
+IF(t1.card_called$calledsbquery OR t1.card_id$calledsbquery,t1.destination,-1), 
+id_ratecard AS route, 
+ROUND(UNIX_TIMESTAMP(t1.starttime)-INSERT(t1.uniqueid,1,1,1)) AS waitup, 
+t1.sessiontime
+$tc, 
+IF(t1.card_id$calledsbquery, t1.sessionbill+margindillers, 0) sessionbill";
+**/
 // EXPORT
 $FG_EXPORT_SESSION_VAR = "pr_export_entity_call";
 
 // Query Preparation for the Export Functionality
-$_SESSION [$FG_EXPORT_SESSION_VAR] = "SELECT $FG_EXPORT_QUERY FROM $FG_TABLE_NAME LEFT JOIN cc_prefix t2 ON prefix = t1.destination WHERE $FG_TABLE_CLAUSE";
+$_SESSION [$FG_EXPORT_SESSION_VAR] = "SELECT $FG_EXPORT_QUERY FROM $FG_TABLE_NAME LEFT JOIN cc_prefix t2 ON prefix = t1.destination WHERE $FG_TABLE_CLAUSE GROUP BY t1.id";
 
-if (! is_null ( $order ) && ($order != '') && ! is_null ( $sens ) && ($sens != '')) {
-	$_SESSION [$FG_EXPORT_SESSION_VAR] .= " ORDER BY $order $sense";
-}
-
-$QUERY = "SELECT DATE(t1.starttime) AS day, sum(t1.sessiontime) AS calltime, sum(IF(t1.card_id=$sessbillquery,t1.sessionbill+margindillers,0)) AS cost, count(*) as nbcall, SUM(IF(ROUND(UNIX_TIMESTAMP(t1.starttime)-INSERT(t1.uniqueid,1,1,1))>0,ROUND(UNIX_TIMESTAMP(t1.starttime)-INSERT(t1.uniqueid,1,1,1)),0)) AS waitup FROM $FG_TABLE_NAME WHERE ".$FG_TABLE_CLAUSE." GROUP BY day ORDER BY day"; //extract(DAY from calldate)
-
+//if (! is_null ( $order ) && ($order != '') && ! is_null ( $sens ) && ($sens != '')) {
+//	$_SESSION [$FG_EXPORT_SESSION_VAR] .= " ORDER BY $order $sense";
+//}
+//echo $_SESSION [$FG_EXPORT_SESSION_VAR];
+//$QUERY = "SELECT day  FROM (SELECT DATE(t1.starttime) AS day, sum(t1.sessiontime) AS calltime, sum(IF(t1.card_id$calledsbquery,t1.sessionbill+margindillers,0)) AS cost, count(*) as nbcall, SUM(IF(ROUND(UNIX_TIMESTAMP(t1.starttime)-INSERT(t1.uniqueid,1,1,1))>0,ROUND(UNIX_TIMESTAMP(t1.starttime)-INSERT(t1.uniqueid,1,1,1)),0)) AS waitup FROM ".$FG_TABLE_NAME." WHERE ".$FG_TABLE_CLAUSE." GROUP by t1.id) calc GROUP BY day ORDER BY day"; //extract(DAY from calldate)
+$QUERY = "SELECT day, SUM(sessiontime) calltime, SUM(cost) cost, COUNT(*) nbcall, SUM(waitup) waitup FROM 
+(SELECT DATE(t1.starttime) AS day, t1.sessiontime, IF(t1.card_id$calledsbquery,t1.sessionbill+margindillers,0) AS cost, 
+IF(ROUND(UNIX_TIMESTAMP(t1.starttime)-INSERT(t1.uniqueid,1,1,1))>0,ROUND(UNIX_TIMESTAMP(t1.starttime)-INSERT(t1.uniqueid,1,1,1)),0) AS waitup FROM ".$FG_TABLE_NAME." WHERE ".$FG_TABLE_CLAUSE." GROUP by t1.id) tt GROUP BY day ORDER BY day"; //extract(DAY from calldate)
+//echo $QUERY;
+$nb_record = $mmax = $totalwaitup = $totalcall = $totalminutes = 0;
 if (!$nodisplay) {
 	$res = $DBHandle -> Execute($QUERY);
 	if ($res) {
 		$num = $res -> RecordCount();
 		for($i=0;$i<$num;$i++) {
-			$list_total_day [] =$res -> fetchRow();
+			$list_total_day [] = $res -> fetchRow();
 		}
+		foreach ($list_total_day as $data) {
+			if ($mmax < $data[1])
+				$mmax	 = $data[1];
+			$totalcall	+= $data[3];
+			$totalminutes	+= $data[1];
+			$totalcost	+= $data[2];
+			$totalwaitup	+= $data[4];
+		}
+		$nb_record = $totalcall;
 	}
-	
-	if ($FG_DEBUG == 3) echo "<br>Clause : $FG_TABLE_CLAUSE";
-	$nb_record = $instance_table -> Table_count ($DBHandle, $FG_TABLE_CLAUSE);
-	if ($FG_DEBUG >= 1) var_dump ($list);
+//	if ($FG_DEBUG == 3) echo "<br>Clause : $FG_TABLE_CLAUSE";
+//	$nb_record = $instance_table -> Table_count ($DBHandle, $FG_TABLE_CLAUSE);
+//	if ($FG_DEBUG >= 1) var_dump ($list);
 }
 
 if ($nb_record<=$FG_LIMITE_DISPLAY) {
@@ -730,7 +795,7 @@ if ($ACXSEERECORDING && $nb_record>0){ echo '
 
 
 <!-- ** ** ** ** ** Part to display the CDR ** ** ** ** ** -->
-<center><?php echo gettext("Number of Calls");?> : <?php if (is_array($list) && count($list)>0){ echo $nb_record . "<h3></h3>";}else{echo "0";}?></center>
+<center><?php echo gettext("Number of Calls");?> : <?php if (is_array($list) && count($list)>0){ echo $nb_record . "<h3></h3>";}else{echo "0";}?>
      <table width="<?php echo $FG_HTML_TABLE_WIDTH?>" border="0" align="center" cellpadding="0" cellspacing="0">
 		<TR bgcolor="#ffffff"> 
           <TD class="callhistory_td11"> 
@@ -743,14 +808,14 @@ if ($ACXSEERECORDING && $nb_record>0){ echo '
         <TR> 
           <TD> <TABLE border=0 cellPadding=0 cellSpacing=0 width="100%">
                 <TR class="bgcolor_008">
-				  <TD width="<?php echo $FG_ACTION_SIZE_COLUMN?>" align="center" class="tableBodyRight" style="PADDING-BOTTOM: 2px; PADDING-LEFT: 2px; PADDING-RIGHT: 2px; PADDING-TOP: 2px"></TD>					
+				  <TD width="<?php echo $FG_ACTION_SIZE_COLUMN?>" align="center" class="tableBodyRight" style="PADDING-BOTTOM: 2px; PADDING-LEFT: 2px; PADDING-RIGHT: 2px; PADDING-TOP: 2px"></TD>
 				  
                   <?php 
 					if (is_array($list) && count($list)>0) {
 						
 					foreach ($FG_TABLE_COL as $i => $val) {
 					?>
-	                  <TD width="<?php echo $FG_TABLE_COL[$i][2]?>" align=middle class="tableBody" style="PADDING-BOTTOM: 2px; PADDING-LEFT: 2px; PADDING-RIGHT: 2px; PADDING-TOP: 2px"> 
+	                  <TD width="<?php echo $FG_TABLE_COL[$i][2]?>" align=middle class="tableBody" style="PADDING-BOTTOM: 2px; PADDING-LEFT: 2px; PADDING-RIGHT: 2px; PADDING-TOP: 2px" nowrap> 
 	                    <center><strong> 
 	                    <?php  if (mb_strtoupper($FG_TABLE_COL[$i][4])=="SORT"){?>
 	                    <a href="<?php  echo $PHP_SELF."?s=1&t=0&stitle=$stitle&atmenu=$atmenu&current_page=$current_page&order=".$FG_TABLE_COL[$i][1]."&sens="; if ($sens=="ASC"){echo"DESC";}else{echo"ASC";} 
@@ -769,17 +834,17 @@ if ($ACXSEERECORDING && $nb_record>0){ echo '
 				   <?php } ?>
 				   		
                 </TR>
-                <TR> 
-                  <TD bgColor="#e1e1e1" colSpan=<?php echo $FG_TOTAL_TABLE_COL?> height="1">
+                <TR>
+                  <TD bgColor="#e1e1e1" colSpan=<?php echo $FG_TOTAL_TABLE_COL?> height="1"></TD>
                 </TR>
 				<?php
-				  	 $ligne_number=0;					 
+				  	 $ligne_number=0;
 				  	 foreach ($list as $recordset){ 
 						 $ligne_number++;
 				?>
 				
                		 <TR bgcolor="<?php echo $FG_TABLE_ALTERNATE_ROW_COLOR[$ligne_number%2]?>"  onMouseOver="bgColor='#C4FFD7'" onMouseOut="bgColor='<?php echo $FG_TABLE_ALTERNATE_ROW_COLOR[$ligne_number%2]?>'"> 
-						<TD align="<?php echo $FG_TABLE_COL[$i][3]?>" class="tableBody"><?php  echo $ligne_number+$current_page*$FG_LIMITE_DISPLAY.".&nbsp;"; ?></TD>
+						<TD align="right" class="tableBody"><?php  echo $ligne_number+$current_page*$FG_LIMITE_DISPLAY."."; ?></TD>
 							 
 				  		<?php foreach ($FG_TABLE_COL as $i => $val) {?>
 						<?php
@@ -864,26 +929,14 @@ if ($ACXSEERECORDING && $nb_record>0){ echo '
 		</TR>
             </TABLE></TD>
         </TR>
-      </table>
+      </table></center>
 
 <!-- ** ** ** ** ** Part to display the GRAPHIC ** ** ** ** ** -->
 <br>
 
-<?php 
-
-if (is_array($list_total_day) && count($list_total_day)>0){
-
-$mmax = $totalwaitup = $totalcall = $totalminutes = 0;
-foreach ($list_total_day as $data){
-	if ($mmax < $data[1])	$mmax = $data[1];
-	$totalcall+=$data[3];
-	$totalminutes+=$data[1];
-	$totalcost+=$data[2];
-	$totalwaitup+=$data[4];
-}
-
+<?php
+if ($nb_record) {
 ?>
-
 
 <!-- TITLE GLOBAL -->
 <center>
