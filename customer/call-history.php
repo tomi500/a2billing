@@ -354,7 +354,7 @@ ROUND(UNIX_TIMESTAMP(t1.starttime)-INSERT(t1.uniqueid,1,1,1)) AS waitup,
 t1.sessiontime$tc, 
 IF(t1.card_id$calledsbquery, t1.sessionbill+margindillers, 0) sessionbill";
 
-if ($ACXSEERECORDING) {
+if ($ACXSEERECORDING && $terminatecauseid!="INCOMPLET") {
 	$FG_TABLE_COL [] = array ('<span class="liens">' . gettext("Audio") . "</span>", "uniqueid", "1%", "center nowrap", "", "30", "", "", "", "", "", "linkonmonitorfile");
 	$FG_COL_QUERY .= $FG_COL_QUERY_RECORDS;
 }
@@ -479,7 +479,7 @@ $smarty->display( 'main.tpl');
 // #### HELP SECTION
 echo $CC_help_balance_customer;
 
-if ($ACXSEERECORDING && $nb_record>0){ echo '
+if ($ACXSEERECORDING && $nb_record>0 && $terminatecauseid!="INCOMPLET"){ echo '
 <script src="./javascript/WavPlayer/domready.js"></script>
 <script src="./javascript/WavPlayer/swfobject.js"></script>
 <script src="./javascript/WavPlayer/wavplayer.js"></script>

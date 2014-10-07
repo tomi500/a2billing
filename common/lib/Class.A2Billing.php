@@ -789,6 +789,7 @@ class A2Billing {
 		$this -> accountcode			= $agi -> request['agi_accountcode'];
 //		$this -> dnid				= rtrim($agi -> request['agi_dnid'], "#");
 		$this -> dnid				= rtrim($agi -> request['agi_extension'], "#");
+		$this -> dnid				= str_replace('%23','',$this -> dnid);
 
 //		Call function to find the cid number
 		$this -> isolate_cid();
