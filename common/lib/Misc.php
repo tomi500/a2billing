@@ -365,7 +365,7 @@ function display_money($value, $currency = BASE_CURRENCY) {
 	$body = explode(" ", $value);
 	if (isset($body[1]))
 		$currency = $body[1];
-	echo number_format($body[0], 2, '.', ' ') . ' ' . strtoupper($currency);
+	echo number_format($body[0], 2, '.', ' ') . ' ' . mb_strtoupper($currency);
 }
 
 function display_refill_money($value, $currency = BASE_CURRENCY) {
@@ -375,7 +375,7 @@ function display_refill_money($value, $currency = BASE_CURRENCY) {
 	$tempval = 100*abs($value-floor($value));
 	$value = number_format($value, 5, '.', ' ');
 	$value = (round($tempval-floor($tempval),5) == 0) ? number_format($value, 2, '.', ' ') : rtrim($value, '0');
-	echo $value . ' ' . strtoupper($currency);
+	echo $value . ' ' . mb_strtoupper($currency);
 }
 
 function display_money_nocur($var, $currency = BASE_CURRENCY) {
@@ -385,7 +385,7 @@ function display_money_nocur($var, $currency = BASE_CURRENCY) {
 		$currency = $choose_currency;
 	if ((!isset ($currencies_list)) || (!is_array($currencies_list)))
 		$currencies_list = get_currencies();
-	$var = round($var / $currencies_list[strtoupper($currency)][2], 5);
+	$var = round($var / $currencies_list[mb_strtoupper($currency)][2], 5);
 	$tempval = 100*abs($var-floor($var));
 	$var = number_format($var, 5, '.', '');
 	$var = (round($tempval-floor($tempval),5) == 0) ? number_format($var, 2, '.', ' ') : rtrim(number_format($var, 5, '.', ' '), '0');
@@ -399,11 +399,11 @@ function display_2bill($var, $currency = BASE_CURRENCY) {
 		$currency = $choose_currency;
 	if ((!isset ($currencies_list)) || (!is_array($currencies_list)))
 		$currencies_list = get_currencies();
-	$var = round($var / $currencies_list[strtoupper($currency)][2], 5);
+	$var = round($var / $currencies_list[mb_strtoupper($currency)][2], 5);
 	$tempval = 100*abs($var-floor($var));
 	$var = number_format($var, 5, '.', ' ');
 	$var = (round($tempval-floor($tempval),5) == 0) ? number_format($var, 2, '.', ' ') : rtrim($var, '0');
-	echo $var . ' ' . strtoupper($currency);
+	echo $var . ' ' . mb_strtoupper($currency);
 //	echo number_format($var, 5) . ' ' . strtoupper($currency);
 }
 
