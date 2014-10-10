@@ -122,7 +122,7 @@ $FG_TABLE_COL [] = array (gettext ( "Date" ), "starttime", "11%", "center", "SOR
 $FG_TABLE_COL [] = array (gettext ( "CallerID" ), "src", "6%", "center", "SORT", "30" );
 $FG_TABLE_COL [] = array (gettext ( "DNID" ), "dnid", "6%", "center", "SORT", "30" );
 $FG_TABLE_COL [] = array (gettext ( "Phone Number" ), "calledstation", "6%", "center", "SORT", "30", "", "", "", "", "", "" );
-$FG_TABLE_COL [] = array (gettext ( "Destination" ), "dest","9%", "center", "SORT", "20", "lie", "cc_prefix", "destination,prefix", "prefix='%id'", "%1" );
+$FG_TABLE_COL [] = array (gettext ( "Destination" ), "dest", "9%", "center", "SORT", "30", "lie", "cc_prefix", "destination", "prefix='%id'", "%1" );
 $FG_TABLE_COL [] = array (gettext ( "Buy Rate" ), "buyrate", "5%", "center", "SORT", "30", "", "", "", "", "", "display_money_nocur" );
 $FG_TABLE_COL [] = array (gettext ( "Sell Rate" ), "rateinitial", "5%", "center", "SORT", "30", "", "", "", "", "", "display_money_nocur" );
 $FG_TABLE_COL [] = array (gettext ( "WaitUp" ), "waitup", "2%", "center", "SORT", "30", "", "", "", "", "", "display_minute" );
@@ -314,9 +314,7 @@ if ($terminatecauseid == "CANCEL") {
 
 if (!isset($resulttype)) $resulttype="min";
 
-if (! $nodisplay) {
-	$list = $instance_table->Get_list ( $DBHandle, $FG_TABLE_CLAUSE, $order, $sens, null, null, $FG_LIMITE_DISPLAY, $current_page * $FG_LIMITE_DISPLAY );
-}
+$list = $instance_table->Get_list ( $DBHandle, $FG_TABLE_CLAUSE, $order, $sens, null, null, $FG_LIMITE_DISPLAY, $current_page * $FG_LIMITE_DISPLAY );
 
 // EXPORT
 $FG_EXPORT_SESSION_VAR = "pr_export_entity_call";
@@ -333,24 +331,21 @@ $QUERY = "SELECT DATE(t1.starttime) AS day, sum(t1.sessiontime) AS calltime, sum
             sum(t1.buycost) AS buy, sum(case when t1.sessiontime>0 then 1 else 0 end) as success_calls
         	FROM $FG_TABLE_NAME WHERE $FG_TABLE_CLAUSE GROUP BY day ORDER BY day"; //extract(DAY from calldate)
 
-if (! $nodisplay) {
-	$res = $DBHandle->Execute ( $QUERY );
-	if ($res) {
-		$num = $res->RecordCount ();
-		for($i = 0; $i < $num; $i ++) {
-			$list_total_day [] = $res->fetchRow ();
-		}
+$res = $DBHandle->Execute ( $QUERY );
+if ($res) {
+	$num = $res->RecordCount ();
+	for($i = 0; $i < $num; $i ++) {
+		$list_total_day [] = $res->fetchRow ();
 	}
-	
-	if ($FG_DEBUG == 3)
-		echo "<br>Clause : $FG_TABLE_CLAUSE";
-	
-	$nb_record = $instance_table->Table_count ( $DBHandle, $FG_TABLE_CLAUSE );
-	if ($FG_DEBUG >= 1)
-		var_dump ( $list );
-
 }
 
+if ($FG_DEBUG == 3)
+	echo "<br>Clause : $FG_TABLE_CLAUSE";
+
+$nb_record = $instance_table->Table_count ( $DBHandle, $FG_TABLE_CLAUSE );
+
+if ($FG_DEBUG >= 1)
+	var_dump ( $list );
 
 if ($nb_record <= $FG_LIMITE_DISPLAY) {
 	$nb_record_max = 1;

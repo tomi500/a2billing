@@ -54,6 +54,7 @@ $HD_Form -> FG_FK_TABLENAMES = array('cc_iax_buddies', 'cc_sip_buddies', 'cc_cal
 $HD_Form -> FG_FK_EDITION_CLAUSE = array("id_cc_card", "id_cc_card", "id_cc_card", "id_cc_card", "id_cc_card", "customer_id");
 // DEFINE IF WE WANT TO DELETE THE CARD OR NOT
 $HD_Form -> FG_FK_WARNONLY = (DELETE_FK_CARD == true) ? false: true;
+$HD_Form -> FG_ACTION_SIZE_COLUMN = '1%';
 
 if (DELETE_FK_CARD) {
 	// WE WILL DELETE THE FK
