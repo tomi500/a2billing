@@ -16,7 +16,7 @@ $HD_Form -> FG_EDITION_CLAUSE .= "id_diller = {$_SESSION['card_id']}";
 
 $HD_Form -> FG_EDITION = true;
 
-$yesno_list = array(array(gettext('yes').'&nbsp','1'),array(gettext('no').'&nbsp','0'));
+$yesno_list = array(array(gettext('yes').'&nbsp;','1'),array(gettext('no').'&nbsp;','0'));
 
 $HD_Form -> AddEditElement (gettext("LASTNAME"),
 			   "lastname",

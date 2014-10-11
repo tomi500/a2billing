@@ -328,6 +328,7 @@ if ($choose_callowner == 1 || $choose_callowner == 2) {
 	$cholder = ", CONCAT_WS(' ',lastname,firstname,IF(company_name='','',CONCAT('<br/>(',company_name,')'))) CallHolder";
 	$didkey++;
 } else	$cholder = "";
+$costkey = $didkey+6;
 $FG_TABLE_COL[]=array (gettext("CallerID"), "src", "13%", "center", "SORT");
 $FG_TABLE_COL[]=array (gettext("Number"), "DID", "8%", "center", "SORT", "40");
 $FG_TABLE_COL[]=array (gettext("PhoneNumber"), "calledstation", "13%", "center", "SORT", "50", "", "", "", "", "", "");
@@ -338,6 +339,7 @@ $FG_TABLE_COL[]=array (gettext("Duration"), "sessiontime", "8%", "center", "SORT
 if ($terminatecauseid!="ANSWER") {
     $FG_TABLE_COL[]=array ('<acronym title="'.gettext("Terminate Cause").'">'.gettext("TC").'</acronym>', "terminatecauseid", "2%", "center", "SORT", "", "list", $dialstatus_list);
     $tc = ', t1.terminatecauseid';
+    $costkey++;
 } else $tc = '';
 $FG_TABLE_COL[]=array (gettext("Cost"), "sessionbill", "8%", "center nowrap", "SORT", "30", "", "", "", "", "", "display_2bill");
 
@@ -408,40 +410,18 @@ IF(t1.sipiax IN (2,3) AND t1.terminatecauseid<>1,'',IF(t1.card_called$calledsbqu
 IF(t1.card_id$calledsbquery,t2.destination,'') Destination,
 $et Duration,
 ROUND(IF(t1.card_id$calledsbquery, t1.sessionbill+margindillers, 0),5) Cost";
-/**
-$FG_COL_QUERY = "
-t1.starttime starttime
-$cholder, 
-IF(t1.src_exten IS NULL, t1.src, IF(t1.card_caller$calledsbquery,IF(t1.src_exten=t1.src_peername,t1.src_exten,CONCAT(t1.src_peername,' &lt;<font color='
-	,IF(t1.src!=t1.src_peername AND t1.src_exten!=t1.src,CONCAT('red>',t1.src),CONCAT('green>',t1.src_exten)),'</font>&gt;')),CONCAT(t1.src_peername
-	,IF(t1.src_peername=t1.src,'',CONCAT(' &lt;<font color=red>',t1.src,'</font>&gt;'))))) src, 
-IF(t1.card_id$calledsbquery AND (sipiax=2 OR sipiax=3 OR sipiax=5),t1.dnid,'') DID, 
-IF((t1.sipiax=2 OR t1.sipiax=3) AND t1.terminatecauseid<>1,'',IF(t1.card_called$calledsbquery, IF(t1.calledexten IS NOT NULL
-	,IF(t1.calledexten=t1.calledstation, t1.calledexten, CONCAT(t1.calledstation,' &lt;<font color=green>',t1.calledexten,'</font>&gt;')), t1.calledstation)
-	,IF(t1.card_id$calledsbquery,t1.calledstation,t1.dnid))) calledstation, 
-IF(t1.card_called$calledsbquery OR t1.card_id$calledsbquery,t1.destination,-1), 
-id_ratecard AS route, 
-ROUND(UNIX_TIMESTAMP(t1.starttime)-INSERT(t1.uniqueid,1,1,1)) AS waitup, 
-t1.sessiontime
-$tc, 
-IF(t1.card_id$calledsbquery, t1.sessionbill+margindillers, 0) sessionbill";
-**/
+
 // EXPORT
 $FG_EXPORT_SESSION_VAR = "pr_export_entity_call";
 
 // Query Preparation for the Export Functionality
 $_SESSION [$FG_EXPORT_SESSION_VAR] = "SELECT $FG_EXPORT_QUERY FROM $FG_TABLE_NAME LEFT JOIN cc_prefix t2 ON prefix = t1.destination WHERE $FG_TABLE_CLAUSE GROUP BY t1.id";
 
-//if (! is_null ( $order ) && ($order != '') && ! is_null ( $sens ) && ($sens != '')) {
-//	$_SESSION [$FG_EXPORT_SESSION_VAR] .= " ORDER BY $order $sense";
-//}
-//echo $_SESSION [$FG_EXPORT_SESSION_VAR];
-//$QUERY = "SELECT day  FROM (SELECT DATE(t1.starttime) AS day, sum(t1.sessiontime) AS calltime, sum(IF(t1.card_id$calledsbquery,t1.sessionbill+margindillers,0)) AS cost, count(*) as nbcall, SUM(IF(ROUND(UNIX_TIMESTAMP(t1.starttime)-INSERT(t1.uniqueid,1,1,1))>0,ROUND(UNIX_TIMESTAMP(t1.starttime)-INSERT(t1.uniqueid,1,1,1)),0)) AS waitup FROM ".$FG_TABLE_NAME." WHERE ".$FG_TABLE_CLAUSE." GROUP by t1.id) calc GROUP BY day ORDER BY day"; //extract(DAY from calldate)
 $QUERY = "SELECT day, SUM(sessiontime) calltime, SUM(cost) cost, COUNT(*) nbcall, SUM(waitup) waitup FROM 
 (SELECT DATE(t1.starttime) AS day, t1.sessiontime, IF(t1.card_id$calledsbquery,t1.sessionbill+margindillers,0) AS cost, 
 IF(ROUND(UNIX_TIMESTAMP(t1.starttime)-INSERT(t1.uniqueid,1,1,1))>0,ROUND(UNIX_TIMESTAMP(t1.starttime)-INSERT(t1.uniqueid,1,1,1)),0) AS waitup FROM ".$FG_TABLE_NAME." WHERE ".$FG_TABLE_CLAUSE." GROUP by t1.id) tt GROUP BY day ORDER BY day"; //extract(DAY from calldate)
 //echo $QUERY;
-$nb_record = $mmax = $totalwaitup = $totalcall = $totalminutes = 0;
+$mmax = $totalcall = $totalminutes = $totalcost = $totalwaitup = $nb_record = 0;
 if (!$nodisplay) {
 	$res = $DBHandle -> Execute($QUERY);
 	if ($res) {
@@ -463,6 +443,8 @@ if (!$nodisplay) {
 //	$nb_record = $instance_table -> Table_count ($DBHandle, $FG_TABLE_CLAUSE);
 //	if ($FG_DEBUG >= 1) var_dump ($list);
 }
+
+if ($totalcost == 0)	unset($FG_TABLE_COL[$costkey]);
 
 if ($nb_record<=$FG_LIMITE_DISPLAY) {
 	$nb_record_max=1;
@@ -724,7 +706,7 @@ if ($ACXSEERECORDING && $nb_record>0 && $terminatecauseid!="INCOMPLET"){ echo '
 		</tr>
 		<!-- Select Option : to show just the Answered Calls or all calls, Result type, currencies... -->
 		<tr class="bgcolor_005">
-			<td class="bgcolor_004" align="left" rowspan="3"><font class="fontstyle_003">&nbsp;&nbsp;<?php echo gettext("OPTIONS")?></font>
+			<td class="bgcolor_004" align="left" rowspan="<?php if ($totalcost) echo 3; else echo 2;?>"><font class="fontstyle_003">&nbsp;&nbsp;<?php echo gettext("OPTIONS")?></font>
 			</td>
 			<td class="fontstyle_searchoptions" align="right" nowrap>
 				&nbsp;&nbsp;<?php echo gettext("SHOW");?> :&nbsp;&nbsp;
@@ -765,6 +747,7 @@ if ($ACXSEERECORDING && $nb_record>0 && $terminatecauseid!="INCOMPLET"){ echo '
 				&nbsp;<?php echo gettext("Seconds");?> 
 			</td>
 		</tr>
+<?php			if ($totalcost) {?>
 		<tr class="bgcolor_005">
 			<td class="fontstyle_searchoptions" align="right">
 				&nbsp;<?php echo gettext("CURRENCY");?> :&nbsp;&nbsp;
@@ -782,11 +765,12 @@ if ($ACXSEERECORDING && $nb_record>0 && $terminatecauseid!="INCOMPLET"){ echo '
 				</select>
 			</td>
 		</tr>
+<?php			}?>
 		<!-- Select Option : to show just the Answered Calls or all calls, Result type, currencies... -->
 		<tr>
 		    <td class="bgcolor_002">
 		    </td>
-		    <td class="bgcolor_003" align="center" colspan="7">
+		    <td class="bgcolor_00<?php if ($totalcost) echo 3; else echo 5;?>" align="center" colspan="7">
 			<input class="form_input_button" value="&nbsp;<?php echo gettext("Search");?>&nbsp;" type="submit">
 		    </td>
 		</tr>
