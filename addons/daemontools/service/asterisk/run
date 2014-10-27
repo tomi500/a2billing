@@ -1,9 +1,13 @@
 #!/bin/bash
 
-sleep 1
 exec 2>&1
-if [ -f /var/run/a2b-callback-daemon.pid ]; then
-    kill `cat /var/run/a2b-callback-daemon.pid`
+if [ -f /var/run/a2billing/a2b-callback-daemon.pid ]; then
+    kill `cat /var/run/a2billing/a2b-callback-daemon.pid`
 fi
+killall a2billing.php 2>/dev/null
+sleep 9
 date "+%F starting asterisk at %X"
-exec setuidgid asterisk /usr/sbin/asterisk -ftTnp
+killall asterisk 2>/dev/null
+sleep 1
+killall -9 asterisk 2>/dev/null
+exec setuidgid asterisk /usr/local/sbin/asterisk -ftT -n

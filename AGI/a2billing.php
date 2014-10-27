@@ -169,7 +169,7 @@ if ($startUpSystem == '') {
 	define ("MANAGER_USERNAME", isset($A2B->config['global']['manager_username'])?$A2B->config['global']['manager_username']:null);
 	define ("MANAGER_SECRET", isset($A2B->config['global']['manager_secret'])?$A2B->config['global']['manager_secret']:null);
 	$as = new AGI_AsteriskManager();
-	$res =@  $as->connect(MANAGER_HOST,MANAGER_USERNAME,MANAGER_SECRET);
+	$res =@ $as->connect(MANAGER_HOST,MANAGER_USERNAME,MANAGER_SECRET);
 	if ($res) {
 	    $res = $as->send_request('Command',array('Command'=>'core show uptime seconds'));
 	    $as->disconnect();
@@ -187,8 +187,9 @@ if ($startUpSystem == '') {
 		$startUpSystem = time() - $uptime[0];
 	    }
 	}
-unset($as);
+	unset($as);
 }
+//$A2B->DBHandle->Execute("SET NAMES 'UTF8'");
 //$A2B -> debug( ERROR, $agi, __FILE__, __LINE__, "StartUpSystem=".$startUpSystem);
 if ($startUpSystem && $startUpOS == "") {
 	$startUpTime = $A2B->config['global']['startup_time'];
@@ -378,10 +379,10 @@ if ($mode == 'standard') {
 	if ($A2B -> agiconfig['answer_call']==1) {
 		$A2B -> debug( INFO, $agi, __FILE__, __LINE__, '[ANSWER CALL]');
 		$agi -> answer();
-		$status_channel=AST_STATE_UP;
+//		$status_channel=AST_STATE_UP;
 	} else {
 		$A2B -> debug( INFO, $agi, __FILE__, __LINE__, '[NO ANSWER CALL]');
-		$status_channel=AST_STATE_RING;
+//		$status_channel=AST_STATE_RING;
 	}
 
 	$A2B -> play_menulanguage ($agi);
@@ -392,10 +393,11 @@ if ($mode == 'standard') {
 		$agi -> stream_file($A2B -> agiconfig['intro_prompt'], '#');
 	}
 	
+//$A2B -> debug( ERROR, $agi, __FILE__, __LINE__, "[START TRY : callingcard_ivr_authenticate]");
 	$cia_res = $A2B -> callingcard_ivr_authenticate($agi);
-	$A2B -> debug( DEBUG, $agi, __FILE__, __LINE__, "[TRY : callingcard_ivr_authenticate]");
+//$A2B -> debug( ERROR, $agi, __FILE__, __LINE__, "[END TRY   : callingcard_ivr_authenticate]");
 	
-	$A2B->card_caller = $A2B->id_card;
+//	$A2B->card_caller = $A2B->id_card;
 	
 	// CALL AUTHENTICATE AND WE HAVE ENOUGH CREDIT TO GO AHEAD
 	if ($cia_res==0) {
@@ -619,9 +621,10 @@ if ($mode == 'standard') {
 			}
 
 			$A2B -> debug( INFO, $agi, __FILE__, __LINE__,  "TARIFF ID -> ". $A2B->tariff);
-			
-			if (!$A2B -> enough_credit_to_call()) {
 
+// Not enough. Need to remove in future.
+			if (!$A2B -> enough_credit_to_call()) {
+$A2B -> debug( ERROR, $agi, __FILE__, __LINE__, "[NO ENOUGH CREDIT TO CALL THIS NUMBER - ERROR]");
 				// SAY TO THE CALLER THAT IT DEOSNT HAVE ENOUGH CREDIT TO MAKE A CALL
 				$A2B -> let_stream_listening($agi);
 				$prompt = "prepaid-no-enough-credit-stop";
@@ -654,7 +657,7 @@ if ($mode == 'standard') {
 					break;
 				}
 			}
-			
+// END not enough
 			$A2B->dnid = rtrim($agi -> request['agi_dnid'], "#");
 			$A2B->extension = rtrim($agi -> request['agi_extension'], "#");
 
@@ -674,7 +677,7 @@ if ($mode == 'standard') {
 					
 					$res_dtmf = $agi -> get_data("prepaid-press9-new-speeddial", 5000, 1); //Press 9 to add a new Speed Dial
 
-                    if ($res_dtmf ["result"] == 9) {
+					if ($res_dtmf ["result"] == 9) {
 						$try_enter_speeddial = 0;
 						do {
 							$try_enter_speeddial++;
@@ -683,7 +686,7 @@ if ($mode == 'standard') {
 							$speeddial_number = $res_dtmf['result'];
 							$A2B -> debug( DEBUG, $agi, __FILE__, __LINE__, "SPEEDDIAL DTMF : ".$speeddial_number);
 
-                            if (!empty($speeddial_number) && is_numeric($speeddial_number) && $speeddial_number>=0) {
+							if (!empty($speeddial_number) && is_numeric($speeddial_number) && $speeddial_number>=0) {
 								$action = 'insert';
 								$QUERY = "SELECT cc_speeddial.phone, cc_speeddial.id
 											FROM cc_speeddial, cc_card WHERE cc_speeddial.id_cc_card = cc_card.id
@@ -910,6 +913,12 @@ if ($mode == 'standard') {
 
 					if (is_array($result)) {
 						//On Net
+/**						if ($A2B->cardnumber != $result[0][6]) {
+							if ($A2B->set_inuse_username)
+								$A2B -> callingcard_acct_start_inuse($agi,0);
+							$A2B -> callingcard_ivr_authenticate($agi,$result[0][6]);
+						}
+**/
 						$A2B -> call_2did($agi, $RateEngine, $result);
 						if ($A2B->set_inuse_username)
 							$A2B -> callingcard_acct_start_inuse($agi,0);
@@ -1464,12 +1473,12 @@ if ($mode == 'standard') {
 								WHERE (id_cc_card = {$A2B->id_card} OR v.concat_id IS NOT NULL) AND name = '{$A2B->src_peername}' AND name = '$called_party' LIMIT 1";
 			$result = $A2B -> instance_table -> SQLExec ($A2B->DBHandle, $QUERY);
 			if (is_array($result) && $result[0][0] != "") {
-				$A2B -> src_exten			=  $result[0][0];
+				$A2B -> src = $result[0][0];
 				$QUERY = "SELECT regexten FROM cc_sip_buddies LEFT JOIN cc_card_concat bb ON id_cc_card = bb.concat_card_id LEFT JOIN ( SELECT aa.concat_id FROM cc_card_concat aa WHERE aa.concat_card_id = {$A2B->id_card} ) AS v ON bb.concat_id = v.concat_id
 								WHERE (id_cc_card = {$A2B->id_card} OR v.concat_id IS NOT NULL) AND name = '{$A2B->destination}' LIMIT 1";
 				$result = $A2B -> instance_table -> SQLExec ($A2B->DBHandle, $QUERY);
-				if (is_array($result)) $calling_num =  $A2B -> src_exten;
-			} else $A2B -> src_exten = 'NULL';
+				if (is_array($result))	$calling_num = $A2B -> src;
+			} else $A2B -> src = 'NULL';
 
 			$calling_party = $agi -> get_variable('CALLERID(name)', true);
 //			$agi -> set_variable('__TEMPONFORWARDCIDEXT1', $calling_num);
@@ -1955,7 +1964,7 @@ if ($charge_callback) {
 				$A2B -> debug( INFO, $agi, __FILE__, __LINE__, "[CALLBACK]:[RateEngine -> answeredtime=".$RateEngine -> answeredtime."]");
 				
 				$A2B -> CallerID =  $A2B -> config["callback"]['callerid'];
-				unset($A2B->src_exten);
+				unset($A2B->src);
 				//(ST) replace above code with the code below to store CDR for all callbacks and to only charge for the callback if requested
 				if ($callback_been_connected==1 || ($A2B -> agiconfig['callback_bill_1stleg_ifcall_notconnected']==1) )  {
 					//(ST) this is called if we need to bill the user
@@ -1977,21 +1986,16 @@ if ($charge_callback) {
 	
 }// END if ($charge_callback)
 
-
 // END
-if ($mode != 'cid-callback' && $mode != 'all-callback' && $mode != 'did' && $mode != 'standard') {
-	$agi -> hangup();
-} elseif ($A2B -> agiconfig['answer_call'] == 1) {
+if (($mode != 'cid-callback' && $mode != 'all-callback' && $mode != 'did' && $mode != 'standard') || $A2B -> agiconfig['answer_call'] == 1) {
 	$agi -> hangup();
 }
-
 
 // SEND MAIL REMINDER WHEN CREDIT IS TOO LOW
 if (isset($send_reminder) && $send_reminder == 1 && $A2B -> agiconfig['send_reminder'] == 1) {
 	if (strlen($A2B -> cardholder_email) > 5) {
 		include_once (dirname(__FILE__)."/lib/mail/class.phpmailer.php");
 		include_once (dirname(__FILE__)."/lib/Class.Mail.php");
-		$A2B->DBHandle->Execute("SET NAMES 'UTF8'");
 		try {
 			$mail = new Mail(Mail::$TYPE_REMINDERCALL,$A2B->id_card,null,null,null,$A2B->DBHandle);
 			$mail -> send();

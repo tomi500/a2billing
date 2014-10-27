@@ -194,7 +194,8 @@ class RateEngine
 		cc_trunk.outbound_cidgroup_id,
 		cc_trunk.cid_handover,
 		cc_trunk.trunkcode,
-		cc_trunk.wrapuptime
+		cc_trunk.wrapuptime,
+		cc_ratecard.tag
 
 		FROM cc_tariffgroup
 
@@ -448,6 +449,7 @@ else echo "Ratecard: ".$this->ratecard_obj[$i][6]."<br>Trunk: ".$this->ratecard_
 				$A2B -> debug( DEBUG, $agi, __FILE__, __LINE__, "[CC_RATE_ENGINE_ALL_CALCULTIMEOUT: k=$k - res_calcultimeout:$res_calcultimeout]");
 
 			if (substr($res_calcultimeout,0,5)=='ERROR')	return false;
+			if ($this -> ratecard_obj[$k][42] == 0) 	break;
 		}
 
 		return (!$addtimeout)?true:$addtimeout;
@@ -483,11 +485,14 @@ else echo "Ratecard: ".$this->ratecard_obj[$i][6]."<br>Trunk: ".$this->ratecard_
 		$id_rate					= $this -> ratecard_obj[$K][6];
 		$disconnectcharge_after 			= $this -> ratecard_obj[$K][49];
 		$announce_time_correction			= $this -> ratecard_obj[$K][50];
+		$tag						= $this -> ratecard_obj[$K][72];
+//		$destination					= $this -> ratecard_obj[$K][5];
 		$initial_credit 				= $credit;
 		// CHANGE THIS - ONLY ALLOW FREE TIME FOR CUSTOMER THAT HAVE MINIMUM CREDIT TO CALL A DESTINATION
 		
+//$A2B -> debug( ERROR, $agi, __FILE__, __LINE__, "OUT : $tag $destination $K");
 		
-		
+//		$initial_credit = $credit			= $credit < 0 ? 0 : $credit;
 		$this -> freetimetocall_left[$K] = 0;
 		$this -> freecall[$K] = false;
 		$this -> package_to_apply [$K] = null;
@@ -593,17 +598,6 @@ else echo "Ratecard: ".$this->ratecard_obj[$i][6]."<br>Trunk: ".$this->ratecard_
 		// used for the simulator
 		$this -> ratecard_obj[$K]['freetime_include_in_timeout'] = $this -> freetimetocall_left[$K];
 		
-		// CHECK IF THE USER IS ALLOW TO CALL WITH ITS CREDIT AMOUNT
-		/*
-		Comment from Abdoulaye Siby
-		This following "if" statement used to verify the minimum credit to call can be improved.
-		This mininum credit should be calculated based on the destination, and the minimum billing block.
-		*/
-		if (($credit <= 0 || $credit < $A2B->agiconfig['min_credit_2call']) && !$this -> freecall[$K] && $this -> freetimetocall_left[$K]<=0) {
-		    $A2B -> debug( DEBUG, $agi, __FILE__, __LINE__, "[NO ENOUGH CREDIT TO CALL THIS NUMBER - ERROR CT1]");
-			return "ERROR CT1";  //NO ENOUGH CREDIT TO CALL THIS NUMBER
-		}
-
 		// if ($rateinitial==0) return "ERROR RATEINITIAL($rateinitial)";
 		$TIMEOUT = 0;
 		$answeredtime_1st_leg = 0;
@@ -619,15 +613,15 @@ else echo "Ratecard: ".$this->ratecard_obj[$i][6]."<br>Trunk: ".$this->ratecard_
 		
 		if ($this -> freecall[$K]) {
 			if ($this -> package_to_apply [$K] ["type"] == 0) {
-				$this -> ratecard_obj[$K]['timeout']= $A2B->agiconfig['maxtime_tounlimited_calls']; // default : 90 min
+				$this -> ratecard_obj[$K]['timeout'] = $A2B->agiconfig['maxtime_tounlimited_calls']; // default : 90 min
 				$TIMEOUT = $A2B->agiconfig['maxtime_tounlimited_calls'];
-				$this -> ratecard_obj[$K]['timeout_without_rules'] =$A2B->agiconfig['maxtime_tounlimited_calls'];
-				$this -> ratecard_obj[$K]['freetime_include_in_timeout']=$A2B->agiconfig['maxtime_tounlimited_calls'];
+				$this -> ratecard_obj[$K]['timeout_without_rules'] = $A2B->agiconfig['maxtime_tounlimited_calls'];
+				$this -> ratecard_obj[$K]['freetime_include_in_timeout'] = $A2B->agiconfig['maxtime_tounlimited_calls'];
 			} else {
-				$this -> ratecard_obj[$K]['timeout']= $A2B->agiconfig['maxtime_tofree_calls'];
-				$TIMEOUT =  $A2B->agiconfig['maxtime_tofree_calls'];
+				$this -> ratecard_obj[$K]['timeout'] = $A2B->agiconfig['maxtime_tofree_calls'];
+				$TIMEOUT = $A2B->agiconfig['maxtime_tofree_calls'];
 				$this -> ratecard_obj[$K]['timeout_without_rules'] = $A2B->agiconfig['maxtime_tofree_calls'];
-				$this -> ratecard_obj[$K]['freetime_include_in_timeout']=$A2B->agiconfig['maxtime_tofree_calls'];
+				$this -> ratecard_obj[$K]['freetime_include_in_timeout'] = $A2B->agiconfig['maxtime_tofree_calls'];
 			}
 			
 //			if ($this -> debug_st) print_r($this -> ratecard_obj[$K]);
@@ -636,7 +630,7 @@ else echo "Ratecard: ".$this->ratecard_obj[$i][6]."<br>Trunk: ".$this->ratecard_
 		
 		if ($credit < $A2B->agiconfig['min_credit_2call'] && $this -> freetimetocall_left[$K]>0) {
 			$this -> ratecard_obj[$K]['timeout'] = $this -> freetimetocall_left[$K];
-			$TIMEOUT =  $this -> freetimetocall_left[$K];
+			$TIMEOUT = $this -> freetimetocall_left[$K];
 			$this -> ratecard_obj[$K]['timeout_without_rules'] = $this -> freetimetocall_left[$K];
 			return $TIMEOUT;
         }
@@ -644,17 +638,17 @@ else echo "Ratecard: ".$this->ratecard_obj[$i][6]."<br>Trunk: ".$this->ratecard_
 
 		// IMPROVE THE get_variable AND TRY TO RETRIEVE THEM ALL SOMEHOW
 		if ($A2B->mode == 'callback') {
-			$calling_party_rateinitial = a2b_round ($agi->get_variable('RI', true) * $A2B->margintotal);
-			$calling_party_initblock = $agi->get_variable('IB', true);
-			$calling_party_billingblock = $agi->get_variable('BB', true);
-			$calling_party_connectcharge = $agi->get_variable('CC', true);
+			$calling_party_rateinitial	= a2b_round ($agi->get_variable('RI', true) * $A2B->margintotal);
+			$calling_party_initblock	= $agi->get_variable('IB', true);
+			$calling_party_billingblock	= $agi->get_variable('BB', true);
+			$calling_party_connectcharge	= $agi->get_variable('CC', true);
 			$calling_party_disconnectcharge = $agi->get_variable('DC', true);
-			$calling_party_stepchargea = $agi->get_variable('SC_A', true);
-			$calling_party_timechargea = $agi->get_variable('TC_A', true);
-			$calling_party_stepchargeb = $agi->get_variable('SC_B', true);
-			$calling_party_timechargeb = $agi->get_variable('TC_B', true);
-			$calling_party_stepchargec = $agi->get_variable('SC_C', true);
-			$calling_party_timechargec = $agi->get_variable('TC_C', true);
+			$calling_party_stepchargea	= $agi->get_variable('SC_A', true);
+			$calling_party_timechargea	= $agi->get_variable('TC_A', true);
+			$calling_party_stepchargeb	= $agi->get_variable('SC_B', true);
+			$calling_party_timechargeb	= $agi->get_variable('TC_B', true);
+			$calling_party_stepchargec	= $agi->get_variable('SC_C', true);
+			$calling_party_timechargec	= $agi->get_variable('TC_C', true);
 		}
 
 		// 2 KIND OF CALCULATION : PROGRESSIVE RATE & FLAT RATE
@@ -698,9 +692,10 @@ else echo "Ratecard: ".$this->ratecard_obj[$i][6]."<br>Trunk: ".$this->ratecard_
 			if ($credit<=0) {
 				if ($this -> freetimetocall_left[$K] > 0) {
 					$this -> ratecard_obj[$K]['timeout'] = $this -> freetimetocall_left[$K];
-					if ($this -> debug_st) print_r($this -> ratecard_obj[$K]);
+//					if ($this -> debug_st) print_r($this -> ratecard_obj[$K]);
 					return $this -> freetimetocall_left[$K];
-				} else {
+				} elseif (($credit < $initial_credit || $rateinitial > 0) && $tag != 'EMERGENCY') {
+//$A2B -> debug( ERROR, $agi, __FILE__, __LINE__, "[NO ENOUGH CREDIT TO CALL THIS NUMBER - ERROR CT2]");
 					return "ERROR CT2";		//NO ENOUGH CREDIT TO CALL THIS NUMBER
 				}
 			}
@@ -713,7 +708,6 @@ else echo "Ratecard: ".$this->ratecard_obj[$i][6]."<br>Trunk: ".$this->ratecard_
 				$mod_sec = $num_sec % $billingblocka;
 				$num_sec=$num_sec-$mod_sec;
 			}
-
 
 			if (($num_sec>$timechargea) && !(empty($chargeb) || $chargeb==0 || empty($timechargeb) || $timechargeb==0) ) {
 				$TIMEOUT += $timechargea;
@@ -832,6 +826,17 @@ else echo "Ratecard: ".$this->ratecard_obj[$i][6]."<br>Trunk: ".$this->ratecard_
 				}
 			}
 		}
+		// CHECK IF THE USER IS ALLOW TO CALL WITH ITS CREDIT AMOUNT
+		/*
+		Comment from Abdoulaye Siby
+		This following "if" statement used to verify the minimum credit to call can be improved.
+		This mininum credit should be calculated based on the destination, and the minimum billing block.
+		*/
+		if ((($credit <=0 && ($credit < $initial_credit || $rateinitial > 0)) || $credit < $A2B->agiconfig['min_credit_2call']) && !$this -> freecall[$K] && $this -> freetimetocall_left[$K]<=0 && $tag != 'EMERGENCY') {
+		    $A2B -> debug( DEBUG, $agi, __FILE__, __LINE__, "[NO ENOUGH CREDIT TO CALL THIS NUMBER - ERROR CT1]");
+//$A2B -> debug( ERROR, $agi, __FILE__, __LINE__, "[NO ENOUGH CREDIT TO CALL THIS NUMBER - ERROR CT1]$tag $destination $K");
+			return "ERROR CT1";  //NO ENOUGH CREDIT TO CALL THIS NUMBER
+		}
 		//Call time to speak without rate rules... idiot rules
 		$num_min_WR = $initial_credit/$rateinitial;
 		$num_sec_WR = intval($num_min_WR * 60);
@@ -900,8 +905,8 @@ else echo "Ratecard: ".$this->ratecard_obj[$i][6]."<br>Trunk: ".$this->ratecard_
 		$this -> margindillers = $this -> commission = 0;
 		$cost = -$connectcharge;
 		if (($disconnectcharge_after<=$callduration) || ($disconnectcharge_after==0)) {
-            $cost -= $disconnectcharge;
-        }
+			$cost -= $disconnectcharge;
+		}
 		
 		$this -> real_answeredtime = $callduration;
 		$callduration = $callduration + $additional_grace_time;
@@ -1283,7 +1288,13 @@ else echo "Ratecard: ".$this->ratecard_obj[$i][6]."<br>Trunk: ".$this->ratecard_
 		$src_peername		= (isset($A2B->src_peername) && is_numeric($A2B->src_peername)) ? $A2B->src_peername : 'NULL';
 		if ($A2B->CallerIDext)
 			$src_exten	= "'". $A2B->CallerIDext ."'";
-		else $src_exten 	= (isset($A2B->src_exten) && is_numeric($A2B->src_exten)) ? $A2B->src_exten : 'NULL';
+		else	{
+//			$src_exten	= (isset($A2B->src) && is_numeric($A2B->src)) ? $A2B->src : 'NULL';
+			$QUERY = "SELECT regexten FROM cc_sip_buddies WHERE name = '{$src_peername}' AND id_cc_card = $card_caller AND regexten IS NOT NULL LIMIT 1";
+			$result = $A2B -> instance_table -> SQLExec ($A2B->DBHandle, $QUERY);
+			$src_exten	= is_array($result) ? "'".$result[0][0]."'" : 'NULL';
+		}
+//$A2B -> debug(ERROR, $agi, __FILE__, __LINE__, "[A2B->CallerIDext: {$A2B->CallerIDext}] [A2B->src: {$A2B->src}]");
 
 		$QUERY = "SELECT regexten, id_cc_card FROM cc_sip_buddies WHERE name = '{$calledstation}' AND regexten IS NOT NULL LIMIT 1";
 /**				LEFT JOIN cc_card_concat bb ON id_cc_card = bb.concat_card_id
@@ -1485,7 +1496,7 @@ else echo "Ratecard: ".$this->ratecard_obj[$i][6]."<br>Trunk: ".$this->ratecard_
 			$status = 1;
 			// LOOOOP FOR THE FAILOVER LIMITED TO failover_recursive_limit
 			while ($loop_failover == 0 || ($loop_failover <= $A2B->agiconfig['failover_recursive_limit'] && is_numeric($failover_trunk) && $failover_trunk >= 0
-			    && $this->dialstatus != "ANSWER" && $this->dialstatus != "CANCEL" && (!$this->dialstatus || $intellect_count>=0 || $this->dialstatus == "CHANUNAVAIL"
+			    && $this->dialstatus != "ANSWER" && $this->dialstatus != "CANCEL" && time() - $timecur < 10 && (!$this->dialstatus || $intellect_count>=0 || $this->dialstatus == "CHANUNAVAIL"
 			    || $this->dialstatus == "CONGESTION"))) {
 
 				$this -> td = $this -> prefixclause = '';
@@ -1858,12 +1869,11 @@ else echo "Ratecard: ".$this->ratecard_obj[$i][6]."<br>Trunk: ".$this->ratecard_
 				    if (($this -> ratecard_obj[$k][12] > 0 && !($A2B->cardnumber != $A2B->accountcode)) || ($this -> ratecard_obj[$k][12] == 0 && $A2B->extext && $this -> ratecard_obj[$k][4] != $A2B->cardnumber && $ipaddress != $prefix.$destination)) {
 					if ($A2B->auth_through_accountcode) {
 						$A2B -> debug( DEBUG, $agi, __FILE__, __LINE__, "[A2Billing] SAY BALANCE : $A2B->credit");
-//$A2B -> debug( ERROR, $agi, __FILE__, __LINE__, "[A2Billing] SAY BALANCE : $A2B->credit");
 						$A2B -> fct_say_balance ($agi, $A2B->credit);
 						$A2B -> auth_through_accountcode = false;
 					}
 					if ((!isset($trunkcode) || strpos($trunkcode,"-INFOLINE") === false) && $typecall != 44) {
-						$A2B -> fct_say_time_2_call($agi, $trunktimeout, $this -> ratecard_obj[$k][12]);
+						if ($A2B -> fct_say_time_2_call($agi, $trunktimeout, $this -> ratecard_obj[$k][12]) == -1) break;
 					}
 				    }
 				    $A2B -> debug( INFO, $agi, __FILE__, __LINE__, "FAILOVER app_callingcard: Dialing '$dialstr' with timeout of '$timeout'.\n");
@@ -1906,7 +1916,7 @@ else echo "Ratecard: ".$this->ratecard_obj[$i][6]."<br>Trunk: ".$this->ratecard_
 //$A2B -> debug( ERROR, $agi, __FILE__, __LINE__, " [===================                                      CALLERID(num): ".$agi -> get_variable('CALLERID(num)', true)." ]");
 //$A2B -> debug( ERROR, $agi, __FILE__, __LINE__, " [===================                                       agi_callerid: ".$agi -> request['agi_callerid']." ]");
 //$A2B -> debug( ERROR, $agi, __FILE__, __LINE__, " [===================                                    A2B -> CallerID: ".$A2B -> CallerID." ]");
-//$A2B -> debug( ERROR, $agi, __FILE__, __LINE__, " [===================                                   A2B -> src_exten: ".$A2B -> src_exten." ]");
+//$A2B -> debug( ERROR, $agi, __FILE__, __LINE__, " [===================                                   A2B -> src: ".$A2B -> src." ]");
 //$A2B -> debug( ERROR, $agi, __FILE__, __LINE__, " [===================                                             OUTCID: ".$outcid." ]");
 
 					if ($outcid != 0 && $agi -> request['agi_callerid'] != $outcid) {

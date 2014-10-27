@@ -778,9 +778,9 @@ class A2Billing {
 	 */
 	function get_agi_request_parameter($agi)
 	{
-		$this -> CallerID = $this -> src_exten	= $agi -> request['agi_callerid'];
-		if (!is_numeric($this -> src_exten) || strlen($this -> src_exten) > 4)
-			$this -> src_exten		= 'NULL';
+		$this -> CallerID = $this -> src	= $agi -> request['agi_callerid'];
+//		if (!is_numeric($this -> src) || strlen($this -> src) > 4)
+			$this -> src			= 'NULL';
 		$this -> src_peername 			= array_search($agi -> request['agi_type'], array('Dongle','Dahdi','Local')) === false ? $agi -> get_variable("CHANNEL(peername)",true) : '';
 		if (!is_numeric($this -> src_peername))
 			$this -> src_peername		= 'NULL';
@@ -847,13 +847,14 @@ class A2Billing {
 	function enough_credit_to_call()
 	{	
 		if ($this->typepaid == 0) {
-			if ($this->credit < $this->agiconfig['min_credit_2call'] || $this->credit < 0 ) {
+//if (!isset($RateEngine -> ratecard_obj[0][72]))		$this -> debug( ERROR, $agi, __FILE__, __LINE__, "[Ratecard_Obj is not set]");
+			if (($this->credit < $this->agiconfig['min_credit_2call'] || $this->credit < 0) && !(isset($RateEngine -> ratecard_obj[0][72]) && $RateEngine -> ratecard_obj[0][72] == 'EMERGENCY')) {
 				return false;
 			} else {
 				return true;
 			}
 		} else {
-			if ($this->credit <= -$this->creditlimit) {
+			if ($this->credit <= -$this->creditlimit && (!isset($RateEngine -> ratecard_obj[0][72]) || $RateEngine -> ratecard_obj[0][72] != 'EMERGENCY')) {
 				$QUERY = "SELECT id_cc_package_offer FROM cc_tariffgroup WHERE id= ".$this->tariff ;
 				$result = $this -> instance_table -> SQLExec ($this->DBHandle, $QUERY);
 				if (!empty($result[0][0])) {
@@ -945,12 +946,6 @@ class A2Billing {
             $this -> debug( DEBUG, $agi, __FILE__, __LINE__, "[REDIAL : DTMF DESTINATION ::> ".$this->destination."]");
         }
 
-//	if ($this->backafterfax) {
-//$this -> debug( ERROR, $agi, __FILE__, __LINE__, "[=======================================[ FULL UNSET ]=======================================]");
-//		unset($this->transferername);
-//		$this->CallerIDext = $this->cidextafter . "<b>&#9100;</b>";
-//		$this->backafterfax = false;
-//	} else {
 	if (!$this->CallerIDext) {
 		$this->transferername = $this->transfererchannel = $agi->get_variable("TRANSFERERNAME", true);
 		if ($this->transferername == "") {
@@ -962,42 +957,37 @@ class A2Billing {
 			$this->src_peername = $this->transferername[0];
 		}
 	}
-//$this -> debug( ERROR, $agi, __FILE__, __LINE__, "[=======================================[ this->src_peername ={$this->src_peername} / this->CallerID ={$this->CallerID} ]");
-	$QUERY = "SELECT regexten FROM cc_sip_buddies WHERE id_cc_card = {$this->id_card} AND name = '{$this->src_peername}' AND name = '{$this->CallerID}' LIMIT 1";
+	$QUERY = "SELECT regexten FROM cc_sip_buddies WHERE id_cc_card = {$this->id_card} AND name = '{$this->src_peername}' AND regexten IS NOT NULL LIMIT 1";
 	$result = $this -> instance_table -> SQLExec ($this->DBHandle, $QUERY);
-	if (is_array($result) && $result[0][0] != "") {
-		$this->src_exten	= $result[0][0];
+	if (is_array($result) && !is_null($result[0][0])) {
+		$this -> src		= $result[0][0];
 		$this -> CID_handover	= '';
 	}
-//$this -> debug( ERROR, $agi, __FILE__, __LINE__, "[=======================================[ this->src_exten ={$this->src_exten} ]");
-//$this -> debug( ERROR, $agi, __FILE__, __LINE__, "[=======================================[ this->destination ={$this->destination} ]");
 	$this->extext = true;
 	if ($this->destination) {
-		$QUERY = "SELECT name, regexten, accountcode FROM cc_sip_buddies
+		$QUERY = "SELECT name, regexten, translit FROM cc_sip_buddies
 				LEFT JOIN cc_card_concat bb ON id_cc_card = bb.concat_card_id
 				LEFT JOIN ( SELECT aa.concat_id FROM cc_card_concat aa WHERE aa.concat_card_id = {$this->id_card} ) AS v ON v.concat_id = bb.concat_id
 				WHERE (id_cc_card = {$this->id_card} OR v.concat_id IS NOT NULL) AND (regexten = '{$this->destination}' OR (name = '{$this->destination}' AND regexten IS NOT NULL)) LIMIT 1";
-//"				WHERE name = '{$this->destination}' OR ((id_cc_card = {$this->id_card} OR v.concat_id IS NOT NULL) AND regexten = '{$this->destination}') LIMIT 1";
-//$this -> debug( ERROR, $agi, __FILE__, __LINE__, "[SQL]:\n".$QUERY);
-//$this -> debug( ERROR, $agi, __FILE__, __LINE__, "[SQL Result:]...");
-//$this -> debug( ERROR, $agi, __FILE__, __LINE__, "[SQL Result:] name=".$result[0][0].", regexten=".$result[0][1]);
 		$result = $this -> instance_table -> SQLExec ($this->DBHandle, $QUERY);
 		if (is_array($result)) {
 			$this->destination = $result[0][0];
-			if (is_numeric($this->src_exten)) {
+			if (is_numeric($this->src)) {
 				if (!isset($this->transferername[0]) && !isset($this->cidextafter)) {
-					$agi -> set_variable('CALLERID(num)', $this->src_exten);
+					$cname = trim('"' . $agi->get_variable('CALLERID(name)', true) . '"<' . $this->src . '>');
+					if ($result[0][2])	$cname = translit($cname);
+$this -> debug( ERROR, $agi, __FILE__, __LINE__, "[=======================================[ CNAME = {$cname} ]");
+					$agi -> set_callerid($cname);
 				}
 				$this -> CID_handover = '';
 			}
 			$this->voicebox = $result[0][1]."@".$result[0][2];
 			$this->extext = false;
-		}/** else {
-			$QUERY = "SELECT id_cc_card, regexten FROM cc_sip_buddies WHERE name = '{$this->destination}' AND regexten IS NOT NULL";
-			$result = $this -> instance_table -> SQLExec ($this->DBHandle, $QUERY);
-			if (is_array($result))
-				$this->card_called = $result[0][0];
-		}**/
+		} elseif ($this->src_peername != 'NULL') {
+			$cname = trim($this->CallerID . ' ' . $agi->get_variable('CALLERID(name)', true));
+$this -> debug( ERROR, $agi, __FILE__, __LINE__, "[=======================================[ CNAME = {$cname} ]");
+			$agi -> set_callerid('"' . $cname . '"<' . $this->src_peername . '>');
+		}
 	}
 	if ($this->extext) {
 		$this->destination = $this->apply_add_countryprefixto ($this->destination);
@@ -1006,78 +996,55 @@ class A2Billing {
 	if ($this->destination) {
 	if (isset($this->transferername[0])) {
 		$this -> agiconfig['number_try']=1;
-//$this -> debug( ERROR, $agi, __FILE__, __LINE__, "[===================[ Processed Transfer...  {$this->transferername[0]}  {$this->transfererchannel}]");
-//		$onforwardcid1sql = $onforwardcid1asterisk = $agi->get_fullvariable('${ONFORWARDCIDEXT1}', $this->transfererchannel, true);
 		$onforwardcidtemp = $agi->get_fullvariable('${ONFORWARDCID1}', $this->transfererchannel, true);
-//$temptemp = $agi->get_variable('ONFORWARDCID1', true);
-//$this -> debug( ERROR, $agi, __FILE__, __LINE__, "[* CID1 Master_channel {$this->transfererchannel} * $onforwardcidtemp ]");
-//$this -> debug( ERROR, $agi, __FILE__, __LINE__, "[* CID1 Current_channel                    * $temptemp ]");
 		if (!$onforwardcidtemp) {
 			$onforwardcidtemp = $agi->get_variable('ONFORWARDCID1', true);
-//$this -> debug( ERROR, $agi, __FILE__, __LINE__, "[===================[ Current_channel                           * ONFORWARDCID1 = $onforwardcidtemp ]");
 		} else {
-//$this -> debug( ERROR, $agi, __FILE__, __LINE__, "[===================[ Master_channel {$this->transfererchannel} * ONFORWARDCID1 = $onforwardcidtemp ]");
 		}
 		$QUERY = "SELECT regexten FROM cc_sip_buddies WHERE id_cc_card = {$this->id_card} AND name = '{$onforwardcidtemp}' LIMIT 1";
 		$result = $this -> instance_table -> SQLExec ($this->DBHandle, $QUERY);
 		if (is_array($result) && $result[0][0] != "")
 			$onforwardcid1sql = $onforwardcid1asterisk = $result[0][0];
 		else $onforwardcid1sql = $onforwardcid1asterisk = $onforwardcidtemp;
-//$this -> debug( ERROR, $agi, __FILE__, __LINE__, "[===================[ CID1=$onforwardcidtemp ] [ CIDEXT1=$onforwardcid1sql ]");
-//		if ($onforwardcid1sql == "") $onforwardcid1sql = $onforwardcid1asterisk = $onforwardcidtemp;
 		if ($onforwardcidtemp == $this->transferername[0] || $onforwardcidtemp == $this->CallerID) {
 			$this->backafter = $onforwardcidtemp;
 			$this->backextafter = $onforwardcid1sql;
-			$onforwardcid1asterisk = "↗" . $onforwardcid1asterisk;
+//			$onforwardcid1asterisk = "↗" . $onforwardcid1asterisk;
 			$onforwardcid1sql = "&#11017;" . $onforwardcid1sql;
 		} else {
 			$agi -> set_variable('MASTER_CHANNEL(__TEMPONFORWARDCID1)', $onforwardcidtemp);
 			$this->cidafter = $onforwardcidtemp;
 			$this->cidextafter = $onforwardcid1sql;
 		}
-//		$onforwardcid2sql = $onforwardcid2asterisk = $agi->get_fullvariable('${ONFORWARDCIDEXT2}', $this->transfererchannel, true);
 		$onforwardcidtemp = $agi->get_fullvariable('${ONFORWARDCID2}', $this->transfererchannel, true);
-//$temptemp = $agi->get_variable('ONFORWARDCID2', true);
-//$this -> debug( ERROR, $agi, __FILE__, __LINE__, "[* CID2 Master_channel {$this->transfererchannel} * $onforwardcidtemp ]");
-//$this -> debug( ERROR, $agi, __FILE__, __LINE__, "[* CID2 Current_channel                    * $temptemp ]");
 		if (!$onforwardcidtemp) {
 			$onforwardcidtemp = $agi->get_variable('ONFORWARDCID2', true);
-//$this -> debug( ERROR, $agi, __FILE__, __LINE__, "[===================[ Current_channel                           * ONFORWARDCID2 = $onforwardcidtemp ]");
 		} else {
-//$this -> debug( ERROR, $agi, __FILE__, __LINE__, "[===================[ Master_channel {$this->transfererchannel} * ONFORWARDCID2 = $onforwardcidtemp ]");
 		}
 		$QUERY = "SELECT regexten FROM cc_sip_buddies WHERE id_cc_card = {$this->id_card} AND name = '{$onforwardcidtemp}' LIMIT 1";
 		$result = $this -> instance_table -> SQLExec ($this->DBHandle, $QUERY);
 		if (is_array($result) && $result[0][0] != "")
 			$onforwardcid2sql = $onforwardcid2asterisk = $result[0][0];
 		else $onforwardcid2sql = $onforwardcid2asterisk = $onforwardcidtemp;
-//$this -> debug( ERROR, $agi, __FILE__, __LINE__, "[===================[ CID2=$onforwardcidtemp ] [ CIDEXT2=$onforwardcid2sql ]");
-//		if ($onforwardcid2sql == "") $onforwardcid2sql = $onforwardcid2asterisk = $onforwardcidtemp;
 		if ($onforwardcidtemp == $this->transferername[0] || $onforwardcidtemp == $this->CallerID) {
 			$this->backafter = $onforwardcidtemp;
 			$this->backextafter = $onforwardcid1sql;
-			$onforwardcid2asterisk .= "↗";
+//			$onforwardcid2asterisk .= "↗";
+			$onforwardcid2asterisk = $onforwardcid1asterisk;
+			$onforwardcid1asterisk = $onforwardcid2sql;
 			$onforwardcid2sql .= "&#11016;";
 		} else {
 			$agi -> set_variable('MASTER_CHANNEL(__TEMPONFORWARDCID1)', $onforwardcidtemp);
 			$this->cidafter = $onforwardcidtemp;
 			$this->cidextafter = $onforwardcid2sql;
 		}
-//$this -> debug( ERROR, $agi, __FILE__, __LINE__, "[==================[ A2B->cidafter ]    = ".$this->cidafter);
-//$this -> debug( ERROR, $agi, __FILE__, __LINE__, "[==================[ A2B->cidextafter ] = ".$this->cidextafter);
 		$this->CallerIDext = $onforwardcid1sql . "&#8660;" . $onforwardcid2sql;
-		$agi -> set_callerid('<'. $onforwardcid1asterisk . "⇔" . $onforwardcid2asterisk .'>');
+		$agi -> set_callerid('"' . $onforwardcid1asterisk . '*"<' . $onforwardcid2asterisk . '>');
 	} else {
-//$this -> debug( ERROR, $agi, __FILE__, __LINE__, "[===================[ No Transfer...]");
-		$agi -> set_variable('MASTER_CHANNEL(__TEMPONFORWARDCID1)', $this->CallerID);
-//		unset($this->CallerIDext);
+		$tempcid1 = ($this->CallerID == $this->src_peername && $this->src != 'NULL') ? $this->src : $this->CallerID;
+		$agi -> set_variable('MASTER_CHANNEL(__TEMPONFORWARDCID1)', $tempcid1);
+		$agi -> set_variable('MASTER_CHANNEL(__TEMPONFORWARDPEER1)', $this->src_peername);
 		if ($this->extext && $this->destination>0) {
-//			$QUERY = "SELECT cli_replace FROM cc_callerid WHERE cid='$this->CID_handover' AND activated='t' AND id_cc_card={$this->id_card} AND cli_replace=1 LIMIT 1";
-// $QUERY = "SELECT cid FROM cc_callerid
-// WHERE id_cc_card = {$A2B->id_card} AND activated = 't' AND verify = 1 AND cid != '{$A2B->destination}'
-// AND ((cli_localreplace = 1 AND cid LIKE '$outprefix%') OR (cli_otherreplace = 1 AND cid NOT LIKE '$outprefix%') OR cli_prefixreplace LIKE '%$outprefix%')
-// ORDER BY cli_localreplace = 1 AND cid LIKE '$outprefix%' DESC, cli_prefixreplace NOT LIKE '%$outprefix%', RAND()";
-
 
 			$QUERY = "SELECT cid FROM cc_callerid, cc_country aa
 				WHERE '{$this->destination}' LIKE concat(aa.countryprefix,'%') AND id_cc_card={$this->id_card} AND activated='t' AND cid LIKE '$this->CID_handover' AND (cli_replace=1
@@ -1085,19 +1052,12 @@ class A2Billing {
 					AND ((cli_localreplace = 1 AND bb.countryprefix LIKE aa.countryprefix) OR cli_prefixreplace LIKE concat(aa.countryprefix,'%')) ORDER BY bb.countryprefix DESC LIMIT 1) IS NOT NULL)
 				) ORDER BY aa.countryprefix DESC LIMIT 1";
 			$result = $this -> instance_table -> SQLExec ($this->DBHandle, $QUERY);
-//$this -> debug( ERROR, $agi, __FILE__, __LINE__, $QUERY);
 			if (is_array($result)) {
 				$this -> CID_handover = '';
-/**
-for ($t=0;$t<count($result);$t++) {
-	$this -> debug( ERROR, $agi, __FILE__, __LINE__, "========== Replace this CID: ".$result[$t][0]);
-}
-**/
 			}
 		}
 	}
 	}
-//	$agi -> set_variable('MASTER_CHANNEL(ONFORWARDCID2)', $this->destination);
 
 	//Check if Account have restriction
 	if ($this->restriction == 1 || $this->restriction == 2 ) {
@@ -1105,9 +1065,6 @@ for ($t=0;$t<count($result);$t++) {
 		$this -> debug( DEBUG, $agi, __FILE__, __LINE__, "[ACCOUNT WITH RESTRICTION]");
 
 		$QUERY = "SELECT * FROM cc_restricted_phonenumber WHERE id_card='".$this->id_card."' AND '".$this->destination."' LIKE number";
-//		if ($this->removeinterprefix) {
-//			$QUERY .= " OR '". $this -> apply_rules ($this->destination)."' LIKE number";
-//		}
 		$QUERY .= " LIMIT 1";
 		$result = $this -> instance_table -> SQLExec ($this->DBHandle, $QUERY);
 
@@ -1161,29 +1118,25 @@ for ($t=0;$t<count($result);$t++) {
 		$iscall2fax = true;
 	} elseif ($call2did) {
 		$this -> debug( INFO, $agi, __FILE__, __LINE__, "[CALL 2 DID]");
-		$QUERY =  "SELECT cc_did.id, iduser".
-			" FROM cc_did, cc_card ".
-			" WHERE cc_card.status=1 and cc_card.id=iduser  and cc_did.activated=1 and did LIKE '$this->destination' ".
-			" AND cc_did.startingdate<= CURRENT_TIMESTAMP AND (cc_did.expirationdate > CURRENT_TIMESTAMP OR cc_did.expirationdate IS NULL";
-		if ($this->config["database"]['dbtype'] != "postgres") {
-			$QUERY .= " OR cc_did.expirationdate = '0000-00-00 00:00:00'";
-		}
-		$QUERY .= ")";
+		$QUERY = "SELECT username FROM cc_did, cc_card
+".			"WHERE cc_card.status=1 AND cc_card.id=iduser AND cc_did.activated=1 AND did LIKE '$this->destination'
+".			"AND cc_did.startingdate <= CURRENT_TIMESTAMP AND cc_did.expirationdate > CURRENT_TIMESTAMP LIMIT 1";
 		$this -> debug( DEBUG, $agi, __FILE__, __LINE__, $QUERY);
 		$result_did = $this -> instance_table -> SQLExec ($this->DBHandle, $QUERY);
-		if (is_array($result_did) && !empty($result_did[0][0]) && !empty($result_did[0][1]))
+		if (is_array($result_did) && !empty($result_did[0][0])) {
 			$iscall2did =true;
+			if ($this -> cardnumber != $result_did[0][0]) {
+				if ($this -> set_inuse_username) {
+					$this -> callingcard_acct_start_inuse($agi,0);
+				}
+				$this -> callingcard_ivr_authenticate($agi,$result_did[0][0]);
+				$this -> agiconfig['number_try'] = 1;
+			}
+		}
 	}
-
 	$this -> debug( INFO, $agi, __FILE__, __LINE__, "DESTINATION ::> ".$this->destination);
 
 	if (!$iscall2did && !$iscall2fax) {
-/**
-		if ($this->extext) {
-			$this->destination = $this->apply_add_countryprefixto ($this->destination);
-			if ($this->removeinterprefix) $this->destination = $this -> apply_rules ($this->destination);
-		}
-**/
 		if ($this->destination) $agi -> set_variable('MASTER_CHANNEL(__TEMPONFORWARDCID2)', $this->destination);
 
 //		$this -> debug( DEBUG, $agi, __FILE__, __LINE__, "RULES APPLY ON DESTINATION ::> ".$this->destination);
@@ -1320,6 +1273,7 @@ for ($t=0;$t<count($result);$t++) {
 		$this -> debug( DEBUG, $agi, __FILE__, __LINE__, "RES_ALL_CALCULTIMEOUT ::> $res_all_calcultimeout");
 		if (!$res_all_calcultimeout) {
 			$this -> let_stream_listening($agi);
+$this -> debug( ERROR, $agi, __FILE__, __LINE__, "CREDIT :: $this->credit");
 			$prompt="prepaid-no-enough-credit";
 			$agi-> stream_file($prompt, '#');
 			return -1;
@@ -1772,7 +1726,7 @@ for ($t=0;$t<count($result);$t++) {
 //						$this->calledexten = $this -> destination;
 //						$this -> destination = $this -> realdestination;
 //						$this -> realdestination = $this->calledexten;
-						$this->src_exten = $this->src_peername = $this->calledexten = "NULL";
+						$this->src = $this->src_peername = $this->calledexten = "NULL";
 
 						// INSERT CDR  & UPDATE SYSTEM
 						$RateEngine->rate_engine_updatesystem($this, $agi, $this->destination, $doibill, 2);
@@ -1853,8 +1807,9 @@ for ($t=0;$t<count($result);$t++) {
 	} else {
 		$doibill = 0;
 	}
-	$credit = $listdestination[0][34];
-	$credit += $listdestination[0][35] == 0 ? 0 : abs($listdestination[0][36]);
+//	$credit = $listdestination[0][34];
+//	$credit += $listdestination[0][35] == 0 ? 0 : abs($listdestination[0][36]);
+	$credit = $this -> credit;
         if (!$call_did_free) {
 		if ($credit < $this->agiconfig['min_credit_2call']) {
 			$time2call = 0;
@@ -1938,6 +1893,12 @@ for ($t=0;$t<count($result);$t++) {
 		if ($call_did_free) $this -> debug( DEBUG, $agi, __FILE__, __LINE__, "[A2Billing] DID call friend: Dialing '$dialstr' Friend.\n");
 
 		if ($agi -> channel_status('',true) == AST_STATE_DOWN) break;
+		if ($this->src_peername != 'NULL')	{
+			$cname = $agi->get_variable('CALLERID(name)', true);
+			if (strpos($cname, $this->CallerID) === false)	$cname = $this->CallerID . ' ' . $cname;
+			$cname = str_replace($this->src_peername, '', $cname);
+			$agi -> set_callerid('"' . $cname . '"<' . $this->src_peername . '>');
+		}
                 $this -> debug( INFO, $agi, __FILE__, __LINE__, "DIAL $dialstr");
                 $myres = $this -> run_dial($agi, $dialstr);
 
@@ -2044,9 +2005,11 @@ for ($t=0;$t<count($result);$t++) {
 		    if (!isset($this->card_caller)) {
 			$this->card_caller = $my_id_card;
 		    }
-//		    $QUERY = "SELECT regexten FROM cc_sip_buddies WHERE (id_cc_card = $my_id_card OR id_cc_card = $this->id_card) AND name = '{$inst_listdestination[10]}' LIMIT 1";
-//		    $result = $this -> instance_table -> SQLExec ($this->DBHandle, $QUERY);
-//		    $this->calledexten = (is_array($result) && $result[0][0] != "") ? "'".$result[0][0]."'" : "NULL";
+
+		    $QUERY = "SELECT regexten FROM cc_sip_buddies WHERE name = '{$this->src_peername}' AND id_cc_card = $this->card_caller AND regexten IS NOT NULL LIMIT 1";
+		    $result = $this -> instance_table -> SQLExec ($this->DBHandle, $QUERY);
+		    $src_exten = is_array($result) ? "'".$result[0][0]."'" : 'NULL';
+
 		    $QUERY = "SELECT regexten, id_cc_card FROM cc_sip_buddies WHERE name = '{$inst_listdestination[10]}' LIMIT 1";
 		    $result = $this -> instance_table -> SQLExec ($this->DBHandle, $QUERY);
 		    if (is_array($result)) {
@@ -2056,6 +2019,7 @@ for ($t=0;$t<count($result);$t++) {
 			$this->calledexten = 'NULL';
 			$card_called = "'0'";
 		    }
+
                     // A-LEG below to the owner of the DID
                     if ($call_did_free || $answeredtime == 0) {
                     	//CALL2DID CDR is free
@@ -2064,7 +2028,7 @@ for ($t=0;$t<count($result);$t++) {
 	                            " terminatecauseid, stoptime, sessionbill, id_tariffgroup, id_tariffplan, id_ratecard, id_trunk, src, sipiax, id_did, src_peername, src_exten, calledexten, dnid) VALUES ".
 	                            "('".$this->uniqueid."', '".$this->channel."',  '".$this->id_card."',  '".$this->card_caller."', $card_called, '".$this->hostname."',";
 	                    $QUERY .= " CURRENT_TIMESTAMP - INTERVAL $answeredtime SECOND ";
-	                    $QUERY .= ", '$answeredtime', '".$inst_listdestination[10]."', '$terminatecauseid', now(), '0', '0', '0', '0', '0', '$this->CallerID', '3', '$this->id_did', $this->src_peername, $this->src_exten, $this->calledexten, '$this->destination')";
+	                    $QUERY .= ", '$answeredtime', '".$inst_listdestination[10]."', '$terminatecauseid', now(), '0', '0', '0', '0', '0', '$this->CallerID', '3', '$this->id_did', $this->src_peername, $src_exten, $this->calledexten, '$this->destination')";
 
 	                    $result = $this -> instance_table -> SQLExec ($this->DBHandle, $QUERY, 0);
 	                    $this -> debug( INFO, $agi, __FILE__, __LINE__, "[DID CALL - LOG CC_CALL: SQL: $QUERY]:[result:$result]");
@@ -2082,7 +2046,7 @@ for ($t=0;$t<count($result);$t++) {
                                 " terminatecauseid, stoptime, sessionbill, id_tariffgroup, id_tariffplan, id_ratecard, id_trunk, src, sipiax, id_did, src_peername, src_exten, calledexten, dnid) VALUES ".
                                 "('".$this->uniqueid."', '".$this->channel."',  '".$my_id_card."', '".$this->card_caller."', $card_called, '".$this->hostname."',";
                         $QUERY .= " CURRENT_TIMESTAMP - INTERVAL $answeredtime SECOND ";
-                        $QUERY .= ", '$answeredtime', '". $listdestination[0][10]."', '$terminatecauseid', now(), '$cost', '0', '0', '0', '0', '$this->CallerID', '3', '$this->id_did', $this->src_peername, $this->src_exten, $this->calledexten, '$this->destination')";
+                        $QUERY .= ", '$answeredtime', '". $listdestination[0][10]."', '$terminatecauseid', now(), '$cost', '0', '0', '0', '0', '$this->CallerID', '3', '$this->id_did', $this->src_peername, $src_exten, $this->calledexten, '$this->destination')";
 
                         $result = $this -> instance_table -> SQLExec ($this->DBHandle, $QUERY, 0);
                         $this -> debug( INFO, $agi, __FILE__, __LINE__, "[DID CALL - LOG CC_CALL: SQL: $QUERY]:[result:$result]");
@@ -2124,7 +2088,7 @@ for ($t=0;$t<count($result);$t++) {
                 $this->dnid = $this->destination;
                 $this->extension = $this->destination = $inst_listdestination[4];
                 if ($this->CC_TESTING) $this->extension = $this->dnid = $this->destination = "011324885";
-                $ast = $this -> callingcard_ivr_authorize($agi, $RateEngine, 0, false, $credit);
+                $ast = $this -> callingcard_ivr_authorize($agi, $RateEngine, 0, false);
                 if ($ast==1 ||  $ast=='2FAX') {
                   if ($ast==1) {
 /**
@@ -2264,9 +2228,9 @@ $this -> debug( ERROR, $agi, __FILE__, __LINE__, "[STATUS] CHANNEL ($dialstatus)
 		$faxbitrate	= $agi->get_variable("FAXBITRATE", true);
 		$faxresolution	= $agi->get_variable("FAXRESOLUTION", true);
 		$faxerror	= $agi->get_variable("FAXERROR", true);
-//		if (!isset($this->CallerIDext)) $this->CallerIDext = $this->src_exten;
+//		if (!isset($this->CallerIDext)) $this->CallerIDext = $this->src;
 //$this -> debug( ERROR, $agi, __FILE__, __LINE__, "================================= CallerIDext: {$this->CallerIDext}");
-		$this->CallerIDext = ($this->CallerIDext)?$this->CallerIDext:$this->src_exten;
+		$this->CallerIDext = ($this->CallerIDext)?$this->CallerIDext:$this->src;
 		$this->CallerIDext = ($this->CallerIDext == "NULL")?$this->CallerIDext:"'{$this->CallerIDext}'";
 //$this -> debug( ERROR, $agi, __FILE__, __LINE__, "================================= CallerIDext: {$this->CallerIDext}");
 /**
@@ -2323,9 +2287,9 @@ $this -> debug( ERROR, $agi, __FILE__, __LINE__, "FAXRESOLUTION: ".$faxresolutio
 				} else {
 					$mail = new Mail(Mail::$TYPE_FAX_FAILED,$this->faxidcard,null,null,null,$this->DBHandle);
 				}
-				if (isset($this->cidextafter)) $this->src_exten = $this->cidextafter;
-				$mail->replaceInEmail(Mail::$FAX_CID_NUMBER,($this->src_exten != "NULL")?$this->src_exten:$this->CallerID);
-				$mail->replaceInEmail(Mail::$FAX_CID_NAME,($this->src_exten != $calleridname && $this->CallerID != $calleridname)?$calleridname:'');
+				if (isset($this->cidextafter)) $this->src = $this->cidextafter;
+				$mail->replaceInEmail(Mail::$FAX_CID_NUMBER,($this->src != "NULL")?$this->src:$this->CallerID);
+				$mail->replaceInEmail(Mail::$FAX_CID_NAME,($this->src != $calleridname && $this->CallerID != $calleridname)?$calleridname:'');
 				$mail->replaceInEmail(Mail::$FAX_COUNT,$faxpages);
 				$mail->replaceInEmail(Mail::$FAX_DEST_EXTEN,$this->destination);
 				$mail->replaceInEmail(Mail::$FAX_DATETIME,date('d F Y - H:i:s'));
@@ -2614,6 +2578,7 @@ $this -> debug( ERROR, $agi, __FILE__, __LINE__, "FAXRESOLUTION: ".$faxresolutio
 		}
 		do {
 		    $this -> let_stream_listening($agi);
+		    sleep(1);
 		    // say 'you have x dollars and x cents'
 		    if ($fromvoucher!=1) {
 			$result = $agi-> stream_file('prepaid-you-have', $ed);
@@ -3201,9 +3166,10 @@ $this -> debug( ERROR, $agi, __FILE__, __LINE__, "FAXRESOLUTION: ".$faxresolutio
 		$language 			= 'en';
 		$callerID_enable 		= $this->agiconfig['cid_enable'];
 		$this->auth_through_accountcode = false;
+		if ($accountback>0) $this->accountcode = $accountback;
 
 		// 		  -%-%-%-%-%-%-		FIRST TRY WITH THE CALLERID AUTHENTICATION 	-%-%-%-%-%-%-
-		if ($callerID_enable == 1 && $this->CallerID != "") {
+		elseif ($callerID_enable == 1 && $this->CallerID != "") {
 //		if ($callerID_enable==1 && is_numeric($this->CallerID) && $this->CallerID>0) {}
 			$this -> debug( DEBUG, $agi, __FILE__, __LINE__, "[CID_ENABLE - CID_CONTROL - CID:".$this->CallerID."]");
 
@@ -3325,7 +3291,7 @@ $this -> debug( ERROR, $agi, __FILE__, __LINE__, "FAXRESOLUTION: ".$faxresolutio
 				$this->cardholder_email 		=  $result[0][23];
 				$this->cardholder_uipass 		=  $result[0][24];
 				$this->id_campaign			=  $result[0][25];
-				$this->id_card				=  $result[0][26];
+				$this->id_card = $this->card_caller	=  $result[0][26];
 				$this->useralias			=  $result[0][27];
 				$this->status				=  $result[0][28];
 				$this->voicemail			= ($result[0][29] && $result[0][30]) ? 1 : 0;
@@ -3449,18 +3415,14 @@ $this -> debug( ERROR, $agi, __FILE__, __LINE__, "FAXRESOLUTION: ".$faxresolutio
 // Тут можно присвоить известный номер:
 //			$this -> CID_handover = '';
 		}
-
 		// 		 -%-%-%-%-%-%-		CHECK IF WE CAN AUTHENTICATE THROUGH THE "ACCOUNTCODE" 	-%-%-%-%-%-%-
 		
 		$prompt_entercardnum = "prepaid-enter-pin-number";
-		if ($accountback>0) $this->accountcode = $accountback;
 		$this -> debug( DEBUG, $agi, __FILE__, __LINE__, ' - Account code ::> '.$this -> accountcode);
 		if (strlen ($this->accountcode)>=1 && !$authentication) {
-			$this->username = $this -> cardnumber = $this->accountcode;
-			for ($i=0;$i<=0;$i++) {
-
+			for ($i=0;$i<=1;$i++) {
+				$this->username = $this->cardnumber = $this->accountcode;
 				if ($callerID_enable!=1 || !is_numeric($this->CallerID) || $this->CallerID<=0 || $accountback>0) {
-					
 					$QUERY = "SELECT credit, tariff, cc_card.activated, inuse, simultaccess, typepaid, creditlimit, cc_sip_buddies.language, removeinterprefix," .
 								" redial, enableexpire, UNIX_TIMESTAMP(expirationdate), expiredays, nbused, UNIX_TIMESTAMP(firstusedate)," .
 								" UNIX_TIMESTAMP(cc_card.creationdate), currency, lastname, firstname, email, uipass, id_campaign, cc_card.id," .
@@ -3505,7 +3467,7 @@ $this -> debug( ERROR, $agi, __FILE__, __LINE__, "FAXRESOLUTION: ".$faxresolutio
 					$this->cardholder_email 	= $result[0][19];
 					$this->cardholder_uipass 	= $result[0][20];
 					$this->id_campaign  		= $result[0][21];
-					$this->id_card  		= $result[0][22];
+					$this->id_card			= $result[0][22];
 					$this->useralias 		= $result[0][23];
 					$this->status 			= $result[0][24];
 					$this->voicemail		=($result[0][25] && $result[0][26]) ? 1 : 0;
@@ -3540,8 +3502,6 @@ $this -> debug( ERROR, $agi, __FILE__, __LINE__, "FAXRESOLUTION: ".$faxresolutio
 				$this -> debug( DEBUG, $agi, __FILE__, __LINE__, "[credit=".$this->credit." :: tariff=".$this->tariff." :: status=".$this->status." :: isused=$isused :: simultaccess=$simultaccess :: typepaid=".$this->typepaid." :: creditlimit=$this->creditlimit :: language=$language]");
 				
 				$prompt = '';
-				// CHECK credit > min_credit_2call / you have zero balance
-				if ( !$this -> enough_credit_to_call() ) $prompt = "prepaid-no-enough-credit-stop";
 				// CHECK activated=t / CARD NOT ACTIVE, CONTACT CUSTOMER -%-%- AND CHECK IF THE CALLERID IS CORRECT FOR THIS CARD	-%-%-%-
 				if ( $this->status != "1" || ($this->cidactivated == "t" && $blacklist == 1) || ($this->agiconfig['callerid_authentication_over_cardnumber']==1 && is_null($this->cidactivated))) {
 					$prompt = "prepaid-auth-fail";	// not expired but inactive.. probably not yet sold.. find better prompt
@@ -3574,9 +3534,27 @@ $this -> debug( ERROR, $agi, __FILE__, __LINE__, "FAXRESOLUTION: ".$faxresolutio
 					    $this -> debug( DEBUG, $agi, __FILE__, __LINE__, "[QUERY UPDATE : $QUERY]");
 					    $result = $this -> instance_table -> SQLExec ($this->DBHandle, $QUERY, 0);
 					}
-
 				}
-				
+				if ($i==0) {
+					$this->card_caller = $this->id_card;
+					if (strlen($this->dnid) >= 1 && $accountback == 0) {
+						$did = $this->apply_add_countryprefixto ($this->dnid);
+						if ($this->removeinterprefix)
+							$did = $this -> apply_rules ($did);
+						$QUERY = "SELECT username FROM cc_did, cc_card WHERE did LIKE '$did' AND cc_did.activated=1 AND cc_card.id=iduser LIMIT 1";
+						$result = $this->instance_table -> SQLExec ($this->DBHandle, $QUERY);
+						if (is_array($result)) {
+							$this->accountcode = $result[0][0];
+							$this->agiconfig['number_try'] = 1;
+							continue;
+						}
+					}
+				}
+				// CHECK credit > min_credit_2call / you have zero balance
+/**				if (!$this -> enough_credit_to_call()) {
+					$prompt = "prepaid-no-enough-credit-stop";
+//$this -> debug( ERROR, $agi, __FILE__, __LINE__, "[credit=".$this->credit." :: tariff=".$this->tariff." :: status=".$this->status." :: isused=$isused :: simultaccess=$simultaccess :: typepaid=".$this->typepaid." :: creditlimit=$this->creditlimit :: language=$language]");
+				}**/
 				if (strlen($prompt)>0) {
 					$this -> let_stream_listening($agi);
 					$agi -> stream_file($prompt, '#'); // Added because was missing the prompt
@@ -3623,6 +3601,7 @@ $this -> debug( ERROR, $agi, __FILE__, __LINE__, "FAXRESOLUTION: ".$faxresolutio
 						$this -> agiconfig['say_balance_after_call']	= $this->say_balance_after_call;
 					$authentication = true;
 				}
+				break;
 			} // For end
 			
 		}
@@ -3729,7 +3708,7 @@ $this -> debug( ERROR, $agi, __FILE__, __LINE__, "FAXRESOLUTION: ".$faxresolutio
 				$this->cardholder_uipass 	= $result[0][20];
 				$the_card_id 				= $result[0][21];
 				$this->id_campaign			= $result[0][22];
-				$this->id_card				= $result[0][23];
+				$this->id_card = $this->card_caller	= $result[0][23];
 				$this->useralias			= $result[0][24];
 				$this->status 				= $result[0][25];
 				$this->voicemail 			= ($result[0][26] && $result[0][27]) ? 1 : 0;
@@ -4052,7 +4031,8 @@ $this -> debug( ERROR, $agi, __FILE__, __LINE__, "FAXRESOLUTION: ".$faxresolutio
 		if (!$this->DBHandle) die("Connection failed");
 		
 		if ($this->config['database']['dbtype'] == "mysqli") {
-			$this->DBHandle -> Execute('SET AUTOCOMMIT=1');
+			$this->DBHandle -> Execute("SET AUTOCOMMIT=1");
+			$this->DBHandle -> Execute("SET NAMES 'UTF8'");
 		}
 		
 		return true;

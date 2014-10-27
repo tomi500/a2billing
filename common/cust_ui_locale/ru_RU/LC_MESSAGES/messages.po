@@ -351,9 +351,13 @@ msgstr "Время, доступное для разговора"
 msgid "ROUTE"
 msgstr "МАРШРУТ"
 
-#: simulator.php:216 call-history.php:380
+#: call-history.php
 msgid "Minutes"
 msgstr "Минутах"
+
+#: simulator.php
+msgid "Minutes "
+msgstr "Минут"
 
 #: simulator.php:220
 msgid "UAH"

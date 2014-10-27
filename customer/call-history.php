@@ -322,17 +322,17 @@ if (!isset($terminatecauseid)) {
 $p=1;
 $didkey = 2;
 $FG_TABLE_COL = array();
-$FG_TABLE_COL[]=array (gettext("Date"), "starttime", "19%", "center", "SORT", "22", "", "", "", "", "", "");
+$FG_TABLE_COL[]=array (gettext("Date"), "starttime", "18%", "center", "SORT", "22", "", "", "", "", "", "");
 if ($choose_callowner == 1 || $choose_callowner == 2) {
 	$FG_TABLE_COL[]=array (gettext("CallHolder"), "CallHolder", "4%", "center nowrap", "SORT", "79");
 	$cholder = ", CONCAT_WS(' ',lastname,firstname,IF(company_name='','',CONCAT('<br/>(',company_name,')'))) CallHolder";
 	$didkey++;
 } else	$cholder = "";
 $costkey = $didkey+6;
-$FG_TABLE_COL[]=array (gettext("CallerID"), "src", "13%", "center", "SORT");
+$FG_TABLE_COL[]=array (gettext("CallerID"), "src", "18%", "center", "SORT");
 $FG_TABLE_COL[]=array (gettext("Number"), "DID", "8%", "center", "SORT", "40");
-$FG_TABLE_COL[]=array (gettext("PhoneNumber"), "calledstation", "13%", "center", "SORT", "50", "", "", "", "", "", "");
-$FG_TABLE_COL[]=array (gettext("Destination"), "destination", "21%", "center", "SORT", "30", "lie", "cc_prefix", "destination", "prefix='%id'", "%1" );
+$FG_TABLE_COL[]=array (gettext("PhoneNumber"), "calledstation", "12%", "center", "SORT", "50", "", "", "", "", "", "");
+$FG_TABLE_COL[]=array (gettext("Destination"), "destination", "19%", "center", "SORT", "30", "lie", "cc_prefix", "destination", "prefix='%id'", "%1" );
 $FG_TABLE_COL[]=array (gettext("Route"), "route", "2%", "center", "SORT", "10");
 $FG_TABLE_COL[]=array (gettext ("WaitUp"), "waitup", "2%", "center", "SORT", "30", "", "", "", "", "", "display_minute" );
 $FG_TABLE_COL[]=array (gettext("Duration"), "sessiontime", "8%", "center", "SORT", "30", "", "", "", "", "", "display_minute");
@@ -341,11 +341,11 @@ if ($terminatecauseid!="ANSWER") {
     $tc = ', t1.terminatecauseid';
     $costkey++;
 } else $tc = '';
-$FG_TABLE_COL[]=array (gettext("Cost"), "sessionbill", "8%", "center nowrap", "SORT", "30", "", "", "", "", "", "display_2bill");
+$FG_TABLE_COL[]=array (gettext("Cost"), "sessionbill", "7%", "center nowrap", "SORT", "30", "", "", "", "", "", "display_2bill");
 
 $FG_COL_QUERY = "t1.starttime starttime$cholder, 
 IF(t1.src_exten IS NULL, t1.src, IF(t1.card_caller$calledsbquery,IF(t1.src_exten=t1.src_peername,t1.src_exten,CONCAT(t1.src_peername,' &lt;<font color='
-	,IF(t1.src!=t1.src_peername AND t1.src_exten!=t1.src,CONCAT('red>',t1.src),CONCAT('green>',t1.src_exten)),'</font>&gt;')),CONCAT(t1.src_peername
+	,IF(t1.src!=t1.src_peername AND t1.src_exten!=t1.src AND t1.src_exten NOT LIKE '%#%',CONCAT('red>',t1.src),CONCAT('green>',t1.src_exten)),'</font>&gt;')),CONCAT(t1.src_peername
 	,IF(t1.src_peername=t1.src,'',CONCAT(' &lt;<font color=red>',t1.src,'</font>&gt;'))))) src, 
 IF(t1.card_id$calledsbquery AND t1.sipiax IN (2,3,5),t1.dnid,'') DID, 
 IF(t1.sipiax IN (2,3) AND t1.terminatecauseid<>1,'',IF(t1.card_called$calledsbquery, IF(t1.calledexten IS NOT NULL

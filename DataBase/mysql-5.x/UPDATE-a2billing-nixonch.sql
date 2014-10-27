@@ -131,6 +131,7 @@ ALTER TABLE cc_sip_buddies ADD `namedpickupgroup` varchar(40) DEFAULT NULL AFTER
 ALTER TABLE cc_sip_buddies ADD warning_threshold INT( 11 ) NOT NULL DEFAULT '-2';
 ALTER TABLE cc_sip_buddies ADD say_rateinitial SMALLINT( 6 ) NOT NULL DEFAULT '0';
 ALTER TABLE cc_sip_buddies ADD say_balance_after_call SMALLINT( 6 ) NOT NULL DEFAULT '0';
+ALTER TABLE cc_sip_buddies ADD translit SMALLINT( 6 ) NOT NULL DEFAULT '0' AFTER `external`;
 
 ALTER TABLE cc_sip_buddies
   CHANGE `canreinvite` `canreinvite` varchar( 20 ) CHARACTER SET utf8 COLLATE utf8_bin NULL DEFAULT NULL ,
