@@ -976,7 +976,6 @@ class A2Billing {
 				if (!isset($this->transferername[0]) && !isset($this->cidextafter)) {
 					$cname = trim('"' . $agi->get_variable('CALLERID(name)', true) . '"<' . $this->src . '>');
 					if ($result[0][2])	$cname = translit($cname);
-$this -> debug( ERROR, $agi, __FILE__, __LINE__, "[=======================================[ CNAME = {$cname} ]");
 					$agi -> set_callerid($cname);
 				}
 				$this -> CID_handover = '';
@@ -984,9 +983,10 @@ $this -> debug( ERROR, $agi, __FILE__, __LINE__, "[=============================
 			$this->voicebox = $result[0][1]."@".$result[0][2];
 			$this->extext = false;
 		} elseif ($this->src_peername != 'NULL') {
-			$cname = trim($this->CallerID . ' ' . $agi->get_variable('CALLERID(name)', true));
-$this -> debug( ERROR, $agi, __FILE__, __LINE__, "[=======================================[ CNAME = {$cname} ]");
-			$agi -> set_callerid('"' . $cname . '"<' . $this->src_peername . '>');
+			if ($this->src_peername != $this->CallerID) {
+				$cname = trim($this->CallerID . ' ' . $agi->get_variable('CALLERID(name)', true));
+				$agi -> set_callerid('"' . $cname . '"<' . $this->src_peername . '>');
+			} else	$agi -> set_variable('CALLERID(num)', $this->src_peername);
 		}
 	}
 	if ($this->extext) {

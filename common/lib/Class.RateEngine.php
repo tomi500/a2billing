@@ -1283,17 +1283,17 @@ else echo "Ratecard: ".$this->ratecard_obj[$i][6]."<br>Trunk: ".$this->ratecard_
 		$trunk_id		= ($trunk_id) ? "'". $trunk_id ."'" : "'". $this->usedtrunk ."'";
 		$id_card_package_offer	= (!is_numeric($id_card_package_offer)) ? 'NULL' : "'$id_card_package_offer'";
 		$calldestination	= (!isset($calldestination) || !is_numeric($calldestination) || ($didcall && $dialstatus != 'ANSWER')) ? -1 : $calldestination;
-		$card_caller		= (isset($A2B->card_caller)) ? "'$A2B->card_caller'" : "'0'";
+		$card_caller		= ( isset($A2B->card_caller)) ? "'$A2B->card_caller'" : "'0'";
 		$id_did			= (!isset($A2B->id_did) || !is_numeric($A2B->id_did)) ? 'NULL' : "'$A2B->id_did'";
-		$src_peername		= (isset($A2B->src_peername) && is_numeric($A2B->src_peername)) ? $A2B->src_peername : 'NULL';
+		$src_peername		= ( isset($A2B->src_peername) && is_numeric($A2B->src_peername)) ? $A2B->src_peername : 'NULL';
 		if ($A2B->CallerIDext)
 			$src_exten	= "'". $A2B->CallerIDext ."'";
-		else	{
+		elseif ($src_peername != 'NULL') {
 //			$src_exten	= (isset($A2B->src) && is_numeric($A2B->src)) ? $A2B->src : 'NULL';
 			$QUERY = "SELECT regexten FROM cc_sip_buddies WHERE name = '{$src_peername}' AND id_cc_card = $card_caller AND regexten IS NOT NULL LIMIT 1";
 			$result = $A2B -> instance_table -> SQLExec ($A2B->DBHandle, $QUERY);
 			$src_exten	= is_array($result) ? "'".$result[0][0]."'" : 'NULL';
-		}
+		} else	$src_exten	= 'NULL';
 //$A2B -> debug(ERROR, $agi, __FILE__, __LINE__, "[A2B->CallerIDext: {$A2B->CallerIDext}] [A2B->src: {$A2B->src}]");
 
 		$QUERY = "SELECT regexten, id_cc_card FROM cc_sip_buddies WHERE name = '{$calledstation}' AND regexten IS NOT NULL LIMIT 1";

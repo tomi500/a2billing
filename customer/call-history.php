@@ -198,7 +198,7 @@ if (strpos ( $SQLcmd, 'WHERE' ) > 0) {
 	$FG_TABLE_CLAUSE = substr ( $date_clause, 5 );
 }
 
-$calledsbquery = $sessbillquery = "='$customer'";
+$calledsbquery = $sessbillquery = " IN ('$customer')";
 $FG_TABLE_NAME = "cc_call t1";
 $FG_HTML_TABLE_TITLE = " - ".gettext("Call Logs")." - ";
 $accdie = false;
@@ -206,16 +206,14 @@ $FG_COL_QUERY_RECORDS = ", t1.uniqueid";
 switch ($choose_callowner) {
 	case 1: //I & MY UNION
 		if ($customer_info[16] || $customer_info[18]) {
-			$FG_TABLE_NAME .= " LEFT JOIN cc_card_concat bb ON bb.concat_card_id IN (t1.card_caller, t1.card_id, t1.card_called) LEFT JOIN cc_card ON cc_card.id=bb.concat_card_id";
+			$FG_TABLE_NAME .= " LEFT JOIN cc_card_concat bb ON bb.concat_card_id IN (t1.card_caller, t1.card_id, t1.card_called) ";
+			
+			$FG_TABLE_NAME .= "LEFT JOIN cc_card ON cc_card.id=bb.concat_card_id";
 			$calledsbquery = " IN (SELECT concat_card_id FROM cc_card_concat WHERE concat_id=$concat_id)";
-//			$calledsbquery = " IN (SELECT concat_card_id FROM bb)";
-//			$calledsbquery = "=bb.concat_card_id";
-//			$FG_TABLE_NAME = "(SELECT * FROM cc_card_concat WHERE concat_id=$concat_id) bb, (SELECT * FROM cc_card WHERE id$calledsbquery OR id_diller$calledsbquery) ccd, cc_call t1";
 			if (strlen($FG_TABLE_CLAUSE)>0)		$FG_TABLE_CLAUSE.=" AND ";
 			$FG_TABLE_CLAUSE.="bb.concat_id=$concat_id AND (bb.mylogs=1 OR bb.concat_card_id{$sessbillquery})";
-//			$FG_TABLE_CLAUSE.="((bb.mylogs=1 AND bb.concat_card_id IN (t1.card_caller, t1.card_id, t1.card_called)) OR bb.concat_card_id{$sessbillquery}) AND ((ccd.id=t1.card_caller AND t1.card_caller) OR (t1.card_caller=0 AND ccd.id=t1.card_id))";
 			$FG_COL_QUERY_RECORDS = ", IF((bb.myrecords AND {$customer_info[21]}) OR t1.card_id{$sessbillquery} OR card_caller{$sessbillquery},t1.uniqueid,'')";
-			$sessbillquery = "=bb.concat_card_id";
+			$sessbillquery = " IN (bb.concat_card_id)";
 		} else $accdie = true;
 		break;
 	case 2: //MY UNION
@@ -225,7 +223,7 @@ switch ($choose_callowner) {
 			if (strlen($FG_TABLE_CLAUSE)>0)		$FG_TABLE_CLAUSE.=" AND ";
 			$FG_TABLE_CLAUSE.="bb.concat_card_id<>'$customer' AND bb.concat_id=$concat_id AND bb.mylogs=1";
 			$FG_COL_QUERY_RECORDS = ", IF(bb.myrecords=1 AND {$customer_info[21]},t1.uniqueid,'')";
-			$sessbillquery = "=bb.concat_card_id";
+			$sessbillquery = " IN (bb.concat_card_id)";
 		} else $accdie = true;
 		break;
 	case 3: //OTHER UNION
@@ -235,7 +233,7 @@ switch ($choose_callowner) {
 			$FG_TABLE_NAME .= " LEFT JOIN cc_card_concat ON concat_card_id=t1.card_id OR concat_card_id=t1.card_caller";
 			if (strlen($FG_TABLE_CLAUSE)>0)		$FG_TABLE_CLAUSE.=" AND ";
 			$FG_TABLE_CLAUSE.="concat_id='$id' AND id_diller='$customer'";
-			$calledsbquery = $sessbillquery = "=concat_card_id";
+			$calledsbquery = $sessbillquery = " IN (concat_card_id)";
 			unset($calltype_list[4]);
 			$calltype_list[3][0] .= $id;
 		} else $accdie = true;
@@ -249,7 +247,7 @@ switch ($choose_callowner) {
 				$FG_TABLE_CLAUSE.="(t1.card_id='$id' OR t1.card_caller='$id')";
 				unset($calltype_list[3]);
 				$FG_HTML_TABLE_TITLE .= "&nbsp;&nbsp;&nbsp;&nbsp;<B><font color=blue>".$resmax[0][0]." ".$resmax[0][1]."</font> (".$resmax[0][2].") <font color=green>".$resmax[0][3]." ".BASE_CURRENCY."</font></B>";
-				$calledsbquery = $sessbillquery = "='$id'";
+				$calledsbquery = $sessbillquery = " IN ('$id')";
 			} else $accdie = true;
 			break;
 		} else $id = '';
@@ -257,17 +255,16 @@ switch ($choose_callowner) {
 		if ($choose_callowner < 0) {
 			$FG_TABLE_NAME .= " LEFT JOIN cc_card_concat bb ON bb.concat_card_id=t1.card_id OR bb.concat_card_id=t1.card_caller OR bb.concat_card_id=t1.card_called";
 			if (strlen($FG_TABLE_CLAUSE)>0)		$FG_TABLE_CLAUSE.=" AND ";
-//			$cust = -$choose_callowner;
 			$FG_TABLE_CLAUSE.="bb.concat_card_id=-$choose_callowner AND bb.concat_id=$concat_id AND bb.mylogs";
 			$FG_COL_QUERY_RECORDS = ", IF(bb.myrecords AND {$customer_info[21]},t1.uniqueid,'')";
-			$sessbillquery = "=bb.concat_card_id";
+			$sessbillquery = " IN (bb.concat_card_id)";
 			$calledsbquery = " IN (SELECT concat_card_id FROM cc_card_concat WHERE concat_id=$concat_id)";
 			break;
 		} else $choose_callowner = 0;
 	case 0: //MY
 		if (strlen($FG_TABLE_CLAUSE)>0)		$FG_TABLE_CLAUSE.=" AND ";
 		$FG_TABLE_CLAUSE .= "'$customer' IN (t1.card_id, t1.card_caller, t1.card_called)";
-		$calledsbquery = $choose_callowner == 0 && $customer_info[19] ? " IN (SELECT concat_card_id FROM cc_card_concat WHERE concat_id=$customer_info[19])" : "$sessbillquery";
+		$calledsbquery = $choose_callowner == 0 && $customer_info[19] ? " IN (SELECT concat_card_id FROM cc_card_concat WHERE concat_id=$customer_info[19])" : $sessbillquery;
 		break;
 }
 
@@ -282,15 +279,9 @@ if ($accdie)	{
 if (!isset($choose_calltype)) $choose_calltype = -1;
 elseif ($choose_calltype != - 1) {
 	if (strlen($FG_TABLE_CLAUSE)>0) $FG_TABLE_CLAUSE.=" AND ";
-	$sssb = $choose_callowner == 0 && $customer_info[19] ? " NOT IN (SELECT concat_card_id FROM cc_card_concat WHERE concat_id='{$customer_info[19]}')" : "!".$sessbillquery;
 	switch ($choose_calltype) {
 		case 0: //INCOMING
-//			$FG_TABLE_CLAUSE .= "(t1.sipiax=2 OR t1.sipiax=3 OR t1.sipiax=5) AND (t1.card_caller=0 OR t1.card_caller=t1.card_id) AND !(t1.src_exten IS NOT NULL AND t1.card_id$sessbillquery)";
-//			$FG_TABLE_CLAUSE .= "(t1.sipiax=2 OR t1.sipiax=3 OR t1.sipiax=5)";
-//			if ($choose_callowner == 0 && $customer_info[19]) {
-//				$FG_TABLE_NAME .=  " LEFT JOIN cc_sip_buddies cc ON cc.id_cc_card$sssb";
-//			}
-			$FG_TABLE_CLAUSE .= "(t1.sipiax=2 OR t1.sipiax=3 OR t1.sipiax=5 OR t1.sipiax=0) AND t1.card_caller$sssb";
+			$FG_TABLE_CLAUSE .= "t1.sipiax IN (0,2,3,5) AND t1.card_caller NOT$calledsbquery";
 			break;
 		case 1: //OUTGOING
 			$FG_TABLE_CLAUSE .= "t1.calledexten IS NULL AND t1.id_did IS NULL";
@@ -299,7 +290,6 @@ elseif ($choose_calltype != - 1) {
 			$FG_TABLE_CLAUSE .= "t1.src=t1.src_peername AND t1.calledexten IS NOT NULL";
 			break;
 		case 3: //CALLBACK CALLS
-//			$FG_TABLE_CLAUSE .= "(t1.sipiax=4 OR (t1.src_peername IS NULL AND t1.src_exten IS NULL AND t1.id_did IS NULL AND t1.dnid LIKE t1.calledstation))";
 			$FG_TABLE_CLAUSE .= "(t1.sipiax=4 OR (t1.src_peername IS NULL AND t1.src_exten IS NULL AND ((t1.id_did IS NULL AND t1.dnid LIKE t1.calledstation) OR (t1.card_id=t1.card_caller AND real_sessiontime IS NULL))))";
 			break;
 		case 4: //TRANSIT

@@ -45,7 +45,7 @@ getpost_ifset(array('id', 'idtariffplan', 'dialprefix', 'destination', 'buyrate'
 $destination = strtolower ($destination);
 
 if ( (empty($form_action) || $form_action=="list") && $deleteselected != 'true') {
-	$HD_Form = new FormHandler("cc_ratecard LEFT JOIN cc_prefix ON prefix=cc_ratecard.destination", "Rates");
+	$HD_Form = new FormHandler("cc_ratecard LEFT JOIN cc_prefix ON prefix=cc_ratecard.destination LEFT JOIN cc_tariffplan ON cc_tariffplan.id=cc_ratecard.idtariffplan", "Rates");
 } else {
 	$HD_Form = new FormHandler("cc_ratecard", "Rates");
 }
@@ -130,7 +130,7 @@ if (!$popup_select) {
 	if ($use_lcr_callplan)
 		$HD_Form -> FieldViewElement ('destination, dialprefix, buyrate, '.$rateinitial_field.', startdate, stopdate, initblock, connectcharge, id_trunk , idtariffplan ');
 	else
-		$HD_Form -> FieldViewElement ("cc_prefix.destination, cc_ratecard.dialprefix, cc_ratecard.buyrate, cc_ratecard.rateinitial, IF(cc_ratecard.startdate>NOW(),CONCAT('<font color=red>',cc_ratecard.startdate,'</font>'),cc_ratecard.startdate) AS startdate, IF(cc_ratecard.stopdate<NOW(),CONCAT('<font color=red>',cc_ratecard.stopdate,'</font>'),cc_ratecard.stopdate) AS stopdate, cc_ratecard.initblock, cc_ratecard.connectcharge, cc_ratecard.id_trunk , cc_ratecard.idtariffplan ");
+		$HD_Form -> FieldViewElement ("cc_prefix.destination, cc_ratecard.dialprefix, cc_ratecard.buyrate, cc_ratecard.rateinitial, IF(cc_ratecard.startdate>NOW(),CONCAT('<font color=red>',cc_ratecard.startdate,'</font>'),cc_ratecard.startdate) AS startdate, IF(cc_ratecard.stopdate<NOW(),CONCAT('<font color=red>',cc_ratecard.stopdate,'</font>'),cc_ratecard.stopdate) AS stopdate, cc_ratecard.initblock, cc_ratecard.connectcharge, IF(cc_ratecard.id_trunk=-1,cc_tariffplan.id_trunk,cc_ratecard.id_trunk) id_trunk, cc_ratecard.idtariffplan ");
 } else {
 	if ($use_lcr_callplan)
 		$HD_Form -> FieldViewElement ('id, destination, dialprefix, buyrate, '.$rateinitial_field);
