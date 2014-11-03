@@ -195,6 +195,7 @@ class A2Billing {
 	var $cardholder_uipass;
 	var $id_campaign;
 	var $id_card;
+	var $caller_concat_id = 0;
 //	var $card_caller = 0;
 //	var $card_called = 0;
 	var $useralias;
@@ -780,7 +781,7 @@ class A2Billing {
 	{
 		$this -> CallerID = $this -> src	= $agi -> request['agi_callerid'];
 //		if (!is_numeric($this -> src) || strlen($this -> src) > 4)
-			$this -> src			= 'NULL';
+//			$this -> src			= 'NULL';
 		$this -> src_peername 			= array_search($agi -> request['agi_type'], array('Dongle','Dahdi','Local')) === false ? $agi -> get_variable("CHANNEL(peername)",true) : '';
 		if (!is_numeric($this -> src_peername))
 			$this -> src_peername		= 'NULL';
@@ -892,7 +893,7 @@ class A2Billing {
      *  @param float $credit
      *  @return 1 if Ok ; -1 if error
 	**/
-	function callingcard_ivr_authorize($agi, &$RateEngine, $try_num, $call2did = false, $callertodidcredit = NULL)
+	function callingcard_ivr_authorize($agi, &$RateEngine, $try_num = 0, $call2did = false, $callertodidcredit = NULL)
 	{
 		$res=0;
 		
@@ -945,8 +946,8 @@ class A2Billing {
             $this->destination = $this->oldphonenumber = $this->redial;
             $this -> debug( DEBUG, $agi, __FILE__, __LINE__, "[REDIAL : DTMF DESTINATION ::> ".$this->destination."]");
         }
-
-	if (!$this->CallerIDext) {
+	if ($try_num==0) {
+	    if (!$this->CallerIDext) {
 		$this->transferername = $this->transfererchannel = $agi->get_variable("TRANSFERERNAME", true);
 		if ($this->transferername == "") {
 			$this->transferername = $this->transfererchannel = $agi->get_variable("BLINDTRANSFER", true);
@@ -956,50 +957,76 @@ class A2Billing {
 		if (isset($this->transferername[0])) {
 			$this->src_peername = $this->transferername[0];
 		}
-	}
-	$QUERY = "SELECT regexten FROM cc_sip_buddies WHERE id_cc_card = {$this->id_card} AND name = '{$this->src_peername}' AND regexten IS NOT NULL LIMIT 1";
-	$result = $this -> instance_table -> SQLExec ($this->DBHandle, $QUERY);
-	if (is_array($result) && !is_null($result[0][0])) {
-		$this -> src		= $result[0][0];
+	    }
+	    $QUERY = "SELECT regexten, concat_id, id_cc_card FROM cc_sip_buddies
+			LEFT JOIN cc_card_concat ON id_cc_card = concat_card_id
+			WHERE name = '{$this->src_peername}' AND regexten IS NOT NULL GROUP BY regexten LIMIT 1";
+	    $result = $this -> instance_table -> SQLExec ($this->DBHandle, $QUERY);
+	    if (is_array($result) && !is_null($result[0][0])) {
+		$this -> src = $this -> src_exten = $result[0][0];
+		$this -> caller_concat_id = $result[0][1];
+		$this -> card_caller = $result[0][2];
 		$this -> CID_handover	= '';
+	    }
 	}
 	$this->extext = true;
 	if ($this->destination) {
-		$QUERY = "SELECT name, regexten, translit FROM cc_sip_buddies
-				LEFT JOIN cc_card_concat bb ON id_cc_card = bb.concat_card_id
-				LEFT JOIN ( SELECT aa.concat_id FROM cc_card_concat aa WHERE aa.concat_card_id = {$this->id_card} ) AS v ON v.concat_id = bb.concat_id
-				WHERE (id_cc_card = {$this->id_card} OR v.concat_id IS NOT NULL) AND (regexten = '{$this->destination}' OR (name = '{$this->destination}' AND regexten IS NOT NULL)) LIMIT 1";
+		$QUERY = "SELECT name, regexten, mailbox, concat_id, id_cc_card, translit FROM cc_sip_buddies
+			LEFT JOIN cc_card_concat ON id_cc_card = concat_card_id
+			WHERE (name = '{$this->destination}' OR (regexten = '{$this->destination}' AND (id_cc_card = {$this->id_card} OR concat_id = '$this->caller_concat_id'))) AND regexten IS NOT NULL GROUP BY regexten LIMIT 1";
 		$result = $this -> instance_table -> SQLExec ($this->DBHandle, $QUERY);
 		if (is_array($result)) {
-			$this->destination = $result[0][0];
-			if (is_numeric($this->src)) {
+			$this -> destination	= $result[0][0];
+			$this -> called_exten	= $result[0][1];
+			$this -> voicebox	= $result[0][2];
+			$this -> called_concat_id = $result[0][3];
+			$this -> card_called	= $result[0][4];
+			if (isset($this->src_exten)) {
+			    if ($this -> card_caller == $this -> card_called || ($this -> caller_concat_id == $this -> called_concat_id && !is_null($this -> caller_concat_id))) {
 				if (!isset($this->transferername[0]) && !isset($this->cidextafter)) {
-					$cname = trim('"' . $agi->get_variable('CALLERID(name)', true) . '"<' . $this->src . '>');
-					if ($result[0][2])	$cname = translit($cname);
+					$cname = '"' . trim(preg_replace('/(?<!\d)(' . $this->src_exten . ')(?!\d)/', '', $agi->get_variable('CALLERID(name)', true)), "\x00..\x2F") . '"<' . $this->src_exten . '>';
+					if ($result[0][5])	$cname = translit($cname);
 					$agi -> set_callerid($cname);
+					unset($this->src_exten);
 				}
-				$this -> CID_handover = '';
+			    } else {
+				$cname = '"' . trim(preg_replace('/(?<!\d)(' . $this->src_peername . ')(?!\d)/', '', ($this->CallerIDext ? $this->CallerIDext : $this->CallerID) . ' ' . $agi->get_variable('CALLERID(name)', true)), "\x00..\x2F") . '"<' . $this->src_peername . '>';
+				if ($result[0][5])	$cname = translit($cname);
+				$agi -> set_callerid($cname);
+				unset($this->src_exten);
+			    }
+			    $this -> CID_handover = '';
 			}
-			$this->voicebox = $result[0][1]."@".$result[0][2];
 			$this->extext = false;
-		} elseif ($this->src_peername != 'NULL') {
-			if ($this->src_peername != $this->CallerID) {
-				$cname = trim($this->CallerID . ' ' . $agi->get_variable('CALLERID(name)', true));
-				$agi -> set_callerid('"' . $cname . '"<' . $this->src_peername . '>');
-			} else	$agi -> set_variable('CALLERID(num)', $this->src_peername);
-		}
+		} elseif (isset($this->src_exten)) {
+//			if ($this->src_peername != $this->CallerID) {
+//				$agi -> set_callerid('"' . trim(preg_replace('/(?<!\d)(' . $this->src_peername . ')(?!\d)/', '', $this->CallerID . ' ' . $agi->get_variable('CALLERID(name)', true)), "\x00..\x2F") . '"<' . $this->src_peername . '>');
+//				unset($this->src_exten);
+/**			} elseif (isset($this->src_exten)) {
+				$QUERY = "SELECT regexten, translit FROM cc_sip_buddies WHERE name = '{$this->destination}' AND external = 0 AND regexten IS NOT NULL LIMIT 1";
+				$result = $this -> instance_table -> SQLExec ($this->DBHandle, $QUERY);
+				if (is_array($result)) {
+//					$this -> called_exten = $result[0][0];
+					$cname = '"' . trim(preg_replace('/(?<!\d)(' . $this->src_peername . ')(?!\d)/', '', $agi->get_variable('CALLERID(name)', true)), "\x00..\x2F") . '"<' . $this->src_peername . '>';
+					$agi -> set_callerid($cname);
+				} else {
+//					$agi -> set_callerid('"' . trim(str_replace($this->src, '', $agi->get_variable('CALLERID(name)', true))) . '"<' . $this->src . '>');
+				}
+			} else {
+				$agi -> set_variable('CALLERID(num)', $this->src_peername);
+			}
+**/		}
 	}
 	if ($this->extext) {
 		$this->destination = $this->apply_add_countryprefixto ($this->destination);
 		if ($this->removeinterprefix) $this->destination = $this -> apply_rules ($this->destination);
 	}
 	if ($this->destination) {
-	if (isset($this->transferername[0])) {
+	    if (isset($this->transferername[0])) {
 		$this -> agiconfig['number_try']=1;
 		$onforwardcidtemp = $agi->get_fullvariable('${ONFORWARDCID1}', $this->transfererchannel, true);
 		if (!$onforwardcidtemp) {
 			$onforwardcidtemp = $agi->get_variable('ONFORWARDCID1', true);
-		} else {
 		}
 		$QUERY = "SELECT regexten FROM cc_sip_buddies WHERE id_cc_card = {$this->id_card} AND name = '{$onforwardcidtemp}' LIMIT 1";
 		$result = $this -> instance_table -> SQLExec ($this->DBHandle, $QUERY);
@@ -1019,7 +1046,6 @@ class A2Billing {
 		$onforwardcidtemp = $agi->get_fullvariable('${ONFORWARDCID2}', $this->transfererchannel, true);
 		if (!$onforwardcidtemp) {
 			$onforwardcidtemp = $agi->get_variable('ONFORWARDCID2', true);
-		} else {
 		}
 		$QUERY = "SELECT regexten FROM cc_sip_buddies WHERE id_cc_card = {$this->id_card} AND name = '{$onforwardcidtemp}' LIMIT 1";
 		$result = $this -> instance_table -> SQLExec ($this->DBHandle, $QUERY);
@@ -1040,12 +1066,11 @@ class A2Billing {
 		}
 		$this->CallerIDext = $onforwardcid1sql . "&#8660;" . $onforwardcid2sql;
 		$agi -> set_callerid('"' . $onforwardcid1asterisk . '*"<' . $onforwardcid2asterisk . '>');
-	} else {
+	    } else {
 		$tempcid1 = ($this->CallerID == $this->src_peername && $this->src != 'NULL') ? $this->src : $this->CallerID;
 		$agi -> set_variable('MASTER_CHANNEL(__TEMPONFORWARDCID1)', $tempcid1);
 		$agi -> set_variable('MASTER_CHANNEL(__TEMPONFORWARDPEER1)', $this->src_peername);
 		if ($this->extext && $this->destination>0) {
-
 			$QUERY = "SELECT cid FROM cc_callerid, cc_country aa
 				WHERE '{$this->destination}' LIKE concat(aa.countryprefix,'%') AND id_cc_card={$this->id_card} AND activated='t' AND cid LIKE '$this->CID_handover' AND (cli_replace=1
 				OR (cli_replace=2 AND (SELECT cid FROM cc_callerid, cc_country bb WHERE cid LIKE concat(bb.countryprefix,'%') AND id_cc_card = {$this->id_card} AND verify = 1 AND cid != '{$this->destination}'
@@ -1056,7 +1081,7 @@ class A2Billing {
 				$this -> CID_handover = '';
 			}
 		}
-	}
+	    }
 	}
 
 	//Check if Account have restriction
@@ -1893,11 +1918,11 @@ $this -> debug( ERROR, $agi, __FILE__, __LINE__, "CREDIT :: $this->credit");
 		if ($call_did_free) $this -> debug( DEBUG, $agi, __FILE__, __LINE__, "[A2Billing] DID call friend: Dialing '$dialstr' Friend.\n");
 
 		if ($agi -> channel_status('',true) == AST_STATE_DOWN) break;
-		if ($this->src_peername != 'NULL')	{
-			$cname = $agi->get_variable('CALLERID(name)', true);
-			if (strpos($cname, $this->CallerID) === false)	$cname = $this->CallerID . ' ' . $cname;
-			$cname = str_replace($this->src_peername, '', $cname);
-			$agi -> set_callerid('"' . $cname . '"<' . $this->src_peername . '>');
+		if (isset($this->src_exten)) {
+			$QUERY = "SELECT 1 FROM cc_card_concat WHERE concat_id = '$this->caller_concat_id' AND concat_card_id = {$this->id_card} LIMIT 1";
+			$result = $this -> instance_table -> SQLExec ($this->DBHandle, $QUERY);
+			$cid =  (is_array($result) || $this->id_card == $this->card_caller) ? $this->src_exten : $this->src_peername;
+			$agi -> set_callerid(translit('"' . trim(preg_replace('/(?<!\d)(' . $cid . ')(?!\d)/', '', $this->CallerID . ' ' . $agi->get_variable('CALLERID(name)', true)), "\x00..\x2F") . '"<' . $cid . '>'));
 		}
                 $this -> debug( INFO, $agi, __FILE__, __LINE__, "DIAL $dialstr");
                 $myres = $this -> run_dial($agi, $dialstr);
@@ -1908,7 +1933,7 @@ $this -> debug( ERROR, $agi, __FILE__, __LINE__, "CREDIT :: $this->credit");
 		if ($answeredtime == "")
 				  $answeredtime = $agi->get_variable("CDR(billsec)",true);
 		if (stripos($dialstr,'QUEUE ') === 0) {
-			if ($answeredtime>1356000000) {
+			if ($answeredtime>1000000) {
 				$answeredtime	= time() - $answeredtime;
 				$dialstatus	= 'ANSWER';
 			} else {
@@ -3181,11 +3206,12 @@ $this -> debug( ERROR, $agi, __FILE__, __LINE__, "FAXRESOLUTION: ".$faxresolutio
 				    " cc_card.lastname, cc_card.firstname, cc_card.email, cc_card.uipass, cc_card.id_campaign, cc_card.id, useralias, " .
 				    " cc_card.status, cc_card.voicemail_permitted, cc_card.voicemail_activated, cc_card.restriction, cc_country.countryprefix, " .
 				    " cc_card.monitor, phonenumber, warning_threshold, say_rateinitial, say_balance_after_call, margin, id_diller, ".
-				    " blacklist, areaprefix, citylength".
+				    " blacklist, areaprefix, citylength, concat_id".
 				    " FROM cc_callerid ".
 				    " LEFT JOIN cc_card ON cc_callerid.id_cc_card=cc_card.id ".
 				    " LEFT JOIN cc_tariffgroup ON cc_card.tariff=cc_tariffgroup.id ".
 				    " LEFT JOIN cc_country ON cc_card.country=cc_country.countrycode ".
+				    " LEFT JOIN cc_card_concat ON concat_card_id=cc_card.id ".
 				    " WHERE cc_callerid.cid LIKE '$this->CallerID'";
 			$result = $this->instance_table -> SQLExec ($this->DBHandle, $QUERY);
 			$this -> debug( DEBUG, $agi, __FILE__, __LINE__, print_r($result,true));
@@ -3307,6 +3333,7 @@ $this -> debug( ERROR, $agi, __FILE__, __LINE__, "FAXRESOLUTION: ".$faxresolutio
 				$blacklist				=  $result[0][40];
 				$this->areaprefix			=  $result[0][41];
 				$this->citylength			=  $result[0][42];
+				$this->caller_concat_id 		=  $result[0][43];
 
 				if (strlen($language)==2 && !($this->languageselected>=1)) {
 

@@ -1924,20 +1924,20 @@ else echo "Ratecard: ".$this->ratecard_obj[$i][6]."<br>Trunk: ".$this->ratecard_
 						//$A2B -> CallerID = $outcid;
 						$calleridname = $agi -> get_variable('CALLERID(name)', true);
 						$agi -> set_callerid($outcid);
-						$agi -> set_variable('CALLERID(ani)', $outcid);
+//						$agi -> set_variable('CALLERID(ani)', $outcid);
 						$A2B -> debug( DEBUG, $agi, __FILE__, __LINE__, "[EXEC SetCallerID : $outcid]");
-					    } else {
+					} else {
 						$outcid = 0;
-					    }
+					}
 					// Count this call on the trunk
 //$A2B -> debug( ERROR, $agi, __FILE__, __LINE__, "this -> usedtrunk = ".$this -> usedtrunk);
 					$myres = $A2B -> run_dial($agi, $dialstr);
 					$A2B -> debug( DEBUG, $agi, __FILE__, __LINE__, "DIAL FAILOVER $dialstr");
 					if ($outcid != 0) {
 						$outcid = 0;
-						$agi -> set_callerid($A2B -> CallerID);
-						$agi -> set_variable('CALLERID(ani)', $A2B -> CallerID);
-						$agi -> set_variable('CALLERID(name)', $calleridname);
+						$agi -> set_callerid('"'.$calleridname.'"<'.$A2B -> CallerID.'>');
+//						$agi -> set_variable('CALLERID(ani)', $A2B -> CallerID);
+//						$agi -> set_variable('CALLERID(name)', $calleridname);
 					}
 					if ($A2B->monitor == 1 || $A2B -> agiconfig['record_call'] == 1) {
 						$myres = $agi->exec($A2B -> format_parameters ("StopMixMonitor"));
