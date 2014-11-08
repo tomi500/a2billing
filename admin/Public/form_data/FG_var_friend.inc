@@ -38,11 +38,9 @@ getpost_ifset(array('id_cc_card', 'cardnumber', 'id', 'name', 'amaflags', 'callg
 'restrictcid', 'rtptimeout', 'rtpholdtimeout', 'secret', 'type', 'username', 'disallow', 'allow', 'musiconhold', 'regseconds', 'ipaddr', 'regexten','friend_id', 'callbackextension', 'callcounter', 'call-limit', 'external'));
 
 getpost_ifset(array('defaultuser', 'subscribemwi', 'vmexten', 'cid_number', 'callingpres', 'usereqphone', 'incominglimit', 'subscribecontext', 'musicclass', 
-'allowtransfer', 'autoframing', 'maxcallbitrate', 'outboundproxy', 'regserver', 'rtpkeepalive', 'dbsecret ', 'regcontext ', 'sourceaddress ', 'mohinterpret ', 
+'allowtransfer', 'autoframing', 'maxcallbitrate', 'outboundproxy', 'regserver', 'rtpkeepalive', 'dbsecret ', 'regcontext ', 'sourceaddress ', 'mohinterpret', 'cbe',
 'mohsuggest ', 'inkeys', 'outkey', 'sendani', 'fullname', 'maxauthreq', 'encryption', 'ignorecryptolifetime', 'transport', 't38pt_udptl', 'forceencryption', 'transfer', 'jitterbuffer', 
 'forcejitterbuffer', 'codecpriority', 'qualifysmoothing', 'qualifyfreqok ', 'qualifyfreqnotok ', 'timezone', 'adsi', 'filterprefix', 'current_page'));
-
-
 
 if ($atmenu=='sip') {
 	$HD_Form = new FormHandler("cc_sip_buddies", gettext("SIP Config"));
@@ -89,6 +87,12 @@ foreach ($result as $one) {
 		$values_list[$one[0]] = $value_elem;
 		unset($value_elem);
 	}
+}
+
+if ($atmenu == 'sip' && $form_action=="ask-edit" && isset($id)) {
+	$cbe_table = new Table('cc_sip_buddies','callbackextension');
+	$cbe_list = $cbe_table -> Get_list ($handle, "id='$id'", null, null, null, null);
+	$cbe = (is_array($cbe_list) && count($cbe_list)>0 && !is_null($cbe_list[0][0])) ? 1 : 0;
 }
 
 $HD_Form -> AddViewElement(gettext("CARDHOLDER"), "id_cc_card", "17%", "center", "sort", "25", "lie", "cc_card", "lastname, firstname", "id='%id'", "%1 %2");
@@ -1126,8 +1130,8 @@ if ($atmenu=='sip') {
 
 $HD_Form -> FieldEditElement ($field_list_edit);
 
-$HD_Form -> FG_ADITION_HIDDEN_PARAM		= $HD_Form -> FG_EDITION_HIDDEN_PARAM		= 'filterprefix';
-$HD_Form -> FG_ADITION_HIDDEN_PARAM_VALUE	= $HD_Form -> FG_EDITION_HIDDEN_PARAM_VALUE	= "$filterprefix";
+$HD_Form -> FG_ADITION_HIDDEN_PARAM		= $HD_Form -> FG_EDITION_HIDDEN_PARAM		= 'filterprefix, cbe';
+$HD_Form -> FG_ADITION_HIDDEN_PARAM_VALUE	= $HD_Form -> FG_EDITION_HIDDEN_PARAM_VALUE	= $filterprefix.",".$cbe;
 
 //$HD_Form -> FG_SPLITABLE_FIELD = 'accountcode';
 

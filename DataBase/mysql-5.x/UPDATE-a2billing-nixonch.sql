@@ -492,6 +492,7 @@ CREATE TABLE IF NOT EXISTS `cc_fax` (
   PRIMARY KEY (`id`,`ext_num`)
 ) ENGINE=MyISAM DEFAULT CHARSET=utf8 COLLATE=utf8_bin;
 
+ALTER TABLE `cc_prefix` CHANGE `prefix` `prefix` BIGINT( 20 ) NOT NULL;
 INSERT IGNORE INTO cc_prefix (`prefix`, `destination`) VALUES ('0', 'Internal Call');
 INSERT IGNORE INTO cc_prefix (`prefix`, `destination`) VALUES ('-1', '');
 INSERT IGNORE INTO cc_prefix (`prefix`, `destination`) VALUES ('-2', '<b>FAX</b>');

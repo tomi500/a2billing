@@ -184,15 +184,21 @@ if(!USE_REALTIME) {
 	  	} else {
 	  		$key = "iax_changed";
 	  	}
-		if($_SESSION["user_type"]=="ADMIN") {$who= Notification::$ADMIN;$id=$_SESSION['admin_id'];} 
-		elseif ($_SESSION["user_type"]=="AGENT"){$who= Notification::$AGENT;$id=$_SESSION['agent_id'];}
-		else {$who=Notification::$UNKNOWN;$id=-1;}
+		if ($_SESSION["user_type"]=="ADMIN") {
+			$who = Notification::$ADMIN;
+			$id = $_SESSION['admin_id'];
+		} elseif ($_SESSION["user_type"]=="AGENT") {
+			$who = Notification::$AGENT;
+			$id = $_SESSION['agent_id'];
+		} else {
+			$who = Notification::$UNKNOWN;
+			$id = -1;
+		}
 		NotificationsDAO::AddNotification($key,Notification::$HIGH,$who,$id);
 	}
 }
 
 $list = $HD_Form -> perform_action($form_action);
-
 
 // #### HEADER SECTION
 $smarty->display('main.tpl');

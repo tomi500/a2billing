@@ -538,10 +538,7 @@ class FormBO {
 				if ($FormHandler->FG_TABLE_NAME == 'cc_sip_buddies')	{
 					$res = $as->Command('sip unregister '.$peername);
 					$res = $as->Command('sip prune realtime peer '.$peername);
-					$table = new Table('cc_sip_buddies','callbackextension');
-					$clause = "name = '{$peername}' AND callbackextension IS NOT NULL";
-					$result = $table -> Get_list($FormHandler->DBHandle, $clause, 0);
-					if ((is_array($result) && count($result)>0) || $processed['callbackextension']) {
+					if ($processed['cbe'] || $processed['callbackextension']) {
 						$res = $as->Command('sip reload');
 					}
 				} else	$res = $as->Command('iax2 prune realtime '.$peername);
@@ -582,10 +579,7 @@ class FormBO {
 				if ($FormHandler->FG_TABLE_NAME == 'cc_sip_buddies')	{
 					$res = $as->Command('sip unregister '.$peername);
 					$res = $as->Command('sip prune realtime peer '.$peername);
-					$table = new Table('cc_sip_buddies','callbackextension');
-					$clause = "name = '{$peername}' AND callbackextension IS NOT NULL";
-					$result = $table -> Get_list($FormHandler->DBHandle, $clause, 0);
-					if ((is_array($result) && count($result)>0) || $processed['callbackextension']) {
+					if ($processed['cbe'] || $processed['callbackextension']) {
 						$res = $as->Command('sip reload');
 					}
 				} else	$res = $as->Command('iax2 prune realtime '.$peername);

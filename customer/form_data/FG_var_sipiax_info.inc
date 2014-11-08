@@ -33,7 +33,7 @@
 
 
 
-getpost_ifset(array('id'));
+getpost_ifset(array('id', 'cbe'));
 
 $atmenu = ($atmenu=='IAX')?$atmenu:'SIP';
 if (!isset($form_action) || $form_action=="list"){
@@ -80,6 +80,12 @@ foreach ($values as $val) {
         $idx++;
         $val_display = round($val,2);
         $limits_notify [$idx] = array($val_display,$val);
+}
+
+if ($atmenu == 'sip' && $form_action=="ask-edit" && isset($id)) {
+	$cbe_table = new Table('cc_sip_buddies','callbackextension');
+	$cbe_list = $cbe_table -> Get_list ($DBHandle, "id='$id'", null, null, null, null);
+	$cbe = (is_array($cbe_list) && count($cbe_list)>0 && !is_null($cbe_list[0][0])) ? 1 : 0;
 }
 
 $HD_Form -> AddViewElement(gettext("EXTENSION"), "regexten", "10%", "center", "sort", "25");
@@ -203,6 +209,9 @@ $HD_Form -> AddEditElement (gettext("SAY BALANCE AFTER CALL"),
 $field_list_edit = 'regexten, name, secret, callerid, nat, warning_threshold, say_rateinitial, say_balance_after_call';
 
 $HD_Form -> FieldEditElement ($field_list_edit);
+
+$HD_Form -> FG_ADITION_HIDDEN_PARAM		= $HD_Form -> FG_EDITION_HIDDEN_PARAM		= 'filterprefix, cbe';
+$HD_Form -> FG_ADITION_HIDDEN_PARAM_VALUE	= $HD_Form -> FG_EDITION_HIDDEN_PARAM_VALUE	= $filterprefix.",".$cbe;
 
 $HD_Form -> FG_FILTER_APPLY = false;
 $HD_Form -> FG_FILTERFIELD = 'name';
