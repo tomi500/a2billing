@@ -1,33 +1,30 @@
 <?
 
-//require_once('./lib/epayment/includes/methods/webmoney.php');
 define('MODULE_PAYMENT_WM_TEXT_TITLE', 'WebMoney');
 define('MODULE_PAYMENT_WM_TEXT_DESCRIPTION', 'WebMoney');
 define('MODULE_PAYMENT_WM_LMI_PAYMENT_DESC', 'Connection service');
 
-class webmoney {
+class webmoneycreditcard {
 	var $code, $title, $description, $enabled, $current_wm_currency;
 
-	function webmoney() {
+	function webmoneycreditcard() {
 		global $order;
 
-		$this->code = 'webmoney';
+		$this->code = 'webmoneycreditcard';
 		$this->title = MODULE_PAYMENT_WM_TEXT_TITLE;
 		$this->description = MODULE_PAYMENT_WM_TEXT_DESCRIPTION;
 		$this->sort_order = 1;
-		$this->enabled = ((MODULE_PAYMENT_WM_STATUS == 'True') ? true : false);
+		$this->enabled = ((MODULE_PAYMENT_WM_STATUS_10 == 'True') ? true : false);
 
 		$this->form_action_url = 'https://merchant.webmoney.ru/lmi/payment.asp';
 	}
 
 	function keys() {
 		return array(
-				  'MODULE_PAYMENT_WM_STATUS',		'MODULE_PAYMENT_WM_WMID'
-				, 'MODULE_PAYMENT_WM_PURSE_WMU',	'MODULE_PAYMENT_WM_PURSE_WME'
-				, 'MODULE_PAYMENT_WM_PURSE_WMR',	'MODULE_PAYMENT_WM_PURSE_WMZ'
-				, 'MODULE_PAYMENT_WM_CACERT',		'MODULE_PAYMENT_WM_LMI_SECRET_KEY'
-				, 'MODULE_PAYMENT_WM_LMI_SIM_MODE',	'MODULE_PAYMENT_WM_LMI_HASH_METHOD'
-//				, 'MODULE_PAYMENT_WM_WMSIGNER_PATH'
+				  'MODULE_PAYMENT_WM_STATUS_10',		'MODULE_PAYMENT_WM_WMID_10'
+				, 'MODULE_PAYMENT_WM_PURSE_WMU_10',		'MODULE_PAYMENT_WM_PURSE_WMR_10'
+				, 'MODULE_PAYMENT_WM_CACERT_10',		'MODULE_PAYMENT_WM_LMI_SECRET_KEY_10'
+				, 'MODULE_PAYMENT_WM_LMI_SIM_MODE_10',		'MODULE_PAYMENT_WM_LMI_HASH_METHOD_10'
 				);
 	}
 
@@ -39,10 +36,8 @@ class webmoney {
 
 		
 		   global $order;
-		   if (MODULE_PAYMENT_WM_PURSE_WME) $purse_type[] = array('id' => 'WME', 'text' => 'WME Euro (EUR)');
-		   if (MODULE_PAYMENT_WM_PURSE_WMZ) $purse_type[] = array('id' => 'WMZ', 'text' => 'WMZ U.S. Dollar (USD)');
-		   if (MODULE_PAYMENT_WM_PURSE_WMU) $purse_type[] = array('id' => 'WMU', 'text' => 'WMU Ukraine Hryvnia (UAH)');
-		   if (MODULE_PAYMENT_WM_PURSE_WMR) $purse_type[] = array('id' => 'WMR', 'text' => 'WMR Russian Rouble (RUB)');
+		   if (MODULE_PAYMENT_WM_PURSE_WMU_10) $purse_type[] = array('id' => 'WMU', 'text' => 'Ukraine Hryvnia (UAH)');
+		   if (MODULE_PAYMENT_WM_PURSE_WMR_10) $purse_type[] = array('id' => 'WMR', 'text' => 'Russian Rouble (RUB)');
 
 		   $selection = array(
 		   'id' => $this->code,
@@ -83,16 +78,17 @@ class webmoney {
 		$process_button_string .= tep_draw_hidden_field('LMI_PAYMENT_DESC', MODULE_PAYMENT_WM_LMI_PAYMENT_DESC);
 //		$process_button_string .= tep_draw_hidden_field('LMI_PAYMENT_NO', '1');
 
-		if ($_POST['wm_purse_type'] == 'WMU')
-		   $process_button_string .= tep_draw_hidden_field('LMI_PAYEE_PURSE', MODULE_PAYMENT_WM_PURSE_WMU);
-		elseif ($_POST['wm_purse_type'] == 'WMZ')
-		   $process_button_string .= tep_draw_hidden_field('LMI_PAYEE_PURSE', MODULE_PAYMENT_WM_PURSE_WMZ);
+		if ($_POST['wm_purse_type'] == 'WMU') {
+		    $process_button_string .= tep_draw_hidden_field('LMI_PAYEE_PURSE', MODULE_PAYMENT_WM_PURSE_WMU_10);
+		    $process_button_string .= tep_draw_hidden_field('LMI_ALLOW_SDP', '10');
+		} elseif ($_POST['wm_purse_type'] == 'WMZ')
+		   $process_button_string .= tep_draw_hidden_field('LMI_PAYEE_PURSE', MODULE_PAYMENT_WM_PURSE_WMZ_10);
 		elseif ($_POST['wm_purse_type'] == 'WME')
-		   $process_button_string .= tep_draw_hidden_field('LMI_PAYEE_PURSE', MODULE_PAYMENT_WM_PURSE_WME);
+		   $process_button_string .= tep_draw_hidden_field('LMI_PAYEE_PURSE', MODULE_PAYMENT_WM_PURSE_WME_10);
 		elseif ($_POST['wm_purse_type'] == 'WMR')
-		   $process_button_string .= tep_draw_hidden_field('LMI_PAYEE_PURSE', MODULE_PAYMENT_WM_PURSE_WMR);
+		   $process_button_string .= tep_draw_hidden_field('LMI_PAYEE_PURSE', MODULE_PAYMENT_WM_PURSE_WMR_10);
 
-		$process_button_string .= tep_draw_hidden_field('LMI_SIM_MODE', MODULE_PAYMENT_WM_LMI_SIM_MODE);
+		$process_button_string .= tep_draw_hidden_field('LMI_SIM_MODE', MODULE_PAYMENT_WM_LMI_SIM_MODE_10);
 
 		$process_button_string .= tep_draw_hidden_field('LMI_SUCCESS_URL', tep_href_link("userinfo.php", '', 'SSL'));
 //		$process_button_string .= tep_draw_hidden_field('LMI_SUCCESS_URL', tep_href_link("checkout_success.php", '', 'SSL'));

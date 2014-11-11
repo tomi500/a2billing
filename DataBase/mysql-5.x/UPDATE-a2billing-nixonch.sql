@@ -422,7 +422,7 @@ drop procedure if exists a2b_trf_check;
 
 ALTER TABLE cc_configuration ADD UNIQUE `SECONDARY` ( `configuration_key` );
 INSERT IGNORE INTO `cc_configuration` (`configuration_title`, `configuration_key`, `configuration_value`, `configuration_description`, `configuration_type`, `use_function`, `set_function`) VALUES
-	('Enable webmoney Module', 'MODULE_PAYMENT_WM_STATUS', 'False', 'Do you want to accept webmoney payments?', 0, NULL, 'tep_cfg_select_option(array(''True'', ''False''),'),
+	('Enable WebMoney Module', 'MODULE_PAYMENT_WM_STATUS', 'False', 'Do you want to accept webmoney payments?', 0, NULL, 'tep_cfg_select_option(array(''True'', ''False''),'),
 	('Provider WMID', 'MODULE_PAYMENT_WM_WMID', '111111111111', '', 0, NULL, NULL),
 	('WME Purse', 'MODULE_PAYMENT_WM_PURSE_WME', 'E222222222222', 'Euro (EUR)', 0, NULL, NULL),
 	('WMR purse', 'MODULE_PAYMENT_WM_PURSE_WMR', 'R333333333333', 'Russian Rouble (RUB)', 0, NULL, NULL),
@@ -431,7 +431,18 @@ INSERT IGNORE INTO `cc_configuration` (`configuration_title`, `configuration_key
 	('WebMoney', 'MODULE_PAYMENT_WM_CACERT', './WebMoneyTransferRootCA.crt', 'root certificate path, in PEM-format', 0, NULL, NULL),
 	('Secret Key', 'MODULE_PAYMENT_WM_LMI_SECRET_KEY', 'Secret Key', 'Known to seller and WM Merchant Interface service on', 0, NULL, NULL),
 	('Extra field for testmode', 'MODULE_PAYMENT_WM_LMI_SIM_MODE', '0', '0 - simulate success; 1 - simulate fail; 2 - simulate 80% success, 20% fail', 0, NULL, NULL),
-	('Hash method', 'MODULE_PAYMENT_WM_LMI_HASH_METHOD', 'MD 5', 'Method of forming control signature', 0, NULL, 'tep_cfg_select_option(array(''MD 5'', ''SIGN''),');
+	('Hash method', 'MODULE_PAYMENT_WM_LMI_HASH_METHOD', 'MD 5', 'Method of forming control signature', 0, NULL, 'tep_cfg_select_option(array(''MD 5'', ''SHA256'', ''SIGN''),'),
+
+	('Enable WebMoney Credit Card payments Module', 'MODULE_PAYMENT_WM_STATUS_10', 'False', 'Do you want to accept separate method for jump directly to interface for paying by Credit Card?', 0, NULL, 'tep_cfg_select_option(array(''True'', ''False''),'),
+	('Provider WMID', 'MODULE_PAYMENT_WM_WMID_10', '111111111111', '', 0, NULL, NULL),
+	('WMU Purse', 'MODULE_PAYMENT_WM_PURSE_WMU_10', 'U555555555555', 'Ukraine Hryvnia (UAH)', 0, NULL, NULL),
+	('WMR purse', 'MODULE_PAYMENT_WM_PURSE_WMR_10', 'R333333333333', 'Russian Rouble (RUB)', 0, NULL, NULL),
+	('WebMoney', 'MODULE_PAYMENT_WM_CACERT_10', './WebMoneyTransferRootCA.crt', 'root certificate path, in PEM-format', 0, NULL, NULL),
+	('Secret Key', 'MODULE_PAYMENT_WM_LMI_SECRET_KEY_10', 'Secret Key', 'Known to seller and WM Merchant Interface service on', 0, NULL, NULL),
+	('Extra field for testmode', 'MODULE_PAYMENT_WM_LMI_SIM_MODE_10', '0', '0 - simulate success; 1 - simulate fail; 2 - simulate 80% success, 20% fail', 0, NULL, NULL),
+	('Hash method', 'MODULE_PAYMENT_WM_LMI_HASH_METHOD_10', 'MD 5', 'Method of forming control signature', 0, NULL, 'tep_cfg_select_option(array(''MD 5'', ''SHA256'', ''SIGN''),');
+
+UPDATE `cc_configuration` SET `set_function` = 'tep_cfg_select_option(array(''MD 5'', ''SHA256'', ''SIGN''),' WHERE `configuration_key` ='MODULE_PAYMENT_WM_LMI_HASH_METHOD';
 
 delimiter //
 

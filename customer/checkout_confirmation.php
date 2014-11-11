@@ -173,7 +173,7 @@ if (is_array($payment_modules->modules)) {
 <tr>
     <td align=center align=left><?php echo $SPOT[$payment];?>&nbsp;</td>
     <td><div align="right"><?php echo gettext("Payment Method");?>: &nbsp;</div></td>
-    <td width=50% align="left"><?php echo mb_strtoupper($payment)?></td>
+    <td width=50% align="left"><?php echo mb_strtoupper(str_replace('creditcard','',$payment))?></td>
 </tr>
 <?php if(strcasecmp("invoice",$item_type)!=0){?>
 <tr>

@@ -242,6 +242,8 @@ switch($transaction_data[0][4])
 		$currAmount             = $transaction_data[0][2];
 		break;
 		
+	case "webmoneycreditcard":
+		
 	case "webmoney":
 		switch(substr($LMI_PAYEE_PURSE,0,1))
 		{
@@ -258,19 +260,32 @@ switch($transaction_data[0][4])
 		 && !tep_ip_vs_net($ipaddress,"91.227.52.0",  "255.255.255.0")) $ipaddress = $security_verify = false;
 //		if($transaction_data[0][2] != trim($LMI_PAYMENT_AMOUNT) && (trim($LMI_PAYMENT_DESC) != "Donate Author" && $transactionID != "1")) $security_verify = false;
 //		if($transaction_data[0][2] != trim($LMI_PAYMENT_AMOUNT)) $security_verify = false;
-		if(array_search($LMI_PAYEE_PURSE, array(MODULE_PAYMENT_WM_PURSE_WMU,MODULE_PAYMENT_WM_PURSE_WMZ,MODULE_PAYMENT_WM_PURSE_WME,MODULE_PAYMENT_WM_PURSE_WMR)) === false) $security_verify = false;
+		if ($transaction_data[0][4] == 'webmoney') {
+			$sk = MODULE_PAYMENT_WM_LMI_SECRET_KEY;
+			$hm = MODULE_PAYMENT_WM_LMI_HASH_METHOD;
+			if (array_search($LMI_PAYEE_PURSE, array(MODULE_PAYMENT_WM_PURSE_WMU,MODULE_PAYMENT_WM_PURSE_WMZ,MODULE_PAYMENT_WM_PURSE_WME,MODULE_PAYMENT_WM_PURSE_WMR)) === false)
+				{ $security_verify = false; }
+		} else {
+			$sk = MODULE_PAYMENT_WM_LMI_SECRET_KEY_10;
+			$hm = MODULE_PAYMENT_WM_LMI_HASH_METHOD_10;
+			if (array_search($LMI_PAYEE_PURSE, array(MODULE_PAYMENT_WM_PURSE_WMU_10,MODULE_PAYMENT_WM_PURSE_WMR_10)) === false)
+				{ $security_verify = false; }
+		}
 		write_log(LOGFILE_EPAYMENT, basename(__FILE__).' line:'.__LINE__." - WebMoney LMI_PREREQUEST='$LMI_PREREQUEST', LMI_MODE='$LMI_MODE', LMI_SYS_INVS_NO='$LMI_SYS_INVS_NO', LMI_SYS_TRANS_NO='$LMI_SYS_TRANS_NO', LMI_PAYER_WM='$LMI_PAYER_WM'");
 		if ($LMI_PREREQUEST == 1 && ($security_verify || ($ipaddress && trim($LMI_PAYMENT_DESC) == "Donate Author"))) {
 			echo "YES";
 			write_log(LOGFILE_EPAYMENT, basename(__FILE__).' line:'.__LINE__." - Answered 'YES' to WebMoney ");
 			exit();
 		}
-		switch(MODULE_PAYMENT_WM_LMI_HASH_METHOD)
+		$common_string = $LMI_PAYEE_PURSE.$LMI_PAYMENT_AMOUNT.$LMI_PAYMENT_NO.$LMI_MODE.$LMI_SYS_INVS_NO.$LMI_SYS_TRANS_NO.$LMI_SYS_TRANS_DATE.$sk.$LMI_PAYER_PURSE.$LMI_PAYER_WM;
+		switch($hm)
 		{
 		    case "MD 5":
-				$common_string = $LMI_PAYEE_PURSE.$LMI_PAYMENT_AMOUNT.$LMI_PAYMENT_NO.$LMI_MODE.$LMI_SYS_INVS_NO.
-						$LMI_SYS_TRANS_NO.$LMI_SYS_TRANS_DATE.MODULE_PAYMENT_WM_LMI_SECRET_KEY.$LMI_PAYER_PURSE.$LMI_PAYER_WM;
 				$hash = mb_strtoupper(md5($common_string));
+				if ($hash!=$LMI_HASH) $security_verify = false;
+				break;
+		    case "SHA256":
+				$hash = mb_strtoupper(hash('sha256', $common_string));
 				if ($hash!=$LMI_HASH) $security_verify = false;
 				break;
 		    case "SIGN":
@@ -609,7 +624,7 @@ if (preg_match("/^[_A-Za-z0-9-]+(\\.[_A-Za-z0-9-]+)*@[A-Za-z0-9]+(\\.[A-Za-z0-9]
         $mail->replaceInEmail(Mail::$ITEM_AMOUNT_KEY,$amount_without_vat." ".BASE_CURRENCY);
         $mail->replaceInEmail(Mail::$ITEM_ID_KEY,$id_logrefill);
         $mail->replaceInEmail(Mail::$ITEM_NAME_KEY,$item_name);
-        $mail->replaceInEmail(Mail::$PAYMENT_METHOD_KEY,$pmodule);
+        $mail->replaceInEmail(Mail::$PAYMENT_METHOD_KEY,mb_strtoupper(str_replace('creditcard','',$pmodule)));
         $mail->replaceInEmail(Mail::$PAYMENT_STATUS_KEY,gettext($statusmessage));
         $mail->replaceInEmail(Mail::$PAYMENT_FEE_KEY,$fee." ".BASE_CURRENCY);
         $mail->replaceInEmail(Mail::$PAYMENT_VAT_KEY,$VAT);

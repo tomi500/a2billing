@@ -587,7 +587,7 @@ $HD_Form -> AddEditElement(gettext("CIDGroup"),
    "sql",
    "cc_outbound_cid_group",
    "group_name, id",
-	"", "", "%1", "", gettext("Set the Outgoing CID Group to use for this destination, or NOT DEFINED to use the rate card trunk."), '', '<OPTION  value="-1" selected>'.gettext("NOT DEFINED").'</OPTION>');
+	"", "", "%1", "", gettext("Set the Outgoing CID Group to use with this Ratecard only, or leave NOT DEFINED to use the rate card trunk."), '', '<OPTION  value="-1" selected>'.gettext("NOT DEFINED").'</OPTION>');
 
 
 $HD_Form -> AddEditElement(gettext("TAG"),
@@ -597,7 +597,7 @@ $HD_Form -> AddEditElement(gettext("TAG"),
    "size=30 maxlength=40",
    "11",
    "",
-   "" , "", "",	"", "", "", "NO", gettext("Set a tag on this rate"));
+   "" , "", "",	"", "", "", "NO", gettext("Set a tag on this rate. Use tag 'EMERGENCY' for let calling even credit is below limit."));
 
 
 if (ADVANCED_MODE) {

@@ -99,6 +99,7 @@ $GLOBALS['worldpay']->enabled = true;
 $GLOBALS['plugnpay']->enabled = true;
 $GLOBALS['iridium']->enabled = true;
 $GLOBALS['webmoney']->enabled = true;
+$GLOBALS['webmoneycreditcard']->enabled = true;
 $module_keys = $payment_modules->keys();
 
 $keys_extra = array ();

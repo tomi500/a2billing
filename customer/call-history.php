@@ -133,7 +133,7 @@ if (!has_rights(ACX_DISTRIBUTION) || !isset($id) || !is_numeric($id))	{
 	if ($choose_callowner == 3 || $choose_callowner == 4)		$choose_callowner	= 0;
 }
 
-if ($choose_callowner >= 0)	$instance_table -> Update_table($DBHandle_max, "showcallstypedefault = '$choose_callowner'", "username = '".$_SESSION["pr_login"]."' AND uipass = '".$_SESSION["pr_password"]."'");
+if (0 <= $choose_callowner && $choose_callowner <= 2)	$instance_table -> Update_table($DBHandle_max, "showcallstypedefault = '$choose_callowner'", "username = '".$_SESSION["pr_login"]."' AND uipass = '".$_SESSION["pr_password"]."'");
 
 $FG_DEBUG = 0;
 // THIS VARIABLE DEFINE THE COLOR OF THE HEAD TABLE
@@ -246,7 +246,7 @@ switch ($choose_callowner) {
 				if (strlen($FG_TABLE_CLAUSE)>0)		$FG_TABLE_CLAUSE.=" AND ";
 				$FG_TABLE_CLAUSE.="(t1.card_id='$id' OR t1.card_caller='$id')";
 				unset($calltype_list[3]);
-				$FG_HTML_TABLE_TITLE .= "&nbsp;&nbsp;&nbsp;&nbsp;<B><font color=blue>".$resmax[0][0]." ".$resmax[0][1]."</font> (".$resmax[0][2].") <font color=green>".$resmax[0][3]." ".BASE_CURRENCY."</font></B>";
+				$FG_HTML_TABLE_TITLE .= '</SPAN></B></TD><TD align="right"><B><font color=blue>'.$resmax[0][0]." ".$resmax[0][1]."</font> (".$resmax[0][2].') <SPAN style="COLOR: green">'.$resmax[0][3]." ".BASE_CURRENCY;
 				$calledsbquery = $sessbillquery = " IN ('$id')";
 			} else $accdie = true;
 			break;
@@ -274,13 +274,12 @@ if ($accdie)	{
 	die();
 }
 
-//if (!isset($choose_callowner)) $choose_callowner = 0;
-
 if (!isset($choose_calltype)) $choose_calltype = -1;
 elseif ($choose_calltype != - 1) {
 	if (strlen($FG_TABLE_CLAUSE)>0) $FG_TABLE_CLAUSE.=" AND ";
 	switch ($choose_calltype) {
 		case 0: //INCOMING
+//IceShock			$FG_TABLE_CLAUSE .= "t1.sipiax IN (0,2,3,5) AND t1.card_caller NOT$calledsbquery AND t1.src_exten IS NULL AND LENGTH(t1.src)!=3";
 			$FG_TABLE_CLAUSE .= "t1.sipiax IN (0,2,3,5) AND t1.card_caller NOT$calledsbquery";
 			break;
 		case 1: //OUTGOING
@@ -290,6 +289,7 @@ elseif ($choose_calltype != - 1) {
 			$FG_TABLE_CLAUSE .= "t1.src=t1.src_peername AND t1.calledexten IS NOT NULL";
 			break;
 		case 3: //CALLBACK CALLS
+//IceShock			$FG_TABLE_CLAUSE .= "t1.sipiax!=4 AND (t1.src_peername IS NULL AND t1.src_exten IS NULL AND ((t1.id_did IS NULL AND t1.dnid LIKE t1.calledstation) OR (t1.card_id=t1.card_caller AND real_sessiontime IS NULL)))";
 			$FG_TABLE_CLAUSE .= "(t1.sipiax=4 OR (t1.src_peername IS NULL AND t1.src_exten IS NULL AND ((t1.id_did IS NULL AND t1.dnid LIKE t1.calledstation) OR (t1.card_id=t1.card_caller AND real_sessiontime IS NULL))))";
 			break;
 		case 4: //TRANSIT
@@ -334,8 +334,8 @@ if ($terminatecauseid!="ANSWER") {
 $FG_TABLE_COL[]=array (gettext("Cost"), "sessionbill", "7%", "center nowrap", "SORT", "30", "", "", "", "", "", "display_2bill");
 
 $FG_COL_QUERY = "t1.starttime starttime$cholder, 
-IF(t1.src_exten IS NULL, t1.src, IF(t1.card_caller$calledsbquery,IF(t1.src_exten=t1.src_peername,t1.src_exten,CONCAT(t1.src_peername,' &lt;<font color='
-	,IF(t1.src!=t1.src_peername AND t1.src_exten!=t1.src AND t1.src_exten NOT LIKE '%#%',CONCAT('red>',t1.src),CONCAT('green>',t1.src_exten)),'</font>&gt;')),CONCAT(t1.src_peername
+IF(t1.src_exten IS NULL, t1.src, IF(t1.card_caller$calledsbquery,IF(t1.src_exten=t1.src_peername,t1.src_exten,IF(t1.src_peername IS NULL,t1.src,CONCAT(t1.src_peername,' &lt;<font color='
+	,IF(t1.src!=t1.src_peername AND t1.src_exten!=t1.src AND t1.src_exten NOT LIKE '%#%',CONCAT('red>',t1.src),CONCAT('green>',t1.src_exten)),'</font>&gt;'))),CONCAT(t1.src_peername
 	,IF(t1.src_peername=t1.src,'',CONCAT(' &lt;<font color=red>',t1.src,'</font>&gt;'))))) src, 
 IF(t1.card_id$calledsbquery AND t1.sipiax IN (2,3,5),t1.dnid,'') DID, 
 IF(t1.sipiax IN (2,3) AND t1.terminatecauseid<>1,'',IF(t1.card_called$calledsbquery, IF(t1.calledexten IS NOT NULL
@@ -347,7 +347,7 @@ ROUND(UNIX_TIMESTAMP(t1.starttime)-INSERT(t1.uniqueid,1,1,1)) AS waitup,
 t1.sessiontime$tc, 
 IF(t1.card_id$calledsbquery, t1.sessionbill+margindillers, 0) sessionbill";
 
-if ($ACXSEERECORDING && $terminatecauseid!="INCOMPLET") {
+if ($ACXSEERECORDING && $terminatecauseid!="INCOMPLET" && !($popup_select>=1) && $choose_callowner != 4) {
 	$FG_TABLE_COL [] = array ('<span class="liens">' . gettext("Audio") . "</span>", "uniqueid", "1%", "center nowrap", "", "30", "", "", "", "", "", "linkonmonitorfile");
 	$FG_COL_QUERY .= $FG_COL_QUERY_RECORDS;
 }
@@ -390,8 +390,8 @@ if ($FG_DELETION || $FG_EDITION)	$FG_TOTAL_TABLE_COL++;
 $et = $resulttype=="sec" ? "t1.sessiontime" : "sec_to_time(t1.sessiontime)";
 $FG_EXPORT_QUERY = "t1.starttime Date
 $cholder,
-IF(t1.src_exten IS NULL, t1.src, IF(t1.card_caller$calledsbquery,IF(t1.src_exten=t1.src_peername,t1.src_exten,CONCAT(t1.src_peername,'-'
-	,IF(t1.src!=t1.src_peername AND t1.src_exten!=t1.src,t1.src,t1.src_exten),'-')),CONCAT(t1.src_peername
+IF(t1.src_exten IS NULL, t1.src, IF(t1.card_caller$calledsbquery,IF(t1.src_exten=t1.src_peername,t1.src_exten,IF(t1.src_peername IS NULL,t1.src,CONCAT(t1.src_peername,'-'
+	,IF(t1.src!=t1.src_peername AND t1.src_exten!=t1.src,t1.src,t1.src_exten),'-'))),CONCAT(t1.src_peername
 	,IF(t1.src_peername=t1.src,'',CONCAT(' -',t1.src,'-'))))) CallerID
 $cdid,
 IF(t1.sipiax IN (2,3) AND t1.terminatecauseid<>1,'',IF(t1.card_called$calledsbquery, IF(t1.calledexten IS NOT NULL
@@ -449,10 +449,12 @@ if ($nb_record<=$FG_LIMITE_DISPLAY) {
 
 $smarty->display( 'main.tpl');
 
-// #### HELP SECTION
-echo $CC_help_balance_customer;
+if (has_rights (ACX_DISTRIBUTION) && !($popup_select>=1)) {
+	// #### HELP SECTION
+	echo $CC_help_balance_customer;
+} //else	echo '</br>';
 
-if ($ACXSEERECORDING && $nb_record>0 && $terminatecauseid!="INCOMPLET"){ echo '
+if ($ACXSEERECORDING && $nb_record>0 && $terminatecauseid!="INCOMPLET" && !($popup_select>=1) && $choose_callowner != 4){ echo '
 <script src="./javascript/WavPlayer/domready.js"></script>
 <script src="./javascript/WavPlayer/swfobject.js"></script>
 <script src="./javascript/WavPlayer/wavplayer.js"></script>
@@ -464,6 +466,10 @@ if ($ACXSEERECORDING && $nb_record>0 && $terminatecauseid!="INCOMPLET"){ echo '
 	    <INPUT TYPE="hidden" NAME="s" value=1>
 	    <INPUT TYPE="hidden" NAME="t" value=0>
 	    <INPUT TYPE="hidden" NAME="sens" value="<?php echo $sens; ?>">
+	    <INPUT TYPE="hidden" NAME="popup_select" value="<?php echo $popup_select; ?>">
+<?php if ($choose_callowner == 4) {?>
+	    <INPUT TYPE="hidden" NAME="choose_callowner" value=4>
+<?php }?>
 	    <INPUT TYPE="hidden" NAME="posted" value=1>
 	    <INPUT TYPE="hidden" NAME="current_page" value=0>
 	    <INPUT TYPE="hidden" NAME="id" value="<?php echo $id; ?>">
@@ -683,7 +689,7 @@ if ($ACXSEERECORDING && $nb_record>0 && $terminatecauseid!="INCOMPLET"){ echo '
 				</select>&nbsp;&nbsp;
 			</td>
 			<td align="left" colspan="4" nowrap>
-<?php			if (count($calltype_list) > 1) {?>
+<?php			if (count($calltype_list) > 1 && $choose_callowner != 4) {?>
 				<font class="fontstyle_searchoptions"><?php echo gettext("BY OWNER");?> :&nbsp;</font>
 				<select NAME="choose_callowner" size="1" class="form_input_select" >
 <?php
@@ -775,8 +781,8 @@ if ($ACXSEERECORDING && $nb_record>0 && $terminatecauseid!="INCOMPLET"){ echo '
 		<TR bgcolor="#ffffff"> 
           <TD class="callhistory_td11"> 
             <TABLE border=0 cellPadding=0 cellSpacing=0 width="100%">
-                <TR> 
-                  <TD><SPAN style="COLOR: #ffffff; FONT-SIZE: 11px"><B><?php echo $FG_HTML_TABLE_TITLE?></B></SPAN></TD>
+                <TR>
+                  <TD><B><SPAN style="COLOR: #ffffff; FONT-SIZE: 11px"><?php echo $FG_HTML_TABLE_TITLE?></SPAN></B></TD>
                 </TR>
             </TABLE></TD>
         </TR>
@@ -793,8 +799,8 @@ if ($ACXSEERECORDING && $nb_record>0 && $terminatecauseid!="INCOMPLET"){ echo '
 	                  <TD width="<?php echo $FG_TABLE_COL[$i][2]?>" align=middle class="tableBody" style="PADDING-BOTTOM: 2px; PADDING-LEFT: 2px; PADDING-RIGHT: 2px; PADDING-TOP: 2px" nowrap> 
 	                    <center><strong> 
 	                    <?php  if (mb_strtoupper($FG_TABLE_COL[$i][4])=="SORT"){?>
-	                    <a href="<?php  echo $PHP_SELF."?s=1&t=0&stitle=$stitle&atmenu=$atmenu&current_page=$current_page&order=".$FG_TABLE_COL[$i][1]."&sens="; if ($sens=="ASC"){echo"DESC";}else{echo"ASC";} 
-						echo "&posted=$posted&Period=$Period&frommonth=$frommonth&fromstatsmonth=$fromstatsmonth&tomonth=$tomonth&tostatsmonth=$tostatsmonth&fromday=$fromday&fromstatsday_sday=$fromstatsday_sday&fromstatsmonth_sday=$fromstatsmonth_sday&today=$today&tostatsday_sday=$tostatsday_sday&tostatsmonth_sday=$tostatsmonth_sday&calleridtype=$calleridtype&phonenumbertype=$phonenumbertype&sourcetype=$sourcetype&clidtype=$clidtype&channel=$channel&resulttype=$resulttype&callerid=$callerid&phonenumber=$phonenumber&clid=$clid&terminatecauseid=$terminatecauseid&choose_calltype=$choose_calltype&fromtime=$fromtime&totime=$totime&fromstatsday_hour=$fromstatsday_hour&fromstatsday_min=$fromstatsday_min&tostatsday_hour=$tostatsday_hour&tostatsday_min=$tostatsday_min&choose_currency=$choose_currency";?>"> 
+	                    <a href="<?php  echo $PHP_SELF."?popup_select=$popup_select&s=1&t=0&stitle=$stitle&atmenu=$atmenu&current_page=$current_page&order=".$FG_TABLE_COL[$i][1]."&choose_callowner=$choose_callowner&sens="; if ($sens=="ASC"){echo"DESC";}else{echo"ASC";} 
+						echo "&id=$id&posted=$posted&Period=$Period&frommonth=$frommonth&fromstatsmonth=$fromstatsmonth&tomonth=$tomonth&tostatsmonth=$tostatsmonth&fromday=$fromday&fromstatsday_sday=$fromstatsday_sday&fromstatsmonth_sday=$fromstatsmonth_sday&today=$today&tostatsday_sday=$tostatsday_sday&tostatsmonth_sday=$tostatsmonth_sday&calleridtype=$calleridtype&phonenumbertype=$phonenumbertype&sourcetype=$sourcetype&clidtype=$clidtype&channel=$channel&resulttype=$resulttype&callerid=$callerid&phonenumber=$phonenumber&clid=$clid&terminatecauseid=$terminatecauseid&choose_calltype=$choose_calltype&fromtime=$fromtime&totime=$totime&fromstatsday_hour=$fromstatsday_hour&fromstatsday_min=$fromstatsday_min&tostatsday_hour=$tostatsday_hour&tostatsday_min=$tostatsday_min&choose_currency=$choose_currency";?>"> 
 	                    <span class="liens"><?php  } ?>
 	                    <?php echo $FG_TABLE_COL[$i][0]?> 
 	                    <?php if ($order==$FG_TABLE_COL[$i][1] && $sens=="ASC"){?>
@@ -890,13 +896,13 @@ if ($ACXSEERECORDING && $nb_record>0 && $terminatecauseid!="INCOMPLET"){ echo '
                   <TD align="right"><SPAN style="COLOR: #ffffff; FONT-SIZE: 11px"><B> 
                     <?php if ($current_page>0){?>
                     <img src="<?php echo Images_Path_Main ?>/fleche-g.gif" width="5" height="10"> <a href="<?php echo $PHP_SELF?>?s=1&t=0&order=<?php echo $order?>&sens=<?php echo $sens?>&current_page=<?php  echo ($current_page-1)?><?php  if (!is_null($letter) && ($letter!="")){ echo "&letter=$letter";} 
-					echo "&posted=$posted&Period=$Period&frommonth=$frommonth&fromstatsmonth=$fromstatsmonth&tomonth=$tomonth&tostatsmonth=$tostatsmonth&fromday=$fromday&fromstatsday_sday=$fromstatsday_sday&fromstatsmonth_sday=$fromstatsmonth_sday&today=$today&tostatsday_sday=$tostatsday_sday&tostatsmonth_sday=$tostatsmonth_sday&fromtime=$fromtime&totime=$totime&fromstatsday_hour=$fromstatsday_hour&fromstatsday_min=$fromstatsday_min&tostatsday_hour=$tostatsday_hour&tostatsday_min=$tostatsday_min&calleridtype=$calleridtype&phonenumbertype=$phonenumbertype&sourcetype=$sourcetype&clidtype=$clidtype&channel=$channel&resulttype=$resulttype&callerid=$callerid&phonenumber=$phonenumber&clid=$clid&terminatecauseid=$terminatecauseid&choose_calltype=$choose_calltype&choose_currency=$choose_currency&choose_callowner=$choose_callowner";?>"> 
+					echo "&popup_select=$popup_select&id=$id&posted=$posted&Period=$Period&frommonth=$frommonth&fromstatsmonth=$fromstatsmonth&tomonth=$tomonth&tostatsmonth=$tostatsmonth&fromday=$fromday&fromstatsday_sday=$fromstatsday_sday&fromstatsmonth_sday=$fromstatsmonth_sday&today=$today&tostatsday_sday=$tostatsday_sday&tostatsmonth_sday=$tostatsmonth_sday&fromtime=$fromtime&totime=$totime&fromstatsday_hour=$fromstatsday_hour&fromstatsday_min=$fromstatsday_min&tostatsday_hour=$tostatsday_hour&tostatsday_min=$tostatsday_min&calleridtype=$calleridtype&phonenumbertype=$phonenumbertype&sourcetype=$sourcetype&clidtype=$clidtype&channel=$channel&resulttype=$resulttype&callerid=$callerid&phonenumber=$phonenumber&clid=$clid&terminatecauseid=$terminatecauseid&choose_calltype=$choose_calltype&choose_currency=$choose_currency&choose_callowner=$choose_callowner";?>"> 
                     <?php echo gettext("PREVIOUS");?> </a> -
                     <?php }?>
                     <?php echo ($current_page+1);?> / <?php  echo $nb_record_max;?> 
                     <?php if ($current_page<$nb_record_max-1){?>
                     - <a href="<?php echo $PHP_SELF?>?s=1&t=0&order=<?php echo $order?>&sens=<?php echo $sens?>&current_page=<?php  echo ($current_page+1)?><?php  if (!is_null($letter) && ($letter!="")){ echo "&letter=$letter";} 
-					echo "&posted=$posted&Period=$Period&frommonth=$frommonth&fromstatsmonth=$fromstatsmonth&tomonth=$tomonth&tostatsmonth=$tostatsmonth&fromday=$fromday&fromstatsday_sday=$fromstatsday_sday&fromstatsmonth_sday=$fromstatsmonth_sday&today=$today&tostatsday_sday=$tostatsday_sday&tostatsmonth_sday=$tostatsmonth_sday&fromtime=$fromtime&totime=$totime&fromstatsday_hour=$fromstatsday_hour&fromstatsday_min=$fromstatsday_min&tostatsday_hour=$tostatsday_hour&tostatsday_min=$tostatsday_min&calleridtype=$calleridtype&phonenumbertype=$phonenumbertype&sourcetype=$sourcetype&clidtype=$clidtype&channel=$channel&resulttype=$resulttype&callerid=$callerid&phonenumber=$phonenumber&clid=$clid&terminatecauseid=$terminatecauseid&choose_calltype=$choose_calltype&choose_currency=$choose_currency&choose_callowner=$choose_callowner";?>"> 
+					echo "&popup_select=$popup_select&id=$id&posted=$posted&Period=$Period&frommonth=$frommonth&fromstatsmonth=$fromstatsmonth&tomonth=$tomonth&tostatsmonth=$tostatsmonth&fromday=$fromday&fromstatsday_sday=$fromstatsday_sday&fromstatsmonth_sday=$fromstatsmonth_sday&today=$today&tostatsday_sday=$tostatsday_sday&tostatsmonth_sday=$tostatsmonth_sday&fromtime=$fromtime&totime=$totime&fromstatsday_hour=$fromstatsday_hour&fromstatsday_min=$fromstatsday_min&tostatsday_hour=$tostatsday_hour&tostatsday_min=$tostatsday_min&calleridtype=$calleridtype&phonenumbertype=$phonenumbertype&sourcetype=$sourcetype&clidtype=$clidtype&channel=$channel&resulttype=$resulttype&callerid=$callerid&phonenumber=$phonenumber&clid=$clid&terminatecauseid=$terminatecauseid&choose_calltype=$choose_calltype&choose_currency=$choose_currency&choose_callowner=$choose_callowner";?>"> 
                     <?php echo gettext("NEXT");?> </a> <img src="<?php echo Images_Path_Main ?>/fleche-d.gif" width="5" height="10">
                     </B></SPAN> 
                     <?php }?>

@@ -88,17 +88,17 @@ if (has_rights (ACX_DISTRIBUTION) && !($popup_select>=1)) {
 
 	$HD_Form -> FG_OTHER_BUTTON1 = true;
 	$HD_Form -> FG_OTHER_BUTTON2 = true;
-	$HD_Form -> FG_OTHER_BUTTON3 = false;
+	$HD_Form -> FG_OTHER_BUTTON3 = true;
 	$HD_Form -> FG_OTHER_BUTTON4 = false;
 	$HD_Form -> FG_OTHER_BUTTON5 = true;
 	$HD_Form -> FG_OTHER_BUTTON1_LINK= "javascript:;\" onClick=\"MM_openBrWindow('A2B_entity_moneysituation_details.php?type=sipiax&form_action=list&atmenu=SIP&displayheader=0&popup_select=1&idcust=|param|','','scrollbars=yes,resizable=yes,width=650,height=415,left=550,top=200,screenX=550,screenY=200')\"";
 	$HD_Form -> FG_OTHER_BUTTON2_LINK= "javascript:;\" onClick=\"MM_openBrWindow('A2B_entity_callerid.php?form_action=list&displayheader=0&popup_select=1&idcust=|param|','','scrollbars=yes,resizable=yes,width=600,height=450,left=600,top=200,screenX=600,screenY=200')\"";
-	$HD_Form -> FG_OTHER_BUTTON3_LINK= "javascript:;\" onClick=\"MM_openBrWindow('A2B_entity_moneysituation_details.php?type=invoice&form_action=list&atmenu=card&displayheader=0&popup_select=1&idcust=|param|','','scrollbars=yes,resizable=yes,width=500,height=415,left=600,top=200,screenX=600,screenY=200')\"";
+	$HD_Form -> FG_OTHER_BUTTON3_LINK= "javascript:;\" onClick=\"MM_openBrWindow('call-history.php?popup_select=1&choose_callowner=4&id=|param|','','scrollbars=yes,resizable=yes,width=950,height=500,left=160,top=180,screenX=160,screenY=180')\"";
 	$HD_Form -> FG_OTHER_BUTTON4_LINK= "javascript:;\" onClick=\"MM_openBrWindow('A2B_entity_moneysituation_details.php?type=payment&form_action=list&atmenu=card&displayheader=0&popup_select=1&idcust=|param|','','scrollbars=yes,resizable=yes,width=550,height=415,left=600,top=200,screenX=600,screenY=200')\"";
 	$HD_Form -> FG_OTHER_BUTTON5_LINK= "javascript:;\" onClick=\"MM_openBrWindow('A2B_entity_logrefill.php?form_action=ask-add&popup_select=1&popup_formname=myForm&card_id=|param|&displayheader=0','','scrollbars=no,resizable=yes,width=570,height=300,left=700,top=200,screenX=700,screenY=200')\"";
 	$HD_Form -> FG_OTHER_BUTTON1_ALT = '<font color="red">'.gettext('EXT').'</font>';
 	$HD_Form -> FG_OTHER_BUTTON2_ALT = '<font color="red">'.gettext('CID').'</font>';
-	$HD_Form -> FG_OTHER_BUTTON3_ALT = '<font color="red">'.gettext('INV').'</font>';
+	$HD_Form -> FG_OTHER_BUTTON3_ALT = '<font color="red">'.gettext('LOG').'</font>';
 	$HD_Form -> FG_OTHER_BUTTON4_ALT = '<font color="red">'.gettext('PAY').'</font>';
 	$HD_Form -> FG_OTHER_BUTTON5_ALT = gettext('Add Refill to this Card');
 //	$HD_Form -> FG_OTHER_BUTTON4_ALT = '<font color="red">'.gettext('REFILL').'</font>';

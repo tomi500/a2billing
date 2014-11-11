@@ -7317,12 +7317,12 @@ msgid "CIDGroup"
 msgstr ""
 
 #: Public/form_data/FG_var_def_ratecard.inc:589
-msgid "Set the Outgoing CID Group to use for this destination, or NOT DEFINED to use the rate card trunk."
-msgstr ""
+msgid "Set the Outgoing CID Group to use with this Ratecard only, or leave NOT DEFINED to use the rate card trunk."
+msgstr "Выберите Группу исходящего CID для исходящих через эту карту звонков, иначе будет использоваться Группа из настроек Транка."
 
 #: Public/form_data/FG_var_def_ratecard.inc:599
-msgid "Set a tag on this rate"
-msgstr ""
+msgid "Set a tag on this rate. Use tag 'EMERGENCY' for let calling even credit is below limit."
+msgstr "Задайте тег для этой тарифной карты. Некоторые теги испльзуются для уточнения маршрутизации и уникальной тарификации, например 'EMERGENCY' - чтобы разрешить использовать карту, даже при отрицательном балансе."
 
 #: Public/form_data/FG_var_def_ratecard.inc:603
 #: Public/form_data/FG_var_friend.inc:527

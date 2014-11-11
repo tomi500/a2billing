@@ -57,8 +57,8 @@ $currencies_list = get_currencies();
 $two_currency = false;
 
 if ( !isset($currencies_list[mb_strtoupper($_SESSION['currency'])][2]) || !is_numeric($currencies_list[mb_strtoupper($_SESSION['currency'])][2]) ) {
-	$mycur = 1; 
-} else { 
+	$mycur = 1;
+} else {
 	$mycur = $currencies_list[mb_strtoupper($_SESSION['currency'])][2];
 	$display_currency = mb_strtoupper($_SESSION['currency']);
 	if (mb_strtoupper($_SESSION['currency'])!=mb_strtoupper(BASE_CURRENCY))
