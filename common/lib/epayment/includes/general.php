@@ -1328,6 +1328,20 @@ include_once (dirname(__FILE__)."/sessions.php");
     return $string;
   }
 
+// PlugnPay Consolidated Credit Card Checkbox Implementation
+// Code from UPS Choice v1.7
+    function _selectOptions($select_array, $key_value, $key = '') {
+        for ($i=0; $i<(sizeof($select_array)); $i++) {
+                $name = (($key) ? 'configuration[' . $key . '][]' : 'configuration_value');
+                $string .= '<br><input type="checkbox" name="' . $name . '" value="' . $select_array[$i] . '"';
+                $key_values = explode(", ", $key_value);
+                if (in_array($select_array[$i], $key_values))
+                        $string .= ' checked="checked"';
+                $string .= '> ' . $select_array[$i];
+        }
+        return $string;
+    }
+
 
   function tep_ip_vs_net($ip,$network,$mask){
 

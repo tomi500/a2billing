@@ -247,6 +247,15 @@ $FG_TABLE_ALTERNATE_ROW_COLOR[1]='#EEE9E9';
 				</td><?php $k=($k)?0:1;?>
 			</tr>
 			<?php }
+			if ($RateEngine->ratecard_obj[$j][13]>0) { ?>
+			<tr>
+				<td height="15" bgcolor="<?php echo $FG_TABLE_ALTERNATE_ROW_COLOR[$k]?>" style="padding-left: 5px; padding-right: 3px;">
+						<b><?php echo gettext("Init block");?></b>			</td>
+				<td height="15" bgcolor="<?php echo $FG_TABLE_ALTERNATE_ROW_COLOR[$k]?>" style="padding-left: 5px; padding-right: 3px;">
+						<i><?php if ($RateEngine->ratecard_obj[$j][13]<60) echo $RateEngine->ratecard_obj[$j][13]." ".gettext("Seconds "); else echo display_minute($RateEngine->ratecard_obj[$j][13])." ".gettext("Minutes ");?></i>
+				</td><?php $k=($k)?0:1;?>
+			</tr>
+			<?php }
 			if ($RateEngine->ratecard_obj[$j][14]) { ?>
 			<tr>
 				<td height="15" bgcolor="<?php echo $FG_TABLE_ALTERNATE_ROW_COLOR[$k]?>" style="padding-left: 5px; padding-right: 3px;">

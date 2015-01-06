@@ -118,7 +118,7 @@ $smarty->display('signup_header.tpl');
 		  <?php echo gettext("An activation email has been sent to"); ?> <b><?php echo $list[0][3]; ?></b><br><br>	  
 	<?php }elseif (has_rights(ACX_DISTRIBUTION)){
 			echo gettext("Your new customer was registered successfully");?><br>
-		  <?php echo gettext("An email confirming registration information has been sent to customer to"); ?> <b><?php echo $list[0][3]; ?></b><br><br>
+		  <?php echo gettext("An email confirming registration information has been sent to customer to"); ?>&nbsp;<b><?php echo $list[0][3]; ?></b><br><br>
 			<h3>
 			  <?php echo gettext("Cardnumber of ").$list[0][2]; ?> <?php echo $list[0][1] . gettext(" is "); ?> <b><font color="#00AA00"><?php echo $list[0][0]; ?></font></b><br><br><br><u>
 			  <?php echo gettext("To login to account :"); ?></u><br>

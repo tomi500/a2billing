@@ -71,7 +71,7 @@ if ($search_sources != 'nochange') {
 $fixfield[0] = "IDTariffplan (KEY)";
 $fixfield[1] = "Outbound Trunk";
 
-$field[0] = "Dialprefix";
+$field[0] = "Dial prefix";
 $field[1] = "Destination Country";
 $field[2] = "Rate Initial";
 
@@ -163,7 +163,10 @@ if ($task == 'upload') {
 					if ($fieldtoimport[$k] == "stopdate" && ($val[$k +3] == '0' || $val[$k +3] == ''))
 						continue;
 
-					if ($fieldtoimport[$k] == "buyrate" || $fieldtoimport[$k] == "connectcharge" || $fieldtoimport[$k] == "disconnectcharge") {
+//					if ($fieldtoimport[$k] == "ratecarddialprefix") {
+//						$val[$k +3] =  preg_replace("/[^0-9]/", '', $val[$k +3]);
+//					}
+					if (in_array($fieldtoimport[$k], array("buyrate", "buyrateconnectcharge", "connectcharge", "disconnectcharge"))) {
 						if ($currencytype == "cent") {
 							$val[$k +3] = $val[$k +3] / 100;
 						}
@@ -172,8 +175,8 @@ if ($task == 'upload') {
 					$TT_UPDATE_QUERY .= ', ' . $fieldtoimport[$k] . '=';
 
 					if (is_numeric($val[$k +3])) {
-						$FG_ADITION_SECOND_ADD_VALUE .= ", " . $val[$k +3];
-						$TT_UPDATE_QUERY .= $val[$k +3];
+						$FG_ADITION_SECOND_ADD_VALUE .= ", '" . $val[$k +3] . "'";
+						$TT_UPDATE_QUERY .= "'" . $val[$k +3] . "'";
 					} else {
 						$FG_ADITION_SECOND_ADD_VALUE .= ", '" . trim($val[$k +3]) . "'";
 						$TT_UPDATE_QUERY .= "'" . trim($val[$k +3]) . "'";

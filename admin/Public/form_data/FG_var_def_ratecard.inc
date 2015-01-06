@@ -122,13 +122,13 @@ if (!$popup_select) $HD_Form -> AddViewElement(gettext("START-DATE"), "startdate
 if (!$popup_select) $HD_Form -> AddViewElement(gettext("STOP-DATE"), "stopdate", "13%", "center", "sort", "35", "", "", "", "", "", "display_dateformat");
 if (!$popup_select) $HD_Form -> AddViewElement("<acronym title=\"INITBLOCK\">".gettext("INITB")."</acronym>", "initblock", "4%", "center", "sort");
 if (!$popup_select) $HD_Form -> AddViewElement("<acronym title=\"CONNECT CHARGE\">".gettext("CC")."</acronym>", "connectcharge", "4%", "center", "sort");
-if (!$popup_select) $HD_Form -> AddViewElement(gettext("TRUNK"), "id_trunk", "10%", "center", "sort", "19", "lie", "cc_trunk", "trunkcode", "id_trunk='%id'", "%1");
+if (!$popup_select) $HD_Form -> AddViewElement(gettext("TRUNK"), "id_trunk", "10%", "center", "sort", "30", "lie", "cc_trunk", "trunkcode", "id_trunk='%id'", "%1");
 if (!$popup_select) $HD_Form -> AddViewElement(gettext("RATE CARD"), "idtariffplan", "12%", "center", "sort", "30", "lie", "cc_tariffplan", "tariffname", "id='%id'", "%1");
 
 
 if (!$popup_select) {
 	if ($use_lcr_callplan)
-		$HD_Form -> FieldViewElement ('destination, dialprefix, buyrate, '.$rateinitial_field.', startdate, stopdate, initblock, connectcharge, id_trunk , idtariffplan ');
+		$HD_Form -> FieldViewElement ("destination, dialprefix, buyrate, ".$rateinitial_field.", startdate, stopdate, initblock, connectcharge, IF(cc_ratecard.id_trunk=-1,cc_tariffplan.id_trunk,cc_ratecard.id_trunk) id_trunk , idtariffplan ");
 	else
 		$HD_Form -> FieldViewElement ("cc_prefix.destination, cc_ratecard.dialprefix, cc_ratecard.buyrate, cc_ratecard.rateinitial, IF(cc_ratecard.startdate>NOW(),CONCAT('<font color=red>',cc_ratecard.startdate,'</font>'),cc_ratecard.startdate) AS startdate, IF(cc_ratecard.stopdate<NOW(),CONCAT('<font color=red>',cc_ratecard.stopdate,'</font>'),cc_ratecard.stopdate) AS stopdate, cc_ratecard.initblock, cc_ratecard.connectcharge, IF(cc_ratecard.id_trunk=-1,cc_tariffplan.id_trunk,cc_ratecard.id_trunk) id_trunk, cc_ratecard.idtariffplan ");
 } else {
@@ -180,12 +180,12 @@ $HD_Form -> AddSearchElement_C2(gettext("BUYRATE"),'buyrate1','buyrate1type','bu
 $HD_Form -> AddSearchElement_C2(gettext("RATE INITIAL"),'rateinitial1','rateinitial1type','rateinitial2','rateinitial2type','rateinitial');
 
 $HD_Form -> FG_FILTER_SEARCH_FORM_SELECT_TEXT = '';
-$HD_Form -> AddSearchElement_Select('SELECT TRUNK', "cc_trunk", "id_trunk, trunkcode, providerip", "", "trunkcode", "ASC", "id_trunk");
-$HD_Form -> AddSearchElement_Select('SELECT RATECARD', "cc_tariffplan", "id, tariffname", "", "tariffname", "ASC", "idtariffplan", 1, null);
+$HD_Form -> AddSearchElement_Select('SELECT TRUNK',	"cc_trunk",	 "id_trunk, trunkcode, providerip", "", "trunkcode",	"ASC",	"cc_ratecard.id_trunk,(cc_ratecard.id_trunk=-1 AND cc_tariffplan.id_trunk,)");
+$HD_Form -> AddSearchElement_Select('SELECT RATECARD',	"cc_tariffplan", "id, tariffname",		    "", "tariffname",	"ASC",	"idtariffplan", 1, null);
 
 
 $HD_Form -> AddEditElement(gettext("RATECARD"),
-   "idtariffplan",	
+   "idtariffplan",
    '$value',	
    "SELECT",	
    "", "", "",	
@@ -257,6 +257,16 @@ $HD_Form -> AddEditElement(gettext("BUYRATE BILLING BLOCK"),
    "4",
    gettext("Insert the billing block"),
    "" , "", "",	"", "", "" , "NO", gettext("Set the billing increment, in seconds (billing block), that the carrier applies. (ie 30 secs)"));
+
+
+$HD_Form -> AddEditElement(gettext("BUYRATE CONNECT CHARGE"),
+   "buyrateconnectcharge",
+   '$value',
+   "INPUT",
+   "size=30 maxlength=20",
+   "12",
+   gettext("Insert the connect charge"),
+   "", "", "", "", "", "", "NO", gettext("Apply the carrier connection charge"));
 
 
 $HD_Form -> AddEditElement(gettext("SELLING RATE"),
@@ -579,6 +589,16 @@ $HD_Form -> AddEditElement(gettext("TRUNK"),
 	"", "", "%1", "", gettext("Set the trunk to use for this destination, or NOT DEFINED to use the rate card trunk."), '', '<OPTION  value="-1" selected>'.gettext("NOT DEFINED").'</OPTION>');
 
 
+$HD_Form -> AddEditElement (gettext("TRUNK AHEAD PREFIX"),
+    "ratecarddialprefix",
+    "$value",
+    "INPUT",
+    "size=30 maxlength=20",
+    "",
+    gettext("Insert the ratecard prefix"),
+    "", "", "", "", "", "", "NO-NULL", gettext("Add the ahead prefix, that will be forward Trunk prefix, to the dialed digits for identify on Terminator side"));
+
+
 $HD_Form -> AddEditElement(gettext("CIDGroup"),
    "id_outbound_cidgroup",
    '$value',
@@ -614,10 +634,10 @@ if (ADVANCED_MODE) {
 
 if (ADVANCED_MODE) {
 	// This Variable store the argument for the SQL query
-	$HD_Form -> FieldEditElement ('cc_ratecard.idtariffplan, dialprefix, cc_ratecard.destination, buyrate, buyrateinitblock, buyrateincrement, rateinitial, initblock, billingblock, connectcharge, disconnectcharge,disconnectcharge_after, minimal_cost, stepchargea, chargea, timechargea, billingblocka, stepchargeb, chargeb, timechargeb, billingblockb, stepchargec, chargec, timechargec, billingblockc,announce_time_correction, startdate, stopdate, starttime, endtime, rounding_calltime, rounding_threshold, additional_block_charge, additional_block_charge_time,additional_grace, id_trunk, id_outbound_cidgroup, tag, musiconhold');
+	$HD_Form -> FieldEditElement ('cc_ratecard.idtariffplan, dialprefix, cc_ratecard.destination, buyrate, buyrateinitblock, buyrateincrement, buyrateconnectcharge, rateinitial, initblock, billingblock, connectcharge, disconnectcharge,disconnectcharge_after, minimal_cost, stepchargea, chargea, timechargea, billingblocka, stepchargeb, chargeb, timechargeb, billingblockb, stepchargec, chargec, timechargec, billingblockc, announce_time_correction, startdate, stopdate, starttime, endtime, rounding_calltime, rounding_threshold, additional_block_charge, additional_block_charge_time,additional_grace, id_trunk, ratecarddialprefix, id_outbound_cidgroup, tag, musiconhold');
 } else {
 	// This Variable store the argument for the SQL query
-	$HD_Form -> FieldEditElement ('cc_ratecard.idtariffplan, dialprefix, cc_ratecard.destination, buyrate, buyrateinitblock, buyrateincrement, rateinitial, initblock, billingblock, connectcharge, disconnectcharge,disconnectcharge_after, minimal_cost, startdate, stopdate, starttime, endtime, rounding_calltime, rounding_threshold, additional_block_charge, additional_block_charge_time,additional_grace, id_trunk, id_outbound_cidgroup, tag');
+	$HD_Form -> FieldEditElement ('cc_ratecard.idtariffplan, dialprefix, cc_ratecard.destination, buyrate, buyrateinitblock, buyrateincrement, buyrateconnectcharge, rateinitial, initblock, billingblock, connectcharge, disconnectcharge,disconnectcharge_after, minimal_cost, startdate, stopdate, starttime, endtime, rounding_calltime, rounding_threshold, additional_block_charge, additional_block_charge_time,additional_grace, id_trunk, ratecarddialprefix, id_outbound_cidgroup, tag');
 }
 
 $HD_Form->FG_ADITION_HIDDEN_PARAM		= $HD_Form->FG_EDITION_HIDDEN_PARAM		= 'filterprefix,current_page';

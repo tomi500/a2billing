@@ -118,7 +118,7 @@ while(true)
 	$query="UPDATE `cc_server_manager` SET `lasttime_used`=now()";
 	if (!$A2B->DBHandle->Execute($query)) die("Can't execute query '$query'\n");
 
-	$query="SELECT `tariff`,`cbtimeoutunavailable`,`cbattemptunavailable`,`cbtimeoutbusy`,`cbattemptbusy`,`cbtimeoutnoanswer`,`cbattemptnoanswer`,`cbtimeoutmax`,TIME_TO_SEC(TIMEDIFF(`cbtimeoutmax`,'$cc_timediff')) FROM `cc_card` WHERE `username`='$cc_account' LIMIT 1";
+	$query="SELECT `tariff`,`cbtimeoutunavailable`,`cbattemptunavailable`,`cbtimeoutbusy`,`cbattemptbusy`,`cbtimeoutnoanswer`,`cbattemptnoanswer`,`cbtimeoutmax`,TIME_TO_SEC(TIMEDIFF(SEC_TO_TIME(`cbtimeoutmax`),'$cc_timediff')) FROM `cc_card` WHERE `username`='$cc_account' LIMIT 1";
 	$result1=$instance_table->SQLExec($A2B->DBHandle, $query);
 	if (!(is_array($result1) && count($result1)>0)) die("Can't execute query '$query'\n");
 	list($acc_tariff,$acc_to_unav,$acc_max_unav,$acc_to_busy,$acc_max_busy,$acc_to_noansw,$acc_max_noansw,$acc_max_timeout,$acc_timeout_res)=$result1[0];

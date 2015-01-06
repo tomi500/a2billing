@@ -110,7 +110,7 @@ class RateEngine
 		$minutes_since_monday = ($daytag * 1440) + ($hours * 60) + $minutes;
 		if ($this -> debug_st) echo "$minutes_since_monday<br> ";
 
-		$sql_clause_days = " AND (starttime <= ".$minutes_since_monday." AND endtime >=".$minutes_since_monday.") ";
+		$sql_clause_days = "(startdate<= CURRENT_TIMESTAMP AND (stopdate > CURRENT_TIMESTAMP OR stopdate = 0) AND (starttime <= ".$minutes_since_monday." AND endtime >=".$minutes_since_monday."))";
 
 		$mydnid = $mycallerid = "";
 		if (strlen($A2B->dnid)>=1) $mydnid = $A2B->dnid;
@@ -118,8 +118,10 @@ class RateEngine
 		if ($this->webui) $A2B -> debug( DEBUG, $agi, __FILE__, __LINE__, "[CC_asterisk_rate-engine - CALLERID : ".$A2B->CallerID."]",0);
 
 		$DNID_SUB_QUERY = "AND 0 = (SELECT COUNT(dnidprefix) FROM cc_tariffgroup_plan RIGHT JOIN cc_tariffplan ON cc_tariffgroup_plan.idtariffplan=cc_tariffplan.id WHERE dnidprefix=SUBSTRING('$mydnid',1,length(dnidprefix)) AND idtariffgroup=$tariffgroupid ) ";
-		$CID_SUB_QUERY = "AND 0 = (SELECT count(calleridprefix) FROM cc_tariffgroup_plan RIGHT JOIN cc_tariffplan ON cc_tariffgroup_plan.idtariffplan=cc_tariffplan.id WHERE calleridprefix=SUBSTRING('$mycallerid',1,length(calleridprefix)) AND idtariffgroup=$tariffgroupid )";
+		$CID_SUB_QUERY = "AND 0 = (SELECT count(calleridprefix) FROM cc_tariffgroup_plan RIGHT JOIN cc_tariffplan ON cc_tariffgroup_plan.idtariffplan=cc_tariffplan.id WHERE ('$mycallerid' LIKE CONCAT(calleridprefix,'%') OR calleridprefix LIKE '$mycallerid,%' OR calleridprefix LIKE '%,$mycallerid,%' OR calleridprefix LIKE '%,$mycallerid') AND idtariffgroup=$tariffgroupid )";
 
+		$TARIFFNAME_SUB_QUERY = $A2B->myprefix=="00" ? "" : " OR cc_tariffplan.tariffname LIKE '$A2B->cardnumber%'";
+//$A2B -> debug( ERROR, $agi, "", __LINE__, "=================== ".$A2B->myprefix);
 		// $prefixclause to allow good DB servers to use an index rather than sequential scan
 		// justification at http://forum.asterisk2billing.org/viewtopic.php?p=9620#9620
 		$max_len_prefix = min(strlen($phonenumber), 15);	// don't match more than 15 digits (the most I have on my side is 8 digit prefixes)
@@ -129,13 +131,11 @@ class RateEngine
 			$max_len_prefix--;
 		}
 		$prefixclause .= "dialprefix='defaultprefix')";
-
 		// match Asterisk/POSIX regex prefixes,  rewrite the Asterisk '_XZN.' characters to
 		// POSIX equivalents, and test each of them against the dialed number
 		$prefixclause .= " OR (dialprefix LIKE '&_%' ESCAPE '&' AND '$phonenumber' ";
 		$prefixclause .= "REGEXP REPLACE(REPLACE(REPLACE(REPLACE(REPLACE(CONCAT('^', dialprefix, '$'), ";
 		$prefixclause .= "'X', '[[:digit:]]'), 'Z', '[1-9]'), 'N', '[2-9]'), '.', '.+'), '_', ''))";
-
 		$QUERY = "SELECT DISTINCT
 		tariffgroupname,
 		lcrtype,
@@ -172,11 +172,11 @@ class RateEngine
 		cc_trunk.providerip,
 		cc_trunk.removeprefix,
 		musiconhold,
-		IF(cc_trunk.dialprefixmain='',cc_trunk.failover_trunk,'-1'),
+		IF(cc_trunk.dialprefixmain='',cc_trunk.failover_trunk,'-1') failover_trunk,
 		cc_trunk.addparameter,
 		id_outbound_cidgroup,
 		id_cc_package_offer,
-		cc_trunk.status,
+		IF(tariff_lcr=1 OR $sql_clause_days,cc_trunk.status,0) status,
 		cc_trunk.inuse,
 		IF(cc_trunk.wrapnexttime>NOW() AND cc_trunk.lastdial NOT LIKE '$A2B->destination',0,cc_trunk.maxuse) maxuse,
 		cc_trunk.if_max_use,
@@ -195,23 +195,26 @@ class RateEngine
 		cc_trunk.cid_handover,
 		cc_trunk.trunkcode,
 		cc_trunk.wrapuptime,
-		cc_ratecard.tag
+		cc_ratecard.tag,
+		id_seller,
+		IFNULL(ratecarddialprefix,sellerdialprefix),
+		buyrateconnectcharge
 
 		FROM cc_tariffgroup
 
 		RIGHT JOIN cc_tariffgroup_plan ON cc_tariffgroup_plan.idtariffgroup=cc_tariffgroup.id
-		INNER JOIN cc_tariffplan ON cc_tariffplan.id=cc_tariffgroup_plan.idtariffplan OR cc_tariffplan.tariffname='$A2B->cardnumber'
+		INNER JOIN cc_tariffplan ON cc_tariffplan.id=cc_tariffgroup_plan.idtariffplan".$TARIFFNAME_SUB_QUERY."
 		LEFT JOIN cc_ratecard ON cc_ratecard.idtariffplan=cc_tariffplan.id
 		LEFT JOIN cc_trunk ON (cc_trunk.id_trunk = cc_ratecard.id_trunk AND cc_ratecard.id_trunk != -1) OR (cc_ratecard.id_trunk = -1 AND cc_trunk.id_trunk = cc_tariffplan.id_trunk)
 
-		WHERE ((cc_tariffgroup.id=$tariffgroupid AND idtariffgroup='$tariffgroupid') OR cc_tariffplan.tariffname='$A2B->cardnumber') AND ($prefixclause)
+		WHERE ((cc_tariffgroup.id=$tariffgroupid AND idtariffgroup='$tariffgroupid') OR cc_tariffplan.tariffname LIKE '$A2B->cardnumber%') AND ($prefixclause)
 		AND startingdate<= CURRENT_TIMESTAMP AND (expirationdate > CURRENT_TIMESTAMP OR expirationdate IS NULL)
-		AND startdate<= CURRENT_TIMESTAMP AND (stopdate > CURRENT_TIMESTAMP OR stopdate IS NULL)
-		$sql_clause_days
-		AND ( dnidprefix=SUBSTRING('$mydnid',1,length(dnidprefix)) OR (dnidprefix='all' $DNID_SUB_QUERY))
-		AND ( calleridprefix=SUBSTRING('$mycallerid',1,length(calleridprefix)) OR (calleridprefix='all' $CID_SUB_QUERY))
+		AND (tariff_lcr=0 OR $sql_clause_days)
+		AND (dnidprefix=SUBSTRING('$mydnid',1,length(dnidprefix)) OR (dnidprefix='all' $DNID_SUB_QUERY))
+		AND ('$mycallerid' LIKE CONCAT(calleridprefix,'%') OR (calleridprefix='all' $CID_SUB_QUERY) OR calleridprefix LIKE '$mycallerid,%' OR calleridprefix LIKE '%,$mycallerid,%' OR calleridprefix LIKE '%,$mycallerid')
 		GROUP BY cc_ratecard.id
 		ORDER BY LENGTH(dialprefix) DESC";
+//		AND ( calleridprefix=SUBSTRING('$mycallerid',1,length(calleridprefix)) OR (calleridprefix='all' $CID_SUB_QUERY))
 
 		$A2B->instance_table = new Table();
 		$result = $A2B->instance_table -> SQLExec ($A2B -> DBHandle, $QUERY);
@@ -370,20 +373,21 @@ class RateEngine
 		}
 		if ($cres > -1 && $result[$cres][12] == 100) $result[$cres][12] = 0;
 
-		
 		// 3) REMOVE THOSE THAT USE THE SAME TRUNK - MAKE A DISTINCT
 		//    AND THOSE THAT ARE DISABLED.
-		$mylistoftrunk = array();
+//		$mylistoftrunk = array();
 		for ($i=0;$i<count($result);$i++) {
-			$status 				= $result[$i][39];
-			$mylistoftrunk_next[] = $mycurrenttrunk = $result[$i][29];
+//			$status 	= $result[$i][39];
+//			$mycurrenttrunk = $result[$i][29];
 
 			// Check if we already have the same trunk in the ratecard
-			if (($i==0 || !in_array ($mycurrenttrunk , $mylistoftrunk)) && $status == 1) {
+//			if (($i==0 || !in_array ($mycurrenttrunk , $mylistoftrunk)) && $status == 1) {
+//				$distinct_result[]	= $result[$i];
+//			}
+//			if ($status == 1)
+//				$mylistoftrunk[]	= $mycurrenttrunk;
+			if ($result[$i][39])
 				$distinct_result[]	= $result[$i];
-			}
-			if ($status == 1)
-				$mylistoftrunk[]	= $mycurrenttrunk;
 		}
 /**
 for ($i=0; $i<count($result); $i++)
@@ -891,6 +895,7 @@ else echo "Ratecard: ".$this->ratecard_obj[$i][6]."<br>Trunk: ".$this->ratecard_
 		$additional_grace_time				= $this -> ratecard_obj[$K][47];
 		$minimal_call_cost 				= $this -> ratecard_obj[$K][48];
 		$disconnectcharge_after				= $this -> ratecard_obj[$K][49];
+		$buyrateconnectcharge		  = a2b_round(abs($this -> ratecard_obj[$K][75]));
 
 		
 		if (!is_numeric($rounding_calltime))			$rounding_calltime = 0;
@@ -943,6 +948,7 @@ else echo "Ratecard: ".$this->ratecard_obj[$i][6]."<br>Trunk: ".$this->ratecard_
 			if ($mod_sec>0) $buyratecallduration += ($buyrateincrement - $mod_sec); // 30 += 18 - 12
 		}
 		$buyratecost -= ($buyratecallduration/60) * $buyrate;
+		$buyratecost -= $buyrateconnectcharge;
 		if ($this -> debug_st)  echo "1. cost: $cost\n buyratecost:$buyratecost\n";
 
         // IF IT S A FREE CALL, WE CAN STOP HERE COST = 0
@@ -1124,9 +1130,10 @@ else echo "Ratecard: ".$this->ratecard_obj[$i][6]."<br>Trunk: ".$this->ratecard_
 		if ($K>=0 && count($this -> ratecard_obj)>0) {
 			$id_cc_package_offer   = $this -> ratecard_obj[$K][38];
 			$additional_grace_time = $this -> ratecard_obj[$K][47];
+			$idseller = $this -> ratecard_obj[$K][73];
 		} else {
 			$id_cc_package_offer = 'NONE';
-			$additional_grace_time = 0;
+			$additional_grace_time = $idseller = 0;
 		}
 		$id_card_package_offer = null;
 		
@@ -1237,13 +1244,8 @@ else echo "Ratecard: ".$this->ratecard_obj[$i][6]."<br>Trunk: ".$this->ratecard_
 			$trunkcode	 = $this -> ratecard_obj[$K][70];
 		}
 		$buycost = 0;
-		if ($doibill==0 || $sessiontime < $A2B->agiconfig['min_duration_2bill']) {
-			$cost = 0;
-			$buycost = abs($this -> lastbuycost);
-		} else {
-			$cost = $this -> lastcost;
-			$buycost = abs($this -> lastbuycost);
-		}
+		$cost = ($doibill==0 || $sessiontime < $A2B->agiconfig['min_duration_2bill']) ? 0 : $this -> lastcost;
+		$buycost = abs($this -> lastbuycost);
 
 		if ($cost<=0) {
 			$signe = '-';
@@ -1311,11 +1313,11 @@ else echo "Ratecard: ".$this->ratecard_obj[$i][6]."<br>Trunk: ".$this->ratecard_
 
 		if ($callback_mode == 0 || $cost != 0 || !is_numeric($callback_mode) || $A2B->CallerID != $A2B -> config["callback"]['callerid']) {
 
-		    $QUERY_COLUMN = "uniqueid, sessionid, card_id, card_caller, card_called, nasipaddress, starttime, sessiontime, real_sessiontime, calledstation, ".
+		    $QUERY_COLUMN = "uniqueid, sessionid, card_id, card_caller, card_called, card_seller, nasipaddress, starttime, sessiontime, real_sessiontime, calledstation, ".
 			" terminatecauseid, stoptime, sessionbill, id_tariffgroup, id_tariffplan, id_ratecard, " .
 			" id_trunk, src, sipiax, buycost, id_card_package_offer, dnid, destination, id_did, src_peername, src_exten, calledexten, margindillers, margindiller";
 		    $QUERY = "INSERT INTO cc_call ($QUERY_COLUMN) VALUES ('".$A2B->uniqueid."', '".$A2B->channel."', ".
-			"$card_id, $card_caller, $card_called, '".$A2B->hostname."', ";
+			"$card_id, $card_caller, $card_called, $idseller, '".$A2B->hostname."', ";
 
 		    if ($A2B->config["global"]['cache_enabled']) {
 			$QUERY .= " datetime( strftime('%s','now') - $sessiontime, 'unixepoch','localtime')";	
@@ -1351,6 +1353,11 @@ else echo "Ratecard: ".$this->ratecard_obj[$i][6]."<br>Trunk: ".$this->ratecard_
 			$result = $A2B->instance_table -> SQLExec ($A2B -> DBHandle, $QUERY, 0);
 			$A2B -> debug( INFO, $agi, __FILE__, __LINE__, "[CC_asterisk_stop : SQL: DONE : result=".$result."]");
 			$A2B -> debug( DEBUG, $agi, __FILE__, __LINE__, "[CC_asterisk_stop : SQL: $QUERY]");
+		    }
+		    if ($idseller > 0 && $buycost > 0) {
+			$QUERY = "UPDATE cc_card SET credit= credit+".a2b_round($buycost)." WHERE id=".$idseller;
+			$result = $A2B->instance_table -> SQLExec ($A2B -> DBHandle, $QUERY, 0);
+			
 		    }
 		}
 		if (!isset($trunkcode) || strpos($trunkcode,"-INFOLINE") === false) {
@@ -1486,8 +1493,9 @@ else echo "Ratecard: ".$this->ratecard_obj[$i][6]."<br>Trunk: ".$this->ratecard_
 		$max_long = 36000000; //Maximum 10 hours
 		$old_destination = $destination;
 		$firstgo = true;
-
-		if ($agi) $A2B -> debug( INFO, $agi, __FILE__, __LINE__, "Count of ratecard_obj = ".count($this -> ratecard_obj));
+//		$timecur = time();
+		$this->dialstatus = 0;
+//		$A2B -> debug( INFO, $agi, __FILE__, __LINE__, "Count of ratecard_obj = ".count($this -> ratecard_obj));
 		for ($k=0;$k<count($this -> ratecard_obj);$k++) {
 			$loop_failover = $loop_intellect = $outcid = 0;
 			$destination = $old_destination;
@@ -1495,9 +1503,9 @@ else echo "Ratecard: ".$this->ratecard_obj[$i][6]."<br>Trunk: ".$this->ratecard_
 			$intellect_count = $trunkrand = -1;
 			$status = 1;
 			// LOOOOP FOR THE FAILOVER LIMITED TO failover_recursive_limit
-			while ($loop_failover == 0 || ($loop_failover <= $A2B->agiconfig['failover_recursive_limit'] && is_numeric($failover_trunk) && $failover_trunk >= 0
-			    && $this->dialstatus != "ANSWER" && $this->dialstatus != "CANCEL" && time() - $timecur < 10 && (!$this->dialstatus || $intellect_count>=0 || $this->dialstatus == "CHANUNAVAIL"
-			    || $this->dialstatus == "CONGESTION"))) {
+			while (($loop_failover == 0 && !$this->dialstatus) || ($loop_failover <= $A2B->agiconfig['failover_recursive_limit']
+			    && $failover_trunk > 0 && $this->dialstatus != "ANSWER" && $this->dialstatus != "CANCEL" && time()-$timecur < 10
+			    && (!$this->dialstatus || $intellect_count >= 0 || $this->dialstatus == "CHANUNAVAIL" || $this->dialstatus == "CONGESTION"))) {
 
 				$this -> td = $this -> prefixclause = '';
 				$CID_handover = NULL;
@@ -1561,11 +1569,17 @@ else echo "Ratecard: ".$this->ratecard_obj[$i][6]."<br>Trunk: ".$this->ratecard_
 				    }
 				}
 				if ($cidgroupid == -1) $cidgroupid = $cidgroupidrate;
-				
+				$sellerprefix = $this -> ratecard_obj[$k][74];
 				if (is_array($removeprefix) && count($removeprefix)>0) {
 					foreach ($removeprefix as $testprefix) {
 						if (substr($destination,0,strlen($testprefix))==$testprefix) {
 							$destination = substr($destination,strlen($testprefix));
+							break;
+						}
+					}
+					foreach ($removeprefix as $testprefix) {
+						if ($testprefix == $sellerprefix) {
+							$sellerprefix = "";
 							break;
 						}
 					}
@@ -1668,7 +1682,7 @@ else echo "Ratecard: ".$this->ratecard_obj[$i][6]."<br>Trunk: ".$this->ratecard_
 								$count_minus++;
 //$vv = "\033[31m";
 							}
-//$A2B -> debug( ERROR, $agi, "", "", $vv.($valu_key<9?" ":"").($valu_key+1).") "."TRUNK = ".($valu_val[2]<10?" ":"").$valu_val[2]."  |   ".$valu_val[3]." times	|   %% = ".$intellecttrunks[$valu_key][1]."	| ".$valu_val[0]." secs free\33[0m");
+//$A2B -> debug( ERROR, $agi, "", "", $vv.str_pad(($valu_key+1),2," ",STR_PAD_LEFT).") "."TRUNK =".str_pad($valu_val[2],3," ",STR_PAD_LEFT)."  |".str_pad($valu_val[3],4," ",STR_PAD_LEFT)." times  |  %% = ".$intellecttrunks[$valu_key][1]."	| ".$valu_val[0]." secs free\33[0m");
 						}
 						if ($intellect_count == -1) {
 							$intellect_count = $valu_key - $count_minus;
@@ -1795,6 +1809,7 @@ else echo "Ratecard: ".$this->ratecard_obj[$i][6]."<br>Trunk: ".$this->ratecard_
 				if (strncmp($destination, $prefix, strlen($prefix)) == 0 && strlen($prefix) > 1) {
 					$prefix="";
 				}
+				$prefix = $sellerprefix.$prefix;
 				$ipaddress = str_replace("%dialingnumber%", $prefix.$destination, $ipaddress);
 
 				if ($this->pos_dialingnumber !== false) {
@@ -1805,7 +1820,6 @@ else echo "Ratecard: ".$this->ratecard_obj[$i][6]."<br>Trunk: ".$this->ratecard_
 					$channel = "$tech/$ipaddress/$prefix$destination";
 				}
 
-//$A2B -> debug( ERROR, $agi, __FILE__, __LINE__, "[CID_handover: ={$CID_handover}]");
 				$A2B->instance_table = new Table();
 				$QUERY = "SELECT countryprefix FROM cc_country WHERE '{$A2B->destination}' LIKE concat(countryprefix,'%') ORDER BY countryprefix DESC LIMIT 1";
 				$result = $A2B->instance_table -> SQLExec ($A2B -> DBHandle, $QUERY);
@@ -1864,8 +1878,6 @@ else echo "Ratecard: ".$this->ratecard_obj[$i][6]."<br>Trunk: ".$this->ratecard_
 					$agi -> say_digits($A2B->oldphonenumber, '#');
 					$firstgo = false;
 				    }
-//$A2B -> debug( ERROR, $agi, __FILE__, __LINE__, "\nIf (".$this -> ratecard_obj[$k][12]." || (".$this -> ratecard_obj[$k][12]." == 0 && ".($A2B->extext?"TRUE":"FALSE")." && ".$this -> ratecard_obj[$k][4]." != ".$A2B->cardnumber." && ".$ipaddress."!=".$prefix.$destination.")");
-//$A2B -> debug( ERROR, $agi, __FILE__, __LINE__, $A2B->accountcode." =? ".$A2B->cardnumber);
 				    if (($this -> ratecard_obj[$k][12] > 0 && !($A2B->cardnumber != $A2B->accountcode)) || ($this -> ratecard_obj[$k][12] == 0 && $A2B->extext && $this -> ratecard_obj[$k][4] != $A2B->cardnumber && $ipaddress != $prefix.$destination)) {
 					if ($A2B->auth_through_accountcode) {
 						$A2B -> debug( DEBUG, $agi, __FILE__, __LINE__, "[A2Billing] SAY BALANCE : $A2B->credit");
@@ -1875,6 +1887,7 @@ else echo "Ratecard: ".$this->ratecard_obj[$i][6]."<br>Trunk: ".$this->ratecard_
 					if ((!isset($trunkcode) || strpos($trunkcode,"-INFOLINE") === false) && $typecall != 44) {
 						if ($A2B -> fct_say_time_2_call($agi, $trunktimeout, $this -> ratecard_obj[$k][12]) == -1) break;
 					}
+					$timecur = time();
 				    }
 				    $A2B -> debug( INFO, $agi, __FILE__, __LINE__, "FAILOVER app_callingcard: Dialing '$dialstr' with timeout of '$timeout'.\n");
 //				    if (array_search($agi -> channel_status('',true), array(AST_STATE_DOWN)) === false) { }
@@ -1948,7 +1961,6 @@ else echo "Ratecard: ".$this->ratecard_obj[$i][6]."<br>Trunk: ".$this->ratecard_
 					}
 				    }
 				    $this -> dialstatus = $agi -> get_variable("DIALSTATUS",true);
-//$A2B -> debug( ERROR, $agi, __FILE__, __LINE__, " [===================                           DIALSTATUS: $this->dialstatus ]");
 
 				} elseif (is_array($amicmd)) {
 				    write_log(LOGFILE_API_CALLBACK, " ActionID = {$amicmd[5]} [#### Starting AMI ORIGINATE     ####] $channel ");
@@ -1999,10 +2011,14 @@ else echo "Ratecard: ".$this->ratecard_obj[$i][6]."<br>Trunk: ".$this->ratecard_
 				    if ($this->dialstatus == "ANSWER") {
 					$answeredtime					= $agi->get_variable("ANSWEREDTIME",true);
 					if ($answeredtime == "")	$answeredtime	= $agi->get_variable("CDR(billsec)",true);
+//$tempdebug="ANSWEREDTIME: $answeredtime sec";
 				    } else {
 					$answeredtime					= 0;
+//$tempdebug="DIALSTATUS: $this->dialstatus";
 				    }
 				    $this -> real_answeredtime = $this -> answeredtime	= $answeredtime;
+
+//$A2B -> debug( ERROR, $agi, __FILE__, __LINE__, "[ \033[1;34m$A2B->destination > $tempdebug\33[0m ]");
 				    $A2B -> debug( INFO, $agi, __FILE__, __LINE__, "[FAILOVER K=$k]:[ANSWEREDTIME=".$this->answeredtime."]:[DIALSTATUS=".$this->dialstatus."]");
 				}
 				if (($this->dialstatus  == "CHANUNAVAIL" || $this->dialstatus  == "CONGESTION") && $intellect_count >= 0) {

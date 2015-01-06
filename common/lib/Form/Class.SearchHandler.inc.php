@@ -277,13 +277,16 @@ if ($this->FG_FILTER_SEARCH_FORM) {
 				<td>
 				<?php
 				foreach ($this->FG_FILTER_SEARCH_FORM_SELECT as $selects){
+				$ts=explode(",",$selects[2]);
+				$pospoint=strrpos($ts[0],".");
+				if ($pospoint) $ts[0]=substr($ts[0],$pospoint+1);
 				?>
-					<select NAME="<?php echo $selects[2]?>" size="1" class="form_input_select">
+					<select NAME="<?php echo $ts[0]?>" size="1" class="form_input_select">
 						<option value=''><?php echo $selects[0]?></option>
 				<?php
 					 foreach ($selects[1] as $recordset){
 				?>
-						<option class=input value='<?php echo $recordset[0]?>'  <?php if ($processed[$selects[2]]==$recordset[0]) echo 'selected="selected"'?>><?php echo $recordset[1]; if (strlen($recordset[2])>0) echo ' - '.$recordset[2]; ?></option>
+						<option class=input value='<?php echo $recordset[0]?>'  <?php if ($processed[$ts[0]]==$recordset[0]) echo 'selected="selected"'?>><?php echo $recordset[1]; if (strlen($recordset[2])>0) echo ' - '.$recordset[2]; ?></option>
 				<?php 	 }
 				?>
 					</select>

@@ -168,7 +168,7 @@ if (!isset ($disable_load_conf) || !($disable_load_conf)) {
 
 	$DBHandle = DbConnect();
 	$instance_table = new Table();
-	$QUERY = "SELECT configuration_key FROM cc_configuration where configuration_key in ('MODULE_PAYMENT_AUTHORIZENET_STATUS','MODULE_PAYMENT_PAYPAL_STATUS','MODULE_PAYMENT_MONEYBOOKERS_STATUS','MODULE_PAYMENT_WORLDPAY_STATUS','MODULE_PAYMENT_PLUGNPAY_STATUS','MODULE_PAYMENT_WM_STATUS','MODULE_PAYMENT_WM_STATUS_10') AND configuration_value='True'";
+	$QUERY = "SELECT configuration_key FROM cc_configuration where configuration_key in ('MODULE_PAYMENT_AUTHORIZENET_STATUS','MODULE_PAYMENT_PAYPAL_BASIC_STATUS','MODULE_PAYMENT_MONEYBOOKERS_STATUS','MODULE_PAYMENT_WORLDPAY_STATUS','MODULE_PAYMENT_PLUGNPAY_STATUS','MODULE_PAYMENT_WM_STATUS','MODULE_PAYMENT_WM_STATUS_10') AND configuration_value='True'";
 	$payment_methods = $instance_table->SQLExec($DBHandle, $QUERY);
 	$show_logo = '';
 	$SPOT['paypal'] = '<a href="https://www.paypal.com/ru/mrb/pal=PGSJEXAEXKTBU" target="_blank"><img src="' . KICON_PATH . '/paypal_logo.gif" alt="Paypal"/></a>';
@@ -200,7 +200,7 @@ if (!isset ($disable_load_conf) || !($disable_load_conf)) {
 	</table>';
 	
 	for ($index = 0; $index < sizeof($payment_methods); $index++) {
-		if ($payment_methods[$index][0] == "MODULE_PAYMENT_PAYPAL_STATUS") {
+		if ($payment_methods[$index][0] == "MODULE_PAYMENT_PAYPAL_BASIC_STATUS") {
 			$show_logo .= $SPOT['paypal'] . ' &nbsp; ';
 		}
 //		elseif( $payment_methods[$index][0] == "MODULE_PAYMENT_AUTHORIZENET_STATUS") {
@@ -216,7 +216,7 @@ if (!isset ($disable_load_conf) || !($disable_load_conf)) {
 			$show_logo .= $SPOT['plugnpay'] . ' &nbsp; ';
 		}
 		elseif ($payment_methods[$index][0] == "MODULE_PAYMENT_WM_STATUS") {
-			$show_logo .= $SPOT['webmoneycreditcard'] . ' &nbsp; ';
+			$show_logo .= $SPOT['webmoney'] . ' &nbsp; ';
 		}
 //		elseif ($payment_methods[$index][0] == "MODULE_PAYMENT_WM_STATUS_10") {
 //			$show_logo .= $SPOT['webmoney'] . ' &nbsp; ';

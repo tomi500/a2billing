@@ -800,7 +800,7 @@ $A2B -> debug( ERROR, $agi, __FILE__, __LINE__, "[NO ENOUGH CREDIT TO CALL THIS 
 				$A2B -> debug( DEBUG, $agi, __FILE__, __LINE__, 'ANSWER fct callingcard_ivr authorize:> '.$ans);
 				
 				// CREATE A PERSONAL UNIQUEID FOR EACH TRY
-//$A2B -> debug( FATAL, $agi, __FILE__, __LINE__, $A2B -> uniqueid);
+//$A2B -> debug( ERROR, $agi, __FILE__, __LINE__, $A2B -> uniqueid);
 				$newuniqueid = explode('.',$A2B -> uniqueid);
 				if ($newuniqueid[0] == time() && $i)		sleep(1);
 				$newuniqueid[0] = time();

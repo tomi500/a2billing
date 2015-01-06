@@ -123,6 +123,8 @@ if (!isset($mc_gross))
 
 switch($transaction_data[0][4])
 {
+	case "paypalcreditcard":
+		
 	case "paypal":
 		$currCurrency = $mc_currency;
 		$currAmount = $mc_gross;
@@ -362,7 +364,7 @@ if ($resmax) {
 $customer_info = $resmax -> fetchRow();
 $nowDate = date("Y-m-d H:i:s");
 
-$pmodule = $transaction_data[0][4];
+$pmodule = str_replace('creditcard','',$transaction_data[0][4]);
 
 $OrderStatus = $payment_modules -> get_OrderStatus();
 $transaction_type = (empty($item_type))?'balance':$item_type;
@@ -418,14 +420,14 @@ if ($id > 0 && is_null($is_transaction[0][0])) {
 
 		$addfield = " (".$mc_gross." ".$currCurrency.")";
 		$field_insert = "date, credit, card_id, description, agent_id";
-		$value_insert = "'$nowDate', '".$amount_without_vat."', '$id', '".$transaction_data[0][4].$addfield."', $id_agent_insert";
+		$value_insert = "'$nowDate', '".$amount_without_vat."', '$id', '".$pmodule.$addfield."', $id_agent_insert";
 		$instance_sub_table = new Table("cc_logrefill", $field_insert);
 		$id_logrefill = $instance_sub_table -> Add_table ($DBHandle, $value_insert, null, null, 'id');
 		write_log(LOGFILE_EPAYMENT, basename(__FILE__).' line:'.__LINE__." - transactionID=$transactionID"." Add_table cc_logrefill : $field_insert - VALUES $value_insert");
 		
 		if ($currCurrency == BASE_CURRENCY)	$addfield = '';
 		$field_insert = "date, payment, card_id, id_logrefill, description, agent_id, fee";
-		$value_insert = "'$nowDate', '".$amount_paid."', '$id', '$id_logrefill', '".$transaction_data[0][4].$addfield."', $id_agent_insert, '$fee'";
+		$value_insert = "'$nowDate', '".$amount_paid."', '$id', '$id_logrefill', '".$pmodule.$addfield."', $id_agent_insert, '$fee'";
 		$instance_sub_table = new Table("cc_logpayment", $field_insert);
 		$id_payment = $instance_sub_table -> Add_table ($DBHandle, $value_insert, null, null,"id");
 		write_log(LOGFILE_EPAYMENT, basename(__FILE__).' line:'.__LINE__." - transactionID=$transactionID"." Add_table cc_logpayment : $field_insert - VALUES $value_insert");
@@ -442,7 +444,7 @@ if ($id > 0 && is_null($is_transaction[0][0])) {
 		$id_invoice = $instance_table -> Add_table ($DBHandle, $value_insert, null, null, "id");
 		//load vat of this card
 		if (!empty($id_invoice) && is_numeric($id_invoice)) {
-			$description = gettext("Refill ONLINE")." : ".$transaction_data[0][4];
+			$description = gettext("Refill ONLINE")." : ".$pmodule;
 			$field_insert = "date, id_invoice, price, fee, vat, description";
 			$instance_table = new Table("cc_invoice_item", $field_insert);
 			$value_insert = "'$date', '$id_invoice', '$amount_without_vat', '$fee', '$VAT', '$description'";
@@ -499,7 +501,7 @@ if ($id > 0 && is_null($is_transaction[0][0])) {
 				$reference =$result_invoice[0][0];
 				
 				$field_insert = "date, payment, card_id, description";
-				$value_insert = "'$nowDate', '".$amount_paid."', '$id', '(".$transaction_data[0][4].") ".gettext('Invoice Payment Ref: ')."$reference '";
+				$value_insert = "'$nowDate', '".$amount_paid."', '$id', '(".$pmodule.") ".gettext('Invoice Payment Ref: ')."$reference '";
 				$instance_sub_table = new Table("cc_logpayment", $field_insert);
 				$id_payment = $instance_sub_table -> Add_table ($DBHandle, $value_insert, null, null,"id");
 				write_log(LOGFILE_EPAYMENT, basename(__FILE__).' line:'.__LINE__." - transactionID=$transactionID"." Add_table cc_logpayment : $field_insert - VALUES $value_insert");
@@ -599,14 +601,14 @@ switch ($OrderStatus)
 		break;
 }
 
-if ( ($OrderStatus != 2) && ($transaction_data[0][4]=='plugnpay')) {
+if ( ($OrderStatus != 2) && ($pmodule=='plugnpay')) {
 	$url_forward = "checkout_payment.php?payment_error=plugnpay&error=The+payment+couldnt+be+proceed+correctly";
 	if(!empty($item_id) && !empty($item_type)) $url_forward .= "&item_id=".$item_id."&item_type=".$item_type;
 	Header ("Location: $url_forward");
 	die();
 }
 
-if ( ($OrderStatus == 0) && ($transaction_data[0][4]=='iridium')) {
+if ( ($OrderStatus == 0) && ($pmodule=='iridium')) {
 	write_log(LOGFILE_EPAYMENT, basename(__FILE__).' line:'.__LINE__." - transactionID=$transactionID"." EPAYMENT ORDER STATUS  = ".$statusmessage);
     die();
 }
@@ -624,7 +626,7 @@ if (preg_match("/^[_A-Za-z0-9-]+(\\.[_A-Za-z0-9-]+)*@[A-Za-z0-9]+(\\.[A-Za-z0-9]
         $mail->replaceInEmail(Mail::$ITEM_AMOUNT_KEY,$amount_without_vat." ".BASE_CURRENCY);
         $mail->replaceInEmail(Mail::$ITEM_ID_KEY,$id_logrefill);
         $mail->replaceInEmail(Mail::$ITEM_NAME_KEY,$item_name);
-        $mail->replaceInEmail(Mail::$PAYMENT_METHOD_KEY,mb_strtoupper(str_replace('creditcard','',$pmodule)));
+        $mail->replaceInEmail(Mail::$PAYMENT_METHOD_KEY,mb_strtoupper($pmodule));
         $mail->replaceInEmail(Mail::$PAYMENT_STATUS_KEY,gettext($statusmessage));
         $mail->replaceInEmail(Mail::$PAYMENT_FEE_KEY,$fee." ".BASE_CURRENCY);
         $mail->replaceInEmail(Mail::$PAYMENT_VAT_KEY,$VAT);
@@ -655,7 +657,7 @@ write_log(LOGFILE_EPAYMENT, basename(__FILE__).' line:'.__LINE__." - transaction
 write_log(LOGFILE_EPAYMENT, basename(__FILE__).' line:'.__LINE__." - transactionID=$transactionID"." ----EPAYMENT TRANSACTION END----");
 
 
-if ($transaction_data[0][4]=='plugnpay') {
+if ($pmodule=='plugnpay') {
 	Header ("Location: userinfo.php");
 	die;
 }

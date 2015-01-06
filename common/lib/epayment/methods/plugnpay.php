@@ -394,7 +394,7 @@ class plugnpay {
       tep_db_query("insert into " . TABLE_CONFIGURATION . " (configuration_title, configuration_key, configuration_value, configuration_description, configuration_group_id, sort_order, set_function, date_added) values ('Authorization Type', 'MODULE_PAYMENT_PLUGNPAY_CCMODE', 'authpostauth', 'Credit card processing mode', '6', '0', 'tep_cfg_select_option(array(\'authpostauth\', \'authonly\'), ', now())");
       tep_db_query("insert into " . TABLE_CONFIGURATION . " (configuration_title, configuration_key, configuration_value, configuration_description, configuration_group_id, sort_order, date_added) values ('Sort Order Of Display', 'MODULE_PAYMENT_PLUGNPAY_SORT_ORDER', '1', 'The order in which this payment type is dislayed. Lowest is displayed first.', '6', '0' , now())");
       tep_db_query("insert into " . TABLE_CONFIGURATION . " (configuration_title, configuration_key, configuration_value, configuration_description, configuration_group_id, sort_order, set_function, date_added) values ('Customer Notifications', 'MODULE_PAYMENT_PLUGNPAY_DONTSNDMAIL', 'yes', 'Should PlugnPay not email a receipt to the customer?', '6', '0', 'tep_cfg_select_option(array(\'yes\', \'no\'), ', now())");
-	  tep_db_query("insert into " . TABLE_CONFIGURATION . " (configuration_title, configuration_key, configuration_value, configuration_description, configuration_group_id, sort_order, set_function, date_added) values ('Accepted Credit Cards', 'MODULE_PAYMENT_PLUGNPAY_ACCEPTED_CC', 'Mastercard, Visa', 'The credit cards you currently accept', '6', '0', '_selectOptions(array(\'Amex\',\'Discover\', \'Mastercard\', \'Visa\'), ', now())");
+	  tep_db_query("insert into " . TABLE_CONFIGURATION . " (configuration_title, configuration_key, configuration_value, configuration_description, configuration_group_id, sort_order, set_function, date_added) values ('Accepted Credit Cards', 'MODULE_PAYMENT_PLUGNPAY_ACCEPTED_CC', 'Mastercard, Visa', 'The credit cards you currently accept', '6', '0', '_selectOptions(array(\'Amex\', \'Discover\', \'Mastercard\', \'Visa\'), ', now())");
     }
 
     function remove() {
@@ -422,18 +422,4 @@ class plugnpay {
     }
 
   }
-
-// PlugnPay Consolidated Credit Card Checkbox Implementation
-// Code from UPS Choice v1.7
-function _selectOptions($select_array, $key_value, $key = '') {
-  for ($i=0; $i<(sizeof($select_array)); $i++) {
-    $name = (($key) ? 'configuration[' . $key . '][]' : 'configuration_value');
-    $string .= '<br><input type="checkbox" name="' . $name . '" value="' . $select_array[$i] . '"';
-    $key_values = explode(", ", $key_value);
-    if (in_array($select_array[$i], $key_values)) $string .= ' checked="checked"';
-    $string .= '> ' . $select_array[$i];
-  } 
-  return $string;
-}
-
 

@@ -3964,6 +3964,14 @@ msgstr "ОТОБРАЖАТЬ В"
 msgid "Seconds"
 msgstr "Секундах"
 
+#: call-history.php
+msgid "Seconds "
+msgstr "Секунд "
+
+#: call-history.php
+msgid "Init block"
+msgstr "Тарифицируются сразу первые"
+
 #: call-history.php:385
 msgid "CURRENCY"
 msgstr "ВАЛЮТА"

@@ -170,6 +170,7 @@ ALTER TABLE cc_iax_buddies CHANGE `DEFAULTip` `defaultip` CHAR( 50 ) CHARACTER S
 
 ALTER TABLE cc_call ADD card_caller BIGINT(20) NOT NULL AFTER `card_id`;
 ALTER TABLE cc_call ADD card_called BIGINT(20) NOT NULL AFTER `card_caller`;
+ALTER TABLE cc_call ADD card_seller BIGINT(20) NOT NULL AFTER `card_called`;
 ALTER TABLE cc_call ADD src_peername INT(11) NULL DEFAULT NULL AFTER `src`;
 ALTER TABLE cc_call ADD src_exten VARCHAR( 40 ) CHARACTER SET utf8 COLLATE utf8_bin NULL DEFAULT NULL AFTER `src_peername`;
 ALTER TABLE cc_call ADD calledexten INT( 11 ) NULL DEFAULT NULL AFTER `calledstation`;
@@ -181,7 +182,14 @@ ALTER TABLE cc_call ADD faxresolution SMALLINT( 6 ) NULL DEFAULT NULL;
 ALTER TABLE cc_call ADD margindillers DECIMAL( 15, 5 ) NOT NULL DEFAULT 0 AFTER `sessionbill`;
 ALTER TABLE cc_call ADD margindiller DECIMAL( 15, 5 ) NOT NULL DEFAULT 0 AFTER `margindillers`;
 ALTER TABLE cc_call CHANGE `destination` `destination` BIGINT( 20 ) NULL DEFAULT '0';
-ALTER TABLE cc_call ADD INDEX `uniqueid` (`uniqueid`) COMMENT '';
+ALTER TABLE cc_call ADD INDEX `uniqueid` (`uniqueid`);
+
+ALTER TABLE cc_tariffplan ADD id_seller BIGINT(20) NOT NULL AFTER `id`;
+ALTER TABLE cc_tariffplan ADD sellerdialprefix char(20) COLLATE utf8_bin NULL DEFAULT NULL AFTER `id_seller`;
+ALTER TABLE cc_tariffplan ADD tariff_lcr INT( 11 ) NOT NULL DEFAULT '1' AFTER `sellerdialprefix`;
+
+ALTER TABLE cc_ratecard ADD buyrateconnectcharge DECIMAL( 15, 5 ) NOT NULL DEFAULT 0 AFTER `buyrateincrement`;
+ALTER TABLE cc_ratecard ADD ratecarddialprefix char(20) COLLATE utf8_bin NULL DEFAULT NULL AFTER `id_trunk`;
 
 ALTER TABLE cc_callerid ADD callback INT( 11 ) NOT NULL DEFAULT '0';
 ALTER TABLE cc_callerid ADD phonenumber VARCHAR( 100 ) CHARACTER SET utf8 COLLATE utf8_bin NOT NULL;
@@ -199,6 +207,7 @@ ALTER TABLE cc_did_destination ADD answer INT( 11 ) NOT NULL DEFAULT '0';
 ALTER TABLE cc_did_destination ADD playsound VARCHAR( 100 ) CHARACTER SET utf8 COLLATE utf8_bin NOT NULL;
 ALTER TABLE cc_did_destination ADD timeout VARCHAR( 3 ) NOT NULL ;
 
+ALTER TABLE cc_did ADD verify_did INT( 11 ) NOT NULL DEFAULT '0' AFTER `did`;
 ALTER TABLE cc_did ADD id_trunk INT( 11 ) NOT NULL DEFAULT '-1';
 ALTER TABLE cc_did ADD allciduse INT( 11 ) NOT NULL DEFAULT '0';
 ALTER TABLE cc_did ADD continuewithdid INT( 11 ) NOT NULL DEFAULT '0';
@@ -400,7 +409,10 @@ ALTER TABLE cc_callback_spool ADD `last_status` varchar(80) COLLATE utf8_bin DEF
 ALTER TABLE cc_callback_spool ADD `surveillance` INT( 11 ) NOT NULL DEFAULT '0';
 
 ALTER TABLE cc_payment_methods ADD UNIQUE `SECONDARY` ( `payment_method` );
-INSERT IGNORE INTO cc_payment_methods (`payment_method`, `payment_filename`) VALUES ('WebMoney', 'webmoney.php');
+INSERT IGNORE INTO cc_payment_methods (`payment_method`, `payment_filename`) VALUES
+	('WebMoney', 'webmoney.php'),
+	('WebMoneyCreditCard', 'webmoneycreditcard.php'),
+	('PayPalCreditCard', 'paypalcreditcard.php');
 
 delimiter //
 
@@ -419,6 +431,8 @@ delimiter ;
 call a2b_trf_check;
 
 drop procedure if exists a2b_trf_check;
+
+UPDATE `cc_configuration` SET `configuration_key` = 'MODULE_PAYMENT_PAYPAL_BASIC_STATUS' WHERE `configuration_id`='7' AND `configuration_key` ='MODULE_PAYMENT_PAYPAL_STATUS';
 
 ALTER TABLE cc_configuration ADD UNIQUE `SECONDARY` ( `configuration_key` );
 INSERT IGNORE INTO `cc_configuration` (`configuration_title`, `configuration_key`, `configuration_value`, `configuration_description`, `configuration_type`, `use_function`, `set_function`) VALUES
@@ -440,7 +454,14 @@ INSERT IGNORE INTO `cc_configuration` (`configuration_title`, `configuration_key
 	('WebMoney', 'MODULE_PAYMENT_WM_CACERT_10', './WebMoneyTransferRootCA.crt', 'root certificate path, in PEM-format', 0, NULL, NULL),
 	('Secret Key', 'MODULE_PAYMENT_WM_LMI_SECRET_KEY_10', 'Secret Key', 'Known to seller and WM Merchant Interface service on', 0, NULL, NULL),
 	('Extra field for testmode', 'MODULE_PAYMENT_WM_LMI_SIM_MODE_10', '0', '0 - simulate success; 1 - simulate fail; 2 - simulate 80% success, 20% fail', 0, NULL, NULL),
-	('Hash method', 'MODULE_PAYMENT_WM_LMI_HASH_METHOD_10', 'MD 5', 'Method of forming control signature', 0, NULL, 'tep_cfg_select_option(array(''MD 5'', ''SHA256'', ''SIGN''),');
+	('Hash method', 'MODULE_PAYMENT_WM_LMI_HASH_METHOD_10', 'MD 5', 'Method of forming control signature', 0, NULL, 'tep_cfg_select_option(array(''MD 5'', ''SHA256'', ''SIGN''),'),
+
+	('Enable PayPal Module', 'MODULE_PAYMENT_PAYPAL_STATUS', 'False', 'Do you want to accept PayPal Express Checkout payments?', 0, NULL, 'tep_cfg_select_option(array(''True'', ''False''), '),
+	('API Username', 'MODULE_PAYMENT_PAYPAL_USER', '', '', 0, NULL, NULL),
+	('API Password', 'MODULE_PAYMENT_PAYPAL_PWD', '', '', 0, NULL, NULL),
+	('Signature', 'MODULE_PAYMENT_PAYPAL_SIGNATURE', '', '', 0, NULL, NULL),
+	('Transaction Currency', 'MODULE_PAYMENT_PAYPAL_CURRENCY', 'EUR, USD', 'The default currencies for the payment transactions', 0, NULL, '_selectOptions(array(''EUR'', ''USD'', ''GBP'', ''HKD'', ''SGD'', ''JPY'', ''CAD'', ''AUD'', ''CHF'', ''DKK'', ''SEK'', ''NOK'', ''ILS'', ''MYR'', ''NZD'', ''TWD'', ''THB'', ''CZK'', ''HUF'', ''SKK'', ''ISK'', ''INR'', ''RUB''), ');
+	
 
 UPDATE `cc_configuration` SET `set_function` = 'tep_cfg_select_option(array(''MD 5'', ''SHA256'', ''SIGN''),' WHERE `configuration_key` ='MODULE_PAYMENT_WM_LMI_HASH_METHOD';
 
@@ -474,7 +495,8 @@ drop procedure if exists a2b_trf_check;
 CREATE TABLE IF NOT EXISTS `cc_card_concat` (
   `concat_id` int(11) NOT NULL DEFAULT '0',
   `concat_card_id` int(11) NOT NULL DEFAULT '0',
-  PRIMARY KEY (`concat_id`,`concat_card_id`)
+  PRIMARY KEY (`concat_card_id`),
+  INDEX `union` ( `concat_id` )
 ) ENGINE=MyISAM DEFAULT CHARSET=utf8 COLLATE=utf8_bin;
 
 ALTER TABLE `cc_card_concat` DROP PRIMARY KEY ,
@@ -484,7 +506,8 @@ ADD INDEX `union` ( `concat_id` );
 ALTER TABLE `cc_card_concat`
 ADD `root_manager` TINYINT NOT NULL DEFAULT '0',
 ADD `foreignvoipconf` TINYINT NOT NULL DEFAULT '0',
-ADD `foreignlogs` TINYINT NOT NULL DEFAULT '0',
+ADD `foreignlogs` TINYINT NOT NULL DEFAULT '0';
+ALTER TABLE `cc_card_concat`
 ADD `mylogs` TINYINT NOT NULL DEFAULT '0',
 ADD `foreignrecords` TINYINT NOT NULL DEFAULT '0',
 ADD `myrecords` TINYINT NOT NULL DEFAULT '0';

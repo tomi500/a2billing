@@ -33,7 +33,7 @@
 
 
 
-getpost_ifset(array('id', 'tariffname', 'startingdate', 'expirationdate', 'id_trunk', 'description', 'dnidprefix', 'calleridprefix'));
+getpost_ifset(array('id', 'tariffname', 'startingdate', 'expirationdate', 'description', 'dnidprefix', 'calleridprefix', 'id_trunk', 'id_seller', 'sellerdialprefix', 'tariff_lcr'));
 
 $HD_Form = new FormHandler("cc_tariffplan","Ratecard");
 
@@ -115,24 +115,14 @@ $HD_Form -> AddEditElement (gettext("EXPIRY DATE"),
 			   gettext("Insert the expiration date"),
 			   "" , "", "",	"", "", "", "res_display_dateformat", gettext("Format YYYY-MM-DD HH:MM:SS. For instance, '2004-12-31 00:00:00'"));
 
-$HD_Form -> AddEditElement (gettext("TRUNK"),
-			   "id_trunk",
-			   '$value',
-			   "SELECT",
-			   "", "", "",
-			   "sql",
-			   "cc_trunk",
-			   "trunkcode, id_trunk",
-			   "", "", "%1", "", gettext("You should define default Trunk for this RateCard"), "", '<OPTION  value="-1" selected>NOT DEFINED</OPTION>');
-
 $HD_Form -> AddEditElement (gettext("DESCRIPTION"),
-			   "description",		
+			   "description",
 			   '',	
 			   "TEXTAREA",	
 			   "cols=50 rows=4",	
 			   "",	
 			   gettext("Insert the description"),
-			   "" , "", "",	"", "" , "", "", "");
+			   "", "", "", "", "", "", "NO-NULL", "");
 
 if ($form_action=="ask-add"){	
 	$val_dnidprefix = "value='all'";
@@ -157,10 +147,49 @@ $HD_Form -> AddEditElement (gettext("CALLERID PREFIX"),
 			   "14",	
 			   gettext("Insert the dnid prefix"),
 			   "" , "", "",	"", "" , "", "", gettext("Set the CallerID rules to choose the ratecard 'calleridprefix', by default, matches all callerID. For instance, Set the calleridprefix to 900540540 to choose this ratecard when the CallerID is 900540540."));
-				
 
-$HD_Form -> FieldEditElement ('tariffname, startingdate, expirationdate, id_trunk, description, dnidprefix, calleridprefix');
+$HD_Form -> AddEditElement (gettext("TRUNK"),
+			   "id_trunk",
+			   '$value',
+			   "SELECT",
+			   "", "", "",
+			   "sql",
+			   "cc_trunk",
+			   "trunkcode, id_trunk",
+			   "", "", "%1", "", gettext("You should define default Trunk for this RateCard"), "", '<OPTION  value="-1" selected>NOT DEFINED</OPTION>');
 
+$HD_Form -> AddEditElement (gettext("CUSTOMER ID"),
+			   "id_seller",
+			   '',
+			   "POPUPVALUE",
+			   "size=30 maxlength=50",
+			   "4",
+			   gettext("Insert the Id Customer ID"),
+			   "", "", "", "", "",
+			   "A2B_entity_card.php?popup_select=1&",
+			   ", 'CardNumberSelection','width=550,height=550,top=100,left=100,scrollbars=1'" ,
+			   gettext("Set the Customer ID."));
+
+$HD_Form -> AddEditElement (gettext("ADD PREFIX"),
+			    "sellerdialprefix",
+			    "$value",
+			    "INPUT",
+			    "size=30 maxlength=20",
+			    "",
+			    gettext("Insert Terminator trunk prefix"),
+			    "", "", "", "", "", "", "NO-NULL", gettext("Add a prefix to the dialled digits for identify on Terminator side"));
+
+$HD_Form -> AddEditElement (gettext("LCR BEHAVIOR"),
+			    "tariff_lcr",
+			    '0',
+			    "RADIOBUTTON",
+			    "",
+			    "",
+			    "",
+			    "" , "", "" , "Yes:1, - No:0", "", "", "", gettext("Expiry ratecars ignore for LCR selecting. Old behavior is 'Yes'."));
+
+
+$HD_Form -> FieldEditElement ('tariffname, startingdate, expirationdate, description, dnidprefix, calleridprefix, id_trunk, id_seller, sellerdialprefix, tariff_lcr');
 
 $HD_Form -> FG_INTRO_TEXT_EDITION= gettext("Modify the properties of the rate card.");
 $HD_Form -> FG_INTRO_TEXT_ASK_DELETION = gettext("If you really want remove this")." ".$HD_Form->FG_INSTANCE_NAME.", ".gettext("click on the delete button.");
@@ -175,5 +204,3 @@ $HD_Form -> FG_BUTTON_EDITION_BOTTOM_TEXT = $HD_Form -> FG_BUTTON_ADITION_BOTTOM
 $HD_Form -> FG_GO_LINK_AFTER_ACTION_ADD = $_SERVER['PHP_SELF']."?atmenu=document&stitle=Document&wh=AC&id=";
 $HD_Form -> FG_GO_LINK_AFTER_ACTION_EDIT = $_SERVER['PHP_SELF']."?atmenu=document&stitle=Document&wh=AC&id=";
 $HD_Form -> FG_GO_LINK_AFTER_ACTION_DELETE = $_SERVER['PHP_SELF']."?atmenu=document&stitle=Document&wh=AC&id=";
-
-

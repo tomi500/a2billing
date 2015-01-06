@@ -960,25 +960,34 @@ class A2Billing {
 	    }
 	    $QUERY = "SELECT regexten, concat_id, id_cc_card FROM cc_sip_buddies
 			LEFT JOIN cc_card_concat ON id_cc_card = concat_card_id
-			WHERE name = '{$this->src_peername}' AND regexten IS NOT NULL GROUP BY regexten LIMIT 1";
+			WHERE name = '{$this->src_peername}' AND regexten IS NOT NULL LIMIT 1";
 	    $result = $this -> instance_table -> SQLExec ($this->DBHandle, $QUERY);
-	    if (is_array($result) && !is_null($result[0][0])) {
+	    if (is_array($result)) {
+		if (!is_null($result[0][1]))
+			$this -> caller_concat_id = $result[0][1];
 		$this -> src = $this -> src_exten = $result[0][0];
-		$this -> caller_concat_id = $result[0][1];
 		$this -> card_caller = $result[0][2];
 		$this -> CID_handover	= '';
+	    } else {
+		$QUERY = "SELECT concat_id FROM cc_card_concat WHERE concat_card_id = {$this->id_card}";
+		$result = $this -> instance_table -> SQLExec ($this->DBHandle, $QUERY);
+		if (is_array($result)) {
+			$this -> caller_concat_id = $result[0][0];
+		}
 	    }
 	}
 	$this->extext = true;
 	if ($this->destination) {
-		$QUERY = "SELECT name, regexten, mailbox, concat_id, id_cc_card, translit FROM cc_sip_buddies
-			LEFT JOIN cc_card_concat ON id_cc_card = concat_card_id
+		$QUERY = "SELECT name, regexten, mailbox, concat_id, id_cc_card, translit, voicemail_activated FROM cc_sip_buddies
+			LEFT JOIN cc_card_concat ON concat_card_id = id_cc_card
+			LEFT JOIN cc_card ON cc_card.id = id_cc_card
 			WHERE (name = '{$this->destination}' OR (regexten = '{$this->destination}' AND (id_cc_card = {$this->id_card} OR concat_id = '$this->caller_concat_id'))) AND regexten IS NOT NULL GROUP BY regexten LIMIT 1";
 		$result = $this -> instance_table -> SQLExec ($this->DBHandle, $QUERY);
 		if (is_array($result)) {
 			$this -> destination	= $result[0][0];
 			$this -> called_exten	= $result[0][1];
 			$this -> voicebox	= $result[0][2];
+			$this -> voicemail	= $result[0][6];
 			$this -> called_concat_id = $result[0][3];
 			$this -> card_called	= $result[0][4];
 			if (isset($this->src_exten)) {
@@ -998,24 +1007,7 @@ class A2Billing {
 			    $this -> CID_handover = '';
 			}
 			$this->extext = false;
-		} elseif (isset($this->src_exten)) {
-//			if ($this->src_peername != $this->CallerID) {
-//				$agi -> set_callerid('"' . trim(preg_replace('/(?<!\d)(' . $this->src_peername . ')(?!\d)/', '', $this->CallerID . ' ' . $agi->get_variable('CALLERID(name)', true)), "\x00..\x2F") . '"<' . $this->src_peername . '>');
-//				unset($this->src_exten);
-/**			} elseif (isset($this->src_exten)) {
-				$QUERY = "SELECT regexten, translit FROM cc_sip_buddies WHERE name = '{$this->destination}' AND external = 0 AND regexten IS NOT NULL LIMIT 1";
-				$result = $this -> instance_table -> SQLExec ($this->DBHandle, $QUERY);
-				if (is_array($result)) {
-//					$this -> called_exten = $result[0][0];
-					$cname = '"' . trim(preg_replace('/(?<!\d)(' . $this->src_peername . ')(?!\d)/', '', $agi->get_variable('CALLERID(name)', true)), "\x00..\x2F") . '"<' . $this->src_peername . '>';
-					$agi -> set_callerid($cname);
-				} else {
-//					$agi -> set_callerid('"' . trim(str_replace($this->src, '', $agi->get_variable('CALLERID(name)', true))) . '"<' . $this->src . '>');
-				}
-			} else {
-				$agi -> set_variable('CALLERID(num)', $this->src_peername);
-			}
-**/		}
+		}
 	}
 	if ($this->extext) {
 		$this->destination = $this->apply_add_countryprefixto ($this->destination);
@@ -1616,12 +1608,14 @@ $this -> debug( ERROR, $agi, __FILE__, __LINE__, "CREDIT :: $this->credit");
 					//# Ooh, something actually happend!
 					if ($dialstatus == "BUSY") {
 						$answeredtime = 0;
-						if ($this->agiconfig['busy_timeout'] > 0) {
-							$res_busy = $agi->exec("Busy ".$this->agiconfig['busy_timeout']);
-						}
-						if (count($listdestination) > $callcount) {
+						if (count($listdestination) > $callcount)
 							continue;
-						} else $agi-> stream_file('prepaid-isbusy', '#');
+						$this -> let_stream_listening($agi);
+						if ($this->agiconfig['busy_timeout'] > 0) {
+							$agi->exec("Playtones busy");
+							sleep($this->agiconfig['busy_timeout']);
+						} else	$agi-> stream_file('prepaid-isbusy', '#');
+//						$res_busy = $agi->exec("Busy");
 					} elseif ($dialstatus == "NOANSWER") {
 						$answeredtime = 0;
 						if (count($listdestination) > $callcount) {
@@ -1957,17 +1951,16 @@ $this -> debug( ERROR, $agi, __FILE__, __LINE__, "CREDIT :: $this->credit");
                 //# Ooh, something actually happend!
                 if ($dialstatus == "BUSY") {
 					$answeredtime = 0;
-					if ($this->agiconfig['busy_timeout'] > 0) {
-						$agi->exec("Playtones busy");
-						sleep($A2B->agiconfig['busy_timeout']);
-						$res_busy = $agi->exec("Busy");
-//						$res_busy = $agi->exec("Busy ".$this->agiconfig['busy_timeout']);
-					}
 					if (count($listdestination)>$callcount) {
 						continue;
 					} else {
 						$this -> let_stream_listening($agi);
-						$agi-> stream_file('prepaid-isbusy', '#');
+						if ($this->agiconfig['busy_timeout'] > 0) {
+							$agi->exec("Playtones busy");
+							sleep($this->agiconfig['busy_timeout']);
+						} else	$agi-> stream_file('prepaid-isbusy', '#');
+//						$res_busy = $agi->exec("Busy");
+//						$res_busy = $agi->exec("Busy ".$this->agiconfig['busy_timeout']);
 					}
                 } elseif ($dialstatus == "NOANSWER") {
 					$answeredtime = 0;

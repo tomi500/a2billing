@@ -267,6 +267,7 @@ echo $CC_help_import_ratecard;
 									<option value="buyrate"><?php echo gettext("buyrate");?></option>
 									<option value="buyrateinitblock"><?php echo gettext("buyrate min duration");?></option>
 									<option value="buyrateincrement"><?php echo gettext("buyrate billing block");?></option>
+									<option value="buyrateconnectcharge"><?php echo gettext("buyrate connectcharge");?></option>
 					
 									<option value="initblock"><?php echo gettext("sellrate min duration");?></option>
 									<option value="billingblock"><?php echo gettext("sellrate billing block");?></option>
@@ -275,7 +276,9 @@ echo $CC_help_import_ratecard;
 									<option value="disconnectcharge"><?php echo gettext("disconnect charge");?></option>
 									<option value="disconnectcharge_after"><?php echo gettext("disconnect charge threshold");?></option>
 									
-									<option value="minimal_cost"><?php echo gettext("minimum call cost");?></option> 
+									<option value="minimal_cost"><?php echo gettext("minimum call cost");?></option>
+									
+									<option value="ratecarddialprefix"><?php echo gettext("forward dialprefix");?></option>
 									
 									<option value="stepchargea"><?php echo gettext("step charge a");?></option>
 									<option value="chargea"><?php echo gettext("charge a");?></option>

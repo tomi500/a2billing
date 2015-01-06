@@ -42,11 +42,6 @@ $HD_Form -> FG_DEBUG = 0;
 $HD_Form -> FG_TABLE_DEFAULT_ORDER = "did DESC, priority";
 $HD_Form -> FG_TABLE_DEFAULT_SENS = "ASC";
 
-$HD_Form -> FG_EDITION = true;
-$HD_Form -> FG_DELETION = true;
-$HD_Form -> FG_ADDITION = true;
-$HD_Form -> FG_OTHER_BUTTON1 = false;
-
 $actived_list = Constants::getActivationList();
 $billingtype_list = Constants::getBillingTypeList();
 
@@ -122,8 +117,10 @@ $HD_Form -> CV_TEXT_TITLE_ABOVE_TABLE = '';
 $HD_Form -> CV_DISPLAY_FILTER_ABOVE_TABLE = false;
 $HD_Form -> FG_LIMITE_DISPLAY = 14;
 
-$HD_Form -> FG_EDITION = false;
+if ($_SESSION["card_id"] == 6) $HD_Form -> FG_EDITION = true;
 $HD_Form -> FG_DELETION = false;
+$HD_Form -> FG_ADDITION = true;
+$HD_Form -> FG_OTHER_BUTTON1 = false;
 $HD_Form -> FG_VIEW_TABLE_WITDH = '80%';
 
 $HD_Form -> AddEditElement (gettext("ACTIVATED"),

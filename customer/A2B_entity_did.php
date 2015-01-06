@@ -272,7 +272,7 @@ if (!isset ($action_release) || $action_release == "confirm_release" || $action_
 		$list_did = $instance_table_did->Get_list($HD_Form->DBHandle, $FG_TABLE_CLAUSE, "did", "ASC", null, null, null, null);
 		$nb_did = count($list_did);
 	}
-	if ($form_action != 'ask-delete') {
+	if ($form_action != 'ask-delete' && $form_action != 'ask-edit') {
 ?>
 <script language="JavaScript" type="text/JavaScript">
 <!--

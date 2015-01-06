@@ -11,7 +11,7 @@
 
 	<div class="toggle_menu"><li><a href="userinfo.php"><strong>{php} echo gettext("ACCOUNT INFO");{/php}</strong></a></li></div>
 
-	{if $ACXVOICEMAIL>0 }
+	{if $ACXVOICEMAIL1>0 }
 	<div class="toggle_menu"><li><a href="A2B_entity_voicemail.php"><strong>{php} echo gettext("VOICEMAIL");{/php}</strong></a></li></div>
 	{/if}
 

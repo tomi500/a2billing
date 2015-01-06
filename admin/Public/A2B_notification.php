@@ -160,10 +160,10 @@ $list_notifications = NotificationsDAO::getNotifications($_SESSION['admin_id'],(
 		<td class="tableBody"  width="15%" align="center" style="padding: 2px;">
 		<?php echo gettext("DATE"); ?>
 		</td>
-		<td class="tableBody"  width="25%" align="center" style="padding: 2px;">
+		<td class="tableBody"  width="30%" align="center" style="padding: 2px;">
 		<?php echo gettext("FROM"); ?>
 		</td>
-		<td class="tableBody"  width="45%" align="center" style="padding: 2px;">
+		<td class="tableBody"  width="40%" align="center" style="padding: 2px;">
 		<?php echo gettext("SUBJECT"); ?>
 		</td>
 		<td class="tableBody"  width="7%" align="center" style="padding: 2px;">

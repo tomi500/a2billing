@@ -613,13 +613,50 @@ msgstr "Wenn Sie das wirklich löschen wollen"
 msgid "you can add easily a new "
 msgstr "Sie können einfach eine neue einfügen"
 
+
+
 #: form_data/FG_var_signup.inc:430
-msgid "Thanks for registering with us.<br>A email with your information has been sent to your account "
-msgstr "Vielen Dank für die Registrierung bei uns. <br> Eine E-Mail mit Ihren Daten wurde auf Ihr Konto gesendet"
+msgid "Thanks for registering with us.<br>A email with information about your account has been sent to "
+msgstr "Sehr geehrter Kunde,<br>wir freuen uns sehr, dass Sie sich auf uns registriert haben.<br>Die Anmeldebestätigung mit Ihren Kundendaten wurde an die e-Mail "
 
 #: form_data/FG_var_signup.inc:430
 msgid "Your card number is "
-msgstr "Ihre Karten Nummer ist"
+msgstr "Ihre Karten Nummer ist "
+
+#: signup_confirmation.php:100
+msgid "Your new customer was registered successfully"
+msgstr "Ihr neuer Kunde wurde erfolgreich registriert"
+
+#: signup_confirmation.php:101
+msgid "An email confirming registration information has been sent to customer to"
+msgstr "Eine Email Bestätigung wurde an"
+
+#: signup_confirmation.php:102
+msgid "Cardnumber of "
+msgstr "Kundennummer lautet "
+
+#: signup_confirmation.php:103
+msgid " is "
+msgstr " - "
+
+#: signup_confirmation.php:104
+msgid "To login to account :"
+msgstr "Anmeldedaten"
+
+#: signup_confirmation.php:105
+msgid "Card alias (login) is "
+msgstr "Login: "
+
+#: signup_confirmation.php:106
+msgid "Password is "
+msgstr "Passwort: "
+
+
+
+
+
+
+
 
 #: form_data/FG_var_signup.inc:430 activate.php:111
 #: signup_confirmation.php:121
@@ -3346,7 +3383,7 @@ msgstr "Eine E-Mail zur Bestätigung Ihrer Informationen wurde an"
 
 #: activate.php:108 signup_confirmation.php:118
 msgid "Your cardnumber is "
-msgstr "Ihre Kartennummer ist"
+msgstr "Ihre Kartennummer ist "
 
 #: activate.php:109 signup_confirmation.php:119
 msgid "To login to your account :"
@@ -3354,7 +3391,7 @@ msgstr "Zum Login auf Ihr Konto:"
 
 #: activate.php:110 signup_confirmation.php:120
 msgid "Your card alias (login) is "
-msgstr "Ihre Karte Alias (login) ist"
+msgstr "Ihre Karte Alias (login) ist "
 
 #: activate.php:115
 msgid "Follow the link to access your account : "

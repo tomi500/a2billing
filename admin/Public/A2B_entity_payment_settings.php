@@ -80,7 +80,7 @@ if (tep_not_null($action)) {
 	switch ($action) {
 		case 'save' :
 			while (list ($key, $value) = each($configuration)) {
-				if ($key == 'MODULE_PAYMENT_PLUGNPAY_ACCEPTED_CC') {
+				if ($key == 'MODULE_PAYMENT_PLUGNPAY_ACCEPTED_CC' || $key == 'MODULE_PAYMENT_PAYPAL_CURRENCY') {
 					$value = join($value, ', ');
 				}
 				$instance_sub_table->Update_table($DBHandle, "configuration_value = '" . $value . "'", "configuration_key = '" . $key . "'");
@@ -93,6 +93,7 @@ if (tep_not_null($action)) {
 
 $payment_modules = new payment($paymentMethod);
 $GLOBALS['paypal']->enabled = true;
+$GLOBALS['paypalcreditcard']->enabled = true;
 $GLOBALS['moneybookers']->enabled = true;
 $GLOBALS['authorizenet']->enabled = true;
 $GLOBALS['worldpay']->enabled = true;

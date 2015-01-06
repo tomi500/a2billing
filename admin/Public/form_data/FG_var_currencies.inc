@@ -48,8 +48,9 @@ $HD_Form ->FG_LIST_ADDING_BUTTON_IMG1 = Images_Path ."/world_add.png" ;
 $HD_Form -> AddViewElement(gettext("CURRENCY"), "currency", "15%", "center", "sort");
 $HD_Form -> AddViewElement(gettext("DETAIL"), "name", "20%", "center", "sort");
 $HD_Form -> AddViewElement(gettext("VALUE"), "value", "15%", "center", "sort");
+$HD_Form -> AddViewElement('1/ '.gettext("VALUE"), "value_m", "15%", "center", "sort");
 
-$HD_Form -> FieldViewElement ('currency,name,value');
+$HD_Form -> FieldViewElement ('currency,name,value,1/value value_m');
 
 
 $HD_Form -> CV_NO_FIELDS  = gettext("THERE IS NO ".strtoupper($HD_Form->FG_INSTANCE_NAME)." CREATED!");

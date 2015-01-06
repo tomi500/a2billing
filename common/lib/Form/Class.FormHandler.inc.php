@@ -977,7 +977,7 @@ class FormHandler
 						gettext("(at least 3 characters)"));
 						
 		// 1.  EMAIL ADRESSE
-		$this -> FG_regular[]  = array(	"^[_A-Za-z0-9-]+(\\.[_A-Za-z0-9-]+)*@[A-Za-z0-9]+(\\.[A-Za-z0-9]+)*(\\.[A-Za-z]{2,})$",
+		$this -> FG_regular[]  = array(	"^[_A-Za-z0-9-]+(\\.[_A-Za-z0-9-]+)*@[A-Za-z0-9-]+(\\.[A-Za-z0-9]+)*(\\.[A-Za-z]{2,})$",
 						gettext("(must match email structure. Example : name@domain.com)"));
 						
 		// 2 . IF AT LEAST FIVE SUCCESSIVE CHARACTERS APPEAR AT THE END OF THE STRING.
@@ -1117,9 +1117,9 @@ class FormHandler
   		
   		if (isset($processed[$fld]) && ($processed[$fld]!='')){
             if (strpos($sql,'WHERE') > 0){
-                $sql = "$sql AND ";
+                $sql .= " AND ";
             }else{
-                $sql = "$sql WHERE ";
+                $sql .= " WHERE ";
             }
 			$sql = "$sql $fldsql";
 			if (isset ($processed[$fldtype])){                
@@ -1135,50 +1135,48 @@ class FormHandler
 		return $sql;
 	}
 
-	function do_field($sql,$fld, $simple=0,$processed=null,$search_table=null)
+	function do_field($sql, $fld, $simple=0, $processed=null, $search_table=null, $oro=false)
 	{
-		
-		
-  		$fldtype = $fld.'type';
-        if(empty($processed)) {
-        	$processed = $this->getProcessed();
-        }
-  		
-        if (isset($processed[$fld]) && ($processed[$fld]!='')){
-			if (strpos($sql,'WHERE') > 0){
-                $sql = "$sql AND ";
-            }else{
-                $sql = "$sql WHERE ";
-            }
-            if(empty($search_table)){
-				$sql = "$sql $fld";
-            }else{
-            	$sql = "$sql $search_table.$fld";
-            }
-	        if (DB_TYPE == "postgres"){		
-		 		$LIKE = "ILIKE";
-		 		$CONVERT ="";
-			}else{
-				$LIKE = "LIKE";
-				$CONVERT =" COLLATE utf8_unicode_ci";
-			}
-			
-			if ($simple==0){
-				if (isset ($processed[$fldtype])){      
-					switch ($processed[$fldtype]) {
-						case 1:	$sql = "$sql='".$processed[$fld]."'";  break;
-						case 2: $sql = "$sql $LIKE '".$processed[$fld]."%'".$CONVERT;  break;
-						case 3: $sql = "$sql $LIKE '%".$processed[$fld]."%'".$CONVERT;  break;
-						case 4: $sql = "$sql $LIKE '%".$processed[$fld]."'".$CONVERT;
-					}
-				}else{ 
-					$sql = "$sql $LIKE '%".$processed[$fld]."%'".$CONVERT; 
-				}
-			}else{
-				$sql = "$sql ='".$processed[$fld]."'";
-			}
+	    $fldtype = $fld.'type';
+	    if(empty($processed)) {
+		$processed = $this->getProcessed();
+	    }
+	    if ($fld==")") $sql .= $fld;
+	    elseif (isset($processed[$fld]) && ($processed[$fld]!='')){
+		if (strpos($sql,'WHERE') > 0){
+			if ($oro) $sql .= " OR "; else $sql .= " AND ";
+		}else{
+			$sql .= " WHERE ";
 		}
-		return $sql;
+		if(empty($search_table)){
+			$sql .= " $fld";
+		}else{
+			if ($search_table != "(")	$search_table .= ".";
+			$sql .= " ".$search_table.$fld;
+		}
+		if (DB_TYPE == "postgres"){
+			$LIKE = "ILIKE";
+			$CONVERT ="";
+		}else{
+			$LIKE = "LIKE";
+			$CONVERT =" COLLATE utf8_unicode_ci";
+		}
+		if ($simple==0){
+			if (isset ($processed[$fldtype])){
+				switch ($processed[$fldtype]) {
+					case 1: $sql .= "='".$processed[$fld]."'";  break;
+					case 2: $sql .= " $LIKE '".$processed[$fld]."%'".$CONVERT;  break;
+					case 3: $sql .= " $LIKE '%".$processed[$fld]."%'".$CONVERT;  break;
+					case 4: $sql .= " $LIKE '%".$processed[$fld]."'".$CONVERT;
+				}
+			}else{ 
+				$sql .= " $LIKE '%".$processed[$fld]."%'".$CONVERT;
+			}
+		}else{
+			$sql .= " ='".$processed[$fld]."'";
+		}
+	    }
+	    return $sql;
 	}
 	
 	/**
@@ -1401,12 +1399,32 @@ class FormHandler
 					$SQLcmd = $this->do_field_duration($SQLcmd,$r[1],$r[5]);
 					$SQLcmd = $this->do_field_duration($SQLcmd,$r[3],$r[5]);
 				}
-				
+
 				foreach ($this->FG_FILTER_SEARCH_FORM_SELECT as $r){
-					$search_parameters .= "|$r[2]=".$processed[$r[2]];
-					$SQLcmd = $this->do_field($SQLcmd, $r[2], 1,null,$r[4]);
+					$ts = explode(",",$r[2]);
+					foreach ($ts as $ket => $st) {
+						$pospoint = strrpos($st,".");
+						if ($pospoint) {
+							$r4 = substr($st,0,$pospoint);
+							$pospoint++;
+							$st = substr($st,$pospoint);
+						} else {
+							$r4 = $r[4];
+						}
+						if ($ket==0) {
+							$nv = $st;
+							if (count($ts)>1)	$r4 = "(".$r4;
+							$search_parameters .= "|$st=".$processed[$st];
+						}
+						if ($processed[$nv]) {
+							$SQLcmd = $this->do_field($SQLcmd, $st, 1, null, $r4, $ket);
+						}
+					}
+					if ($ket && $processed[$nv]) {
+						$SQLcmd .= ")";
+					}
+					unset($nv);
 				}
-				
 				$_SESSION[$this->FG_FILTER_SEARCH_SESSION_NAME] = $search_parameters;
 
 				$date_clause = '';

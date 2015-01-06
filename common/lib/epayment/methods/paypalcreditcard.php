@@ -1,25 +1,32 @@
 <?php
 include(dirname(__FILE__).'/../includes/methods/paypal.php');
 
-class paypal {
+class paypalcreditcard {
     var $code, $title, $description, $enabled;
-    var $paypal_allowed_currencies = array('EUR', 'USD');
-//    var $paypal_allowed_currencies = array('CAD', 'EUR', 'GBP', 'JPY', 'USD', 'MXN', 'AUD', 'NZD', 'BRL');
+    var $paypal_allowed_currencies;
 
 	// class constructorform_action_url
-    function paypal() {
+    function paypalcreditcard() {
 		global $user_paypal;
 
 		$this->title = MODULE_PAYMENT_PAYPAL_TEXT_TITLE;
 		$this->description = MODULE_PAYMENT_PAYPAL_TEXT_DESCRIPTION;
-		$this->code = 'paypal';
+		$this->code = 'paypalcreditcard';
 		$this->sort_order = 1;
-		$this->enabled = ((MODULE_PAYMENT_PAYPAL_BASIC_STATUS == 'True' && $user_paypal) ? true : false);
+		$this->enabled = ((MODULE_PAYMENT_PAYPAL_STATUS == 'True' && $user_paypal) ? true : false);
 		//$this->enabled = true;
 
 		$this->form_action_url = PAYPAL_PAYMENT_URL;
+		$this->paypal_allowed_currencies = explode(', ', MODULE_PAYMENT_PAYPAL_CURRENCY);
     }
 
+    function keys() {
+		return array(
+			'MODULE_PAYMENT_PAYPAL_STATUS', 	'MODULE_PAYMENT_PAYPAL_ID',
+			'MODULE_PAYMENT_PAYPAL_USER',		'MODULE_PAYMENT_PAYPAL_PWD',
+			'MODULE_PAYMENT_PAYPAL_SIGNATURE',	'MODULE_PAYMENT_PAYPAL_CURRENCY'
+		);
+    }
 	// class methods
     function update_status() {
 		global $order;
@@ -57,8 +64,6 @@ class paypal {
 		   'fields' => array(array('title' => 'Choose type', 'field' => tep_draw_pull_down_menu('wm_purse_type', $purse_type)))
 		   );
 		return $selection;
-		
-//		return array('id' => $this->code, 'module' => $this->title);
     }
 
     function pre_confirmation_check() {
@@ -79,7 +84,19 @@ class paypal {
 		}
 		$currencyObject = new currencies();
 		$process_button_string =
-					 tep_draw_hidden_field('cmd', '_xclick') .
+					 tep_draw_hidden_field('METHOD', 'SetExpressCheckout') .
+					 tep_draw_hidden_field('PAYMENTREQUEST_0_CURRENCYCODE', $my_currency) .
+					 tep_draw_hidden_field('PAYMENTREQUEST_0_ITEMAMT', number_format($order->info['total'], $currencyObject->get_decimal_places($my_currency))) .
+					 tep_draw_hidden_field('PAYMENTREQUEST_0_AMT', number_format($order->info['total'], $currencyObject->get_decimal_places($my_currency))) .
+					 tep_draw_hidden_field('RETURNURL', tep_href_link("userinfo.php", '', 'SSL')) .
+					 tep_draw_hidden_field('CANCELURL', tep_href_link("checkout_payment.php", '', 'SSL')) .
+					 tep_draw_hidden_field('SOLUTIONTYPE', 'Sole') .
+					 tep_draw_hidden_field('LANDINGPAGE', 'Billing') .
+					 tep_draw_hidden_field('NO_SHIPPING', '1') .
+					 tep_draw_hidden_field('ALLOWNOTE', '0') .
+					 tep_draw_hidden_field('LOCALECODE', LANG) .
+					 tep_draw_hidden_field('ADDROVERRIDE', '0');
+/**					 tep_draw_hidden_field('cmd', '_xclick') .
 					 tep_draw_hidden_field('business', MODULE_PAYMENT_PAYPAL_ID) .
 					 tep_draw_hidden_field('item_name', gettext('Payment for ').STORE_NAME) .
 					 tep_draw_hidden_field('rm', '2') .
@@ -96,13 +113,12 @@ class paypal {
 					 tep_draw_hidden_field('notify_url', tep_href_link("checkout_process.php?transactionID=".$transactionID."&sess_id=".session_id()."&key=".$key, '', 'SSL')) .
 					 tep_draw_hidden_field('return', tep_href_link("userinfo.php", '', 'SSL')) .
 					 tep_draw_hidden_field('cbt', gettext('Return to ').STORE_NAME) .
-					 tep_draw_hidden_field('cancel_return', tep_href_link("checkout_payment.php", '', 'SSL'));
-
+					 tep_draw_hidden_field('cancel_return', tep_href_link("userinfo.php", '', 'SSL'));
+**/
 
 		return $process_button_string;
     }
-    function get_CurrentCurrency()
-    {
+    function get_CurrentCurrency() {
 		$getcur = $_POST['wm_purse_type'];
 		if (!in_array($getcur, $this->paypal_allowed_currencies))
 			$getcur = BASE_CURRENCY;
@@ -152,8 +168,4 @@ class paypal {
 		return false;
     }
 
-    function keys() {
-		return array('MODULE_PAYMENT_PAYPAL_BASIC_STATUS', 'MODULE_PAYMENT_PAYPAL_ID');
-    }
 }
-
