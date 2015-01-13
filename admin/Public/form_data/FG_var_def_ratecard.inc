@@ -96,8 +96,9 @@ if (isset($posted) && !$popup_select) {
 }
 
 $HD_Form -> FG_DEBUG = 0;
-$HD_Form -> FG_TABLE_DEFAULT_ORDER = " IF(CONCAT(dialprefix+0) = dialprefix, dialprefix, ''),
-					IF(CONCAT(dialprefix+0) = dialprefix, cast(dialprefix as signed), -LENGTH(dialprefix))";
+$HD_Form -> FG_TABLE_DEFAULT_ORDER =	" IF(CONCAT(dialprefix+0) = dialprefix, dialprefix, ''),"
+					."IF(CONCAT(dialprefix+0) = dialprefix, cast(dialprefix as signed), -LENGTH(dialprefix)) ASC,"
+					."rateinitial";
 $HD_Form -> FG_TABLE_DEFAULT_SENS = "ASC";
 
 $HD_Form->FG_FILTER_SEARCH_SESSION_NAME = 'entity_ratecard_selection';
@@ -398,7 +399,7 @@ if (ADVANCED_MODE) {
 	   "size=30 maxlength=20",
 	   "12",
 	   gettext("Insert the charge B"),
-	   "" , "", "",	"", "", "", "NO", gettext("When entering in the cycle 'B', define the rate to apply." ));
+	   "", "", "", "", "", "", "NO", gettext("When entering in the cycle 'B', define the rate to apply." ));
 	
 	
 	$HD_Form -> AddEditElement(gettext("TIMECHARGE B"),
@@ -408,7 +409,7 @@ if (ADVANCED_MODE) {
 	   "size=30 maxlength=20",
 	   "4",
 	   gettext("Insert the time charge B"),
-	   "" , "", "",	"", "", "", "NO", gettext("Define the duration of the cycle 'B'." ));
+	   "", "", "", "", "", "", "NO", gettext("Define the duration of the cycle 'B'." ));
 	
 	
 	$HD_Form -> AddEditElement(gettext("BILLING BLOCK B"),

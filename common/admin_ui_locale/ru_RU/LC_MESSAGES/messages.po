@@ -2530,7 +2530,7 @@ msgstr "ВЫБЕРИТЕ ДЕНЬ"
 #: Public/call-pnl-report.php:179 Public/A2B_entity_paymentlog_agent.php:90
 #: Public/A2B_entity_paymentlog_agent.php:142
 msgid "From"
-msgstr "От"
+msgstr "С"
 
 #: Public/call-comp.php:285
 msgid "Number of days to compare"
@@ -3615,7 +3615,7 @@ msgstr "Время :"
 #: Public/A2B_entity_paymentlog_agent.php:112
 #: Public/A2B_entity_paymentlog_agent.php:172
 msgid "To"
-msgstr "Кому"
+msgstr "До"
 
 #: Public/call-log-customers.php:602
 #: Public/form_data/FG_var_phonenumber.inc:59

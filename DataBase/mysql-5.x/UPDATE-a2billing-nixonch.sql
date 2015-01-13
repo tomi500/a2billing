@@ -472,17 +472,17 @@ begin
     declare a int;
     select count(*) into a from cc_configuration where configuration_key='MODULE_PAYMENT_WM_STATUS';
     if a>1 then
-	select id into a from cc_configuration where configuration_key='MODULE_PAYMENT_WM_LMI_HASH_METHOD' order by id limit 0,1;
-	delete from cc_configuration where configuration_key='MODULE_PAYMENT_WM_LMI_HASH_METHOD' and id>a;
-	delete from cc_configuration where configuration_key='MODULE_PAYMENT_WM_LMI_SIM_MODE' and id>a;
-	delete from cc_configuration where configuration_key='MODULE_PAYMENT_WM_LMI_SECRET_KEY' and id>a;
-	delete from cc_configuration where configuration_key='MODULE_PAYMENT_WM_CACERT' and id>a;
-	delete from cc_configuration where configuration_key='MODULE_PAYMENT_WM_PURSE_WMU' and id>a;
-	delete from cc_configuration where configuration_key='MODULE_PAYMENT_WM_PURSE_WMZ' and id>a;
-	delete from cc_configuration where configuration_key='MODULE_PAYMENT_WM_PURSE_WMR' and id>a;
-	delete from cc_configuration where configuration_key='MODULE_PAYMENT_WM_PURSE_WME' and id>a;
-	delete from cc_configuration where configuration_key='MODULE_PAYMENT_WM_WMID' and id>a;
-	delete from cc_configuration where configuration_key='MODULE_PAYMENT_WM_STATUS' and id>a;
+	select configuration_id into a from cc_configuration where configuration_key='MODULE_PAYMENT_WM_LMI_HASH_METHOD' order by configuration_id limit 0,1;
+	delete from cc_configuration where configuration_key='MODULE_PAYMENT_WM_LMI_HASH_METHOD' and configuration_id>a;
+	delete from cc_configuration where configuration_key='MODULE_PAYMENT_WM_LMI_SIM_MODE' and configuration_id>a;
+	delete from cc_configuration where configuration_key='MODULE_PAYMENT_WM_LMI_SECRET_KEY' and configuration_id>a;
+	delete from cc_configuration where configuration_key='MODULE_PAYMENT_WM_CACERT' and configuration_id>a;
+	delete from cc_configuration where configuration_key='MODULE_PAYMENT_WM_PURSE_WMU' and configuration_id>a;
+	delete from cc_configuration where configuration_key='MODULE_PAYMENT_WM_PURSE_WMZ' and configuration_id>a;
+	delete from cc_configuration where configuration_key='MODULE_PAYMENT_WM_PURSE_WMR' and configuration_id>a;
+	delete from cc_configuration where configuration_key='MODULE_PAYMENT_WM_PURSE_WME' and configuration_id>a;
+	delete from cc_configuration where configuration_key='MODULE_PAYMENT_WM_WMID' and configuration_id>a;
+	delete from cc_configuration where configuration_key='MODULE_PAYMENT_WM_STATUS' and configuration_id>a;
     end if;
 end //
 

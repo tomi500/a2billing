@@ -90,8 +90,6 @@ $FG_DEBUG = 0;
 // The variable FG_TABLE_NAME define the table name to use
 $FG_TABLE_NAME = "cc_call t1 LEFT OUTER JOIN cc_trunk t3 ON t1.id_trunk = t3.id_trunk LEFT OUTER JOIN cc_ratecard t4 ON t1.id_ratecard = t4.id";
 
-
-
 // THIS VARIABLE DEFINE THE COLOR OF THE HEAD TABLE
 $FG_TABLE_ALTERNATE_ROW_COLOR [] = "#FFFFFF";
 $FG_TABLE_ALTERNATE_ROW_COLOR [] = "#F2F8FF";

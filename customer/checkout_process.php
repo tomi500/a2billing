@@ -35,7 +35,7 @@ include ("./lib/customer.defines.php");
 
 getpost_ifset (array('transactionID', 'sess_id', 'key', 'mc_currency', 'currency', 'md5sig', 'merchant_id', 'mb_amount', 'status', 'mb_currency',
 					'transaction_id', 'mc_fee', 'card_number', 'mc_gross', 'item_name', 'receiver_id',
-					'LMI_PREREQUEST','LMI_PAYEE_PURSE','LMI_PAYMENT_AMOUNT','LMI_PAYMENT_NO','LMI_MODE','LMI_SYS_INVS_NO',
+					'LMI_PREREQUEST','LMI_PAYEE_PURSE','LMI_PAYMENT_AMOUNT','LMI_PAYMENT_NO','LMI_MODE','LMI_SYS_INVS_NO','LMI_WMCHECK_NUMBER',
 					'LMI_SYS_TRANS_NO','LMI_PAYER_PURSE','LMI_SDP_TYPE','LMI_PAYER_WM','LMI_HASH','LMI_SYS_TRANS_DATE','LMI_PAYMENT_DESC'));
 
 
@@ -79,13 +79,13 @@ if (DB_TYPE == "postgres") {
 // Status - New 0 ; Proceed 1 ; In Process 2
 $QUERY = "SELECT id, cardid, amount, vat, paymentmethod, cc_owner, cc_number, cc_expires, UNIX_TIMESTAMP(creationdate), status, cvv, credit_card_type, currency, item_id, item_type " .
 		 " FROM cc_epayment_log " .
-		 " WHERE id = ".$transactionID." AND (status = 0 OR ((status = 1 OR status = 2) AND cc_expires = 'w' AND $CASHIN_7DAY) OR (status = 2 AND $NOW_7MIN))";
+		 " WHERE id = ".$transactionID." AND (status = 0 OR (status IN (1,2) AND cc_expires = 'w' AND $CASHIN_7DAY) OR (status = 2 AND $NOW_7MIN))";
 $transaction_data = $paymentTable->SQLExec ($DBHandle_max, $QUERY);
 write_log(LOGFILE_EPAYMENT, basename(__FILE__).' line:'.__LINE__." - QUERY = ".$QUERY."\n".print_r($transaction_data, true));
 
 $item_id = $transaction_data[0][13];
 $item_type = $transaction_data[0][14];
-if ($transaction_data[0][9] == 0 && $LMI_SDP_TYPE == 8) {
+if ($transaction_data[0][9] == 0 && ($LMI_WMCHECK_NUMBER or $LMI_SDP_TYPE)) {
     $transaction_data[0][7] = "w";
     $paystatus = 1;
 } else {

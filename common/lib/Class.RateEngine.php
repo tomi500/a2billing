@@ -1316,8 +1316,8 @@ else echo "Ratecard: ".$this->ratecard_obj[$i][6]."<br>Trunk: ".$this->ratecard_
 		    $QUERY_COLUMN = "uniqueid, sessionid, card_id, card_caller, card_called, card_seller, nasipaddress, starttime, sessiontime, real_sessiontime, calledstation, ".
 			" terminatecauseid, stoptime, sessionbill, id_tariffgroup, id_tariffplan, id_ratecard, " .
 			" id_trunk, src, sipiax, buycost, id_card_package_offer, dnid, destination, id_did, src_peername, src_exten, calledexten, margindillers, margindiller";
-		    $QUERY = "INSERT INTO cc_call ($QUERY_COLUMN) VALUES ('".$A2B->uniqueid."', '".$A2B->channel."', ".
-			"$card_id, $card_caller, $card_called, $idseller, '".$A2B->hostname."', ";
+		    $QUERY = "INSERT INTO cc_call ($QUERY_COLUMN) VALUES ('{$A2B->uniqueid}', '{$A2B->channel}', ".
+			"$card_id, $card_caller, $card_called, $idseller, '{$A2B->hostname}', ";
 
 		    if ($A2B->config["global"]['cache_enabled']) {
 			$QUERY .= " datetime( strftime('%s','now') - $sessiontime, 'unixepoch','localtime')";	
@@ -1333,8 +1333,8 @@ else echo "Ratecard: ".$this->ratecard_obj[$i][6]."<br>Trunk: ".$this->ratecard_
 		    }
 
 		    $QUERY .= " , '$signe_cc_call".a2b_round(abs($cost))."', ".
-					" $id_tariffgroup, $id_tariffplan, $id_ratecard, $trunk_id, '".$A2B->CallerID."', '$calltype', ".
-					" '$buycost', $id_card_package_offer, '".$A2B->dnid."', $calldestination, $id_did, $src_peername, $src_exten, $calledexten, ".a2b_round($this->margindillers).", ".a2b_round($this->commission).")";
+					" $id_tariffgroup, $id_tariffplan, $id_ratecard, $trunk_id, '{$A2B->CallerID}', '$calltype', ".
+					" '$buycost', $id_card_package_offer, '{$A2B->dnid}', $calldestination, $id_did, $src_peername, $src_exten, $calledexten, ".a2b_round($this->margindillers).", ".a2b_round($this->commission).")";
 
 		    if ($A2B->config["global"]['cache_enabled']) {
 			 //insert query in the cache system
@@ -1494,7 +1494,7 @@ else echo "Ratecard: ".$this->ratecard_obj[$i][6]."<br>Trunk: ".$this->ratecard_
 		$old_destination = $destination;
 		$firstgo = true;
 //		$timecur = time();
-		$this->dialstatus = 0;
+		$this->dialstatus = '';
 //		$A2B -> debug( INFO, $agi, __FILE__, __LINE__, "Count of ratecard_obj = ".count($this -> ratecard_obj));
 		for ($k=0;$k<count($this -> ratecard_obj);$k++) {
 			$loop_failover = $loop_intellect = $outcid = 0;
@@ -1504,8 +1504,8 @@ else echo "Ratecard: ".$this->ratecard_obj[$i][6]."<br>Trunk: ".$this->ratecard_
 			$status = 1;
 			// LOOOOP FOR THE FAILOVER LIMITED TO failover_recursive_limit
 			while (($loop_failover == 0 && !$this->dialstatus) || ($loop_failover <= $A2B->agiconfig['failover_recursive_limit']
-			    && $failover_trunk > 0 && $this->dialstatus != "ANSWER" && $this->dialstatus != "CANCEL" && time()-$timecur < 10
-			    && (!$this->dialstatus || $intellect_count >= 0 || $this->dialstatus == "CHANUNAVAIL" || $this->dialstatus == "CONGESTION"))) {
+			    && $failover_trunk > 0 && $this->dialstatus != "ANSWER" && $this->dialstatus != "CANCEL" && (time()-$timecur) < 10
+			    && (in_array($this->dialstatus, array("","CHANUNAVAIL","CONGESTION")) || $intellect_count >= 0))) {
 
 				$this -> td = $this -> prefixclause = '';
 				$CID_handover = NULL;
@@ -1523,7 +1523,7 @@ else echo "Ratecard: ".$this->ratecard_obj[$i][6]."<br>Trunk: ".$this->ratecard_
 //				    if ($typecall==1)
 				    $timeout		= $typecall==1 ? $A2B -> config["callback"]['predictivedialer_maxtime_tocall'] : $this -> ratecard_obj[$k]['timeout'];
 //				    else $timeout	= $this -> ratecard_obj[$k]['timeout'];
-				    if ($this -> timeout)
+				    if (isset($this -> timeout) && $this -> timeout)
 					$timeout	= $this -> timeout;
 				    $timeout		*= 1000;
 				    $musiconhold	= $this -> ratecard_obj[$k][34];
@@ -1653,7 +1653,7 @@ else echo "Ratecard: ".$this->ratecard_obj[$i][6]."<br>Trunk: ".$this->ratecard_
 							$intellect_failover_trunk = $result[0][3];
 							$intellect_ifmaxuse = $ifmaxuse;
 							$intellect_trunkcode = $trunkcode;
-						} elseif (!$firstrand && is_array($intellecttrunks)) {
+						} elseif (!$firstrand && isset($intellecttrunks) && is_array($intellecttrunks)) {
 							$resultrand = $intellecttrunks;
 						} elseif (isset($resultrand)) {
 							unset($resultrand);

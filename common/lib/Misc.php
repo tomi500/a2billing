@@ -696,11 +696,13 @@ function MDP_STRING($chrs = LEN_CARDNUMBER)
 {
 	$pwd = "";
 	mt_srand((double) microtime() * 1000000);
-	while (strlen($pwd) < $chrs) {
+	do {
+	    while (strlen($pwd) < $chrs) {
 		$chr = chr(mt_rand(0, 255));
 		if (preg_match("/^[0-9a-z]$/i", $chr))
 			$pwd = $pwd . $chr;
-	};
+	    }
+	} while (!preg_match('/(([a-zA-Z]\d)|(\d[a-zA-Z]))+/',$pwd));
 	return $pwd;
 }
 
