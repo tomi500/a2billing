@@ -316,6 +316,18 @@ class Constants
 		return $calltype_list;
 	}
 	
+	public static function getWeekDays(){
+		$calltype_list = array();
+		$calltype_list["0"] = array( gettext("Mo"), "0");
+		$calltype_list["1"] = array( gettext("Tu"), "1");
+		$calltype_list["2"] = array( gettext("We"), "2");
+		$calltype_list["3"] = array( gettext("Th"), "3");
+		$calltype_list["4"] = array( gettext("Fr"), "4");
+		$calltype_list["5"] = array( gettext("Sa"), "5");
+		$calltype_list["6"] = array( gettext("Su"), "6");
+		return $calltype_list;
+	}
+	
 	public static function getDialStatusList(){
 		$dialstatus_list = array();
 		$dialstatus_list["1"] = array( gettext("ANSWER")		, "1");

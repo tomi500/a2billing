@@ -328,7 +328,7 @@ if (has_rights (ACX_MODIFY_CUSTOMERS) && !($popup_select>=1)) {
 				   "username",
 				   "",
 				   "INPUT",
-				    "size=30 $maxi readonly  maxlength=40",
+				    "readonly size=30 $maxi maxlength=40",
 				   "4",
 				   gettext("Insert the account number"),
 				   "" , "", "",	"", "" , "", "", '', null, null, gettext("Customer Information"));

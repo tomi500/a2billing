@@ -537,7 +537,12 @@ class FormHandler
 		
 		$this->_action = $action ? $action : $_SERVER['PHP_SELF'];
 		
-		$this->_vars = array_merge((array)$_GET, (array)$_POST);
+		$json_data = $_POST["json_data"];
+		if (isset($json_data)) {
+			$this->_vars = json_decode($json_data,true,512);
+		} else {
+			$this->_vars = array_merge((array)$_GET, (array)$_POST);
+		}
 		
 		$this -> def_list();
 		
@@ -1494,7 +1499,7 @@ class FormHandler
 			$pos = strpos($this->FG_TABLE_ADITION[$i][14], ":"); // SQL CUSTOM QUERY
 			$pos_mul = strpos($this->FG_TABLE_ADITION[$i][4], "multiple");
 			
-			if (!$pos) {
+			if ($pos === false) {
 				
 				$fields_name = $this->FG_TABLE_ADITION[$i][1];
 				$regexp = $this->FG_TABLE_ADITION[$i][5];
@@ -1636,8 +1641,8 @@ class FormHandler
 		}
 	}
 
-	
-	
+
+
 	/**
      * Function to edit the fields
      * @public
@@ -1645,38 +1650,38 @@ class FormHandler
 	function perform_edit (&$form_action)
 	{
 		include_once (FSROOT."lib/Class.Table.php");
-		
+
 		$processed = $this->getProcessed();  //$processed['firstname']
-		
+		$id = $processed['id'];
 		$this->VALID_SQL_REG_EXP = $res_funct = true;
-		
+
 		$instance_table = new Table($this->FG_TABLE_NAME, $this->FG_QUERY_EDITION);
-		
-		if ($processed['id']!="" || !is_null($processed['id'])){
-			$this->FG_EDITION_CLAUSE = str_replace("%id", $processed['id'], $this->FG_EDITION_CLAUSE);
+
+		if ($processed['id']!="" || !is_null($id)){
+			$this->FG_EDITION_CLAUSE = str_replace("%id", $id, $this->FG_EDITION_CLAUSE);
 		}
-		
+		$ins_real = false;
 		for($i=0;$i<$this->FG_NB_TABLE_EDITION;$i++) {
-			
-			$pos = strpos($this->FG_TABLE_EDITION[$i][14], ":"); // SQL CUSTOM QUERY		
+
 			$pos_mul = strpos($this->FG_TABLE_EDITION[$i][4], "multiple");
-			if (!$pos){
-				$fields_name = $this->FG_TABLE_EDITION[$i][1];								
+			if (strpos($this->FG_TABLE_EDITION[$i][14], ':') === false && !strpos($this->FG_TABLE_EDITION[$i][4], 'readonly')) {		// SQL CUSTOM QUERY & cut readonly
+				$fields_name = $this->FG_TABLE_EDITION[$i][1];
 				$regexp = $this->FG_TABLE_EDITION[$i][5];
-				
+
 				if ($pos_mul && is_array($processed[$fields_name])){
 					$total_mult_select=0;
 					foreach ($processed[$fields_name] as $value){
 						$total_mult_select += $value;
 					}
 					if ($this->FG_DEBUG == 1) echo "<br>$fields_name : ".$total_mult_select;
-					if ($i>0) $param_update .= ", ";				
+					if ($ins_real) $param_update .= ", ";
+					else	$ins_real = true;
 					$param_update .= "$fields_name = '".addslashes(trim($total_mult_select))."'";
 				} else {
 					if (is_numeric($regexp))	$regexp = $this->FG_regular[$regexp][0];
 					elseif ($regexp != "") {
 						$existing_value = $this->FG_TABLE_EDITION[$i][2];
-						$regexp = str_replace($existing_value[$processed['id']], '666', $regexp);
+						$regexp = str_replace($existing_value[$id], '666', $regexp);
 					}
 					if ($regexp != "" && $regexp != "check_select" && !(strtoupper(substr($this->FG_TABLE_ADITION[$i][13],0,2))=="NO" && $processed[$fields_name]=="") ) {
 						$this-> FG_fit_expression[$i] = preg_match ('/'.$regexp.'/' , $processed[$fields_name]);
@@ -1687,9 +1692,9 @@ class FormHandler
 							$form_action="ask-edit";
 						}
 					}
-					
 					if ($this->FG_DEBUG == 1) echo "<br>$fields_name : ".$processed[$fields_name];
-					if ($i>0 && $this->FG_TABLE_EDITION[$i][3]!= "SPAN") $param_update .= ", ";
+					if ($ins_real && $this->FG_TABLE_EDITION[$i][3] != "SPAN") $param_update .= ", ";
+					else	$ins_real = true;
 					if (empty($processed[$fields_name]) && strtoupper(substr($this->FG_TABLE_ADITION[$i][13],3,4))=="NULL"){
 						$param_update .= $fields_name." = NULL ";
 					} else {
@@ -1698,42 +1703,38 @@ class FormHandler
 						}
 					}
 				}
-				
-			} else {
-				if (strtoupper ($this->FG_TABLE_EDITION[$i][3])==strtoupper ("CHECKBOX")) {
+			} elseif (strtoupper ($this->FG_TABLE_EDITION[$i][3]) == "CHECKBOX") {
 					$table_split = preg_split("/:/",$this->FG_TABLE_EDITION[$i][1]);
-					$checkbox_data = $table_split[0];	//doc_tariff			
-					$instance_sub_table = new Table($table_split[0], $table_split[1].", ".$table_split[5]);
-					$SPLIT_FG_DELETE_CLAUSE = $table_split[5]."='".trim($processed['id'])."'";	
-					$instance_sub_table -> Delete_table ($this -> DBHandle, $SPLIT_FG_DELETE_CLAUSE, $func_table = null);
-					
+					$checkbox_data = $table_split[0];	//doc_tariff
+					$instance_sub_table = new Table($checkbox_data, $table_split[1].", ".$table_split[5]);
+					$SPLIT_FG_DELETE_CLAUSE = $table_split[5]."='".trim($id)."'";
+					$instance_sub_table -> Delete_table ($this -> DBHandle, $SPLIT_FG_DELETE_CLAUSE);
+
 					if (!is_array($processed[$checkbox_data])) {
 						$snum=0;
 						$this -> VALID_SQL_REG_EXP = false;
 						$this-> FG_fit_expression[$i] = false;
-					} else {									
+					} else {
 						$snum = count($processed[$checkbox_data]);
 					}
-					
 					$checkbox_data_tab = $processed[$checkbox_data];
 					for($j=0;$j<$snum;$j++){
-						$this -> RESULT_QUERY = $instance_sub_table -> Add_table ($this-> DBHandle, "'".addslashes(trim($checkbox_data_tab[$j]))."', '".addslashes(trim($processed['id']))."'", null, null);
+						$this -> RESULT_QUERY = $instance_sub_table -> Add_table ($this-> DBHandle, "'".addslashes(trim($checkbox_data_tab[$j]))."', '".addslashes(trim($id))."'", null, null);
 						if (!$this -> RESULT_QUERY) {
 							$findme   = 'duplicate';
-							$pos_find = strpos($instance_sub_table -> errstr, $findme);	
+							$pos_find = strpos($instance_sub_table -> errstr, $findme);
 							
 							// Note our use of ===.  Simply == would not work as expected
 							// because the position of 'a' was the 0th (first) character.
 							if ($pos_find === false) {
-								echo $instance_sub_table -> errstr;	
+								echo $instance_sub_table -> errstr;
 							} else {
 								//echo $FG_TEXT_ERROR_DUPLICATION;
 								$alarm_db_error_duplication = true;
-							}								
-						}						
+							}
+						}
 					}
-				}
-			}			
+			}
 		}
 		
 		if (!is_null($this->FG_QUERY_EDITION_HIDDEN_FIELDS) && $this->FG_QUERY_EDITION_HIDDEN_FIELDS!=""){
@@ -1757,26 +1758,49 @@ class FormHandler
 			}
 		}
 		if ($res_funct) {
-			if ($this->FG_DEBUG == 1)
+			if ($this->FG_DEBUG == 1) {
 				echo "<br><hr> PARAM_UPDATE: $param_update<br>".$this->FG_EDITION_CLAUSE;
-			
-			if ($this->VALID_SQL_REG_EXP)
-				$this -> RESULT_QUERY = $instance_table -> Update_table ($this->DBHandle, $param_update, $this->FG_EDITION_CLAUSE, $func_table = null);
-			
-			if($this -> FG_ENABLE_LOG == 1)
-				$this -> logger -> insertLog_Update($_SESSION["admin_id"], 3, "A ".strtoupper($this->FG_INSTANCE_NAME)." UPDATED" , "A RECORD IS UPDATED, EDITION CALUSE USED IS ".$this->FG_EDITION_CLAUSE, $this->FG_TABLE_NAME, $_SERVER['REMOTE_ADDR'], $_SERVER['REQUEST_URI'], $param_update);
-			
+			}
+			if ($this->VALID_SQL_REG_EXP) {
+				$this -> RESULT_QUERY = $instance_table -> Update_table ($this->DBHandle, $param_update, $this->FG_EDITION_CLAUSE);
+				for($i=0;$i<$this->FG_NB_TABLE_EDITION;$i++) {
+					if (strtoupper ($this->FG_TABLE_EDITION[$i][3]) == 'POPUPDAYTIME') {
+						$instance_sub_table = new Table($this->FG_TABLE_EDITION[$i][8], $this->FG_TABLE_EDITION[$i][9]);
+						$instance_sub_table -> Delete_table ($this->DBHandle, str_replace("%id", "$id", $this->FG_TABLE_EDITION[$i][10]));
+						$QUERY = "INSERT INTO ".$this->FG_TABLE_EDITION[$i][8]." (".$this->FG_TABLE_EDITION[$i][15].") VALUES ";
+						$ins_real = false;
+						foreach ($processed[$this->FG_TABLE_ADITION[$i][1]] as $val1) {
+							if (current($val1) != "") {
+								$col = 0;
+								$QUERY .= "(".str_replace("%id", "$id", $this->FG_TABLE_EDITION[$i][11])."),";
+								$ins_real = true;
+								foreach ($val1 as $val2) {
+									$col++;
+									$QUERY = str_replace("%$col", $val2, $QUERY);
+								}
+							}
+						}
+						if ($ins_real) {
+							$QUERY = substr($QUERY, 0, -1);
+							$result = $instance_sub_table -> SQLExec ($this -> DBHandle, $QUERY, 0);
+						}
+					}
+				}
+			}
+			if($this -> FG_ENABLE_LOG == 1) {
+				$this -> logger -> insertLog_Update($_SESSION["admin_id"], 3, "A ".strtoupper($this->FG_INSTANCE_NAME)." UPDATED", "A RECORD IS UPDATED, EDITION CALUSE USED IS ".$this->FG_EDITION_CLAUSE, $this->FG_TABLE_NAME, $_SERVER['REMOTE_ADDR'], $_SERVER['REQUEST_URI'], $param_update);
+			}
 			if ($this->FG_DEBUG == 1) echo $this -> RESULT_QUERY;
 				// CALL DEFINED FUNCTION AFTER THE ACTION ADDITION
 			if (strlen($this->FG_ADDITIONAL_FUNCTION_AFTER_EDITION)>0 && ($this->VALID_SQL_REG_EXP))
 				$res_funct = call_user_func(array('FormBO', $this->FG_ADDITIONAL_FUNCTION_AFTER_EDITION)); 
 			
 			if (($this->VALID_SQL_REG_EXP) && (isset($this->FG_GO_LINK_AFTER_ACTION_EDIT))) {				
-				if ($this->FG_DEBUG == 1)  echo "<br> GOTO ; ".$this->FG_GO_LINK_AFTER_ACTION_EDIT.$processed['id'];
+				if ($this->FG_DEBUG == 1)  echo "<br> GOTO ; ".$this->FG_GO_LINK_AFTER_ACTION_EDIT.$id;
 				$ext_link ='';
 				if(is_numeric($processed['current_page']))$ext_link.="&current_page=".$processed['current_page'];
 				if(!empty($processed['order']) && !empty($processed['sens']))$ext_link.="&order=".$processed['order']."&sens=".$processed['sens'];
-				Header ("Location: ".$this->FG_GO_LINK_AFTER_ACTION_EDIT.$processed['id'].$ext_link);
+				Header ("Location: ".$this->FG_GO_LINK_AFTER_ACTION_EDIT.$id.$ext_link);
 			}
 		}
 	}

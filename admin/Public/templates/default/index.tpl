@@ -10,7 +10,7 @@
 			   <link href="templates/default/css/menu.css" rel="stylesheet" type="text/css">
 			   <link href="templates/default/css/style-def.css" rel="stylesheet" type="text/css">
 		{/if}
-        <script type="text/javascript" src="./javascript/jquery/jquery-1.2.6.min.js"></script>
+
 </HEAD>
 
 <BODY leftmargin="0" topmargin="0" marginwidth="0" marginheight="0">

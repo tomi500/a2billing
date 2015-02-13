@@ -2037,7 +2037,7 @@ $this -> debug( ERROR, $agi, __FILE__, __LINE__, "CREDIT :: $this->credit");
 			$this->calledexten = 'NULL';
 			$card_called = "'0'";
 		    }
-
+		    if ($this->src_peername >= pow(10,$this->config['global']['len_aliasnumber'])) $this->src_peername = 'NULL';
                     // A-LEG below to the owner of the DID
                     if ($call_did_free || $answeredtime == 0) {
                     	//CALL2DID CDR is free
@@ -2269,6 +2269,8 @@ $this -> debug( ERROR, $agi, __FILE__, __LINE__, "FAXRESOLUTION: ".$faxresolutio
 			$faxstatus = 1;
 			if ($faxpages == 0) $faxpages = 1;
 		} else	$faxstatus = 0;
+		if ($this->src_peername >= pow(10,$this->config['global']['len_aliasnumber']))
+			$this->src_peername = 'NULL';
 
 		$QUERY  = "INSERT INTO cc_call (uniqueid, sessionid, card_id, card_caller, card_called, nasipaddress, starttime, sessiontime, calledstation, destination, terminatecauseid, stoptime, sessionbill, ".
 				"id_tariffgroup, id_tariffplan, id_ratecard, id_trunk, src, sipiax, src_peername, src_exten, calledexten, dnid, faxstatus, remotefaxid, faxpages, faxbitrate, faxresolution) VALUES ";

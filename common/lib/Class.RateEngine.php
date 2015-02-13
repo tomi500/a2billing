@@ -110,7 +110,8 @@ class RateEngine
 		$minutes_since_monday = ($daytag * 1440) + ($hours * 60) + $minutes;
 		if ($this -> debug_st) echo "$minutes_since_monday<br> ";
 
-		$sql_clause_days = "(startdate<= CURRENT_TIMESTAMP AND (stopdate > CURRENT_TIMESTAMP OR stopdate = 0) AND (starttime <= ".$minutes_since_monday." AND endtime >=".$minutes_since_monday."))";
+		$sql_clause_days = "(startdate<= CURRENT_TIMESTAMP AND (stopdate > CURRENT_TIMESTAMP OR stopdate = 0) AND (cc_sheduler_ratecard.id_ratecard IS NULL OR (weekdays LIKE CONCAT('%',WEEKDAY(NOW()),'%') AND (CURTIME() BETWEEN timefrom AND timetill OR (timetill<=timefrom AND (CURTIME()<timetill OR CURTIME()>=timefrom))))))";
+//		$sql_clause_days = "(startdate<= CURRENT_TIMESTAMP AND (stopdate > CURRENT_TIMESTAMP OR stopdate = 0) AND (starttime <= ".$minutes_since_monday." AND endtime >=".$minutes_since_monday."))";
 
 		$mydnid = $mycallerid = "";
 		if (strlen($A2B->dnid)>=1) $mydnid = $A2B->dnid;
@@ -205,6 +206,7 @@ class RateEngine
 		RIGHT JOIN cc_tariffgroup_plan ON cc_tariffgroup_plan.idtariffgroup=cc_tariffgroup.id
 		INNER JOIN cc_tariffplan ON cc_tariffplan.id=cc_tariffgroup_plan.idtariffplan".$TARIFFNAME_SUB_QUERY."
 		LEFT JOIN cc_ratecard ON cc_ratecard.idtariffplan=cc_tariffplan.id
+		LEFT JOIN cc_sheduler_ratecard ON id_ratecard=cc_ratecard.id OR id_tariffplan=cc_tariffplan.id
 		LEFT JOIN cc_trunk ON (cc_trunk.id_trunk = cc_ratecard.id_trunk AND cc_ratecard.id_trunk != -1) OR (cc_ratecard.id_trunk = -1 AND cc_trunk.id_trunk = cc_tariffplan.id_trunk)
 
 		WHERE ((cc_tariffgroup.id=$tariffgroupid AND idtariffgroup='$tariffgroupid') OR cc_tariffplan.tariffname LIKE '$A2B->cardnumber%') AND ($prefixclause)
@@ -1145,7 +1147,8 @@ else echo "Ratecard: ".$this->ratecard_obj[$i][6]."<br>Trunk: ".$this->ratecard_
 			$dialstatus = $this -> dialstatus;
 		}
 
-		if ($K>=0) $A2B -> debug( INFO, $agi, __FILE__, __LINE__, ":[sessiontime:$sessiontime - id_cc_package_offer:$id_cc_package_offer - package2apply:".$this ->package_to_apply[$K]."]\n\n");
+		if ($K>=0) $A2B -> debug( INFO, $agi, __FILE__, __LINE__, ":[sessiontime:$sessiontime - id_cc_package_offer:$id_cc_package_offer - package2apply:".$this ->package_to_apply[$K]."]");
+//if ($K>=0) $A2B -> debug( ERROR, $agi, __FILE__, __LINE__, ":[sessiontime:$sessiontime - id_cc_package_offer:$id_cc_package_offer - package2apply:".$this ->package_to_apply[$K]."]");
 		
 //$temptempqueuednid = $agi -> get_variable('CHANNEL(peeraccount)',true);
 //$A2B -> debug( ERROR, $agi, __FILE__, __LINE__, "[* CHANNEL (peeraccount)     {$temptempqueuednid}");
@@ -1249,7 +1252,7 @@ else echo "Ratecard: ".$this->ratecard_obj[$i][6]."<br>Trunk: ".$this->ratecard_
 
 		if ($cost<=0) {
 			$signe = '-';
-			$signe_cc_call = '+';
+			$signe_cc_call = '';
 		} else {
 			$signe = '+';
 			$signe_cc_call = '-';
@@ -1375,7 +1378,7 @@ else echo "Ratecard: ".$this->ratecard_obj[$i][6]."<br>Trunk: ".$this->ratecard_
 		if ($sessiontime>0) {
 			
 			if (!isset($td)) $td = (isset($this->td))?$this->td:"";
-			$A2B -> credit = $A2B -> credit + $cost - a2b_round($this->margindillers);
+			$A2B -> credit += $cost - a2b_round($this->margindillers);
 			if (!is_null($myclause_nodidcall)) {
 				$myclause_nodidcall .= ", ";
 			}
@@ -1503,9 +1506,9 @@ else echo "Ratecard: ".$this->ratecard_obj[$i][6]."<br>Trunk: ".$this->ratecard_
 			$intellect_count = $trunkrand = -1;
 			$status = 1;
 			// LOOOOP FOR THE FAILOVER LIMITED TO failover_recursive_limit
-			while (($loop_failover == 0 && !$this->dialstatus) || ($loop_failover <= $A2B->agiconfig['failover_recursive_limit']
-			    && $failover_trunk > 0 && $this->dialstatus != "ANSWER" && $this->dialstatus != "CANCEL" && (time()-$timecur) < 10
-			    && (in_array($this->dialstatus, array("","CHANUNAVAIL","CONGESTION")) || $intellect_count >= 0))) {
+			while ((($loop_failover == 0 && !$this->dialstatus) || ($loop_failover <= $A2B->agiconfig['failover_recursive_limit']
+			    && $failover_trunk > 0 && (time()-$timecur) < 10 && (in_array($this->dialstatus, array("","CHANUNAVAIL","CONGESTION")) || $intellect_count >= 0)))
+			    && $this->dialstatus != "ANSWER" && $this->dialstatus != "CANCEL") {
 
 				$this -> td = $this -> prefixclause = '';
 				$CID_handover = NULL;
@@ -1871,7 +1874,6 @@ else echo "Ratecard: ".$this->ratecard_obj[$i][6]."<br>Trunk: ".$this->ratecard_
 					$addparameter = str_replace("%dialingnumber%", $prefix.$destination, $addparameter);
 					$dialstr .= $addparameter;
 				}
-
 				$this -> trunk_start_inuse($agi, $A2B, 1);
 				if ($agi) {
 				    if ($A2B->dtmf_destination && $A2B->oldphonenumber && $firstgo && (!isset($trunkcode) || strpos($trunkcode,"-INFOLINE") === false)) {
@@ -1884,7 +1886,7 @@ else echo "Ratecard: ".$this->ratecard_obj[$i][6]."<br>Trunk: ".$this->ratecard_
 						$A2B -> fct_say_balance ($agi, $A2B->credit);
 						$A2B -> auth_through_accountcode = false;
 					}
-					if ((!isset($trunkcode) || strpos($trunkcode,"-INFOLINE") === false) && $typecall != 44) {
+					if ((!isset($trunkcode) || strpos($trunkcode,"-INFOLINE") === false) && $typecall != 44 && $loop_failover == 0 && $loop_intellect <= 1) {
 						if ($A2B -> fct_say_time_2_call($agi, $trunktimeout, $this -> ratecard_obj[$k][12]) == -1) break;
 					}
 					$timecur = time();
@@ -1936,7 +1938,7 @@ else echo "Ratecard: ".$this->ratecard_obj[$i][6]."<br>Trunk: ".$this->ratecard_
 						//Uncomment this line if you want to save the outbound_cid in the CDR
 						//$A2B -> CallerID = $outcid;
 						$calleridname = $agi -> get_variable('CALLERID(name)', true);
-						$agi -> set_callerid($outcid);
+						$agi -> set_callerid('"'.$outcid.'"<'.$outcid.'>');
 //						$agi -> set_variable('CALLERID(ani)', $outcid);
 						$A2B -> debug( DEBUG, $agi, __FILE__, __LINE__, "[EXEC SetCallerID : $outcid]");
 					} else {

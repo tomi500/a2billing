@@ -32,7 +32,9 @@
 **/
 
 
-
+$json_data = $_POST["json_data"];
+if (isset($json_data))		extract(json_decode($json_data,true,512));
+else
 getpost_ifset(array('id', 'tariffname', 'startingdate', 'expirationdate', 'description', 'dnidprefix', 'calleridprefix', 'id_trunk', 'id_seller', 'sellerdialprefix', 'tariff_lcr'));
 
 $HD_Form = new FormHandler("cc_tariffplan","Ratecard");
@@ -47,15 +49,13 @@ $HD_Form ->FG_LIST_ADDING_BUTTON_LINK1 = "A2B_entity_tariffplan.php?form_action=
 $HD_Form ->FG_LIST_ADDING_BUTTON_ALT1 = $HD_Form ->FG_LIST_ADDING_BUTTON_MSG1 = gettext("Add RateCard");
 $HD_Form ->FG_LIST_ADDING_BUTTON_IMG1 = Images_Path ."/table_multiple.png" ;
 
-
 // Dependent Tables
 $HD_Form -> FG_FK_DELETE_ALLOWED = true;
 $HD_Form -> FG_FK_DELETE_CONFIRM = true;
 $HD_Form -> FG_FK_WARNONLY = false;
-$HD_Form -> FG_FK_TABLENAMES = array("cc_ratecard");
-$HD_Form -> FG_FK_EDITION_CLAUSE = array(" idtariffplan ");
-$HD_Form -> FG_FK_DELETE_MESSAGE = gettext("You are going as well to remove all the rates attached to this ratecard! Please comfirm that you really want to remove this ratecard and those rates ? ");
-
+$HD_Form -> FG_FK_TABLENAMES = array("cc_ratecard", "cc_sheduler_ratecard");
+$HD_Form -> FG_FK_EDITION_CLAUSE = array("idtariffplan", "id_tariffplan");
+$HD_Form -> FG_FK_DELETE_MESSAGE = gettext("You are going as well to remove all the schedules and rates attached to this tariffplan! Please confirm that you really want to remove this tariffplan and those rates?");
 
 $HD_Form -> AddViewElement(gettext("ID"), "id", "4%", "center", "sort");
 $HD_Form -> AddViewElement(gettext("TARIFFNAME"), "tariffname", "18%", "left", "sort");
@@ -114,6 +114,17 @@ $HD_Form -> AddEditElement (gettext("EXPIRY DATE"),
 			   "10",	
 			   gettext("Insert the expiration date"),
 			   "" , "", "",	"", "", "", "res_display_dateformat", gettext("Format YYYY-MM-DD HH:MM:SS. For instance, '2004-12-31 00:00:00'"));
+
+if ($form_action<>"ask-add") {
+$HD_Form -> AddEditElement(gettext("SCHEDULE"),
+			   "shedule",
+			   '$value',
+			   "POPUPDAYTIME",
+			   "", "", "", "",
+			   "cc_sheduler_ratecard",
+			   "weekdays, TIME_TO_SEC(timefrom) timefrom, TIME_TO_SEC(timetill) timetill",
+			   "id_tariffplan='%id'", "'%id','%1',SEC_TO_TIME('%2'),SEC_TO_TIME('%3')", "", "", "", ":", "`id_tariffplan`,`weekdays`,`timefrom`,`timetill`");
+}
 
 $HD_Form -> AddEditElement (gettext("DESCRIPTION"),
 			   "description",
@@ -189,7 +200,7 @@ $HD_Form -> AddEditElement (gettext("LCR BEHAVIOR"),
 			    "" , "", "" , "Yes:1, - No:0", "", "", "", gettext("Expiry ratecars ignore for LCR selecting. Old behavior is 'Yes'."));
 
 
-$HD_Form -> FieldEditElement ('tariffname, startingdate, expirationdate, description, dnidprefix, calleridprefix, id_trunk, id_seller, sellerdialprefix, tariff_lcr');
+$HD_Form -> FieldEditElement ('tariffname, startingdate, expirationdate, id_seller, description, dnidprefix, calleridprefix, id_trunk, id_seller, sellerdialprefix, tariff_lcr');
 
 $HD_Form -> FG_INTRO_TEXT_EDITION= gettext("Modify the properties of the rate card.");
 $HD_Form -> FG_INTRO_TEXT_ASK_DELETION = gettext("If you really want remove this")." ".$HD_Form->FG_INSTANCE_NAME.", ".gettext("click on the delete button.");

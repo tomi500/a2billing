@@ -19,6 +19,42 @@ msgstr ""
 msgid "UNION"
 msgstr "СОЮЗ"
 
+#: lib/Form/Class.FormHandler.EditForm.inc.php
+msgid "Hours"
+msgstr "Часов"
+
+#: lib/Form/Class.FormHandler.EditForm.inc.php
+msgid "Cancel"
+msgstr "Отменить"
+
+#: lib/Form/Class.FormHandler.EditForm.inc.php
+msgid "Mo"
+msgstr "Пн"
+
+#: lib/Form/Class.FormHandler.EditForm.inc.php
+msgid "Tu"
+msgstr "Вт"
+
+#: lib/Form/Class.FormHandler.EditForm.inc.php
+msgid "We"
+msgstr "Ср"
+
+#: lib/Form/Class.FormHandler.EditForm.inc.php
+msgid "Th"
+msgstr "Чт"
+
+#: lib/Form/Class.FormHandler.EditForm.inc.php
+msgid "Fr"
+msgstr "Пт"
+
+#: lib/Form/Class.FormHandler.EditForm.inc.php
+msgid "Sa"
+msgstr "Сб"
+
+#: lib/Form/Class.FormHandler.EditForm.inc.php
+msgid "Su"
+msgstr "Вс"
+
 #: Public/form_data/FG_var_card_union.inc
 msgid "Add Member"
 msgstr "Добавить Участника"
@@ -5782,7 +5818,7 @@ msgstr ""
 #: Public/form_data/FG_var_def_ratecard.inc:484
 #: Public/form_data/FG_var_subscriber.inc:113
 msgid "STOP DATE"
-msgstr ""
+msgstr "ДАТА ОКОНЧАНИЯ"
 
 #: Public/form_data/FG_var_subscription.inc:147
 #: Public/form_data/FG_var_def_ratecard.inc:490
@@ -6900,6 +6936,10 @@ msgstr ""
 msgid "EXPORTED LCR CALL PLAN"
 msgstr ""
 
+#: Public/form_data/FG_var_def_ratecard.inc:512
+msgid "SCHEDULE"
+msgstr "РАСПИСАНИЕ"
+
 #: Public/form_data/FG_var_def_ratecard.inc:107
 #: Public/form_data/FG_var_currencies.inc:44
 #: Public/A2B_package_manage_rates.php:215
@@ -7217,7 +7257,7 @@ msgstr ""
 
 #: Public/form_data/FG_var_def_ratecard.inc:481
 msgid "Define the period when this rate table is active."
-msgstr ""
+msgstr "Расписание и период действия Тарифа"
 
 #: Public/form_data/FG_var_def_ratecard.inc:491
 msgid "Leave empty to apply this rate indefinitely. Format YYYY-MM-DD HH:MM:SS. For instance, '2004-12-31 00:00:00"
@@ -7489,8 +7529,8 @@ msgid "Add RateCard"
 msgstr ""
 
 #: Public/form_data/FG_var_tariffplan.inc:57
-msgid "You are going as well to remove all the rates attached to this ratecard! Please comfirm that you really want to remove this ratecard and those rates ? "
-msgstr ""
+msgid "You are going as well to remove all the schedules and rates attached to this tariffplan! Please confirm that you really want to remove this tariffplan and those rates?"
+msgstr "Подтвердите, что согласны удалить и все тарифы, прикрепленные к этой тарифной группе?"
 
 #: Public/form_data/FG_var_tariffplan.inc:61
 #: Public/form_data/FG_var_tariffplan.inc:83
@@ -11841,7 +11881,7 @@ msgstr "Загрузить"
 
 #: Public/CC_upload.php:242
 msgid "Clear"
-msgstr "Очистить"
+msgstr "Сбросить"
 
 #: Public/CC_upload.php:256
 msgid "FILE NAME"

@@ -407,8 +407,8 @@ if ($mode == 'standard') {
 		
 		for ($i=0;$i< $A2B -> agiconfig['number_try'] ;$i++) {
             
-			$RateEngine->Reinit();
-			$A2B-> Reinit();
+			$RateEngine -> Reinit();
+			$A2B -> Reinit();
 
 			// RETRIEVE THE CHANNEL STATUS AND LOG : STATUS - CREDIT - MIN_CREDIT_2CALL
 			$stat_channel = $agi -> channel_status($A2B-> channel);
@@ -796,7 +796,7 @@ $A2B -> debug( ERROR, $agi, __FILE__, __LINE__, "[NO ENOUGH CREDIT TO CALL THIS 
 				$cia_res = $A2B-> call_sip_iax_buddy($agi, $RateEngine, $i);
 
 			} else {
-				$ans = $A2B-> callingcard_ivr_authorize($agi, $RateEngine, $i, true);
+				$ans = $A2B -> callingcard_ivr_authorize($agi, $RateEngine, $i, true);
 				$A2B -> debug( DEBUG, $agi, __FILE__, __LINE__, 'ANSWER fct callingcard_ivr authorize:> '.$ans);
 				
 				// CREATE A PERSONAL UNIQUEID FOR EACH TRY
@@ -840,23 +840,23 @@ $A2B -> debug( ERROR, $agi, __FILE__, __LINE__, "[NO ENOUGH CREDIT TO CALL THIS 
 						$A2B -> callingcard_acct_start_inuse($agi,0);
 					}
 				}
+//$A2B -> debug( ERROR, $agi, __FILE__, __LINE__, $A2B-> destination);
 				if ($ans==1) {
 				    do {
+					$RateEngine -> Reinit();
 					// PERFORM THE CALL
 					$result_callperf = $RateEngine->rate_engine_performcall ($agi, $A2B-> destination, $A2B);
-
 					if (!$result_callperf && !(!$A2B->extext && $A2B->voicemail && !is_null($A2B->voicebox) && !isset($A2B->transferername[0]))) {
 						$A2B -> let_stream_listening($agi);
 						$prompt = "prepaid-dest-unreachable";
 						$agi -> stream_file($prompt, '#');
 					}
 					// INSERT CDR  & UPDATE SYSTEM
-					$RateEngine->rate_engine_updatesystem($A2B, $agi, $A2B-> destination);
-
+					$RateEngine -> rate_engine_updatesystem($A2B, $agi, $A2B-> destination);
 					if ($A2B->backaftertransfer && isset($A2B->transferername[0]) && $RateEngine->dialstatus != "ANSWER") {
 						$A2B-> extension = $A2B-> dnid = $A2B-> destination = $A2B-> backafter;
 						unset($A2B->transferername);
-						$A2B->backaftertransfer = false;
+						$A2B-> backaftertransfer = false;
 						$A2B-> CallerIDext = $A2B->cidextafter . "<b>&#9100;</b>";
 						$agi-> set_callerid('<'. $A2B-> cidextafter .'>');
 						$A2B-> agiconfig['number_try'] = 1;

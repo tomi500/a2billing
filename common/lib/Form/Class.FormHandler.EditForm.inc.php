@@ -1,9 +1,64 @@
 <?php
 
 $processed = $this->getProcessed();
+$dynaform = false;
+foreach ($this->FG_TABLE_EDITION as $sts) {
+	if ($sts[3]=='POPUPDAYTIME') {
 
+		$WeekDaysList = Constants::getWeekDays();
+		foreach ($WeekDaysList as $key => $val) {
+			$weekdays .= '"'.$val[0].'"';
+			$weekdays .= ',';
+		}
+		$weekdays = substr($weekdays,0,-1);
+		if (!$dynaform) {
+?>
+<script language="JavaScript" type="text/JavaScript">
+	var WEEKDAYS = {"dows": [<?php echo $weekdays;?>]};
+	var TIMEINTERVALLIST = {"format": "%HH%:%MM%",
+                                "empt": "00:00",
+                                "DaysText": "<?php echo gettext("Days")?>",
+                                "HoursText": "<?php echo gettext("Hours")?>",
+                                "MinText": "<?php echo gettext("Minutes")?>",
+                                "daylabel": "Дн.",
+                                "hourlabel": "час.",
+                                "minlabel": "мин.",
+                                "ResetTxt": "<?php echo gettext("Clear")?>",
+                                "CancelTxt": "<?php echo gettext("Cancel")?>",
+                                "OkTxt": " <?php echo gettext("Ok")?> ",
+                                "hidedays": true};
+</script>
+<!-- Init jQuery, jQuery UI and jQuery PI -->
+<link href="./javascript/jquery/jquery.pi_ctl.min.css" type="text/css" rel="stylesheet">
+<script language="JavaScript" src="./javascript/jquery/jquery.pi_timeInterval.min.js"></script>
+<script language="JavaScript" src="./javascript/jquery/jquery.pi_dowselect.min.js"></script>
+<script language="JavaScript" src="./javascript/jquery/jquery-ui-1.8.20.custom.min.js"></script>
+<link href="./javascript/jquery/jquery-ui-1.8.20.custom.css" media="screen" type="text/css" rel="stylesheet">
+
+<!-- Init jqDynaForm -->
+<link href="./javascript/jquery/jqDynaForm.css" media="screen" type="text/css" rel="stylesheet">
+<script language="JavaScript" src="./javascript/jquery/jqDynaForm.js"></script>
+<script language="JavaScript" src="./javascript/jquery/fakeData.js"></script>
+<div id="popup"></div>
+<?php
+			$dynaform = true;
+		}
+?>
+<div style="display:none">
+    <div data-name="<?php echo $sts[1];?>">
+	<input name="weekdays" />
+	<style type="text/css">.span12{padding:3px 10px;}</style>
+	&nbsp;&nbsp;&nbsp;
+		<?php echo gettext("From")?>: <b><input name="timefrom" value="0" /></b>&nbsp;
+		<?php echo gettext("To")?>: <b><input name="timetill" value="0" /></b>
+    </div>
+</div>
+<?php
+	}
+}
 ?>
 
+<script language="JavaScript" src="./javascript/krutilke.js"></script>
 <script language="JavaScript" src="./javascript/calonlydays.js"></script>
 <script language="JavaScript" type="text/JavaScript">
 <!--
@@ -52,7 +107,6 @@ function updatecontent(id_el, record, field_inst, instance)
 
 //-->
 </script>
-
 <FORM action=<?php echo $_SERVER['PHP_SELF']?> method=post name="myForm" id="myForm">
 	<INPUT type="hidden" name="id" value="<?php echo $id?>">
 	<INPUT type="hidden" name="form_action" value="edit">
@@ -86,7 +140,7 @@ function updatecontent(id_el, record, field_inst, instance)
 <table class="editform_table1" cellspacing="2">
 <?php
 	for($i=0;$i<$this->FG_NB_TABLE_EDITION;$i++) { 
-		$pos = strpos($this->FG_TABLE_EDITION[$i][14], ":"); // SQL CUSTOM QUERY		
+		$pos = strpos($this->FG_TABLE_EDITION[$i][14], ':'); // SQL CUSTOM QUERY		
 		if (strlen($this->FG_TABLE_EDITION[$i][16])>1) {
 			echo '<TR><TD width="%25" valign="top" bgcolor="#FEFEEE" colspan="2" class="tableBodyRight" ><i>';				
 			echo $this->FG_TABLE_EDITION[$i][16];
@@ -139,7 +193,7 @@ function updatecontent(id_el, record, field_inst, instance)
                          <?php if($this->VALID_SQL_REG_EXP){ echo stripslashes($list[0][$i]); }else{ echo $processed[$this->FG_TABLE_ADITION[$i][1]];  }?>
                         <?php 
 				}
-				elseif (strtoupper ($this->FG_TABLE_EDITION[$i][3])=="POPUPVALUE"){
+				elseif (strtoupper ($this->FG_TABLE_EDITION[$i][3])=="POPUPVALUE") {
 			?>
 				<INPUT class="form_enter" name=<?php echo $this->FG_TABLE_EDITION[$i][1]?>  <?php echo $this->FG_TABLE_EDITION[$i][4]?> value="<?php
 					if($this->VALID_SQL_REG_EXP && is_array($list)){
@@ -147,14 +201,12 @@ function updatecontent(id_el, record, field_inst, instance)
 					}else{ echo $processed[$this->FG_TABLE_ADITION[$i][1]]; }?>">
                                 	<a href="#" onclick="window.open('<?php echo $this->FG_TABLE_EDITION[$i][12]?>popup_formname=myForm&popup_fieldname=<?php echo $this->FG_TABLE_EDITION[$i][1]?>' <?php echo $this->FG_TABLE_EDITION[$i][13]?>);"><img src="<?php echo Images_Path_Main;?>/icon_arrow_orange.gif"/></a>
 			 <?php
-				}elseif (strtoupper ($this -> FG_TABLE_EDITION[$i][3])=="POPUPVALUETIME")
-				{
+				}elseif (strtoupper ($this -> FG_TABLE_EDITION[$i][3])=="POPUPVALUETIME") {
                         ?>
                         <INPUT class="form_enter" name=<?php echo $this->FG_TABLE_EDITION[$i][1]?>  <?php echo $this->FG_TABLE_EDITION[$i][4]?> value="<?php if($this->VALID_SQL_REG_EXP){ echo stripslashes($list[0][$i]); }else{ echo $processed[$this->FG_TABLE_ADITION[$i][1]]; }?>">
-                         <a href="#" onclick="window.open('<?php echo $this->FG_TABLE_EDITION[$i][14]?>formname=myForm&fieldname=<?php echo $this->FG_TABLE_EDITION[$i][1]?>' <?php echo $this->FG_TABLE_EDITION[$i][14]?>);"><img src="<?php echo Images_Path_Main;?>/icon_arrow_orange.gif"/></a>
+                         <a href="#" onclick="window.open('<?php echo $this->FG_TABLE_EDITION[$i][12]?>formname=myForm&fieldname=<?php echo $this->FG_TABLE_EDITION[$i][1]?>' <?php echo $this->FG_TABLE_EDITION[$i][14]?>);"><img src="<?php echo Images_Path_Main;?>/icon_arrow_orange.gif"/></a>
                         <?php
-				}elseif (strtoupper ($this->FG_TABLE_EDITION[$i][3])=="POPUPDATETIME")
-				{
+				} elseif (strtoupper ($this->FG_TABLE_EDITION[$i][3])=="POPUPDATETIME") {
                         ?>
                          <INPUT class="form_enter" name=<?php echo $this->FG_TABLE_EDITION[$i][1]?>  <?php echo $this->FG_TABLE_EDITION[$i][4]?> value="<?php if($this->VALID_SQL_REG_EXP){ echo stripslashes($list[0][$i]); }else{ echo $processed[$this->FG_TABLE_ADITION[$i][1]]; }?>">
                           <a href="javascript:cal<?php echo $this->FG_TABLE_EDITION[$i][1]?>.popup();"><img src="<?php echo Images_Path_Main;?>/cal.gif" width="16" height="16" border="0" title="Click Here to Pick up the date" alt="Click Here to Pick up the date"></a>
@@ -168,9 +220,38 @@ function updatecontent(id_el, record, field_inst, instance)
                           cal<?php echo $this->FG_TABLE_EDITION[$i][1]?>.formatpgsql = true;
                           //-->
                           </script>
-			<?php	
-		  		}elseif (strtoupper ($this->FG_TABLE_EDITION[$i][3])=="TEXTAREA")
-				{
+			<?php
+				} elseif (strtoupper ($this->FG_TABLE_EDITION[$i][3])=="POPUPDAYTIME") {
+					$instance_sub_table = new Table($this->FG_TABLE_EDITION[$i][8], $this->FG_TABLE_EDITION[$i][9]);
+					$select_list = $instance_sub_table -> Get_list ($this->DBHandle, str_replace("%id", "$id", $this->FG_TABLE_EDITION[$i][10]), null, null, null, null, null, null);
+					if ($this->FG_DEBUG >= 2) { echo "<br>"; print_r($select_list);}
+					//echo $select_list."<br>";
+					if($this->VALID_SQL_REG_EXP) {
+						if ($select_list !== 0) {
+							$json_list = array();
+							foreach ($select_list as $key => $value) {
+								$json_list[] = array_diff_key($value, array('0'=>0,'1'=>1,'2'=>2,'3'=>3,'4'=>4,'5'=>5,'6'=>6,'7'=>7,'8'=>8));
+							}
+							$json_str = json_encode($json_list);
+							//echo $json_str."<br>";
+							?>
+							<script language="JavaScript"> PopUpDayTimeJson={"<?php echo $this->FG_TABLE_EDITION[$i][1];?>Array":<?php echo $json_str;?>}; </script>
+							<?php
+						} else {
+						
+						}
+					} else {
+						$json_str = json_encode($processed[$this->FG_TABLE_ADITION[$i][1]]);?>
+						<script language="JavaScript"> PopUpDayTimeJson={"<?php echo $this->FG_TABLE_EDITION[$i][1]?>Array":<?php echo $json_str;?>}; </script>
+						<?php
+					}
+			?>
+				    <div class="blockDyna">
+				        <div data-holder-for="<?php echo $this->FG_TABLE_EDITION[$i][1];?>"></div>
+				    </div>
+				    <div class="clear"></div>
+			<?php
+				} elseif (strtoupper ($this->FG_TABLE_EDITION[$i][3])=="TEXTAREA") {
 			  ?>
                      <textarea class="form_input_textarea" 
 					 <?php if(substr_count($this->FG_TABLE_EDITION[$i][4], "readonly") > 0){?>
@@ -281,17 +362,16 @@ function updatecontent(id_el, record, field_inst, instance)
 						//  No<input type="radio" name="digitalized" value="f">
 						
 					}//END_IF (RADIOBUTTON)
-?>
+					if (!$this-> FG_fit_expression[$i]  &&  isset($this-> FG_fit_expression[$i]) ){?>
 			<span class="liens">
 <?php
-					if (!$this-> FG_fit_expression[$i]  &&  isset($this-> FG_fit_expression[$i]) ){
-echo "			<br>".$this->FG_TABLE_EDITION[$i][6]." - ".$this->FG_regular[$this->FG_TABLE_EDITION[$i][5]][1];
-					} ?>
+echo "		<br>".$this->FG_TABLE_EDITION[$i][6]." - ".$this->FG_regular[$this->FG_TABLE_EDITION[$i][5]][1];?>
 			</span>
-<?php					if (strlen($this->FG_TABLE_COMMENT[$i])>0){
-echo "			<br/>".$this->FG_TABLE_COMMENT[$i];
+<?php					}
+					if (strlen($this->FG_TABLE_COMMENT[$i])>1){
+echo "			<br/>".$this->FG_TABLE_COMMENT[$i]?>&nbsp;<?php
 					} ?>
-			&nbsp;
+			
 			</TD>
 		</TR>
 <?php
@@ -834,8 +914,8 @@ echo "			<br/>".$this->FG_TABLE_COMMENT[$i];
 		<tr>
 			<td width="50%"><span class="tableBodyRight"><?php echo $this->FG_BUTTON_EDITION_BOTTOM_TEXT?></span></td>
             <td width="50%" align="right" valign="top" class="text">
-				<input value=" <?php echo $this->FG_EDIT_PAGE_CONFIRM_BUTTON; ?> " class="form_input_button" type="SUBMIT">
+				<input value=" <?php echo $this->FG_EDIT_PAGE_CONFIRM_BUTTON; ?> " class="form_input_button" type="SUBMIT" id="submit4">
 			</td>
 		</tr>
 	  </TABLE>
-</FORM> 
+</FORM>

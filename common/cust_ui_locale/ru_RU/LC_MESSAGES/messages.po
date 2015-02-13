@@ -15,6 +15,42 @@ msgstr ""
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
 
+#: lib/Form/Class.FormHandler.EditForm.inc.php
+msgid "Hours"
+msgstr "Часов"
+
+#: lib/Form/Class.FormHandler.EditForm.inc.php
+msgid "Cancel"
+msgstr "Отменить"
+
+#: lib/Form/Class.FormHandler.EditForm.inc.php
+msgid "Mo"
+msgstr "Пн"
+
+#: lib/Form/Class.FormHandler.EditForm.inc.php
+msgid "Tu"
+msgstr "Вт"
+
+#: lib/Form/Class.FormHandler.EditForm.inc.php
+msgid "We"
+msgstr "Ср"
+
+#: lib/Form/Class.FormHandler.EditForm.inc.php
+msgid "Th"
+msgstr "Чт"
+
+#: lib/Form/Class.FormHandler.EditForm.inc.php
+msgid "Fr"
+msgstr "Пт"
+
+#: lib/Form/Class.FormHandler.EditForm.inc.php
+msgid "Sa"
+msgstr "Сб"
+
+#: lib/Form/Class.FormHandler.EditForm.inc.php
+msgid "Su"
+msgstr "Вс"
+
 #: form_data/FG_var_sipiax_info.inc:136
 msgid "Enter right number from range below exclude afore existing numbers"
 msgstr "Введите номер из ниже указанного диапазона, исключая уже используемые номера"

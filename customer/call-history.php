@@ -199,7 +199,7 @@ if (strpos ( $SQLcmd, 'WHERE' ) > 0) {
 }
 
 $calledsbquery = $sessbillquery = " IN ('$customer')";
-$FG_TABLE_NAME = "cc_call t1";
+$FG_TABLE_NAME = "cc_call t1 LEFT JOIN cc_did ON cc_did.id=t1.id_did";
 $FG_HTML_TABLE_TITLE = " - ".gettext("Call Logs")." - ";
 $accdie = false;
 $FG_COL_QUERY_RECORDS = ", t1.uniqueid";
@@ -212,7 +212,8 @@ switch ($choose_callowner) {
 			$calledsbquery = " IN (SELECT concat_card_id FROM cc_card_concat WHERE concat_id=$concat_id)";
 			if (strlen($FG_TABLE_CLAUSE)>0)		$FG_TABLE_CLAUSE.=" AND ";
 			$FG_TABLE_CLAUSE.="bb.concat_id=$concat_id AND (bb.mylogs=1 OR bb.concat_card_id{$sessbillquery})";
-			$FG_COL_QUERY_RECORDS = ", IF((bb.myrecords AND {$customer_info[21]}) OR t1.card_id{$sessbillquery} OR card_caller{$sessbillquery},t1.uniqueid,'')";
+//			$FG_COL_QUERY_RECORDS = ", IF((bb.myrecords AND {$customer_info[21]}) OR t1.card_id{$sessbillquery} OR card_caller{$sessbillquery},t1.uniqueid,'')";
+			$FG_COL_QUERY_RECORDS = ", IF((bb.myrecords AND {$customer_info[21]}) OR '$customer' IN (t1.card_id, card_caller, card_called), t1.uniqueid, '')";
 			$sessbillquery = " IN (bb.concat_card_id)";
 		} else $accdie = true;
 		break;
@@ -333,18 +334,18 @@ if ($terminatecauseid!="ANSWER") {
 } else $tc = '';
 $FG_TABLE_COL[]=array (gettext("Cost"), "sessionbill", "7%", "center nowrap", "SORT", "30", "", "", "", "", "", "display_2bill");
 
-$FG_COL_QUERY = "t1.starttime starttime$cholder, 
+$FG_COL_QUERY = "t1.starttime starttime$cholder,
 IF(t1.src_exten IS NULL, t1.src, IF(t1.card_caller$calledsbquery,IF(t1.src_exten=t1.src_peername,t1.src_exten,IF(t1.src_peername IS NULL,t1.src,CONCAT(t1.src_peername,' &lt;<font color='
 	,IF(t1.src!=t1.src_peername AND t1.src_exten!=t1.src AND t1.src_exten NOT LIKE '%#%',CONCAT('red>',t1.src),CONCAT('green>',t1.src_exten)),'</font>&gt;'))),CONCAT(t1.src_peername
-	,IF(t1.src_peername=t1.src,'',CONCAT(' &lt;<font color=red>',t1.src,'</font>&gt;'))))) src, 
-IF(t1.card_id$calledsbquery AND t1.sipiax IN (2,3,5),t1.dnid,'') DID, 
+	,IF(t1.src_peername=t1.src,'',CONCAT(' &lt;<font color=red>',t1.src,'</font>&gt;'))))) src,
+IF(iduser$calledsbquery AND t1.sipiax IN (2,3,5),t1.dnid,'') DID,
 IF(t1.sipiax IN (2,3) AND t1.terminatecauseid<>1,'',IF(t1.card_called$calledsbquery, IF(t1.calledexten IS NOT NULL
 	,IF(t1.calledexten=t1.calledstation, t1.calledexten, CONCAT(t1.calledstation,' &lt;<font color=green>',t1.calledexten,'</font>&gt;')), t1.calledstation)
-	,IF(t1.card_id$calledsbquery,t1.calledstation,t1.dnid))) calledstation, 
-IF(t1.card_called$calledsbquery OR t1.card_id$calledsbquery,t1.destination,-1), 
-id_ratecard AS route, 
-ROUND(UNIX_TIMESTAMP(t1.starttime)-INSERT(t1.uniqueid,1,1,1)) AS waitup, 
-t1.sessiontime$tc, 
+	,IF(t1.card_id$calledsbquery,t1.calledstation,t1.dnid))) calledstation,
+IF(t1.card_called$calledsbquery OR t1.card_id$calledsbquery,t1.destination,-1),
+id_ratecard AS route,
+ROUND(UNIX_TIMESTAMP(t1.starttime)-INSERT(t1.uniqueid,1,1,1)) AS waitup,
+t1.sessiontime$tc,
 IF(t1.card_id$calledsbquery, t1.sessionbill+margindillers, 0) sessionbill";
 
 if ($ACXSEERECORDING && $terminatecauseid!="INCOMPLET" && !($popup_select>=1) && $choose_callowner != 4) {

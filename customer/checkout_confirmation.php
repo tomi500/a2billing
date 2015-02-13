@@ -64,7 +64,7 @@ getpost_ifset(array('item_id','item_type'));
 $two_currency = false;
 $currencies_list = get_currencies();
 
-if (!is_numeric($amount) || $amount < 1 || $amount > 1000) {
+if (!is_numeric($amount) || $amount < 1 || $amount > 1500) {
 	Header ("Location: checkout_payment.php");
 	die();
 }

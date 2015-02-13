@@ -47,7 +47,7 @@ if (!has_rights(ACX_RATECARD)) {
 getpost_ifset(array('package','popup_select', 'popup_formname', 'popup_fieldname','posted', 'Period', 'frommonth', 'fromstatsmonth', 'tomonth', 'tostatsmonth', 
 		    'fromday', 'fromstatsday_sday', 'fromstatsmonth_sday', 'today', 'tostatsday_sday', 'tostatsmonth_sday', 'removeallrate', 
 		    'removetariffplan', 'definecredit', 'IDCust', 'mytariff_id', 'destination', 'dialprefix', 'buyrate1', 'buyrate2', 'buyrate1type', 
-		    'buyrate2type', 'rateinitial1', 'rateinitial2', 'rateinitial1type', 'rateinitial2type', 'id_trunk', "check", "type", "mode"));
+		    'buyrate2type', 'rateinitial1', 'rateinitial2', 'rateinitial1type', 'rateinitial2type', 'id_trunk', 'check', 'type', 'mode'));
 
 /********************************* BATCH UPDATE ***********************************/
 getpost_ifset(array ( 'batchupdate', 'upd_id_trunk', 'upd_idtariffplan', 'upd_id_outbound_cidgroup', 'upd_tag', 'upd_inuse', 'upd_activated', 'upd_language',
@@ -55,10 +55,13 @@ getpost_ifset(array ( 'batchupdate', 'upd_id_trunk', 'upd_idtariffplan', 'upd_id
 	'upd_expiredays', 'upd_runservice', 'filterfield'
 ));
 
+$is_merged=0;
+
 $update_fields = array (
 	"upd_buyrate",
 	"upd_buyrateinitblock",
 	"upd_buyrateincrement",
+	"upd_buyrateconnectcharge",
 	"upd_rateinitial",
 	"upd_initblock",
 	"upd_billingblock",
@@ -73,6 +76,7 @@ $update_fields_info = array (
 	"BUYING RATE",
 	"BUYRATE MIN DURATION",
 	"BUYRATE BILLING BLOCK",
+	"BUYRATE CONNECT CHARGE",
 	"SELLING RATE",
 	"SELLRATE MIN DURATION",
 	"SELLRATE BILLING BLOCK",
@@ -309,7 +313,7 @@ if ($form_action == "list" && !$popup_select) {
 <center>
 <b>&nbsp;<?php echo $HD_Form -> FG_NB_RECORD ?> <?php echo gettext("rates selected!"); ?>&nbsp;<?php echo gettext("Use the options below to batch update the selected rates.");?></b>
 	   <table align="center" border="0" width="65%"  cellspacing="1" cellpadding="2">
-		<form name="updateForm" action="<?php echo $_SERVER['PHP_SELF']?>" method="post">
+		<form name="updateForm" action="<?php echo $_SERVER['PHP_SELF']?>" method="POST">
 		<INPUT type="hidden" name="batchupdate" value="1">
 		<INPUT type="hidden" name="atmenu" value="<?php echo $atmenu?>">
 		<INPUT type="hidden" name="popup_select" value="<?php echo $popup_select?>">
@@ -635,5 +639,3 @@ if (strpos($_SESSION[$HD_Form->FG_EXPORT_SESSION_VAR], 'cc_callplan_lcr')===fals
 
 // #### FOOTER SECTION
 $smarty->display('footer.tpl');
-
-

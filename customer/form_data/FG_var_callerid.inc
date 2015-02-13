@@ -133,7 +133,7 @@ if (isset($form_action) && ($form_action=='ask-edit' || $form_action=='edit')) {
 
 	$cidRO = "";
 	$cli_access = 'disabled="true" style="color: gray;" ';
-	$cli_prefix_access = "readonly";
+	$cli_prefix_access = " readonly";
 	$DBHandle_max = DbConnect();
 	$resmax = $DBHandle_max -> Execute("SELECT * FROM cc_callerid WHERE id='$id' AND verify=1 LIMIT 1");
 	if ( $resmax ) {
@@ -150,7 +150,7 @@ $HD_Form -> AddEditElement (gettext("CALLERID"),
 			   "cid",
 			   '$value',
 			   "INPUT",
-			   "size=20 maxlength=30 ".$cidRO,
+			   "size=20 maxlength=30".$cidRO,
 			   "18",
 			   gettext("Insert the CallerID"));
 
@@ -260,7 +260,7 @@ if ($form_action != 'ask-delete') {
 			    "cli_prefixreplace",
 			    "$value",
 			    "INPUT",
-			    "size=30 maxlength=30 ".$cli_prefix_access,
+			    "size=30 maxlength=30".$cli_prefix_access,
 			    "28",
 			    "",
 			    "" , "", "", "", "" , "" , "NO", gettext("Present this CallerID, when calls are made to countries from listed prefixes. Insert the replaceable prefixes separated by comma, e.g. for UK,IT,RU,UA are '44,39,7,380'."));

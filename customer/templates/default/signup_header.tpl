@@ -20,7 +20,7 @@
 	<script type="text/javascript">	
 		var IMAGE_PATH = "templates/{$SKIN_NAME}/images/";
 	</script>
-	<script type="text/javascript" src="./javascript/jquery/jquery-1.2.6.min.js"></script>
+	<script type="text/javascript" src="./javascript/jquery/jquery-1.7.2.min.js"></script>
 	<script type="text/javascript" src="./javascript/jquery/jquery.debug.js"></script>
 	<script type="text/javascript" src="./javascript/jquery/ilogger.js"></script>
 	<script type="text/javascript" src="./javascript/jquery/handler_jquery.js"></script>

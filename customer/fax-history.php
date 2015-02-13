@@ -193,7 +193,7 @@ if (!isset ($FG_TABLE_CLAUSE) || strlen($FG_TABLE_CLAUSE)==0) {
 
 
 if (strlen($FG_TABLE_CLAUSE)>0) $FG_TABLE_CLAUSE.=" AND ";
-$FG_TABLE_CLAUSE.="(t1.card_caller='$customer' AND faxstatus IS NOT NULL)";
+$FG_TABLE_CLAUSE.="(t1.card_called='$customer' AND faxstatus IS NOT NULL)";
 
 if (!isset($choose_calltype)) $choose_calltype = 1;
 if ($choose_calltype != - 1) {

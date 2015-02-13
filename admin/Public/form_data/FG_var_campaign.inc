@@ -124,7 +124,7 @@ if ($form_action=="ask-add") {
 		"id_card",
 		'$value',
 		"INPUT",
-		"size=30 maxlength=50 readonly",
+		"readonly size=30 maxlength=50",
 		"4",
 		gettext("Insert the Customer ID"),
 		"" , "", "", "", "" , "", "", gettext("Customer ID Selected "));

@@ -217,6 +217,19 @@ ALTER TABLE cc_did ADD citylength SMALLINT( 6 ) NULL DEFAULT NULL;
 ALTER TABLE cc_did ADD verify_callerid SMALLINT( 6 ) NOT NULL DEFAULT '0';
 ALTER TABLE cc_did ADD voicebox VARCHAR( 20 ) CHARACTER SET utf8 COLLATE utf8_bin NULL DEFAULT NULL;
 
+CREATE TABLE IF NOT EXISTS `cc_sheduler_ratecard` (
+  `id_ratecard` BIGINT(20) NOT NULL DEFAULT '0',
+  `id_tariffplan` BIGINT(20) NOT NULL DEFAULT '0',
+  `weekdays` varchar(13) CHARACTER SET utf8 COLLATE utf8_bin NOT NULL,
+  `timefrom` TIME NOT NULL DEFAULT '0',
+  `timetill` TIME NOT NULL DEFAULT '0',
+  INDEX `id` ( `id_ratecard` , `id_tariffplan` )
+) ENGINE=MyISAM DEFAULT CHARSET=utf8 COLLATE=utf8_bin;
+
+ALTER TABLE `cc_ratecard`
+  DROP `starttime`,
+  DROP `endtime`;
+
 CREATE TABLE IF NOT EXISTS cc_voicemail_users (
 	uniqueid BIGINT(20) NOT NULL AUTO_INCREMENT PRIMARY KEY,
 	customer_id BIGINT(20) NOT NULL default '0',
