@@ -1320,7 +1320,7 @@ else echo "Ratecard: ".$this->ratecard_obj[$i][6]."<br>Trunk: ".$this->ratecard_
 			" terminatecauseid, stoptime, sessionbill, id_tariffgroup, id_tariffplan, id_ratecard, " .
 			" id_trunk, src, sipiax, buycost, id_card_package_offer, dnid, destination, id_did, src_peername, src_exten, calledexten, margindillers, margindiller";
 		    $QUERY = "INSERT INTO cc_call ($QUERY_COLUMN) VALUES ('{$A2B->uniqueid}', '{$A2B->channel}', ".
-			"$card_id, $card_caller, $card_called, $idseller, '{$A2B->hostname}', ";
+			"$card_id, $card_caller, $card_called, '$idseller', '{$A2B->hostname}', ";
 
 		    if ($A2B->config["global"]['cache_enabled']) {
 			$QUERY .= " datetime( strftime('%s','now') - $sessiontime, 'unixepoch','localtime')";	
