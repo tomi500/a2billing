@@ -694,9 +694,9 @@ function getnameofagent($id) {
  */
 function MDP_STRING($chrs = LEN_CARDNUMBER)
 {
-	$pwd = "";
-	mt_srand((double) microtime() * 1000000);
 	do {
+	    $pwd = "";
+	    mt_srand((double) microtime() * 1000000);
 	    while (strlen($pwd) < $chrs) {
 		$chr = chr(mt_rand(0, 255));
 		if (preg_match("/^[0-9a-z]$/i", $chr))
