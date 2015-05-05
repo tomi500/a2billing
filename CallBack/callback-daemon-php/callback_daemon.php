@@ -33,8 +33,10 @@ function reasondesc($reason) {
 function originateresponse($e, $parameters, $server, $port, &$ast) {
 
     if ($parameters['ActionID'] == $ast->actionid) {
-//	write_log(LOGFILE_API_CALLBACK, "OriginateResponse: ".var_export($parameters, true));
-	return reasondesc($parameters['Reason']);
+	$ansnum = $parameters['Reason'];
+	$ansalpha = reasondesc($ansnum);
+//	write_log(LOGFILE_API_CALLBACK, "OriginateResponse{$ans}: ".var_export($parameters, true));
+	return array($ansnum,$ansalpha);
     }
     return false;
 }

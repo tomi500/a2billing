@@ -1983,9 +1983,11 @@ else echo "Ratecard: ".$this->ratecard_obj[$i][6]."<br>Trunk: ".$this->ratecard_
 //					$response = $ast -> wait_response(true);
 //					write_log(LOGFILE_API_CALLBACK, " ActionID = {$amicmd[5]} [#### RESULT AMI WAIT RESPONSE   ####] ChannelStateDesc = ".var_export($response, true)." ");
 //					$ast->log("ActionID = {$amicmd[5]} [#### RESULT AMI WAIT RESPONSE   ####] ChannelStateDesc = ".var_export($response, true));
-					$this->dialstatus = $ast -> wait_response(true);
+					$response = $ast -> wait_response(true);
+					$this->dialstatus = $response[1];
 				    } else {
 					$this->dialstatus = "CHANUNAVAIL";
+					$response[0] = 0;
 				    }
 				    write_log(LOGFILE_API_CALLBACK, " ActionID = {$amicmd[5]} [#### RESULT AMI WAIT RESPONSE   ####] $channel = $this->dialstatus ");
 				    $ast->log("ActionID = {$amicmd[5]} [#### RESULT AMI WAIT RESPONSE   ####] $channel = $this->dialstatus");
@@ -2055,7 +2057,7 @@ else echo "Ratecard: ".$this->ratecard_obj[$i][6]."<br>Trunk: ".$this->ratecard_
 					continue;
 				}
 			    }
-			    return $response;
+			    return $response[0];
 			}
 			if (!$agi || $typecall == 9) {
 				continue;

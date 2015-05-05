@@ -557,7 +557,8 @@ CREATE TABLE IF NOT EXISTS `cc_ringup_list` (
   `channelstatedesc` VARCHAR( 40 ) NOT NULL,
   `passed` smallint(6) NOT NULL DEFAULT '0',
   `result` smallint(6) NOT NULL DEFAULT '0',
-  PRIMARY KEY (`id`,`id_ringup`)
+  PRIMARY KEY (`id`),
+  UNIQUE `ringseria` (`id_ringup`, `tonum`)
 ) ENGINE=MyISAM DEFAULT CHARSET=utf8 COLLATE=utf8_bin;
 
 CREATE TABLE IF NOT EXISTS `cc_sms` (

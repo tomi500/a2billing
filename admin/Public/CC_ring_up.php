@@ -343,7 +343,7 @@ function sendtoupload(form){
 <br><table cellspacing="1" cellpadding="1" border="0">
   <tr class="form_head">
     <td class="tableBody" style="padding: 2px;" align="center" width="22%"><?php echo gettext("TAG");?></td>
-    <td class="tableBody" style="padding: 2px;" align="center" width="12%"><?php echo gettext("TRUNKS");?></td>
+    <td class="tableBody" style="padding: 2px;" align="center" width="12%"><?php echo gettext("TRUNK");?></td>
     <td class="tableBody" style="padding: 2px;" align="center" width="10%"><?php echo gettext("CHANNELS");?></td>
     <td class="tableBody" style="padding: 2px;" align="center" width="11%"><?php echo gettext("PASSED");?></td>
     <td class="tableBody" style="padding: 2px;" align="center" width="11%"><?php echo gettext("LEFT");?></td>

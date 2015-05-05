@@ -62,7 +62,7 @@ if (strlen($_SESSION[$var_export]) < 10) {
 	if ($var_export == "pr_export_entity_ringup")
 		$myfileName = $filename . "_" . date("Y-m-d");
 		if (is_numeric($id))
-			$_SESSION[$var_export] .= $id." ORDER BY id";
+			$_SESSION[$var_export] .= $id." ORDER BY channelstatedesc DESC, attempt";
 		else
 			$log->insertLog($_SESSION["admin_id"], 2, "FILE EXPORT FAILED", "A File in CSV Format was not exported by User, File Name= " . $myfileName . ".csv", '', $_SERVER['REMOTE_ADDR'], $_SERVER['REQUEST_URI'], '');
 	if (strcmp($var_export_type, "type_csv") == 0) {
