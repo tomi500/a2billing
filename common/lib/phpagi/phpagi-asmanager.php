@@ -804,7 +804,7 @@
       if(function_exists($handler))
       {
 //        $this->log("Execute handler $handler");
-        $ret = $handler($e, $parameters, $this->server, $this->port, $this->actionid);
+        $ret = $handler($e, $parameters, $this->server, $this->port, $this);
       }
 //      else
 //        $this->log("No event handler for event '$e'");

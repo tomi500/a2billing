@@ -46,11 +46,11 @@ foreach ($this->FG_TABLE_EDITION as $sts) {
 ?>
 <div style="display:none">
     <div data-name="<?php echo $sts[1];?>">
-	<input name="weekdays" />
+	<input name="weekdays[]" />
 	<style type="text/css">.span12{padding:3px 10px;}</style>
 	&nbsp;&nbsp;&nbsp;
-		<?php echo gettext("From")?>: <b><input name="timefrom" value="0" /></b>&nbsp;
-		<?php echo gettext("To")?>: <b><input name="timetill" value="0" /></b>
+		<?php echo gettext("From")?>: <b><input name="timefrom[]" value="0" /></b>&nbsp;
+		<?php echo gettext("To")?>: <b><input name="timetill[]" value="0" /></b>
     </div>
 </div>
 <?php
@@ -229,8 +229,9 @@ function updatecontent(id_el, record, field_inst, instance)
 					if($this->VALID_SQL_REG_EXP) {
 						if ($select_list !== 0) {
 							$json_list = array();
-							foreach ($select_list as $key => $value) {
-								$json_list[] = array_diff_key($value, array('0'=>0,'1'=>1,'2'=>2,'3'=>3,'4'=>4,'5'=>5,'6'=>6,'7'=>7,'8'=>8));
+							foreach ($select_list as $value) {
+//								$json_list[] = array_diff_key($value, array('0'=>0,'1'=>1,'2'=>2,'3'=>3,'4'=>4,'5'=>5,'6'=>6,'7'=>7,'8'=>8));
+								$json_list[] = array('weekdays[]'=>$value[0],'timefrom[]'=>$value[1],'timetill[]'=>$value[2]);
 							}
 							$json_str = json_encode($json_list);
 							//echo $json_str."<br>";

@@ -1968,8 +1968,9 @@ else echo "Ratecard: ".$this->ratecard_obj[$i][6]."<br>Trunk: ".$this->ratecard_
 				    write_log(LOGFILE_API_CALLBACK, " ActionID = {$amicmd[5]} [#### Starting AMI ORIGINATE     ####] $channel ");
 				    $ast->log("ActionID = {$amicmd[5]} [#### Starting AMI ORIGINATE     ####] $channel");
 				    $ast -> add_event_handler('OriginateResponse', 'originateresponse');
+//				    $ast -> add_event_handler('Newstate', 'newstateresponse');
 				    $ast -> actionid = $amicmd[5];
-				    $amicmd[3] = substr_replace($amicmd[3],"RATECARD={$this->ratecard_obj[$k][6]},TRUNK=$this->usedtrunk,TD=$this->td",strpos($amicmd[3],"RATECARD"));
+				    $amicmd[3] = substr_replace($amicmd[3],"RATECARD={$this->ratecard_obj[$k][6]},TRUNK={$this->usedtrunk},TD={$this->td}",strpos($amicmd[3],"RATECARD")).",ACTIONID={$ast->actionid}";
 				    $res = $ast -> Originate($channel,$amicmd[0],$A2B -> config['callback']['context_callback'],$amicmd[1],NULL,NULL,
 					$A2B -> config['callback']['timeout']*1000,$amicmd[2],$amicmd[3],$amicmd[4],true,$amicmd[5]);
 				    write_log(LOGFILE_API_CALLBACK, " ActionID = {$amicmd[5]} [#### RESULT AMI ORIGINATE       ####] ".var_export($res, true));
@@ -1977,19 +1978,12 @@ else echo "Ratecard: ".$this->ratecard_obj[$i][6]."<br>Trunk: ".$this->ratecard_
 				    if ($res['Response'] == "Success") {
 					write_log(LOGFILE_API_CALLBACK, " ActionID = {$amicmd[5]} [#### Starting AMI WAIT_RESPONSE ####] $channel ");
 					$ast->log("ActionID = {$amicmd[5]} [#### Starting AMI WAIT_RESPONSE ####] $channel");
-					$response = $ast -> wait_response(true);
+//					$response = $ast -> wait_response(true);
+//					write_log(LOGFILE_API_CALLBACK, " ActionID = {$amicmd[5]} [#### RESULT AMI WAIT RESPONSE   ####] ChannelStateDesc = ".var_export($response, true)." ");
+//					$ast->log("ActionID = {$amicmd[5]} [#### RESULT AMI WAIT RESPONSE   ####] ChannelStateDesc = ".var_export($response, true));
+					$this->dialstatus = $ast -> wait_response(true);
 				    } else {
-					$response = 0;
-				    }
-				    switch($response)
-				    {
-				     case  0: $this->dialstatus = "CHANUNAVAIL"; break;
-				     case  1: $this->dialstatus = "BUSY"; break;
-				     case  3: $this->dialstatus = "NOANSWER"; break;
-				     case  4: $this->dialstatus = "ANSWER"; break;
-//				     case  5: $this->dialstatus = "CONGESTION"; break;
-				     case  8: $this->dialstatus = "CHANUNAVAIL"; break;
-				     default: $this->dialstatus = "CONGESTION"; break;
+					$this->dialstatus = "CHANUNAVAIL";
 				    }
 				    write_log(LOGFILE_API_CALLBACK, " ActionID = {$amicmd[5]} [#### RESULT AMI WAIT RESPONSE   ####] $channel = $this->dialstatus ");
 				    $ast->log("ActionID = {$amicmd[5]} [#### RESULT AMI WAIT RESPONSE   ####] $channel = $this->dialstatus");

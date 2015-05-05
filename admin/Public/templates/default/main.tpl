@@ -75,6 +75,7 @@
                 <li><a href="CC_card_import.php?section=1">{php} echo gettext("Import");{/php}</a></li>
 				<li><a href="A2B_entity_friend.php?atmenu=sip&section=1">{php} echo gettext("VoIP Settings");{/php}</a></li>
 				<li><a href="A2B_entity_callerid.php?atmenu=callerid&section=1">{php} echo gettext("Caller-ID");{/php}</a></li>
+				<li><a href="CC_ring_up.php?section=1">{php} echo gettext("Ring-Up");{/php}</a></li>
 				<li><a href="A2B_notifications.php?section=1">{php} echo gettext("Credit Notification");{/php}</a></li>
 				<li><a href="A2B_entity_card_group.php?section=1">{php} echo gettext("Groups");{/php}</a></li>
 				<li><a href="A2B_entity_card_union.php?section=1">{php} echo gettext("Unions");{/php}</a></li>

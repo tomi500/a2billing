@@ -58,10 +58,10 @@
                 var name = $(this).attr('name');
                 if(name) {
                     setFieldValue($(this), json[name]);
-                    if(name == 'weekdays') {
+                    if(name == 'weekdays[]') {
                         $(this).pi_dowselect(WEEKDAYS).change();
                     }
-                    if(name == 'timefrom' || name == 'timetill') {
+                    if(name == 'timefrom[]' || name == 'timetill[]') {
                         $(this).pi_timeInterval(TIMEINTERVALLIST);
                     }
                 }

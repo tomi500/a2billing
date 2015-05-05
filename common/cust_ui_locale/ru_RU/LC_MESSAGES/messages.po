@@ -1301,7 +1301,7 @@ msgstr "Список платежей"
 
 #: form_data/FG_var_payment.inc:59
 msgid "No payments have been made!"
-msgstr "Ни одного платежа не было призведено !"
+msgstr "Ни одного платежа не было призведено"
 
 #: form_data/FG_var_ratecard.inc:55
 msgid "PREFIX"

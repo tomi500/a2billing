@@ -225,10 +225,14 @@ CREATE TABLE IF NOT EXISTS `cc_sheduler_ratecard` (
   `timetill` TIME NOT NULL DEFAULT '0',
   INDEX `id` ( `id_ratecard` , `id_tariffplan` )
 ) ENGINE=MyISAM DEFAULT CHARSET=utf8 COLLATE=utf8_bin;
+ALTER TABLE `cc_sheduler_ratecard`
+  ADD `id_ringup` BIGINT(20) NOT NULL DEFAULT '0' AFTER `id_tariffplan`,
+  DROP INDEX `id`,
+  ADD INDEX `id` ( `id_ratecard` , `id_tariffplan` , `id_ringup` );
 
-ALTER TABLE `cc_ratecard`
-  DROP `starttime`,
-  DROP `endtime`;
+#ALTER TABLE `cc_ratecard`
+#  DROP `starttime`,
+#  DROP `endtime`;
 
 CREATE TABLE IF NOT EXISTS cc_voicemail_users (
 	uniqueid BIGINT(20) NOT NULL AUTO_INCREMENT PRIMARY KEY,
@@ -524,6 +528,36 @@ ALTER TABLE `cc_card_concat`
 ADD `mylogs` TINYINT NOT NULL DEFAULT '0',
 ADD `foreignrecords` TINYINT NOT NULL DEFAULT '0',
 ADD `myrecords` TINYINT NOT NULL DEFAULT '0';
+
+CREATE TABLE IF NOT EXISTS `cc_ringup` (
+  `id` bigint(20) NOT NULL AUTO_INCREMENT,
+  `tag` varchar(60) COLLATE utf8_bin NOT NULL UNIQUE,
+  `trunks` varchar(60) COLLATE utf8_bin NOT NULL,
+  `simult` smallint(6) NOT NULL DEFAULT '0',
+  `inuse` smallint(6) NOT NULL DEFAULT '0',
+  `processed` int(11) NOT NULL DEFAULT '0',
+  `lefte` int(11) NOT NULL DEFAULT '0',
+  `status` smallint(6) NOT NULL DEFAULT '0',
+  `action` smallint(6) NOT NULL DEFAULT '0',
+  `account_id` int(11) NOT NULL DEFAULT '0',
+  `id_server` int(11) NOT NULL DEFAULT '1',
+  `id_server_group` int(11) NOT NULL DEFAULT '1',
+  PRIMARY KEY (`id`)
+) ENGINE=MyISAM DEFAULT CHARSET=utf8 COLLATE=utf8_bin;
+
+CREATE TABLE IF NOT EXISTS `cc_ringup_list` (
+  `id` bigint(20) NOT NULL AUTO_INCREMENT,
+  `id_ringup` int(11) NOT NULL DEFAULT '0',
+  `tonum` varchar(40) COLLATE utf8_bin NOT NULL,
+  `try` smallint(6) NOT NULL DEFAULT '0',
+  `attempt` TIMESTAMP NULL DEFAULT NULL,
+  `inuse` smallint(6) NOT NULL DEFAULT '0',
+  `dialstatus` smallint(6) NOT NULL DEFAULT '0',
+  `channelstatedesc` VARCHAR( 40 ) NOT NULL,
+  `passed` smallint(6) NOT NULL DEFAULT '0',
+  `result` smallint(6) NOT NULL DEFAULT '0',
+  PRIMARY KEY (`id`,`id_ringup`)
+) ENGINE=MyISAM DEFAULT CHARSET=utf8 COLLATE=utf8_bin;
 
 CREATE TABLE IF NOT EXISTS `cc_fax` (
   `id` bigint(20) NOT NULL AUTO_INCREMENT,
