@@ -165,8 +165,8 @@ if ( (isset ($id_cc_card) && (is_numeric($id_cc_card)  != "")) && ( $form_action
 	$HD_Form->_vars = array_merge((array)$_GET, (array)$_POST);
 }
 
-$HD_Form -> FG_EDITION_LINK	= $_SERVER['PHP_SELF']."?form_action=ask-edit&atmenu=$atmenu&current_page=$current_page&filterprefix=$filterprefix&id=";
-$HD_Form -> FG_DELETION_LINK	= $_SERVER['PHP_SELF']."?form_action=ask-delete&atmenu=$atmenu&current_page=$current_page&filterprefix=$filterprefix&id=";
+$HD_Form -> FG_EDITION_LINK	= $_SERVER['PHP_SELF']."?form_action=ask-edit&atmenu=$atmenu&current_page=$current_page&filterprefix=$filterprefix&filterprefix2=$filterprefix2&id=";
+$HD_Form -> FG_DELETION_LINK	= $_SERVER['PHP_SELF']."?form_action=ask-delete&atmenu=$atmenu&current_page=$current_page&filterprefix=$filterprefix&filterprefix2=$filterprefix2&id=";
 
 if ($id!="" || !is_null($id)) {
 	$HD_Form -> FG_EDITION_CLAUSE = str_replace("%id", "$id", $HD_Form -> FG_EDITION_CLAUSE);	
@@ -276,6 +276,7 @@ if ($form_action=='list') {
 		<form name="updateForm" action="<?php echo $_SERVER['PHP_SELF']?>" method="post">
 		<INPUT type="hidden" name="batchupdate" value="1">
 		<INPUT type="hidden" name="filterprefix" value="<?php echo $filterprefix?>">
+		<INPUT type="hidden" name="filterprefix2" value="<?php echo $filterprefix2?>">
 		<tr>
           <td align="left" class="bgcolor_001" >
 		  		<input name="check[upd_callerid]" type="checkbox" <?php if ($check["upd_callerid"]=="on") echo "checked"?>>

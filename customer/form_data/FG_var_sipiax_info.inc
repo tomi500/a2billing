@@ -85,7 +85,9 @@ foreach ($values as $val) {
 if ($atmenu == 'sip' && $form_action=="ask-edit" && isset($id)) {
 	$cbe_table = new Table('cc_sip_buddies','callbackextension');
 	$cbe_list = $cbe_table -> Get_list ($DBHandle, "id='$id'", null, null, null, null);
-	$cbe = (is_array($cbe_list) && count($cbe_list)>0 && !is_null($cbe_list[0][0])) ? 1 : 0;
+	if (is_array($cbe_list) && count($cbe_list)>0) {
+		$cbe = (!is_null($cbe_list[0][0])) ? 1 : 0;
+	}
 }
 
 $HD_Form -> AddViewElement(gettext("EXTENSION"), "regexten", "10%", "center", "sort", "25");

@@ -114,7 +114,6 @@ if (has_rights(ACX_DISTRIBUTION) && ($popup_select>=1)) {
 
 if ($form_action == "list") {
 ?>
-<br/>
 <center>
 <table border="0" align="center" cellpadding="0" cellspacing="1">
 	<tr>

@@ -40,7 +40,7 @@ getpost_ifset(array('id_cc_card', 'cardnumber', 'id', 'name', 'amaflags', 'callg
 getpost_ifset(array('defaultuser', 'subscribemwi', 'vmexten', 'cid_number', 'callingpres', 'usereqphone', 'incominglimit', 'subscribecontext', 'musicclass', 
 'allowtransfer', 'autoframing', 'maxcallbitrate', 'outboundproxy', 'regserver', 'rtpkeepalive', 'dbsecret ', 'regcontext ', 'sourceaddress ', 'mohinterpret', 'cbe',
 'mohsuggest ', 'inkeys', 'outkey', 'sendani', 'fullname', 'maxauthreq', 'encryption', 'ignorecryptolifetime', 'transport', 't38pt_udptl', 'forceencryption', 'transfer', 'jitterbuffer', 
-'forcejitterbuffer', 'codecpriority', 'qualifysmoothing', 'qualifyfreqok ', 'qualifyfreqnotok ', 'timezone', 'adsi', 'filterprefix', 'current_page'));
+'forcejitterbuffer', 'codecpriority', 'qualifysmoothing', 'qualifyfreqok ', 'qualifyfreqnotok ', 'timezone', 'adsi', 'filterprefix', 'filterprefix2', 'current_page'));
 
 if ($atmenu=='sip') {
 	$HD_Form = new FormHandler("cc_sip_buddies", gettext("SIP Config"));
@@ -96,14 +96,14 @@ if ($atmenu == 'sip' && $form_action=="ask-edit" && isset($id)) {
 }
 
 $HD_Form -> AddViewElement(gettext("CARDHOLDER"), "id_cc_card", "17%", "center", "sort", "25", "lie", "cc_card", "lastname, firstname", "id='%id'", "%1 %2");
-$HD_Form -> AddViewElement(gettext("NAME"), "name", "6%", "center", "sort");
-$HD_Form -> AddViewElement(gettext("SECRET"), "secret", "6%", "center", "sort");
 $HD_Form -> AddViewElement(gettext("ACCOUNTCODE"), "accountcode", "12%", "center", "sort", "", "", "", "", "", "", "linktocustomer");
+$HD_Form -> AddViewElement(gettext("NAME"), "name", "6%", "center", "sort");
 if ($atmenu=='sip') {
 	$HD_Form -> AddViewElement(gettext("DEFAULTUSER"), "defaultuser", "6%", "center", "sort");
 } else {
 	$HD_Form -> AddViewElement(gettext("USERNAME"), "username", "6%", "center", "sort");
 }
+$HD_Form -> AddViewElement(gettext("SECRET"), "secret", "6%", "center", "sort");
 $HD_Form -> AddViewElement(gettext("CALLERID"), "callerid", "24%", "center", "sort");
 $HD_Form -> AddViewElement(gettext("CONTEXT"), "context", "9%", "center", "sort");
 $HD_Form -> AddViewElement("<font color=#00ff00>IP</font> / ".gettext(DEFAULTIP), "curip", "20%", "center", "sort");
@@ -114,10 +114,10 @@ $HD_Form ->FG_LIST_ADDING_BUTTON_LINK1 = "A2B_entity_friend.php?form_action=ask-
 
 if ($atmenu=='sip') {
 	$HD_Form ->FG_LIST_ADDING_BUTTON_ALT1 = $HD_Form ->FG_LIST_ADDING_BUTTON_MSG1 = gettext("Add SIP Config");
-	$HD_Form -> FieldViewElement ("id_cc_card, name, secret, accountcode, $un, callerid, context, IF(port>0 AND UNIX_TIMESTAMP()<regseconds,concat('<font color=green>',ipaddr,':',port,'</font> ',IF(lastms=-1,'UNREACHABLE',IF(lastms>0,concat('(',lastms,' ms)'),'')),'<br>',useragent),defaultip) AS curip");
+	$HD_Form -> FieldViewElement ("id_cc_card, accountcode, name, $un, secret, callerid, context, IF(port>0 AND UNIX_TIMESTAMP()<regseconds,concat('<font color=green>',ipaddr,':',port,'</font> ',IF(lastms=-1,'UNREACHABLE',IF(lastms>0,concat('(',lastms,' ms)'),'')),'<br>',useragent),defaultip) AS curip");
 } else {
 	$HD_Form ->FG_LIST_ADDING_BUTTON_ALT1 = $HD_Form ->FG_LIST_ADDING_BUTTON_MSG1 = gettext("Add IAX Config");
-	$HD_Form -> FieldViewElement ("id_cc_card, name, secret, accountcode, $un, callerid, context, IF(port>0 AND UNIX_TIMESTAMP()<regseconds,concat('<font color=green>',ipaddr,':',port,'</font> ',IF(qualifyfreqok=-1,'UNREACHABLE',IF(qualifyfreqok>0,concat('(',qualifyfreqok,' ms)'),''))),defaultip) AS curip");
+	$HD_Form -> FieldViewElement ("id_cc_card, accountcode, name, $un, secret, callerid, context, IF(port>0 AND UNIX_TIMESTAMP()<regseconds,concat('<font color=green>',ipaddr,':',port,'</font> ',IF(qualifyfreqok=-1,'UNREACHABLE',IF(qualifyfreqok>0,concat('(',qualifyfreqok,' ms)'),''))),defaultip) AS curip");
 }
 $HD_Form ->FG_LIST_ADDING_BUTTON_IMG1 = Images_Path ."/telephone_add.png" ;
 
@@ -1130,8 +1130,8 @@ if ($atmenu=='sip') {
 
 $HD_Form -> FieldEditElement ($field_list_edit);
 
-$HD_Form -> FG_ADITION_HIDDEN_PARAM		= $HD_Form -> FG_EDITION_HIDDEN_PARAM		= 'filterprefix, cbe';
-$HD_Form -> FG_ADITION_HIDDEN_PARAM_VALUE	= $HD_Form -> FG_EDITION_HIDDEN_PARAM_VALUE	= $filterprefix.",".$cbe;
+$HD_Form -> FG_ADITION_HIDDEN_PARAM		= $HD_Form -> FG_EDITION_HIDDEN_PARAM		= 'filterprefix, filterprefix2, cbe';
+$HD_Form -> FG_ADITION_HIDDEN_PARAM_VALUE	= $HD_Form -> FG_EDITION_HIDDEN_PARAM_VALUE	= $filterprefix.",".$filterprefix2.",".$cbe;
 
 //$HD_Form -> FG_SPLITABLE_FIELD = 'accountcode';
 
@@ -1159,6 +1159,17 @@ if (isset($filterprefix)  &&  (strlen($filterprefix)>0)){
 	$HD_Form -> FG_TABLE_CLAUSE.="accountcode like '$filterprefix%'";
 }
 
-$HD_Form -> FG_GO_LINK_AFTER_ACTION_ADD = $_SERVER['PHP_SELF']."?atmenu=$atmenu&stitle=Document&wh=AC&filterprefix=$filterprefix&id=";
-$HD_Form -> FG_GO_LINK_AFTER_ACTION_EDIT = $_SERVER['PHP_SELF']."?atmenu=$atmenu&stitle=Document&wh=AC&filterprefix=$filterprefix&id=";
-$HD_Form -> FG_GO_LINK_AFTER_ACTION_DELETE = $_SERVER['PHP_SELF']."?atmenu=$atmenu&stitle=Document&wh=AC&filterprefix=$filterprefix&id=";
+$HD_Form -> FG_FILTER_APPLY2 = true;
+$HD_Form -> FG_FILTERFIELD2 = 'name';
+$HD_Form -> FG_FILTERFIELDNAME2 = ' name';
+$HD_Form -> FG_FILTER_FORM_ACTION2 = 'list';
+
+if (isset($filterprefix2)  &&  (strlen($filterprefix2)>0)){
+	if (strlen($HD_Form -> FG_TABLE_CLAUSE)>0) $HD_Form -> FG_TABLE_CLAUSE.=" AND ";
+	$HD_Form -> FG_TABLE_CLAUSE .= "name like '$filterprefix2%'";
+}
+
+
+$HD_Form -> FG_GO_LINK_AFTER_ACTION_ADD = $_SERVER['PHP_SELF']."?atmenu=$atmenu&stitle=Document&wh=AC&filterprefix=$filterprefix&filterprefix2=$filterprefix2&id=";
+$HD_Form -> FG_GO_LINK_AFTER_ACTION_EDIT = $_SERVER['PHP_SELF']."?atmenu=$atmenu&stitle=Document&wh=AC&filterprefix=$filterprefix&filterprefix2=$filterprefix2&id=";
+$HD_Form -> FG_GO_LINK_AFTER_ACTION_DELETE = $_SERVER['PHP_SELF']."?atmenu=$atmenu&stitle=Document&wh=AC&filterprefix=$filterprefix&filterprefix2=$filterprefix2&id=";

@@ -4553,7 +4553,7 @@ msgstr "Выберите 'Да', если хотите получать копи
 
 #:
 msgid "VIRTUAL FAX"
-msgstr "ФАКС МАШИНА"
+msgstr "ФАКС НОМЕРА"
 
 #:
 msgid "SURVEILLANCE"

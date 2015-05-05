@@ -1132,7 +1132,7 @@ else echo "Ratecard: ".$this->ratecard_obj[$i][6]."<br>Trunk: ".$this->ratecard_
 		if ($K>=0 && count($this -> ratecard_obj)>0) {
 			$id_cc_package_offer   = $this -> ratecard_obj[$K][38];
 			$additional_grace_time = $this -> ratecard_obj[$K][47];
-			$idseller = $this -> ratecard_obj[$K][73];
+			$idseller = is_null($this -> ratecard_obj[$K][73]) ? 0 : $this -> ratecard_obj[$K][73];
 		} else {
 			$id_cc_package_offer = 'NONE';
 			$additional_grace_time = $idseller = 0;
@@ -1355,7 +1355,9 @@ else echo "Ratecard: ".$this->ratecard_obj[$i][6]."<br>Trunk: ".$this->ratecard_
 		    } else {
 			$result = $A2B->instance_table -> SQLExec ($A2B -> DBHandle, $QUERY, 0);
 			$A2B -> debug( INFO, $agi, __FILE__, __LINE__, "[CC_asterisk_stop : SQL: DONE : result=".$result."]");
+//$A2B -> debug( ERROR, $agi, __FILE__, __LINE__, "[CC_asterisk_stop : SQL: DONE : result=".$result."]");
 			$A2B -> debug( DEBUG, $agi, __FILE__, __LINE__, "[CC_asterisk_stop : SQL: $QUERY]");
+//$A2B -> debug( ERROR, $agi, __FILE__, __LINE__, "[CC_asterisk_stop : SQL: $QUERY]");
 		    }
 		    if ($idseller > 0 && $buycost > 0) {
 			$QUERY = "UPDATE cc_card SET credit= credit+".a2b_round($buycost)." WHERE id=".$idseller;
@@ -1881,7 +1883,7 @@ else echo "Ratecard: ".$this->ratecard_obj[$i][6]."<br>Trunk: ".$this->ratecard_
 					$firstgo = false;
 				    }
 				    if (($this -> ratecard_obj[$k][12] > 0 && !($A2B->cardnumber != $A2B->accountcode)) || ($this -> ratecard_obj[$k][12] == 0 && $A2B->extext && $this -> ratecard_obj[$k][4] != $A2B->cardnumber && $ipaddress != $prefix.$destination)) {
-					if ($A2B->auth_through_accountcode) {
+					if ($A2B->auth_through_accountcode && $typecall != 44) {
 						$A2B -> debug( DEBUG, $agi, __FILE__, __LINE__, "[A2Billing] SAY BALANCE : $A2B->credit");
 						$A2B -> fct_say_balance ($agi, $A2B->credit);
 						$A2B -> auth_through_accountcode = false;

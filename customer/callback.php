@@ -75,10 +75,11 @@ $instance_table = new Table();
 $A2B -> set_instance_table ($instance_table);
 $A2B -> cardnumber = $_SESSION["pr_login"];
 if ($A2B -> callingcard_ivr_authenticate_light ($error_msg) && $callback) {
-	$called  = $A2B -> apply_rules($called);
-	$calling = $A2B -> apply_rules($calling);
+//	$called  = $A2B -> apply_rules($called);
+//	$calling = $A2B->apply_add_countryprefixto ($calling);
+//	if ($A2B->removeinterprefix) $calling = $A2B -> apply_rules($calling);
 	if (strlen($called)>1 && strlen($calling)>1 && is_numeric($called) && is_numeric($calling)) {
-		$virtcalled = $called;
+//		$virtcalled = $called;
 		$virtcalling = $calling;
 			$QUERY = "SELECT name, regexten FROM cc_sip_buddies
 					LEFT JOIN cc_card_concat bb ON id_cc_card = bb.concat_card_id
@@ -87,8 +88,11 @@ if ($A2B -> callingcard_ivr_authenticate_light ($error_msg) && $callback) {
 //			$QUERY = "SELECT name FROM cc_sip_buddies WHERE id_cc_card = $A2B->card_id AND regexten = '$called' LIMIT 1";
 			$result = $A2B -> instance_table -> SQLExec ($A2B->DBHandle, $QUERY);
 			if (is_array($result) && $result[0][0] != "") {
-				$virtcalled			= $result[0][0];
+				$A2B -> dnid			= $result[0][0];
 				if ($result[0][1]) $called	= $result[0][1];
+			} else {
+			$A2B -> dnid = $A2B->apply_add_countryprefixto ($called);
+			if ($A2B->removeinterprefix) $A2B -> dnid = $A2B -> apply_rules($A2B -> dnid);
 			}
 			$QUERY = "SELECT name, regexten FROM cc_sip_buddies
 					LEFT JOIN cc_card_concat bb ON id_cc_card = bb.concat_card_id
@@ -107,9 +111,8 @@ if ($A2B -> callingcard_ivr_authenticate_light ($error_msg) && $callback) {
 			$A2B -> agiconfig['accountcode']=$_SESSION["pr_login"];
 			$A2B -> agiconfig['use_dnid']=1;
 			$A2B -> agiconfig['say_timetocall']=0;						
-			$A2B -> extension = $A2B -> dnid = $A2B -> destination = $virtcalled;
+			$A2B -> extension = $A2B -> destination = $A2B -> dnid;
 			$resfindrate = $RateEngine->rate_engine_findrates($A2B, $A2B -> dnid, $_SESSION["tariff"]);
-
 			// IF FIND RATE
 			if ($resfindrate!=0) {				
 				$res_all_calcultimeout = $RateEngine->rate_engine_all_calcultimeout($A2B, $A2B->credit);
@@ -141,10 +144,10 @@ if ($A2B -> callingcard_ivr_authenticate_light ($error_msg) && $callback) {
 						$RateEngine->ratecard_obj[$channeloutcid[4]][6].$sep."TRUNK=".$channeloutcid[2].$sep."TD=".$channeloutcid[3];
 					
 					$QUERY = " INSERT INTO cc_callback_spool (uniqueid, status, server_ip, num_attempt, channel, exten, context, priority," .
-							 " variable, id_server_group, callback_time, account, callerid, timeout, next_attempt_time, exten_leg_a) " .
+							 " variable, id_server_group, callback_time, account, callerid, timeout, next_attempt_time, exten_leg_a, leg_a) " .
 							 " VALUES ('$uniqueid', '$status', '$server_ip', '$num_attempt', '$channel', '$exten', '$context', '$priority'," .
 							 " '$variable', '$id_server_group', ADDTIME(now(),SEC_TO_TIME($timeoutbefore)), '$account', '$callerid'," .
-							 " '$timeout', ADDTIME(now(),SEC_TO_TIME($timeoutbefore)), '$A2B->dnid')";
+							 " '$timeout', ADDTIME(now(),SEC_TO_TIME($timeoutbefore)), '$A2B->dnid', '$called')";
 					$res = $A2B -> DBHandle -> Execute($QUERY);
 					
 					if (!$res) {
@@ -178,7 +181,7 @@ $smarty->display( 'main.tpl');
 echo $CC_help_callback;
 
 if ($calling == '' && $called == '') {
-	$QUERY = "SELECT exten_leg_a, exten FROM cc_callback_spool WHERE account = $A2B->cardnumber ORDER BY id DESC LIMIT 1";
+	$QUERY = "SELECT leg_a, exten FROM cc_callback_spool WHERE account = $A2B->cardnumber AND exten_leg_a != '' ORDER BY id DESC LIMIT 1";
 	$result = $A2B -> instance_table -> SQLExec ($A2B->DBHandle, $QUERY);
 	if (is_array($result)) {
 		$called 	= $result[0][0];

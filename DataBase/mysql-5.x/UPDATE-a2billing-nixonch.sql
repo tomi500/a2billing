@@ -422,6 +422,7 @@ ALTER TABLE cc_callback_spool ADD `num_attempts_unavailable` int(11) NOT NULL DE
 ALTER TABLE cc_callback_spool ADD `num_attempts_busy` int(11) NOT NULL DEFAULT '0';
 ALTER TABLE cc_callback_spool ADD `num_attempts_noanswer` int(11) NOT NULL DEFAULT '0';
 ALTER TABLE cc_callback_spool ADD `exten_leg_a` varchar(60) COLLATE utf8_bin NOT NULL;
+ALTER TABLE cc_callback_spool ADD `leg_a` varchar(60) COLLATE utf8_bin NOT NULL;
 ALTER TABLE cc_callback_spool ADD `last_status` varchar(80) COLLATE utf8_bin DEFAULT NULL;
 ALTER TABLE cc_callback_spool ADD `surveillance` INT( 11 ) NOT NULL DEFAULT '0';
 
@@ -557,6 +558,28 @@ CREATE TABLE IF NOT EXISTS `cc_ringup_list` (
   `passed` smallint(6) NOT NULL DEFAULT '0',
   `result` smallint(6) NOT NULL DEFAULT '0',
   PRIMARY KEY (`id`,`id_ringup`)
+) ENGINE=MyISAM DEFAULT CHARSET=utf8 COLLATE=utf8_bin;
+
+CREATE TABLE IF NOT EXISTS `cc_sms` (
+  `id` bigint(20) NOT NULL AUTO_INCREMENT,
+  `id_cc_card` int(11) NOT NULL DEFAULT '0',
+  `num` varchar(40) COLLATE utf8_bin NOT NULL,
+  `email` varchar(70) COLLATE utf8_bin NOT NULL,
+  `notify_email` smallint(6) NOT NULL DEFAULT '1',
+  `go_on` smallint(6) NOT NULL DEFAULT '0',
+  PRIMARY KEY (`id`,`id_cc_card`)
+) ENGINE=MyISAM DEFAULT CHARSET=utf8 COLLATE=utf8_bin;
+
+CREATE TABLE IF NOT EXISTS `cc_sms_log` (
+  `id` bigint(20) NOT NULL AUTO_INCREMENT,
+  `id_card_from` int(11) NOT NULL DEFAULT '0',
+  `id_card_to` int(11) NOT NULL DEFAULT '0',
+  `receivedtime` TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
+  `fromnum` varchar(40) COLLATE utf8_bin NOT NULL,
+  `tonum` varchar(40) COLLATE utf8_bin NOT NULL,
+  `sent` smallint(6) NOT NULL DEFAULT '0',
+  `smstext` varchar(256) COLLATE utf8_bin NOT NULL,
+  PRIMARY KEY (`id`,`id_card_from`,`id_card_to`)
 ) ENGINE=MyISAM DEFAULT CHARSET=utf8 COLLATE=utf8_bin;
 
 CREATE TABLE IF NOT EXISTS `cc_fax` (

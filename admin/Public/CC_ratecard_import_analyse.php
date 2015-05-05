@@ -46,7 +46,7 @@ if (!has_rights(ACX_RATECARD)) {
 
 check_demo_mode();
 
-getpost_ifset(array ('tariffplan', 'trunk', 'search_sources', 'task', 'status', 'currencytype', 'uploadedfile_name', 'uploadedfile_name'));
+getpost_ifset(array ('tariffplan', 'trunk', 'search_sources', 'task', 'status', 'currencytype', 'uploadedfile_type', 'uploadedfile_name'));
 
 $tariffplanval = preg_split('/-:-/', $tariffplan);
 if (!is_numeric($tariffplanval[0])) {
@@ -71,8 +71,8 @@ if ($search_sources != 'nochange') {
 $fixfield[0] = "IDTariffplan (KEY)";
 $fixfield[1] = "Outbound Trunk";
 
-$field[0] = "Dial prefix";
-$field[1] = "Destination Country";
+$field[0] = "Destination Country";
+$field[1] = "Dial prefix";
 $field[2] = "Rate Initial";
 
 $FG_DEBUG = 0;
@@ -153,8 +153,8 @@ if ($task == 'upload') {
 				$val[2] = $val[2] / 100;
 			}
 
-			$FG_ADITION_SECOND_ADD_VALUE = "'" . $tariffplanval[0] . "', '" . $trunkval[0] . "', '" . $val[0] . "', '" . intval($val[0]) . "', '" . $val[2] . "'";
-			$TT_UPDATE_QUERY = "UPDATE " . $FG_ADITION_SECOND_ADD_TABLE . " SET idtariffplan='" . $tariffplanval[0] . "', id_trunk='" . $trunkval[0] . "', dialprefix='" . $val[0] . "', destination='" . intval($val[0]) . "', rateinitial='" . $val[2] . "'";
+			$FG_ADITION_SECOND_ADD_VALUE = "'" . $tariffplanval[0] . "', '" . $trunkval[0] . "', '" . $val[1] . "', '" . intval($val[1]) . "', '" . $val[2] . "'";
+			$TT_UPDATE_QUERY = "UPDATE " . $FG_ADITION_SECOND_ADD_TABLE . " SET idtariffplan='" . $tariffplanval[0] . "', id_trunk='" . $trunkval[0] . "', dialprefix='" . $val[1] . "', destination='" . intval($val[1]) . "', rateinitial='" . $val[2] . "'";
 			
 			for ($k = 0; $k < count($fieldtoimport); $k++) {
 				if (!empty ($val[$k +3]) || $val[$k +3] == '0') {
@@ -201,11 +201,11 @@ if ($task == 'upload') {
 				$TT_UPDATE_QUERY .= ", stopdate='" . $begin_date_plus . $end_date . "'";
 			}
 			if (intval($val[0]) > 0) {
-				$FG_ADITION_SECOND_ADD_VALUE_PREFIX = "'" . intval($val[0]) . "', '" . $val[1] . "'";
-				$TT_QUERY_PREFIX = "INSERT INTO cc_prefix (" . $FG_ADITION_SECOND_ADD_FIELDS_PREFIX . ") values (" . $FG_ADITION_SECOND_ADD_VALUE_PREFIX . ") ON DUPLICATE KEY UPDATE destination = '" . $val[1] . "'";
+				$FG_ADITION_SECOND_ADD_VALUE_PREFIX = "'" . intval($val[1]) . "', '" . $val[0] . "'";
+				$TT_QUERY_PREFIX = "INSERT INTO cc_prefix (" . $FG_ADITION_SECOND_ADD_FIELDS_PREFIX . ") values (" . $FG_ADITION_SECOND_ADD_VALUE_PREFIX . ") ON DUPLICATE KEY UPDATE destination = '" . $val[0] . "'";
 				$DBHandle->Execute($TT_QUERY_PREFIX);
 			}
-			$TT_UPDATE_QUERY .= $addinsertquery = " WHERE dialprefix='" . $val[0] . "' AND idtariffplan='" . $tariffplanval[0] . "' LIMIT 1";
+			$TT_UPDATE_QUERY .= $addinsertquery = " WHERE dialprefix='" . $val[1] . "' AND idtariffplan='" . $tariffplanval[0] . "' LIMIT 1";
 			$TT_INSERT_QUERY = "INSERT INTO " . $FG_ADITION_SECOND_ADD_TABLE . "(" . $FG_ADITION_SECOND_ADD_FIELDS . ") SELECT " . $FG_ADITION_SECOND_ADD_VALUE . " FROM " . $FG_ADITION_SECOND_ADD_TABLE . " WHERE NOT EXISTS(SELECT id FROM " . $FG_ADITION_SECOND_ADD_TABLE . $addinsertquery . ") LIMIT 1";
 
 			$nb_to_import++;

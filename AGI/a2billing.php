@@ -90,6 +90,7 @@ if ($argc > 2 && strlen($argv[2]) > 0) {
 	switch($argv[2])
 	{
 	    case 'did': 			$mode = 'did'; break;
+	    case 'sms': 			$mode = 'sms'; break;
 	    case 'callback':			$mode = 'callback'; break;
 	    case 'cid-callback':		$mode = 'cid-callback'; break;
 	    case 'cid-prompt-callback': 	$mode = 'cid-prompt-callback'; break;
@@ -115,19 +116,12 @@ $A2B -> debug( INFO, $agi, __FILE__, __LINE__, "MODE : $mode");
 
 
 // get the area code for the cid-callback, all-callback and cid-prompt-callback
-if ($argc > 3 && strlen($argv[3]) > 0) {
-	$caller_areacode = $argv[3];
-} else $caller_areacode = "";
-
+$caller_areacode = ($argc > 3 && strlen($argv[3]) > 0) ? $argv[3] : "";
 if ($argc > 4 && strlen($argv[4]) > 0) {
-	$groupid = $argv[4];
+	$groupid = $A2B -> group_id = $argv[4];
 	$A2B -> group_mode = true;
-	$A2B -> group_id = $groupid;
-}
-
-if ($argc > 5 && strlen($argv[5]) > 0) {
-	$cid_1st_leg_tariff_id = $argv[5];
-} else $cid_1st_leg_tariff_id = "";
+} else $groupid = "";
+$cid_1st_leg_tariff_id = ($argc > 5 && strlen($argv[5]) > 0) ? $argv[5] : "";
 
 $A2B -> CC_TESTING = isset($A2B -> agiconfig['debugshell']) && $A2B -> agiconfig['debugshell'];
 //$A2B -> CC_TESTING = true;
@@ -223,7 +217,7 @@ if ($startUpSystem && $startUpOS == "") {
 	} elseif ($startUpSystem > $startUpTime+30) {
 		$QUERY = "UPDATE cc_config SET config_value=$startUpSystem WHERE config_key='startup_time' AND config_group_title='global'";
 		$A2B -> DBHandle -> Execute($QUERY);
-		$QUERY = "UPDATE cc_card,cc_trunk SET cc_card.inuse=0, cc_trunk.inuse=0";
+		$QUERY = "UPDATE cc_card, cc_trunk SET cc_card.inuse=0, cc_trunk.inuse=0";
 		$A2B -> DBHandle -> Execute($QUERY);
 		$QUERY = "UPDATE cc_callback_spool SET status='PENDING', last_attempt_time='1980-01-01 00:00:00', next_attempt_time=NOW() WHERE surveillance > 0 AND agi_result='AGI PROCESSING'";
 		$A2B -> DBHandle -> Execute($QUERY);
@@ -248,7 +242,88 @@ if ($A2B -> CC_TESTING) {
 	$accountcode = '2222222222';
 }
 
-if ($mode == 'auto') {
+if ($mode == 'sms') {
+//	$A2B -> Reinit();
+	$messfrom = addslashes($caller_areacode);
+	$messto   = addslashes($groupid);
+	$body	  = addslashes($cid_1st_leg_tariff_id);
+//	$messbody = str_replace("'", "\'", $body);
+//	$accountcode = $A2B->dnid;
+	$QUERY =  "SELECT id FROM cc_card WHERE username='{$A2B->dnid}' LIMIT 1";
+	$result = $A2B -> instance_table -> SQLExec ($A2B->DBHandle, $QUERY);
+	if (is_array($result)) {
+		$card_id = $result[0][0];
+		$QUERY	 = "SELECT id, smstext FROM cc_sms_log WHERE id_card_to=$card_id AND fromnum LIKE '$messfrom' AND tonum LIKE '$messto' AND TIMESTAMPDIFF(SECOND,receivedtime,NOW())<31 ORDER BY id DESC LIMIT 1";
+		$result  = $A2B -> instance_table -> SQLExec ($A2B->DBHandle, $QUERY);
+	} else	$card_id = $result = 0;
+	if (is_array($result)) {
+		$QUERY = "UPDATE cc_sms_log SET receivedtime=NOW(), smstext=CONCAT(smstext,'$body') WHERE id={$result[0][0]}";
+		$A2B -> DBHandle -> Execute($QUERY);
+//$A2B -> debug( ERROR, $agi, __FILE__, __LINE__, "========= !!! UPDATE !!! ============");
+		$body = $result[0][1].$body;
+	} else {
+		$QUERY = "INSERT INTO cc_sms_log (id_card_from, id_card_to, fromnum, tonum, smstext) VALUES ($card_id, $card_id, '$messfrom', '$messto', '$body')";
+		$A2B -> DBHandle -> Execute($QUERY);
+		$result = $A2B -> instance_table -> SQLExec ($A2B->DBHandle, "SELECT LAST_INSERT_ID()");
+//$A2B -> debug( ERROR, $agi, __FILE__, __LINE__, "LAST INSERT ID: ".$result[0][0]);
+	}
+//$A2B -> debug( ERROR, $agi, __FILE__, __LINE__, "FROM: ".$messfrom);
+//$A2B -> debug( ERROR, $agi, __FILE__, __LINE__, "TO: ".$messto);
+//$A2B -> debug( ERROR, $agi, __FILE__, __LINE__, "BODY: ".$body);
+//$A2B -> debug( ERROR, $agi, __FILE__, __LINE__, "Parent: ".posix_getppid()." Current: ".getmypid());
+/**	$A2B -> DbDisconnect();
+//	$agi -> disconnect();
+//	$agi -> hangup();
+//	pcntl_signal(SIGHUP, SIG_IGN);
+//	posix_setsid();
+//	$parent=getmypid();
+//	set_time_limit(0);
+	declare(ticks = 1);
+//	pcntl_signal(SIGHUP, ));
+	$pid = pcntl_fork();
+	if($pid == -1) {
+		exit(2);
+	} elseif ($pid) {
+//		$A2B -> DbConnect($agi);
+//		pcntl_wait($status, WNOHANG);
+//		pcntl_signal_dispatch();
+//		register_shutdown_function(create_function('$ppp', 'posix_kill(getmypid(), SIGKILL);', array()));
+//		pcntl_signal(SIGCHLD,SIG_DFL);
+//		$agi -> hangup();
+//		posix_kill(getmypid(),9);
+//		posix_kill(posix_getppid(),SIGCHLD);
+//		posix_kill(posix_getpid(),SIGHUP);
+//		wait(NULL);
+		exit(0);
+	} else {
+//		pcntl_signal(SIGCHLD,SIG_DFL);
+		posix_setsid();
+		$pid = pcntl_fork();
+		if($pid==-1) {
+			exit(2);
+		} elseif ($pid) {
+//			pcntl_wait($status, WNOHANG);
+			exit(0);
+		}
+//		posix_kill(posix_getppid(),SIGHUP);
+//		ob_start();
+//		umask(0);
+//		posix_setsid();
+//		register_shutdown_function(create_function('', 'ob_end_clean();posix_kill(getmypid(), SIGKILL);'));
+		sleep(15);
+		$A2B -> DbConnect($agi);
+		$A2B -> set_instance_table ($instance_table);
+		$QUERY = "SELECT id FROM cc_sms_log WHERE id={$result[0][0]} AND smstext LIKE '$body'";
+		$result = $A2B -> instance_table -> SQLExec ($A2B->DBHandle, $QUERY);
+		if (is_array($result)) {
+		} else {
+			$A2B -> DBHandle -> Execute("UPDATE cc_sms_log SET sent=sent+1 WHERE id={$result[0][0]}");
+		}
+		$A2B -> DbDisconnect();
+		exit(0);
+	}
+**/
+} elseif ($mode == 'auto') {
 
 	$A2B-> Reinit();
 
@@ -1987,7 +2062,7 @@ if ($charge_callback) {
 }// END if ($charge_callback)
 
 // END
-if (($mode != 'cid-callback' && $mode != 'all-callback' && $mode != 'did' && $mode != 'standard') || $A2B -> agiconfig['answer_call'] == 1) {
+if (($mode != 'cid-callback' && $mode != 'all-callback' && $mode != 'did' && $mode != 'standard' && $mode != 'sms') || $A2B -> agiconfig['answer_call'] == 1) {
 	$agi -> hangup();
 }
 
@@ -2011,4 +2086,3 @@ if ($A2B->set_inuse_username) {
 
 /************** END OF THE APPLICATION ****************/
 $A2B -> write_log("[exit]", 0);
-

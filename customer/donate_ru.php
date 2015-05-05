@@ -2,8 +2,8 @@
 $mosConfig_live_site = 'https://customer.sipde.net/';
 // Global
 $moduleclass_sfx = '';
-$pretext = 'Donate Author';
-$btntxt = 'Donate';
+$pretext = 'Благодарность Автору';
+$btntxt = 'Отправить';
 // Webmoney
 $use_wm = 1;
 $wmz = 'Z419639909455';
@@ -11,13 +11,13 @@ $wme = 'E241616677453';
 $wmr = 'R367908670622';
 $wmu = 'U188972105659';
 $wm_summ = '10';
-$wm_successurl = $wm_errorurl = $mosConfig_live_site."donate_en.php";
+$wm_successurl = $wm_errorurl = $mosConfig_live_site."donate_ru.php";
 $wm_descpay = 'Donate Author';
 // Yandex
 $use_yandex = 0;
 $yandex = '01234567891011';
 $yandex_summ = '50';
-$yandex_successurl = $mosConfig_live_site;
+$yandex_successurl = $mosConfig_live_site."donate_ru.php";
 // PayPal
 $use_paypal = 1;
 //$donate_email = '4935XK7M8RJQY';
@@ -30,7 +30,7 @@ $paypalvalleast_val = 5;
 $donate_org = 'Donate Author';
 $donate_len = 1;
 $paypallen_val = 4;
-$link_return = $link_cancel = $mosConfig_live_site."donate_en.php";
+$link_cancel = $link_return = $mosConfig_live_site."donate_ru.php";
 //////////////////////////////////////////////////////////////////////////////
 if ($wmz != '') {
     $wmtype1 = 'WMZ';
@@ -146,21 +146,24 @@ $logopaypal_sm = $mosConfig_live_site.'/templates/default/images/kicons/logopayp
 			<?php echo $pretext;?>
 		</span><br/><br/>
 	<?php
-	}
+	}?>
+	<?php
 	if ($use_wm)
 	{?>
 		<a href="javascript:void(0);" onclick="show_wm()" title="Webmoney">
 			<img src="<?php echo $logowm_sm;?>" alt="Webmoney" border="0" />
 		</a>
 	<?php
-	}
+	}?>
+	<?php
 	if ($use_yandex)
 	{?>
 		<a href="javascript:void(0);" onclick="show_yandex()" title="Yandex">
 			<img src="<?php echo $logoyandex_sm;?>" alt="Yandex" border="0" />
 		</a>
 	<?php
-	}
+	}?>
+	<?php
 	if ($use_paypal)
 	{?>
 		<a href="javascript:void(0);" onclick="show_paypal()" title="PayPal">
@@ -171,7 +174,7 @@ $logopaypal_sm = $mosConfig_live_site.'/templates/default/images/kicons/logopayp
 </div>
 <!--------------------------- Webmoney --------------------------->
 <div id="wm" align="center" style="display:none;">
-	<form id="pay" name="pay" method="POST" action="https://merchant.wmtransfer.com/lmi/payment.asp">
+	<form id="pay" name="pay" method="POST" action="https://merchant.webmoney.ru/lmi/payment.asp">
 		<table width="100%" align="center" cellpadding="0" cellspacing="0" border="0">
 			<tr>
 				<td width="100%" align="center">
@@ -180,7 +183,7 @@ $logopaypal_sm = $mosConfig_live_site.'/templates/default/images/kicons/logopayp
 			</tr>
 			<tr>
 				<td width="100%" align="center">
-					Amount / Currency
+					Сумма / Знаки
 				</td>
 			</tr>
 			<tr>
@@ -282,7 +285,7 @@ $currencies = array( 'USD' => '$ ', 'EUR' => '&euro; ' );
     <input type="hidden" name="cmd" value="_donations">
     <input type="hidden" name="business" value="<?php echo $donate_email?>">
     <input type="hidden" name="charset" value="UTF-8">
-    <input type="hidden" name="lc" value="EN">
+    <input type="hidden" name="lc" value="RU">
     <input type="hidden" name="no_shipping" value="1">
     <input type="hidden" name="no_note" value="1">
     <input type="hidden" name="notify_url" value="<?php echo $link?>">
@@ -308,7 +311,7 @@ if ($paypalval_on == 0) {
 </script>
 JAVASCRIPT;
   $symbol = $currencies[ $paypalcur_val ];
-  echo "$javaScript Enter Amount:<br><span id=\"donate_symbol_currency\">".$symbol."</span><input type=\"text\" name=\"amount\" size=\"3\"  value=\"".$paypalval_val."\" class=\"inputbox\">";
+  echo "$javaScript Сумма / Валюта<br><span id=\"donate_symbol_currency\">".$symbol."</span><input type=\"text\" name=\"amount\" size=\"3\"  value=\"".$paypalval_val."\" class=\"inputbox\">";
 }
 elseif ($paypalval_on == 1) {
   echo "<input type=\"hidden\" value=\"".$paypalval_val."\" name=\"amount\">";

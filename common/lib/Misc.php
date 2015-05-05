@@ -1372,7 +1372,7 @@ function currencies_update_yahoo ($DBHandle, $instance_table)
 	$url = "http://download.finance.yahoo.com/d/quotes.csv?s=";
 	$return = "";
 	
-	$QUERY = "SELECT id, currency, basecurrency FROM cc_currencies ORDER BY id";
+	$QUERY = "SELECT id, currency, basecurrency, value FROM cc_currencies ORDER BY id";
 	$old_currencies = $instance_table->SQLExec($DBHandle, $QUERY);
 	// we will retrieve a .CSV file e.g. USD to EUR and USD to CAD with a URL like:
 	// http://download.finance.yahoo.com/d/quotes.csv?s=USDEUR=X+USDCAD=X&f=l1
@@ -1425,7 +1425,8 @@ function currencies_update_yahoo ($DBHandle, $instance_table)
 		}
 		for ($i = 0; $i < $num_cur; $i++) {
 			if (!is_numeric(trim($currencies[$i]))) {
-				return gettext("At least one of the entries in the CSV file isn't a number.") . ' ' . gettext('Currency update ABORTED.');
+				if (trim($currencies[$i]) == "N/A")		$currencies[$i] = $old_currencies[$i][3];
+				else return gettext("At least one of the entries in the CSV file isn't a number.").' '.$old_currencies[$i][1].' = '.$currencies[$i].'. '.gettext('Currency update ABORTED.');
 			}
 		}
 		

@@ -87,7 +87,7 @@ if (isset($filterprefix)  &&  (strlen($filterprefix)>0)){
 
 $HD_Form -> FG_FILTER_APPLY2 = true;
 $HD_Form -> FG_FILTERFIELD2 = 'did';
-$HD_Form -> FG_FILTERFIELDNAME2 = 'did';
+$HD_Form -> FG_FILTERFIELDNAME2 = ' did';
 $HD_Form -> FG_FILTER_FORM_ACTION2 = 'list';
 
 if (isset($filterprefix2)  &&  (strlen($filterprefix2)>0)){

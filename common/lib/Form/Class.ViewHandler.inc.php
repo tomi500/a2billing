@@ -244,18 +244,20 @@ if ((count($list)>0) && is_array($list)){
 
 					} elseif($this->FG_TABLE_COL[$i][6]=="link2cust") {
 
-						$instance_sub_table = new Table($this->FG_TABLE_COL[$i][7], $this->FG_TABLE_COL[$i][8]);
+						$sub_clause = str_replace("%id", $list[$ligne_number][$i-$k], $this->FG_TABLE_COL[$i][8]);
+						$instance_sub_table = new Table($this->FG_TABLE_COL[$i][7], $sub_clause);
 						$sub_clause = str_replace("%id", $list[$ligne_number][$i-$k], $this->FG_TABLE_COL[$i][9]);
 						$select_list = $instance_sub_table -> Get_list ($this->DBHandle, $sub_clause, null, null, null, null, null, null, null, 10);
 						if (is_array($select_list)) {
 							$record_clear = $this->FG_TABLE_COL[$i][10];
 							$link_display = $this->FG_TABLE_COL[$i][12];
-							$record_display = "<a href=\"".$this->FG_TABLE_COL[$i][12]."\">".$this->FG_TABLE_COL[$i][10]."</a>";
 							for ($l=count($select_list[0]);$l>=1;$l--){
 								$record_clear = str_replace("%$l", $select_list[0][$l-1], $record_clear);
 								$link_display = str_replace("%$l", $select_list[0][$l-1], $link_display);
 							}
-							$record_display = "<a href=\"".$link_display."\">".$record_clear."</a>";
+							if ($list[$ligne_number][$i-$k] >= 0)
+								$record_display = "<a href=\"".$link_display."\">".$record_clear."</a>";
+							else	$record_display = "<b>".$record_clear."</b>";
 						} elseif ($list[$ligne_number][$i-$k] != 0) {
 							$record_display = $this->FG_TABLE_COL[$i][13];
 						} else {

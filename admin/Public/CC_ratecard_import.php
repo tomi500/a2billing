@@ -250,8 +250,8 @@ echo $CC_help_import_ratecard;
 					<?php echo gettext("These fields are mandatory");?><br>
 
 					<select  name="bydefault" multiple="multiple" size="4" width="40" class="form_input_select">
-						<option value="bb1"><?php echo gettext("dialprefix");?></option>
 						<option value="bb2"><?php echo gettext("destination");?></option>
+						<option value="bb1"><?php echo gettext("dialprefix");?></option>
 						<option value="bb3"><?php echo gettext("selling rate");?></option>
 					</select>
 					<br/><br/>

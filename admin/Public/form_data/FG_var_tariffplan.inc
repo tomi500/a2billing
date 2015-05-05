@@ -169,7 +169,7 @@ $HD_Form -> AddEditElement (gettext("TRUNK"),
 			   "trunkcode, id_trunk",
 			   "", "", "%1", "", gettext("You should define default Trunk for this RateCard"), "", '<OPTION  value="-1" selected>NOT DEFINED</OPTION>');
 
-$HD_Form -> AddEditElement (gettext("CUSTOMER ID"),
+$HD_Form -> AddEditElement (gettext("SELLER ID"),
 			   "id_seller",
 			   '',
 			   "POPUPVALUE",
@@ -179,7 +179,7 @@ $HD_Form -> AddEditElement (gettext("CUSTOMER ID"),
 			   "", "", "", "", "",
 			   "A2B_entity_card.php?popup_select=1&",
 			   ", 'CardNumberSelection','width=550,height=550,top=100,left=100,scrollbars=1'" ,
-			   gettext("Set the Customer ID."));
+			   gettext("This Customer will be credited a fee for calls over the RateCard"));
 
 $HD_Form -> AddEditElement (gettext("ADD PREFIX"),
 			    "sellerdialprefix",

@@ -15,7 +15,7 @@ if (!isset($form_action) || $form_action=="list") {
 	$QUERY = "((SELECT cc_charge.id, cc_charge.creationdate `date`, -amount credit, lastname, firstname, company_name, id_cc_card card_id, chargetype+3 refill_type, IFNULL(description,0) description FROM cc_charge
 LEFT JOIN cc_card ON cc_card.id=id_cc_card WHERE id_cc_card = ".$_SESSION["card_id"]." AND charged_status = 1)
 UNION (
-SELECT cc_logrefill.id, `date`, cc_logrefill.credit, lastname, firstname, company_name, card_id, refill_type, description FROM cc_logrefill
+SELECT cc_logrefill.id, `date`, cc_logrefill.credit, lastname, firstname, company_name, IF(card_id=".$_SESSION['card_id']." AND diller_id IS NOT NULL, -diller_id, card_id) card_id, refill_type, description FROM cc_logrefill
 LEFT JOIN cc_card ON cc_card.id=card_id WHERE cc_card.id = ".$_SESSION["card_id"].$QUERY_CLAUSE.")) aa";
 	$HD_Form = new FormHandler($QUERY,gettext("Refill"));
 //	if (strlen($HD_Form -> FG_TABLE_CLAUSE)>0)
@@ -42,14 +42,15 @@ $HD_Form ->FG_LIST_ADDING_BUTTON_IMG1 = Images_Path . "/money.png";
 //$HD_Form -> AddViewElement(gettext("ID"), "cc_logrefill.id", "4%", "center", "sort");
 $HD_Form -> AddViewElement(gettext("REFILL DATE"), "date", "17%", "center", "sort", "30", "", "", "", "", "", "display_dateformat");
 if (has_rights(ACX_DISTRIBUTION)) {
-	$HD_Form -> AddViewElement(gettext("PARTNER"), "lastname", "22%", "center", "sort", "", "link2cust", "cc_card", "IF(id = ".$_SESSION['card_id'].",'',CONCAT_WS(' ',lastname,firstname,IF(company_name='','',CONCAT('(',company_name,')')))), id", "id='%id'", "%1", "", "javascript:;\" onClick=\"MM_openBrWindow('A2B_entity_moneysituation_details.php?type=card&form_action=ask-edit&atmenu=card&displayheader=0&popup_select=1&idcust=%2','','scrollbars=yes,resizable=yes,width=660,height=810,left=600,top=50,screenX=430,screenY=50')\"", gettext("USER DELETED"));
+	$HD_Form -> AddViewElement(gettext("PARTNER"), "lastname", "22%", "center", "sort", "", "link2cust", "cc_card", "IF(id = ".$_SESSION['card_id'].",'',IF(company_name='',CONCAT_WS(' ',lastname,firstname),IF(%id<0,company_name,CONCAT_WS(' ',lastname,firstname,CONCAT('(',company_name,')'))))), id", "id=ABS(%id)", "%1", "", "javascript:;\" onClick=\"MM_openBrWindow('A2B_entity_moneysituation_details.php?type=card&form_action=ask-edit&atmenu=card&displayheader=0&popup_select=1&idcust=%2','','scrollbars=yes,resizable=yes,width=660,height=810,left=600,top=50,screenX=430,screenY=50')\"", gettext("USER DELETED"));
+//	$HD_Form -> AddViewElement(gettext("PARTNER"), "lastname", "22%", "center", "sort", "", "link2cust", "cc_card", "IF(id = ".$_SESSION['card_id'].",'',CONCAT_WS(' ',lastname,firstname,IF(company_name='','',CONCAT('(',company_name,')')))), id", "id='%id'", "%1", "", "javascript:;\" onClick=\"MM_openBrWindow('A2B_entity_moneysituation_details.php?type=card&form_action=ask-edit&atmenu=card&displayheader=0&popup_select=1&idcust=%2','','scrollbars=yes,resizable=yes,width=660,height=810,left=600,top=50,screenX=430,screenY=50')\"", gettext("USER DELETED"));
 	$QUERY_ADD = "card_id, ";
 }
 $HD_Form -> AddViewElement(gettext("REFILL AMOUNT"), "credit", "15%", "center", "sort","", "", "", "", "", "", "display_refill_money");
 $HD_Form -> AddViewElement(gettext("REFILL TYPE"),"refill_type", "13%", "center", "sort", "", "list", $list_refill_type);
 $HD_Form -> AddViewElement(gettext("DESCRIPTION"), "description", "25%", "center", "sort");
 
-$HD_Form -> FieldViewElement ("date, ".$QUERY_ADD."IF(card_id = ".$_SESSION['card_id'].", credit, -credit) AS credit, refill_type, IFNULL(description,IF(credit > 0,IF(card_id = ".$_SESSION['card_id'].",'".gettext('REFILL FROM YOUR DILLER')."','".gettext('REFILL TO YOUR CUSTOMER')."'),IF(card_id = ".$_SESSION['card_id'].",'".gettext('REFUND TO YOUR DILLER')."','".gettext('REFUND FROM YOUR CUSTOMER')."')))");
+$HD_Form -> FieldViewElement ("date, ".$QUERY_ADD."IF(card_id = ".$_SESSION['card_id']." OR card_id < 0, credit, -credit) AS credit, refill_type, IFNULL(description,IF(credit > 0,IF(card_id = ".$_SESSION['card_id']." OR card_id < 0,'".gettext('REFILL FROM YOUR DILLER')."','".gettext('REFILL TO YOUR CUSTOMER')."'),IF(card_id = ".$_SESSION['card_id']." OR card_id < 0,'".gettext('REFUND TO YOUR DILLER')."','".gettext('REFUND FROM YOUR CUSTOMER')."')))");
 
 /**
 if (!($popup_select>=1))	 $HD_Form -> FG_FILTER_SEARCH_FORM = true;

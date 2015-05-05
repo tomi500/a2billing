@@ -1,6 +1,6 @@
 <HTML>
 <HEAD>
-	<link rel="shortcut icon" href="templates/{$SKIN_NAME}/images/a2billing-icon-32x32.ico">
+	<link rel="shortcut icon" href="templates/{$SKIN_NAME}/images/sipde-icon-32x32.ico">
 	<title>{$CCMAINTITLE}</title>
 	<meta http-equiv="Content-Type" content="text/html; charset=utf-8">
 		{if ($CSS_NAME!="" && $CSS_NAME!="default")}
@@ -104,6 +104,8 @@
     $instance_table = new Table();
     $QUERY = "SELECT configuration_key FROM cc_configuration where configuration_key in ('MODULE_PAYMENT_AUTHORIZENET_STATUS','MODULE_PAYMENT_PAYPAL_BASIC_STATUS','MODULE_PAYMENT_MONEYBOOKERS_STATUS','MODULE_PAYMENT_WORLDPAY_STATUS','MODULE_PAYMENT_PLUGNPAY_STATUS','MODULE_PAYMENT_WM_STATUS') AND configuration_value='True'";
     $payment_methods = $instance_table->SQLExec($DBHandle, $QUERY);
+    $QUERY = "SELECT configuration_value FROM cc_configuration where configuration_key='MODULE_PAYMENT_WM_WMID'";
+    $wmid = $instance_table->SQLExec($DBHandle, $QUERY);
     $show_logo = '';
     for ($index = 0; $index < sizeof($payment_methods); $index++) {
 	if ($payment_methods[$index][0] == "MODULE_PAYMENT_PAYPAL_BASIC_STATUS") {
@@ -113,7 +115,7 @@
 	} elseif ($payment_methods[$index][0] == "MODULE_PAYMENT_PLUGNPAY_STATUS") {
 	    $show_logo .= '<a href="http://www.plugnpay.com/" target="_blank"><img src="' . KICON_PATH . '/plugnpay.png" alt="plugnpay.com"/></a>' . ' &nbsp; ';
 	} elseif ($payment_methods[$index][0] == "MODULE_PAYMENT_WM_STATUS") {
-	    $show_logo .= '<a href="http://www.wmtransfer.com/" target="_blank"><img src="' . KICON_PATH . '/webmoney_virified.png" alt="WebMoney"/></a>' . ' &nbsp; ';
+	    $show_logo .= '<a href="http://www.wmtransfer.com/" target="_blank"><img src="' . KICON_PATH . '/webmoney_virified.png" alt="WebMoney"/></a>' . ' &nbsp; ' . '<a href="https://passport.webmoney.ru/asp/certview.asp?wmid='.$wmid[0][0].'" target="_blank"><img src="' . KICON_PATH . '/v_blue_on_transp_en.png" alt="Check the seller\'s WMID" border="0" /></a>';
 	}
     }
 

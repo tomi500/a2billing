@@ -10,27 +10,27 @@ $wmz = 'Z419639909455';
 $wme = 'E241616677453';
 $wmr = 'R367908670622';
 $wmu = 'U188972105659';
-$wm_summ = '10';
+$wm_summ = '50';
 $wm_successurl = $wm_errorurl = $mosConfig_live_site."donate_en.php";
 $wm_descpay = 'Donate Author';
 // Yandex
 $use_yandex = 0;
 $yandex = '01234567891011';
 $yandex_summ = '50';
-$yandex_successurl = $mosConfig_live_site;
+$yandex_successurl = $mosConfig_live_site."donate_en.php";
 // PayPal
 $use_paypal = 1;
 //$donate_email = '4935XK7M8RJQY';
 $donate_email = 'VBP4BCSYDMWD6';
 $paypalcur_on = 0;
-$paypalcur_val = 'EUR';
+$paypalcur_val = 'USD';
 $paypalval_on = 0;
-$paypalval_val = 10;
+$paypalval_val = 70;
 $paypalvalleast_val = 5;
 $donate_org = 'Donate Author';
 $donate_len = 1;
 $paypallen_val = 4;
-$link_return = $link_cancel = $mosConfig_live_site."donate_en.php";
+$link_cancel = $link_return = $mosConfig_live_site."donate_en.php";
 //////////////////////////////////////////////////////////////////////////////
 if ($wmz != '') {
     $wmtype1 = 'WMZ';
@@ -146,21 +146,24 @@ $logopaypal_sm = $mosConfig_live_site.'/templates/default/images/kicons/logopayp
 			<?php echo $pretext;?>
 		</span><br/><br/>
 	<?php
-	}
+	}?>
+	<?php
 	if ($use_wm)
 	{?>
 		<a href="javascript:void(0);" onclick="show_wm()" title="Webmoney">
 			<img src="<?php echo $logowm_sm;?>" alt="Webmoney" border="0" />
 		</a>
 	<?php
-	}
+	}?>
+	<?php
 	if ($use_yandex)
 	{?>
 		<a href="javascript:void(0);" onclick="show_yandex()" title="Yandex">
 			<img src="<?php echo $logoyandex_sm;?>" alt="Yandex" border="0" />
 		</a>
 	<?php
-	}
+	}?>
+	<?php
 	if ($use_paypal)
 	{?>
 		<a href="javascript:void(0);" onclick="show_paypal()" title="PayPal">

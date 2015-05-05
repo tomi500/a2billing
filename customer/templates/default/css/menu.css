@@ -237,13 +237,15 @@ list-style-type : none;
 
 #leftmenu-top{
 	background: url(../images/bg-menu-up.png) no-repeat;
-	background-position: top right; 
+	background-position: top right;
 	padding-top: 30px;
+	margin-top: -10px;
+	text-align: left;
 }
 #leftmenu-middle{
+	padding-right: 20px;
 	background: url(../images/bg-menu-middle.png) repeat-y;
-	background-position: center right; 
-	padding-right : 20px;
+	background-position: center right;
 }
 #leftmenu-down{
 	background: url(../images/bg-menu-down.png) no-repeat;

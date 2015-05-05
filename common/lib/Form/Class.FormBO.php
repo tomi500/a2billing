@@ -530,10 +530,17 @@ class FormBO {
 		$FormHandler = FormHandler::GetInstance();
 		require_once (dirname(__FILE__)."/../phpagi/phpagi-asmanager.php");
 		$as = new AGI_AsteriskManager();
+		$processed = $FormHandler->getProcessed();
+
+		$regexten = $processed['regexten'];
+		$sip_buddy_id = $processed['id'];
+		$instance_table = new Table("cc_voicemail_users", "");
+		$QUERY = "UPDATE cc_voicemail_users SET mailbox='".$regexten."' WHERE sip_buddy_id='".$sip_buddy_id."'";
+		$instance_table->SQLExec($FormHandler->DBHandle, $QUERY, 0);
+
 		if (USE_REALTIME) {
 			$res =@  $as->connect(MANAGER_HOST,MANAGER_USERNAME,MANAGER_SECRET);
 			if ($res) {
-				$processed = $FormHandler->getProcessed();
 				$peername = $processed['name'];
 				if ($FormHandler->FG_TABLE_NAME == 'cc_sip_buddies')	{
 					$res = $as->Command('sip unregister '.$peername);

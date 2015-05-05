@@ -96,7 +96,7 @@ if ($form_action == "list" && $message != "success" && has_rights (ACX_DISTRIBUT
 
 	$undoQuery = "";
 	for ($i = 0; $i < count($list_refill_type); $i++) {
-		$undoQuery .= ", SUM(IF(refill_type='$i',IF(card_id=".$_SESSION['card_id'].",credit,-credit),0)) A$i";
+		$undoQuery .= ", SUM(IF(refill_type='$i',IF(card_id=".$_SESSION['card_id']." OR card_id<0,credit,-credit),0)) A$i";
 	}
 	$QUERY = "SELECT DATE_FORMAT(`date`,'%c') A".$undoQuery." FROM ".$QUERY." WHERE ";
 	if (strlen($HD_Form -> FG_TABLE_CLAUSE)>0) $QUERY .= $HD_Form -> FG_TABLE_CLAUSE." AND";

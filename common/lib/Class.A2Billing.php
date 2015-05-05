@@ -782,7 +782,8 @@ class A2Billing {
 		$this -> CallerID = $this -> src	= $agi -> request['agi_callerid'];
 //		if (!is_numeric($this -> src) || strlen($this -> src) > 4)
 //			$this -> src			= 'NULL';
-		$this -> src_peername 			= array_search($agi -> request['agi_type'], array('Dongle','Dahdi','Local')) === false ? $agi -> get_variable("CHANNEL(peername)",true) : '';
+//$this -> debug( ERROR, $agi, __FILE__, __LINE__, 'agi_type='.$agi -> request['agi_type']);
+		$this -> src_peername 			= array_search($agi -> request['agi_type'], array('Dongle','Dahdi','Local','Message')) === false ? $agi -> get_variable("CHANNEL(peername)",true) : '';
 		if (!is_numeric($this -> src_peername))
 			$this -> src_peername		= 'NULL';
 		$this -> channel			= $agi -> request['agi_channel'];
@@ -796,6 +797,7 @@ class A2Billing {
 		$this -> isolate_cid();
 		$this -> realdestination		= $this -> dnid;
 		$this -> debug( INFO, $agi, __FILE__, __LINE__, ' get_agi_request_parameter = '.$this->CallerID.' ; '.$this->channel.' ; '.$this->uniqueid.' ; '.$this->accountcode.' ; '.$this->dnid);
+//$this -> debug( ERROR, $agi, __FILE__, __LINE__, ' get_agi_request_parameter = '.$this->CallerID.' ; '.$this->channel.' ; '.$this->uniqueid.' ; '.$this->accountcode.' ; '.$this->dnid);
 	}
 
 
@@ -2120,6 +2122,7 @@ $this -> debug( ERROR, $agi, __FILE__, __LINE__, "CREDIT :: $this->credit");
                     // PERFORM THE CALL
 		    if ($agi -> channel_status('',true) != AST_STATE_DOWN) {
 			$this->agiconfig['dialcommand_param'] = $this->agiconfig['dialcommand_param_call_2did'];
+//$this -> debug( ERROR, $agi, __FILE__, __LINE__, "[CALL_2DID]:[credit:$credit]");
 			$result_callperf = $RateEngine->rate_engine_performcall ($agi, $this -> destination, $this, 44); // 44 = For not to play announce seconds and call cost
 			if (!$result_callperf && count($listdestination) == $callcount && is_null($didvoicebox) && is_null($this->voicebox)) {
 	                    $prompt="prepaid-callfollowme";
@@ -2961,6 +2964,7 @@ $this -> debug( ERROR, $agi, __FILE__, __LINE__, "FAXRESOLUTION: ".$faxresolutio
 	 */
 	function apply_rules ($phonenumber)
 	{
+		$phonenumber = strpbrk(substr($phonenumber,0,1),"+") . preg_replace ("/(^[a-z].*)|[^\d]/i","$1",$phonenumber);
 		if (is_array($this->agiconfig['international_prefixes']) && (count($this->agiconfig['international_prefixes'])>0)) {
 			foreach ($this->agiconfig['international_prefixes'] as $testprefix) {
 				if (substr($phonenumber,0,strlen($testprefix))==$testprefix) {
@@ -3560,9 +3564,12 @@ $this -> debug( ERROR, $agi, __FILE__, __LINE__, "FAXRESOLUTION: ".$faxresolutio
 				if ($i==0) {
 					$this->card_caller = $this->id_card;
 					if (strlen($this->dnid) >= 1 && $accountback == 0) {
-						$did = $this->apply_add_countryprefixto ($this->dnid);
+						$did = $this->dnid;
 						if ($this->removeinterprefix)
-							$did = $this -> apply_rules ($did);
+							$did = $this -> apply_rules($did);
+//$this -> debug( ERROR, $agi, __FILE__, __LINE__, "removeinterprefix=".$this->removeinterprefix."   / did=".$did);
+						if ($this->myprefix == "")
+							$did = $this -> apply_add_countryprefixto($did);
 						$QUERY = "SELECT username FROM cc_did, cc_card WHERE did LIKE '$did' AND cc_did.activated=1 AND cc_card.id=iduser LIMIT 1";
 						$result = $this->instance_table -> SQLExec ($this->DBHandle, $QUERY);
 						if (is_array($result)) {

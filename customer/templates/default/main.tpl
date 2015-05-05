@@ -1,16 +1,18 @@
 {include file="header.tpl"}
 {if ($popupwindow == 0)}
 {if ($EXPORT == 0)}
+
 <div id="left-sidebar">
+<div style="position: relative; right: 10px; text-align: center;">
+<a href="userinfo.php"><img src="templates/{$SKIN_NAME}/images/logo.png" width="124" height="64" alt="To Home Page"></a>
+</div>
 <div id="leftmenu-top">
 <div id="leftmenu-down">
 <div id="leftmenu-middle">
-
-	
 <ul id="nav">
-
+<!--
 	<div class="toggle_menu"><li><a href="userinfo.php"><strong>{php} echo gettext("ACCOUNT INFO");{/php}</strong></a></li></div>
-
+-->
 	{if $ACXVOICEMAIL1>0 }
 	<div class="toggle_menu"><li><a href="A2B_entity_voicemail.php"><strong>{php} echo gettext("VOICEMAIL");{/php}</strong></a></li></div>
 	{/if}
@@ -104,10 +106,6 @@
 	<div class="toggle_menu"><li><a href="A2B_entity_password.php?atmenu=password&form_action=ask-edit&stitle=Password"><strong>{php} echo gettext("PASSWORD");{/php}</strong></a></li></div>
 	{/if}
 
-	{if $ACXSUPPORT >0 }
-	<div class="toggle_menu"><li><a href="A2B_support.php"><strong>{php} echo gettext("SUPPORT");{/php}</strong></a></li></div>
-	{/if}
-
 	{if $ACXVOUCHER >0 }
 	<div class="toggle_menu"><li><a href="A2B_entity_voucher.php?form_action=list"><strong>{php} echo gettext("VOUCHERS");{/php}</strong></a></li></div>
 	{/if}
@@ -174,17 +172,20 @@
 	<div class="toggle_menu"><li><a href="A2B_entity_card.php?atmenu=password&form_action=ask-edit&stitle=Personal+Information"><strong>{php} echo gettext("MY PROFILE");{/php}</strong></a></li></div>
 	{/if}
 
+	{if $ACXSUPPORT >0 }
+	<div class="toggle_menu"><li><a href="A2B_support.php"><strong>{php} echo gettext("SUPPORT");{/php}</strong></a></li></div>
+	{/if}
+
 </ul>
 
 <br/>
 <ul id="nav"><li>
-	<ul><li><a href="logout.php?logout=true" target="_top"><img style="vertical-align:bottom;" src="templates/{$SKIN_NAME}/images/logout.png"> <font color="#DD0000"><STRONG>&nbsp;&nbsp;{php} echo gettext("LOGOUT");{/php}</STRONG></font> </a></li></ul>
+	<ul><li><a href="logout.php?logout=true" target="_top"><img style="vertical-align:bottom;" src="templates/{$SKIN_NAME}/images/logout.png"> <font color="#DD0000"><STRONG>{php} echo gettext("LOGOUT");{/php}</STRONG></font> </a></li></ul>
 </li></ul>
 
 </div>
 </div>
 </div>
-
 
 <table width="90%" cellspacing="15">
 <tr>
@@ -211,16 +212,13 @@
 		<a href="{$PAGE_SELF}?ui_language=indonesian"><img src="templates/{$SKIN_NAME}/images/flags/id.gif" border="0" title="Indonesian" alt="Indonesian"></a>
    </td>
 </tr>
-
-
 </table>
-
 
 </div>
 
 <div id="main-content">
 	<div id="inside">
-<br/>
+
 {else}
 <div>
 {/if}

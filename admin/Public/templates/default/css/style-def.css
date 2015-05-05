@@ -57,6 +57,7 @@ body {
 	color: #FFFFFF;
 	background-color: #3399FF;
 	border: solid 0px;
+	display: inline;
 }
 
 textarea {
