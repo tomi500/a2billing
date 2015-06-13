@@ -56,6 +56,7 @@ $smarty->assign("COPYRIGHT", COPYRIGHT);
 $smarty->assign("CCMAINTITLE", CCMAINTITLE);
 $smarty->assign("SIGNUPLINK", SIGNUP_LINK);
 $smarty->assign("LOGOPATH", LOGOPATH);
+$smarty->assign("SHORTCUTICONPATHCUSTOMER", SHORTCUTICONPATHCUSTOMER);
 
 $smarty->assign("ACXPASSWORD", $ACXPASSWORD);
 $smarty->assign("ACXSIP_IAX", $ACXSIP_IAX);

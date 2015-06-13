@@ -54,7 +54,7 @@ $smarty->assign("TEXTCONTACT", TEXTCONTACT);
 $smarty->assign("EMAILCONTACT", EMAILCONTACT);
 $smarty->assign("COPYRIGHT", COPYRIGHT);
 $smarty->assign("CCMAINTITLE", CCMAINTITLE);
-
+$smarty->assign("SHORTCUTICONPATH", SHORTCUTICONPATH);
 $smarty->assign("SKIN_NAME", $skin_name);
 // if it is a pop window
 if (!is_numeric($popup_select)) {

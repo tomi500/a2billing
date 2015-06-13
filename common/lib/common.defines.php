@@ -131,6 +131,8 @@ define ("COPYRIGHT", "A2Billing 1.9.4 (Cuprum), A2Billing is a ".'<a href="http:
 
 define ("CCMAINTITLE", isset($A2B->config['webui']['main_title'])?$A2B->config['webui']['main_title']:'..:: A2Billing Portal ::..');
 define ("LOGOPATH", isset($A2B->config['global']['logo_path'])?$A2B->config['global']['logo_path']:'templates/default/images/logo.png');
+define ("SHORTCUTICONPATH", isset($A2B->config['webui']['shortcut_icon'])?$A2B->config['webui']['shortcut_icon']:'images/ico/a2billing-icon-32x32.ico');
+define ("SHORTCUTICONPATHCUSTOMER", isset($A2B->config['webcustomerui']['shortcut_icon'])?$A2B->config['webcustomerui']['shortcut_icon']:'templates/default/images/sipde-icon-32x32.ico');
 define ("SIGNUPENABLE", $A2B->config['signup']['enable_signup']);
 
 

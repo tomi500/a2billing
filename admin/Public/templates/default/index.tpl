@@ -1,6 +1,6 @@
 <HTML>
 <HEAD>
-	<link rel="shortcut icon" href="images/ico/a2billing-icon-32x32.ico">
+	<link rel="shortcut icon" href="{$SHORTCUTICONPATH}">
 	<title>{$CCMAINTITLE}</title>
 	<meta http-equiv="Content-Type" content="text/html; charset=utf-8">
 		{if ($CSS_NAME!="" && $CSS_NAME!="default")}

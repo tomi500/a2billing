@@ -1,6 +1,6 @@
 <HTML>
 <HEAD>
-	<link rel="shortcut icon" href="templates/{$SKIN_NAME}/images/sipde-icon-32x32.ico">
+	<link rel="shortcut icon" href="{$SHORTCUTICONPATHCUSTOMER}">
 	<title>{$CCMAINTITLE}</title>
 	<meta http-equiv="Content-Type" content="text/html; charset=utf-8">
 		{if ($CSS_NAME!="" && $CSS_NAME!="default")}
