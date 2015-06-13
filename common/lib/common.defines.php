@@ -130,9 +130,8 @@ define ("EMAILCONTACT", "areski@gmail.com");
 define ("COPYRIGHT", "A2Billing 1.9.4 (Cuprum), A2Billing is a ".'<a href="http://www.star2billing.com/solutions/voip-billing/" target="_blank">voip billing software</a>' . " licensed under the ".'<a href="http://www.fsf.org/licensing/licenses/agpl-3.0.html" target="_blank">AGPL 3</a>' . ". <br/>" . "Copyright (C) 2004-2011 - Star2billing S.L. <a href=\"http://www.star2billing.com\" target=\"_blank\">http://www.star2billing.com/</a>");
 
 define ("CCMAINTITLE", isset($A2B->config['webui']['main_title'])?$A2B->config['webui']['main_title']:'..:: A2Billing Portal ::..');
-define ("LOGOPATH", isset($A2B->config['global']['logo_path'])?$A2B->config['global']['logo_path']:'templates/default/images/logo.png');
-define ("SHORTCUTICONPATH", isset($A2B->config['webui']['shortcut_icon'])?$A2B->config['webui']['shortcut_icon']:'images/ico/a2billing-icon-32x32.ico');
-define ("SHORTCUTICONPATHCUSTOMER", isset($A2B->config['webcustomerui']['shortcut_icon'])?$A2B->config['webcustomerui']['shortcut_icon']:'templates/default/images/sipde-icon-32x32.ico');
+define ("LOGOPATH", isset($A2B->config['global']['logo_path'])?$A2B->config['global']['logo_path']:'images/logo/sipde-transparent.png');
+define ("FAVICONPATH", isset($A2B->config['global']['shortcut_icon'])?$A2B->config['global']['shortcut_icon']:'images/ico/sipde-icon-32x32.ico');
 define ("SIGNUPENABLE", $A2B->config['signup']['enable_signup']);
 
 

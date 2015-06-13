@@ -35,7 +35,7 @@ function originateresponse($e, $parameters, $server, $port, &$ast) {
     if ($parameters['ActionID'] == $ast->actionid) {
 	$ansnum = $parameters['Reason'];
 	$ansalpha = reasondesc($ansnum);
-//	write_log(LOGFILE_API_CALLBACK, "OriginateResponse{$ans}: ".var_export($parameters, true));
+//	write_log(LOGFILE_API_CALLBACK, "OriginateResponse{$ansalpha}: ".var_export($parameters, true));
 	return array($ansnum,$ansalpha);
     }
     return false;
@@ -45,16 +45,18 @@ function newstateresponse($e, $parameters, $server, $port, &$ast) {
 
     if ($e == 'newstate') {
 	$res = $ast->GetVar($parameters['Channel'],'ACTIONID');
-//	write_log(LOGFILE_API_CALLBACK, var_export($ast->actionid, true) . " GetVar: " . var_export($res, true));
 	if ($res['Response'] == "Success" && $res['Value'] == $ast->actionid && !isset($parameters['Value'])) {
-//	write_log(LOGFILE_API_CALLBACK, "NewState: ".var_export($parameters, true));
+//		write_log(LOGFILE_API_CALLBACK, "NewState: ".var_export($parameters, true));
+//		write_log(LOGFILE_API_CALLBACK, var_export($ast->actionid, true) . " GetVar: " . var_export($res, true));
 		unset($ast->event_handlers[$e]);
 		$ast->channel = $parameters['Channel'];
-		return $parameters['ChannelStateDesc'];
+		$res = $parameters['ChannelStateDesc'];
+		if ($res =="Up")	$res = "ANSWER";
+		return $res;
 	}
     }
     if ($e == 'originateresponse' && $parameters['ActionID'] == $ast->actionid) {
-	write_log(LOGFILE_API_CALLBACK, "OriginateResponse: ".var_export($parameters, true));
+//	write_log(LOGFILE_API_CALLBACK, "OriginateResponse: ".var_export($parameters, true));
 	return reasondesc($parameters['Reason']);
     }
     return false;
@@ -137,6 +139,10 @@ function ringup_engine(&$A2B, $server, $username, $secret, $AmiVars, $destinatio
 	$response = $ast -> wait_response(true);
 	if ($ast->channel)	$ast -> Hangup ($ast->channel);
 	$ast -> disconnect();
+	if (is_array($response)) {
+		write_log(LOGFILE_API_CALLBACK, "!!!!!!!!!!!!!!!!!!!!!=================== ARRAY ==================: ".var_export($response, true));
+		$response = 'ERROR';
+	}
 	return $response;
 //	if ($res !== false) return $res;
 //	else return -2; // not enough free trunk for make call

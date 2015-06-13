@@ -3534,6 +3534,14 @@ msgstr "К сожалению, транзакция в ожидающих"
 msgid "PREVIEW NEXT RECEIPT DETAIL"
 msgstr ""
 
+#: A2B_entity_sipiax_info.php
+msgid "Set how many additional numbers You need in Your PBX and from which number they will begin. All additional numbers are 3-digit numbers. For example if 703 is exist and if You add 5 numbers beginning from 701, there will be additional numbers 701, 702, 704, 705, 706. There is no need to add numbers in advance. You can always add more."
+msgstr "Задайте количество внутренних линий в Вашей АТС, и с какого номера они будут начинаться. Все внутренние линии обозначаются тремя цифрами и, например, если номер 703 уже существует и заказать 5 номеров начиная с 701, то будут созданы номера 701, 702, 704, 705, 706. Не обязательно создавать номера «с запасом», Вы всегда можете увеличить их количество."
+
+#: A2B_entity_sipiax_info.php
+msgid "Information"
+msgstr "Информация"
+
 #: A2B_entity_sipiax_info.php:59
 msgid "IAX Config"
 msgstr "Конфигурация IAX"

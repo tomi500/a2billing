@@ -424,7 +424,7 @@ begin
     select count(*) into a from cc_config where config_key='shortcut_icon';
     if a=0 then
 	INSERT INTO cc_config (id, config_title, config_key, config_value, config_description, config_valuetype, config_listvalues, config_group_title)
-	VALUES (NULL, 'Web shortcut icon path', 'shortcut_icon', 'images/ico/a2billing-icon-32x32.ico', 'Path to the shortcut icon of your whole system', 0, NULL, 'webui');
+	VALUES (NULL, 'Web favicon path', 'shortcut_icon', 'images/ico/sipde-icon-32x32.ico', 'Path to the shortcut icon of your whole system', 0, NULL, 'global');
     elseif a>1 then
 	select id into a from cc_config where config_key='shortcut_icon' order by id limit 0,1;
 	delete from cc_config where config_key='shortcut_icon' and id>a;
@@ -442,31 +442,10 @@ delimiter //
 create procedure a2b_trf_check()
 begin
     declare a int;
-    select count(*) into a from cc_config where config_key='shortcut_icon_customer';
-    if a=0 then
-	INSERT INTO cc_config (id, config_title, config_key, config_value, config_description, config_valuetype, config_listvalues, config_group_title)
-	VALUES (NULL, 'Web shortcut icon path', 'shortcut_icon_customer', 'templates/default/images/sipde-icon-32x32.ico', 'Path to the shortcut icon of your whole system', 0, NULL, 'webcustomerui');
-    elseif a>1 then
-	select id into a from cc_config where config_key='shortcut_icon_customer' order by id limit 0,1;
-	delete from cc_config where config_key='shortcut_icon_customer' and id>a;
-    end if;
-end //
-
-delimiter ;
-
-call a2b_trf_check;
-
-drop procedure if exists a2b_trf_check;
-
-delimiter //
-
-create procedure a2b_trf_check()
-begin
-    declare a int;
     select count(*) into a from cc_config where config_key='logo_path';
     if a=0 then
 	INSERT INTO cc_config (id, config_title, config_key, config_value, config_description, config_valuetype, config_listvalues, config_group_title)
-	VALUES (NULL, 'System logo path', 'logo_path', 'templates/default/images/logo.png', 'Path to the Logo of your whole system', 0, NULL, 'global');
+	VALUES (NULL, 'System logo path', 'logo_path', 'images/logo/sipde-transparent.png', 'Path to the Logo of your whole system', 0, NULL, 'global');
     elseif a>1 then
 	select id into a from cc_config where config_key='logo_path' order by id limit 0,1;
 	delete from cc_config where config_key='logo_path' and id>a;

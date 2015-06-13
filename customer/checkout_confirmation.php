@@ -74,9 +74,9 @@ $amount_paypal = ($amount+$vat_amount+0.35)/0.961;
 //$amount_webmoney = ($amount+$vat_amount)/0.95;
 $mc_fee = (strcasecmp("paypal",$payment)==0)?round(($amount_paypal)*0.039,2)+0.35:0;
 //$mc_fee = (strcasecmp("webmoney",$payment)==0)?round(($amount_webmoney)*0.05,2):0;
+//$mc_fee = 0;
 $total_amount = $amount+$vat_amount+$mc_fee;
 //Test value:
-//$mc_fee = 0;
 if (!isset($item_id) || is_null($item_id) || $item_id == "") {
 	$item_id = 0;
 }

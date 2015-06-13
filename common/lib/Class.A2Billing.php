@@ -847,30 +847,36 @@ class A2Billing {
 	/*
 	 *	function enough_credit_to_call
 	 */
-	function enough_credit_to_call()
+	function enough_credit_to_call(&$agi = NULL, &$RateEngine = NULL)
 	{	
 		if ($this->typepaid == 0) {
 //if (!isset($RateEngine -> ratecard_obj[0][72]))		$this -> debug( ERROR, $agi, __FILE__, __LINE__, "[Ratecard_Obj is not set]");
 			if (($this->credit < $this->agiconfig['min_credit_2call'] || $this->credit < 0) && !(isset($RateEngine -> ratecard_obj[0][72]) && $RateEngine -> ratecard_obj[0][72] == 'EMERGENCY')) {
+//$this -> debug( ERROR, $agi, __FILE__, __LINE__, "[Ratecard_Obj[72]=".$RateEngine -> ratecard_obj[0][72]);
 				return false;
 			} else {
+//$this -> debug( ERROR, $agi, __FILE__, __LINE__, "[Ratecard_Obj[72]=".$RateEngine -> ratecard_obj[0][72]);
 				return true;
 			}
 		} else {
-			if ($this->credit <= -$this->creditlimit && (!isset($RateEngine -> ratecard_obj[0][72]) || $RateEngine -> ratecard_obj[0][72] != 'EMERGENCY')) {
+			if ($this->credit <= -$this->creditlimit && !(isset($RateEngine -> ratecard_obj[0][72]) && $RateEngine -> ratecard_obj[0][72] == 'EMERGENCY')) {
 				$QUERY = "SELECT id_cc_package_offer FROM cc_tariffgroup WHERE id= ".$this->tariff ;
 				$result = $this -> instance_table -> SQLExec ($this->DBHandle, $QUERY);
 				if (!empty($result[0][0])) {
 					$id_package_groupe = $result[0][0];
 					if ($id_package_groupe > 0) {
+//$this -> debug( ERROR, $agi, __FILE__, __LINE__, "[Ratecard_Obj[72]=".$RateEngine -> ratecard_obj[0][72]);
 						return true;
 					} else {
+//$this -> debug( ERROR, $agi, __FILE__, __LINE__, "[Ratecard_Obj[72]=".$RateEngine -> ratecard_obj[0][72]);
 						return false;
 					}
 				} else {
+//$this -> debug( ERROR, $agi, __FILE__, __LINE__, "[Ratecard_Obj[72]=".$RateEngine -> ratecard_obj[0][72]);
 					return false;
 				}
 			} else {
+//$this -> debug( ERROR, $agi, __FILE__, __LINE__, "[Ratecard_Obj[72]=".$RateEngine -> ratecard_obj[0][72]);
 				return true;
 			}
 		}

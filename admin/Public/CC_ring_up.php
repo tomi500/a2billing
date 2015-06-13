@@ -127,7 +127,7 @@ if ($method == 'upload') {
 			}
 		}
 	    } else {
-		$_SESSION['message'] .=  ". </font><font color=\"red\">".gettext('Data was absent.');
+		$_SESSION['message'] .=  ". </font><font color=\"red\">".gettext('But data was absent.');
 		$QUERY = "DELETE FROM cc_ringup WHERE id = '" . $id_ringup . "'";
 		$result_query = @ $DBHandle->Execute($QUERY);
 	    }
@@ -139,10 +139,10 @@ if ($method == 'upload') {
 	$_SESSION['message'] = "<img src=\"$dir_img/error.gif\" width=\"15\" height=\"15\">&nbsp;<b><font size=\"3\" color=\"red\">";
 	$QUERY = "DELETE FROM cc_ringup WHERE id = ".$id;
 	$result_query = @ $DBHandle->Execute($QUERY);
-	if ($result_query) {
-	    $QUERY = "DELETE FROM `cc_sheduler_ratecard` WHERE `id_ringup`='$id'";
+	if ($result_query !== false) {
+	    $QUERY = "DELETE FROM `cc_ringup_list` WHERE `id_ringup`='{$id}'";
 	    $result_query = @ $DBHandle->Execute($QUERY);
-	    $QUERY = "DELETE FROM `cc_ringup_list` WHERE `id_ringup`='$id'";
+	    $QUERY = "DELETE FROM `cc_sheduler_ratecard` WHERE `id_ringup`='{$id}'";
 	    $result_query = @ $DBHandle->Execute($QUERY);
 	    if ($result_query)
 		$_SESSION['message'] = "<font size=\"3\" color=\"green\">" . "Ring-Up list deleted";
@@ -151,9 +151,20 @@ if ($method == 'upload') {
 	} else	$_SESSION['message'] .= "Ring-Up not deleted.";
 
 	//StartStop ring-up
-} elseif ($method == "startstop" && is_numeric($id)) {
-	$QUERY = "UPDATE cc_ringup SET status=IF(status=0,1,0) WHERE id='" . $id . "'";
-	$result_query = @ $DBHandle->Execute($QUERY);
+} elseif ($method == "start" && is_numeric($id)) {
+	$QUERY = "SELECT `status` FROM `cc_ringup` WHERE `id`='{$id}'";
+	$result_query = $instance_table -> SQLExec ($DBHandle, $QUERY);
+	if (is_array($result_query) && $result_query[0][0] == 0) {
+		$QUERY = "UPDATE `cc_ringup` SET `status`='1' WHERE `id`='{$id}'";
+		$result_query = @ $DBHandle->Execute($QUERY);
+	}
+} elseif ($method == "stop" && is_numeric($id)) {
+	$QUERY = "SELECT `status` FROM `cc_ringup` WHERE `id`='{$id}'";
+	$result_query = $instance_table -> SQLExec ($DBHandle, $QUERY);
+	if (is_array($result_query) && $result_query[0][0] == 1) {
+		$QUERY = "UPDATE `cc_ringup` SET `status`='0' WHERE `id`='{$id}'";
+		$result_query = @ $DBHandle->Execute($QUERY);
+	}
 }
 
 $QUERY = "SELECT id_trunk, trunkcode FROM cc_trunk ORDER BY id_trunk";
@@ -350,9 +361,7 @@ function sendtoupload(form){
     <td class="tableBody" style="padding: 2px;" align="center" width="16%"><?php echo gettext("STATUS");?></td>
     <td class="tableBody" style="padding: 2px;" align="center" width="18%" colspan="2"><?php echo gettext("ACTION");?></td>
   </tr>
-  
   <?php
-
 	$QUERY = "SELECT id, tag, trunks, simult, processed, lefte,
 	IF(`id_ringup` IS NULL OR `status`!='1' OR (`weekdays` LIKE CONCAT('%',WEEKDAY(NOW()),'%') AND (CURTIME() BETWEEN `timefrom` AND `timetill`
 	OR (`timetill`<=`timefrom` AND (CURTIME()<`timetill` OR CURTIME()>=`timefrom`)))),`status`,3), action FROM cc_ringup
@@ -362,35 +371,28 @@ function sendtoupload(form){
 	if ($result_query) {
 	    // EXPORT
 	    $FG_EXPORT_SESSION_VAR = "pr_export_entity_ringup";
-	    
 	    // Query Preparation for the Export Functionality
 	    $_SESSION [$FG_EXPORT_SESSION_VAR] = "SELECT tonum, channelstatedesc, attempt, try FROM cc_ringup_list WHERE id_ringup=";
-	    
-	    if (! is_null ( $order ) && ($order != '') && ! is_null ( $sens ) && ($sens != '')) {
-		$_SESSION [$FG_EXPORT_SESSION_VAR] .= " ORDER BY id";
-	    }
-	    
+
 	    for ($i = 0; $i < count($result_query); $i++) {
-    ?>
-		<tr>
-			<td>&nbsp;<?php echo $result_query[$i][1];?></td>
-			<td align="center"><?php echo $result_query[$i][2];?></td>
-			<td align="center"><?php echo $result_query[$i][3];?></td>
-			<td align="center"><?php echo $result_query[$i][4];?></td>
-			<td align="center"><?php echo $result_query[$i][5];?></td>
-			<td align="center"><?php if($result_query[$i][6]==1) echo gettext('IN PROGRESS'); elseif($result_query[$i][6]==0) echo gettext('STOPPED'); elseif($result_query[$i][6]==2) echo gettext('FINISHED'); elseif($result_query[$i][6]==3) echo gettext('TIME-OUT');?></td>
-			<td align="center"><?php if($result_query[$i][6]!=2) {?>
-				<A href="<?php echo $_SERVER['PHP_SELF'];?>?method=startstop&amp;id=<?php echo $result_query[$i][0];?>&<?php echo $pass_param?>"><div class="upload_button">&nbsp;<?php if($result_query[$i][6]==1 || $result_query[$i][6]==3) echo gettext('Stop'); elseif($result_query[$i][6]==0) echo gettext('Start');?>&nbsp;</div></a>
-			<?php }?></td>
-			<td align="left" nowrap>
-				<A href="javascript:if(confirm('<?php echo gettext("Are you sure to delete ");?> <?php echo $entry;?>?')) location.href='<?php echo $_SERVER['PHP_SELF'];?>?method=delete&amp;id=<?php echo $result_query[$i][0];?>&<?php echo $pass_param?>';"><img src='<?php echo $dir_img?>/cross.gif' title='Delete <?php echo $entry;?>' alt='Delete <?php echo $entry;?>' border=0></a>
-				<A href="export_csv.php?var_export=<?php echo $FG_EXPORT_SESSION_VAR?>&var_export_type=type_csv&filename=<?php echo str_replace(" ","_",$result_query[$i][1]);?>&id=<?php echo $result_query[$i][0];?>" target="_blank"><img src="<?php echo $dir_img?>/dl.gif" title="<?php echo gettext("Export CSV");?>" alt="<?php echo gettext("Export CSV");?>" border="0"></a>
-<!--				<A href="javascript: var inserttext = ''; if(inserttext = prompt('Rename <?php echo $entry;?>. Fill in the new name for the file.','<?php echo $entry;?>')) location.href='<?php echo $_SERVER['PHP_SELF'];?>?method=rename&<?php echo $pass_param?>&amp;file=<?php echo $entry;?>&amp;to='+inserttext; "><img src='<?php echo $dir_img?>/edit.gif' alt='Rename <?php echo $entry;?>' border=0></a>
+  ?><tr>
+	<td>&nbsp;<?php echo $result_query[$i][1];?></td>
+	<td align="center"><?php echo $result_query[$i][2];?></td>
+	<td align="center"><?php echo $result_query[$i][3];?></td>
+	<td align="center"><?php echo $result_query[$i][4];?></td>
+	<td align="center"><?php echo $result_query[$i][5];?></td>
+	<td align="center"><?php if($result_query[$i][6]==0) echo gettext('STOPPED'); elseif($result_query[$i][6]==1) echo gettext('IN PROGRESS'); elseif($result_query[$i][6]==2) echo gettext('FINISHED'); elseif($result_query[$i][6]==3) echo gettext('TIME-OUT');?></td>
+	<td align="center"><?php if($result_query[$i][6]!=2) { ?><A href="<?php echo $_SERVER['PHP_SELF'];?>?method=<?php if($result_query[$i][6]==1) echo "stop"; elseif($result_query[$i][6]==0) echo "start";?>&amp;id=<?php echo $result_query[$i][0];?>"><div class="upload_button">&nbsp;<?php if($result_query[$i][6]==1 || $result_query[$i][6]==3) echo gettext('Stop'); elseif($result_query[$i][6]==0) echo gettext('Start');?>&nbsp;</div></a><?php }?></td>
+	<td align="left" nowrap>
+		<A href="javascript:if(confirm('<?php echo gettext("Are you sure to delete ");?> <?php echo $result_query[$i][1];?>?')) location.href='<?php echo $_SERVER['PHP_SELF'];?>?method=delete&amp;id=<?php echo $result_query[$i][0];?>';"><img src='<?php echo $dir_img?>/cross.gif' title='Delete <?php echo $entry;?>' alt='Delete <?php echo $entry;?>' border=0></a>
+		<A href="export_csv.php?var_export=<?php echo $FG_EXPORT_SESSION_VAR?>&var_export_type=type_csv&filename=<?php echo str_replace(" ","_",$result_query[$i][1]);?>&id=<?php echo $result_query[$i][0];?>" target="_blank"><img src="<?php echo $dir_img?>/dl.gif" title="<?php echo gettext("Export CSV");?>" alt="<?php echo gettext("Export CSV");?>" border="0"></a>
+<!--		<A href="javascript: var inserttext = ''; if(inserttext = prompt('Rename <?php echo $entry;?>. Fill in the new name for the file.','<?php echo $entry;?>')) location.href='<?php echo $_SERVER['PHP_SELF'];?>?method=rename&amp;file=<?php echo $entry;?>&amp;to='+inserttext; "><img src='<?php echo $dir_img?>/edit.gif' alt='Rename <?php echo $entry;?>' border=0></a>
 -->
-			</td>
-		</tr>
+	</td>
+  </tr>
     <?php
-       }   }
+	    }
+	}
     ?>
 
 </table></center>

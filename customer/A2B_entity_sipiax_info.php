@@ -189,10 +189,8 @@ if ($atmenu == "SIP" && $form_action == "list") {
 			&nbsp;<input class="form_input_text" id="num1" name="startnumber" onfocus="clear_textbox();" onkeypress="return keytoDownNumber(event,id);" size="10" maxlength="<?php echo $extlen;?>" value="<?php echo $extstart;?>">
 		    </td>
 		    <td align="justify" style="padding: 0 15px" rowspan="100%">
-			<center><h3>Информация</h3></center>
-			Задайте количество внутренних линий в Вашей АТС, и с какого номера они будут начинаться.
-			Все внутренние линии обозначаются тремя цифрами и, например, если номер 703 уже существует и заказать 5 номеров начиная с 701, то будут созданы номера 701, 702, 704, 705, 706.
-			Не обязательно создавать номера «с запасом», Вы всегда можете увеличить их количество.
+			<center><h3><?php echo gettext("Information");?></h3></center>
+			<?php echo gettext("Set how many additional numbers You need in Your PBX and from which number they will begin. All additional numbers are 3-digit numbers. For example if 703 is exist and if You add 5 numbers beginning from 701, there will be additional numbers 701, 702, 704, 705, 706. There is no need to add numbers in advance. You can always add more.");?>
 		    </td>
 		</tr>
 		<tr><td align="left" valign="top">

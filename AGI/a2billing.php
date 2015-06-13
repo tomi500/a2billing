@@ -697,8 +697,11 @@ if ($mode == 'standard') {
 
 			$A2B -> debug( INFO, $agi, __FILE__, __LINE__,  "TARIFF ID -> ". $A2B->tariff);
 
+
+//---------------------------------------------------------------------------------------------------------------------------------------
 // Not enough. Need to remove in future.
-			if (!$A2B -> enough_credit_to_call()) {
+/**
+			if (!$A2B -> enough_credit_to_call($agi, $RateEngine)) {
 $A2B -> debug( ERROR, $agi, __FILE__, __LINE__, "[NO ENOUGH CREDIT TO CALL THIS NUMBER - ERROR]");
 				// SAY TO THE CALLER THAT IT DEOSNT HAVE ENOUGH CREDIT TO MAKE A CALL
 				$A2B -> let_stream_listening($agi);
@@ -732,6 +735,7 @@ $A2B -> debug( ERROR, $agi, __FILE__, __LINE__, "[NO ENOUGH CREDIT TO CALL THIS 
 					break;
 				}
 			}
+**/
 // END not enough
 			$A2B->dnid = rtrim($agi -> request['agi_dnid'], "#");
 			$A2B->extension = rtrim($agi -> request['agi_extension'], "#");
@@ -872,8 +876,43 @@ $A2B -> debug( ERROR, $agi, __FILE__, __LINE__, "[NO ENOUGH CREDIT TO CALL THIS 
 
 			} else {
 				$ans = $A2B -> callingcard_ivr_authorize($agi, $RateEngine, $i, true);
-				$A2B -> debug( DEBUG, $agi, __FILE__, __LINE__, 'ANSWER fct callingcard_ivr authorize:> '.$ans);
+				if (!$A2B -> enough_credit_to_call($agi, $RateEngine)) {
+//$A2B -> debug( ERROR, $agi, __FILE__, __LINE__, "[NO ENOUGH CREDIT TO CALL THIS NUMBER - ERROR]");
+					// SAY TO THE CALLER THAT IT DEOSNT HAVE ENOUGH CREDIT TO MAKE A CALL
+					$A2B -> let_stream_listening($agi);
+					$prompt = "prepaid-no-enough-credit-stop";
+					$agi -> stream_file($prompt, '#');
+					$A2B -> debug( DEBUG, $agi, __FILE__, __LINE__, "[STOP STREAM FILE $prompt]");
 				
+					if (($A2B -> agiconfig['notenoughcredit_cardnumber']==1) && (($i+1)< $A2B -> agiconfig['number_try'])) {
+//$A2B -> debug( ERROR, $agi, __FILE__, __LINE__, "[NO ENOUGH CREDIT TO CALL THIS NUMBER - ERROR]");
+
+						if ($A2B->set_inuse_username)
+							$A2B->callingcard_acct_start_inuse($agi,0);
+
+						$A2B -> agiconfig['cid_enable'] = 0;
+						$A2B -> agiconfig['use_dnid'] = 0;
+						$A2B -> agiconfig['cid_auto_assign_card_to_cid'] = 0;
+						$A2B -> accountcode = '';
+						$A2B -> username = '';
+						$A2B -> ask_other_cardnumber = 1;
+
+						$cia_res = $A2B -> callingcard_ivr_authenticate($agi);
+						$A2B -> debug( DEBUG, $agi, __FILE__, __LINE__, "[NOTENOUGHCREDIT_CARDNUMBER - TRY : callingcard_ivr_authenticate]");
+						if ($cia_res!=0) break;
+
+						$A2B -> debug( DEBUG, $agi, __FILE__, __LINE__, "[NOTENOUGHCREDIT_CARDNUMBER - callingcard_acct_start_inuse]");
+						$A2B -> callingcard_acct_start_inuse($agi,1);
+						continue;
+
+					} else {
+//$A2B -> debug( ERROR, $agi, __FILE__, __LINE__, "[NO ENOUGH CREDIT TO CALL THIS NUMBER - ERROR]");
+						$send_reminder = 1;
+						$A2B -> debug( DEBUG, $agi, __FILE__, __LINE__, "[SET MAIL REMINDER - NOT ENOUGH CREDIT]");
+						break;
+					}
+				}
+				$A2B -> debug( DEBUG, $agi, __FILE__, __LINE__, 'ANSWER fct callingcard_ivr authorize:> '.$ans);
 				// CREATE A PERSONAL UNIQUEID FOR EACH TRY
 //$A2B -> debug( ERROR, $agi, __FILE__, __LINE__, $A2B -> uniqueid);
 				$newuniqueid = explode('.',$A2B -> uniqueid);

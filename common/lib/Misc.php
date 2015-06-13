@@ -1412,10 +1412,17 @@ function currencies_update_yahoo ($DBHandle, $instance_table)
 
 		// trim off any leading/trailing comments/headers that may have been added
 		$i = 0;
-		while (!is_numeric(trim($currencies[$i]))) {
+		while (!is_numeric(trim($currencies[$i])) && trim($currencies[$i]) != "N/A") {
 			$i++;
 		}
-		$currencies = array_slice($currencies, $i, $num_cur);
+/**		$num_res = count($currencies);
+		for ($i = 0; $i < $num_res; $i++) {
+			if (is_numeric(trim($currencies[$i])) || trim($currencies[$i]) == "N/A") {
+				
+				break;
+			}
+		}
+**/		$currencies = array_slice($currencies, $i, $num_cur);
 
 		// do some simple checks to try to verify we've received exactly one
 		// valid response for each currency we requested

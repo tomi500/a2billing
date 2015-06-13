@@ -120,7 +120,6 @@ class RateEngine
 
 		$DNID_SUB_QUERY = "AND 0 = (SELECT COUNT(dnidprefix) FROM cc_tariffgroup_plan RIGHT JOIN cc_tariffplan ON cc_tariffgroup_plan.idtariffplan=cc_tariffplan.id WHERE dnidprefix=SUBSTRING('$mydnid',1,length(dnidprefix)) AND idtariffgroup=$tariffgroupid ) ";
 		$CID_SUB_QUERY = "AND 0 = (SELECT count(calleridprefix) FROM cc_tariffgroup_plan RIGHT JOIN cc_tariffplan ON cc_tariffgroup_plan.idtariffplan=cc_tariffplan.id WHERE ('$mycallerid' LIKE CONCAT(calleridprefix,'%') OR calleridprefix LIKE '$mycallerid,%' OR calleridprefix LIKE '%,$mycallerid,%' OR calleridprefix LIKE '%,$mycallerid') AND idtariffgroup=$tariffgroupid )";
-
 		$TARIFFNAME_SUB_QUERY = $A2B->myprefix=="00" ? "" : " OR cc_tariffplan.tariffname LIKE '$A2B->cardnumber%'";
 //$A2B -> debug( ERROR, $agi, "", __LINE__, "=================== ".$A2B->myprefix);
 		// $prefixclause to allow good DB servers to use an index rather than sequential scan

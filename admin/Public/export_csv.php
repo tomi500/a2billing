@@ -59,19 +59,20 @@ if (strlen($_SESSION[$var_export]) < 10) {
 } else {
 	$log = new Logger();
 	$myfileName = "Dump_" . date("Y-m-d");
+	$QUERY = $_SESSION[$var_export];
 	if ($var_export == "pr_export_entity_ringup")
 		$myfileName = $filename . "_" . date("Y-m-d");
 		if (is_numeric($id))
-			$_SESSION[$var_export] .= $id." ORDER BY channelstatedesc DESC, attempt";
+			$QUERY .= $id." ORDER BY channelstatedesc DESC, attempt";
 		else
 			$log->insertLog($_SESSION["admin_id"], 2, "FILE EXPORT FAILED", "A File in CSV Format was not exported by User, File Name= " . $myfileName . ".csv", '', $_SERVER['REMOTE_ADDR'], $_SERVER['REQUEST_URI'], '');
 	if (strcmp($var_export_type, "type_csv") == 0) {
 		$log->insertLog($_SESSION["admin_id"], 2, "FILE EXPORTED", "A File in CSV Format is exported by User, File Name= " . $myfileName . ".csv", '', $_SERVER['REMOTE_ADDR'], $_SERVER['REQUEST_URI'], '');
-		$dumpfile->dump($_SESSION[$var_export], $myfileName, "csv", DBNAME, USER, PASS, HOST, DB_TYPE);
+		$dumpfile->dump($QUERY, $myfileName, "csv", DBNAME, USER, PASS, HOST, DB_TYPE);
 	}
 	elseif (strcmp($var_export_type, "type_xml") == 0) {
 		$log->insertLog($_SESSION["admin_id"], 2, "FILE EXPORTED", "A File in XML Format is exported by User, File Name= " . $myfileName . ".xml", '', $_SERVER['REMOTE_ADDR'], $_SERVER['REQUEST_URI'], '');
-		$dumpfile->dump($_SESSION[$var_export], $myfileName, "xml", DBNAME, USER, PASS, HOST, DB_TYPE);
+		$dumpfile->dump($QUERY, $myfileName, "xml", DBNAME, USER, PASS, HOST, DB_TYPE);
 	}
 	$log = null;
 }
