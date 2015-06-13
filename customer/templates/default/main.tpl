@@ -4,7 +4,7 @@
 
 <div id="left-sidebar">
 <div style="position: relative; right: 10px; text-align: center;">
-<a href="userinfo.php"><img src="templates/{$SKIN_NAME}/images/logo.png" width="124" height="64" alt="To Home Page"></a>
+<a href="userinfo.php"><img src="{$LOGOPATH}" width="124" height="64" alt="To Home Page"></a>
 </div>
 <div id="leftmenu-top">
 <div id="leftmenu-down">

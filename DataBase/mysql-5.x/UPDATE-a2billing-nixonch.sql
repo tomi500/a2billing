@@ -416,6 +416,27 @@ call a2b_trf_check;
 
 drop procedure if exists a2b_trf_check;
 
+delimiter //
+
+create procedure a2b_trf_check()
+begin
+    declare a int;
+    select count(*) into a from cc_config where config_key='logo_path';
+    if a=0 then
+	INSERT INTO cc_config (id, config_title, config_key, config_value, config_description, config_valuetype, config_listvalues, config_group_title)
+	VALUES (NULL, 'System logo path', 'logo_path', 'templates/default/images/logo.png', 'Full path to the Logo of your whole system', 0, NULL, 'global');
+    elseif a>1 then
+	select id into a from cc_config where config_key='logo_path' order by id limit 0,1;
+	delete from cc_config where config_key='logo_path' and id>a;
+    end if;
+end //
+
+delimiter ;
+
+call a2b_trf_check;
+
+drop procedure if exists a2b_trf_check;
+
 ALTER TABLE cc_callback_spool ADD `next_attempt_time` timestamp NULL DEFAULT NULL;
 ALTER TABLE cc_callback_spool ADD `reason` int(11) DEFAULT NULL;
 ALTER TABLE cc_callback_spool ADD `num_attempts_unavailable` int(11) NOT NULL DEFAULT '0';
@@ -450,9 +471,10 @@ call a2b_trf_check;
 
 drop procedure if exists a2b_trf_check;
 
+ALTER TABLE `cc_configuration` ADD UNIQUE `SECONDARY` (`configuration_key`);
+
 UPDATE `cc_configuration` SET `configuration_key` = 'MODULE_PAYMENT_PAYPAL_BASIC_STATUS' WHERE `configuration_id`='7' AND `configuration_key` ='MODULE_PAYMENT_PAYPAL_STATUS';
 
-ALTER TABLE cc_configuration ADD UNIQUE `SECONDARY` ( `configuration_key` );
 INSERT IGNORE INTO `cc_configuration` (`configuration_title`, `configuration_key`, `configuration_value`, `configuration_description`, `configuration_type`, `use_function`, `set_function`) VALUES
 	('Enable WebMoney Module', 'MODULE_PAYMENT_WM_STATUS', 'False', 'Do you want to accept webmoney payments?', 0, NULL, 'tep_cfg_select_option(array(''True'', ''False''),'),
 	('Provider WMID', 'MODULE_PAYMENT_WM_WMID', '111111111111', '', 0, NULL, NULL),
@@ -479,7 +501,6 @@ INSERT IGNORE INTO `cc_configuration` (`configuration_title`, `configuration_key
 	('API Password', 'MODULE_PAYMENT_PAYPAL_PWD', '', '', 0, NULL, NULL),
 	('Signature', 'MODULE_PAYMENT_PAYPAL_SIGNATURE', '', '', 0, NULL, NULL),
 	('Transaction Currency', 'MODULE_PAYMENT_PAYPAL_CURRENCY', 'EUR, USD', 'The default currencies for the payment transactions', 0, NULL, '_selectOptions(array(''EUR'', ''USD'', ''GBP'', ''HKD'', ''SGD'', ''JPY'', ''CAD'', ''AUD'', ''CHF'', ''DKK'', ''SEK'', ''NOK'', ''ILS'', ''MYR'', ''NZD'', ''TWD'', ''THB'', ''CZK'', ''HUF'', ''SKK'', ''ISK'', ''INR'', ''RUB''), ');
-	
 
 UPDATE `cc_configuration` SET `set_function` = 'tep_cfg_select_option(array(''MD 5'', ''SHA256'', ''SIGN''),' WHERE `configuration_key` ='MODULE_PAYMENT_WM_LMI_HASH_METHOD';
 
