@@ -147,7 +147,7 @@ if ((count($list)>0) && is_array($list)){
 			if ($this -> FG_FILTER_APPLY2){ ?>
 				&nbsp;&nbsp;&nbsp;&nbsp; - &nbsp;&nbsp;&nbsp;&nbsp;
 				<font class="viewhandler_filter_on"><?php echo gettext("FILTER ON");?><?php echo strtoupper($this->FG_FILTERFIELDNAME2)?> :</font>
-				<INPUT type="text" name="filterprefix2" value="" class="form_input_text">
+				<INPUT type="text" name="filterprefix2" value="<?php if(!empty($processed['filterprefix2'])) echo $processed['filterprefix2']; ?>" class="form_input_text">
 				<INPUT type="hidden" name="filterfield2"	value="<?php echo $this->FG_FILTERFIELD2?>">
 				<?php
 				if ($this -> FG_FILTERTYPE2 == 'INPUT') {

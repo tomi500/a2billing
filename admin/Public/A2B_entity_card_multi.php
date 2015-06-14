@@ -133,12 +133,10 @@ if ($nbcard > 0 && $action == "generate" && $nb_error == 0) {
 	$_SESSION["IDfilter"] = $gen_id;
 	
 	$sip_buddy = $iax_buddy = 0;
-	
 	if (isset ($sip) && $sip == 1)
-        $sip_buddy = 1;
-    
-    if (isset ($iax) && $iax == 1)
-        $iax_buddy = 1;
+	    $sip_buddy = 1;
+	if (isset ($iax) && $iax == 1)
+	    $iax_buddy = 1;
 
 	$creditlimit = is_numeric($creditlimit) ? $creditlimit : 0;
 	//initialize refill parameter
@@ -170,14 +168,20 @@ if ($nbcard > 0 && $action == "generate" && $nb_error == 0) {
 			$instance_refill_table->Add_table($HD_Form->DBHandle, $value_insert_refill, null, null);
 		}
 
-		$instance_realtime -> insert_voip_config ($sip, $iax, $id_cc_card, $accountnumber, $passui_secret);
+		$instance_realtime -> insert_voip_config ($sip, $iax, $id_cc_card, $accountnumber, $passui_secret, $useralias);
 	}
 	
 	// Save Sip accounts to file
 	if (isset ($sip)) {
 		$instance_realtime -> create_trunk_config_file ('sip');
 	}
-
+//	if (isset ($sip) || isset ($iax)) {
+//		if (RELOAD_ASTERISK_IF_SIPIAX_CREATED) {
+//			self::create_sipiax_friends_reload();
+//		} else {
+//			self::create_sipiax_friends();
+//		}
+//	}
 	// Save IAX accounts to file
 	if (isset ($iax)) {
 		$instance_realtime -> create_trunk_config_file ('iax');

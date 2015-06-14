@@ -95,7 +95,7 @@ if ($atmenu == 'sip' && $form_action=="ask-edit" && isset($id)) {
 	$cbe = (is_array($cbe_list) && count($cbe_list)>0 && !is_null($cbe_list[0][0])) ? 1 : 0;
 }
 
-$HD_Form -> AddViewElement(gettext("CARDHOLDER"), "id_cc_card", "17%", "center", "sort", "25", "lie", "cc_card", "lastname, firstname", "id='%id'", "%1 %2");
+$HD_Form -> AddViewElement(gettext("CARDHOLDER"), "id_cc_card", "17%", "center", "sort", "50", "lie", "cc_card", "CONCAT_WS(' ',lastname,firstname,IF(company_name='','',CONCAT('(',company_name,')'))) AS customer", "id='%id'", "%1");
 $HD_Form -> AddViewElement(gettext("ACCOUNTCODE"), "accountcode", "12%", "center", "sort", "", "", "", "", "", "", "linktocustomer");
 $HD_Form -> AddViewElement(gettext("NAME"), "name", "6%", "center", "sort");
 if ($atmenu=='sip') {
