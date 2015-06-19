@@ -1506,12 +1506,16 @@ class FormHandler
 				
 				// FIND THE MULTIPLE SELECT
 				if ($pos_mul && is_array($processed[$fields_name])) {
-					$total_mult_select=0;					
-					foreach ($processed[$fields_name] as $value) {
+					if ($fields_name != 'dillertariffs' && $fields_name != 'dillergroups') {
+						$total_mult_select=0;
+						foreach ($processed[$fields_name] as $value) {
 							$total_mult_select += $value;
+						}
+					} else {
+						$total_mult_select = implode(",", $processed[$fields_name]);
 					}
 
-					if ($this->FG_DEBUG == 1) echo "<br>$fields_name : ".$total_mult_select;					
+					if ($this->FG_DEBUG == 1) echo "<br>$fields_name : ".$total_mult_select;
 
 					if ($i>0) $param_add_fields .= ",";
 					$param_add_fields .= $fields_name;
@@ -1587,7 +1591,7 @@ class FormHandler
 			if ($i>0) $param_add_fields .= ",";		
 			$param_add_fields .= $this->FG_QUERY_ADITION_HIDDEN_FIELDS;
 			if ($i>0) $param_add_value .= ",";
-			$split_hidden_fields_value = preg_split("/,/",trim($this->FG_QUERY_ADITION_HIDDEN_VALUE));
+			$split_hidden_fields_value = preg_split("/, /",trim($this->FG_QUERY_ADITION_HIDDEN_VALUE));
 			for ($cur_hidden=0;$cur_hidden<count($split_hidden_fields_value);$cur_hidden++){
 				$param_add_value .= "'".trim($split_hidden_fields_value[$cur_hidden])."'" ;
 				if($cur_hidden<count($split_hidden_fields_value)-1)$param_add_value.=",";
@@ -1669,9 +1673,13 @@ class FormHandler
 				$regexp = $this->FG_TABLE_EDITION[$i][5];
 
 				if ($pos_mul && is_array($processed[$fields_name])){
-					$total_mult_select=0;
-					foreach ($processed[$fields_name] as $value){
-						$total_mult_select += $value;
+					if ($fields_name != 'dillertariffs' && $fields_name != 'dillergroups') {
+						$total_mult_select=0;
+						foreach ($processed[$fields_name] as $value) {
+							$total_mult_select += $value;
+						}
+					} else {
+						$total_mult_select = implode(",", $processed[$fields_name]);
 					}
 					if ($this->FG_DEBUG == 1) echo "<br>$fields_name : ".$total_mult_select;
 					if ($ins_real) $param_update .= ", ";

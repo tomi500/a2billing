@@ -294,7 +294,8 @@ function updatecontent(id_el, record, field_inst, instance)
 									if ($this->VALID_SQL_REG_EXP) {
 										if (strpos($this->FG_TABLE_EDITION[$i][4], "multiple")) {
 											$recordshow .= $select_recordset[1]."' ";
-											if (intval($select_recordset[1]) & intval($list[0][$i])) $recordshow .= "selected";
+											if (intval($select_recordset[1]) & intval($list[0][$i]))
+												$recordshow .= "selected";
 										} else {
 											$temprecord = explode(';', $list[0][$i]);
 											if (strcmp($temprecord[0],$select_recordset[1])==0) {

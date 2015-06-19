@@ -15,7 +15,7 @@ $processed = $this->getProcessed();
 	<?php
 	if (!empty($this->FG_QUERY_ADITION_HIDDEN_FIELDS)) {
 		$split_hidden_fields = preg_split("/,/",trim($this->FG_QUERY_ADITION_HIDDEN_FIELDS));
-		$split_hidden_fields_value = preg_split("/,/",trim($this->FG_QUERY_ADITION_HIDDEN_VALUE));
+		$split_hidden_fields_value = preg_split("/, /",trim($this->FG_QUERY_ADITION_HIDDEN_VALUE));
 		for ($cur_hidden=0;$cur_hidden<count($split_hidden_fields);$cur_hidden++){
 			echo "<INPUT type=\"hidden\" name=\"".trim($split_hidden_fields[$cur_hidden])."\" value=\"".trim($split_hidden_fields_value[$cur_hidden])."\">\n";
 		}
@@ -134,9 +134,9 @@ $processed = $this->getProcessed();
 	<?php  } 
 				if (count($select_list)>0){
 					$select_number=0;
-				  	foreach ($select_list as $select_recordset) {
+					foreach ($select_list as $select_recordset) {
 						$select_number++;
-				   		if ($this->FG_TABLE_ADITION[$i][12] != "") {
+						if ($this->FG_TABLE_ADITION[$i][12] != "") {
 							$value_display = $this->FG_TABLE_ADITION[$i][12];
 							$nb_recor_k = count($select_recordset);
 							for ($k=1;$k<=$nb_recor_k;$k++) {
@@ -155,7 +155,7 @@ $processed = $this->getProcessed();
 						
 					 } // END_FOREACH
 				 } else {
-			  		echo gettext("No data found !!!");
+					echo gettext("No data found !!!");
 				 }//END_IF				
 	?>
         </SELECT>

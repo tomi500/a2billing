@@ -141,12 +141,12 @@ if ($popup_select) {
 }
 
 if (has_rights (ACX_MODIFY_AGENTS) && !($popup_select)) {
-	
+
 	$HD_Form -> FG_EDITION = true;
 	$HD_Form -> FG_ADDITION = true;
 	$HD_Form -> FG_DELETION = true;
-	
-	
+
+
 	$HD_Form -> AddEditElement (gettext("LOGIN"),
 			"login",
 			'$value',
@@ -155,7 +155,7 @@ if (has_rights (ACX_MODIFY_AGENTS) && !($popup_select)) {
 			"3",
 			gettext("Insert the login"),
 			"" , "", "", "", "" , "", "", "");
-	
+
 	$HD_Form -> AddEditElement (gettext("PASSWORD"),
 			"passwd",
 			'$value',
@@ -164,32 +164,31 @@ if (has_rights (ACX_MODIFY_AGENTS) && !($popup_select)) {
 			"3",
 			gettext("Insert the password"),
 			"" , "", "", "", "", "", "", "");
-	
+
 	$HD_Form -> AddEditElement (gettext("PERMISSION"),
 			"perms",
 			'$value',
 			"SELECT",
 			"size=\"$len_right_list\" multiple=\"multiple\"",
 			"", "",
-			"list", "", "description, id", "", $right_list, "%1" , "",
-			gettext("To select several rights in the above ListBox, hold the CTRL key down while clicking the items") );
-			
+			"list", "", "", "", $right_list, "%1" , "",gettext("To select several rights in the above ListBox, hold the CTRL key down while clicking the items") );
+
 	$HD_Form -> AddEditElement (gettext("ACTIVE"),
-		   "active",
-		   '1',
-		   "RADIOBUTTON",
-		   "",
-		   "",
-		   gettext("Choose if you want to active the agent"),
-		   "" , "", "" , "Yes :1, - No:0",  "", "" , "", gettext("Enable agent"));
-	
+			"active",
+			'1',
+			"RADIOBUTTON",
+			"",
+			"",
+			gettext("Choose if you want to active the agent"),
+			"" , "", "" , "Yes :1, - No:0",  "", "" , "", gettext("Enable agent"));
+
 	if ($form_action =="ask-add" || $form_action=="add") {
 		$balance_access = "value = '0'";
 		$default_label_value = "0";
 	} else {
 		$balance_access = 'readonly';
 	}
-		   
+
 	$HD_Form -> AddEditElement (gettext("BALANCE"),
 		   "credit",
 		   "",

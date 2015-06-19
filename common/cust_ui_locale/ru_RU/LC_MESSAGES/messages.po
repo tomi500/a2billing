@@ -644,7 +644,7 @@ msgstr "СЧЕТА ЕЩЁ НЕ ВЫСТАВЛЯЛИСЬ!"
 
 #: form_data/FG_var_signup.inc:88
 msgid "No Call Plan id are defined"
-msgstr ""
+msgstr "Неверный тарифный план"
 
 #: form_data/FG_var_signup.inc:111
 msgid "PAYPAL PAYMENT"
@@ -659,9 +659,8 @@ msgid "LANG"
 msgstr "ЯЗЫК"
 
 #: form_data/FG_var_signup.inc:163
-#, fuzzy
 msgid "CALL PLAN"
-msgstr "ЗВОНКИ ПО НАПРАВЛЕНИЯМ"
+msgstr "ТАРИФНЫЙ ПЛАН"
 
 #: form_data/FG_var_signup.inc:175 form_data/FG_var_card.inc:53
 msgid "LASTNAME"

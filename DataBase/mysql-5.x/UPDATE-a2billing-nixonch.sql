@@ -62,6 +62,8 @@ ALTER TABLE cc_card ADD commission DECIMAL( 15, 5 ) NOT NULL DEFAULT 0 AFTER `ma
 ALTER TABLE cc_card ADD areaprefix SMALLINT( 6 ) NULL DEFAULT NULL AFTER `country`;
 ALTER TABLE cc_card ADD citylength SMALLINT( 6 ) NULL DEFAULT NULL AFTER `areaprefix`;
 ALTER TABLE cc_card ADD showcallstypedefault INT(11) NOT NULL DEFAULT '0';
+ALTER TABLE cc_card ADD dillertariffs varchar(60) COLLATE utf8_bin NOT NULL AFTER `tariff`;
+ALTER TABLE cc_card ADD dillergroups varchar(60) COLLATE utf8_bin NOT NULL AFTER `id_group`;
 
 ALTER TABLE cc_card CHANGE id_campaign id_campaign  INT( 11 ) NULL DEFAULT '-1';
 ALTER TABLE cc_card CHANGE id_timezone id_timezone CHAR( 40 ) NULL DEFAULT '0';
@@ -302,6 +304,27 @@ begin
 	select S.id_cc_card, S.accountcode, S.regexten, '0000', concat(C.lastname,' ',C.firstname) fullname, C.email, S.language
 	from cc_sip_buddies S, cc_card C
 	where S.regexten IS NOT NULL AND S.regexten<>'' AND S.id_cc_card=C.id;
+    end if;
+end //
+
+delimiter ;
+
+call a2b_trf_check;
+
+drop procedure if exists a2b_trf_check;
+
+delimiter //
+
+create procedure a2b_trf_check()
+begin
+    declare a int;
+    select count(*) into a from cc_config where config_key='group_id_list';
+    if a=0 then
+	INSERT INTO cc_config (id, config_title, config_key, config_value, config_description, config_valuetype, config_listvalues, config_group_title)
+	VALUES (NULL , 'Group_ID List', 'group_id_list', '1', 'ID list of Customer Groups which will be listed by default.', '0', NULL , 'signup');
+    elseif a>1 then
+	select id into a from cc_config where config_key='group_id_list' order by id limit 0,1;
+	delete from cc_config where config_key='group_id_list' and id>a;
     end if;
 end //
 

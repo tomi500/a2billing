@@ -4,7 +4,7 @@ getpost_ifset(array('message', 'id', 'idcust', 'displayheader', 'type', 'popup_f
 
 if ($form_action == "ask-edit" || $form_action == "edit" || $message == "success") {
 
-getpost_ifset(array('lastname', 'firstname', 'company_name', 'email', 'company_website', 'address','city', 'state', 'areaprefix', 'citylength', 'country', 'zipcode', 'language', 'id_timezone', 'phone', 'fax', 'voicemail_activated', 'monitor', 'recalldays', 'margin', 'paypal'));
+getpost_ifset(array('lastname', 'firstname', 'company_name', 'id_group', 'email', 'company_website', 'address','city', 'state', 'areaprefix', 'citylength', 'country', 'zipcode', 'language', 'id_timezone', 'phone', 'fax', 'voicemail_activated', 'monitor', 'recalldays', 'tariff', 'margin', 'paypal'));
 
 $HD_Form = new FormHandler("cc_card","Card");
 $HD_Form -> FG_TABLE_CLAUSE = "id_diller = {$_SESSION['card_id']}";
@@ -16,7 +16,96 @@ $HD_Form -> FG_EDITION_CLAUSE .= "id_diller = {$_SESSION['card_id']}";
 
 $HD_Form -> FG_EDITION = true;
 
+$HD_Form->setDBHandler(DbConnect());
+
 $yesno_list = array(array(gettext('yes').'&nbsp;','1'),array(gettext('no').'&nbsp;','0'));
+
+// ******* Available Tariff List Detecting
+if (!empty($_SESSION['dillertariffs']))
+	$callPlan_idlist = $_SESSION["dillertariffs"];
+else
+	$callPlan_idlist = isset ($A2B->config['signup']['callplan_id_list']) ? $A2B->config['signup']['callplan_id_list'] : NULL;
+
+if (strlen($callPlan_idlist) == 0) {
+        exit ("No Call Plan Defined.");
+}
+$tariff_table = new Table("cc_card", "tariff, id_group");
+$tariff_list = $tariff_table->Get_list($HD_Form->DBHandle, "id='$idcust'");
+
+//echo "1.<br>".var_export($tariff_list,true)."<br>";
+if (!is_array($tariff_list) && count($tariff_list) <= 0) {
+	exit (gettext("No Call Plan ID or Group ID are defined"));
+}
+$callPlan_idlistArr = explode(',',$callPlan_idlist);
+if (!in_array($tariff_list[0][0],$callPlan_idlistArr)) {
+	$callPlan_idlist .= ','.$tariff_list[0][0];
+}
+if (!isset($tariff))	$tariff = $tariff_list[0][0];
+//echo "2.<br>".$callPlan_idlist."<br>";
+//echo "3.<br>".$tariff."<br>";
+$callPlan_idlistArr = explode(',',$callPlan_idlist);
+if (!in_array($tariff,$callPlan_idlistArr)) {
+	exit (gettext("No Call Plan id are defined"));
+}
+$call_table = new Table("cc_tariffgroup", "tariffgroupname,id");
+$callPlan_list = $call_table->Get_list($HD_Form->DBHandle, "id IN ($callPlan_idlist)", "FIELD(id,".$callPlan_idlist.")", "ASC");
+
+//echo "4.<br>".var_export($callPlan_list,true)."<br>";
+if (!is_array($callPlan_list) && count($callPlan_list) <= 0) {
+        exit (gettext("No Call Plan id are defined"));
+}
+$flag = true;
+$callPlan_count = count($callPlan_list);
+if ($tariff != "" || !is_null($tariff)) {
+        for ($i = 0; $i < $callPlan_count; $i++) {
+                if ($callPlan_list[$i][1] == trim($tariff, "\'")) {
+                        $flag = false;
+                }
+        }
+        if ($flag) {
+                exit ("Invalid Call Plan Id");
+        }
+}
+
+// ******* Available Group List Detecting
+if (!empty($_SESSION['dillergroups']))
+	$group_idlist = $_SESSION["dillergroups"];
+else
+	$group_idlist = isset($A2B->config['signup']['group_id_list']) ? $A2B->config['signup']['group_id_list'] : NULL;
+
+if (strlen($group_idlist) == 0) {
+        exit ("No Groups Defined.");
+}
+
+$group_idlistArr = explode(',',$group_idlist);
+if (!in_array($tariff_list[0][1],$group_idlistArr)) {
+	$group_idlist .= ','.$tariff_list[0][1];
+}
+if (!isset($id_group))	$id_group = $tariff_list[0][1];
+$group_idlistArr = explode(',',$group_idlist);
+if (!in_array($id_group,$group_idlistArr)) {
+	exit (gettext("No Group id are defined"));
+}
+$group_table = new Table("cc_card_group", "name,id");
+$group_list = $group_table->Get_list($HD_Form->DBHandle, "id IN ($group_idlist)", "FIELD(id,".$group_idlist.")", "ASC");
+
+//echo "4.<br>".var_export($callPlan_list,true)."<br>";
+if (!is_array($callPlan_list) && count($callPlan_list) <= 0) {
+        exit (gettext("No Group id are defined"));
+}
+$flag = true;
+$group_count = count($group_list);
+if ($id_group != "" || !is_null($id_group)) {
+        for ($i = 0; $i < $group_count; $i++) {
+                if ($group_list[$i][1] == trim($id_group, "\'")) {
+                        $flag = false;
+                }
+        }
+        if ($flag) {
+                exit ("Invalid Group Id");
+        }
+}
+
 
 $HD_Form -> AddEditElement (gettext("LASTNAME"),
 			   "lastname",
@@ -37,25 +126,34 @@ $HD_Form -> AddEditElement (gettext("FIRSTNAME"),
 			   "" , "", "",	"", "", "" , "NO", "");
 
 $HD_Form->AddEditElement(gettext("COMPANY NAME"),
-                "company_name",
-                '$value',
-                "INPUT",
-                "size=40 maxlength=50", "",
-                gettext("Insert Company name of this customer"), "", "", "", "", "", "", "NO", "");
-$company_name_editFG = "company_name,";
+			    "company_name",
+			    '$value',
+			    "INPUT",
+			    "size=40 maxlength=50", "",
+			    gettext("Insert Company name of this customer"), "", "", "", "", "", "", "NO", "");
+
+if ($group_count > 1) {
+	$HD_Form->AddEditElement(gettext("CUSTOMER GROUP"),
+			    "id_group",
+			    "$id_group",
+			    "SELECT",
+			    "", "",
+			    "", "list", "", "", "", $group_list, "%1", "", "");
+	$group_editFG = ", id_group";
+} else $group_editFG = "";
 
 $HD_Form->AddEditElement(gettext("EMAIL")." *",
-                "email",
-                '$value',
-                "INPUT",
-                "size=30 maxlength=70", "1",
-                gettext("Insert your email"), "", "", "", "", "", "", "", "");
+			    "email",
+			    '$value',
+			    "INPUT",
+			    "size=30 maxlength=70", "1",
+			    gettext("Insert your email"), "", "", "", "", "", "", "", "");
 
 $HD_Form->AddEditElement(gettext("COMPANY WEBSITE"),
-                            "company_website",
-                            '$value',
-                            "INPUT", "size=40 maxlength=60",
-                            "8", gettext("Insert the company website of this customer"), "", "", "", "", "", "", "NO", "");
+			    "company_website",
+			    '$value',
+			    "INPUT", "size=40 maxlength=60",
+			    "8", gettext("Insert the company website of this customer"), "", "", "", "", "", "", "NO", "");
 
 $HD_Form -> AddEditElement (gettext("ADRESS"),
 			   "address",
@@ -124,7 +222,6 @@ $HD_Form -> AddEditElement (gettext("COUNTRY"),
 			   "cc_country",
 			   "countryname, countrycode, countryprefix",
 			   "", "", "%1 +%3", "", "", "", '' );
-
 
 $language_list = Constants::getLanguagesList();
 $HD_Form->AddEditElement(gettext("LANGUAGE")." *",
@@ -202,10 +299,19 @@ if (ACT_VOICEMAIL && $ACXVOICEMAIL) {
 			   "",
 			   "",
 			   gettext("Customer can choose to enable the voicemail for this card"),
-			   "" , "", "", "Yes :1, - No:0");
+			   "" , "", "", gettext("Yes")." :1, - ".gettext("No").":0");
 $add_fields_voicemail = ', voicemail_activated';
 } else $add_fields_voicemail = '';
 
+if ($callPlan_count > 1) {
+	$HD_Form->AddEditElement(gettext("CALL PLAN"),
+				    "tariff",
+				    "$tariff",
+				    "SELECT",
+				    "", "",
+				    "", "list", "", "", "", $callPlan_list, "%1", "", "");
+	$tariff_editFG = ", tariff";
+} else $tariff_editFG = "";
 
 $HD_Form -> AddEditElement (gettext("MARGIN").", %%",
                                     "margin",
@@ -225,7 +331,7 @@ $HD_Form -> AddEditElement (gettext("PAYPAL PAYMENT"),
                                     "list", "", "", "", $yesno_list, "%1", "", gettext("Apply PayPal payment to this customer"));
 
 
-$HD_Form -> FieldEditElement ('lastname, firstname, company_name, email, company_website, address, city, state, zipcode, areaprefix, citylength, country, language, id_timezone, phone, fax'.$add_fields_monitor.', recalldays'.$add_fields_voicemail.', margin, paypal');
+$HD_Form -> FieldEditElement ('lastname, firstname, company_name'.$group_editFG.', email, company_website, address, city, state, zipcode, areaprefix, citylength, country, language, id_timezone, phone, fax'.$add_fields_monitor.', recalldays'.$add_fields_voicemail.$tariff_editFG.', margin, paypal');
 
 $HD_Form->FG_ADITION_HIDDEN_PARAM = $HD_Form->FG_EDITION_HIDDEN_PARAM = 'popup_select, idcust';
 $HD_Form->FG_ADITION_HIDDEN_PARAM = $HD_Form->FG_EDITION_HIDDEN_PARAM_VALUE = "$popup_select, $idcust";
