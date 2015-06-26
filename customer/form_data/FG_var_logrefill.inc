@@ -16,7 +16,10 @@ if (!isset($form_action) || $form_action=="list") {
 LEFT JOIN cc_card ON cc_card.id=id_cc_card WHERE id_cc_card = ".$_SESSION["card_id"]." AND charged_status = 1)
 UNION (
 SELECT cc_logrefill.id, `date`, cc_logrefill.credit, lastname, firstname, company_name, IF(card_id=".$_SESSION['card_id']." AND diller_id IS NOT NULL, -diller_id, card_id) card_id, refill_type, description FROM cc_logrefill
-LEFT JOIN cc_card ON cc_card.id=card_id WHERE cc_card.id = ".$_SESSION["card_id"].$QUERY_CLAUSE.")) aa";
+LEFT JOIN cc_card ON cc_card.id=card_id WHERE cc_card.id = ".$_SESSION["card_id"].$QUERY_CLAUSE.")
+UNION (
+SELECT cc_voucher.id, `usedate` AS `date`, cc_voucher.credit, lastname, firstname, company_name, cc_card.id card_id, 0, 'Voucher' FROM cc_voucher
+LEFT JOIN cc_card ON username=usedcardnumber WHERE cc_card.id = ".$_SESSION["card_id"].")) aa";
 	$HD_Form = new FormHandler($QUERY,gettext("Refill"));
 //	if (strlen($HD_Form -> FG_TABLE_CLAUSE)>0)
 //		$HD_Form -> FG_TABLE_CLAUSE.=" AND ";
@@ -42,7 +45,7 @@ $HD_Form ->FG_LIST_ADDING_BUTTON_IMG1 = Images_Path . "/money.png";
 //$HD_Form -> AddViewElement(gettext("ID"), "cc_logrefill.id", "4%", "center", "sort");
 $HD_Form -> AddViewElement(gettext("REFILL DATE"), "date", "17%", "center", "sort", "30", "", "", "", "", "", "display_dateformat");
 if (has_rights(ACX_DISTRIBUTION)) {
-	$HD_Form -> AddViewElement(gettext("PARTNER"), "lastname", "22%", "center", "sort", "", "link2cust", "cc_card", "IF(id = ".$_SESSION['card_id'].",'',IF(company_name='',CONCAT_WS(' ',lastname,firstname),IF(%id<0,company_name,CONCAT_WS(' ',lastname,firstname,CONCAT('(',company_name,')'))))), id", "id=ABS(%id)", "%1", "", "javascript:;\" onClick=\"MM_openBrWindow('A2B_entity_moneysituation_details.php?type=card&form_action=ask-edit&atmenu=card&displayheader=0&popup_select=1&idcust=%2','','scrollbars=yes,resizable=yes,width=660,height=810,left=600,top=50,screenX=430,screenY=50')\"", gettext("USER DELETED"));
+	$HD_Form -> AddViewElement(gettext("PARTNER"), "lastname", "22%", "center", "sort", "", "link2cust", "cc_card", "IF(id = ".$_SESSION['card_id'].",'',IF(company_name='',CONCAT_WS(' ',lastname,firstname),IF(%id<0,company_name,CONCAT_WS(' ',lastname,firstname,CONCAT('(',company_name,')'))))), id, tariff", "id=ABS(%id)", "%1", "", "javascript:;\" onClick=\"MM_openBrWindow('A2B_entity_moneysituation_details.php?type=card&form_action=ask-edit&atmenu=card&displayheader=0&popup_select=1&idcust=%2&tariff=%3','','scrollbars=yes,resizable=yes,width=660,height=810,left=600,top=50,screenX=430,screenY=50')\"", gettext("USER DELETED"));
 //	$HD_Form -> AddViewElement(gettext("PARTNER"), "lastname", "22%", "center", "sort", "", "link2cust", "cc_card", "IF(id = ".$_SESSION['card_id'].",'',CONCAT_WS(' ',lastname,firstname,IF(company_name='','',CONCAT('(',company_name,')')))), id", "id='%id'", "%1", "", "javascript:;\" onClick=\"MM_openBrWindow('A2B_entity_moneysituation_details.php?type=card&form_action=ask-edit&atmenu=card&displayheader=0&popup_select=1&idcust=%2','','scrollbars=yes,resizable=yes,width=660,height=810,left=600,top=50,screenX=430,screenY=50')\"", gettext("USER DELETED"));
 	$QUERY_ADD = "card_id, ";
 }

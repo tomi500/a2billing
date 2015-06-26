@@ -200,7 +200,7 @@ if ($task == 'upload') {
 				$FG_ADITION_SECOND_ADD_VALUE .= ", '" . $begin_date_plus . $end_date . "'";
 				$TT_UPDATE_QUERY .= ", stopdate='" . $begin_date_plus . $end_date . "'";
 			}
-			if (intval($val[0]) > 0) {
+			if (intval($val[1]) > 0) {
 				$FG_ADITION_SECOND_ADD_VALUE_PREFIX = "'" . intval($val[1]) . "', '" . $val[0] . "'";
 				$TT_QUERY_PREFIX = "INSERT INTO cc_prefix (" . $FG_ADITION_SECOND_ADD_FIELDS_PREFIX . ") values (" . $FG_ADITION_SECOND_ADD_VALUE_PREFIX . ") ON DUPLICATE KEY UPDATE destination = '" . $val[0] . "'";
 				$DBHandle->Execute($TT_QUERY_PREFIX);

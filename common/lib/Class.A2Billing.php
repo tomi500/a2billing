@@ -626,7 +626,7 @@ class A2Billing {
 		if (isset($this->config["agi-conf$idconfig"]['debugshell']) && $this->config["agi-conf$idconfig"]['debugshell'] == 1 && isset($agi)) $agi->nlinetoread = 0;
 
 		if (!isset($this->config["agi-conf$idconfig"]['ivr_voucher'])) $this->config["agi-conf$idconfig"]['ivr_voucher'] = 0;
-		if (!isset($this->config["agi-conf$idconfig"]['ivr_voucher_prefixe'])) $this->config["agi-conf$idconfig"]['ivr_voucher_prefixe'] = 8;
+		if (!isset($this->config["agi-conf$idconfig"]['ivr_voucher_prefix'])) $this->config["agi-conf$idconfig"]['ivr_voucher_prefix'] = 8;
 		if (!isset($this->config["agi-conf$idconfig"]['jump_voucher_if_min_credit'])) $this->config["agi-conf$idconfig"]['jump_voucher_if_min_credit'] = 0;
 		if (!isset($this->config["agi-conf$idconfig"]['failover_lc_prefix'])) $this->config["agi-conf$idconfig"]['failover_lc_prefix'] = 0;
 		if (!isset($this->config["agi-conf$idconfig"]['cheat_on_announcement_time'])) $this->config["agi-conf$idconfig"]['cheat_on_announcement_time'] = 0;
@@ -919,7 +919,6 @@ class A2Billing {
 			$this->oldphonenumber = $this->destination;
 			$this -> debug( DEBUG, $agi, __FILE__, __LINE__, "[USE_DNID DESTINATION ::> ".$this->destination."]");
 		} else {
-//$this -> debug( ERROR, $agi, __FILE__, __LINE__, "FIRST DTMF 1 : ".$this->first_dtmf);
 			if ($this->first_dtmf != '') {
 				$prompt_enter_dest = '""';
 				if ($this->first_dtmf == '0') {
@@ -932,25 +931,27 @@ class A2Billing {
 			}
 			if ($max_digits) {
 				$res_dtmf = $agi->get_data($prompt_enter_dest, 6000, $max_digits);
-//$this -> debug( ERROR, $agi, __FILE__, __LINE__, "  RES DTMF 1 : ".$res_dtmf["result"]);
+				$dtmf = $res_dtmf["result"];
+				if ($dtmf == '-1')
+					return -1;
 				$prompt_enter_dest = '""';
-			} else	$res_dtmf["result"] = '';
-			if ($res_dtmf["result"] != -1) {
-				$this->first_dtmf .= $res_dtmf["result"];
-//$this -> debug( ERROR, $agi, __FILE__, __LINE__, "FIRST DTMF 2 : ".$this->first_dtmf);
-				if ($this->first_dtmf != '0*' && strlen($res_dtmf["result"]) == $max_digits) {
-					$res_dtmf = $agi->get_data($prompt_enter_dest, 6000, 18);
-				} else	$res_dtmf["result"] = '';
+				$this->first_dtmf .= $dtmf;
+			} else	$dtmf = '';
+			if ($this->first_dtmf != '0*' && $this->first_dtmf != '*0' && strlen($dtmf) == $max_digits) {
+				$res_dtmf = $agi->get_data($prompt_enter_dest, 6000, 18);
+				$dtmf = $res_dtmf["result"];
+				if ($dtmf == '-1')
+					return -1;
+				$this->first_dtmf .= $dtmf;
 			}
-			$this->destination = $this->oldphonenumber = $this->first_dtmf . $res_dtmf["result"];
+			$this->destination = $this->oldphonenumber = $this->first_dtmf;
 			$this->dtmf_destination = true;
-			$this->first_dtmf = '';
 			$this -> debug( DEBUG, $agi, __FILE__, __LINE__, "RES DTMF : ".$this->destination);
-//if ($this->destination)	$this -> debug( ERROR, $agi, __FILE__, __LINE__, " DESTINATION : ".$this->destination);
 		}
+		$this->first_dtmf = '';
 
         //REDIAL FIND THE LAST DIALED NUMBER (STORED IN THE DATABASE)
-        if ( $this->destination == '0*' ) {
+        if ($this->destination == '0*' || $this->destination == '*0') {
             $this->destination = $this->oldphonenumber = $this->redial;
             $this -> debug( DEBUG, $agi, __FILE__, __LINE__, "[REDIAL : DTMF DESTINATION ::> ".$this->destination."]");
         }
@@ -1018,8 +1019,15 @@ class A2Billing {
 		}
 	}
 	if ($this->extext) {
-		$this->destination = $this->apply_add_countryprefixto ($this->destination);
 		if ($this->removeinterprefix) $this->destination = $this -> apply_rules ($this->destination);
+		else	$dest_wo_int_prefix = '-';
+		$this->destination = $this->apply_add_countryprefixto ($this->destination);
+		if ($this->removeinterprefix && strlen($dest_wo_int_prefix) && strcmp($dest_wo_int_prefix, $this->oldphonenumber) == 0 && strcmp($dest_wo_int_prefix, $this->destination) == 0 && !(preg_match("/^1[2-9]/", $this->oldphonenumber) && preg_match("/^[1a-zA-Z]/", $this->CallerID))) {
+			$agi-> stream_file('the-number-u-dialed', '#');
+			$agi-> say_digits($this->oldphonenumber, '#');
+			$agi-> stream_file('pbx-invalid', '#');
+			return -1;
+		}
 	}
 	if ($this->destination) {
 	    if (isset($this->transferername[0])) {
@@ -2970,17 +2978,18 @@ $this -> debug( ERROR, $agi, __FILE__, __LINE__, "FAXRESOLUTION: ".$faxresolutio
 	 */
 	function apply_rules ($phonenumber)
 	{
-		$phonenumber = strpbrk(substr($phonenumber,0,1),"+") . preg_replace ("/(^[a-z].*)|[^\d]/i","$1",$phonenumber);
-		if (is_array($this->agiconfig['international_prefixes']) && (count($this->agiconfig['international_prefixes'])>0)) {
+		if ($phonenumber != '-1') {
+		    $phonenumber = strpbrk(substr($phonenumber,0,1),"+") . preg_replace ("/(^[a-z].*)|[^\d]/i","$1",$phonenumber);
+		    if (is_array($this->agiconfig['international_prefixes']) && (count($this->agiconfig['international_prefixes'])>0)) {
 			foreach ($this->agiconfig['international_prefixes'] as $testprefix) {
 				if (substr($phonenumber,0,strlen($testprefix))==$testprefix) {
 					$this->myprefix = $testprefix;
 					return substr($phonenumber,strlen($testprefix));
 				}
 			}
+		    }
+		    $this->myprefix='';
 		}
-
-		$this->myprefix='';
 		return $phonenumber;
 	}
 
@@ -3010,7 +3019,6 @@ $this -> debug( ERROR, $agi, __FILE__, __LINE__, "FAXRESOLUTION: ".$faxresolutio
 	 */
 	function apply_add_countryprefixto ($phonenumber)
 	{
-		$this->oldphonenumber = $phonenumber;
 		if ($this->agiconfig['local_dialing_addcountryprefix']==1) {
 
 /**			if ((strlen($this->countryprefix)>0) && (substr($phonenumber,0,1)=="0") && (substr($phonenumber,1,1)!="0")) {

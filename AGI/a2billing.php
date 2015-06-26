@@ -737,14 +737,19 @@ $A2B -> debug( ERROR, $agi, __FILE__, __LINE__, "[NO ENOUGH CREDIT TO CALL THIS 
 			}
 **/
 // END not enough
-			$A2B->dnid = rtrim($agi -> request['agi_dnid'], "#");
-			$A2B->extension = rtrim($agi -> request['agi_extension'], "#");
+			$A2B -> dnid = rtrim($agi -> request['agi_dnid'], "#");
+			$A2B -> extension = rtrim($agi -> request['agi_extension'], "#");
 
 			if ($A2B -> agiconfig['ivr_voucher']==1) {
-				$res_dtmf = $agi -> get_data('prepaid-refill_card_with_voucher', 5000, 1);
-				$A2B -> debug( DEBUG, $agi, __FILE__, __LINE__, "RES REFILL CARD VOUCHER DTMF : ".$res_dtmf ["result"]);
-				$A2B-> ivr_voucher = $res_dtmf ["result"];
-				if ((isset($A2B-> ivr_voucher)) && ($A2B-> ivr_voucher == $A2B -> agiconfig['ivr_voucher_prefixe'])) {
+				if ($A2B -> first_dtmf != '') {
+					$A2B -> ivr_voucher = $A2B->first_dtmf;
+				} else {
+					$res_dtmf = $agi -> get_data('prepaid-refill_card_with_voucher', 5000, 1);
+					$A2B -> ivr_voucher = $A2B -> first_dtmf = $res_dtmf ["result"];
+				}
+				$A2B -> debug( DEBUG, $agi, __FILE__, __LINE__, "RES REFILL CARD VOUCHER DTMF : " . $A2B -> ivr_voucher);
+				if (isset($A2B -> ivr_voucher) && $A2B -> ivr_voucher == $A2B -> agiconfig['ivr_voucher_prefix']) {
+					$A2B -> first_dtmf = '';
 					$vou_res = $A2B->refill_card_with_voucher($agi, $i);
 				}
 			}
@@ -753,10 +758,15 @@ $A2B -> debug( ERROR, $agi, __FILE__, __LINE__, "[NO ENOUGH CREDIT TO CALL THIS 
 				$A2B -> debug( INFO, $agi, __FILE__, __LINE__, "[IVR SPEED DIAL]");
 				do {
 					$return_mainmenu = FALSE;
-					
-					$res_dtmf = $agi -> get_data("prepaid-press9-new-speeddial", 5000, 1); //Press 9 to add a new Speed Dial
+					if ($A2B -> first_dtmf != '') {
+						$ivr_speeddial = $A2B -> first_dtmf;
+					} else {
+						$res_dtmf = $agi -> get_data("prepaid-press9-new-speeddial", 5000, 1); //Press 9 to add a new Speed Dial
+						$ivr_speeddial = $A2B -> first_dtmf = $res_dtmf ["result"];
+					}
 
-					if ($res_dtmf ["result"] == 9) {
+					if ($ivr_speeddial == 9) {
+						$A2B -> first_dtmf = '';
 						$try_enter_speeddial = 0;
 						do {
 							$try_enter_speeddial++;

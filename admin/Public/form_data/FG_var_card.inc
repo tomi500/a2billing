@@ -304,6 +304,7 @@ if (isset($filterprefix)  &&  (strlen($filterprefix)>0)){
 	$HD_Form -> FG_TABLE_CLAUSE.="username like '$filterprefix%'";
 }
 
+$diller_default = isset($id_diller) ? "" : " value = '0'" ;
 $HD_Form -> FG_ADDITION = true;
 
 if (has_rights (ACX_MODIFY_CUSTOMERS) && !($popup_select>=1)) {
@@ -395,7 +396,7 @@ if (has_rights (ACX_MODIFY_CUSTOMERS) && !($popup_select>=1)) {
 				    "id_diller",
 				    '',
 				    "POPUPVALUE",
-				    "size=30 maxlength=50",
+				    "size=30 maxlength=50".$diller_default,
 				    "4",
 				    gettext("Insert the Id CardNumber"),
 				    "", "", "", "", "",

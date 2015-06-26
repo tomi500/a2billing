@@ -450,7 +450,7 @@ if ($nb_record<=$FG_LIMITE_DISPLAY) {
 
 $smarty->display( 'main.tpl');
 
-if (has_rights (ACX_DISTRIBUTION) && !($popup_select>=1)) {
+if (!($popup_select>=1)) {
 	// #### HELP SECTION
 	echo $CC_help_balance_customer;
 } //else	echo '</br>';

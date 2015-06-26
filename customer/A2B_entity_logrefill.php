@@ -138,9 +138,9 @@ if ($form_action == "list" && $message != "success" && has_rights (ACX_DISTRIBUT
 					<tr class="form_head">
 						<td>&nbsp;</td><?php
 						for ($i = 1; $i <= count($list_refill_type); $i++) {
-//							if ($result_column[$i]!=0) {
+							if ($result_column[$i]!=0) {
 						?><td width="20%" align="center" nowrap="nowrap" class="tableBodyRight" style="padding: 2px;"><strong><?php echo $list_refill_type[$i-1][0];?></strong></td><?php
-//							}
+							}
 						} ?>
 					</tr>
 					<?php for($i=0;$i<=$nb_month;$i++){

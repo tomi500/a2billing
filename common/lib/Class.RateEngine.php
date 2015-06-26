@@ -1498,7 +1498,8 @@ else echo "Ratecard: ".$this->ratecard_obj[$i][6]."<br>Trunk: ".$this->ratecard_
 		$old_destination = $destination;
 		$firstgo = true;
 //		$timecur = time();
-		$this->dialstatus = '';
+		$this -> dialstatus = $A2B -> first_dtmf = '';
+		$timeoutlast = 0;
 //		$A2B -> debug( INFO, $agi, __FILE__, __LINE__, "Count of ratecard_obj = ".count($this -> ratecard_obj));
 		for ($k=0;$k<count($this -> ratecard_obj);$k++) {
 			$loop_failover = $loop_intellect = $outcid = 0;
@@ -1887,12 +1888,13 @@ else echo "Ratecard: ".$this->ratecard_obj[$i][6]."<br>Trunk: ".$this->ratecard_
 						$A2B -> fct_say_balance ($agi, $A2B->credit);
 						$A2B -> auth_through_accountcode = false;
 					}
-					if ((!isset($trunkcode) || strpos($trunkcode,"-INFOLINE") === false) && $typecall != 44 && $loop_failover == 0 && $loop_intellect <= 1) {
-						if ($A2B -> fct_say_time_2_call($agi, $trunktimeout, $this -> ratecard_obj[$k][12]) == -1) break;
+					if ((!isset($trunkcode) || strpos($trunkcode,"-INFOLINE") === false) && $typecall != 44 && $loop_failover == 0 && $loop_intellect <= 1 && $this -> ratecard_obj[$k]['timeout_without_rules'] != $timeoutlast) {
+						$timeoutlast = $this -> ratecard_obj[$k]['timeout_without_rules'];
+						if ($A2B -> fct_say_time_2_call($agi, $timeoutlast, $this -> ratecard_obj[$k][12]) == -1) break;
 					}
 					$timecur = time();
 				    }
-				    $A2B -> debug( INFO, $agi, __FILE__, __LINE__, "FAILOVER app_callingcard: Dialing '$dialstr' with timeout of '$timeout'.\n");
+				    $A2B -> debug( INFO, $agi, __FILE__, __LINE__, "FAILOVER app_callingcard: Dialing '$dialstr' with timeout of '$trunktimeout'.\n");
 //				    if (array_search($agi -> channel_status('',true), array(AST_STATE_DOWN)) === false) { }
 				    if ($agi -> channel_status('',true) != AST_STATE_DOWN) {
 					if ($A2B->monitor == 1 || $A2B -> agiconfig['record_call'] == 1) {
@@ -1962,8 +1964,8 @@ else echo "Ratecard: ".$this->ratecard_obj[$i][6]."<br>Trunk: ".$this->ratecard_
 							unlink($monfile);
 						}
 					}
+					$this -> dialstatus = $agi -> get_variable("DIALSTATUS",true);
 				    }
-				    $this -> dialstatus = $agi -> get_variable("DIALSTATUS",true);
 
 				} elseif (is_array($amicmd)) {
 				    write_log(LOGFILE_API_CALLBACK, " ActionID = {$amicmd[5]} [#### Starting AMI ORIGINATE     ####] $channel ");

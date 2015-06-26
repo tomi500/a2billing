@@ -64,6 +64,7 @@ ALTER TABLE cc_card ADD citylength SMALLINT( 6 ) NULL DEFAULT NULL AFTER `areapr
 ALTER TABLE cc_card ADD showcallstypedefault INT(11) NOT NULL DEFAULT '0';
 ALTER TABLE cc_card ADD dillertariffs varchar(60) COLLATE utf8_bin NOT NULL AFTER `tariff`;
 ALTER TABLE cc_card ADD dillergroups varchar(60) COLLATE utf8_bin NOT NULL AFTER `id_group`;
+ALTER TABLE cc_card ADD max_concurrent INT(11) NOT NULL DEFAULT '10';
 
 ALTER TABLE cc_card CHANGE id_campaign id_campaign  INT( 11 ) NULL DEFAULT '-1';
 ALTER TABLE cc_card CHANGE id_timezone id_timezone CHAR( 40 ) NULL DEFAULT '0';
@@ -480,6 +481,8 @@ delimiter ;
 call a2b_trf_check;
 
 drop procedure if exists a2b_trf_check;
+
+UPDATE `cc_config` SET `config_group_title` = 'epayment_method' WHERE `config_group_title` = '5';
 
 ALTER TABLE cc_callback_spool ADD `next_attempt_time` timestamp NULL DEFAULT NULL;
 ALTER TABLE cc_callback_spool ADD `reason` int(11) DEFAULT NULL;
