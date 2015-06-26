@@ -58,7 +58,6 @@ if($posted == 1) {
 	
 	check_demo_mode();
 	
-	$instance_table = new Table();
 	$bool = false;
 	$ratecard_src_val = $ratecard_source;
 	if (!is_numeric($ratecard_src_val)){ 
@@ -86,48 +85,19 @@ if($posted == 1) {
 		$fieldtomerge_sql = trim ($fieldtomerge_sql);
 		//if (strlen($fieldtomerge_sql)>0) $fieldtomerge_sql = ', '.$fieldtomerge_sql;
 	}
-	
+
 	if(!$bool){
-		$count = 0;
-		$fields = "dialprefix, ";
-		$fields .= $fieldtomerge_sql; 
-		$fields_array = preg_split('/,/', $fields);
-	
+		$fields_array = preg_split('/,/', $fieldtomerge_sql);
 		if(!empty($_SESSION['search_ratecard'])){
-			$condition .= " AND ".$_SESSION['search_ratecard'];
+			$condition = str_replace("AND ", "AND aa.", " AND ".$_SESSION['search_ratecard']);
 		}
-	
-		$sql = "select $fields from cc_ratecard where idtariffplan = $ratecard_src_val $condition order by dialprefix,id";
-		$result  = $instance_table->SQLExec ($HD_Form -> DBHandle, $sql);
-		$q = "";
-		$q_update = "";
-		for ($i=0; $i<count($result); $i++){
-			$Update = "";
-			for($k=0; $k<count($fields_array); $k++){
-		    	$val = $result[$i][$k];
-		    	if($k == 0){
-		    		$dialprefix = $result[$i][$k];
-		    	}else{
-		    		$Update .= ",";
-		    	}
-		    		$Update .= "$fields_array[$k] = '$val'";
-		    }
-			$replac_able = "dialprefix = '".$dialprefix."',";
-			$Update = str_replace($replac_able, "",$Update);
-		    $sql_target = "select id from cc_ratecard where idtariffplan = $ratecard_des_val and dialprefix = $dialprefix and is_merged = 0 $condition order by dialprefix, id";
-			//$q .= "<br>SQL Target". $sql_target;
-			$result_target  = $instance_table->SQLExec ($HD_Form -> DBHandle, $sql_target);
-			$id = $result_target[0][0];
-		   if(!empty($id)){
-				$count++;
-				$Update1 = "update cc_ratecard set $Update, is_merged = 1 where id = $id";
-				$result_updated  = $instance_table->SQLExec ($HD_Form -> DBHandle, $Update1);
-		   }
+		foreach ($fields_array as $val) {
+			$update_src .= ",".$val;
+			$update_des .= ",aa.".$val."=bb.".$val;
 		}
-	    $reset_table = "update cc_ratecard set is_merged = 0";
-		$result_reset  = $instance_table->SQLExec ($HD_Form -> DBHandle, $reset_table);
-		
-		if($count > 0)	
+		$instance_table = new Table("cc_ratecard aa, (SELECT dialprefix$update_src FROM cc_ratecard WHERE idtariffplan = $ratecard_src_val) bb");
+		$result_updated  = $instance_table->Update_table ($HD_Form -> DBHandle, "aa.dialprefix = bb.dialprefix$update_des", "aa.idtariffplan = $ratecard_des_val AND aa.dialprefix = bb.dialprefix$condition");
+		if($result_updated)
 			$msg = "Ratecard is successfully merged.";
 		else
 			$msg = "Ratecard is not merged, please try again with different search criteria.";
