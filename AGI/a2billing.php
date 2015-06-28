@@ -407,6 +407,11 @@ if ($mode == 'sms') {
 				}
 			}
 
+		} elseif ($A2B -> agiconfig['cid_auto_create_card']==1) {
+		    $A2B -> mode = $mode = 'standard';
+		    $A2B -> agiconfig['cid_enable']=1;
+		    $A2B -> agiconfig['answer_call']=1;
+		    $A2B -> agiconfig['use_dnid']=0;
 		} elseif ($caller_areacode == 'didless') break;
 		  else {
 		    $A2B -> mode = $mode = 'did';
@@ -740,7 +745,7 @@ $A2B -> debug( ERROR, $agi, __FILE__, __LINE__, "[NO ENOUGH CREDIT TO CALL THIS 
 			$A2B -> dnid = rtrim($agi -> request['agi_dnid'], "#");
 			$A2B -> extension = rtrim($agi -> request['agi_extension'], "#");
 
-			if ($A2B -> agiconfig['ivr_voucher']==1) {
+			if ($A2B -> agiconfig['ivr_voucher']==1 && $i == 0 && $A2B -> vouchernumber == 0) {
 				if ($A2B -> first_dtmf != '') {
 					$A2B -> ivr_voucher = $A2B->first_dtmf;
 				} else {
@@ -753,7 +758,7 @@ $A2B -> debug( ERROR, $agi, __FILE__, __LINE__, "[NO ENOUGH CREDIT TO CALL THIS 
 					$vou_res = $A2B->refill_card_with_voucher($agi, $i);
 				}
 			}
-
+			$A2B -> vouchernumber = 0;
 			if ($A2B -> agiconfig['ivr_enable_ivr_speeddial']==1) {
 				$A2B -> debug( INFO, $agi, __FILE__, __LINE__, "[IVR SPEED DIAL]");
 				do {
@@ -924,7 +929,6 @@ $A2B -> debug( ERROR, $agi, __FILE__, __LINE__, "[NO ENOUGH CREDIT TO CALL THIS 
 				}
 				$A2B -> debug( DEBUG, $agi, __FILE__, __LINE__, 'ANSWER fct callingcard_ivr authorize:> '.$ans);
 				// CREATE A PERSONAL UNIQUEID FOR EACH TRY
-//$A2B -> debug( ERROR, $agi, __FILE__, __LINE__, $A2B -> uniqueid);
 				$newuniqueid = explode('.',$A2B -> uniqueid);
 				if ($newuniqueid[0] == time() && $i)		sleep(1);
 				$newuniqueid[0] = time();

@@ -44,10 +44,8 @@ getpost_ifset(array('defaultuser', 'subscribemwi', 'vmexten', 'cid_number', 'cal
 
 if ($atmenu=='sip') {
 	$HD_Form = new FormHandler("cc_sip_buddies", gettext("SIP Config"));
-	$un = 'defaultuser';
 } else {
 	$HD_Form = new FormHandler("cc_iax_buddies", gettext("IAX Config"));
-	$un = 'username';
 }
 
 
@@ -99,9 +97,12 @@ $HD_Form -> AddViewElement(gettext("CARDHOLDER"), "id_cc_card", "17%", "center",
 $HD_Form -> AddViewElement(gettext("ACCOUNTCODE"), "accountcode", "12%", "center", "sort", "", "", "", "", "", "", "linktocustomer");
 $HD_Form -> AddViewElement(gettext("NAME"), "name", "6%", "center", "sort");
 if ($atmenu=='sip') {
+	$HD_Form -> AddViewElement(gettext("REGEXTEN"), "regexten", "6%", "center", "sort");
 	$HD_Form -> AddViewElement(gettext("DEFAULTUSER"), "defaultuser", "6%", "center", "sort");
+	$un = 'regexten, defaultuser';
 } else {
 	$HD_Form -> AddViewElement(gettext("USERNAME"), "username", "6%", "center", "sort");
+	$un = 'username';
 }
 $HD_Form -> AddViewElement(gettext("SECRET"), "secret", "6%", "center", "sort");
 $HD_Form -> AddViewElement(gettext("CALLERID"), "callerid", "24%", "center", "sort");

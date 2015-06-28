@@ -54,7 +54,7 @@ $HD_Form = new FormHandler("cc_config_group","configuration group");
 
 $HD_Form -> FG_DEBUG = 0;
 $HD_Form -> FG_TABLE_ID="id";
-$HD_Form -> FG_TABLE_DEFAULT_ORDER = "id";
+$HD_Form -> FG_TABLE_DEFAULT_ORDER = "group_title LIKE 'agi-conf%'";
 $HD_Form -> FG_TABLE_DEFAULT_SENS = "ASC";
 
 

@@ -1509,7 +1509,7 @@ else echo "Ratecard: ".$this->ratecard_obj[$i][6]."<br>Trunk: ".$this->ratecard_
 			$status = 1;
 			// LOOOOP FOR THE FAILOVER LIMITED TO failover_recursive_limit
 			while ((($loop_failover == 0 && !$this->dialstatus) || ($loop_failover <= $A2B->agiconfig['failover_recursive_limit']
-			    && $failover_trunk > 0 && (time()-$timecur) < 10 && (in_array($this->dialstatus, array("","CHANUNAVAIL","CONGESTION")) || $intellect_count >= 0)))
+			    && $failover_trunk > 0 && (time()-$timecur) < 20 && (in_array($this->dialstatus, array("","CHANUNAVAIL","CONGESTION")) || $intellect_count >= 0)))
 			    && $this->dialstatus != "ANSWER" && $this->dialstatus != "CANCEL") {
 
 				$this -> td = $this -> prefixclause = '';
@@ -1878,7 +1878,7 @@ else echo "Ratecard: ".$this->ratecard_obj[$i][6]."<br>Trunk: ".$this->ratecard_
 				}
 				$this -> trunk_start_inuse($agi, $A2B, 1);
 				if ($agi) {
-				    if ($A2B->dtmf_destination && $A2B->oldphonenumber && $firstgo && (!isset($trunkcode) || strpos($trunkcode,"-INFOLINE") === false)) {
+				    if ($A2B->dtmf_destination && strlen($A2B->oldphonenumber) && $firstgo && (!isset($trunkcode) || strpos($trunkcode,"-INFOLINE") === false)) {
 					$agi -> say_digits($A2B->oldphonenumber, '#');
 					$firstgo = false;
 				    }

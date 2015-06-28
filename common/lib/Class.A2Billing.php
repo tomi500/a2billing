@@ -217,7 +217,7 @@ class A2Billing {
 	var $update_callerid=0;
 
 	var $ivr_voucher;
-	var $vouchernumber;
+	var $vouchernumber = 0;
 	var $add_credit;
 
 	var $cardnumber_range;
@@ -1019,15 +1019,23 @@ class A2Billing {
 		}
 	}
 	if ($this->extext) {
-		if ($this->removeinterprefix) $this->destination = $this -> apply_rules ($this->destination);
-		else	$dest_wo_int_prefix = '-';
-		$this->destination = $this->apply_add_countryprefixto ($this->destination);
-		if ($this->removeinterprefix && strlen($dest_wo_int_prefix) && strcmp($dest_wo_int_prefix, $this->oldphonenumber) == 0 && strcmp($dest_wo_int_prefix, $this->destination) == 0 && !(preg_match("/^1[2-9]/", $this->oldphonenumber) && preg_match("/^[1a-zA-Z]/", $this->CallerID))) {
-			$agi-> stream_file('the-number-u-dialed', '#');
-			$agi-> say_digits($this->oldphonenumber, '#');
-			$agi-> stream_file('pbx-invalid', '#');
-			return -1;
+		if ($this->removeinterprefix && strlen($this->destination) > 6)
+			$this->destination = $dest_wo_int_prefix = $this -> apply_rules ($this->destination);
+		else	$dest_wo_int_prefix = $this->destination;
+		if (strcmp($this->destination, $this->oldphonenumber) == 0) {
+			$this->destination = $this->apply_add_countryprefixto ($this->destination);
+//$this -> debug( ERROR, $agi, __FILE__, __LINE__, "Prefix required: ".$this->agiconfig['prefix_required']);
+			if ($this->removeinterprefix && $this->agiconfig['prefix_required'] && strcmp($this->oldphonenumber, $this->destination) == 0 && !(preg_match("/^1[2-9]/", $this->oldphonenumber) && preg_match("/^[1a-zA-Z]/", $this->CallerID)) && strlen($this->oldphonenumber) > 5) {
+//$this -> debug( ERROR, $agi, __FILE__, __LINE__, $this->oldphonenumber." => ".$dest_wo_int_prefix." => ".$this->destination);
+//$this -> debug( ERROR, $agi, __FILE__, __LINE__, "======================================================================================================================");
+				$this -> let_stream_listening($agi);
+				$agi-> stream_file('the-number-u-dialed', '#');
+				$agi-> say_digits($this->oldphonenumber, '#');
+				$agi-> stream_file('pbx-invalid', '#');
+				return -1;
+			}
 		}
+//$this -> debug( ERROR, $agi, __FILE__, __LINE__, $this->oldphonenumber." => ".$dest_wo_int_prefix." => ".$this->destination);
 	}
 	if ($this->destination) {
 	    if (isset($this->transferername[0])) {
@@ -3197,20 +3205,25 @@ $this -> debug( ERROR, $agi, __FILE__, __LINE__, "FAXRESOLUTION: ".$faxresolutio
 
 	function callingcard_ivr_authenticate($agi,$accountback=0)
 	{
-		$authentication 		= false;
-		$prompt				= '';
-		$res				= 0;
-		$retries			= 0;
-		$language 			= 'en';
-		$callerID_enable 		= $this->agiconfig['cid_enable'];
-		$this->auth_through_accountcode = false;
-		if ($accountback>0) $this->accountcode = $accountback;
+		global $currencies_list;
+
+		$authentication 			= false;
+		$prompt					= '';
+		$language 				= 'en';
+		$callerID_enable 			= $this->agiconfig['cid_enable'];
+		$this -> auth_through_accountcode	= false;
+		$ed					= '0123456789#';
+		$this -> add_credit = $res = $retries	= 0;
+		$currency				= $this->config['global']['base_currency'];
 
 		// 		  -%-%-%-%-%-%-		FIRST TRY WITH THE CALLERID AUTHENTICATION 	-%-%-%-%-%-%-
-		elseif ($callerID_enable == 1 && $this->CallerID != "") {
+		if ($accountback>0) {
+			$this->accountcode	= $accountback;
+		} elseif ($callerID_enable == 1 && $this->CallerID != "") {
 //		if ($callerID_enable==1 && is_numeric($this->CallerID) && $this->CallerID>0) {}
-			$this -> debug( DEBUG, $agi, __FILE__, __LINE__, "[CID_ENABLE - CID_CONTROL - CID:".$this->CallerID."]");
-
+		    $this -> debug( DEBUG, $agi, __FILE__, __LINE__, "[CID_ENABLE - CID_CONTROL - CID:".$this->CallerID."]");
+		    do {
+			$repeat = false;
 			// NOT USE A LEFT JOIN HERE - In case the callerID is alone without card bound
 			$QUERY =    "SELECT cc_callerid.cid, cc_callerid.id_cc_card, cc_callerid.activated, cc_card.credit, ".
 				    " cc_card.tariff, cc_card.activated, cc_card.inuse, cc_card.simultaccess, cc_card.typepaid, cc_card.creditlimit, " .
@@ -3230,70 +3243,140 @@ $this -> debug( ERROR, $agi, __FILE__, __LINE__, "FAXRESOLUTION: ".$faxresolutio
 			$this -> debug( DEBUG, $agi, __FILE__, __LINE__, print_r($result,true));
 			
 			if (!is_array($result)) {
-				
 				$this -> debug( DEBUG, $agi, __FILE__, __LINE__, "[CID_CONTROL - NO CALLERID]");
 
 				if ($this -> agiconfig['cid_auto_create_card']==1) {
-				    $this -> debug( DEBUG, $agi, __FILE__, __LINE__, "[CID_CONTROL - NO CALLERID - ASK PIN CODE]");
-				    for ($k=0 ; $k <= 20 ; $k++) {
-						if ($k == 20) {
-						    $this -> debug( WARN, $agi, __FILE__, __LINE__, "ERROR : Impossible to generate a cardnumber not yet used!");
-                            $prompt = "prepaid-auth-fail";
-                            $this -> debug( DEBUG, $agi, __FILE__, __LINE__, "[StreamFile : $prompt]");
-						    $agi-> stream_file($prompt, '#');
+				    $prompt = "prepaid-auth-fail";
+				    if ($this -> agiconfig['cid_askpincode_ifnot_callerid']==1) {
+//					$this -> let_stream_listening($agi);
+					$result = $agi-> stream_file('prepaid-welcome', $ed);
+					for ($k=0; $k < $this -> agiconfig['number_try']; $k++) {
+					    $res_dtmf = $agi->get_data('prepaid-enter_voucher_or_pin_number', 12000, max($this->config['global']['len_voucher'], CARDNUMBER_LENGTH_MAX), '#');
+					    $this -> vouchernumber = $res_dtmf ["result"];
+					    if ($this -> vouchernumber <= 0)
+						if ($k == 9)	{
+							$agi-> stream_file($prompt, '#');
+							return -2;
+						} else	continue;
+					    if ($result['result'] > 0 && $k == 0 && chr($result['result']) != '#') {
+						$this -> vouchernumber = chr($result['result']) . $this -> vouchernumber;
+					    }
+					    if (strlen($this -> vouchernumber) != $this->config['global']['len_voucher'] && (strlen($this->vouchernumber) > CARDNUMBER_LENGTH_MAX || strlen($this->vouchernumber) < CARDNUMBER_LENGTH_MIN)) {
+						$agi-> stream_file("prepaid-invalid-digits", '#');
+						if ($k == 9)
+							return -2;
+						else	continue;
+					    }
+					    $QUERY = "SELECT voucher, credit, IF(activated='t' AND expirationdate >= CURRENT_TIMESTAMP AND used = '0',activated,'f') activated, tag, currency, expirationdate, usedcardnumber FROM cc_voucher WHERE voucher='".$this -> vouchernumber."' LIMIT 1";
+					    $result = $this -> instance_table -> SQLExec ($this->DBHandle, $QUERY);
+					    if ($result[0][0] == $this->vouchernumber) {
+						if (!isset ($currencies_list[strtoupper($result[0][4])][2])) {
 						    return -2;
+						} elseif ($result[0][2] == 't') {
+						    $this -> add_credit = $result[0][1] * $currencies_list[strtoupper($result[0][4])][2];
+						    $currency = $result[0][4];
+						    break;
+						} elseif ($result[0][6] >= CARDNUMBER_LENGTH_MIN) {
+						    $this->username = $result[0][6];
+						} elseif ($k == 9)	{
+							$agi-> stream_file($prompt, '#');
+							return -2;
 						}
-						$card_gen = $this -> MDP ($this->agiconfig['cid_auto_create_card_len']);
-						$numrow = 0;
-						$resmax = $this->DBHandle -> Execute("SELECT username FROM $FG_TABLE_NAME where username='$card_gen'");
-						if ($resmax)
-						    $numrow = $resmax -> RecordCount();
-						if ($numrow!=0) continue;
-						break;
+						continue;
+					    }
+					    $this -> debug( DEBUG, $agi, __FILE__, __LINE__, "[CID_CONTROL - NO CALLERID - ASK PIN CODE]");
+					    $QUERY = "SELECT id FROM cc_card WHERE username='".$this->username."' LIMIT 1";
+					    $result = $this->instance_table -> SQLExec ($this->DBHandle, $QUERY);
+					    if (is_array($result)) {
+						$QUERY_FIELS = 'cid, id_cc_card';
+						$QUERY_VALUES = "'".$this->CallerID."','$result[0][0]'";
+						$result = $this->instance_table -> Add_table ($this->DBHandle, $QUERY_VALUES, $QUERY_FIELS, 'cc_callerid');
+//						$this -> accountcode = $this->vouchernumber;
+//						$this -> vouchernumber = $this -> add_credit;
+//						$isused = $simultaccess = $callerID_enable = 0;
+						$prompt = '';
+						$repeat = true;
+						continue 2;
+					    }
+					    if ($k == 9)
+						return -2;
+					}
 				    }
-				    $card_alias = $this -> MDP ($this->agiconfig['cid_auto_create_card_len']);
-				    $uipass = $this -> MDP (5);
+				    for ($k=0 ; $k <= 100 ; $k++) {
+					if ($k == 100) {
+					    $this -> debug( WARN, $agi, __FILE__, __LINE__, "ERROR : Impossible to generate a cardnumber not yet used!");
+					    $this -> debug( DEBUG, $agi, __FILE__, __LINE__, "[StreamFile : $prompt]");
+					    $agi-> stream_file($prompt, '#');
+					    return -2;
+					}
+					$card_gen	= MDP ($this->agiconfig['cid_auto_create_card_len']);
+					$card_alias	= MDP ($this -> config["global"]['len_aliasnumber']);
+					$numrow 	= 0;
+					$resmax 	= $this->DBHandle -> Execute("SELECT cc_card.username, cc_sip_buddies.name, cc_iax_buddies.name FROM cc_card, cc_sip_buddies, cc_iax_buddies WHERE cc_card.username='$card_gen' OR useralias='$card_alias' OR cc_sip_buddies.name='$card_alias' OR cc_iax_buddies.name='$card_alias'");
+					if ($resmax)
+					    $numrow	= $resmax -> RecordCount();
+					if ($numrow!=0) continue;
+					break;
+				    }
+				    $QUERY = "SELECT cc_country.countrycode, cc_timezone.id FROM cc_country LEFT JOIN cc_timezone ON cc_timezone.countrycode LIKE concat('%',cc_country.countrycode,'%') WHERE '{$this->CallerID}' LIKE concat(countryprefix,'%') ORDER BY countryprefix DESC LIMIT 1";
+				    $result = $this->instance_table -> SQLExec ($this -> DBHandle, $QUERY);
+				    $country = is_array($result) ? $result[0][0] : "";
+				    $timezone = is_array($result) ? $result[0][1] : "";
+				    $uipass = MDP_STRING(10);
 				    $ttcard = ($this->agiconfig['cid_auto_create_card_typepaid']=="POSTPAID") ? 1 : 0;
-
+				    $this -> credit = ($this -> add_credit) ? $this -> add_credit : $this->agiconfig['cid_auto_create_card_credit'];
+//				    $this -> add_credit = 0;
+				    $this->tariff = $this->agiconfig['cid_auto_create_card_tariffgroup'];
+				    $this->creditlimit = $this->agiconfig['cid_auto_create_card_credit_limit'];
 				    //CREATE A CARD
-				    $QUERY_FIELS = 'username, useralias, uipass, credit, language, tariff, activated, typepaid, creditlimit, inuse, status, currency';
-				    $QUERY_VALUES = "'$card_gen', '$card_alias', '$uipass', '".$this->agiconfig['cid_auto_create_card_credit']."', 'en', '".$this->agiconfig['cid_auto_create_card_tariffgroup']."', 't','$ttcard', '".$this->agiconfig['cid_auto_create_card_credit_limit']."', '0', '1', '".$this->config['global']['base_currency']."'";
-				    
+				    $QUERY_FIELS = 'username, useralias, uipass, credit, language, tariff, activated, typepaid, creditlimit, inuse, status, currency, country, phone, id_timezone';
+				    $QUERY_VALUES = "'$card_gen', '$card_alias', '$uipass', '".$this->credit."', '$language', '".$this->tariff."', 't','$ttcard', '".$this->creditlimit."', '0', '1', '".$currency."', '$country', '{$this->CallerID}', '$timezone'";
+				
 				    if ($this ->groupe_mode) {
 						$QUERY_FIELS .= ", id_group";
 						$QUERY_VALUES .= " , '$this->group_id'";
 				    }
-					
-				    $result = $this->instance_table -> Add_table ($this->DBHandle, $QUERY_VALUES, $QUERY_FIELS, 'cc_card', 'id');
+				
+				    $id_card = $this->instance_table -> Add_table ($this->DBHandle, $QUERY_VALUES, $QUERY_FIELS, 'cc_card', 'id');
 				    $this -> debug( INFO, $agi, __FILE__, __LINE__, "[CARDNUMBER: $card_gen]:[CARDID CREATED : $result]");
-
+				    if (!$id_card) {
+					$agi-> stream_file($prompt, '#');
+					return -2;
+				    }
 				    //CREATE A CARD AND AN INSTANCE IN CC_CALLERID
 				    $QUERY_FIELS = 'cid, id_cc_card';
-				    $QUERY_VALUES = "'".$this->CallerID."','$result'";
+				    $QUERY_VALUES = "'".$this->CallerID."','$id_card'";
 
 				    $result = $this->instance_table -> Add_table ($this->DBHandle, $QUERY_VALUES, $QUERY_FIELS, 'cc_callerid');
 				    if (!$result) {
-						$this -> debug( ERROR, $agi, __FILE__, __LINE__, "[CALLERID CREATION ERROR TABLE cc_callerid]");
-						$prompt="prepaid-auth-fail";
-						$this -> debug( DEBUG, $agi, __FILE__, __LINE__, strtoupper($prompt));
-						$agi-> stream_file($prompt, '#');
-						return -2;
+					$this -> debug( ERROR, $agi, __FILE__, __LINE__, "[CALLERID CREATION ERROR TABLE cc_callerid]");
+					$this -> debug( DEBUG, $agi, __FILE__, __LINE__, strtoupper($prompt));
+					$result = $this->instance_table -> Delete_table ($this -> DBHandle, "id='$id_card' AND username='$card_gen'", "cc_card");
+					$agi-> stream_file($prompt, '#');
+					return -2;
+				    }
+				    if ($this -> add_credit) {
+					$result = $this->instance_table -> Update_table ($this -> DBHandle, "activated='f', usedcardnumber='".$card_gen."', used=1, usedate=now()", "voucher='".$this->vouchernumber."'", "cc_voucher");
+					if (!$result) {
+					    $result = $this->instance_table -> Delete_table ($this -> DBHandle, "cid='".$this->CallerID."' AND id_cc_card='$id_card'", "cc_callerid");
+					    $result = $this->instance_table -> Delete_table ($this -> DBHandle, "id='$id_card' AND username='$card_gen'", "cc_card");
+					    $agi-> stream_file($prompt, '#');
+					    return -2;
+					}
 				    }
 
-				    $this->credit = $this->agiconfig['cid_auto_create_card_credit'];
-				    $this->tariff = $this->agiconfig['cid_auto_create_card_tariffgroup'];
-				    $this->active = 1;
-				    $this->status = 1;
-				    $isused = 0;
-				    $simultaccess = 0;
-				    $this->typepaid = $ttcard;
-				    $this->creditlimit = $this->agiconfig['cid_auto_create_card_credit_limit'];
-				    $language = 'en';
+//				    $this->fct_say_balance ($agi, $this->credit, 1);
+//				    $this->active = $this->status = 1;
+//				    $isused = $simultaccess = $callerID_enable = 0;
+//				    $this->typepaid = $ttcard;
 				    $this->accountcode = $card_gen;
+				    $prompt = '';
 
-				    if ($this->typepaid==1)
-				    	$this->credit = $this->credit + $this->creditlimit;
+//				    if ($this->typepaid==1)
+//				    	$this->credit = $this->credit + $this->creditlimit;
 
+				    $repeat = true;
+				    continue;
 				} else {
 				    if ($this -> agiconfig['cid_askpincode_ifnot_callerid']==1) {
 					    $this -> debug( DEBUG, $agi, __FILE__, __LINE__, "[CID_CONTROL - NO CALLERID - ASK PIN CODE]");
@@ -3430,7 +3513,8 @@ $this -> debug( ERROR, $agi, __FILE__, __LINE__, "FAXRESOLUTION: ".$faxresolutio
 							$this -> update_callerid = 1;
 						}
 					} elseif ($prompt == "prepaid-card-expired") {
-					    $this -> accountcode=''; $callerID_enable=0;
+					    $this -> accountcode='';
+					    $callerID_enable=0;
 					    $this -> ask_other_cardnumber = 1;
 					    $this -> update_callerid = 1;
 					} else {
@@ -3448,7 +3532,7 @@ $this -> debug( ERROR, $agi, __FILE__, __LINE__, "FAXRESOLUTION: ".$faxresolutio
 				}
 
 			} // elseif We -> found a card for this callerID
-
+		    } while ($repeat);
 		} else {
 			// NO CALLERID AUTHENTICATION
 			$callerID_enable=0;
@@ -3604,7 +3688,6 @@ $this -> debug( ERROR, $agi, __FILE__, __LINE__, "FAXRESOLUTION: ".$faxresolutio
 					$this -> debug( DEBUG, $agi, __FILE__, __LINE__, "[ERROR CHECK CARD : $prompt (cardnumber:".$this->cardnumber.")]");
 					
 					if ($this->agiconfig['jump_voucher_if_min_credit']==1 && !$this -> enough_credit_to_call()) {
-						
 						$this -> debug( DEBUG, $agi, __FILE__, __LINE__, "[NOTENOUGHCREDIT - refill_card_withvoucher] ");
 						$vou_res = $this -> refill_card_with_voucher($agi,2);
 						if ($vou_res==1) {

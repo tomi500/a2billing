@@ -69,6 +69,8 @@ ALTER TABLE cc_card ADD max_concurrent INT(11) NOT NULL DEFAULT '10';
 ALTER TABLE cc_card CHANGE id_campaign id_campaign  INT( 11 ) NULL DEFAULT '-1';
 ALTER TABLE cc_card CHANGE id_timezone id_timezone CHAR( 40 ) NULL DEFAULT '0';
 
+ALTER TABLE cc_timezone ADD countrycode CHAR(80) COLLATE utf8_bin NOT NULL;
+
 ALTER TABLE cc_logrefill ADD diller_id bigint(20) NULL DEFAULT NULL;
 
 ALTER TABLE cc_logpayment ADD fee DECIMAL( 15, 5 ) NOT NULL DEFAULT 0 AFTER `payment`;
@@ -305,6 +307,31 @@ begin
 	select S.id_cc_card, S.accountcode, S.regexten, '0000', concat(C.lastname,' ',C.firstname) fullname, C.email, S.language
 	from cc_sip_buddies S, cc_card C
 	where S.regexten IS NOT NULL AND S.regexten<>'' AND S.id_cc_card=C.id;
+    end if;
+end //
+
+delimiter ;
+
+call a2b_trf_check;
+
+drop procedure if exists a2b_trf_check;
+
+delimiter //
+
+create procedure a2b_trf_check()
+begin
+    declare a int;
+    select count(*) into a from cc_config where config_key='prefix_required' and config_group_title='agi-conf1';
+    if a=0 then
+        select count(*) into a from cc_config where `config_key` LIKE 'description' GROUP BY `config_key`;
+        WHILE a > 0 DO
+            INSERT INTO cc_config (id, config_title, config_key, config_value, config_description, config_valuetype, config_listvalues, config_group_title)
+            VALUES (NULL, 'Prefix required', 'prefix_required', '0', 'Is the prefix required for international calls', '1', 'yes,no', CONCAT('agi-conf',a));
+            SET a = a - 1;
+        END WHILE;
+        elseif a>1 then
+        select id into a from cc_config where config_key='prefix_required' and config_group_title='agi-conf1' order by id limit 0,1;
+        delete from cc_config where config_key='prefix_required' and config_group_title='agi-conf1' and id>a;
     end if;
 end //
 
