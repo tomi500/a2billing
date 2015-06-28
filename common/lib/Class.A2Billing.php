@@ -3267,6 +3267,7 @@ $this -> debug( ERROR, $agi, __FILE__, __LINE__, "FAXRESOLUTION: ".$faxresolutio
 							return -2;
 						else	continue;
 					    }
+					    $username = $this -> vouchernumber;
 					    $QUERY = "SELECT voucher, credit, IF(activated='t' AND expirationdate >= CURRENT_TIMESTAMP AND used = '0',activated,'f') activated, tag, currency, expirationdate, usedcardnumber FROM cc_voucher WHERE voucher='".$this -> vouchernumber."' LIMIT 1";
 					    $result = $this -> instance_table -> SQLExec ($this->DBHandle, $QUERY);
 					    if ($result[0][0] == $this->vouchernumber) {
@@ -3277,7 +3278,7 @@ $this -> debug( ERROR, $agi, __FILE__, __LINE__, "FAXRESOLUTION: ".$faxresolutio
 						    $currency = $result[0][4];
 						    break;
 						} elseif ($result[0][6] >= CARDNUMBER_LENGTH_MIN) {
-						    $this->username = $result[0][6];
+						    $username = $result[0][6];
 						} elseif ($k == 9)	{
 							$agi-> stream_file($prompt, '#');
 							return -2;
@@ -3285,7 +3286,7 @@ $this -> debug( ERROR, $agi, __FILE__, __LINE__, "FAXRESOLUTION: ".$faxresolutio
 						continue;
 					    }
 					    $this -> debug( DEBUG, $agi, __FILE__, __LINE__, "[CID_CONTROL - NO CALLERID - ASK PIN CODE]");
-					    $QUERY = "SELECT id FROM cc_card WHERE username='".$this->username."' LIMIT 1";
+					    $QUERY = "SELECT id FROM cc_card WHERE username='".$username."' LIMIT 1";
 					    $result = $this->instance_table -> SQLExec ($this->DBHandle, $QUERY);
 					    if (is_array($result)) {
 						$QUERY_FIELS = 'cid, id_cc_card';
