@@ -136,7 +136,7 @@ $FG_TABLE_COL [] = array (gettext ( "Margin" ), "margin", "3%", "center", "SORT"
 $FG_TABLE_COL [] = array (gettext ( "Markup" ), "markup", "3%", "center", "SORT", "30", "", "", "", "", "", "display_2dec_percentage" );
 
 if (LINK_AUDIO_FILE) {
-	$FG_TABLE_COL [] = array ("", "uniqueid", "10%", "center", "", "30", "", "", "", "", "", "linkonmonitorfile" );
+	$FG_TABLE_COL [] = array ("", "uniqueid", "10%", "center\" nowrap=\"nowrap", "", "30", "", "", "", "", "", "linkonmonitorfile" );
 }
 
 if (has_rights (ACX_DELETE_CDR)) {

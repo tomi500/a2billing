@@ -129,7 +129,8 @@ $HD_Form -> FG_DELETION_CLAUSE = "id_cc_card = ".$_SESSION["card_id"]." AND exte
 $HD_Form -> FG_EDITION_CLAUSE .= $HD_Form -> FG_DELETION_CLAUSE;
 **/
 $HD_Form -> FG_EDITION_CONDITION = '"|col6|" != ""';
-$HD_Form -> FG_DELETION_CONDITION = '"|col6|" != "" && "|col5|" != "{$_SESSION["user_alias"]}"';
+$HD_Form -> FG_DELETION_CONDITION = $HD_Form -> FG_EDITION_CONDITION;
+//$HD_Form -> FG_DELETION_CONDITION = '"|col6|" != "" && "|col5|" != "{$_SESSION["user_alias"]}"';
 
 $HD_Form -> FG_EDITION = true;
 $HD_Form -> FG_DELETION = true;

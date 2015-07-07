@@ -987,7 +987,7 @@ class A2Billing {
 	}
 	$this->extext = true;
 	if ($this->destination) {
-		$QUERY = "SELECT name, regexten, mailbox, concat_id, id_cc_card, translit, voicemail_activated FROM cc_sip_buddies
+		$QUERY = "SELECT name, regexten, mailbox, concat_id, id_cc_card, translit, voicemail_activated, removeaddprefix, addprefixinternational FROM cc_sip_buddies
 			LEFT JOIN cc_card_concat ON concat_card_id = id_cc_card
 			LEFT JOIN cc_card ON cc_card.id = id_cc_card
 			WHERE (name = '{$this->destination}' OR (regexten = '{$this->destination}' AND (id_cc_card = {$this->id_card} OR concat_id = '$this->caller_concat_id'))) AND regexten IS NOT NULL GROUP BY regexten LIMIT 1";
@@ -1014,6 +1014,8 @@ class A2Billing {
 				unset($this->src_exten);
 			    }
 			    $this -> CID_handover = '';
+			} else {
+			    $this -> CID_handover = $this -> apply_cid_rules ($this -> CallerID, $result[0][7], $result[0][8]);
 			}
 			$this->extext = false;
 		}
@@ -1024,10 +1026,7 @@ class A2Billing {
 		else	$dest_wo_int_prefix = $this->destination;
 		if (strcmp($this->destination, $this->oldphonenumber) == 0) {
 			$this->destination = $this->apply_add_countryprefixto ($this->destination);
-//$this -> debug( ERROR, $agi, __FILE__, __LINE__, "Prefix required: ".$this->agiconfig['prefix_required']);
-			if ($this->removeinterprefix && $this->agiconfig['prefix_required'] && strcmp($this->oldphonenumber, $this->destination) == 0 && !(preg_match("/^1[2-9]/", $this->oldphonenumber) && preg_match("/^[1a-zA-Z]/", $this->CallerID)) && strlen($this->oldphonenumber) > 5) {
-//$this -> debug( ERROR, $agi, __FILE__, __LINE__, $this->oldphonenumber." => ".$dest_wo_int_prefix." => ".$this->destination);
-//$this -> debug( ERROR, $agi, __FILE__, __LINE__, "======================================================================================================================");
+			if ($this->removeinterprefix && $this->agiconfig['prefix_required'] && $call2did===false && strcmp($this->oldphonenumber, $this->destination) == 0 && !(preg_match("/^1[2-9]/", $this->oldphonenumber) && preg_match("/^[1a-zA-Z]/", $this->CallerID)) && strlen($this->oldphonenumber) > 5) {
 				$this -> let_stream_listening($agi);
 				$agi-> stream_file('the-number-u-dialed', '#');
 				$agi-> say_digits($this->oldphonenumber, '#');
@@ -1157,7 +1156,7 @@ class A2Billing {
 		$this->faxemail 	= $result_did[0][3];
 		$this->fax2mail 	= $result_did[0][4];
 		$iscall2fax = true;
-	} elseif ($call2did) {
+	} elseif ($call2did===true) {
 		$this -> debug( INFO, $agi, __FILE__, __LINE__, "[CALL 2 DID]");
 		$QUERY = "SELECT username FROM cc_did, cc_card
 ".			"WHERE cc_card.status=1 AND cc_card.id=iduser AND cc_did.activated=1 AND did LIKE '$this->destination'
@@ -1314,7 +1313,7 @@ class A2Billing {
 		$this -> debug( DEBUG, $agi, __FILE__, __LINE__, "RES_ALL_CALCULTIMEOUT ::> $res_all_calcultimeout");
 		if (!$res_all_calcultimeout) {
 			$this -> let_stream_listening($agi);
-$this -> debug( ERROR, $agi, __FILE__, __LINE__, "CREDIT :: $this->credit");
+//$this -> debug( ERROR, $agi, __FILE__, __LINE__, "CREDIT :: $this->credit");
 			$prompt="prepaid-no-enough-credit";
 			$agi-> stream_file($prompt, '#');
 			return -1;
@@ -1597,6 +1596,9 @@ $this -> debug( ERROR, $agi, __FILE__, __LINE__, "CREDIT :: $this->credit");
 					$this -> debug( DEBUG, $agi, __FILE__, __LINE__, "[A2Billing] DID call friend: Dialing '$dialstr' Friend.\n");
 
 					if ($agi -> channel_status('',true) == AST_STATE_DOWN) break;
+					$CID_handover = $this -> apply_cid_rules ($this->CallerID, $inst_listdestination[34], $inst_listdestination[35]);
+					if ($CID_handover != $this->CallerID)
+						$agi -> set_variable('CALLERID(num)', $CID_handover);
 					//# Channel: technology/number@ip_of_gw_to PSTN
 					// Dial(IAX2/guest@misery.digium.com/s@default)
 					$this -> debug( INFO, $agi, __FILE__, __LINE__, "DIAL $dialstr");
@@ -1741,7 +1743,7 @@ $this -> debug( ERROR, $agi, __FILE__, __LINE__, "CREDIT :: $this->credit");
 					$this->extension = $this->destination = $inst_listdestination[4];
 					if ($this->CC_TESTING) $this->extension = $this->dnid = $this->destination="011324885";
 					
-					$ast = $this -> callingcard_ivr_authorize($agi, $RateEngine, 0);
+					$ast = $this -> callingcard_ivr_authorize($agi, $RateEngine, 0, -1);
 					if ($ast==1 || $ast=='2FAX') {
 					    if ($ast==1) {
 						// PERFORM THE CALL
@@ -1837,7 +1839,7 @@ $this -> debug( ERROR, $agi, __FILE__, __LINE__, "CREDIT :: $this->credit");
         $selling_rate = $listdestination[0][9];
 
         if ($connection_charge == 0 && $selling_rate == 0) {
-    	$call_did_free = true;
+		$call_did_free = true;
 		$this -> debug( INFO, $agi, __FILE__, __LINE__, "[A2Billing] DID call free ");
 	} else {
 		$call_did_free = false;
@@ -1918,11 +1920,11 @@ $this -> debug( ERROR, $agi, __FILE__, __LINE__, "CREDIT :: $this->credit");
 				
 		$max_long = 36000000; //Maximum 10 hours
 		$dialstr = $inst_listdestination[4];
-		if ($call_did_free) {
+		if ($call_did_free && $this->extext) {
 		    $this -> fct_say_time_2_call($agi,$time2call,0);
 		    $dialparams = $this->agiconfig['dialcommand_param_call_2did'];
 
-                } else {
+                } elseif ($this->extext) {
 		    $this -> debug( INFO, $agi, __FILE__, __LINE__, "TIME TO CALL : $time2call");
 		    $this -> fct_say_time_2_call($agi,$time2call,$selling_rate);
 		    $dialparams = $this->agiconfig['dialcommand_param'];
@@ -1941,6 +1943,10 @@ $this -> debug( ERROR, $agi, __FILE__, __LINE__, "CREDIT :: $this->credit");
 			$result = $this -> instance_table -> SQLExec ($this->DBHandle, $QUERY);
 			$cid =  (is_array($result) || $this->id_card == $this->card_caller) ? $this->src_exten : $this->src_peername;
 			$agi -> set_callerid(translit('"' . trim(preg_replace('/(?<!\d)(' . $cid . ')(?!\d)/', '', $this->CallerID . ' ' . $agi->get_variable('CALLERID(name)', true)), "\x00..\x2F") . '"<' . $cid . '>'));
+		} else {
+			$CID_handover = $this -> apply_cid_rules ($this->CallerID, $inst_listdestination[34], $inst_listdestination[35]);
+			if ($CID_handover != $this->CallerID)
+				$agi -> set_variable('CALLERID(num)', $CID_handover);
 		}
                 $this -> debug( INFO, $agi, __FILE__, __LINE__, "DIAL $dialstr");
                 $myres = $this -> run_dial($agi, $dialstr);
@@ -2130,7 +2136,7 @@ $this -> debug( ERROR, $agi, __FILE__, __LINE__, "CREDIT :: $this->credit");
                 $this->dnid = $this->destination;
                 $this->extension = $this->destination = $inst_listdestination[4];
                 if ($this->CC_TESTING) $this->extension = $this->dnid = $this->destination = "011324885";
-                $ast = $this -> callingcard_ivr_authorize($agi, $RateEngine, 0, false);
+                $ast = $this -> callingcard_ivr_authorize($agi, $RateEngine, 0, -1);
                 if ($ast==1 ||  $ast=='2FAX') {
                   if ($ast==1) {
 /**
@@ -2224,7 +2230,7 @@ $this -> debug( ERROR, $agi, __FILE__, __LINE__, "CREDIT :: $this->credit");
 			} else return;
 			// The following section will send the caller to VoiceMail with the unavailable priority.\
 			$this -> debug( INFO, $agi, __FILE__, __LINE__, "[STATUS] CHANNEL ($dialstatus) - GOTO VOICEMAIL ($this->voicebox)");
-$this -> debug( ERROR, $agi, __FILE__, __LINE__, "[STATUS] CHANNEL ($dialstatus) - GOTO VOICEMAIL ($this->voicebox)");
+//$this -> debug( ERROR, $agi, __FILE__, __LINE__, "[STATUS] CHANNEL ($dialstatus) - GOTO VOICEMAIL ($this->voicebox)");
 			$agi-> exec('VoiceMail', $this -> format_parameters ($this->voicebox));
 		}
 
@@ -3001,6 +3007,23 @@ $this -> debug( ERROR, $agi, __FILE__, __LINE__, "FAXRESOLUTION: ".$faxresolutio
 		return $phonenumber;
 	}
 
+	function apply_cid_rules ($cidnumber,$remadd,$addint)
+	{
+		$cidbirth = $cidnumber;
+		$remadd = explode(",",$remadd);
+		if (is_array($remadd) && count($remadd)>0) {
+			for ($i=0;$i<count($remadd);$i=$i+2) {
+				if (substr($cidnumber,0,strlen($remadd[$i]))==$remadd[$i]) {
+					$cidnumber = substr($cidnumber,strlen($remadd[$i])) . $remadd[$i+1];
+					break;
+				}
+			}
+		}
+		if ($cidbirth == $cidnumber && strlen($cidbirth)>6)
+			$cidnumber = $addint . $cidnumber;
+		return $cidnumber;
+	}
+
 	function did_apply_add_countryprefixfrom($result,$phonenumber)
 	{
 	    if (is_numeric($phonenumber)) {
@@ -3247,6 +3270,7 @@ $this -> debug( ERROR, $agi, __FILE__, __LINE__, "FAXRESOLUTION: ".$faxresolutio
 
 				if ($this -> agiconfig['cid_auto_create_card']==1) {
 				    $prompt = "prepaid-auth-fail";
+				    $this->tariff = $this->agiconfig['cid_auto_create_card_tariffgroup'];
 				    if ($this -> agiconfig['cid_askpincode_ifnot_callerid']==1) {
 //					$this -> let_stream_listening($agi);
 					$result = $agi-> stream_file('prepaid-welcome', $ed);
@@ -3268,7 +3292,7 @@ $this -> debug( ERROR, $agi, __FILE__, __LINE__, "FAXRESOLUTION: ".$faxresolutio
 						else	continue;
 					    }
 					    $username = $this -> vouchernumber;
-					    $QUERY = "SELECT voucher, credit, IF(activated='t' AND expirationdate >= CURRENT_TIMESTAMP AND used = '0',activated,'f') activated, tag, currency, expirationdate, usedcardnumber FROM cc_voucher WHERE voucher='".$this -> vouchernumber."' LIMIT 1";
+					    $QUERY = "SELECT voucher, credit, IF(activated='t' AND expirationdate >= CURRENT_TIMESTAMP AND used = '0',activated,'f') activated, tag, currency, expirationdate, usedcardnumber, callplan FROM cc_voucher WHERE voucher='".$this -> vouchernumber."' LIMIT 1";
 					    $result = $this -> instance_table -> SQLExec ($this->DBHandle, $QUERY);
 					    if ($result[0][0] == $this->vouchernumber) {
 						if (!isset ($currencies_list[strtoupper($result[0][4])][2])) {
@@ -3276,21 +3300,21 @@ $this -> debug( ERROR, $agi, __FILE__, __LINE__, "FAXRESOLUTION: ".$faxresolutio
 						} elseif ($result[0][2] == 't') {
 						    $this -> add_credit = $result[0][1] * $currencies_list[strtoupper($result[0][4])][2];
 						    $currency = $result[0][4];
+						    $this->tariff = $result[0][7];
 						    break;
 						} elseif ($result[0][6] >= CARDNUMBER_LENGTH_MIN) {
 						    $username = $result[0][6];
 						} elseif ($k == 9)	{
 							$agi-> stream_file($prompt, '#');
 							return -2;
-						}
-						continue;
+						} else	continue;
 					    }
 					    $this -> debug( DEBUG, $agi, __FILE__, __LINE__, "[CID_CONTROL - NO CALLERID - ASK PIN CODE]");
 					    $QUERY = "SELECT id FROM cc_card WHERE username='".$username."' LIMIT 1";
 					    $result = $this->instance_table -> SQLExec ($this->DBHandle, $QUERY);
 					    if (is_array($result)) {
 						$QUERY_FIELS = 'cid, id_cc_card';
-						$QUERY_VALUES = "'".$this->CallerID."','$result[0][0]'";
+						$QUERY_VALUES = "'".$this->CallerID."','{$result[0][0]}'";
 						$result = $this->instance_table -> Add_table ($this->DBHandle, $QUERY_VALUES, $QUERY_FIELS, 'cc_callerid');
 //						$this -> accountcode = $this->vouchernumber;
 //						$this -> vouchernumber = $this -> add_credit;
@@ -3327,7 +3351,6 @@ $this -> debug( ERROR, $agi, __FILE__, __LINE__, "FAXRESOLUTION: ".$faxresolutio
 				    $ttcard = ($this->agiconfig['cid_auto_create_card_typepaid']=="POSTPAID") ? 1 : 0;
 				    $this -> credit = ($this -> add_credit) ? $this -> add_credit : $this->agiconfig['cid_auto_create_card_credit'];
 //				    $this -> add_credit = 0;
-				    $this->tariff = $this->agiconfig['cid_auto_create_card_tariffgroup'];
 				    $this->creditlimit = $this->agiconfig['cid_auto_create_card_credit_limit'];
 				    //CREATE A CARD
 				    $QUERY_FIELS = 'username, useralias, uipass, credit, language, tariff, activated, typepaid, creditlimit, inuse, status, currency, country, phone, id_timezone';
@@ -3949,7 +3972,7 @@ $this -> debug( ERROR, $agi, __FILE__, __LINE__, "FAXRESOLUTION: ".$faxresolutio
 			
 			$this -> callingcard_acct_start_inuse($agi,1);
 			
-			if ($this->agiconfig['say_balance_after_auth']==1 && !$this->auth_through_accountcode) {
+			if ($this->agiconfig['say_balance_after_auth']==1 && !$this->auth_through_accountcode && $accountback == 0) {
 				
 				$this -> debug( DEBUG, $agi, __FILE__, __LINE__, "[A2Billing] SAY BALANCE : $this->credit \n");
 				$this -> fct_say_balance ($agi, $this->credit);

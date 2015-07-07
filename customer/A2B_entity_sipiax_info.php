@@ -75,7 +75,7 @@ if ($atmenu == "SIP")
 	if ($resmax) {
 		for ($k=0;$k<count($resmax);$k++) {
 			if ($resmax[$k][1] == $cardid && $extstart == 1+$extmin) {
-				$extstart = (is_numeric($resmax[$k][0]) && $extmin <= $resmax[$k][0] && $resmax[$k][0] <= $extmax) ? floor($resmax[$k][0]/100)*100+1 : $extstart;
+				$extstart = (is_numeric($resmax[$k][0]) && $extmin <= $resmax[$k][0] && $resmax[$k][0] <= $extmax) ? floor($resmax[$k][0]/100)*100+1 : $extstart+1;
 				break;
 			}
 		}
@@ -89,7 +89,7 @@ if ($atmenu == "SIP")
 //echo $resmax[$k][2]." = ".$exten_include[$resmax[$k][2]]."<br/>";
 			}
 		}
-	}
+	} else	$extstart=$extmin;
 	if ($form_action == "addexten") {
 		unset($form_action);
 		if ( !is_numeric($quantity) || !is_numeric($startnumber) || $quantity == '0' || startnumber == '0' || $quantity > $extquantity || $startnumber < $extmin || $extmax < $startnumber + $quantity -1 )

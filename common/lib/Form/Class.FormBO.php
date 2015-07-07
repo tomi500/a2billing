@@ -538,6 +538,9 @@ class FormBO {
 		$QUERY = "UPDATE cc_voicemail_users SET mailbox='".$regexten."' WHERE sip_buddy_id='".$sip_buddy_id."'";
 		$instance_table->SQLExec($FormHandler->DBHandle, $QUERY, 0);
 
+		$QUERY = "UPDATE ".$FormHandler->FG_TABLE_NAME." SET mailbox=CONCAT('".$regexten."@',SUBSTRING_INDEX(mailbox, '@', -1)) WHERE id='".$sip_buddy_id."'";
+		$instance_table->SQLExec($FormHandler->DBHandle, $QUERY, 0);
+
 		if (USE_REALTIME) {
 			$res =@  $as->connect(MANAGER_HOST,MANAGER_USERNAME,MANAGER_SECRET);
 			if ($res) {

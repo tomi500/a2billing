@@ -41,6 +41,8 @@ ALTER TABLE cc_trunk
 ALTER TABLE cc_trunk ADD lastdial VARCHAR( 50 ) COLLATE utf8_bin NOT NULL;
 ALTER TABLE cc_trunk ADD attract int(3) NOT NULL DEFAULT '0';
 
+ALTER TABLE cc_voucher ADD callplan INT(11) NOT NULL;
+
 ALTER TABLE cc_card ADD monitor int(11) DEFAULT '0';
 ALTER TABLE cc_card ADD recalldays int(11) NOT NULL DEFAULT '10';
 ALTER TABLE cc_card ADD recalltime int(11) NOT NULL DEFAULT '7200';
@@ -61,6 +63,8 @@ ALTER TABLE cc_card ADD margin_diller int(3) NOT NULL DEFAULT 10 AFTER `margin`;
 ALTER TABLE cc_card ADD commission DECIMAL( 15, 5 ) NOT NULL DEFAULT 0 AFTER `margin_diller`;
 ALTER TABLE cc_card ADD areaprefix SMALLINT( 6 ) NULL DEFAULT NULL AFTER `country`;
 ALTER TABLE cc_card ADD citylength SMALLINT( 6 ) NULL DEFAULT NULL AFTER `areaprefix`;
+ALTER TABLE cc_card ADD removeaddprefix char(30) COLLATE utf8_bin NOT NULL AFTER `citylength`;
+ALTER TABLE cc_card ADD addprefixinternational char(30) COLLATE utf8_bin NOT NULL AFTER `addprefixlocal`;
 ALTER TABLE cc_card ADD showcallstypedefault INT(11) NOT NULL DEFAULT '0';
 ALTER TABLE cc_card ADD dillertariffs varchar(60) COLLATE utf8_bin NOT NULL AFTER `tariff`;
 ALTER TABLE cc_card ADD dillergroups varchar(60) COLLATE utf8_bin NOT NULL AFTER `id_group`;

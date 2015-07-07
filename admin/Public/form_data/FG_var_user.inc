@@ -159,7 +159,7 @@ if (has_rights (ACX_MODIFY_ADMINS) && !($popup_select)) {
 			"SELECT",
 			"size=\"$len_right_list\" multiple=\"multiple\"",
 			"", "",
-			"list", "", "description, id", "", $right_list, "%1" , "",
+			"LIST", "", "description, id", "", $right_list, "%1" , "",
 			gettext("To select several rights in the above ListBox, hold the CTRL key down while clicking the items") );
 	}
 	

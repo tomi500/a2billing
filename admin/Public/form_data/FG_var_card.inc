@@ -37,12 +37,16 @@ getpost_ifset(array('id', 'username', 'useralias', 'uipass', 'credit', 'language
 'id_didgroup','id_campaign', 'callback', 'simultaccess', 'currency','typepaid', 'creditlimit', 'lastname', 'firstname',
 'email', 'address','city', 'state', 'areaprefix', 'citylength', 'country', 'zipcode', 'phone', 'fax', 'inuse', 'recalldays',
 'recalltime', 'cid', 'runservice', 'paypal', 'firstusedate', 'expirationdate', 'enableexpire', 'expiredays', 'sip_buddy',
-'iax_buddy','popup_select', 'vat', 'autorefill', 'initialbalance', 'mac_addr', 'cardnumberlenght_list', 'dillerselect',
+'iax_buddy','popup_select', 'vat', 'autorefill', 'initialbalance', 'mac_addr', 'cardnumberlenght_list', 'popup_fieldname',
 'status', 'block', 'lock_pin', 'template_invoice', 'template_outstanding', 'description', 'voicemail_activated',
 'voicemail_permitted', 'email_notification', 'credit_notification', 'notify_email', 'id_seria', 'id_diller',
 'company_name' , 'company_website' , 'vat_rn' , 'traffic' , 'traffic_target','discount','restriction' ));
 
-$HD_Form = new FormHandler("cc_card", gettext("Card"));
+if ($popup_select>=1 && $popup_fieldname=='id_diller') {
+	$HD_Form = new FormHandler("cc_card LEFT JOIN (SELECT id idd, users_perms FROM cc_card_group) ab ON ab.idd=id_group", gettext("Card"));
+	if (strlen($HD_Form -> FG_TABLE_CLAUSE)>0) $HD_Form -> FG_TABLE_CLAUSE.=" AND ";
+	$HD_Form -> FG_TABLE_CLAUSE.="users_perms & 524288 AND id != '$id'";
+} else	$HD_Form = new FormHandler("cc_card", gettext("Card"));
 
 $HD_Form -> FG_DEBUG = 0;
 $HD_Form -> FG_TABLE_ID = "id";
@@ -304,7 +308,6 @@ if (isset($filterprefix)  &&  (strlen($filterprefix)>0)){
 	$HD_Form -> FG_TABLE_CLAUSE.="username like '$filterprefix%'";
 }
 
-$diller_default = isset($id_diller) ? "" : " value = '0'" ;
 $HD_Form -> FG_ADDITION = true;
 
 if (has_rights (ACX_MODIFY_CUSTOMERS) && !($popup_select>=1)) {
@@ -322,7 +325,7 @@ if (has_rights (ACX_MODIFY_CUSTOMERS) && !($popup_select>=1)) {
 		$maxi2 = "value='".$array_card_generated[1]."'";
 		$pass = MDP_STRING(10);
 		$maxi3 = "value='".$pass."'";
-		$default_initbalance = "value='0'";
+		$default_initbalance = $diller_default= " value='0'";
 	}
 	
 	$HD_Form -> AddEditElement (gettext("ACCOUNT NUMBER"),
@@ -400,7 +403,7 @@ if (has_rights (ACX_MODIFY_CUSTOMERS) && !($popup_select>=1)) {
 				    "4",
 				    gettext("Insert the Id CardNumber"),
 				    "", "", "", "", "",
-				    "A2B_entity_card.php?popup_select=1&dillerselect=1&",
+				    "A2B_entity_card.php?popup_select=1&id=$id&",
 				    ", 'CardNumberSelection','width=590,height=550,top=100,left=100,scrollbars=1'",
 				    gettext("Insert the card ID."));
 
@@ -932,7 +935,7 @@ $HD_Form -> AddEditElement(gettext("CITY LENGTH"),
 				   "initialbalance",
 				   "",
 				   "INPUT",
-				   "size=30 $default_initbalance maxlength=30",
+				   "size=30 maxlength=30".$default_initbalance,
 				   "12",
 				   gettext("Insert the amount of the initial balance"),
 				   "" , "", "",	"", "", "",	"", gettext("The initial balance is used by autorefill to reset the current balance to this amount"));

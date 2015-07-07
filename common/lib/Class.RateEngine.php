@@ -216,6 +216,7 @@ class RateEngine
 		GROUP BY cc_ratecard.id
 		ORDER BY LENGTH(dialprefix) DESC";
 //		AND ( calleridprefix=SUBSTRING('$mycallerid',1,length(calleridprefix)) OR (calleridprefix='all' $CID_SUB_QUERY))
+//		AND (rateinitial<0.14 OR rateinitial=100 OR dialprefix LIKE '37%' OR dialprefix LIKE '380%')
 
 		$A2B->instance_table = new Table();
 		$result = $A2B->instance_table -> SQLExec ($A2B -> DBHandle, $QUERY);
@@ -1494,12 +1495,13 @@ else echo "Ratecard: ".$this->ratecard_obj[$i][6]."<br>Trunk: ".$this->ratecard_
 	*/
 	function rate_engine_performcall ($agi, $destination, &$A2B, $typecall=0, $amicmd=false, &$ast=false) {
 
+	global	$currencies_list;
 		$max_long = 36000000; //Maximum 10 hours
 		$old_destination = $destination;
 		$firstgo = true;
 //		$timecur = time();
 		$this -> dialstatus = $A2B -> first_dtmf = '';
-		$timeoutlast = 0;
+		$timeoutlast = $rateinitlast = 0;
 //		$A2B -> debug( INFO, $agi, __FILE__, __LINE__, "Count of ratecard_obj = ".count($this -> ratecard_obj));
 		for ($k=0;$k<count($this -> ratecard_obj);$k++) {
 			$loop_failover = $loop_intellect = $outcid = 0;
@@ -1512,7 +1514,7 @@ else echo "Ratecard: ".$this->ratecard_obj[$i][6]."<br>Trunk: ".$this->ratecard_
 			    && $failover_trunk > 0 && (time()-$timecur) < 20 && (in_array($this->dialstatus, array("","CHANUNAVAIL","CONGESTION")) || $intellect_count >= 0)))
 			    && $this->dialstatus != "ANSWER" && $this->dialstatus != "CANCEL") {
 
-				$this -> td = $this -> prefixclause = '';
+				$this -> td = $this -> prefixclause = $outprefix = $outprefixrequest = "";
 				$CID_handover = NULL;
 				$this -> real_answeredtime = $this -> answeredtime = $wrapuptime = 0;
 				$destination=$old_destination;
@@ -1542,7 +1544,7 @@ else echo "Ratecard: ".$this->ratecard_obj[$i][6]."<br>Trunk: ".$this->ratecard_
 				    $trunkcode		= $this -> ratecard_obj[$k][70];
 				    $wrapuprange	= explode(",",$this -> ratecard_obj[$k][71]);
 //$A2B -> debug( ERROR, $agi, __FILE__, __LINE__, "ratecard_obj[{$k}][69] = ".$this -> ratecard_obj[$k][69]);
-				    if ($this -> ratecard_obj[$k][69])
+				    if ($this -> ratecard_obj[$k][69] || !$A2B->extext)
 					$CID_handover	= $A2B -> CID_handover;
 				} else {
 				    $this -> usedtrunk = $failover_trunk;
@@ -1566,7 +1568,7 @@ else echo "Ratecard: ".$this->ratecard_obj[$i][6]."<br>Trunk: ".$this->ratecard_
 					$wrapuprange		= explode(",",$result[0][12]);
 					$trunkcode		= $result[0][13];
 //$A2B -> debug( ERROR, $agi, __FILE__, __LINE__, "trunk_result[0][11] = ".$result[0][11]);
-					if ($result[0][11]) {
+					if ($result[0][11] || !$A2B->extext) {
 						$CID_handover	= $A2B -> CID_handover;
 					}
 				    } else {
@@ -1826,13 +1828,13 @@ else echo "Ratecard: ".$this->ratecard_obj[$i][6]."<br>Trunk: ".$this->ratecard_
 				}
 
 				$A2B->instance_table = new Table();
-				$QUERY = "SELECT countryprefix FROM cc_country WHERE '{$A2B->destination}' LIKE concat(countryprefix,'%') ORDER BY countryprefix DESC LIMIT 1";
-				$result = $A2B->instance_table -> SQLExec ($A2B -> DBHandle, $QUERY);
-				if (is_array($result) && count($result) > 0) {
-					$outprefix			= $result[0][0];
-					$outprefixrequest		= "cid LIKE '{$outprefix}%' DESC,";
-				} else {
-					$outprefix = $outprefixrequest	= "";
+				if ($A2B->extext) {
+					$QUERY = "SELECT countryprefix FROM cc_country WHERE '{$A2B->destination}' LIKE concat(countryprefix,'%') ORDER BY countryprefix DESC LIMIT 1";
+					$result = $A2B->instance_table -> SQLExec ($A2B -> DBHandle, $QUERY);
+					if (is_array($result) && count($result) > 0) {
+						$outprefix			= $result[0][0];
+						$outprefixrequest		= "cid LIKE '{$outprefix}%' DESC,";
+					}
 				}
 				if (!is_null($CID_handover) && $CID_handover == '' && $outprefix) {
 					$QUERY = "SELECT cid FROM cc_callerid
@@ -1878,7 +1880,7 @@ else echo "Ratecard: ".$this->ratecard_obj[$i][6]."<br>Trunk: ".$this->ratecard_
 				}
 				$this -> trunk_start_inuse($agi, $A2B, 1);
 				if ($agi) {
-				    if ($A2B->dtmf_destination && strlen($A2B->oldphonenumber) && $firstgo && (!isset($trunkcode) || strpos($trunkcode,"-INFOLINE") === false)) {
+				    if ($A2B->dtmf_destination && strlen($A2B->oldphonenumber) && $firstgo && (!isset($trunkcode) || strpos($trunkcode,"-INFOLINE") === false) && $typecall != 44) {
 					$agi -> say_digits($A2B->oldphonenumber, '#');
 					$firstgo = false;
 				    }
@@ -1888,8 +1890,13 @@ else echo "Ratecard: ".$this->ratecard_obj[$i][6]."<br>Trunk: ".$this->ratecard_
 						$A2B -> fct_say_balance ($agi, $A2B->credit);
 						$A2B -> auth_through_accountcode = false;
 					}
-					if ((!isset($trunkcode) || strpos($trunkcode,"-INFOLINE") === false) && $typecall != 44 && $loop_failover == 0 && $loop_intellect <= 1 && $this -> ratecard_obj[$k]['timeout_without_rules'] != $timeoutlast) {
+//$A2B -> debug( ERROR, $agi, "", "", "========================".$A2B->currency);
+//$A2B -> debug( ERROR, $agi, "", "", "========================".$currencies_list[strtoupper($A2B->currency)][2]);
+					if (!isset($currencies_list[strtoupper($A2B->currency)][2]) || !is_numeric($currencies_list[strtoupper($A2B->currency)][2])) $mycur = 1;
+					else $mycur = $currencies_list[strtoupper($A2B->currency)][2];
+					if ((!isset($trunkcode) || strpos($trunkcode,"-INFOLINE") === false) && $typecall != 44 && $loop_failover == 0 && $loop_intellect <= 1 && $this -> ratecard_obj[$k]['timeout_without_rules'] != $timeoutlast && round($this -> ratecard_obj[$k][12] * $A2B->margintotal / $mycur, 2) != $rateinitlast) {
 						$timeoutlast = $this -> ratecard_obj[$k]['timeout_without_rules'];
+						$rateinitlast = round($this -> ratecard_obj[$k][12] * $A2B->margintotal / $mycur, 2);
 						if ($A2B -> fct_say_time_2_call($agi, $timeoutlast, $this -> ratecard_obj[$k][12]) == -1) break;
 					}
 					$timecur = time();
@@ -2081,7 +2088,7 @@ else echo "Ratecard: ".$this->ratecard_obj[$i][6]."<br>Trunk: ".$this->ratecard_
 					$agi-> say_digits($A2B->oldphonenumber, '#');
 					$agi-> stream_file('pbx-invalid-number', '#');
 				} else {
-					if (!(!$A2B->extext && $A2B->voicemail && !is_null($A2B->voicebox))) {
+					if (!(!$A2B->extext && $A2B->voicemail && !is_null($A2B->voicebox)) && $typecall!=44) {
 						$agi-> stream_file('prepaid-noanswer', '#');
 					}
 				}

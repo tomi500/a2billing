@@ -763,7 +763,7 @@ function generate_unique_value($table, $len, $field)
 /*
  * function gen_card_with_alias
  */
-function gen_card_with_alias($table = "cc_card", $api = 0, $length_cardnumber = LEN_CARDNUMBER, $DBHandle = null, $alias_static = 0)
+function gen_card_with_alias($table = "cc_card", $api = 0, $length_cardnumber = LEN_CARDNUMBER, $DBHandle = null, $alias_static = 0, $card_id = 0)
 {
 	if (!isset($DBHandle)) {
 		$DBHandle = DbConnect();
@@ -789,6 +789,13 @@ function gen_card_with_alias($table = "cc_card", $api = 0, $length_cardnumber = 
 			}
 		}
 
+		if ($card_id) {
+			$inst_table = new Table($table, "useralias");
+			$resmax = $inst_table->Get_list($DBHandle, "id = '$card_id' AND useralias NOT IN (SELECT name FROM cc_sip_buddies WHERE id_cc_card = '$card_id' AND external=0) AND LENGTH(useralias)=" . LEN_ALIASNUMBER, "", "", "", "", "", "", "", 10);
+			if (is_array($resmax) && count($resmax)) {
+				$alias_gen = $resmax[0][0];
+			}
+		}
 		$query = "SELECT cc_card.username, cc_sip_buddies.name  FROM " . $table . " where cc_card.username='$card_gen' OR cc_card.useralias='$alias_gen' OR cc_card.useralias='$card_gen' FULL OUTER JOIN cc_sip_buddies ON cc_sip_buddies.name='$card_gen' OR cc_sip_buddies.name='$alias_gen'";
 		$numrow = 0;
 		$resmax = $DBHandle->Execute($query);
@@ -867,7 +874,8 @@ function gen_friends($card_id, $start, $quantity, $min, $max, $DBHandle = null, 
 		    }
 //echo $start."-";
 		$pass = MDP_STRING(10);
-		$name = gen_card_with_alias("cc_card", 0, LEN_CARDNUMBER, $DBHandle, $start);
+		$c_id = $i==1 ? $card_id : 0 ;
+		$name = gen_card_with_alias("cc_card", 0, LEN_CARDNUMBER, $DBHandle, $start, $c_id);
 
 		$QUERY = "INSERT INTO cc_sip_buddies (id_cc_card, name, defaultuser, accountcode, secret, regexten, callerid, amaflags, type, nat, dtmfmode, allow, host, context, regseconds, language, mailbox, rtptimeout, rtpholdtimeout, rtpkeepalive, qualify, allowtransfer)
 			VALUES ('$card_id', '{$name[1]}', '{$name[1]}', '" . $_SESSION["pr_login"] . "', '$pass', '$start', 'Internal-$start', '$amaflags', '$type', '$nat', '$dtmfmode', '$allow', '$host', '$context', $regseconds, '$language', '{$start}@{$_SESSION["pr_login"]}', $rtptimeout, $rtpholdtimeout, $rtpkeepalive, '$qualify', $allowtransfer)";

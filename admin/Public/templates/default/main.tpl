@@ -87,7 +87,7 @@
 	</ul>
 	</div>
 	{/if}
-
+<!--
 	{if ($ACXADMINISTRATOR  > 0)}
 	<div class="toggle_menu"><li>
 	<a href="javascript:;" class="toggle_menu" target="_self"> <div> <div id="menutitlebutton"> <img id="img2"
@@ -110,7 +110,7 @@
 		</ul>
 	</div>
 	{/if}
-
+-->
 
 	{if ($ACXADMINISTRATOR  > 0)}
 	<div class="toggle_menu"><li>

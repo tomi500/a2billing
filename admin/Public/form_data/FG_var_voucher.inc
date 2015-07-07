@@ -5,10 +5,10 @@
 /**
  * This file is part of A2Billing (http://www.a2billing.net/)
  *
- * A2Billing, Commercial Open Source Telecom Billing platform,   
+ * A2Billing, Commercial Open Source Telecom Billing platform,
  * powered by Star2billing S.L. <http://www.star2billing.com/>
- * 
- * @copyright   Copyright (C) 2004-2009 - Star2billing S.L. 
+ *
+ * @copyright   Copyright (C) 2004-2012 - Star2billing S.L.
  * @author      Belaid Arezqui <areski@gmail.com>
  * @license     http://www.fsf.org/licensing/licenses/agpl-3.0.html
  * @package     A2Billing
@@ -27,13 +27,14 @@
  *
  * You should have received a copy of the GNU Affero General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
- * 
- * 
+ *
+ *
 **/
 
 
 
-getpost_ifset(array('id', 'creationdate', 'usedate', 'expirationdate', 'voucher', 'tag', 'credit', 'activated', 'used', 'currency'));
+//getpost_ifset(array('id', 'creationdate', 'usedate', 'expirationdate', 'voucher', 'tag', 'credit', 'activated', 'used', 'currency'));
+getpost_ifset(array('id', 'creationdate', 'usedate', 'expirationdate', 'voucher', 'tag', 'credit', 'activated', 'used', 'currency', 'callplan'));
 
 $HD_Form = new FormHandler("cc_voucher","Voucher");
 
@@ -85,8 +86,9 @@ $HD_Form -> AddViewElement(gettext("ACCOUNT USED"), "usedcardnumber", "12%", "ce
 $HD_Form -> AddViewElement(gettext("CREATED DATE"), "creationdate", "12%", "center", "sort", "16");
 $HD_Form -> AddViewElement(gettext("USED DATE"), "usedate", "13%", "center", "sort", "16");
 $HD_Form -> AddViewElement(gettext("CURRENCY"), "currency", "6%", "center", "sort", "", "list", $currency_list_key);
+$HD_Form -> AddViewElement(gettext("CALLPLAN"), "callplan", "8%", "center", "sort", "20", "lie", "cc_tariffgroup", "tariffgroupname", "id='%id'", "%1");
 
-$HD_Form -> FieldViewElement ('id, voucher, credit, tag, activated, used, usedcardnumber, creationdate, usedate, currency');
+$HD_Form -> FieldViewElement ('id, voucher, credit, tag, activated, used, usedcardnumber, creationdate, usedate, currency, callplan');
 
 
 // Search form
@@ -98,6 +100,7 @@ $HD_Form -> FG_FILTER_SEARCH_2_TIME_FIELD = 'creationdate';
 $HD_Form -> AddSearchElement_C1 (gettext("VOUCHER"), 'voucher','vouchertype');
 $HD_Form -> AddSearchElement_C1 (gettext("ACCOUNT NUMBER"),'usedcardnumber','usedcardnumbertype');
 $HD_Form -> AddSearchElement_C1 (gettext("TAG"),'tag','tagtype');
+$HD_Form -> AddSearchElement_C1 (gettext("CALLPLAN"), 'callplanid','callplanidtype');	
 $HD_Form -> AddSearchElement_C2 (gettext("CREDIT"),'credit1','credit1type','credit2','credit2type','credit');
 
 $HD_Form -> FG_FILTER_SEARCH_FORM_SELECT_TEXT = '';
@@ -126,31 +129,31 @@ if ($form_action=="ask-add") {
 }
 
 $HD_Form -> AddEditElement (gettext("VOUCHER"),
-   "voucher",			
-   "$value",	
+   "voucher",
+   "$value",
    "INPUT",
-	"size=20 $maxi readonly maxlength=40",	 
-   "4",	
+	"size=20 $maxi readonly maxlength=40",
+   "4",
    gettext("Insert the voucher"),
    "" , "", "",	"", "" , "", "", "");
 
 
 $HD_Form -> AddEditElement (gettext("AMOUNT"),
    "credit",
-   '$value',	
-   "INPUT",	
-   "size=30 maxlength=30",	
+   '$value',
+   "INPUT",
+   "size=30 maxlength=30",
    "12",
    gettext("Insert the number of credit"),
    "" , "", "",	"", "", "",	"", "" );
 
 
 $HD_Form -> AddEditElement (gettext("TAG"),
-   "tag",			
-   '$value',	
+   "tag",
+   '$value',
    "INPUT",
-   "size=30 maxlength=30",	
-   "11",	
+   "size=30 maxlength=30",
+   "11",
    gettext("Insert the tag"),
    "" , "", "",	"", "", "", "NO-NULL", "" );
 
@@ -158,8 +161,8 @@ $HD_Form -> AddEditElement (gettext("TAG"),
 $HD_Form -> AddEditElement (gettext("ACTIVATED"),
 	"activated",
 	't',
-	"RADIOBUTTON",	
-	"",	
+	"RADIOBUTTON",
+	"",
 	"",
 	gettext("Choose if you want to activate this card"),
 	"" , "", "" ,"Yes :t, - No:f", "", "" , "" , "");
@@ -176,7 +179,7 @@ $HD_Form -> AddEditElement (gettext("CURRENCY"),
 
 if ($form_action=="ask-add") {
 	$begin_date = date("Y");
-	$begin_date_plus = date("Y")+10;
+	$begin_date_plus = date("Y") + 10;
 	$end_date = date("-m-d H:i:s");
 	$comp_date = "value='".$begin_date.$end_date."'";
 	$comp_date_plus = "value='".$begin_date_plus.$end_date."'";
@@ -187,7 +190,7 @@ $HD_Form -> AddEditElement (gettext("EXPIRY DATE"),
 	"expirationdate",
 	'$value',
 	"INPUT",
-	"size=40 maxlength=40  $comp_date_plus",	
+	"size=40 maxlength=40  $comp_date_plus",
 	"10",
 	gettext("Insert the expiration date"),
 	"" , "", "",	"", "", "", "", gettext("Format YYYY-MM-DD HH:MM:SS. For instance, '2004-12-31 00:00:00'"), null, "res_display_dateformat" );

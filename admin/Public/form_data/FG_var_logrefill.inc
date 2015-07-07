@@ -105,14 +105,14 @@ if (has_rights (ACX_MODIFY_REFILLS)) {
 	}
 	
 	$HD_Form -> AddEditElement (gettext("ID CUSTOMER"),
-				   "card_id",		
-				   "$value", "POPUPVALUE", "size=30 maxlength=50 ".$id_val,		
-				   "4",	gettext("Insert the Customer ID"),
-				    "" , "", "", "", "", 				
-					"A2B_entity_card.php?popup_select=1&", ", 'CardNumberSelection','width=550,height=330,top=20,left=100,scrollbars=1'" ,
-					gettext("Select the Customer ID"));
+				"card_id",
+				"$value", "POPUPVALUE", "size=30 maxlength=50 ".$id_val,
+				"4",	gettext("Insert the Customer ID"),
+				"" , "", "", "", "",
+				"A2B_entity_card.php?popup_select=1&", ", 'CardNumberSelection','width=550,height=330,top=20,left=100,scrollbars=1'" ,
+				gettext("Select the Customer ID"));
 	
-	if ($form_action=="ask-add") {	
+	if ($form_action=="ask-add") {
 		$begin_date = date("Y");
 		$end_date = date("-m-d H:i:s");
 		$comp_date=$begin_date.$end_date;
@@ -120,51 +120,51 @@ if (has_rights (ACX_MODIFY_REFILLS)) {
 	}
 	
 	$HD_Form -> AddEditElement (gettext("REFILL DATE"),
-				   "date",		
-				   '$value',	
-				   "INPUT",	
-				   "size=40 maxlength=40 $comp_date",	
-				   "10",	
-				   gettext("Insert the current date"),
-				   "" , "", "",	"", "", "", "", "" );
+				"date",
+				'$value',
+				"INPUT",
+				"size=40 maxlength=40 $comp_date",
+				"10",
+				gettext("Insert the current date"),
+				"", "", "", "", "", "", "", "");
 	
 	$HD_Form -> AddEditElement (gettext("REFILL AMOUNT"),
-				   "credit",		
-				   '$value',	
-				   "INPUT",	
-				   "size=60 maxlength=10",	
-				   "12",	
-				   gettext("Insert the credit amount"),
-				   "" , "", "",	"", "" , "", "", gettext("Enter the amount in the currency base : ").BASE_CURRENCY );
+				"credit",
+				'$value',
+				"INPUT",
+				"size=60 maxlength=10",
+				"12",
+				gettext("Insert the credit amount"),
+				"", "", "", "", "", "", "", gettext("Enter the amount in the currency base : ").BASE_CURRENCY );
 	
 	$HD_Form -> AddEditElement (gettext("DESCRIPTION"),
-					"description",
-					'',
-					"TEXTAREA",
-					"cols=50 rows=4",
-					"",
-					gettext("Insert the description"),
-					"", "", "", "", "", "", "NO-NULL" );
-				   
-	$HD_Form -> AddEditElement (gettext("REFILL TYPE"),
-	               "refill_type",
-	               '$value',
-	               "SELECT",
-	               "",
-	               "",
-	               "",
-	               "list", "", "", "", $list_refill_type, "%1", "", gettext("Define type for payment and refill,if created.") );
+				"description",
+				'',
+				"TEXTAREA",
+				"cols=50 rows=4",
+				"",
+				gettext("Insert the description"),
+				"", "", "", "", "", "", "NO-NULL" );
 	
-	if ($form_action!="ask-edit" && $form_action!="edit") {	
+	$HD_Form -> AddEditElement (gettext("REFILL TYPE"),
+				"refill_type",
+				'$value',
+				"SELECT",
+				"",
+				"",
+				"",
+				"list", "", "", "", $list_refill_type, "%1", "", gettext("Define type for payment and refill,if created.") );
+	
+	if ($form_action!="ask-edit" && $form_action!="edit") {
 		$HD_Form -> AddEditElement (gettext("CREATE ASSOCIATE INVOICE"),
-					   "added_invoice",
-					   '1',
-					   "RADIOBUTTON",
-					   "",
-					   "",
-					   gettext("Choose if you want to create an invoice with this refill account"),
-					   "" , "", "" , "Yes :1, - No:0", "", "" , "", "");
-	$added_invoice = ", added_invoice";
+				"added_invoice",
+				'0',
+				"RADIOBUTTON",
+				"",
+				"",
+				gettext("Choose if you want to create an invoice with this refill account"),
+				"" , "", "" , "Yes :1, - No:0", "", "" , "", "");
+		$added_invoice = ", added_invoice";
 	} else	$added_invoice = '';
 	
 	
