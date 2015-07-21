@@ -206,7 +206,7 @@ $FG_TABLE_ALTERNATE_ROW_COLOR[1]='#EEE9E9';
 		<?php 
 		
 		for($j=0;$j<count($RateEngine->ratecard_obj);$j++){ 
-		    if ($RateEngine->ratecard_obj[$j][12]<100) {
+		    if ($RateEngine->ratecard_obj[$j][12]<100 && $RateEngine->ratecard_obj[$j][7] != '') {
 			$result = $A2B->instance_table -> SQLExec ($A2B -> DBHandle, "SELECT destination FROM cc_prefix where prefix='".$RateEngine->ratecard_obj[$j][5]."'");
 			if (is_array($result))	$destination = $result[0][0];
 				
@@ -228,7 +228,7 @@ $FG_TABLE_ALTERNATE_ROW_COLOR[1]='#EEE9E9';
 				<td height="15" bgcolor="<?php echo $FG_TABLE_ALTERNATE_ROW_COLOR[$k]?>" style="padding-left: 5px; padding-right: 3px;" nowrap>
 						<font color="blue"><b><?php echo gettext("CallTime available");?></b></font>				</td>
 				<td height="15" bgcolor="<?php echo $FG_TABLE_ALTERNATE_ROW_COLOR[$k]?>" style="padding-left: 5px; padding-right: 3px;">
-						<font color="blue"><i><?php echo display_minute($RateEngine->ratecard_obj[$j]['timeout_without_rules']);?> <?php echo gettext("Minutes ");?> </i></font>
+						<font color="blue"><i><?php echo display_minute($RateEngine->ratecard_obj[$j]['alltimeout']);?> <?php echo gettext("Minutes ");?> </i></font>
 				</td><?php $k=($k)?0:1;?>
 			</tr>
 				
@@ -273,7 +273,8 @@ $FG_TABLE_ALTERNATE_ROW_COLOR[1]='#EEE9E9';
 						<i><?php echo round($A2B->margintotal * $RateEngine->ratecard_obj[$j][12] / $mycur, 5); ?> <?php echo gettext($currency); ?></i>
 				</td>
 			</tr>
-		<?php }} ?>
+		<?php if ($RateEngine->ratecard_obj[$j][42]==0)	break;
+		    }} ?>
 		
 	  </table>
       <div align="center">

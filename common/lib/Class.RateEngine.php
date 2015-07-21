@@ -469,27 +469,27 @@ else echo "Ratecard: ".$this->ratecard_obj[$i][6]."<br>Trunk: ".$this->ratecard_
 	{
 		global $agi;
 
-		$rateinitial 			 = a2b_round (abs($this -> ratecard_obj[$K][12]));
+		$rateinitial 			 = a2b_round (abs($this -> ratecard_obj[$K][12])* $A2B->margintotal);
 		$initblock 					= $this -> ratecard_obj[$K][13];
 		$billingblock 					= $this -> ratecard_obj[$K][14];
-		$connectcharge 			 = a2b_round (abs($this -> ratecard_obj[$K][15]));
-		$disconnectcharge 		 = a2b_round (abs($this -> ratecard_obj[$K][16]));
-		$stepchargea 					= $this -> ratecard_obj[$K][17];
-		$chargea 			 = a2b_round (abs($this -> ratecard_obj[$K][18]));
+		$connectcharge 			 = a2b_round (abs($this -> ratecard_obj[$K][15])* $A2B->margintotal);
+		$disconnectcharge 		 = a2b_round (abs($this -> ratecard_obj[$K][16])* $A2B->margintotal);
+		$stepchargea 			 = a2b_round	 ($this -> ratecard_obj[$K][17] * $A2B->margintotal);
+		$chargea 			 = a2b_round	 ($this -> ratecard_obj[$K][18] * $A2B->margintotal);
 		$timechargea 					= $this -> ratecard_obj[$K][19];
 		$billingblocka 					= $this -> ratecard_obj[$K][20];
-		$stepchargeb 					= $this -> ratecard_obj[$K][21];
-		$chargeb 			 = a2b_round (abs($this -> ratecard_obj[$K][22]));
+		$stepchargeb 			 = a2b_round	 ($this -> ratecard_obj[$K][21] * $A2B->margintotal);
+		$chargeb 			 = a2b_round	 ($this -> ratecard_obj[$K][22] * $A2B->margintotal);
 		$timechargeb 					= $this -> ratecard_obj[$K][23];
 		$billingblockb 					= $this -> ratecard_obj[$K][24];
-		$stepchargec 					= $this -> ratecard_obj[$K][25];
-		$chargec 			 = a2b_round (abs($this -> ratecard_obj[$K][26]));
+		$stepchargec 			 = a2b_round	 ($this -> ratecard_obj[$K][25] * $A2B->margintotal);
+		$chargec 			 = a2b_round	 ($this -> ratecard_obj[$K][26] * $A2B->margintotal);
 		$timechargec 					= $this -> ratecard_obj[$K][27];
 		$billingblockc 					= $this -> ratecard_obj[$K][28];
 		// ****************  PACKAGE PARAMETERS ****************
 		$id_cc_package_offer				= $this -> ratecard_obj[$K][38];
 		$id_rate					= $this -> ratecard_obj[$K][6];
-		$disconnectcharge_after 			= $this -> ratecard_obj[$K][49];
+		$disconnectcharge_after 	 = a2b_round	 ($this -> ratecard_obj[$K][49] * $A2B->margintotal);
 		$announce_time_correction			= $this -> ratecard_obj[$K][50];
 		$tag						= $this -> ratecard_obj[$K][72];
 //		$destination					= $this -> ratecard_obj[$K][5];
@@ -597,9 +597,9 @@ else echo "Ratecard: ".$this->ratecard_obj[$i][6]."<br>Trunk: ".$this->ratecard_
 			$callbackrate['bb_c'] = $billingblockc;
 		}
 		
-		$rateinitial = a2b_round ($rateinitial * $A2B->margintotal);
+//		$rateinitial = a2b_round ($rateinitial * $A2B->margintotal);
 		$this -> ratecard_obj[$K]['callbackrate']=$callbackrate;
-		$this -> ratecard_obj[$K]['timeout']=0;
+		$this -> ratecard_obj[$K]['timeout']=$this -> ratecard_obj[$K]['alltimeout']=0;
 		$this -> ratecard_obj[$K]['timeout_without_rules']=0;
 		// used for the simulator
 		$this -> ratecard_obj[$K]['freetime_include_in_timeout'] = $this -> freetimetocall_left[$K];
@@ -609,7 +609,7 @@ else echo "Ratecard: ".$this->ratecard_obj[$i][6]."<br>Trunk: ".$this->ratecard_
 		$answeredtime_1st_leg = 0;
 
 		if ($rateinitial <= 0) {
-			$this -> ratecard_obj[$K]['timeout']= $A2B->agiconfig['maxtime_tocall_negatif_free_route'];
+			$this -> ratecard_obj[$K]['timeout'] = $this -> ratecard_obj[$K]['alltimeout'] = $A2B->agiconfig['maxtime_tocall_negatif_free_route'];
 			$this -> ratecard_obj[$K]['timeout_without_rules'] = $A2B->agiconfig['maxtime_tocall_negatif_free_route'];
 			$TIMEOUT = $A2B->agiconfig['maxtime_tocall_negatif_free_route'];
 			// 90 min
@@ -619,15 +619,11 @@ else echo "Ratecard: ".$this->ratecard_obj[$i][6]."<br>Trunk: ".$this->ratecard_
 		
 		if ($this -> freecall[$K]) {
 			if ($this -> package_to_apply [$K] ["type"] == 0) {
-				$this -> ratecard_obj[$K]['timeout'] = $A2B->agiconfig['maxtime_tounlimited_calls']; // default : 90 min
-				$TIMEOUT = $A2B->agiconfig['maxtime_tounlimited_calls'];
+				$TIMEOUT = $this -> ratecard_obj[$K]['freetime_include_in_timeout'] = $this -> ratecard_obj[$K]['timeout'] = $this -> ratecard_obj[$K]['alltimeout'] = $A2B->agiconfig['maxtime_tounlimited_calls']; // default : 90 min
 				$this -> ratecard_obj[$K]['timeout_without_rules'] = $A2B->agiconfig['maxtime_tounlimited_calls'];
-				$this -> ratecard_obj[$K]['freetime_include_in_timeout'] = $A2B->agiconfig['maxtime_tounlimited_calls'];
 			} else {
-				$this -> ratecard_obj[$K]['timeout'] = $A2B->agiconfig['maxtime_tofree_calls'];
-				$TIMEOUT = $A2B->agiconfig['maxtime_tofree_calls'];
+				$TIMEOUT = $this -> ratecard_obj[$K]['freetime_include_in_timeout'] = $this -> ratecard_obj[$K]['timeout'] = $this -> ratecard_obj[$K]['alltimeout'] = $A2B->agiconfig['maxtime_tofree_calls'];
 				$this -> ratecard_obj[$K]['timeout_without_rules'] = $A2B->agiconfig['maxtime_tofree_calls'];
-				$this -> ratecard_obj[$K]['freetime_include_in_timeout'] = $A2B->agiconfig['maxtime_tofree_calls'];
 			}
 			
 //			if ($this -> debug_st) print_r($this -> ratecard_obj[$K]);
@@ -635,8 +631,7 @@ else echo "Ratecard: ".$this->ratecard_obj[$i][6]."<br>Trunk: ".$this->ratecard_
 		}
 		
 		if ($credit < $A2B->agiconfig['min_credit_2call'] && $this -> freetimetocall_left[$K]>0) {
-			$this -> ratecard_obj[$K]['timeout'] = $this -> freetimetocall_left[$K];
-			$TIMEOUT = $this -> freetimetocall_left[$K];
+			$TIMEOUT = $this -> ratecard_obj[$K]['timeout'] = $this -> ratecard_obj[$K]['alltimeout'] = $this -> freetimetocall_left[$K];
 			$this -> ratecard_obj[$K]['timeout_without_rules'] = $this -> freetimetocall_left[$K];
 			return $TIMEOUT;
         }
@@ -644,7 +639,7 @@ else echo "Ratecard: ".$this->ratecard_obj[$i][6]."<br>Trunk: ".$this->ratecard_
 
 		// IMPROVE THE get_variable AND TRY TO RETRIEVE THEM ALL SOMEHOW
 		if ($A2B->mode == 'callback') {
-			$calling_party_rateinitial	= a2b_round ($agi->get_variable('RI', true) * $A2B->margintotal);
+			$calling_party_rateinitial	= $agi->get_variable('RI', true);
 			$calling_party_initblock	= $agi->get_variable('IB', true);
 			$calling_party_billingblock	= $agi->get_variable('BB', true);
 			$calling_party_connectcharge	= $agi->get_variable('CC', true);
@@ -848,7 +843,8 @@ else echo "Ratecard: ".$this->ratecard_obj[$i][6]."<br>Trunk: ".$this->ratecard_
 		$num_sec_WR = intval($num_min_WR * 60);
 		$this -> ratecard_obj[$K]['timeout_without_rules'] = $num_sec_WR + $this -> freetimetocall_left[$K];
 		
-		$TIMEOUT = $TIMEOUT + $this -> freetimetocall_left[$K];
+		$TIMEOUT = $this -> ratecard_obj[$K]['alltimeout'] = $TIMEOUT + $this -> freetimetocall_left[$K];
+//$A2B -> debug( ERROR, $agi, __FILE__, __LINE__, "&K - [TIMEOUT] = $TIMEOUT");
 		if ($TIMEOUT > $A2B->agiconfig['maxtime_tounlimited_calls']) {
 		    $addtimeout = $TIMEOUT - $A2B->agiconfig['maxtime_tounlimited_calls'];
 		    $TIMEOUT = $A2B->agiconfig['maxtime_tounlimited_calls'];
@@ -1884,7 +1880,7 @@ else echo "Ratecard: ".$this->ratecard_obj[$i][6]."<br>Trunk: ".$this->ratecard_
 					$agi -> say_digits($A2B->oldphonenumber, '#');
 					$firstgo = false;
 				    }
-				    if (($this -> ratecard_obj[$k][12] > 0 && !($A2B->cardnumber != $A2B->accountcode)) || ($this -> ratecard_obj[$k][12] == 0 && $A2B->extext && $this -> ratecard_obj[$k][4] != $A2B->cardnumber && $ipaddress != $prefix.$destination)) {
+				    if (($this -> ratecard_obj[$k][12] > 0 && !($A2B->cardnumber != $A2B->accountcode)) || ($this -> ratecard_obj[$k][12] == 0 && $A2B->extext && $this -> ratecard_obj[$k][4] != $A2B->cardnumber && $ipaddress != $prefix.$destination && $this -> ratecard_obj[$k][72] != 'EMERGENCY')) {
 					if ($A2B->auth_through_accountcode && $typecall != 44) {
 						$A2B -> debug( DEBUG, $agi, __FILE__, __LINE__, "[A2Billing] SAY BALANCE : $A2B->credit");
 						$A2B -> fct_say_balance ($agi, $A2B->credit);
@@ -1894,8 +1890,8 @@ else echo "Ratecard: ".$this->ratecard_obj[$i][6]."<br>Trunk: ".$this->ratecard_
 //$A2B -> debug( ERROR, $agi, "", "", "========================".$currencies_list[strtoupper($A2B->currency)][2]);
 					if (!isset($currencies_list[strtoupper($A2B->currency)][2]) || !is_numeric($currencies_list[strtoupper($A2B->currency)][2])) $mycur = 1;
 					else $mycur = $currencies_list[strtoupper($A2B->currency)][2];
-					if ((!isset($trunkcode) || strpos($trunkcode,"-INFOLINE") === false) && $typecall != 44 && $loop_failover == 0 && $loop_intellect <= 1 && $this -> ratecard_obj[$k]['timeout_without_rules'] != $timeoutlast && round($this -> ratecard_obj[$k][12] * $A2B->margintotal / $mycur, 2) != $rateinitlast) {
-						$timeoutlast = $this -> ratecard_obj[$k]['timeout_without_rules'];
+					if ((!isset($trunkcode) || strpos($trunkcode,"-INFOLINE") === false) && $typecall != 44 && $loop_failover == 0 && $loop_intellect <= 1 && $this -> ratecard_obj[$k]['alltimeout'] != $timeoutlast && round($this -> ratecard_obj[$k][12] * $A2B->margintotal / $mycur, 2) != $rateinitlast) {
+						$timeoutlast = $this -> ratecard_obj[$k]['alltimeout'];
 						$rateinitlast = round($this -> ratecard_obj[$k][12] * $A2B->margintotal / $mycur, 2);
 						if ($A2B -> fct_say_time_2_call($agi, $timeoutlast, $this -> ratecard_obj[$k][12]) == -1) break;
 					}
@@ -2019,6 +2015,7 @@ else echo "Ratecard: ".$this->ratecard_obj[$i][6]."<br>Trunk: ".$this->ratecard_
 				    if ($this->dialstatus == "ANSWER") {
 					$answeredtime					= $agi->get_variable("ANSWEREDTIME",true);
 					if ($answeredtime == "")	$answeredtime	= $agi->get_variable("CDR(billsec)",true);
+					if ($answeredtime == $this -> ratecard_obj[$k]['alltimeout'] + 1)	$answeredtime--;
 //$tempdebug="ANSWEREDTIME: $answeredtime sec";
 				    } else {
 					$answeredtime					= 0;

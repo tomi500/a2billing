@@ -3013,13 +3013,13 @@ $this -> debug( ERROR, $agi, __FILE__, __LINE__, "FAXRESOLUTION: ".$faxresolutio
 		$remadd = explode(",",$remadd);
 		if (is_array($remadd) && count($remadd)>0) {
 			for ($i=0;$i<count($remadd);$i=$i+2) {
-				if (substr($cidnumber,0,strlen($remadd[$i]))==$remadd[$i]) {
-					$cidnumber = substr($cidnumber,strlen($remadd[$i])) . $remadd[$i+1];
+				if ($remadd[$i]!="" && substr($cidnumber,0,strlen($remadd[$i]))==$remadd[$i]) {
+					$cidnumber = @ substr($cidnumber,strlen($remadd[$i])) . $remadd[$i+1];
 					break;
 				}
 			}
 		}
-		if ($cidbirth == $cidnumber && strlen($cidbirth)>6)
+		if ($cidbirth == $cidnumber && strlen($cidbirth)>6 && !preg_match("/^[a-zA-Z].{2,}$/",$cidbirth))
 			$cidnumber = $addint . $cidnumber;
 		return $cidnumber;
 	}
@@ -3031,7 +3031,8 @@ $this -> debug( ERROR, $agi, __FILE__, __LINE__, "FAXRESOLUTION: ".$faxresolutio
 		$citylength	= $result[1];
 		$countryprefix	= $result[2];
 		if (strlen($countryprefix)>0) {
-			if (substr($phonenumber,0,1)=="0" && substr($phonenumber,1,1)!="0") {
+//			if (substr($phonenumber,0,1)=="0" && substr($phonenumber,1,1)!="0") {}
+			if (substr($phonenumber,0,1)=='0' && strpos($phonenumber,'11')!=1 && substr($phonenumber,1,1)!='0') {
 				$phonenumber = $countryprefix.substr($phonenumber,1);
 			} elseif (!is_null($areaprefix) && !is_null($citylength)) {
 				if (substr($phonenumber,0,strlen($areaprefix))==$areaprefix && strlen($phonenumber)==strlen($areaprefix)+$citylength) {
@@ -3058,7 +3059,8 @@ $this -> debug( ERROR, $agi, __FILE__, __LINE__, "FAXRESOLUTION: ".$faxresolutio
 **/
 
 			if (strlen($this->countryprefix)>0) {
-				if (substr($phonenumber,0,1)=="0" && substr($phonenumber,1,1)!="0") {
+//				if (substr($phonenumber,0,1)=="0" && substr($phonenumber,1,1)!="0") {}
+				if (substr($phonenumber,0,1)=='0' && strpos($phonenumber,'11')!=1 && substr($phonenumber,1,1)!='0') {
 					$phonenumber = $this->countryprefix.substr($phonenumber,1);
 				} elseif (!is_null($this->areaprefix) && !is_null($this->citylength)) {
 					if (substr($phonenumber,0,strlen($this->areaprefix))==$this->areaprefix && strlen($phonenumber)==strlen($this->areaprefix)+$this->citylength) {

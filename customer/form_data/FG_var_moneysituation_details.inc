@@ -4,7 +4,7 @@ getpost_ifset(array('message', 'id', 'idcust', 'displayheader', 'type', 'popup_f
 
 if ($form_action == "ask-edit" || $form_action == "edit" || $message == "success") {
 
-getpost_ifset(array('lastname', 'firstname', 'company_name', 'id_group', 'email', 'company_website', 'address','city', 'state', 'areaprefix', 'citylength', 'country', 'zipcode', 'language', 'id_timezone', 'phone', 'fax', 'voicemail_activated', 'monitor', 'recalldays', 'tariff', 'margin', 'paypal'));
+getpost_ifset(array('lastname', 'firstname', 'company_name', 'id_group', 'email', 'company_website', 'address','city', 'state', 'areaprefix', 'citylength', 'country', 'removeaddprefix', 'addprefixinternational', 'zipcode', 'language', 'id_timezone', 'phone', 'fax', 'voicemail_activated', 'monitor', 'recalldays', 'tariff', 'margin', 'paypal'));
 
 $HD_Form = new FormHandler("cc_card","Card");
 $HD_Form -> FG_TABLE_CLAUSE = "id_diller = {$_SESSION['card_id']}";
@@ -223,6 +223,24 @@ $HD_Form -> AddEditElement (gettext("COUNTRY"),
 			   "countryname, countrycode, countryprefix",
 			   "", "", "%1 +%3", "", "", "", '' );
 
+$HD_Form -> AddEditElement(gettext("REMOVE+ADD PREFIX"),
+                            "removeaddprefix",
+                            '$value',
+                            "INPUT",
+                            "size=30 maxlength=30",
+                            "31",
+                            "",
+                            "", "", "", "", "", "", "NO", gettext("Set for display CallerID on internal phones which prefix you want to remove and then add with comma separated (i.e. \"38044,,38,\")"));
+
+$HD_Form -> AddEditElement(gettext("ADD INTERNATIONAL PREFIX"),
+                            "addprefixinternational",
+                            '$value',
+                            "INPUT",
+                            "size=30 maxlength=3",
+                            "",
+                            "",
+                            "", "", "", "", "", "", "NO", gettext("Set for display on internal phones which prefix you want see before international CallerID (i.e. \"+\")"));
+
 $language_list = Constants::getLanguagesList();
 $HD_Form->AddEditElement(gettext("LANGUAGE")." *",
 	                    "language",
@@ -331,7 +349,7 @@ $HD_Form -> AddEditElement (gettext("PAYPAL PAYMENT"),
                                     "list", "", "", "", $yesno_list, "%1", "", gettext("Apply PayPal payment to this customer"));
 
 
-$HD_Form -> FieldEditElement ('lastname, firstname, company_name'.$group_editFG.', email, company_website, address, city, state, zipcode, areaprefix, citylength, country, language, id_timezone, phone, fax'.$add_fields_monitor.', recalldays'.$add_fields_voicemail.$tariff_editFG.', margin, paypal');
+$HD_Form -> FieldEditElement ('lastname, firstname, company_name'.$group_editFG.', email, company_website, address, city, state, zipcode, areaprefix, citylength, country, removeaddprefix, addprefixinternational, language, id_timezone, phone, fax'.$add_fields_monitor.', recalldays'.$add_fields_voicemail.$tariff_editFG.', margin, paypal');
 
 $HD_Form->FG_ADITION_HIDDEN_PARAM = $HD_Form->FG_EDITION_HIDDEN_PARAM = 'popup_select, idcust';
 $HD_Form->FG_ADITION_HIDDEN_PARAM = $HD_Form->FG_EDITION_HIDDEN_PARAM_VALUE = "$popup_select, $idcust";

@@ -35,12 +35,13 @@
 
 getpost_ifset(array('id', 'username', 'useralias', 'uipass', 'credit', 'language', 'tariff', 'filterprefix', 'current_page',
 'id_didgroup','id_campaign', 'callback', 'simultaccess', 'currency','typepaid', 'creditlimit', 'lastname', 'firstname',
-'email', 'address','city', 'state', 'areaprefix', 'citylength', 'country', 'zipcode', 'phone', 'fax', 'inuse', 'recalldays',
-'recalltime', 'cid', 'runservice', 'paypal', 'firstusedate', 'expirationdate', 'enableexpire', 'expiredays', 'sip_buddy',
-'iax_buddy','popup_select', 'vat', 'autorefill', 'initialbalance', 'mac_addr', 'cardnumberlenght_list', 'popup_fieldname',
-'status', 'block', 'lock_pin', 'template_invoice', 'template_outstanding', 'description', 'voicemail_activated',
-'voicemail_permitted', 'email_notification', 'credit_notification', 'notify_email', 'id_seria', 'id_diller',
-'company_name' , 'company_website' , 'vat_rn' , 'traffic' , 'traffic_target','discount','restriction' ));
+'email', 'address','city', 'state', 'areaprefix', 'citylength', 'country', 'removeaddprefix', 'addprefixinternational',
+'zipcode', 'phone', 'fax', 'inuse', 'recalldays', 'recalltime', 'cid', 'runservice', 'paypal', 'firstusedate',
+'expirationdate', 'enableexpire', 'expiredays', 'sip_buddy', 'iax_buddy','popup_select', 'vat', 'autorefill',
+'initialbalance', 'mac_addr', 'cardnumberlenght_list', 'popup_fieldname', 'status', 'block', 'lock_pin', 'template_invoice',
+'template_outstanding', 'description', 'voicemail_activated', 'voicemail_permitted', 'email_notification',
+'credit_notification', 'notify_email', 'id_seria', 'id_diller', 'company_name', 'company_website', 'vat_rn', 'traffic',
+'traffic_target', 'discount', 'restriction'));
 
 if ($popup_select>=1 && $popup_fieldname=='id_diller') {
 	$HD_Form = new FormHandler("cc_card LEFT JOIN (SELECT id idd, users_perms FROM cc_card_group) ab ON ab.idd=id_group", gettext("Card"));
@@ -385,6 +386,16 @@ if (has_rights (ACX_MODIFY_CUSTOMERS) && !($popup_select>=1)) {
 				   "name, id",
 				   "", "", "%1", "", "", "", "", "");
 
+	$HD_Form -> AddEditElement (gettext("CUSTOMER GROUPS CONTROL"),
+				   "dillergroups",
+				   '$value',
+				   "MULTSELECT",
+				   "", "", "",
+				   "sql",
+				   "cc_card_group",
+				   "id, name",
+				   "", "", "%1 - (%2)", "", gettext("Allow Diller appoint a group to his customers"));
+
 	$HD_Form -> AddEditElement (gettext("SERIAL"),
 				   "id_seria",
 				    "",
@@ -461,7 +472,7 @@ if (has_rights (ACX_MODIFY_CUSTOMERS) && !($popup_select>=1)) {
 				   gettext("Insert the state"),
 				   "" , "", "",	"", "", "" , "NO", "");
 
-$HD_Form -> AddEditElement(gettext("AREA CODE"),
+	$HD_Form -> AddEditElement(gettext("AREA CODE"),
 				    "areaprefix",
 				    '$value',
 				    "INPUT",
@@ -470,7 +481,7 @@ $HD_Form -> AddEditElement(gettext("AREA CODE"),
 				    "",
 				    "", "", "", "", "", "", "NO-NULL", gettext("Set prefix of the city by default (i.e. 30 for Berlin)"));
 
-$HD_Form -> AddEditElement(gettext("CITY LENGTH"),
+	$HD_Form -> AddEditElement(gettext("CITY LENGTH"),
 				    "citylength",
 				    '$value',
 				    "INPUT",
@@ -492,7 +503,25 @@ $HD_Form -> AddEditElement(gettext("CITY LENGTH"),
 				   "cc_country",
 				   "countryname, countrycode, countryprefix",
 				   "", "", "%1 +%3", "", "", "", '' );
-	
+
+	$HD_Form -> AddEditElement(gettext("REMOVE+ADD PREFIX"),
+				    "removeaddprefix",
+				    '$value',
+				    "INPUT",
+				    "size=30 maxlength=30",
+				    "31",
+				    "",
+				    "", "", "", "", "", "", "NO", gettext("Set for display CallerID on internal phones which prefix you want to remove and then add with comma separated (i.e. \"38044,,38,\")"));
+
+	$HD_Form -> AddEditElement(gettext("ADD INTERNATIONAL PREFIX"),
+				    "addprefixinternational",
+				    '$value',
+				    "INPUT",
+				    "size=30 maxlength=3",
+				    "",
+				    "",
+				    "", "", "", "", "", "", "NO", gettext("Set for display on internal phones which prefix you want see before international CallerID (i.e. \"+\")"));
+
 	$HD_Form -> AddEditElement (gettext("ZIP/POSTAL CODE"),
 				   "zipcode",
 				   '$value',
@@ -566,6 +595,16 @@ $HD_Form -> AddEditElement(gettext("CITY LENGTH"),
 				   "", "", "%1", "", gettext("Changing the call plan will result in the free minutes or free calls package being reset.") );
 	
 	
+	$HD_Form -> AddEditElement (gettext("CALL PLANS CONTROL"),
+				   "dillertariffs",
+				   '$value',
+				   "MULTSELECT",
+				   "", "", "",
+				   "sql",
+				   "cc_tariffgroup",
+				   "id, tariffgroupname",
+				   "", "", "%1 - (%2)", "", gettext("Allow Diller appoint a call plan to his customers"));
+
 	$HD_Form -> AddEditElement (gettext("DIDGROUP"),
 				   "id_didgroup",
 				   "",
@@ -1075,9 +1114,9 @@ $HD_Form -> AddEditElement(gettext("CITY LENGTH"),
 	if (ACT_VOICEMAIL)
 		$add_fields_voicemail = 'voicemail_permitted, voicemail_activated, ';
 	
-	$HD_Form -> FieldEditElement ('username, useralias, uipass, credit, id_group, id_seria, id_diller, lastname, firstname, email, address, city, '.
-			' state, areaprefix, citylength, country, zipcode, phone, fax,company_name, company_website, ' .$update_field_typepaid.
-			' tariff, id_didgroup, id_timezone, language, currency, status, block, lock_pin, simultaccess,  runservice, paypal, creditlimit, ' .
+	$HD_Form -> FieldEditElement ('username, useralias, uipass, credit, id_group, dillergroups, id_seria, id_diller, lastname, firstname, email, address, city, '.
+			' state, areaprefix, citylength, country, removeaddprefix, addprefixinternational, zipcode, phone, fax,company_name, company_website, ' .$update_field_typepaid.
+			' tariff, dillertariffs, id_didgroup, id_timezone, language, currency, status, block, lock_pin, simultaccess,  runservice, paypal, creditlimit, ' .
 			' credit_notification, notify_email, email_notification, ' .$add_fields_voicemail.
 			' id_campaign, ' .
 			' firstusedate, enableexpire, expirationdate, expiredays, sip_buddy, iax_buddy, mac_addr, inuse, recalldays, recalltime, ' .

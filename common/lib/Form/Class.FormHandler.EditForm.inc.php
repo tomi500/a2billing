@@ -1,7 +1,7 @@
 <?php
 
 $processed = $this->getProcessed();
-$dynaform = false;
+$dynaform = $multform = false;
 foreach ($this->FG_TABLE_EDITION as $sts) {
 	if ($sts[3]=='POPUPDAYTIME') {
 
@@ -14,6 +14,7 @@ foreach ($this->FG_TABLE_EDITION as $sts) {
 		if (!$dynaform) {
 ?>
 <script language="JavaScript" type="text/JavaScript">
+<!--
 	var WEEKDAYS = {"dows": [<?php echo $weekdays;?>]};
 	var TIMEINTERVALLIST = {"format": "%HH%:%MM%",
                                 "empt": "00:00",
@@ -27,6 +28,7 @@ foreach ($this->FG_TABLE_EDITION as $sts) {
                                 "CancelTxt": "<?php echo gettext("Cancel")?>",
                                 "OkTxt": " <?php echo gettext("Ok")?> ",
                                 "hidedays": true};
+// -->
 </script>
 <!-- Init jQuery, jQuery UI and jQuery PI -->
 <link href="./javascript/jquery/jquery.pi_ctl.min.css" type="text/css" rel="stylesheet">
@@ -54,10 +56,156 @@ foreach ($this->FG_TABLE_EDITION as $sts) {
     </div>
 </div>
 <?php
+	} elseif ($sts[3]=='MULTSELECT' && !$multform) {
+?>
+<script language="JavaScript" type="text/javascript">
+<!--
+function deselectHeaders(search_sources)
+{
+    sss = document.myForm["selected_" + search_sources];
+    uss = document.myForm["unselected_" + search_sources];
+    uss[0].selected = false;
+    sss[0].selected = false;
+}
+
+function resetHidden(search_sources,sss)
+{
+    var tmp = '';
+    for (i = 1; i < sss.length; i++) {
+        tmp += sss[i].value;
+        if (i < sss.length - 1)
+            tmp += ",";
+    }
+
+    document.myForm[search_sources].value = tmp;
+}
+
+function addSource(search_sources)
+{
+    sss = document.myForm["selected_" + search_sources];
+    uss = document.myForm["unselected_" + search_sources];
+    for (i = 1; i < uss.length; i++) {
+        if ((uss[i].selected) && (uss[i].style.display != 'none')) {
+            ll = sss.length;
+            sss[ll] = new Option(uss[i].text, uss[i].value);
+            sss[ll].idx = i;
+            uss[i].style.display = 'none';
+        }
+    }
+
+    resetHidden(search_sources,sss);
+}
+
+function removeSource(search_sources)
+{
+    sss = document.myForm["selected_" + search_sources];
+    uss = document.myForm["unselected_" + search_sources];
+    for (i = 1; i < sss.length; i++) {
+        if (sss[i].selected) {
+            uss[sss[i].idx] = new Option(sss[i].text, sss[i].value);
+            sss[i] = null;
+            i--;
+        }
+    }
+
+    resetHidden(search_sources,sss);
+}
+
+function moveSourceUp(search_sources)
+{
+    sss = document.myForm["selected_" + search_sources];
+    var sel = sss.selectedIndex;
+
+    if (sel == -1 || sss.length <= 2) return;
+
+    // deselect everything but the first selected item
+    sss.selectedIndex = sel;
+
+    if (sel == 1) {
+        tmp = sss[sel];
+        sss[sel] = null;
+        sss[sss.length] = tmp;
+        sss.selectedIndex = sss.length - 1;
+    } else {
+        tmp = new Array();
+
+        for (i = 1; i < sss.length; i++) {
+            tmp[i - 1] = new Option(sss[i].text, sss[i].value);
+            tmp[i - 1].idx = sss[i].idx;
+        }
+
+        for (i = 0; i < tmp.length; i++) {
+            if (i + 1 == sel - 1) {
+                sss[i + 1] = tmp[i + 1];
+            } else if (i + 1 == sel) {
+                sss[i + 1] = tmp[i - 1];
+            } else {
+                sss[i + 1] = tmp[i];
+            }
+        }
+
+        sss.selectedIndex = sel - 1;
+    }
+
+    resetHidden(search_sources,sss);
+}
+
+function moveSourceDown(search_sources)
+{
+    sss = document.myForm["selected_" + search_sources];
+    var sel = sss.selectedIndex;
+
+    if (sel == -1 || sss.length <= 2) return;
+
+    // deselect everything but the first selected item
+    sss.selectedIndex = sel;
+
+    if (sel == sss.length - 1) {
+        tmp = new Array();
+
+        for (i = 1; i < sss.length; i++) {
+            tmp[i - 1] = new Option(sss[i].text, sss[i].value);
+            tmp[i - 1].idx = sss[i].idx;
+        }
+
+        sss[1] = tmp[tmp.length - 1];
+        for (i = 0; i < tmp.length - 1; i++) {
+            sss[i + 2] = tmp[i];
+        }
+
+        sss.selectedIndex = 1;
+    } else {
+        tmp = new Array();
+
+        for (i = 1; i < sss.length; i++) {
+            tmp[i - 1] = new Option(sss[i].text, sss[i].value)
+            tmp[i - 1].idx = sss[i].idx;
+        }
+
+        for (i = 0; i < tmp.length; i++) {
+            if (i + 1 == sel) {
+                sss[i + 1] = tmp[i + 1];
+            } else if (i + 1 == sel + 1) {
+                sss[i + 1] = tmp[i - 1];
+            } else {
+                sss[i + 1] = tmp[i];
+            }
+        }
+
+        sss.selectedIndex = sel + 1;
+    }
+
+    resetHidden(search_sources,sss);
+}
+
+
+// -->
+</script>
+<?php
+	$multform = true;
 	}
 }
 ?>
-
 <script language="JavaScript" src="./javascript/krutilke.js"></script>
 <script language="JavaScript" src="./javascript/calonlydays.js"></script>
 <script language="JavaScript" type="text/JavaScript">
@@ -162,11 +310,11 @@ function updatecontent(id_el, record, field_inst, instance)
 				$valuelist = explode(",", $list[0][$this->FG_SELECT_FIELDNAME]);
 				
 				?>
-					<SELECT name='<?php echo $this->FG_TABLE_EDITION[$i][1]?>' class="form_input_select">
+					<SELECT name=<?php echo "'{$this->FG_TABLE_EDITION[$i][1]}'"?> class="form_input_select">
 					<?php 
 					foreach($valuelist as $listval) {
 					?>
-					<option value="<?php echo $listval;?>" <?php  if($listval == $list[0][$i]) echo " selected";?>><?php echo $listval;?></option>
+					<option value=<?php echo "\"$listval\"";?> <?php  if($listval == $list[0][$i]) echo " selected";?>><?php echo $listval;?></option>
 					<?php }?>
 					</select>
 				<?php
@@ -230,11 +378,9 @@ function updatecontent(id_el, record, field_inst, instance)
 						if ($select_list !== 0) {
 							$json_list = array();
 							foreach ($select_list as $value) {
-//								$json_list[] = array_diff_key($value, array('0'=>0,'1'=>1,'2'=>2,'3'=>3,'4'=>4,'5'=>5,'6'=>6,'7'=>7,'8'=>8));
 								$json_list[] = array('weekdays[]'=>$value[0],'timefrom[]'=>$value[1],'timetill[]'=>$value[2]);
 							}
 							$json_str = json_encode($json_list);
-							//echo $json_str."<br>";
 							?>
 							<script language="JavaScript"> PopUpDayTimeJson={"<?php echo $this->FG_TABLE_EDITION[$i][1];?>Array":<?php echo $json_str;?>}; </script>
 							<?php
@@ -265,8 +411,7 @@ function updatecontent(id_el, record, field_inst, instance)
 			  ?>
                      <span name=<?php echo $this->FG_TABLE_EDITION[$i][1]?>  <?php echo $this->FG_TABLE_EDITION[$i][4]?>><?php if($this->VALID_SQL_REG_EXP){ echo stripslashes($list[0][$i]); }else{ echo $processed[$this->FG_TABLE_ADITION[$i][1]];  }?></span> 	 
                         <?php 	
-				} elseif (strtoupper ($this->FG_TABLE_EDITION[$i][3])=="SELECT")
-				{
+				} elseif (strtoupper ($this->FG_TABLE_EDITION[$i][3])=="SELECT")	{
 					if (strtoupper ($this->FG_TABLE_EDITION[$i][7])=="SQL") {
 						$instance_sub_table = new Table($this->FG_TABLE_EDITION[$i][8], $this->FG_TABLE_EDITION[$i][9]);
 						$select_list = $instance_sub_table -> Get_list ($this->DBHandle, str_replace("%id", "$id", $this->FG_TABLE_EDITION[$i][10]), null, null, null, null, null, null);
@@ -342,7 +487,7 @@ function updatecontent(id_el, record, field_inst, instance)
 						}//END_IF
 ?>			</SELECT>
 <?php
-					}elseif (strtoupper ($this->FG_TABLE_EDITION[$i][3])=="RADIOBUTTON"){
+				}elseif (strtoupper ($this->FG_TABLE_EDITION[$i][3])=="RADIOBUTTON"){
 						$radio_table = preg_split("/,/",trim($this->FG_TABLE_EDITION[$i][10]));
 						foreach ($radio_table as $radio_instance){
 							$radio_composant = preg_split("/:/",$radio_instance);
@@ -363,15 +508,105 @@ function updatecontent(id_el, record, field_inst, instance)
 						//  Yes <input type="radio" name="digitalized" value="t" checked>
 						//  No<input type="radio" name="digitalized" value="f">
 						
-					}//END_IF (RADIOBUTTON)
-					if (!$this-> FG_fit_expression[$i]  &&  isset($this-> FG_fit_expression[$i]) ){?>
+				}//END_IF (RADIOBUTTON)
+				elseif (strtoupper ($this->FG_TABLE_EDITION[$i][3])=="MULTSELECT"){
+					if (strtoupper ($this->FG_TABLE_EDITION[$i][7])=="SQL") {
+						$instance_sub_table = new Table($this->FG_TABLE_EDITION[$i][8], $this->FG_TABLE_EDITION[$i][9]);
+						$unselect_list = $instance_sub_table -> Get_list ($this->DBHandle, str_replace("%id", "$id", $this->FG_TABLE_EDITION[$i][10]), null, null, null, null, null, null);
+					} elseif (strtoupper ($this->FG_TABLE_EDITION[$i][7])=="LIST") {
+						$unselect_list = $this->FG_TABLE_EDITION[$i][11];
+					}
+?>
+		<input name="<?php echo $this->FG_TABLE_EDITION[$i][1];?>" value="<?php if($this->VALID_SQL_REG_EXP){ echo $list[0][$i]; }else{ echo $processed[$this->FG_TABLE_EDITION[$i][1]];  }?>" type="hidden">
+<?php					if (count($unselect_list)>0) {
+?>		<table>
+			<tr>
+			<td>
+			<SELECT name="unselected_<?php echo $this->FG_TABLE_EDITION[$i][1];?>" multiple="multiple" size="9" width="50" onchange="deselectHeaders(<?php echo "'{$this->FG_TABLE_EDITION[$i][1]}'";?>)" class="form_input_select">
+				<OPTION value=""><?php echo gettext("Unselected Fields...");?></OPTION>
+				<script language="JavaScript" type="text/JavaScript">
+				<!--
+				document.myForm.unselected_<?php echo $this->FG_TABLE_EDITION[$i][1];?>[0].style.color="#505050";
+				//-->
+				</script>
+				<?php		$select_number=0;
+						$select_list = Array();
+						if ($this->VALID_SQL_REG_EXP) {
+							$select_recordset = explode(',', $list[0][$i]);
+						} else {
+							$select_recordset = explode(',', $processed[$this->FG_TABLE_EDITION[$i][1]]);
+						}
+						foreach ($unselect_list as $unselect_recordset){
+							$select_number++;
+							$selected_item = $recordshow = "<OPTION  value=\"{$unselect_recordset[0]}\"";
+							if ($this->FG_TABLE_EDITION[$i][12] != "") {
+								$value_display = $this->FG_TABLE_EDITION[$i][12];
+								$nb_recor_k = count($unselect_recordset);
+								for ($k=1;$k<=$nb_recor_k;$k++) {
+									$value_display  = str_replace("%$k", $unselect_recordset[$k-1], $value_display );
+								}
+							} else {
+								$value_display = $unselect_recordset[0];
+							}
+							if (array_search($unselect_recordset[0], $select_recordset) !== false) {
+								$selected_item .= " idx=\"{$select_number}\">".$value_display;
+								$recordshow .= " style=\"display: none\"";
+								$select_list[] = Array(array_search($unselect_recordset[0], $select_recordset), $selected_item, $select_number);
+							}
+							echo $recordshow.'> '.$value_display;
+							?></OPTION>
+				<?php		}
+		      ?></SELECT>
+			</td>
+			<td>
+			<a href="" onclick="addSource('<?php echo $this->FG_TABLE_EDITION[$i][1];?>'); return false;"><img src="<?php echo Images_Path;?>/forward.png" alt="add source" title="add source" border="0"></a>
+			<br>
+			<a href="" onclick="removeSource('<?php echo $this->FG_TABLE_EDITION[$i][1];?>'); return false;"><img src="<?php echo Images_Path;?>/back.png" alt="remove source" title="remove source" border="0"></a>
+			</td>
+			<td>
+			<SELECT name="selected_<?php echo $this->FG_TABLE_EDITION[$i][1];?>" multiple="multiple" size="9" width="50" onchange="deselectHeaders('<?php echo $this->FG_TABLE_EDITION[$i][1];?>');" class="form_input_select">
+				<OPTION value=""><?php echo gettext("Selected Fields...");?></OPTION>
+				<script language="JavaScript" type="text/JavaScript">
+				<!--
+				document.myForm.selected_<?php echo $this->FG_TABLE_EDITION[$i][1];?>[0].style.color="#505050";
+				//-->
+				</script>
+				<?php		$select_number=0;
+						sort($select_list);
+						foreach ($select_list as $selected_item){
+							$select_number++;
+							echo $selected_item[1];?></OPTION>
+				<script language="JavaScript" type="text/JavaScript">
+				<!--
+				document.myForm.selected_<?php echo $this->FG_TABLE_EDITION[$i][1];?>[<?php echo $select_number;?>].idx=<?php echo $selected_item[2];?>;
+				//-->
+				</script>
+				<?php		}
+		      ?></SELECT>
+			</td>
+	
+			<td>
+			<a href="" onclick="moveSourceUp('<?php echo $this->FG_TABLE_EDITION[$i][1];?>'); return false;"><img src="<?php echo Images_Path;?>/up_black.png" alt="move up" title="move up" border="0"></a>
+			<br>
+			<a href="" onclick="moveSourceDown('<?php echo $this->FG_TABLE_EDITION[$i][1];?>'); return false;"><img src="<?php echo Images_Path;?>/down_black.png" alt="move down" title="move down" border="0"></a>
+			</td>
+			</tr>
+		</table>
+<?php					} else {
+						echo gettext("No data found !!!");
+					}//END_IF
+?><?php
+				}
+				if (!$this-> FG_fit_expression[$i]  &&  isset($this-> FG_fit_expression[$i]) ){?>
 			<span class="liens">
 <?php
 echo "		<br>".$this->FG_TABLE_EDITION[$i][6]." - ".$this->FG_regular[$this->FG_TABLE_EDITION[$i][5]][1];?>
 			</span>
 <?php					}
 					if (strlen($this->FG_TABLE_COMMENT[$i])>1){
-echo "			<br/>".$this->FG_TABLE_COMMENT[$i]?>&nbsp;<?php
+						if (strtoupper ($this->FG_TABLE_EDITION[$i][3])!="MULTSELECT")
+echo "			<br/>";
+echo $this->FG_TABLE_COMMENT[$i]?>&nbsp;<?php
 					} ?>
 			
 			</TD>

@@ -5040,7 +5040,23 @@ msgstr "ТИП ПЛАТЕЖА"
 #: Public/form_data/FG_var_service.inc:197
 #: Public/form_data/FG_var_signup_agent.inc:54
 msgid "CALL PLAN"
-msgstr "КОЛ-ПЛАН"
+msgstr "ТАРИФНЫЙ ПЛАН"
+
+#: Public/form_data/FG_var_card.inc
+msgid "CUSTOMER GROUPS CONTROL"
+msgstr "УПРАВЛЕНИЕ ГРУППАМИ"
+
+#: Public/form_data/FG_var_card.inc
+msgid "Allow Diller appoint a group to his customers"
+msgstr "Позволяет диллерам самостоятельно назначить группу своему клиенту из разрешенных"
+
+#: Public/form_data/FG_var_card.inc
+msgid "CALL PLANS CONTROL"
+msgstr "УПРАВЛЕНИЕ ТАРИФНЫМИ ПЛАНАМИ"
+
+#: Public/form_data/FG_var_card.inc
+msgid "Allow Diller appoint a call plan to his customers"
+msgstr "Позволяет диллерам самостоятельно назначать тарифный план своему клиенту из разрешенных"
 
 #: Public/form_data/FG_var_invoice.inc:131
 #: Public/form_data/FG_var_card.inc:822 Public/A2B_card_info.php:365
@@ -6060,7 +6076,7 @@ msgstr ""
 
 #: Public/form_data/FG_var_card.inc:372
 msgid "CUSTOMER GROUP"
-msgstr "ГРУППА КЛИЕНЕТА"
+msgstr "ГРУППА ДОСТУПА"
 
 #: Public/form_data/FG_var_card.inc:390 Public/form_data/FG_var_card.inc:546
 #: Public/form_data/FG_var_card.inc:659 Public/form_data/FG_var_card.inc:709

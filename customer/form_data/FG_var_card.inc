@@ -33,7 +33,7 @@
 
 
 
-getpost_ifset(array('id', 'lastname', 'firstname', 'email', 'address','city', 'state', 'country', 'zipcode', 'id_timezone', 'phone', 'fax', 'message', 'voicemail_activated', 'monitor', 'recalldays', 'recalltime'));
+getpost_ifset(array('id', 'lastname', 'firstname', 'email', 'address','city', 'state', 'areaprefix', 'citylength', 'country', 'removeaddprefix', 'addprefixinternational', 'zipcode', 'id_timezone', 'phone', 'fax', 'message', 'voicemail_activated', 'monitor', 'recalldays', 'recalltime'));
 
 $HD_Form = new FormHandler("cc_card","Card");
 
@@ -96,6 +96,23 @@ $HD_Form -> AddEditElement (gettext("STATE/PROVINCE"),
 			   gettext("Insert the state"),
 			   "" , "", "",	"", "", "" , "NO", "");
 
+$HD_Form -> AddEditElement(gettext("AREA CODE"),
+                            "areaprefix",
+                            '$value',
+                            "INPUT",
+                            "size=30 maxlength=6",
+                            "22",
+                            "",
+                            "", "", "", "", "", "", "NO-NULL", gettext("Set prefix of the city by default (i.e. 30 for Berlin)"));
+
+$HD_Form -> AddEditElement(gettext("CITY LENGTH"),
+                            "citylength",
+                            '$value',
+                            "INPUT",
+                            "size=30 maxlength=1",
+                            "23",
+                            "",
+                            "", "", "", "", "", "", "NO-NULL", gettext("Set length of city numbers"));
 
 $HD_Form -> AddEditElement (gettext("COUNTRY"),
 			   "country",
@@ -107,6 +124,23 @@ $HD_Form -> AddEditElement (gettext("COUNTRY"),
 			   "countryname, countrycode, countryprefix",
 			   "", "", "%1 +%3", "", "", "", '' );
 
+$HD_Form -> AddEditElement(gettext("REMOVE+ADD PREFIX"),
+                            "removeaddprefix",
+                            '$value',
+                            "INPUT",
+                            "size=30 maxlength=30",
+                            "31",
+                            "",
+                            "", "", "", "", "", "", "NO", gettext("Set for display CallerID on internal phones which prefix you want to remove and then add with comma separated (i.e. \"38044,,38,\")"));
+
+$HD_Form -> AddEditElement(gettext("ADD INTERNATIONAL PREFIX"),
+                            "addprefixinternational",
+                            '$value',
+                            "INPUT",
+                            "size=30 maxlength=3",
+                            "",
+                            "",
+                            "", "", "", "", "", "", "NO", gettext("Set for display on internal phones which prefix you want see before international CallerID (i.e. \"+\")"));
 
 $HD_Form -> AddEditElement (gettext("ZIP/POSTAL CODE"),
 			   "zipcode",			
@@ -193,7 +227,7 @@ $add_fields_monitor = '';
 if ($ACXSEERECORDING)
 	$add_fields_monitor = ', monitor';
 
-$HD_Form -> FieldEditElement ('lastname, firstname, address, city, state, country, zipcode, id_timezone, phone, fax'.$add_fields_monitor.', recalldays, recalltime'.$add_fields_voicemail);
+$HD_Form -> FieldEditElement ('lastname, firstname, address, city, state, areaprefix, citylength, country, removeaddprefix, addprefixinternational, zipcode, id_timezone, phone, fax'.$add_fields_monitor.', recalldays, recalltime'.$add_fields_voicemail);
 
 $HD_Form -> FG_INTRO_TEXT_ADD = gettext("you can add easily update your information clicking on the button.");
 

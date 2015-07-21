@@ -238,7 +238,7 @@ $HD_Form->AddEditElement(gettext("COMPANY NAME"),
 		gettext("Insert Company name of this customer"), "", "", "", "", "", "", "NO", "");
 $company_name_editFG = "company_name,";
 }
-
+$group_editFG = "";
 if (!$agent_conf && strpos($group_idlist, ',') !== false && !($subscriber_signup>0)) {
 	$HD_Form->AddEditElement(gettext("CUSTOMER GROUP"),
 		"id_group",
@@ -246,7 +246,29 @@ if (!$agent_conf && strpos($group_idlist, ',') !== false && !($subscriber_signup
 		"SELECT",
 		"", "",
 		"", "list", "", "", "", $group_list, "%1", "", "");
-	$group_editFG = "id_group,";
+$group_editFG = "id_group,";
+}
+
+if (!$agent_conf && strpos($callPlan_idlist, ',') !== false && !($subscriber_signup>0)) {
+	$HD_Form->AddEditElement(gettext("CALL PLAN"),
+								"tariff",
+								"$tariff",
+								"SELECT",
+								"", "",
+								"", "list", "", "", "", $callPlan_list, "%1", "", "");
+$group_editFG .= "tariff,";
+}
+
+if (has_rights (ACX_DISTRIBUTION) || (isset($id_diller) && $id_diller > 0))  {
+	$HD_Form -> AddEditElement (gettext("MARGIN").", %%",
+								"margin",
+								'$value',
+								"INPUT",
+								"size=10 maxlength=3",
+								"27", "(0..100)%",
+								"", "", "", "", "", "", "NO", "");
+$group_editFG .= "margin,";
+
 }
 
 $HD_Form->AddEditElement(gettext("EMAIL")." *",
@@ -423,7 +445,7 @@ if (TRAFFIC_TARGET_ENABLE)  {
 								"", gettext("Insert the target traffic description"), "", "", "", "", "", "", "", "");
 	$traffic_target_editFG = ",traffic_target";
 }
-$distribution_editFG = "";
+
 if (has_rights (ACX_DISTRIBUTION) || (isset($id_diller) && $id_diller > 0))  {
 	$HD_Form -> AddEditElement (gettext("SUBSCRIBER"),
 								"id_diller",
@@ -432,28 +454,7 @@ if (has_rights (ACX_DISTRIBUTION) || (isset($id_diller) && $id_diller > 0))  {
 								'size=30 maxlength=20 readonly style="color: gray;"',
 								"6",
 								"", "", "", "", "", "", "", "", "");
-
-	$distribution_editFG = ",id_diller";
-}
-if (!$agent_conf && strpos($callPlan_idlist, ',') !== false && !($subscriber_signup>0)) {
-	$HD_Form->AddEditElement(gettext("CALL PLAN"),
-								"tariff",
-								"$tariff",
-								"SELECT",
-								"", "",
-								"", "list", "", "", "", $callPlan_list, "%1", "", "");
-	$distribution_editFG .= ",tariff";
-}
-if (has_rights (ACX_DISTRIBUTION) || (isset($id_diller) && $id_diller > 0))  {
-	$HD_Form -> AddEditElement (gettext("MARGIN").", %%",
-								"margin",
-								'$value',
-								"INPUT",
-								"size=10 maxlength=3",
-								"27", "(0..100)%",
-								"", "", "", "", "", "", "NO", "");
-
-	$distribution_editFG .= ",margin";
+	$subscriber_editFG = ",id_diller";
 
 	$HD_Form -> AddEditElement (gettext("PAYPAL PAYMENT"),
 								"paypal",
@@ -463,8 +464,7 @@ if (has_rights (ACX_DISTRIBUTION) || (isset($id_diller) && $id_diller > 0))  {
 								"",
 								"",
 								"list", "", "", "", $yesno_list, "%1", "", gettext("Apply PayPal payment to this customer"));
-	$distribution_editFG .= ",paypal";
-
+	$subscriber_editFG .= ",paypal";
 } elseif (CAPTCHA_ENABLE) {
 
 	$HD_Form->AddEditElement(gettext("VERIFICATION"),
@@ -481,7 +481,7 @@ $HD_Form->FieldEditElement('username, useralias, uipass, credit, ' . $language_e
 	'callback, activated, simultaccess, ' . $currency_editFG . ' runservice, typepaid, creditlimit, firstusedate, enableexpire,' .
 	'expirationdate, expiredays, vat, ' . $lastname_editFG . $firstname_editFG . $company_name_editFG . $group_editFG . ' email' . $address_editFG .
 	$city_editFG . $state_editFG . $country_editFG . $zipcode_editFG . $id_timezone_editFG . $phone_editFG . $fax_editFG .
-	$company_website_editFG . $VAT_RN_editFG . $VAT_editFG . $traffic_editFG . $traffic_target_editFG . $distribution_editFG . $captcha);
+	$company_website_editFG . $VAT_RN_editFG . $VAT_editFG . $traffic_editFG . $traffic_target_editFG . $subscriber_editFG . $captcha);
 
 if (!isset ($myusername))
 	$myusername = '';
