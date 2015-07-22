@@ -565,7 +565,7 @@ function updatecontent(id_el, record, field_inst, instance)
 			<a href="" onclick="removeSource('<?php echo $this->FG_TABLE_EDITION[$i][1];?>'); return false;"><img src="<?php echo Images_Path;?>/back.png" alt="remove source" title="remove source" border="0"></a>
 			</td>
 			<td>
-			<SELECT name="selected_<?php echo $this->FG_TABLE_EDITION[$i][1];?>" multiple="multiple" size="9" width="50" onchange="deselectHeaders('<?php echo $this->FG_TABLE_EDITION[$i][1];?>');" class="form_input_select">
+			<SELECT name="selected_<?php echo $this->FG_TABLE_EDITION[$i][1];?>" multiple="multiple" size="<?php if($count_usl<8){echo $count_usl+1;}else{echo 9;}?>" width="50" onchange="deselectHeaders('<?php echo $this->FG_TABLE_EDITION[$i][1];?>');" class="form_input_select">
 				<OPTION value=""><?php echo gettext("Selected Fields...");?></OPTION>
 				<script language="JavaScript" type="text/JavaScript">
 				<!--
