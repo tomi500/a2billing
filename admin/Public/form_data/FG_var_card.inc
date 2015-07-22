@@ -36,8 +36,8 @@
 getpost_ifset(array('id', 'username', 'useralias', 'uipass', 'credit', 'language', 'tariff', 'filterprefix', 'current_page',
 'id_didgroup','id_campaign', 'callback', 'simultaccess', 'currency','typepaid', 'creditlimit', 'lastname', 'firstname',
 'email', 'address','city', 'state', 'areaprefix', 'citylength', 'country', 'removeaddprefix', 'addprefixinternational',
-'zipcode', 'phone', 'fax', 'inuse', 'recalldays', 'recalltime', 'cid', 'runservice', 'paypal', 'firstusedate',
-'expirationdate', 'enableexpire', 'expiredays', 'sip_buddy', 'iax_buddy','popup_select', 'vat', 'autorefill',
+'zipcode', 'phone', 'fax', 'inuse', 'recalldays', 'recalltime', 'cid', 'runservice', 'paypal', 'firstusedate', 'dillertariffs',
+'expirationdate', 'enableexpire', 'expiredays', 'sip_buddy', 'iax_buddy','popup_select', 'vat', 'autorefill', 'dillergroups',
 'initialbalance', 'mac_addr', 'cardnumberlenght_list', 'popup_fieldname', 'status', 'block', 'lock_pin', 'template_invoice',
 'template_outstanding', 'description', 'voicemail_activated', 'voicemail_permitted', 'email_notification',
 'credit_notification', 'notify_email', 'id_seria', 'id_diller', 'company_name', 'company_website', 'vat_rn', 'traffic',
@@ -386,7 +386,12 @@ if (has_rights (ACX_MODIFY_CUSTOMERS) && !($popup_select>=1)) {
 				   "name, id",
 				   "", "", "%1", "", "", "", "", "");
 
-	$HD_Form -> AddEditElement (gettext("CUSTOMER GROUPS CONTROL"),
+	$DBHandle_max = DbConnect();
+	$resmax = $DBHandle_max -> Execute("SELECT id FROM cc_card_group WHERE users_perms & 524288");
+	if ( $resmax ) {
+		$numrow = $resmax -> RecordCount( );
+		if ($numrow>0) {
+			$HD_Form -> AddEditElement (gettext("CUSTOMER GROUPS CONTROL"),
 				   "dillergroups",
 				   '$value',
 				   "MULTSELECT",
@@ -395,6 +400,9 @@ if (has_rights (ACX_MODIFY_CUSTOMERS) && !($popup_select>=1)) {
 				   "cc_card_group",
 				   "id, name",
 				   "", "", "%1 - (%2)", "", gettext("Allow Diller appoint a group to his customers"));
+			$dillergroups_ED = " dillergroups,";
+		}
+	} else $numrow = 0;
 
 	$HD_Form -> AddEditElement (gettext("SERIAL"),
 				   "id_seria",
@@ -594,8 +602,8 @@ if (has_rights (ACX_MODIFY_CUSTOMERS) && !($popup_select>=1)) {
 				   "tariffgroupname, id",
 				   "", "", "%1", "", gettext("Changing the call plan will result in the free minutes or free calls package being reset.") );
 	
-	
-	$HD_Form -> AddEditElement (gettext("CALL PLANS CONTROL"),
+	if ($numrow>0) {
+		$HD_Form -> AddEditElement (gettext("CALL PLANS CONTROL"),
 				   "dillertariffs",
 				   '$value',
 				   "MULTSELECT",
@@ -603,7 +611,9 @@ if (has_rights (ACX_MODIFY_CUSTOMERS) && !($popup_select>=1)) {
 				   "sql",
 				   "cc_tariffgroup",
 				   "id, tariffgroupname",
-				   "", "", "%1 - (%2)", "", gettext("Allow Diller appoint a call plan to his customers"));
+				   "", "", "%1 - %2", "", gettext("Allow Diller appoint a call plan to his customers"));
+		$dillertariffs_ED = " dillertariffs,";
+	}
 
 	$HD_Form -> AddEditElement (gettext("DIDGROUP"),
 				   "id_didgroup",
@@ -1114,9 +1124,9 @@ if (has_rights (ACX_MODIFY_CUSTOMERS) && !($popup_select>=1)) {
 	if (ACT_VOICEMAIL)
 		$add_fields_voicemail = 'voicemail_permitted, voicemail_activated, ';
 	
-	$HD_Form -> FieldEditElement ('username, useralias, uipass, credit, id_group, dillergroups, id_seria, id_diller, lastname, firstname, email, address, city, '.
+	$HD_Form -> FieldEditElement ('username, useralias, uipass, credit, id_group,'.$dillergroups_ED.' id_seria, id_diller, lastname, firstname, email, address, city, '.
 			' state, areaprefix, citylength, country, removeaddprefix, addprefixinternational, zipcode, phone, fax,company_name, company_website, ' .$update_field_typepaid.
-			' tariff, dillertariffs, id_didgroup, id_timezone, language, currency, status, block, lock_pin, simultaccess,  runservice, paypal, creditlimit, ' .
+			' tariff,'.$dillertariffs_ED.' id_didgroup, id_timezone, language, currency, status, block, lock_pin, simultaccess,  runservice, paypal, creditlimit, ' .
 			' credit_notification, notify_email, email_notification, ' .$add_fields_voicemail.
 			' id_campaign, ' .
 			' firstusedate, enableexpire, expirationdate, expiredays, sip_buddy, iax_buddy, mac_addr, inuse, recalldays, recalltime, ' .

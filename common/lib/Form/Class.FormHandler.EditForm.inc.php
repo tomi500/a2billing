@@ -516,13 +516,14 @@ function updatecontent(id_el, record, field_inst, instance)
 					} elseif (strtoupper ($this->FG_TABLE_EDITION[$i][7])=="LIST") {
 						$unselect_list = $this->FG_TABLE_EDITION[$i][11];
 					}
+					$count_usl = count($unselect_list);
 ?>
 		<input name="<?php echo $this->FG_TABLE_EDITION[$i][1];?>" value="<?php if($this->VALID_SQL_REG_EXP){ echo $list[0][$i]; }else{ echo $processed[$this->FG_TABLE_EDITION[$i][1]];  }?>" type="hidden">
-<?php					if (count($unselect_list)>0) {
+<?php					if ($count_usl>0) {
 ?>		<table>
 			<tr>
 			<td>
-			<SELECT name="unselected_<?php echo $this->FG_TABLE_EDITION[$i][1];?>" multiple="multiple" size="9" width="50" onchange="deselectHeaders(<?php echo "'{$this->FG_TABLE_EDITION[$i][1]}'";?>)" class="form_input_select">
+			<SELECT name="unselected_<?php echo $this->FG_TABLE_EDITION[$i][1];?>" multiple="multiple" size="<?php if($count_usl<8){echo $count_usl+1;}else{echo 9;}?>" width="50" onchange="deselectHeaders(<?php echo "'{$this->FG_TABLE_EDITION[$i][1]}'";?>)" class="form_input_select">
 				<OPTION value=""><?php echo gettext("Unselected Fields...");?></OPTION>
 				<script language="JavaScript" type="text/JavaScript">
 				<!--
