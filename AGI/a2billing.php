@@ -331,8 +331,9 @@ if ($mode == 'sms') {
 	$didyes = $diddest = false;
 
 	if (strlen($mydnid) > 0){
-	    $QUERY = "SELECT areaprefix, citylength, countryprefix, cc_did.id, cc_did_destination.activated FROM cc_country, cc_did, cc_did_destination
-			WHERE cc_did.activated=1 AND did LIKE '$mydnid' AND startingdate<=CURRENT_TIMESTAMP AND id_cc_did=cc_did.id AND (expirationdate>CURRENT_TIMESTAMP OR expirationdate IS NULL";
+	    $QUERY = "SELECT areaprefix, citylength, countryprefix, cc_did.id, cc_did_destination.activated FROM cc_country, cc_did
+".			"LEFT JOIN cc_did_destination ON id_cc_did=cc_did.id
+".			"WHERE cc_did.activated=1 AND did LIKE '$mydnid' AND startingdate<=CURRENT_TIMESTAMP AND (expirationdate>CURRENT_TIMESTAMP OR expirationdate IS NULL";
 	    // if MYSQL
 	    if ($A2B->config["database"]['dbtype'] != "postgres") $QUERY .= " OR expirationdate = '0000-00-00 00:00:00'";
 	    $QUERY .= ") AND cc_country.id=id_cc_country LIMIT 1";
