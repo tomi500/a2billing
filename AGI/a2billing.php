@@ -335,7 +335,7 @@ if ($mode == 'sms') {
 			WHERE cc_did.activated=1 AND did LIKE '$mydnid' AND startingdate<=CURRENT_TIMESTAMP AND id_cc_did=cc_did.id AND (expirationdate>CURRENT_TIMESTAMP OR expirationdate IS NULL";
 	    // if MYSQL
 	    if ($A2B->config["database"]['dbtype'] != "postgres") $QUERY .= " OR expirationdate = '0000-00-00 00:00:00'";
-	    $QUERY .= ") AND cc_country.id=id_cc_country AND cc_did_destination.activated=1 LIMIT 1";
+	    $QUERY .= ") AND cc_country.id=id_cc_country LIMIT 1";
 	    $result = $A2B -> instance_table -> SQLExec ($A2B->DBHandle, $QUERY);
 	    if (is_array($result)) {
 		$didyes = true;
