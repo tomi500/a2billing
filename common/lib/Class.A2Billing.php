@@ -3294,7 +3294,8 @@ $this -> debug( ERROR, $agi, __FILE__, __LINE__, "FAXRESOLUTION: ".$faxresolutio
 						else	continue;
 					    }
 					    $username = $this -> vouchernumber;
-					    $QUERY = "SELECT voucher, credit, IF(activated='t' AND expirationdate >= CURRENT_TIMESTAMP AND used = '0',activated,'f') activated, tag, currency, expirationdate, usedcardnumber, callplan FROM cc_voucher WHERE voucher='".$this -> vouchernumber."' LIMIT 1";
+					    $QUERY = "SELECT bb.voucher, bb.credit, IF(bb.activated='t' AND bb.expirationdate >= CURRENT_TIMESTAMP AND bb.used = '0',bb.activated,'f') activated, bb.tag, bb.currency, bb.expirationdate, bb.usedcardnumber, bb.callplan, aa.voucher
+".							"FROM cc_voucher aa, cc_voucher bb WHERE bb.voucher='".$this -> vouchernumber."' AND (aa.usedcardnumber=bb.usedcardnumber OR bb.usedcardnumber IS NULL) ORDER BY aa.usedate DESC LIMIT 1";
 					    $result = $this -> instance_table -> SQLExec ($this->DBHandle, $QUERY);
 					    if ($result[0][0] == $this->vouchernumber) {
 						if (!isset ($currencies_list[strtoupper($result[0][4])][2])) {
@@ -3304,7 +3305,7 @@ $this -> debug( ERROR, $agi, __FILE__, __LINE__, "FAXRESOLUTION: ".$faxresolutio
 						    $currency = $result[0][4];
 						    $this->tariff = $result[0][7];
 						    break;
-						} elseif ($result[0][6] >= CARDNUMBER_LENGTH_MIN) {
+						} elseif ($result[0][6] >= CARDNUMBER_LENGTH_MIN && $result[0][0] == $result[0][8]) {
 						    $username = $result[0][6];
 						} elseif ($k == 9)	{
 							$agi-> stream_file($prompt, '#');

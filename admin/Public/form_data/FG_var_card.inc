@@ -399,7 +399,7 @@ if (has_rights (ACX_MODIFY_CUSTOMERS) && !($popup_select>=1)) {
 				   "sql",
 				   "cc_card_group",
 				   "id, name",
-				   "", "", "%1 - (%2)", "", gettext("Allow Diller appoint a group to his customers"));
+				   "", "", "%1 - %2", "", gettext("Allow Diller appoint a group to his customers"));
 			$dillergroups_ED = " dillergroups,";
 		}
 	} else $numrow = 0;
@@ -611,7 +611,7 @@ if (has_rights (ACX_MODIFY_CUSTOMERS) && !($popup_select>=1)) {
 				   "sql",
 				   "cc_tariffgroup",
 				   "id, tariffgroupname",
-				   "", "", "%1 - %2", "", gettext("Allow Diller appoint a call plan to his customers"));
+				   "", "", "%1 - (%2)", "", gettext("Allow Diller appoint a call plan to his customers"));
 		$dillertariffs_ED = " dillertariffs,";
 	}
 
