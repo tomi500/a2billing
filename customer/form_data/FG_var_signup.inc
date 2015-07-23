@@ -89,7 +89,7 @@ if (has_rights (ACX_DISTRIBUTION) && (isset($id_diller) && $id_diller > 0)) {
 }
 if (!$agent_conf) {
 	if (strlen($callPlan_idlist) == 0) {
-		exit ("No Call Plan Defined.".);
+		exit ("No Call Plan Defined.");
 	}
 	$call_table = new Table("cc_tariffgroup", "tariffgroupname,id");
 	$callPlan_list = $call_table->Get_list($HD_Form->DBHandle, "id in ($callPlan_idlist)", "FIELD(id,".$callPlan_idlist.")", "ASC");
