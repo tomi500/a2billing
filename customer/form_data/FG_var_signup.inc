@@ -77,21 +77,19 @@ if (!empty ($agentkey)) {
 		}
 	}
 }
+$callPlan_idlist = isset($A2B->config["signup"]['callplan_id_list']) ? $A2B->config["signup"]['callplan_id_list'] : NULL;
+$group_idlist = isset($A2B->config["signup"]['group_id_list']) ? $A2B->config["signup"]['group_id_list'] : NULL;
 if (has_rights (ACX_DISTRIBUTION) && (isset($id_diller) && $id_diller > 0)) {
 	if (!empty($_SESSION["dillertariffs"]))  {
 		$callPlan_idlist = $_SESSION["dillertariffs"];
-	} else {
-		$callPlan_idlist = isset($A2B->config["signup"]['callplan_id_list']) ? $A2B->config["signup"]['callplan_id_list'] : NULL;
 	}
 	if (!empty($_SESSION["dillergroups"]))  {
 		$group_idlist = $_SESSION["dillergroups"];
-	} else {
-		$group_idlist = isset($A2B->config["signup"]['group_id_list']) ? $A2B->config["signup"]['group_id_list'] : NULL;
 	}
 }
 if (!$agent_conf) {
 	if (strlen($callPlan_idlist) == 0) {
-		exit ("No Call Plan Defined.");
+		exit ("No Call Plan Defined.".);
 	}
 	$call_table = new Table("cc_tariffgroup", "tariffgroupname,id");
 	$callPlan_list = $call_table->Get_list($HD_Form->DBHandle, "id in ($callPlan_idlist)", "FIELD(id,".$callPlan_idlist.")", "ASC");
