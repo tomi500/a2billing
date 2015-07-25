@@ -1108,7 +1108,7 @@ class FormHandler
 						gettext("(INTEGER NUMBER)"));
 		
 		// 31 - Check numeric array with comma, eg. 38044,,38,
-		$this -> FG_regular[]  = array(	"^[1-9]+\d*\,([1-9]+\d*)*(\,([1-9]+\d*)\,([1-9]+\d*)*)*$",
+		$this -> FG_regular[]  = array(	"^[1-9]+\d*\,(\d+\d*)*(\,([1-9]+\d*)\,(\d+\d*)*)*$",
 						gettext("(ONLY NUMERIC CHARACTERS WITH COMMA SEPARATED)"));
 		
 	}

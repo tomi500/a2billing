@@ -181,7 +181,7 @@ echo $CC_help_simulator_rateengine;
 </table>
 
 
-<?php if ( (is_array($RateEngine->ratecard_obj)) && (!empty($RateEngine->ratecard_obj)) && ($RateEngine->ratecard_obj[0][12]<100)){
+<?php if ( (is_array($RateEngine->ratecard_obj)) && (!empty($RateEngine->ratecard_obj)) && ($RateEngine->ratecard_obj[0][70]!="-INFOLINE-")){
 
 if ($FG_DEBUG == 1) print_r($RateEngine->ratecard_obj);
 
@@ -197,7 +197,7 @@ $FG_TABLE_ALTERNATE_ROW_COLOR[1]='#EEE9E9';
           <TD style="border-bottom: medium dotted #FF4444" colspan="2"> <B><font color="red" size="3"><?php echo gettext("Simulator found a rate for your destination");?></font></B></TD>
         </TR>
 
-		<?php if (count($RateEngine->ratecard_obj)>1){ ?>
+		<?php if (count($RateEngine->ratecard_obj)>1 && strpos($RateEngine->ratecard_obj[0][7],"_")===false && strpos($RateEngine->ratecard_obj[1][7],"_")===false){ ?>
 		<TR>
           <td height="15" class="bgcolor_005" style="padding-left: 5px; padding-right: 3px;" colspan="2">
 					<b><?php echo gettext("We found several destinations:");?></b></td>
@@ -206,7 +206,8 @@ $FG_TABLE_ALTERNATE_ROW_COLOR[1]='#EEE9E9';
 		<?php 
 		
 		for($j=0;$j<count($RateEngine->ratecard_obj);$j++){ 
-		    if ($RateEngine->ratecard_obj[$j][12]<100 && $RateEngine->ratecard_obj[$j][7] != '') {
+		    if ($RateEngine->ratecard_obj[$j][70]=="-INFOLINE-")	break;
+		    if ($RateEngine->ratecard_obj[$j][7] != '') {
 			$result = $A2B->instance_table -> SQLExec ($A2B -> DBHandle, "SELECT destination FROM cc_prefix where prefix='".$RateEngine->ratecard_obj[$j][5]."'");
 			if (is_array($result))	$destination = $result[0][0];
 				
@@ -273,19 +274,14 @@ $FG_TABLE_ALTERNATE_ROW_COLOR[1]='#EEE9E9';
 						<i><?php echo round($A2B->margintotal * $RateEngine->ratecard_obj[$j][12] / $mycur, 5); ?> <?php echo gettext($currency); ?></i>
 				</td>
 			</tr>
-		<?php if ($RateEngine->ratecard_obj[$j][42]==0)	break;
+		<?php if (strpos($RateEngine->ratecard_obj[$j][7],"_")===0 && strpos($RateEngine->ratecard_obj[$j+1][7],"_")===false)	break;
 		    }} ?>
 		
 	  </table>
       <div align="center">
-        <?php  } ?>
-        
-        
-        <?php  if (count($RateEngine->ratecard_obj)==0) {
-		if  ($called){
+        <?php  } elseif ($called) {
 		?>
         <span style="font-weight: bold">	<img src="<?php echo Images_Path_Main ?>/kicons/button_cancel.gif" alt="a" width="32" height="32"/> <?php echo gettext("The number, you have entered, is not correct!");?>  </span>
-        <?php  } ?>
         <?php  } ?>
         
         <br><br><br><br>

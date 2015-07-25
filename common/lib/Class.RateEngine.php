@@ -90,7 +90,6 @@ class RateEngine
 	function rate_engine_findrates (&$A2B, $phonenumber, $tariffgroupid)
 	{
 		global $agi;
-
 		// Check if we want to force the call plan
 		if (is_numeric($A2B->agiconfig['force_callplan_id']) && ($A2B->agiconfig['force_callplan_id'] > 0)) {
 			$A2B -> debug( DEBUG, $agi, __FILE__, __LINE__, "force the call plan : ".$A2B->agiconfig['force_callplan_id']);
@@ -110,8 +109,7 @@ class RateEngine
 		$minutes_since_monday = ($daytag * 1440) + ($hours * 60) + $minutes;
 		if ($this -> debug_st) echo "$minutes_since_monday<br> ";
 
-		$sql_clause_days = "(startdate<= CURRENT_TIMESTAMP AND (stopdate > CURRENT_TIMESTAMP OR stopdate = 0) AND (cc_sheduler_ratecard.id_ratecard IS NULL OR (weekdays LIKE CONCAT('%',WEEKDAY(NOW()),'%') AND (CURTIME() BETWEEN timefrom AND timetill OR (timetill<=timefrom AND (CURTIME()<timetill OR CURTIME()>=timefrom))))))";
-//		$sql_clause_days = "(startdate<= CURRENT_TIMESTAMP AND (stopdate > CURRENT_TIMESTAMP OR stopdate = 0) AND (starttime <= ".$minutes_since_monday." AND endtime >=".$minutes_since_monday."))";
+		$sql_clause_days = "(startdate<= CURRENT_TIMESTAMP AND (stopdate > CURRENT_TIMESTAMP OR stopdate = 0) AND (csr.id_ratecard IS NULL OR (weekdays LIKE CONCAT('%',WEEKDAY(NOW()),'%') AND (CURTIME() BETWEEN timefrom AND timetill OR (timetill<=timefrom AND (CURTIME()<timetill OR CURTIME()>=timefrom))))))";
 
 		$mydnid = $mycallerid = "";
 		if (strlen($A2B->dnid)>=1) $mydnid = $A2B->dnid;
@@ -120,8 +118,8 @@ class RateEngine
 
 		$DNID_SUB_QUERY = "AND 0 = (SELECT COUNT(dnidprefix) FROM cc_tariffgroup_plan RIGHT JOIN cc_tariffplan ON cc_tariffgroup_plan.idtariffplan=cc_tariffplan.id WHERE dnidprefix=SUBSTRING('$mydnid',1,length(dnidprefix)) AND idtariffgroup=$tariffgroupid ) ";
 		$CID_SUB_QUERY = "AND 0 = (SELECT count(calleridprefix) FROM cc_tariffgroup_plan RIGHT JOIN cc_tariffplan ON cc_tariffgroup_plan.idtariffplan=cc_tariffplan.id WHERE ('$mycallerid' LIKE CONCAT(calleridprefix,'%') OR calleridprefix LIKE '$mycallerid,%' OR calleridprefix LIKE '%,$mycallerid,%' OR calleridprefix LIKE '%,$mycallerid') AND idtariffgroup=$tariffgroupid )";
-		$TARIFFNAME_SUB_QUERY = $A2B->myprefix=="00" ? "" : " OR cc_tariffplan.tariffname LIKE '$A2B->cardnumber%'";
-//$A2B -> debug( ERROR, $agi, "", __LINE__, "=================== ".$A2B->myprefix);
+		$TARIFFNAME_SUB_QUERY = ($A2B->myprefix=="00" || $A2B->myprefix=="011") ? "" : " OR cc_tariffplan.tariffname LIKE '$A2B->cardnumber%'";
+
 		// $prefixclause to allow good DB servers to use an index rather than sequential scan
 		// justification at http://forum.asterisk2billing.org/viewtopic.php?p=9620#9620
 		$max_len_prefix = min(strlen($phonenumber), 15);	// don't match more than 15 digits (the most I have on my side is 8 digit prefixes)
@@ -131,11 +129,13 @@ class RateEngine
 			$max_len_prefix--;
 		}
 		$prefixclause .= "dialprefix='defaultprefix')";
+
 		// match Asterisk/POSIX regex prefixes,  rewrite the Asterisk '_XZN.' characters to
 		// POSIX equivalents, and test each of them against the dialed number
 		$prefixclause .= " OR (dialprefix LIKE '&_%' ESCAPE '&' AND '$phonenumber' ";
 		$prefixclause .= "REGEXP REPLACE(REPLACE(REPLACE(REPLACE(REPLACE(CONCAT('^', dialprefix, '$'), ";
 		$prefixclause .= "'X', '[[:digit:]]'), 'Z', '[1-9]'), 'N', '[2-9]'), '.', '.+'), '_', ''))";
+
 		$QUERY = "SELECT DISTINCT
 		tariffgroupname,
 		lcrtype,
@@ -176,7 +176,7 @@ class RateEngine
 		cc_trunk.addparameter,
 		id_outbound_cidgroup,
 		id_cc_package_offer,
-		IF(tariff_lcr=1 OR $sql_clause_days,cc_trunk.status,0) status,
+		MAX(IF(tariff_lcr=1 OR $sql_clause_days,cc_trunk.status,0)) status,
 		cc_trunk.inuse,
 		IF(cc_trunk.wrapnexttime>NOW() AND cc_trunk.lastdial NOT LIKE '$A2B->destination',0,cc_trunk.maxuse) maxuse,
 		cc_trunk.if_max_use,
@@ -200,12 +200,13 @@ class RateEngine
 		IFNULL(ratecarddialprefix,sellerdialprefix),
 		buyrateconnectcharge
 
-		FROM cc_tariffgroup
+		FROM cc_ratecard
 
-		RIGHT JOIN cc_tariffgroup_plan ON cc_tariffgroup_plan.idtariffgroup=cc_tariffgroup.id
-		INNER JOIN cc_tariffplan ON cc_tariffplan.id=cc_tariffgroup_plan.idtariffplan".$TARIFFNAME_SUB_QUERY."
-		LEFT JOIN cc_ratecard ON cc_ratecard.idtariffplan=cc_tariffplan.id
-		LEFT JOIN cc_sheduler_ratecard ON id_ratecard=cc_ratecard.id OR id_tariffplan=cc_tariffplan.id
+		LEFT JOIN cc_tariffplan ON cc_tariffplan.id=cc_ratecard.idtariffplan
+		LEFT JOIN cc_tariffgroup_plan ON cc_tariffgroup_plan.idtariffplan=cc_tariffplan.id
+		LEFT JOIN cc_tariffgroup ON cc_tariffgroup.id=cc_tariffgroup_plan.idtariffgroup
+
+		LEFT JOIN cc_sheduler_ratecard csr ON id_ratecard=cc_ratecard.id OR id_tariffplan=cc_tariffplan.id
 		LEFT JOIN cc_trunk ON (cc_trunk.id_trunk = cc_ratecard.id_trunk AND cc_ratecard.id_trunk != -1) OR (cc_ratecard.id_trunk = -1 AND cc_trunk.id_trunk = cc_tariffplan.id_trunk)
 
 		WHERE ((cc_tariffgroup.id=$tariffgroupid AND idtariffgroup='$tariffgroupid') OR cc_tariffplan.tariffname LIKE '$A2B->cardnumber%') AND ($prefixclause)
@@ -215,13 +216,9 @@ class RateEngine
 		AND ('$mycallerid' LIKE CONCAT(calleridprefix,'%') OR (calleridprefix='all' $CID_SUB_QUERY) OR calleridprefix LIKE '$mycallerid,%' OR calleridprefix LIKE '%,$mycallerid,%' OR calleridprefix LIKE '%,$mycallerid')
 		GROUP BY cc_ratecard.id
 		ORDER BY LENGTH(dialprefix) DESC";
-//		AND ( calleridprefix=SUBSTRING('$mycallerid',1,length(calleridprefix)) OR (calleridprefix='all' $CID_SUB_QUERY))
-//		AND (rateinitial<0.14 OR rateinitial=100 OR dialprefix LIKE '37%' OR dialprefix LIKE '380%')
 
 		$A2B->instance_table = new Table();
 		$result = $A2B->instance_table -> SQLExec ($A2B -> DBHandle, $QUERY);
-
-//if ($this->webui) $A2B -> debug( ERROR, $agi, "", __LINE__, "=================== QUERY:\n".$QUERY);
 
 		if (!is_array($result) || count($result)==0) return 0; // NO RATE FOR THIS NUMBER
 
@@ -258,8 +255,6 @@ class RateEngine
             $myresult = array();
             $myresult = $result;
             $mysearchvalue = array();
-//            if ($this->webui) $A2B -> debug( DEBUG, $agi, __FILE__, __LINE__, "[rate-engine: MYRESULT before sort \n".print_r($myresult, true));
-
             // 3 - tariff plan, 7 - dialprefix, 12 - rateinitial
             foreach ($myresult as $key => $row) {
                 $sorttariffplan[$key]    = $row[3];
@@ -267,67 +262,24 @@ class RateEngine
                 $sortdialprefixnum[$key] = $row[7];
             }
             array_multisort($sorttariffplan,SORT_NUMERIC,$sortdialprefixstr,SORT_NUMERIC,SORT_DESC,$sortdialprefixnum,SORT_NUMERIC,SORT_DESC,$myresult);
-//            if ($this->webui) $A2B -> debug( DEBUG, $agi, __FILE__, __LINE__, "[rate-engine: MYRESULT after sort \n".print_r($myresult, true));
-//if ($this->webui) $A2B -> debug( ERROR, $agi, __FILE__, __LINE__, "[rate-engine: Count MYRESULT after sort: ".count($myresult)."]");
-//echo "<br><br>MYRESULT after sort<br>".print_r($myresult, true);
-            $countdelete = 0;
-            $resultcount = 0;
-            $mysearchvalue[$resultcount] = $myresult[0];
+            $countdelete = $resultcount = 0;
+            $mysearchvalue[] = $myresult[0];
             for ($ii=0;$ii<count($result)-1;$ii++){
-                if (isset($myresult[$ii])) $mysearchvalue[$resultcount] = $myresult[$ii];
-/**
-                if ($this->webui) {
-                    $A2B -> debug( DEBUG, $agi, __FILE__, __LINE__, "[rate-engine: Begin for ii value ".$ii."]");
-                    $A2B -> debug( DEBUG, $agi, __FILE__, __LINE__, "[rate-engine: MYSEARCHCVALUE \n".print_r($mysearchvalue,true)."]");
-                };
-**/
+                if (isset($myresult[$ii]))	$mysearchvalue[$resultcount] = $myresult[$ii];
                 if (count($myresult)>0){
                     foreach($myresult as $j=>$i){
-/**
-                        if ($this->webui) {
-                            $A2B -> debug( DEBUG, $agi, __FILE__, __LINE__, "[rate-engine: foreach J=".print_r($j, true));
-                            if (isset($mysearchvalue[$resultcount][4])) $A2B -> debug( DEBUG, $agi, __FILE__, __LINE__, "[rate-engine:mysearchvalue[4]=".$mysearchvalue[$resultcount][4]);
-                            $A2B -> debug( DEBUG, $agi, __FILE__, __LINE__, "[rate-engine:i[4]=".$i[4]);
-                            if (isset($mysearchvalue[$resultcount][3])) $A2B -> debug( DEBUG, $agi, __FILE__, __LINE__, "[rate-engine:mysearchvalue[3]=".$mysearchvalue[$resultcount][3]);
-                            $A2B -> debug( DEBUG, $agi, __FILE__, __LINE__, "[rate-engine:i[3]=".$i[3]);
-                            if (isset($mysearchvalue[$resultcount][7])) $A2B -> debug( DEBUG, $agi, __FILE__, __LINE__, "[rate-engine:mysearchvalue[7]=".$mysearchvalue[$resultcount][7]);
-                            $A2B -> debug( DEBUG, $agi, __FILE__, __LINE__, "[rate-engine:i[7]=".$i[7]);
-                        };
-**/
                         if (isset($mysearchvalue[$resultcount][3]) && $mysearchvalue[$resultcount][3] == $i[3] ) {
                             if (strlen($mysearchvalue[$resultcount][7]) != strlen($i[7])) {
                                 unset($myresult[$j]);
                                 $countdelete++;
-/**
-                                if ($this->webui) {
-                                    $A2B -> debug( DEBUG, $agi, __FILE__, __LINE__, "[rate-engine: foreach: COUNTDELETE: ".$countdelete."]");
-                                    $A2B -> debug( DEBUG, $agi, __FILE__, __LINE__, "[rate-engine: foreach: MYRESULT count after delete: ".count($myresult)."]");
-                                };
-**/
-                            };
+                            }
                         }
                     } //end foreach
                     $myresult = array_values($myresult);
                     $resultcount++;
-/**
-                    if ($this->webui) $A2B -> debug( DEBUG, $agi, __FILE__, __LINE__, "[rate-engine: MYRESULT  after foreach \n".print_r($myresult, true));
-                    if ($this->webui) {
-                        $A2B -> debug( DEBUG, $agi, __FILE__, __LINE__, "[rate-engine: Count MYRESULT after foreach=".count($myresult)."]");
-                        $A2B -> debug( DEBUG, $agi, __FILE__, __LINE__, "[rate-engine: RESULTCOUNT=".$resultcount."]");
-                    };
-**/
                 }
-//                if ($this->webui) $A2B -> debug( DEBUG, $agi, __FILE__, __LINE__, "[rate-engine: End for II value ".$ii."]");
             }  //end for
-//$A2B -> debug( ERROR, $agi, __FILE__, __LINE__, "[rate-engine: Count MYRESULT before unset = ".count($myresult)."]");
-/**
-            if ($this->webui) {
-                $A2B -> debug( DEBUG, $agi, __FILE__, __LINE__, "[rate-engine: COUNTDELETE=".$countdelete."]");
-                $A2B -> debug( DEBUG, $agi, __FILE__, __LINE__, "[rate-engine: MYRESULT before unset \n".print_r($myresult, true));
-            }
-**/
             if (count($result)>1 and $countdelete != 0) {
-//                if ($this->webui) $A2B -> debug( DEBUG, $agi, __FILE__, __LINE__, "[rate-engine: LAST UNSET]");
                 unset($mysearchvalue[$resultcount]);
                 foreach ($mysearchvalue as $key => $value) {
                     if (is_null($value) or $value == "") {
@@ -338,20 +290,8 @@ class RateEngine
                 unset($myresult);
                 $result = $mysearchvalue;
             }
-/**
-            if ($this->webui) {
-                $A2B -> debug( DEBUG, $agi, __FILE__, __LINE__, "[rate-engine: RESULTCOUNT".$resultcount."]");
-                if (isset($myresult)) {
-                    $A2B -> debug( DEBUG, $agi, __FILE__, __LINE__, "[rate-engine: MYRESULT  after delete \n".print_r($myresult, true));
-                    $A2B -> debug( DEBUG, $agi, __FILE__, __LINE__, "[rate-engine: Count Total result after 4 ".count($myresult)."]");
-                }
-                $A2B -> debug( DEBUG, $agi, __FILE__, __LINE__, "[rate-engine: MYSEARCHVALUE after delete \n".print_r($mysearchvalue, true));
-            }
-            if ($this->webui) $A2B -> debug( DEBUG, $agi, __FILE__, __LINE__, "[rate-engine: RESULT  after delete \n".print_r($result, true));
-**/
             unset($mysearchvalue);
         }
-		
 		//2) TAKE THE VALUE OF LCTYPE
 		//LCR : According to the buyer price	-0 	buyrate [col 9]
 		//LCD : According to the seller price	-1  rateinitial	[col 12]
@@ -360,7 +300,7 @@ class RateEngine
 
 		foreach ($result as $key => $row) {
 		    $strprefix[$key]  = (ctype_digit($row[7]))?1:(($row[12] != 100)?strlen($row[7]):0);
-		    $lcrsort[$key] = ($LCtype==0)?$row[9]:$row[12];
+		    $lcrsort[$key] = ($row[72]=="EMERGENCY")?-1:(($LCtype==0)?$row[9]:$row[12]);
 		}
 		array_multisort($strprefix, SORT_DESC, $lcrsort, $result);
 		
@@ -373,48 +313,26 @@ class RateEngine
 			unset($result[$cres]);
 			$cres--;
 		}
-		if ($cres > -1 && $result[$cres][12] == 100) $result[$cres][12] = 0;
+		if ($cres >= 0 && $result[$cres][12] == 100)	$result[$cres][12] = 0;
 
 		// 3) REMOVE THOSE THAT USE THE SAME TRUNK - MAKE A DISTINCT
 		//    AND THOSE THAT ARE DISABLED.
-//		$mylistoftrunk = array();
 		for ($i=0;$i<count($result);$i++) {
-//			$status 	= $result[$i][39];
-//			$mycurrenttrunk = $result[$i][29];
 
 			// Check if we already have the same trunk in the ratecard
-//			if (($i==0 || !in_array ($mycurrenttrunk , $mylistoftrunk)) && $status == 1) {
-//				$distinct_result[]	= $result[$i];
-//			}
-//			if ($status == 1)
-//				$mylistoftrunk[]	= $mycurrenttrunk;
 			if ($result[$i][39])
 				$distinct_result[]	= $result[$i];
 		}
-/**
-for ($i=0; $i<count($result); $i++)
-{
-$ttee = "Ratecard: ".$result[$i][6]."<br>Trunk: ".$result[$i][32]."<br>Prefix: ".$result[$i][7]."<br>Rateinitial: ".$result[$i][12]."<br>";
-if ($this->webui) $A2B -> debug( ERROR, $agi, __FILE__, __LINE__, $ttee);
-else echo $ttee;
-}
-**/
 		$this -> ratecard_obj = $distinct_result;
 		$this -> number_trunk = count($distinct_result);
-/**
-for ($i=0; $i<count($myresult); $i++)
-{
-$ttee = "Trunk: ".$myresult[$i][32]."<br>Prefix: ".$myresult[$i][7]."<br>Rateinitial: ".$myresult[$i][12]."<br>";
-if ($this->webui) $A2B -> debug( ERROR, $agi, __FILE__, __LINE__, $ttee);
-else echo $ttee;
-}
-**/
-/**
+
 for ($i=0; $i<count($this->ratecard_obj); $i++) {
-if ($this->webui) { }
-else echo "Ratecard: ".$this->ratecard_obj[$i][6]."<br>Trunk: ".$this->ratecard_obj[$i][32]."<br>Prefix: ".$this->ratecard_obj[$i][7]."<br>Rateinitial: ".$this->ratecard_obj[$i][12]."<br>";
+ $ttee = "Tariffname: ".$this->ratecard_obj[$i][4]." / Ratecard: ".$this->ratecard_obj[$i][6]." / Trunk: ".$this->ratecard_obj[$i][32]." / Prefix: ".$this->ratecard_obj[$i][7]." / Rateinitial: ".$this->ratecard_obj[$i][12]." / STATUS: ".$this->ratecard_obj[$i][39]." / idtariffplan: ".var_export($this->ratecard_obj[$i][3],true);
+ if ($this->webui) {
+  $A2B -> debug( ERROR, $agi, __FILE__, __LINE__, $ttee);
+ }// else echo "5-".$ttee."<br>";
 }
-**/
+
 		// if an extracharge DID number was called increase rates with the extracharge fee
 		if (strlen($A2B->dnid)>1 && is_array($A2B->agiconfig['extracharge_did']) && in_array($A2B->dnid, $A2B->agiconfig['extracharge_did'])) {
 			$fee=$A2B->agiconfig['extracharge_fee'][array_search($A2B->dnid, $A2B->agiconfig['extracharge_did'])];
@@ -455,7 +373,7 @@ else echo "Ratecard: ".$this->ratecard_obj[$i][6]."<br>Trunk: ".$this->ratecard_
 				$A2B -> debug( DEBUG, $agi, __FILE__, __LINE__, "[CC_RATE_ENGINE_ALL_CALCULTIMEOUT: k=$k - res_calcultimeout:$res_calcultimeout]");
 
 			if (substr($res_calcultimeout,0,5)=='ERROR')	return false;
-			if ($this -> ratecard_obj[$k][42] == 0) 	break;
+//			if ($this -> ratecard_obj[$k][42] == 0) 	break;
 		}
 
 		return (!$addtimeout)?true:$addtimeout;

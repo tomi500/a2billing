@@ -302,7 +302,7 @@ $FG_TABLE_ALTERNATE_ROW_COLOR[1]='#EEE9E9';
 			<?php }  
 			} ?>
 			
-		<?php if ($RateEngine->ratecard_obj[$j][42]==0)	break;
+		<?php //if ($RateEngine->ratecard_obj[$j][42]==0)	break;
 		    } ?>
 		
 		<TR> 
