@@ -453,9 +453,10 @@ SPAN.errorText {
 	color: #AA4444;
 }
 
-.callhistory_maintable{	
-	width: 77%;
-	border: 0px none;
+.callhistory_maintable{
+	width: 60%;
+	border: 0px none transparent;
+	border-spacing: 0px;
 	padding: 2px;
 	margin: 1px;
 }

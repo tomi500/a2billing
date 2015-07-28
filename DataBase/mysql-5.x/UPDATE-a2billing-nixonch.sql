@@ -371,6 +371,27 @@ delimiter //
 create procedure a2b_trf_check()
 begin
     declare a int;
+    select count(*) into a from cc_config where config_key='waitup_sorting';
+    if a=0 then
+	INSERT INTO cc_config (id, config_title, config_key, config_value, config_description, config_valuetype, config_listvalues, config_group_title)
+	VALUES (NULL , 'WaitUp Sorting', 'waitup_sorting', '0', '', '1', 'yes,no', 'webui');
+    elseif a>1 then
+	select id into a from cc_config where config_key='waitup_sorting' order by id limit 0,1;
+	delete from cc_config where config_key='waitup_sorting' and id>a;
+    end if;
+end //
+
+delimiter ;
+
+call a2b_trf_check;
+
+drop procedure if exists a2b_trf_check;
+
+delimiter //
+
+create procedure a2b_trf_check()
+begin
+    declare a int;
     select count(*) into a from cc_config where config_key='fax_path';
     if a=0 then
 	INSERT INTO cc_config (id, config_title, config_key, config_value, config_description, config_valuetype, config_listvalues, config_group_title)

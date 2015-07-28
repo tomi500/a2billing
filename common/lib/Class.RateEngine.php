@@ -327,7 +327,7 @@ class RateEngine
 		$this -> number_trunk = count($distinct_result);
 
 for ($i=0; $i<count($this->ratecard_obj); $i++) {
- $ttee = "Tariffname: ".$this->ratecard_obj[$i][4]." / Ratecard: ".$this->ratecard_obj[$i][6]." / Trunk: ".$this->ratecard_obj[$i][32]." / Prefix: ".$this->ratecard_obj[$i][7]." / Rateinitial: ".$this->ratecard_obj[$i][12]." / STATUS: ".$this->ratecard_obj[$i][39]." / idtariffplan: ".var_export($this->ratecard_obj[$i][3],true);
+ $ttee = "Tariffname:".$this->ratecard_obj[$i][4]." / Ratecard:".$this->ratecard_obj[$i][6]." / Trunk:".$this->ratecard_obj[$i][32]." / Prefix:".$this->ratecard_obj[$i][7]." / Rate:".$this->ratecard_obj[$i][12]."-".$this->ratecard_obj[$i][9]." / STATUS:".$this->ratecard_obj[$i][39]." / idtariffplan:".var_export($this->ratecard_obj[$i][3],true);
  if ($this->webui) {
   $A2B -> debug( ERROR, $agi, __FILE__, __LINE__, $ttee);
  }// else echo "5-".$ttee."<br>";

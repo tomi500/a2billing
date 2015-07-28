@@ -2043,6 +2043,10 @@ msgid "Ends with"
 msgstr "Заканчивается на"
 
 #: call-history.php:146
+msgid "sec"
+msgstr "сек"
+
+#: call-history.php:146
 msgid "Route"
 msgstr "Маршрут"
 

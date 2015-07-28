@@ -43,7 +43,19 @@ if (! has_rights (ACX_CALL_HISTORY)) {
 	die();
 }
 
-getpost_ifset(array('id', 'posted', 'Period', 'frommonth', 'fromstatsmonth', 'tomonth', 'tostatsmonth', 'fromday', 'fromstatsday_sday', 'fromstatsmonth_sday', 'today', 'tostatsday_sday', 'tostatsmonth_sday', 'fromtime', 'totime', 'fromstatsday_hour', 'tostatsday_hour', 'fromstatsday_min', 'tostatsday_min', 'calleridtype', 'phonenumbertype', 'sourcetype', 'clidtype', 'channel', 'resulttype', 'stitle', 'atmenu', 'current_page', 'order', 'sens', 'callerid', 'phonenumber', 'clid', 'choose_currency', 'terminatecauseid', 'choose_calltype', 'download', 'file', 'choose_callowner'));
+getpost_ifset(array('id', 'posted', 'Period', 'frommonth', 'fromstatsmonth', 'tomonth', 'tostatsmonth', 'fromday', 'fromstatsday_sday', 'fromstatsmonth_sday', 'today', 'tostatsday_sday', 'tostatsmonth_sday', 'fromtime', 'totime', 'fromstatsday_hour', 'tostatsday_hour', 'fromstatsday_min', 'tostatsday_min', 'calleridtype', 'phonenumbertype', 'sourcetype', 'clidtype', 'channel', 'resulttype', 'stitle', 'atmenu', 'current_page', 'order', 'sens', 'callerid', 'phonenumber', 'clid', 'choose_currency', 'terminatecauseid', 'choose_calltype', 'download', 'file', 'choose_callowner', 'waitup1', 'waitup2', 'waitup1type', 'waitup2type'));
+
+$cl = 2;
+$cr = 3;
+function bgcolor($c) {
+	global $cl,$cr;
+	if ($c) {
+		$ret = $cr = $cr==3?5:3;
+	} else {
+		$ret = $cl = $cl==2?4:2;
+	}
+	echo "class=\"bgcolor_00{$ret}\"";
+}
 
 $customer = $_SESSION["card_id"];
 
@@ -160,6 +172,29 @@ if ($posted==1) {
 	$SQLcmd = do_field($SQLcmd, 'phonenumber', 'calledstation', false, 1);
 	$SQLcmd = do_field($SQLcmd, 'phonenumber', 'calledexten', true);
 	$SQLcmd = do_field($SQLcmd, 'phonenumber', 'dnid', true, 2);
+	if ($SQLcmd == "")	$tmpcmd = " WHERE ";
+	else			$tmpcmd = " AND ";
+	$wheretmp = "IF(ROUND(UNIX_TIMESTAMP(t1.starttime)-INSERT(t1.uniqueid,1,1,1))>0,ROUND(UNIX_TIMESTAMP(t1.starttime)-INSERT(t1.uniqueid,1,1,1)),0)";
+	if (ctype_digit($waitup1)) {
+		if ($waitup1type == "4") {
+			$SQLcmd .= $tmpcmd . $waitup1 . " < " . $wheretmp;
+			$tmpcmd = " AND ";
+		} elseif ($waitup1type == "5") {
+			$SQLcmd .= $tmpcmd . $waitup1 . " <= " . $wheretmp;
+			$tmpcmd = " AND ";
+		} elseif ($waitup1type == "1") {
+			$SQLcmd .= $tmpcmd . $waitup1 . " = " . $wheretmp;
+			$tmpcmd = " AND ";
+		}
+	} else $waitup1 = "";
+	if (ctype_digit($waitup2)) {
+		if ($waitup2type == "2") {
+			$SQLcmd .= $tmpcmd . $wheretmp . " <= " . $waitup2;
+		} elseif ($waitup2type == "3") {
+			$SQLcmd .= $tmpcmd . $wheretmp . " < " . $waitup2;
+		}
+	} else $waitup2 = "";
+//echo "- ".$SQLcmd;
 }
 
 $date_clause = '';
@@ -344,7 +379,7 @@ IF(t1.sipiax IN (2,3) AND t1.terminatecauseid<>1,'',IF(t1.card_called$calledsbqu
 	,IF(t1.card_id$calledsbquery,t1.calledstation,t1.dnid))) calledstation,
 IF(t1.card_called$calledsbquery OR t1.card_id$calledsbquery,t1.destination,-1),
 id_ratecard AS route,
-ROUND(UNIX_TIMESTAMP(t1.starttime)-INSERT(t1.uniqueid,1,1,1)) AS waitup,
+IF(ROUND(UNIX_TIMESTAMP(t1.starttime)-INSERT(t1.uniqueid,1,1,1))>0,ROUND(UNIX_TIMESTAMP(t1.starttime)-INSERT(t1.uniqueid,1,1,1)),0) AS waitup,
 t1.sessiontime$tc,
 IF(t1.card_id$calledsbquery, t1.sessionbill+margindillers, 0) sessionbill";
 
@@ -478,10 +513,10 @@ if ($ACXSEERECORDING && $nb_record>0 && $terminatecauseid!="INCOMPLET" && !($pop
 	    <INPUT TYPE="hidden" NAME="terminatecauseid" value="<?php echo $terminatecauseid; ?>">
 	    <table class="callhistory_maintable" align="center">
 		<tr>
-		    <td align="left" class="bgcolor_004">
+		    <td align="left" <?php bgcolor(0)?>>
 			<font class="fontstyle_003">&nbsp;&nbsp;<?php echo gettext ( "DATE" ); ?></font>
 		    </td>
-		    <td align="left" class="bgcolor_005" colspan="7">
+		    <td align="left" <?php bgcolor(1)?> colspan="7">
 			<table width="100%" border="0" cellspacing="0" cellpadding="0">
 			    <tr>
 				<td class="fontstyle_searchoptions">&nbsp;
@@ -648,10 +683,10 @@ if ($ACXSEERECORDING && $nb_record>0 && $terminatecauseid!="INCOMPLET" && !($pop
 		    </td>
 		</tr>
 		<tr>
-			<td align="left" class="bgcolor_002" nowrap>
+			<td align="left" <?php bgcolor(0)?> nowrap>
 				<font class="fontstyle_003">&nbsp;&nbsp;<?php echo gettext("CALLERID");?>&nbsp;&nbsp;</font>
 			</td>
-			<td align="left" class="bgcolor_003" colspan="7">
+			<td align="left" <?php bgcolor(1)?> colspan="7">
 			<table width="100%" border="0" cellspacing="1" cellpadding="0">
 			<tr><td class="fontstyle_searchoptions" nowrap>&nbsp;<INPUT TYPE="text" NAME="callerid" value="<?php echo $callerid?>" class="form_input_text">&nbsp;</td>
 			<td align="center" class="fontstyle_searchoptions" nowrap><input type="radio" NAME="calleridtype" value="1" <?php if((!isset($calleridtype))||($calleridtype==1)){?>checked<?php }?>><?php echo gettext("Exact");?>&nbsp;</td>
@@ -661,10 +696,10 @@ if ($ACXSEERECORDING && $nb_record>0 && $terminatecauseid!="INCOMPLET" && !($pop
 			</tr></table></td>
 		</tr>
 		<tr>
-			<td align="left" class="bgcolor_004" nowrap>
+			<td align="left" <?php bgcolor(0)?> nowrap>
 				<font class="fontstyle_003">&nbsp;&nbsp;<?php echo gettext("PHONENUMBER");?>&nbsp;&nbsp;</font>
 			</td>
-			<td align="left" class="bgcolor_005" colspan="7">
+			<td align="left" <?php bgcolor(1)?> colspan="7">
 			<table width="100%" border="0" cellspacing="1" cellpadding="0">
 			<tr><td class="fontstyle_searchoptions" nowrap>&nbsp;<INPUT TYPE="text" NAME="phonenumber" value="<?php echo $phonenumber?>" class="form_input_text">&nbsp;</td>
 			<td align="center" class="fontstyle_searchoptions" nowrap><input type="radio" NAME="phonenumbertype" value="1" <?php if((!isset($phonenumbertype))||($phonenumbertype==1)){?>checked<?php }?>><?php echo gettext("Exact");?>&nbsp;</td>
@@ -674,8 +709,8 @@ if ($ACXSEERECORDING && $nb_record>0 && $terminatecauseid!="INCOMPLET" && !($pop
 			</tr></table></td>
 		</tr>		
 		<!-- Select Calltype: -->
-		<tr class="bgcolor_003">
-			<td class="bgcolor_002" align="left"><font class="fontstyle_003">&nbsp;&nbsp;<?php echo gettext("CALL TYPE"); ?>&nbsp;&nbsp;</font>
+		<tr <?php bgcolor(1)?>>
+			<td <?php bgcolor(0)?> align="left"><font class="fontstyle_003">&nbsp;&nbsp;<?php echo gettext("CALL TYPE"); ?>&nbsp;&nbsp;</font>
 			</td>
 			<td class="fontstyle_searchoptions" align="right" nowrap>
 				&nbsp;<?php echo gettext("BY DIRECTION");?> :&nbsp;&nbsp;
@@ -702,8 +737,8 @@ if ($ACXSEERECORDING && $nb_record>0 && $terminatecauseid!="INCOMPLET" && !($pop
 			</td>
 		</tr>
 		<!-- Select Option : to show just the Answered Calls or all calls, Result type, currencies... -->
-		<tr class="bgcolor_005">
-			<td class="bgcolor_004" align="left" rowspan="<?php if ($totalcost) echo 3; else echo 2;?>"><font class="fontstyle_003">&nbsp;&nbsp;<?php echo gettext("OPTIONS")?></font>
+		<tr <?php bgcolor(1)?>>
+			<td <?php bgcolor(0)?> align="left" rowspan="<?php if ($totalcost) echo 3; else echo 2;?>"><font class="fontstyle_003">&nbsp;&nbsp;<?php echo gettext("OPTIONS")?></font>
 			</td>
 			<td class="fontstyle_searchoptions" align="right" nowrap>
 				&nbsp;&nbsp;<?php echo gettext("SHOW");?> :&nbsp;&nbsp;
@@ -727,7 +762,7 @@ if ($ACXSEERECORDING && $nb_record>0 && $terminatecauseid!="INCOMPLET" && !($pop
 				&nbsp;<?php echo gettext("All Calls");?> 
 			</td>
 		</tr>
-		<tr class="bgcolor_003">
+		<tr <?php bgcolor(1)?>>
 			<td class="fontstyle_searchoptions" align="right" nowrap>
 				&nbsp;<?php echo gettext("RESULT");?> :&nbsp;&nbsp;
 			</td>
@@ -745,7 +780,7 @@ if ($ACXSEERECORDING && $nb_record>0 && $terminatecauseid!="INCOMPLET" && !($pop
 			</td>
 		</tr>
 <?php			if ($totalcost) {?>
-		<tr class="bgcolor_005">
+		<tr <?php bgcolor(1)?>>
 			<td class="fontstyle_searchoptions" align="right">
 				&nbsp;<?php echo gettext("CURRENCY");?> :&nbsp;&nbsp;
 			</td>
@@ -762,12 +797,42 @@ if ($ACXSEERECORDING && $nb_record>0 && $terminatecauseid!="INCOMPLET" && !($pop
 				</select>
 			</td>
 		</tr>
+<?php			}
+			if ($A2B->config["webui"]['waitup_sorting']) {?>
+		<tr <?php bgcolor(1)?>>
+			<td <?php bgcolor(0)?> align="left"><font class="fontstyle_003">&nbsp;&nbsp;<?php echo gettext("WAITUP").", ".gettext("sec")?>&nbsp;&nbsp;</font>
+			</td>
+			<td align="left">
+			<table width="100%" border="0" cellspacing="1" cellpadding="0"><tr>
+			    <td class="fontstyle_searchoptions" nowrap>&nbsp;<INPUT TYPE="text" NAME="waitup1" value="<?php echo $waitup1?>" class="form_input_text" size="6" maxlength="6"></td>
+			</tr></table>
+			</td>
+			<td align="left" colspan="2">
+			<table width="100%" border="0" cellspacing="0" cellpadding="0"><tr>
+			    <td align="left" class="fontstyle_searchoptions" nowrap><input type="radio" NAME="waitup1type" value="4" <?php if($waitup1type==4){?>checked<?php }?>>&lt;</td>
+			    <td align="left" class="fontstyle_searchoptions" nowrap>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<input type="radio" NAME="waitup1type" value="5" <?php if((!isset($waitup1type))||($waitup1type==5)){?>checked<?php }?>>&lt;=</td>
+			</tr></table>
+			</td>
+			<td align="left" colspan="4">
+			<table width="100%" border="0" cellspacing="0" cellpadding="0"><tr>
+			    <td align="left" class="fontstyle_searchoptions" nowrap><input type="radio" NAME="waitup1type" value="1" <?php if($waitup1type==1){?>checked<?php }?>>=</td>
+			    <td align="center" class="fontstyle_searchoptions" nowrap><b>(<?php echo gettext("WaitUp")?>)</b>&nbsp;&nbsp;&nbsp;</td>
+			    <td align="left" class="fontstyle_searchoptions" nowrap><input type="radio" NAME="waitup2type" value="2" <?php if((!isset($waitup2type))||($waitup2type==2)){?>checked<?php }?>>&lt;=&nbsp;&nbsp;</td>
+			    <td align="left" class="fontstyle_searchoptions" nowrap><input type="radio" NAME="waitup2type" value="3" <?php if($waitup2type==3){?>checked<?php }?>>&lt;&nbsp;&nbsp;&nbsp;</td>
+			    <td align="left" class="fontstyle_searchoptions" nowrap>&nbsp;<INPUT TYPE="text" NAME="waitup2" value="<?php echo $waitup2?>" class="form_input_text" size="6" maxlength="6"></td>
+			    <td>&nbsp;</td>
+			    <td>&nbsp;</td>
+			    <td>&nbsp;</td>
+			    <td>&nbsp;</td>
+			</tr></table>
+			</td>
+		</tr>
 <?php			}?>
 		<!-- Select Option : to show just the Answered Calls or all calls, Result type, currencies... -->
 		<tr>
-		    <td class="bgcolor_002">
+		    <td <?php bgcolor(0)?>>
 		    </td>
-		    <td class="bgcolor_00<?php if ($totalcost) echo 3; else echo 5;?>" align="center" colspan="7">
+		    <td <?php bgcolor(1)?> align="center" colspan="7">
 			<input class="form_input_button" value="&nbsp;<?php echo gettext("Search");?>&nbsp;" type="submit">
 		    </td>
 		</tr>
@@ -800,7 +865,7 @@ if ($ACXSEERECORDING && $nb_record>0 && $terminatecauseid!="INCOMPLET" && !($pop
 	                  <TD width="<?php echo $FG_TABLE_COL[$i][2]?>" align=middle class="tableBody" style="PADDING-BOTTOM: 2px; PADDING-LEFT: 2px; PADDING-RIGHT: 2px; PADDING-TOP: 2px" nowrap> 
 	                    <center><strong> 
 	                    <?php  if (mb_strtoupper($FG_TABLE_COL[$i][4])=="SORT"){?>
-	                    <a href="<?php  echo $PHP_SELF."?popup_select=$popup_select&s=1&t=0&stitle=$stitle&atmenu=$atmenu&current_page=$current_page&order=".$FG_TABLE_COL[$i][1]."&choose_callowner=$choose_callowner&sens="; if ($sens=="ASC"){echo"DESC";}else{echo"ASC";} 
+	                    <a href="<?php  echo $PHP_SELF."?popup_select=$popup_select&s=1&t=0&stitle=$stitle&atmenu=$atmenu&current_page=$current_page&order=".$FG_TABLE_COL[$i][1]."&choose_callowner=$choose_callowner&waitup1=$waitup1&waitup2=$waitup2&waitup1type=$waitup1type&waitup2type=$waitup2type&sens="; if ($sens=="ASC"){echo"DESC";}else{echo"ASC";} 
 						echo "&id=$id&posted=$posted&Period=$Period&frommonth=$frommonth&fromstatsmonth=$fromstatsmonth&tomonth=$tomonth&tostatsmonth=$tostatsmonth&fromday=$fromday&fromstatsday_sday=$fromstatsday_sday&fromstatsmonth_sday=$fromstatsmonth_sday&today=$today&tostatsday_sday=$tostatsday_sday&tostatsmonth_sday=$tostatsmonth_sday&calleridtype=$calleridtype&phonenumbertype=$phonenumbertype&sourcetype=$sourcetype&clidtype=$clidtype&channel=$channel&resulttype=$resulttype&callerid=$callerid&phonenumber=$phonenumber&clid=$clid&terminatecauseid=$terminatecauseid&choose_calltype=$choose_calltype&fromtime=$fromtime&totime=$totime&fromstatsday_hour=$fromstatsday_hour&fromstatsday_min=$fromstatsday_min&tostatsday_hour=$tostatsday_hour&tostatsday_min=$tostatsday_min&choose_currency=$choose_currency";?>"> 
 	                    <span class="liens"><?php  } ?>
 	                    <?php echo $FG_TABLE_COL[$i][0]?> 
@@ -897,13 +962,13 @@ if ($ACXSEERECORDING && $nb_record>0 && $terminatecauseid!="INCOMPLET" && !($pop
                   <TD align="right"><SPAN style="COLOR: #ffffff; FONT-SIZE: 11px"><B> 
                     <?php if ($current_page>0){?>
                     <img src="<?php echo Images_Path_Main ?>/fleche-g.gif" width="5" height="10"> <a href="<?php echo $PHP_SELF?>?s=1&t=0&order=<?php echo $order?>&sens=<?php echo $sens?>&current_page=<?php  echo ($current_page-1)?><?php  if (!is_null($letter) && ($letter!="")){ echo "&letter=$letter";} 
-					echo "&popup_select=$popup_select&id=$id&posted=$posted&Period=$Period&frommonth=$frommonth&fromstatsmonth=$fromstatsmonth&tomonth=$tomonth&tostatsmonth=$tostatsmonth&fromday=$fromday&fromstatsday_sday=$fromstatsday_sday&fromstatsmonth_sday=$fromstatsmonth_sday&today=$today&tostatsday_sday=$tostatsday_sday&tostatsmonth_sday=$tostatsmonth_sday&fromtime=$fromtime&totime=$totime&fromstatsday_hour=$fromstatsday_hour&fromstatsday_min=$fromstatsday_min&tostatsday_hour=$tostatsday_hour&tostatsday_min=$tostatsday_min&calleridtype=$calleridtype&phonenumbertype=$phonenumbertype&sourcetype=$sourcetype&clidtype=$clidtype&channel=$channel&resulttype=$resulttype&callerid=$callerid&phonenumber=$phonenumber&clid=$clid&terminatecauseid=$terminatecauseid&choose_calltype=$choose_calltype&choose_currency=$choose_currency&choose_callowner=$choose_callowner";?>"> 
+					echo "&popup_select=$popup_select&id=$id&posted=$posted&Period=$Period&frommonth=$frommonth&fromstatsmonth=$fromstatsmonth&tomonth=$tomonth&tostatsmonth=$tostatsmonth&fromday=$fromday&fromstatsday_sday=$fromstatsday_sday&fromstatsmonth_sday=$fromstatsmonth_sday&today=$today&tostatsday_sday=$tostatsday_sday&tostatsmonth_sday=$tostatsmonth_sday&fromtime=$fromtime&totime=$totime&fromstatsday_hour=$fromstatsday_hour&fromstatsday_min=$fromstatsday_min&tostatsday_hour=$tostatsday_hour&tostatsday_min=$tostatsday_min&calleridtype=$calleridtype&phonenumbertype=$phonenumbertype&sourcetype=$sourcetype&clidtype=$clidtype&channel=$channel&resulttype=$resulttype&callerid=$callerid&phonenumber=$phonenumber&clid=$clid&terminatecauseid=$terminatecauseid&choose_calltype=$choose_calltype&choose_currency=$choose_currency&choose_callowner=$choose_callowner&waitup1=$waitup1&waitup2=$waitup2&waitup1type=$waitup1type&waitup2type=$waitup2type";?>"> 
                     <?php echo gettext("PREVIOUS");?> </a> -
                     <?php }?>
                     <?php echo ($current_page+1);?> / <?php  echo $nb_record_max;?> 
                     <?php if ($current_page<$nb_record_max-1){?>
                     - <a href="<?php echo $PHP_SELF?>?s=1&t=0&order=<?php echo $order?>&sens=<?php echo $sens?>&current_page=<?php  echo ($current_page+1)?><?php  if (!is_null($letter) && ($letter!="")){ echo "&letter=$letter";} 
-					echo "&popup_select=$popup_select&id=$id&posted=$posted&Period=$Period&frommonth=$frommonth&fromstatsmonth=$fromstatsmonth&tomonth=$tomonth&tostatsmonth=$tostatsmonth&fromday=$fromday&fromstatsday_sday=$fromstatsday_sday&fromstatsmonth_sday=$fromstatsmonth_sday&today=$today&tostatsday_sday=$tostatsday_sday&tostatsmonth_sday=$tostatsmonth_sday&fromtime=$fromtime&totime=$totime&fromstatsday_hour=$fromstatsday_hour&fromstatsday_min=$fromstatsday_min&tostatsday_hour=$tostatsday_hour&tostatsday_min=$tostatsday_min&calleridtype=$calleridtype&phonenumbertype=$phonenumbertype&sourcetype=$sourcetype&clidtype=$clidtype&channel=$channel&resulttype=$resulttype&callerid=$callerid&phonenumber=$phonenumber&clid=$clid&terminatecauseid=$terminatecauseid&choose_calltype=$choose_calltype&choose_currency=$choose_currency&choose_callowner=$choose_callowner";?>"> 
+					echo "&popup_select=$popup_select&id=$id&posted=$posted&Period=$Period&frommonth=$frommonth&fromstatsmonth=$fromstatsmonth&tomonth=$tomonth&tostatsmonth=$tostatsmonth&fromday=$fromday&fromstatsday_sday=$fromstatsday_sday&fromstatsmonth_sday=$fromstatsmonth_sday&today=$today&tostatsday_sday=$tostatsday_sday&tostatsmonth_sday=$tostatsmonth_sday&fromtime=$fromtime&totime=$totime&fromstatsday_hour=$fromstatsday_hour&fromstatsday_min=$fromstatsday_min&tostatsday_hour=$tostatsday_hour&tostatsday_min=$tostatsday_min&calleridtype=$calleridtype&phonenumbertype=$phonenumbertype&sourcetype=$sourcetype&clidtype=$clidtype&channel=$channel&resulttype=$resulttype&callerid=$callerid&phonenumber=$phonenumber&clid=$clid&terminatecauseid=$terminatecauseid&choose_calltype=$choose_calltype&choose_currency=$choose_currency&choose_callowner=$choose_callowner&waitup1=$waitup1&waitup2=$waitup2&waitup1type=$waitup1type&waitup2type=$waitup2type";?>"> 
                     <?php echo gettext("NEXT");?> </a> <img src="<?php echo Images_Path_Main ?>/fleche-d.gif" width="5" height="10">
                     </B></SPAN> 
                     <?php }?>
@@ -946,7 +1011,7 @@ if ($nb_record) {
 		<td align="center" class="callhistory_td2"><?php echo gettext("DURATION");?></td>
 		<td align="center" class="callhistory_td2"><?php echo gettext("GRAPHIC");?></td>
 		<td align="center" class="callhistory_td2"><?php echo gettext("CALLS");?></td>
-		<td align="center" class="callhistory_td3"><acronym title="<?php echo gettext("AVERAGE LENGTH OF CALL");?>"><?php echo gettext("ALOC");?></acronym></font></td>
+		<td align="center" class="callhistory_td3"><?php echo gettext("ALOC");?></td>
 		<td align="center" class="callhistory_td3"><?php echo gettext("WAITUP");?></td>
 		<td align="center" class="callhistory_td2"><?php echo gettext("TOTAL COST");?></td>
 
@@ -980,16 +1045,16 @@ if ($nb_record) {
 		?>
 	</tr><tr>
 		<td align="center" class="sidenav" nowrap="nowrap"><font class="callhistory_td5"><?php echo $data[0]?></font></td>
-		<td bgcolor="<?php echo $FG_TABLE_ALTERNATE_ROW_COLOR[$i]?>" align="right" nowrap="nowrap" class="fontstyle_001"><?php echo $minutes?> </td>
+		<td bgcolor="<?php echo $FG_TABLE_ALTERNATE_ROW_COLOR[$i]?>" align="right" nowrap="nowrap" class="fontstyle_001"><?php echo $minutes?>&nbsp;</td>
 		<td bgcolor="<?php echo $FG_TABLE_ALTERNATE_ROW_COLOR[$i]?>" align="left" nowrap="nowrap" width="<?php echo $widthbar+60?>">
 			<table cellspacing="0" cellpadding="0"><tr>
 				<td bgcolor="#e22424"><img src="<?php echo Images_Path_Main ?>/spacer.gif" width="<?php echo $widthbar?>" height="6"></td>
 			</tr></table>
 		</td>
-		<td bgcolor="<?php echo $FG_TABLE_ALTERNATE_ROW_COLOR[$i]?>" align="right" nowrap="nowrap" class="fontstyle_001"><?php echo $data[3]?></td>
+		<td bgcolor="<?php echo $FG_TABLE_ALTERNATE_ROW_COLOR[$i]?>" align="right" nowrap="nowrap" class="fontstyle_001"><?php echo $data[3]?>&nbsp;</td>
 		<td bgcolor="<?php echo $FG_TABLE_ALTERNATE_ROW_COLOR[$i]?>" align="center" nowrap="nowrap" class="fontstyle_001" ><?php echo $tmc?> </td>
 		<td bgcolor="<?php echo $FG_TABLE_ALTERNATE_ROW_COLOR[$i]?>" align="center" nowrap="nowrap" class="fontstyle_001"><?php echo $waitup?> </td>
-		<td bgcolor="<?php echo $FG_TABLE_ALTERNATE_ROW_COLOR[$i]?>" align="right" nowrap="nowrap" class="fontstyle_001"><?php  display_2bill($data[2]) ?></td>
+		<td bgcolor="<?php echo $FG_TABLE_ALTERNATE_ROW_COLOR[$i]?>" align="right" nowrap="nowrap" class="fontstyle_001"><?php  display_2bill($data[2]) ?>&nbsp;</td>
 	<?php	}
 
 		if ((!isset($resulttype)) || ($resulttype=="min")){
@@ -1006,9 +1071,9 @@ if ($nb_record) {
 
 	<!-- TOTAL -->
 	<tr class="callhistory_td2">
-		<td align="right" nowrap="nowrap" class="callhistory_td4"><?php echo gettext("TOTAL").":";?></td>
+		<td align="right" nowrap="nowrap" class="callhistory_td4"><?php echo gettext("TOTAL").":";?>&nbsp;</td>
 		<td align="center" nowrap="nowrap" colspan="2" class="callhistory_td4"><?php echo $totalminutes?> </td>
-		<td align="right" nowrap="nowrap" class="callhistory_td4"><?php echo $totalcall?></td>
+		<td align="right" nowrap="nowrap" class="callhistory_td4"><?php echo $totalcall?>&nbsp;</td>
 		<td align="center" nowrap="nowrap" class="callhistory_td4"><?php echo $total_tmc?></td>
 		<td align="center" nowrap="nowrap" class="callhistory_td4"><?php echo $total_waitup?></td>
 		<td align="center" nowrap="nowrap" class="callhistory_td4"><?php  display_2bill($totalcost) ?></td>

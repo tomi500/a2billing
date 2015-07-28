@@ -42,7 +42,19 @@ if (! has_rights ( ACX_CALL_REPORT )) {
 	die ();
 }
 
-getpost_ifset ( array ('customer', 'sellrate', 'buyrate', 'entercustomer','entercustomer_num', 'enterprovider', 'entertariffgroup', 'entertrunk', 'enterratecard', 'posted', 'Period', 'frommonth', 'fromstatsmonth', 'tomonth', 'tostatsmonth', 'fromday', 'fromstatsday_sday', 'fromstatsmonth_sday', 'today', 'tostatsday_sday', 'tostatsmonth_sday', 'fromtime', 'totime', 'fromstatsday_hour', 'tostatsday_hour', 'fromstatsday_min', 'tostatsday_min', 'dsttype', 'srctype', 'dnidtype', 'clidtype', 'channel', 'resulttype', 'stitle', 'atmenu', 'current_page', 'order', 'sens', 'dst', 'src', 'dnid', 'clid', 'choose_currency', 'terminatecauseid', 'choose_calltype', 'download', 'file') );
+getpost_ifset ( array ('customer', 'sellrate', 'buyrate', 'entercustomer','entercustomer_num', 'enterprovider', 'entertariffgroup', 'entertrunk', 'enterratecard', 'posted', 'Period', 'frommonth', 'fromstatsmonth', 'tomonth', 'tostatsmonth', 'fromday', 'fromstatsday_sday', 'fromstatsmonth_sday', 'today', 'tostatsday_sday', 'tostatsmonth_sday', 'fromtime', 'totime', 'fromstatsday_hour', 'tostatsday_hour', 'fromstatsday_min', 'tostatsday_min', 'dsttype', 'srctype', 'dnidtype', 'clidtype', 'channel', 'resulttype', 'stitle', 'atmenu', 'current_page', 'order', 'sens', 'dst', 'src', 'dnid', 'clid', 'choose_currency', 'terminatecauseid', 'choose_calltype', 'download', 'file', 'waitup1', 'waitup2', 'waitup1type', 'waitup2type'));
+
+$cl = 2;
+$cr = 3;
+function bgcolor($c) {
+	global $cl,$cr;
+	if ($c) {
+		$ret = $cr = $cr==3?5:3;
+	} else {
+		$ret = $cl = $cl==2?4:2;
+	}
+	echo "class=\"bgcolor_00{$ret}\"";
+}
 
 if (($download == "file") && $file) {
 	
@@ -179,6 +191,28 @@ if ($posted == 1) {
 	$SQLcmd = do_field ( $SQLcmd, 'src', 'src' );
 	$SQLcmd = do_field ( $SQLcmd, 'dst', 'calledstation' );
 	$SQLcmd = do_field ( $SQLcmd, 'dnid', 'dnid' );
+	if ($SQLcmd == "")	$tmpcmd = " WHERE ";
+	else			$tmpcmd = " AND ";
+	$wheretmp = "IF(ROUND(UNIX_TIMESTAMP(t1.starttime)-INSERT(t1.uniqueid,1,1,1))>0,ROUND(UNIX_TIMESTAMP(t1.starttime)-INSERT(t1.uniqueid,1,1,1)),0)";
+	if (ctype_digit($waitup1)) {
+		if ($waitup1type == "4") {
+			$SQLcmd .= $tmpcmd . $waitup1 . " < " . $wheretmp;
+			$tmpcmd = " AND ";
+		} elseif ($waitup1type == "5") {
+			$SQLcmd .= $tmpcmd . $waitup1 . " <= " . $wheretmp;
+			$tmpcmd = " AND ";
+		} elseif ($waitup1type == "1") {
+			$SQLcmd .= $tmpcmd . $waitup1 . " = " . $wheretmp;
+			$tmpcmd = " AND ";
+		}
+	} else $waitup1 = "";
+	if (ctype_digit($waitup2)) {
+		if ($waitup2type == "2") {
+			$SQLcmd .= $tmpcmd . $wheretmp . " <= " . $waitup2;
+		} elseif ($waitup2type == "3") {
+			$SQLcmd .= $tmpcmd . $wheretmp . " < " . $waitup2;
+		}
+	} else $waitup2 = "";
 }
 
 $date_clause = '';
@@ -378,8 +412,7 @@ if (LINK_AUDIO_FILE && $nb_record){ echo '
 	echo $current_page?>">
 <INPUT TYPE="hidden" NAME="posted" value=1> <INPUT TYPE="hidden"
 	NAME="current_page" value=0>
-<TABLE class="bar-status" width="85%" border="0" cellspacing="1"
-	cellpadding="2" align="center">
+<TABLE class="callhistory_maintable" align="center">
 		<?php
 		if ($_SESSION ["pr_groupID"] == 2 && is_numeric ( $_SESSION ["pr_IDCust"] )) {
 			?>
@@ -387,103 +420,97 @@ if (LINK_AUDIO_FILE && $nb_record){ echo '
 		} else {
 			?>
 		<tr>
-		<td align="left" valign="top" class="bgcolor_004"><font
+		<td align="left" valign="center" <?php bgcolor(0)?>><font
 			class="fontstyle_003">&nbsp;&nbsp;<?php
 			echo gettext ( "CUSTOMERS" );
 			?></font>
 		</td>
-		<td class="bgcolor_005" align="left">
-		<table width="100%" border="0" cellspacing="0" cellpadding="0">
+		<td <?php bgcolor(1)?> align="left">
+		<table width="100%" border="0" cellspacing="3" cellpadding="0">
 			<tr>
-				<td class="fontstyle_searchoptions" width="700" valign="top">
-					<?php
-			echo gettext ( "Enter the customer ID" );
-			?>: <INPUT TYPE="text"
-					NAME="entercustomer" value="<?php echo $entercustomer?>"
+				<td width="700">
+				<table width="100%" border="0" cellspacing="0" cellpadding="0">
+				<tr><td class="fontstyle_searchoptions" width="5%" nowrap>
+					<?php echo gettext ("Enter the customer ID");?> :&nbsp;<br>OR</td><td class="fontstyle_searchoptions" align="left" valign="top" nowrap><INPUT TYPE="text" NAME="entercustomer" value="<?php echo $entercustomer?>"
 					class="form_input_text"> <a href="#"
 					onclick="window.open('A2B_entity_card.php?popup_select=1&popup_formname=myForm&popup_fieldname=entercustomer' , 'CardNumberSelection','scrollbars=1,width=550,height=330,top=20,left=100,scrollbars=1');"><img
 					src="<?php echo Images_Path; ?>/icon_arrow_orange.gif"></a>
-				 <BR> OR <br>
-				<?php echo gettext ( "Enter the customer number" );?>: <INPUT TYPE="text" NAME="entercustomer_num" 
-					value="<?php echo $entercustomer_num?>" class="form_input_text"> <a href="#"
-                                        onclick="window.open('A2B_entity_card.php?popup_select=2&popup_formname=myForm&popup_fieldname=entercustomer_num' , 'CardNumberSelection','scrollbars=1,width=550,height=330,top=20,left=100,scrollbars=1');"><img
-                                        src="<?php echo Images_Path; ?>/icon_arrow_orange.gif"></a>
+				</td></tr>
+				<tr><td class="fontstyle_searchoptions" width="5%" nowrap><?php echo gettext("Enter the customer number")?> : &nbsp;
+				</td><td class="fontstyle_searchoptions" align="left" nowrap><INPUT TYPE="text" NAME="entercustomer_num" value="<?php echo $entercustomer_num?>"
+					class="form_input_text"> <a href="#"
+					onclick="window.open('A2B_entity_card.php?popup_select=2&popup_formname=myForm&popup_fieldname=entercustomer_num' , 'CardNumberSelection','scrollbars=1,width=550,height=330,top=20,left=100,scrollbars=1');"><img
+					src="<?php echo Images_Path; ?>/icon_arrow_orange.gif"></a>
+				</td></tr>
+				</table>
 				</td>
 				<td width="50%">
 				<table width="100%" border="0" cellspacing="0" cellpadding="0">
-					<tr>
-						<td align="left" class="fontstyle_searchoptions"><?php echo gettext ( "CallPlan" ); ?> :</td>
-						<td align="left" class="fontstyle_searchoptions"><INPUT TYPE="text" NAME="entertariffgroup" value="<?php echo $entertariffgroup?>" size="4" class="form_input_text">&nbsp;<a href="#" onclick="window.open('A2B_entity_tariffgroup.php?popup_select=2&popup_formname=myForm&popup_fieldname=entertariffgroup' , 'CallPlanSelection','scrollbars=1,width=550,height=330,top=20,left=100');"><img
-							src="<?php echo Images_Path; ?>/icon_arrow_orange.gif"></a></td>
-						<td align="left" class="fontstyle_searchoptions"><?php echo gettext ( "Provider" ); ?> :
-			
-			<td align="left" class="fontstyle_searchoptions"><INPUT
-							TYPE="text" NAME="enterprovider"
-							value="<?php echo $enterprovider?>" size="4" class="form_input_text">&nbsp;<a href="#"
-							onclick="window.open('A2B_entity_provider.php?popup_select=2&popup_formname=myForm&popup_fieldname=enterprovider' , 'ProviderSelection','scrollbars=1,width=550,height=330,top=20,left=100');"><img
-							src="<?php echo Images_Path; ?>/icon_arrow_orange.gif"></a></td>
-					</tr>
-					<tr>
-						<td align="left" class="fontstyle_searchoptions"><?php echo gettext ( "Trunk" ); ?> :</td>
-						<td align="left" class="fontstyle_searchoptions"><INPUT
-							TYPE="text" NAME="entertrunk" value="<?php
-			echo $entertrunk?>"
-							size="4" class="form_input_text">&nbsp;<a href="#"
-							onclick="window.open('A2B_entity_trunk.php?popup_select=2&popup_formname=myForm&popup_fieldname=entertrunk' , 'TrunkSelection','scrollbars=1,width=550,height=330,top=20,left=100');"><img
-							src="<?php
-			echo Images_Path;
-			?>/icon_arrow_orange.gif"></a></td>
-						<td align="left" class="fontstyle_searchoptions"><?php
-			echo gettext ( "Rate" );
-			?> :</td>
-						<td align="left" class="fontstyle_searchoptions"><INPUT
-							TYPE="text" NAME="enterratecard"
-							value="<?php
-			echo $enterratecard?>" size="4"
-							class="form_input_text">&nbsp;<a href="#"
-							onclick="window.open('A2B_entity_def_ratecard.php?popup_select=2&popup_formname=myForm&popup_fieldname=enterratecard' , 'RatecardSelection','scrollbars=1,width=550,height=330,top=20,left=100');"><img
-							src="<?php
-			echo Images_Path;
-			?>/icon_arrow_orange.gif"></a></td>
-					</tr>
+				<tr>
+					<td align="left" class="fontstyle_searchoptions" nowrap>&nbsp<?php echo gettext ( "CallPlan" );?> :&nbsp</td>
+					<td align="left" class="fontstyle_searchoptions" nowrap><INPUT TYPE="text" NAME="entertariffgroup" value="<?php echo $entertariffgroup?>"
+						size="4" class="form_input_text">&nbsp;<a href="#"
+						onclick="window.open('A2B_entity_tariffgroup.php?popup_select=2&popup_formname=myForm&popup_fieldname=entertariffgroup' , 'CallPlanSelection','scrollbars=1,width=550,height=330,top=20,left=100');">
+						<img src="<?php echo Images_Path; ?>/icon_arrow_orange.gif"></a></td>
+					<td align="left" class="fontstyle_searchoptions" nowrap>&nbsp<?php echo gettext ( "Provider" );?> :&nbsp</td>
+					<td align="left" class="fontstyle_searchoptions" nowrap><INPUT TYPE="text" NAME="enterprovider" value="<?php echo $enterprovider?>"
+						size="4" class="form_input_text">&nbsp;<a href="#"
+						onclick="window.open('A2B_entity_provider.php?popup_select=2&popup_formname=myForm&popup_fieldname=enterprovider' , 'ProviderSelection','scrollbars=1,width=550,height=330,top=20,left=100');">
+						<img src="<?php echo Images_Path; ?>/icon_arrow_orange.gif"></a></td>
+				</tr>
+				<tr>
+					<td align="left" class="fontstyle_searchoptions" nowrap>&nbsp<?php echo gettext ( "Trunk" );?> :&nbsp</td>
+					<td align="left" class="fontstyle_searchoptions" nowrap><INPUT
+						TYPE="text" NAME="entertrunk" value="<?php echo $entertrunk?>"
+						size="4" class="form_input_text">&nbsp;<a href="#"
+						onclick="window.open('A2B_entity_trunk.php?popup_select=2&popup_formname=myForm&popup_fieldname=entertrunk' , 'TrunkSelection','scrollbars=1,width=550,height=330,top=20,left=100');">
+						<img src="<?php echo Images_Path;?>/icon_arrow_orange.gif"></a></td>
+					<td align="left" class="fontstyle_searchoptions" nowrap>&nbsp<?php echo gettext ( "Rate" );?> :&nbsp</td>
+					<td align="left" class="fontstyle_searchoptions" nowrap><INPUT
+						TYPE="text" NAME="enterratecard" value="<?php echo $enterratecard?>"
+						size="4" class="form_input_text">&nbsp;<a href="#"
+						onclick="window.open('A2B_entity_def_ratecard.php?popup_select=2&popup_formname=myForm&popup_fieldname=enterratecard' , 'RatecardSelection','scrollbars=1,width=550,height=330,top=20,left=100');">
+						<img src="<?php echo Images_Path;?>/icon_arrow_orange.gif"></a></td>
+				</tr>
 				</table>
 				</td>
 			</tr>
-
 		</table>
 		</td>
-	</tr>			
+	</tr>
 		<?php
 		}
 		?>
 	<tr>
-		<td align="left" class="bgcolor_004"><font class="fontstyle_003">&nbsp;&nbsp;<?php echo gettext ( "DATE" ); ?></font>
+		<td align="left" <?php bgcolor(0)?>><font class="fontstyle_003">&nbsp;&nbsp;<?php echo gettext ( "DATE" ); ?></font>
 		</td>
-		<td align="left" class="bgcolor_005">
+		<td align="left" <?php bgcolor(1)?>>
 		<table width="100%" border="0" cellspacing="0" cellpadding="0">
 			<tr>
-				<td class="fontstyle_searchoptions"><input type="checkbox"
-					name="fromday" value="true" <?php
+				<td class="fontstyle_searchoptions">
+					&nbsp;<input type="checkbox" name="fromday" value="true"<?php
 					if ($fromday) {
-						?> checked
-					<?php
+						?> checked<?php
 					}
-					?>> <?php
-					echo gettext ( "From" );
-					?> :
-				<select name="fromstatsday_sday" class="form_input_select">
+					?>>
+				</td>
+				<td class="fontstyle_searchoptions">
+					<?php echo gettext ( "From" );?> :
+				</td>
+				<td class="fontstyle_searchoptions">
+					<select name="fromstatsday_sday" class="form_input_select">
 					<?php
 					for($i = 1; $i <= 31; $i ++) {
 						if ($fromstatsday_sday == sprintf ( "%02d", $i ))
-							$selected = "selected";
+							$selected = " selected";
 						else
 							$selected = "";
-						echo '<option value="' . sprintf ( "%02d", $i ) . "\"$selected>" . sprintf ( "%02d", $i ) . '</option>';
+						echo "<option value=\"" . sprintf ( "%02d", $i ) . "\"$selected>" . sprintf ( "%02d", $i ) . "</option>";
 					}
-					?>	
-				</select> <select name="fromstatsmonth_sday"
-					class="form_input_select">
-				<?php
+					?> 
+					</select>
+					<select name="fromstatsmonth_sday" class="form_input_select">
+					<?php
 				$year_actual = date ( "Y" );
 				$monthname = array (gettext ( "January" ), gettext ( "February" ), gettext ( "March" ), gettext ( "April" ), gettext ( "May" ), gettext ( "June" ), gettext ( "July" ), gettext ( "August" ), gettext ( "September" ), gettext ( "October" ), gettext ( "November" ), gettext ( "December" ) );
 				for($i = $year_actual; $i >= $year_actual - 1; $i --) {
@@ -495,68 +522,39 @@ if (LINK_AUDIO_FILE && $nb_record){ echo '
 					for($j = $monthnumber; $j >= 0; $j --) {
 						$month_formated = sprintf ( "%02d", $j + 1 );
 						if ($fromstatsmonth_sday == "$i-$month_formated")
-							$selected = "selected";
+							$selected = " selected";
 						else
 							$selected = "";
-						echo "<OPTION value=\"$i-$month_formated\" $selected> $monthname[$j]-$i </option>";
+						echo "<OPTION value=\"$i-$month_formated\"$selected> $monthname[$j]-$i </option>";
 					}
 				}
-				?>
-				</select> <br />
-				<input type="checkbox" name="fromtime" value="true"
-					<?php
-					if ($fromtime) {
-						?> checked <?php
-					}
-					?>> 
-				<?php
-				echo gettext ( "Time :" )?>
-				<select name="fromstatsday_hour" class="form_input_select">
-				<?php
-				for($i = 0; $i <= 23; $i ++) {
-					if ($fromstatsday_hour == sprintf ( "%02d", $i )) {
-						$selected = "selected";
-					} else {
-						$selected = "";
-					}
-					echo '<option value="' . sprintf ( "%02d", $i ) . "\"$selected>" . sprintf ( "%02d", $i ) . '</option>';
-				}
-				?>						
-				</select> : <select name="fromstatsday_min"
-					class="form_input_select">
-				<?php
-				for($i = 0; $i < 60; $i = $i + 5) {
-					if ($fromstatsday_min == sprintf ( "%02d", $i )) {
-						$selected = "selected";
-					} else {
-						$selected = "";
-					}
-					echo '<option value="' . sprintf ( "%02d", $i ) . "\"$selected>" . sprintf ( "%02d", $i ) . '</option>';
-				}
-				?>						
-				</select></td>
-				<td class="fontstyle_searchoptions"><input type="checkbox"
-					name="today" value="true" <?php
+					?> 
+					</select>
+				</td>
+				<td class="fontstyle_searchoptions">
+					<input type="checkbox" name="today" value="true"<?php
 					if ($today) {
 						?> checked <?php
 					}
-					?>> 
-				<?php
-				echo gettext ( "To" );
-				?>  :
-				<select name="tostatsday_sday" class="form_input_select">
-				<?php
+					?>>
+				</td>
+				<td class="fontstyle_searchoptions">
+					<?php echo gettext ( "To" )?> :
+				</td>
+				<td class="fontstyle_searchoptions">
+					<select name="tostatsday_sday" class="form_input_select">
+					<?php
 				for($i = 1; $i <= 31; $i ++) {
 					if ($tostatsday_sday == sprintf ( "%02d", $i )) {
-						$selected = "selected";
+						$selected = " selected";
 					} else {
 						$selected = "";
 					}
 					echo '<option value="' . sprintf ( "%02d", $i ) . "\"$selected>" . sprintf ( "%02d", $i ) . '</option>';
 				}
-				?>						
-				</select> <select name="tostatsmonth_sday" class="form_input_select">
-				<?php
+				?> 
+					</select> <select name="tostatsmonth_sday" class="form_input_select">
+					<?php
 				$year_actual = date ( "Y" );
 				for($i = $year_actual; $i >= $year_actual - 1; $i --) {
 					if ($year_actual == $i) {
@@ -567,58 +565,100 @@ if (LINK_AUDIO_FILE && $nb_record){ echo '
 					for($j = $monthnumber; $j >= 0; $j --) {
 						$month_formated = sprintf ( "%02d", $j + 1 );
 						if ($tostatsmonth_sday == "$i-$month_formated")
-							$selected = "selected";
+							$selected = " selected";
 						else
 							$selected = "";
-						echo "<OPTION value=\"$i-$month_formated\" $selected> $monthname[$j]-$i </option>";
+						echo "<OPTION value=\"$i-$month_formated\"$selected> $monthname[$j]-$i </option>";
 					}
 				}
-				?>
-				</select> <br />
-				<input type="checkbox" name="totime" value="true"
+				?> 
+					</select>
+				</td>
+			</tr>
+			<tr>
+				<td class="fontstyle_searchoptions">
+					&nbsp;<input type="checkbox" name="fromtime" value="true"<?php
+					if ($fromtime) {
+						?> checked <?php
+					}
+					?>>
+				</td>
+				<td class="fontstyle_searchoptions">
+					<?php echo gettext ( "Time" )?> :
+				</td>
+				<td class="fontstyle_searchoptions">
+					<select name="fromstatsday_hour" class="form_input_select">
 					<?php
+				for($i = 0; $i <= 23; $i ++) {
+					if ($fromstatsday_hour == sprintf ( "%02d", $i )) {
+						$selected = " selected";
+					} else {
+						$selected = "";
+					}
+					echo '<option value="' . sprintf ( "%02d", $i ) . "\"$selected>" . sprintf ( "%02d", $i ) . '</option>';
+				}
+				?> 
+					</select> : <select name="fromstatsday_min" class="form_input_select">
+					<?php
+				for($i = 0; $i < 60; $i = $i + 5) {
+					if ($fromstatsday_min == sprintf ( "%02d", $i )) {
+						$selected = " selected";
+					} else {
+						$selected = "";
+					}
+					echo '<option value="' . sprintf ( "%02d", $i ) . "\"$selected>" . sprintf ( "%02d", $i ) . '</option>';
+				}
+				?> 
+					</select>
+				</td>
+				<td class="fontstyle_searchoptions">
+					<input type="checkbox" name="totime" value="true"<?php
 					if ($totime) {
 						?> checked <?php
 					}
-					?>> 
-				<?php
-				echo gettext ( "Time :" )?>
-				<select name="tostatsday_hour" class="form_input_select">
-				<?php
+					?>>
+				</td>
+				<td class="fontstyle_searchoptions">
+					<?php echo gettext ( "Time" )?> :
+				</td>
+				<td class="fontstyle_searchoptions">
+					<select name="tostatsday_hour" class="form_input_select">
+					<?php
 				for($i = 0; $i <= 23; $i ++) {
 					if ($tostatsday_hour == sprintf ( "%02d", $i )) {
-						$selected = "selected";
+						$selected = " selected";
 					} else {
 						$selected = "";
 					}
 					echo '<option value="' . sprintf ( "%02d", $i ) . "\"$selected>" . sprintf ( "%02d", $i ) . '</option>';
 				}
-				?>						
-				</select> : <select name="tostatsday_min" class="form_input_select">
-				<?php
+				?> 
+					</select> : <select name="tostatsday_min" class="form_input_select">
+					<?php
 				for($i = 0; $i < 60; $i = $i + 5) {
 					if ($tostatsday_min == sprintf ( "%02d", $i )) {
-						$selected = "selected";
+						$selected = " selected";
 					} else {
 						$selected = "";
 					}
 					echo '<option value="' . sprintf ( "%02d", $i ) . "\"$selected>" . sprintf ( "%02d", $i ) . '</option>';
 				}
-				?>						
-				</select></td>
+				?> 
+					</select>
+				</td>
 			</tr>
 		</table>
 		</td>
 	</tr>
 	<tr>
-		<td class="bgcolor_002" align="left"><font class="fontstyle_003">&nbsp;&nbsp;<?php
+		<td <?php bgcolor(0)?> align="left"><font class="fontstyle_003">&nbsp;&nbsp;<?php
 		echo gettext ( "PHONENUMBER" );
-		?></font>
+		?>&nbsp;&nbsp;</font>
 		</td>
-		<td class="bgcolor_003" align="left">
-		<table width="100%" border="0" cellspacing="0" cellpadding="0">
+		<td <?php bgcolor(1)?> align="left">
+		<table width="100%" border="0" cellspacing="1" cellpadding="0">
 			<tr>
-				<td>&nbsp;&nbsp;<INPUT TYPE="text" NAME="dst"
+				<td class="fontstyle_searchoptions" nowrap>&nbsp;<INPUT TYPE="text" NAME="dst"
 					value="<?php
 					echo $dst?>" class="form_input_text"></td>
 				<td class="fontstyle_searchoptions" align="center"><input
@@ -662,14 +702,14 @@ if (LINK_AUDIO_FILE && $nb_record){ echo '
 		</td>
 	</tr>
 	<tr>
-		<td align="left" class="bgcolor_004"><font class="fontstyle_003">&nbsp;&nbsp;<?php
+		<td align="left" <?php bgcolor(0)?>><font class="fontstyle_003">&nbsp;&nbsp;<?php
 		echo gettext ( "CALLERID" );
 		?></font>
 		</td>
-		<td class="bgcolor_005" align="left">
-		<table width="100%" border="0" cellspacing="0" cellpadding="0">
+		<td <?php bgcolor(1)?> align="left">
+		<table width="100%" border="0" cellspacing="1" cellpadding="0">
 			<tr>
-				<td>&nbsp;&nbsp;<INPUT TYPE="text" NAME="src"
+				<td class="fontstyle_searchoptions" nowrap>&nbsp;<INPUT TYPE="text" NAME="src"
 					value="<?php
 					echo "$src";
 					?>" class="form_input_text"></td>
@@ -715,14 +755,14 @@ if (LINK_AUDIO_FILE && $nb_record){ echo '
 	</tr>
 
 	<tr>
-		<td align="left" class="bgcolor_004"><font class="fontstyle_003">&nbsp;&nbsp;<?php
+		<td align="left" <?php bgcolor(0)?>><font class="fontstyle_003">&nbsp;&nbsp;<?php
 		echo gettext ( "DNID" );
 		?></font>
 		</td>
-		<td class="bgcolor_005" align="left">
-		<table width="100%" border="0" cellspacing="0" cellpadding="0">
+		<td <?php bgcolor(1)?> align="left">
+		<table width="100%" border="0" cellspacing="1" cellpadding="0">
 			<tr>
-				<td>&nbsp;&nbsp;<INPUT TYPE="text" NAME="dnid"
+				<td class="fontstyle_searchoptions" nowrap>&nbsp;<INPUT TYPE="text" NAME="dnid"
 					value="<?php
 					echo "$dnid";
 					?>" class="form_input_text"></td>
@@ -769,14 +809,13 @@ if (LINK_AUDIO_FILE && $nb_record){ echo '
 
 	<!-- Select Calltype: -->
 	<tr>
-		<td class="bgcolor_002" align="left"><font class="fontstyle_003">&nbsp;&nbsp;<?php
+		<td <?php bgcolor(0)?> align="left"><font class="fontstyle_003">&nbsp;&nbsp;<?php
 		echo gettext ( "CALL TYPE" );
 		?></font></td>
-		<td class="bgcolor_003" align="center">
+		<td <?php bgcolor(1)?> align="center">
 		<table width="100%" border="0" cellspacing="0" cellpadding="0">
 			<tr>
-				<td class="fontstyle_searchoptions"><select NAME="choose_calltype"
-					size="1" class="form_input_select">
+				<td class="fontstyle_searchoptions">&nbsp;<select NAME="choose_calltype" size="1" class="form_input_select">
 					<option value='-1'
 						<?php
 						if (($choose_calltype == - 1) || (! isset ( $choose_calltype ))) {
@@ -806,19 +845,37 @@ if (LINK_AUDIO_FILE && $nb_record){ echo '
 		</table>
 		</td>
 	</tr>
-
+<?php		if ($A2B->config["webui"]['waitup_sorting']) {?>
+	<tr <?php bgcolor(1)?>>
+		<td <?php bgcolor(0)?> align="left" nowrap><font class="fontstyle_003">&nbsp;&nbsp;<?php echo gettext("WAITUP").", ".gettext("sec")?>&nbsp;&nbsp;</font>
+		</td>
+		<td align="left">
+		<table width="100%" border="0" cellspacing="1" cellpadding="0"><tr>
+		    <td class="fontstyle_searchoptions" nowrap>&nbsp;<INPUT TYPE="text" NAME="waitup1" value="<?php echo $waitup1?>" class="form_input_text" size="6" maxlength="6"></td>
+		    <td align="left" class="fontstyle_searchoptions" nowrap><input type="radio" NAME="waitup1type" value="4" <?php if($waitup1type==4){?>checked<?php }?>>&lt;</td>
+		    <td align="left" class="fontstyle_searchoptions" nowrap>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<input type="radio" NAME="waitup1type" value="5" <?php if((!isset($waitup1type))||($waitup1type==5)){?>checked<?php }?>>&lt;=</td>
+		    <td align="left" class="fontstyle_searchoptions" nowrap><input type="radio" NAME="waitup1type" value="1" <?php if($waitup1type==1){?>checked<?php }?>>=</td>
+		    <td align="center" class="fontstyle_searchoptions" nowrap><b>(<?php echo gettext("WaitUp")?>)</b>&nbsp;&nbsp;&nbsp;</td>
+		    <td align="left" class="fontstyle_searchoptions" nowrap><input type="radio" NAME="waitup2type" value="2" <?php if((!isset($waitup2type))||($waitup2type==2)){?>checked<?php }?>>&lt;=&nbsp;&nbsp;</td>
+		    <td align="left" class="fontstyle_searchoptions" nowrap><input type="radio" NAME="waitup2type" value="3" <?php if($waitup2type==3){?>checked<?php }?>>&lt;&nbsp;&nbsp;&nbsp;</td>
+		    <td align="left" class="fontstyle_searchoptions" nowrap>&nbsp;<INPUT TYPE="text" NAME="waitup2" value="<?php echo $waitup2?>" class="form_input_text" size="6" maxlength="6"></td>
+		    <td>&nbsp;&nbsp;&nbsp;&nbsp;</td>
+		</tr></table>
+		</td>
+	</tr>
+<?php		}?>
 	<!-- Select Option : to show just the Answered Calls or all calls, Result type, currencies... -->
 	<tr>
-		<td class="bgcolor_002" align="left"><font class="fontstyle_003">&nbsp;&nbsp;<?php
+		<td <?php bgcolor(0)?> align="left"><font class="fontstyle_003">&nbsp;&nbsp;<?php
 		echo gettext ( "OPTIONS" );
 		?></font></td>
-		<td class="bgcolor_003" align="center">
+		<td <?php bgcolor(1)?> align="center">
 		<div align="left">
 
 		<table width="100%" border="0" cellspacing="0" cellpadding="0">
 			<tr>
 				<td width="20%" class="fontstyle_searchoptions">
-					<?php
+					&nbsp;<?php
 					echo gettext ( "SHOW CALLS" );
 					?> :  						
 			   </td>
@@ -899,9 +956,9 @@ if (LINK_AUDIO_FILE && $nb_record){ echo '
 
 				</select></td>
 			</tr>
-			<tr class="bgcolor_005">
+			<tr <?php bgcolor(1)?>>
 				<td class="fontstyle_searchoptions">
-					<?php
+					&nbsp;<?php
 					echo gettext ( "RESULT" );
 					?> : 
 			   </td>
@@ -924,9 +981,9 @@ if (LINK_AUDIO_FILE && $nb_record){ echo '
 					}
 					?>></td>
 			</tr>
-			<tr>
+			<tr <?php bgcolor(1)?>>
 				<td class="fontstyle_searchoptions">
-					<?php
+					&nbsp;<?php
 					echo gettext ( "CURRENCY" );
 					?> :
 				</td>
@@ -958,8 +1015,8 @@ if (LINK_AUDIO_FILE && $nb_record){ echo '
 	<!-- Select Option : to show just the Answered Calls or all calls, Result type, currencies... -->
 
 	<tr>
-		<td class="bgcolor_004" align="left"></td>
-		<td class="bgcolor_005" align="center"><input type="image"
+		<td <?php bgcolor(0)?> align="left"></td>
+		<td <?php bgcolor(1)?> align="center"><input type="image"
 			name="image16" align="top" border="0"
 			src="<?php
 			echo Images_Path;
@@ -1007,7 +1064,7 @@ if (is_array ( $list ) && count ( $list ) > 0) {
 						<center><strong> 
 						<?php if (strtoupper ( $FG_TABLE_COL [$i] [4] ) == "SORT") { ?>
 						<a href="<?php
-								echo $PHP_SELF . "?entercustomer_num=$entercustomer_num&s=1&t=0&stitle=$stitle&atmenu=$atmenu&current_page=$current_page&order=" . $FG_TABLE_COL [$i] [1] . "&sens=";
+								echo $PHP_SELF . "?entercustomer_num=$entercustomer_num&s=1&t=0&stitle=$stitle&atmenu=$atmenu&current_page=$current_page&waitup1=$waitup1&waitup2=$waitup2&waitup1type=$waitup1type&waitup2type=$waitup2type&order=" . $FG_TABLE_COL [$i] [1] . "&sens=";
 								if ($sens == "ASC") {
 									echo "DESC";
 								} else {
@@ -1130,7 +1187,7 @@ foreach ( $list as $recordset ) {
 		</td>
 	</tr>
 	<TR bgcolor="#ffffff">
-		<TD class="bgcolor_005" height="16" style="PADDING-LEFT: 5px; PADDING-RIGHT: 3px">
+		<TD <?php bgcolor(1)?> height="16" style="PADDING-LEFT: 5px; PADDING-RIGHT: 3px">
 			<TABLE border=0 cellPadding=0 cellSpacing=0 width="100%">
 				<TR>
 					<TD align="right"><SPAN class="fontstyle_003">
@@ -1140,7 +1197,7 @@ foreach ( $list as $recordset ) {
 									if (! is_null ( $letter ) && ($letter != "")) {
 										echo "&letter=$letter";
 									}
-									echo "&entercustomer_num=$entercustomer_num&posted=$posted&Period=$Period&frommonth=$frommonth&fromstatsmonth=$fromstatsmonth&tomonth=$tomonth&tostatsmonth=$tostatsmonth&fromday=$fromday&fromstatsday_sday=$fromstatsday_sday&fromstatsmonth_sday=$fromstatsmonth_sday&today=$today&tostatsday_sday=$tostatsday_sday&tostatsmonth_sday=$tostatsmonth_sday&dsttype=$dsttype&srctype=$srctype&clidtype=$clidtype&channel=$channel&resulttype=$resulttype&dst=$dst&src=$src&clid=$clid&terminatecauseid=$terminatecauseid&choose_calltype=$choose_calltype&entercustomer=$entercustomer&enterprovider=$enterprovider&entertrunk=$entertrunk&enterratecard=$enterratecard&fromtime=$fromtime&totime=$totime&fromstatsday_hour=$fromstatsday_hour&fromstatsday_min=$fromstatsday_min&tostatsday_hour=$tostatsday_hour&tostatsday_min=$tostatsday_min&dnid=$dnid&dnidtype=$dnidtype&choose_currency=$choose_currency&entertariffgroup=$entertariffgroup";
+									echo "&entercustomer_num=$entercustomer_num&posted=$posted&Period=$Period&frommonth=$frommonth&fromstatsmonth=$fromstatsmonth&tomonth=$tomonth&tostatsmonth=$tostatsmonth&fromday=$fromday&fromstatsday_sday=$fromstatsday_sday&fromstatsmonth_sday=$fromstatsmonth_sday&today=$today&tostatsday_sday=$tostatsday_sday&tostatsmonth_sday=$tostatsmonth_sday&dsttype=$dsttype&srctype=$srctype&clidtype=$clidtype&channel=$channel&resulttype=$resulttype&dst=$dst&src=$src&clid=$clid&terminatecauseid=$terminatecauseid&choose_calltype=$choose_calltype&entercustomer=$entercustomer&enterprovider=$enterprovider&entertrunk=$entertrunk&enterratecard=$enterratecard&fromtime=$fromtime&totime=$totime&fromstatsday_hour=$fromstatsday_hour&fromstatsday_min=$fromstatsday_min&tostatsday_hour=$tostatsday_hour&tostatsday_min=$tostatsday_min&dnid=$dnid&dnidtype=$dnidtype&choose_currency=$choose_currency&entertariffgroup=$entertariffgroup&waitup1=$waitup1&waitup2=$waitup2&waitup1type=$waitup1type&waitup2type=$waitup2type";
 									?>">
 					<?php echo gettext ( "Previous" ); ?> </a> - <?php } echo ($current_page + 1); ?> / <?php echo $nb_record_max;
 					      if ($current_page < $nb_record_max - 1) { ?>
@@ -1148,7 +1205,7 @@ foreach ( $list as $recordset ) {
 									if (! is_null ( $letter ) && ($letter != "")) {
 										echo "&letter=$letter";
 									}
-									echo "&entercustomer_num=$entercustomer_num&posted=$posted&Period=$Period&frommonth=$frommonth&fromstatsmonth=$fromstatsmonth&tomonth=$tomonth&tostatsmonth=$tostatsmonth&fromday=$fromday&fromstatsday_sday=$fromstatsday_sday&fromstatsmonth_sday=$fromstatsmonth_sday&today=$today&tostatsday_sday=$tostatsday_sday&tostatsmonth_sday=$tostatsmonth_sday&dsttype=$dsttype&srctype=$srctype&clidtype=$clidtype&channel=$channel&resulttype=$resulttype&dst=$dst&src=$src&clid=$clid&terminatecauseid=$terminatecauseid&choose_calltype=$choose_calltype&entercustomer=$entercustomer&enterprovider=$enterprovider&entertrunk=$entertrunk&enterratecard=$enterratecard&fromtime=$fromtime&totime=$totime&fromstatsday_hour=$fromstatsday_hour&fromstatsday_min=$fromstatsday_min&tostatsday_hour=$tostatsday_hour&tostatsday_min=$tostatsday_min&dnid=$dnid&dnidtype=$dnidtype&choose_currency=$choose_currency&entertariffgroup=$entertariffgroup";
+									echo "&entercustomer_num=$entercustomer_num&posted=$posted&Period=$Period&frommonth=$frommonth&fromstatsmonth=$fromstatsmonth&tomonth=$tomonth&tostatsmonth=$tostatsmonth&fromday=$fromday&fromstatsday_sday=$fromstatsday_sday&fromstatsmonth_sday=$fromstatsmonth_sday&today=$today&tostatsday_sday=$tostatsday_sday&tostatsmonth_sday=$tostatsmonth_sday&dsttype=$dsttype&srctype=$srctype&clidtype=$clidtype&channel=$channel&resulttype=$resulttype&dst=$dst&src=$src&clid=$clid&terminatecauseid=$terminatecauseid&choose_calltype=$choose_calltype&entercustomer=$entercustomer&enterprovider=$enterprovider&entertrunk=$entertrunk&enterratecard=$enterratecard&fromtime=$fromtime&totime=$totime&fromstatsday_hour=$fromstatsday_hour&fromstatsday_min=$fromstatsday_min&tostatsday_hour=$tostatsday_hour&tostatsday_min=$tostatsday_min&dnid=$dnid&dnidtype=$dnidtype&choose_currency=$choose_currency&entertariffgroup=$entertariffgroup&waitup1=$waitup1&waitup2=$waitup2&waitup1type=$waitup1type&waitup2type=$waitup2type";
 									?>">
 					<?php echo gettext ( "Next" ); ?></a> <img src="<?php echo Images_Path; ?>/fleche-d.gif" width="5" height="10"> </SPAN> 
 					<?php } ?>
@@ -1396,4 +1453,3 @@ if ($profit > 500 && $rand_num==4 && SHOW_DONATION) {
 <?php
 
 $smarty->display('footer.tpl');
-

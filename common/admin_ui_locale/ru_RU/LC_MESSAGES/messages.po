@@ -3557,6 +3557,10 @@ msgstr "КРЕДИТ"
 msgid "WaitUp"
 msgstr "Ожидал"
 
+#: Public/call-log-customers.php
+msgid "WAITUP"
+msgstr "ОЖИДАНИЕ"
+
 #: Public/call-log-customers.php:103
 msgid "AUTO DIALER"
 msgstr ""
