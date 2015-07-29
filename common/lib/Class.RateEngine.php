@@ -116,10 +116,10 @@ class RateEngine
 		if (strlen($A2B->CallerID)>=1) $mycallerid = $A2B->CallerID;
 		if ($this->webui) $A2B -> debug( DEBUG, $agi, __FILE__, __LINE__, "[CC_asterisk_rate-engine - CALLERID : ".$A2B->CallerID."]",0);
 
+		$OUTOF_INTPREF_FORSURE = strlen($A2B->myprefix)>0 ? " AND out_of_intern_prefix_for_sure = 0" : "" ;
 		$DNID_SUB_QUERY = "AND 0 = (SELECT COUNT(dnidprefix) FROM cc_tariffgroup_plan RIGHT JOIN cc_tariffplan ON cc_tariffgroup_plan.idtariffplan=cc_tariffplan.id WHERE dnidprefix=SUBSTRING('$mydnid',1,length(dnidprefix)) AND idtariffgroup=$tariffgroupid ) ";
 		$CID_SUB_QUERY = "AND 0 = (SELECT count(calleridprefix) FROM cc_tariffgroup_plan RIGHT JOIN cc_tariffplan ON cc_tariffgroup_plan.idtariffplan=cc_tariffplan.id WHERE ('$mycallerid' LIKE CONCAT(calleridprefix,'%') OR calleridprefix LIKE '$mycallerid,%' OR calleridprefix LIKE '%,$mycallerid,%' OR calleridprefix LIKE '%,$mycallerid') AND idtariffgroup=$tariffgroupid )";
-		$TARIFFNAME_SUB_QUERY = ($A2B->myprefix=="00" || $A2B->myprefix=="011") ? "" : " OR cc_tariffplan.tariffname LIKE '$A2B->cardnumber%'";
-
+//		$TARIFFNAME_SUB_QUERY = ($A2B->myprefix=="00" || $A2B->myprefix=="011") ? "" : " OR cc_tariffplan.tariffname LIKE '$A2B->cardnumber%'";
 		// $prefixclause to allow good DB servers to use an index rather than sequential scan
 		// justification at http://forum.asterisk2billing.org/viewtopic.php?p=9620#9620
 		$max_len_prefix = min(strlen($phonenumber), 15);	// don't match more than 15 digits (the most I have on my side is 8 digit prefixes)
@@ -209,7 +209,7 @@ class RateEngine
 		LEFT JOIN cc_sheduler_ratecard csr ON id_ratecard=cc_ratecard.id OR id_tariffplan=cc_tariffplan.id
 		LEFT JOIN cc_trunk ON (cc_trunk.id_trunk = cc_ratecard.id_trunk AND cc_ratecard.id_trunk != -1) OR (cc_ratecard.id_trunk = -1 AND cc_trunk.id_trunk = cc_tariffplan.id_trunk)
 
-		WHERE ((cc_tariffgroup.id=$tariffgroupid AND idtariffgroup='$tariffgroupid') OR cc_tariffplan.tariffname LIKE '$A2B->cardnumber%') AND ($prefixclause)
+		WHERE ((cc_tariffgroup.id=$tariffgroupid AND idtariffgroup='$tariffgroupid') OR cc_tariffplan.tariffname LIKE '$A2B->cardnumber%') AND ($prefixclause)$OUTOF_INTPREF_FORSURE
 		AND startingdate<= CURRENT_TIMESTAMP AND (expirationdate > CURRENT_TIMESTAMP OR expirationdate IS NULL)
 		AND (tariff_lcr=0 OR $sql_clause_days)
 		AND (dnidprefix=SUBSTRING('$mydnid',1,length(dnidprefix)) OR (dnidprefix='all' $DNID_SUB_QUERY))
@@ -329,7 +329,7 @@ class RateEngine
 for ($i=0; $i<count($this->ratecard_obj); $i++) {
  $ttee = "Tariffname:".$this->ratecard_obj[$i][4]." / Ratecard:".$this->ratecard_obj[$i][6]." / Trunk:".$this->ratecard_obj[$i][32]." / Prefix:".$this->ratecard_obj[$i][7]." / Rate:".$this->ratecard_obj[$i][12]."-".$this->ratecard_obj[$i][9]." / STATUS:".$this->ratecard_obj[$i][39]." / idtariffplan:".var_export($this->ratecard_obj[$i][3],true);
  if ($this->webui) {
-  $A2B -> debug( ERROR, $agi, __FILE__, __LINE__, $ttee);
+  $A2B -> debug( ERROR, $agi, "" ,"" , $ttee );
  }// else echo "5-".$ttee."<br>";
 }
 

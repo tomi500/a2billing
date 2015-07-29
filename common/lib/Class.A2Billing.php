@@ -3014,12 +3014,12 @@ $this -> debug( ERROR, $agi, __FILE__, __LINE__, "FAXRESOLUTION: ".$faxresolutio
 		if (is_array($remadd) && count($remadd)>0) {
 			for ($i=0;$i<count($remadd);$i=$i+2) {
 				if ($remadd[$i]!="" && substr($cidnumber,0,strlen($remadd[$i]))==$remadd[$i]) {
-					$cidnumber = @ substr($cidnumber,strlen($remadd[$i])) . $remadd[$i+1];
+					$cidnumber = @ $remadd[$i+1] . substr($cidnumber,strlen($remadd[$i]));
 					break;
 				}
 			}
 		}
-		if ($cidbirth == $cidnumber && strlen($cidbirth)>6 && !preg_match("/^[a-zA-Z].{2,}$/",$cidbirth))
+		if ($cidbirth == $cidnumber && strlen($cidbirth)>6 && !preg_match("/^[a-zA-Z0].{2,}$/",$cidbirth))
 			$cidnumber = $addint . $cidnumber;
 		return $cidnumber;
 	}

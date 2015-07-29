@@ -37,7 +37,7 @@ if (isset($json_data))		extract(json_decode($json_data,true,512));
 else
 getpost_ifset(array('id', 'idtariffplan', 'dialprefix', 'destination', 'buyrate', 'buyrateinitblock',
 'buyrateincrement', 'rateinitial', 'initblock', 'billingblock', 'connectcharge', 'disconnectcharge','disconnectcharge_after',
-'stepchargea', 'chargea', 'timechargea', 'billingblocka', 'stepchargeb', 'chargeb', 'timechargeb',
+'stepchargea', 'chargea', 'timechargea', 'billingblocka', 'stepchargeb', 'chargeb', 'timechargeb', 'out_of_intern_prefix_for_sure',
 'billingblockb', 'stepchargec', 'chargec', 'timechargec', 'billingblockc', 'startdate', 'stopdate', 'is_merged',
 'starttime', 'endtime', 'id_trunk', 'musiconhold','tariffplan', 'tariffgroup','posted','id_outbound_cidgroup','rounding_calltime', 
 'rounding_threshold', 'additional_block_charge', 'additional_block_charge_time', 'additional_grace','minimal_cost','announce_time_correction',
@@ -226,17 +226,15 @@ $HD_Form -> AddEditElement(gettext("Destination Prefix"),
    "" , "", "",	"", "" , "A2B_entity_prefix.php?popup_select=2&", ", 'prefix','width=550,height=340,top=20,left=100,scrollbars=1'", 
    gettext("Select the prefix destination corresponding to your prefix rate.").'<br>'.gettext("This is the label that appears against the Call Detail Record."));
 
-/**
-$HD_Form -> AddEditElement(gettext("Destination Prefix"),
-   "destination",
-   '$value',	
-   "SELECT",	
-   "", "", "",	
-   "SQL",
-   "cc_prefix",	
-   "destination, prefix",		
-   "prefix >= 0 ORDER BY prefix ASC", "", "%2 (%1)", "", gettext("Select the prefix destination corresponding to your prefix rate."));
-**/
+
+$HD_Form -> AddEditElement(gettext("OUT OF PREFIX"),
+   "out_of_intern_prefix_for_sure",
+   '0',
+   "RADIOBUTTON",
+   "", "", "",
+   "", "", "", gettext("Yes").":1, - ".gettext("No").":0", "", "", "",
+   gettext("Choose 'Yes' if you want to call not go through when dialed number is with international prefix"));
+
 
 $HD_Form -> AddEditElement("BUYING RATE",
    "buyrate",
@@ -654,10 +652,10 @@ if (ADVANCED_MODE) {
 
 if (ADVANCED_MODE) {
 	// This Variable store the argument for the SQL query
-	$HD_Form -> FieldEditElement ('cc_ratecard.idtariffplan, dialprefix, cc_ratecard.destination, buyrate, buyrateinitblock, buyrateincrement, buyrateconnectcharge, rateinitial, initblock, billingblock, connectcharge, disconnectcharge,disconnectcharge_after, minimal_cost, stepchargea, chargea, timechargea, billingblocka, stepchargeb, chargeb, timechargeb, billingblockb, stepchargec, chargec, timechargec, billingblockc, announce_time_correction, startdate, stopdate, is_merged, rounding_calltime, rounding_threshold, additional_block_charge, additional_block_charge_time,additional_grace, id_trunk, ratecarddialprefix, id_outbound_cidgroup, tag, musiconhold');
+	$HD_Form -> FieldEditElement ('cc_ratecard.idtariffplan, dialprefix, cc_ratecard.destination, out_of_intern_prefix_for_sure, buyrate, buyrateinitblock, buyrateincrement, buyrateconnectcharge, rateinitial, initblock, billingblock, connectcharge, disconnectcharge,disconnectcharge_after, minimal_cost, stepchargea, chargea, timechargea, billingblocka, stepchargeb, chargeb, timechargeb, billingblockb, stepchargec, chargec, timechargec, billingblockc, announce_time_correction, startdate, stopdate, is_merged, rounding_calltime, rounding_threshold, additional_block_charge, additional_block_charge_time,additional_grace, id_trunk, ratecarddialprefix, id_outbound_cidgroup, tag, musiconhold');
 } else {
 	// This Variable store the argument for the SQL query
-	$HD_Form -> FieldEditElement ('cc_ratecard.idtariffplan, dialprefix, cc_ratecard.destination, buyrate, buyrateinitblock, buyrateincrement, buyrateconnectcharge, rateinitial, initblock, billingblock, connectcharge, disconnectcharge,disconnectcharge_after, minimal_cost, startdate, stopdate, is_merged, starttime, endtime, rounding_calltime, rounding_threshold, additional_block_charge, additional_block_charge_time,additional_grace, id_trunk, ratecarddialprefix, id_outbound_cidgroup, tag');
+	$HD_Form -> FieldEditElement ('cc_ratecard.idtariffplan, dialprefix, cc_ratecard.destination, out_of_intern_prefix_for_sure, buyrate, buyrateinitblock, buyrateincrement, buyrateconnectcharge, rateinitial, initblock, billingblock, connectcharge, disconnectcharge,disconnectcharge_after, minimal_cost, startdate, stopdate, is_merged, starttime, endtime, rounding_calltime, rounding_threshold, additional_block_charge, additional_block_charge_time,additional_grace, id_trunk, ratecarddialprefix, id_outbound_cidgroup, tag');
 }
 
 $HD_Form->FG_ADITION_HIDDEN_PARAM		= $HD_Form->FG_EDITION_HIDDEN_PARAM		= 'filterprefix,current_page';
