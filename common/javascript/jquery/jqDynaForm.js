@@ -197,6 +197,10 @@
                     if(field.attr('type') == 'checkbox') {
                         return (field.attr('checked') == undefined) ? null : field.attr('value');
                     }
+                    else if(field.attr('type') == 'radio') {
+                        var name = field.attr('name');
+                        return $("[name='" + name + "']:checked").val();
+                    }
                     else if(field.get(0).tagName == 'select') {
                         return field.val();
                     }
