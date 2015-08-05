@@ -1988,22 +1988,24 @@ for ($i=0; $i<count($this->ratecard_obj); $i++) {
 			//# Ooh, something actually happened!
 			if ($this->dialstatus  == "BUSY") {
 				$this -> real_answeredtime = $this -> answeredtime = 0;
-				$A2B -> let_stream_listening($agi);
 				if ($A2B->agiconfig['busy_timeout'] > 0 && !(!$A2B->extext && $A2B->voicemail && !is_null($A2B->voicebox))) {
+					$A2B -> let_stream_listening($agi);
 					$agi->exec("Playtones busy");
 					sleep($A2B->agiconfig['busy_timeout']);
 				} elseif (!(!$A2B->extext && $A2B->voicemail && !is_null($A2B->voicebox))) {
+					$A2B -> let_stream_listening($agi);
 					$agi-> stream_file('prepaid-isbusy', '#');
 				}
 			} elseif ($this->dialstatus == "NOANSWER") {
 				$this -> real_answeredtime = $this -> answeredtime = 0;
-				$A2B -> let_stream_listening($agi);
 				if (isset($trunkcode) && strpos($trunkcode,"-INFOLINE") !== false) {
+					$A2B -> let_stream_listening($agi);
 					$agi-> stream_file('the-number-u-dialed', '#');
 					$agi-> say_digits($A2B->oldphonenumber, '#');
 					$agi-> stream_file('pbx-invalid-number', '#');
 				} else {
 					if (!(!$A2B->extext && $A2B->voicemail && !is_null($A2B->voicebox)) && $typecall!=44) {
+						$A2B -> let_stream_listening($agi);
 						$agi-> stream_file('prepaid-noanswer', '#');
 					}
 				}

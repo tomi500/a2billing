@@ -814,9 +814,17 @@ class A2Billing {
 			$len_gt = $pos_gt - $pos_lt - 1;
 			$this->CallerID = substr($this->CallerID,$pos_lt+1,$len_gt);
 		}
-		$this->CallerID = str_replace("+", '', $this->CallerID);
+/**		$this->CallerID = str_replace("+", '', $this->CallerID);
 		if (substr($this->CallerID,0,2) == '00') {
 			$this->CallerID = substr($this->CallerID,2);
+		}
+**/
+		if (strpos($this->CallerID,'+')===0) {
+			$this->CallerID = substr($this->CallerID,1);
+		} elseif (substr($this->CallerID,0,2) == '00') {
+			$this->CallerID = substr($this->CallerID,2);
+		} elseif (substr($this->CallerID,0,2) == '011') {
+			$this->CallerID = substr($this->CallerID,3);
 		}
 	}
 
@@ -1749,7 +1757,7 @@ class A2Billing {
 						// PERFORM THE CALL
 						if ($agi -> channel_status('',true) != AST_STATE_DOWN) {
 						    $this->agiconfig['dialcommand_param'] = $this->agiconfig['dialcommand_param_call_2did'];
-						    $result_callperf = $RateEngine->rate_engine_performcall ($agi, $this -> destination, $this);
+						    $result_callperf = $RateEngine->rate_engine_performcall ($agi, $this -> destination, $this, 44); // 44 = For not to play announce seconds and call cost
 						    if (!$result_callperf) {
 							if (count($listdestination) == $callcount) {
 							    if (is_null($didvoicebox) && is_null($this->voicebox)) {

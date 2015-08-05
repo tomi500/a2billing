@@ -133,7 +133,7 @@ $HD_Form->AddEditElement(gettext("COMPANY NAME"),
 			    gettext("Insert Company name of this customer"), "", "", "", "", "", "", "NO", "");
 
 if ($group_count > 1) {
-	$HD_Form->AddEditElement(gettext("CUSTOMER GROUP"),
+	$HD_Form->AddEditElement(gettext("CUSTOMER TYPE"),
 			    "id_group",
 			    "$id_group",
 			    "SELECT",

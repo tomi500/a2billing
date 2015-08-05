@@ -336,7 +336,7 @@ if ($mode == 'sms') {
 ".			"WHERE cc_did.activated=1 AND did LIKE '$mydnid' AND startingdate<=CURRENT_TIMESTAMP AND (expirationdate>CURRENT_TIMESTAMP OR expirationdate IS NULL";
 	    // if MYSQL
 	    if ($A2B->config["database"]['dbtype'] != "postgres") $QUERY .= " OR expirationdate = '0000-00-00 00:00:00'";
-	    $QUERY .= ") AND cc_country.id=id_cc_country LIMIT 1";
+	    $QUERY .= ") AND cc_country.id=id_cc_country ORDER BY cc_did_destination.activated DESC LIMIT 1";
 	    $result = $A2B -> instance_table -> SQLExec ($A2B->DBHandle, $QUERY);
 	    if (is_array($result)) {
 		$didyes = true;
@@ -351,7 +351,9 @@ if ($mode == 'sms') {
 		}
 	    }
 	    if ($didyes) {
-		if ($caller_areacode == 'recalldidless') break;
+		if ($caller_areacode == 'recalldidless') {
+			break;
+		}
 /**		$QUERY="SELECT IF(src=src_exten,src_peername,src) src, cc_card.username, cc_card.recalltime, continuewithdid FROM cc_card
 ".			"INNER JOIN cc_call ON starttime > DATE_SUB(NOW(), INTERVAL recalldays DAY) AND card_id = cc_card.id
 ".			"INNER JOIN cc_did ON cc_did.id_trunk = cc_call.id_trunk
@@ -409,8 +411,9 @@ if ($mode == 'sms') {
 				}
 			}
 
-		} elseif ($caller_areacode == 'didless') break;
-		  elseif ($diddest){
+		} elseif ($caller_areacode == 'didless') {
+		    break;
+		} elseif ($diddest){
 		    $A2B -> mode = $mode = 'did';
 		    $A2B -> agiconfig['answer_call']=0;
 		    $A2B -> agiconfig['cid_enable']=0;
