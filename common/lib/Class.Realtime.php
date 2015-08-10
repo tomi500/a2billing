@@ -127,7 +127,7 @@ class Realtime {
 	// insert_voip_config
 	// sip : 1 / 0
 	// iax : 1 / 0
-	function insert_voip_config ($sip, $iax, $id_card, $accountnumber, $passui_secret, $useralias, $language)
+	function insert_voip_config ($sip, $iax, $id_card, $accountnumber, $passui_secret, $useralias, $language='en', $warning_threshold=-2, $say_dialednumber=0, $say_rateinitial=0, $say_timetotalk=0, $say_balance_after_call=0)
 	{
 	    $who_id = '';
 	    if (!isset ($sip))
@@ -177,11 +177,11 @@ class Realtime {
 	    // Insert data for sip_buddy
 		if ($sip) {
 			
-			$FG_QUERY_ADITION_SIP_FIELDS = "name, accountcode, regexten, amaflags, callerid, context, dtmfmode, host, type, defaultuser, allow, secret, id_cc_card, nat, qualify, language, mailbox, rtptimeout, rtpholdtimeout, rtpkeepalive, allowtransfer";
+			$FG_QUERY_ADITION_SIP_FIELDS = "name, accountcode, regexten, amaflags, callerid, context, dtmfmode, host, type, defaultuser, allow, secret, id_cc_card, nat, qualify, language, mailbox, rtptimeout, rtpholdtimeout, rtpkeepalive, allowtransfer, warning_threshold, say_dialednumber, say_rateinitial, say_timetotalk, say_balance_after_call";
 		    $instance_sip_table = new Table($FG_TABLE_SIP_NAME, $FG_QUERY_ADITION_SIP_FIELDS);
 
 			$FG_QUERY_ADITION_SIP_IAX_VALUE = "'$useralias', '$accountnumber', '701', '$amaflags', 'Internal-701', '$context', '$dtmfmode','$host', '$type', ".
-			                                    "'$useralias', '$allow', '$passui_secret', '$id_card', '$nat', '$qualify', '$language', '701@$accountnumber', '60', '300', '30', 'yes'";
+			                                    "'$useralias', '$allow', '$passui_secret', '$id_card', '$nat', '$qualify', '$language', '701@$accountnumber', '60', '300', '30', 'yes', '$warning_threshold', '$say_dialednumber', '$say_rateinitial', '$say_timetotalk', '$say_balance_after_call'";
 			$result_query1 = $instance_sip_table->Add_table($this->DBHandler, $FG_QUERY_ADITION_SIP_IAX_VALUE, null, null, null);
 
 			$QUERY = "INSERT INTO cc_voicemail_users (customer_id, sip_buddy_id, context, mailbox, password, fullname, email, language)

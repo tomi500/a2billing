@@ -74,7 +74,7 @@ if ($nbvoucher>0) {
 
         for ($k=0;$k < $nbvoucher;$k++) {
 			
-            $vouchernum = generate_unique_value($FG_ADITION_SECOND_ADD_TABLE, LEN_VOUCHER, 'voucher');
+            $vouchernum = generate_unique_value($FG_ADITION_SECOND_ADD_TABLE . ", cc_card", LEN_VOUCHER, 'voucher', 'username');
 //            $FG_ADITION_SECOND_ADD_VALUE  = "'$vouchernum', '$addcredit', 't', '$tag_list', '$choose_currency', '$expirationdate'";
             $FG_ADITION_SECOND_ADD_VALUE  = "'$vouchernum', '$addcredit', 't', '$tag_list', '$choose_currency', '$expirationdate', '$callplan_id'";
 			$result_query = $instance_sub_table -> Add_table ($HD_Form -> DBHandle, $FG_ADITION_SECOND_ADD_VALUE, null, null);

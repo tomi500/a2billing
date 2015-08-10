@@ -730,25 +730,31 @@ function MDP($chrs = LEN_CARDNUMBER)
 /*
  * function gen_card
  */
-function gen_card($table = "cc_card", $len = LEN_CARDNUMBER, $field = "username")
+function gen_card($table = "cc_card, cc_voucher", $len = LEN_CARDNUMBER, $field1 = "username", $field2 = "voucher")
 {
-	return generate_unique_value ($table, $len, $field);
+	return generate_unique_value ($table, $len, $field1, $field2);
 }
 
 /*
  * function generate_unique_value
  */
-function generate_unique_value($table, $len, $field)
+function generate_unique_value($table, $len, $field1, $field2 = false)
 {
 	$DBHandle_max = DbConnect();
-	for ($k = 0; $k <= 1000; $k++) {
-		$card_gen = MDP($len);
-		if ($k == 1000) {
-			echo "ERROR : Impossible to generate a $field not yet used!<br>Perhaps check the LEN_CARDNUMBER (value:" . LEN_CARDNUMBER . ")";
+	for ($k = 0; $k <= 10000; $k++) {
+		do {
+			$card_gen = MDP($len);
+		} while ($card_gen < pow(10,$len-1));
+		if ($k == 10000) {
+			echo "ERROR : Impossible to generate a $field1 not yet used!<br>Perhaps check the LEN_CARDNUMBER (value:" . LEN_CARDNUMBER . ")";
 			exit ();
 		}
-
-		$query = "SELECT " . $field . " FROM " . $table . " where " . $field . "='$card_gen'";
+		$addwhere = $field1;
+		if ($field2 !== false)	{
+			$addwhere = "='$card_gen' OR $field2";
+			$field2   = ", " . $field2;
+		} else	$addwhere = "";
+		$query = "SELECT " . $field1 . $field2 . " FROM " . $table . " WHERE " . $addwhere . "='$card_gen'";
 		$resmax = $DBHandle_max->Execute($query);
 		$numrow = 0;
 		if ($resmax)
@@ -763,20 +769,21 @@ function generate_unique_value($table, $len, $field)
 /*
  * function gen_card_with_alias
  */
-function gen_card_with_alias($table = "cc_card", $api = 0, $length_cardnumber = LEN_CARDNUMBER, $DBHandle = null, $alias_static = 0, $card_id = 0)
+function gen_card_with_alias($table = "cc_card, cc_voucher", $api = 0, $length_cardnumber = LEN_CARDNUMBER, $DBHandle = null, $alias_static = 0, $card_id = 0)
 {
 	if (!isset($DBHandle)) {
 		$DBHandle = DbConnect();
 	}
 
-	for ($k = 0; $k <= 200; $k++) {
-		do {
+	for ($k = 0; $k <= 10000; $k++) {
+/**		do {
 			$card_gen = MDP($length_cardnumber);
 		} while ($card_gen < pow(10,$length_cardnumber-1));
+**/		$card_gen = gen_card($table, $length_cardnumber);
 		do {
 			$alias_gen = ($k==0 && LEN_ALIASNUMBER==strlen($alias_static))?$alias_static:MDP(LEN_ALIASNUMBER);
 		} while ($alias_gen != $alias_static && $alias_gen < pow(10,LEN_ALIASNUMBER-1));
-		if ($k == 200) {
+		if ($k == 10000) {
 			if ($api) {
 				global $mail_content, $email_alarm, $logfile;
 				mail($email_alarm, "ALARM : API (gen_card_with_alias - CODE_ERROR 8)", $mail_content);

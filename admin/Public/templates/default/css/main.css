@@ -835,6 +835,17 @@ SPAN.errorText {
 {
 	font-weight: bold;	
 }
+.form_list_ol {
+	counter-reset: item;
+}
+.form_list_ol li {
+	list-style-type: none;
+}
+.form_list_ol li:before {
+	content: counter(item) ") ";
+	counter-increment: item;
+	font-weight: 600;
+}
 .form_input_button {
 	background-color: #F9FBF9;
 	font-family: Arial, Helvetica, sans-serif;
@@ -864,6 +875,10 @@ SPAN.errorText {
 	font-size: 11px;
 	font-weight: bold;
 	color: #BC2222;
+}
+
+.form_input_checkbox {
+	vertical-align: -20%;
 }
 
 .form_input_select_disabled {
