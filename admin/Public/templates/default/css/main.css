@@ -837,6 +837,10 @@ SPAN.errorText {
 }
 .form_list_ol {
 	counter-reset: item;
+	margin-left: 5px;
+	margin-right: 5px;
+	margin-top: 1px;
+	margin-bottom: 2px;
 }
 .form_list_ol li {
 	list-style-type: none;
@@ -844,7 +848,7 @@ SPAN.errorText {
 .form_list_ol li:before {
 	content: counter(item) ") ";
 	counter-increment: item;
-	font-weight: 600;
+	font-weight: bold;
 }
 .form_input_button {
 	background-color: #F9FBF9;

@@ -125,6 +125,9 @@ if ($action == "generate") {
 	if ($choose_typepaid == "0") {
 		$creditlimit = 0;
 	}
+	if ($warning_threshold != "-1") {
+		$warning_threshold = "-2";
+	}
 }
 $nbcard = $nb_to_create;
 if ($nbcard > 0 && $action == "generate" && $nb_error == 0) {
@@ -264,10 +267,11 @@ $list_language = Constants::getLanguagesList();
     }
   }
   function onoff() {
-    if(document.getElementById("ddd").style.display=='block'){
-	$('#ddd').animate({ height: 'hide', opacity: 'hide' }, function(){ $(this).css({display:"none"}); });
-    } else {
+//    if(document.getElementById("ddd").style.display=='block') {}
+    if($(this).is(':checked')) {
 	$('#ddd').animate({ height: 'show', opacity: 'show' }, function(){ $(this).css({display:"block"}); });
+    } else {
+	$('#ddd').animate({ height: 'hide', opacity: 'hide' }, function(){ $(this).css({display:"none"}); });
     }
   }
 -->
@@ -279,9 +283,9 @@ $list_language = Constants::getLanguagesList();
 	</div>
 <?php } ?>
 <form name="theForm" action="<?php echo $_SERVER['PHP_SELF'] ?>" method="POST">
-<table align="center" class="bgcolor_001" border="0" width="65%">
+<table border="0" width="735px" align="center">
 <tr>
-	<td align="left">
+	<td align="left" class="bgcolor_001">
 	<ol class="form_list_ol">
 	<li>
 	 <?php echo gettext("Number of customers to create")?> : 
@@ -301,7 +305,7 @@ $list_language = Constants::getLanguagesList();
 	}
 	?></select>&nbsp;&nbsp;
 	<div style="position: relative; display:<?php if($cardnumberlenght_list==end($A2B -> cardnumber_range)) echo "inline"; else echo "none";?>" id="digpass">
-	<?php echo gettext("Numeric password based on ").end($A2B -> cardnumber_range).gettext(" digits, same the card number");?> : <input class="form_input_checkbox" type="checkbox" name="digit_password" value="1" <?php if($digit_password==1) echo "checked" ?>>&nbsp;
+	<?php echo gettext("Numeric password based on ").end($A2B -> cardnumber_range).gettext(" digits, same the card number");?> : <input class="form_input_checkbox" type="checkbox" name="digit_password" value="1" <?php if($digit_password==1) echo "checked" ?>>
 	</div>
 	</li>
 	<li>
@@ -392,11 +396,11 @@ $list_language = Constants::getLanguagesList();
 	<?php echo gettext("Yes");?> <input class="form_input_checkbox" name="runservice" value="1" <?php if($runservice==1) echo "checked='checked'" ?> type="radio"> - <?php echo gettext("No");?> <input class="form_input_checkbox" name="runservice" value="0" <?php if($runservice==0 || empty($runservice) ) echo "checked='checked'" ?>  type="radio">
 	</li>
 	<li>
-   <?php echo gettext("Create SIP/IAX Friends");?>&nbsp;: <?php echo gettext("SIP")?> <input class="form_input_checkbox" type="checkbox" name="sip" value="1" <?php if($sip==1) echo "checked" ?> onclick="onoff(this)"> <?php echo gettext("IAX")?> : <input class="form_input_checkbox" type="checkbox" name="iax" value="1" <?php if($iax==1 ) echo "checked ";?>disabled readonly title="Not in service temporally">
+   <?php echo gettext("Create SIP/IAX Friends");?>&nbsp;: <?php echo gettext("SIP")?> <input class="form_input_checkbox" type="checkbox" name="sip" value="1" <?php if($sip==1) echo "checked" ?> onclick="onoff.call(this)"> <?php echo gettext("IAX")?> : <input class="form_input_checkbox" type="checkbox" name="iax" value="1" <?php if($iax==1 ) echo "checked ";?>disabled readonly title="Not in service temporally">
 	</li>
 	<div style="display:<?php if($sip==1) echo "block"; else echo "none";?>" id="ddd">
 	<li>
-   <?php echo gettext("Say balance before call");?>&nbsp;: <input class="form_input_checkbox" type="checkbox" name="warning_threshold" value="1" <?php if($warning_threshold==1) echo "checked" ?>>
+   <?php echo gettext("Say balance before call");?>&nbsp;: <input class="form_input_checkbox" type="checkbox" name="warning_threshold" value="-1" <?php if($warning_threshold==-1) echo "checked" ?>>
 	</li>
 	<li>
    <?php echo gettext("Say the dialed number before call");?>&nbsp;: <input class="form_input_checkbox" type="checkbox" name="say_dialednumber" value="1" <?php if($say_dialednumber==1) echo "checked" ?>>

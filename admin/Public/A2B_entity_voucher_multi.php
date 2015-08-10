@@ -111,9 +111,9 @@ echo $CC_help_generate_voucher;
 
 ?>
 <div align="center">
-<table align="center" class="bgcolor_001" border="0" width="65%">
-<tbody><tr>
 <form name="theForm" action="<?php echo filter_input(INPUT_SERVER, 'PHP_SELF', FILTER_SANITIZE_URL) ?>">
+<table align="center" border="0">
+<tbody><tr>
     <?php
         if ($HD_Form->FG_CSRF_STATUS == true) {
     ?>
@@ -122,8 +122,9 @@ echo $CC_help_generate_voucher;
     <?php
         }
     ?>
-    <td align="left" width="75%">
-        <strong>1)</strong>
+    <td align="left" class="bgcolor_001" nowrap>
+    <ol class="form_list_ol">
+    <li>
         <select name="choose_list" size="1" class="form_input_select">
             <option value=""><?php echo gettext("Choose the number of vouchers to create");?></option>
             <option class="input" value="5"><?php echo gettext("5 Voucher");?></option>
@@ -133,13 +134,11 @@ echo $CC_help_generate_voucher;
             <option class="input" value="200"><?php echo gettext("200 Vouchers");?></option>
             <option class="input" value="500"><?php echo gettext("500 Vouchers");?></option>
         </select>
-        <br/>
-
-        <strong>2)</strong>
+    </li>
+    <li>
         <?php echo gettext("Amount of credit");?> : 	<input class="form_input_text" name="addcredit" size="10" maxlength="10" >
-        <br/>
-
-        <strong>3)</strong>
+    </li>
+    <li>
         <select NAME="choose_currency" size="1" class="form_input_select">
         <?php
         foreach ($currencies_list as $key => $cur_value) {
@@ -147,8 +146,7 @@ echo $CC_help_generate_voucher;
         <option value='<?php echo $key ?>'><?php echo $cur_value[1].' ('.$cur_value[2].')' ?></option>
         <?php } ?>
         </select>
-        <br/>
-
+    </li>
         <?php
             $begin_date = date("Y");
             $begin_date_plus = date("Y") + 10;
@@ -156,42 +154,31 @@ echo $CC_help_generate_voucher;
             $comp_date = "value='".$begin_date.$end_date."'";
             $comp_date_plus = "value='".$begin_date_plus.$end_date."'";
         ?>
-        <strong>4)</strong>
+    <li>
         <?php echo gettext("Expiration date");?> : <input class="form_input_text"  name="expirationdate" size="40" maxlength="40" <?php echo $comp_date_plus; ?>> <?php echo gettext("(respect the format YYYY-MM-DD HH:MM:SS)");?>
-        <br/>
-        <strong>5)</strong>
+    </li>
+    <li>
         <?php echo gettext("Tag");?> : <input class="form_input_text"  name="tag_list" size="40" maxlength="40">
-	<br />
-		<!-- voucher call plan update -->
-
-		<div style="margin-top:3px;">
-
-		<strong>6)</strong> Plan : 
-
-        <select name="callplan_id" size="1" class="form_input_select">
-
+    </li>
+    <li>
+	Plan : <select name="callplan_id" size="1" class="form_input_select">
         <?php
-
         foreach ($cus_list_voucher as $key => $cus_tariffview) {
-
         ?>
-
         <option value='<?php echo $cus_tariffview[0] ?>'><?php echo $cus_tariffview[1] ?></option>
-
         <?php } ?>
-
         </select>
-
-		</div>
-
-
-        </td>
-        <td align="left" valign="bottom">
-            <input class="form_input_button" value=" GENERATE VOUCHER " type="submit">
-        </td>
-</form>
+    </li>
+    </ol>
+    </td>
 </tr>
-</tbody></table>
+<tr>
+    <td align="right">
+        <input class="form_input_button" value=" GENERATE VOUCHER " type="submit">
+    </td>
+</tr></tbody>
+</table>
+</form>
 <br>
 </div>
 
