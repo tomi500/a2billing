@@ -129,13 +129,11 @@ class RateEngine
 			$max_len_prefix--;
 		}
 		$prefixclause .= "dialprefix='defaultprefix')";
-
 		// match Asterisk/POSIX regex prefixes,  rewrite the Asterisk '_XZN.' characters to
 		// POSIX equivalents, and test each of them against the dialed number
 		$prefixclause .= " OR (dialprefix LIKE '&_%' ESCAPE '&' AND '$phonenumber' ";
 		$prefixclause .= "REGEXP REPLACE(REPLACE(REPLACE(REPLACE(REPLACE(CONCAT('^', dialprefix, '$'), ";
 		$prefixclause .= "'X', '[[:digit:]]'), 'Z', '[1-9]'), 'N', '[2-9]'), '.', '.+'), '_', ''))";
-
 		$QUERY = "SELECT DISTINCT
 		tariffgroupname,
 		lcrtype,
@@ -1279,16 +1277,12 @@ for ($i=0; $i<count($this->ratecard_obj); $i++) {
 			
 		    }
 		}
+		$myclause_nodidcall = NULL;
 		if (!isset($trunkcode) || strpos($trunkcode,"-INFOLINE") === false) {
 			if ($didcall==0 && $callback==0) {
 				$myclause_nodidcall = "redial='$A2B->oldphonenumber'";
 				$A2B->redial = $A2B->oldphonenumber;
-			} else {
-				$myclause_nodidcall='';
 			}
-		}
-		if (!isset($myclause_nodidcall)) {
-			$myclause_nodidcall = NULL;
 		}
 		//Update the global credit
 		if ($sessiontime>0) {
@@ -1378,7 +1372,7 @@ for ($i=0; $i<count($this->ratecard_obj); $i++) {
 				$id_diller = $id_diller_next;
 			} while ($id_diller);
 		}
-		if ($myclause_nodidcall) {
+		if (!is_null($myclause_nodidcall)) {
 			$myclause_nodidcall = "UPDATE cc_card SET $myclause_nodidcall WHERE username='$A2B->username'";
 			$A2B -> debug( DEBUG, $agi, __FILE__, __LINE__, "[CC_asterisk_stop 1.2: SQL: $myclause_nodidcall]");
 			$A2B->instance_table -> SQLExec ($A2B -> DBHandle, $myclause_nodidcall, 0);
@@ -1425,7 +1419,7 @@ for ($i=0; $i<count($this->ratecard_obj); $i++) {
 			$status = 1;
 			// LOOOOP FOR THE FAILOVER LIMITED TO failover_recursive_limit
 			while ((($loop_failover == 0 && !$this->dialstatus) || ($loop_failover <= $A2B->agiconfig['failover_recursive_limit']
-			    && $failover_trunk > 0 && (time()-$timecur) < 20 && (in_array($this->dialstatus, array("","CHANUNAVAIL","CONGESTION")) || $intellect_count >= 0)))
+			    && $failover_trunk > 0 && (time()-$timecur) < 24 && (in_array($this->dialstatus, array("","CHANUNAVAIL","CONGESTION")) || $intellect_count >= 0)))
 			    && $this->dialstatus != "ANSWER" && $this->dialstatus != "CANCEL") {
 
 				$this -> td = $this -> prefixclause = $outprefix = $outprefixrequest = "";

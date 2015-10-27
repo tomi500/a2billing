@@ -155,7 +155,7 @@ echo $CC_help_generate_voucher;
             $comp_date_plus = "value='".$begin_date_plus.$end_date."'";
         ?>
     <li>
-        <?php echo gettext("Expiration date");?> : <input class="form_input_text"  name="expirationdate" size="40" maxlength="40" <?php echo $comp_date_plus; ?>> <?php echo gettext("(respect the format YYYY-MM-DD HH:MM:SS)");?>
+        <?php echo gettext("Expiration date");?> : <input class="form_input_text"  name="expirationdate" size="19" maxlength="19" <?php echo $comp_date_plus; ?>> <?php echo gettext("(respect the format YYYY-MM-DD HH:MM:SS)");?>
     </li>
     <li>
         <?php echo gettext("Tag");?> : <input class="form_input_text"  name="tag_list" size="40" maxlength="40">

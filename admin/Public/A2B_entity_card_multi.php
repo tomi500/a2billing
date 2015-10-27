@@ -377,7 +377,7 @@ $list_language = Constants::getLanguagesList();
 	<?php if($expdate_error) {
 		echo "<font color=\"#C14430\">".gettext("Expiry Date")."</font>";
 	} else	echo gettext("Expiry Date");
-	?> : <input class="form_input_text"  name="expirationdate" size="40" maxlength="40" <?php if(!empty($expirationdate)) echo "value='$expirationdate'"; else echo $comp_date_plus;?> > <?php echo gettext("(Format YYYY-MM-DD HH:MM:SS)");?>
+	?> : <input class="form_input_text"  name="expirationdate" size="19" maxlength="19" <?php if(!empty($expirationdate)) echo "value='$expirationdate'"; else echo $comp_date_plus;?> > <?php echo gettext("(Format YYYY-MM-DD HH:MM:SS)");?>
 	<?php if($expdate_error){ ?>
 		<img style="vertical-align:middle;" src="<?php echo Images_Path;?>/exclamation.png" />
 	<?php } ?>&nbsp;
@@ -396,7 +396,7 @@ $list_language = Constants::getLanguagesList();
 	<?php echo gettext("Yes");?> <input class="form_input_checkbox" name="runservice" value="1" <?php if($runservice==1) echo "checked='checked'" ?> type="radio"> - <?php echo gettext("No");?> <input class="form_input_checkbox" name="runservice" value="0" <?php if($runservice==0 || empty($runservice) ) echo "checked='checked'" ?>  type="radio">
 	</li>
 	<li>
-   <?php echo gettext("Create SIP/IAX Friends");?>&nbsp;: <?php echo gettext("SIP")?> <input class="form_input_checkbox" type="checkbox" name="sip" value="1" <?php if($sip==1) echo "checked" ?> onclick="onoff.call(this)"> <?php echo gettext("IAX")?> : <input class="form_input_checkbox" type="checkbox" name="iax" value="1" <?php if($iax==1 ) echo "checked ";?>disabled readonly title="Not in service temporally">
+   <?php echo gettext("Create SIP/IAX Friends");?>&nbsp;: <?php echo gettext("SIP")?> <input class="form_input_checkbox" type="checkbox" name="sip" value="1" <?php if($sip==1) echo "checked" ?> onclick="onoff.call(this)"> <?php echo gettext("IAX")?> : <input class="form_input_checkbox" type="checkbox" name="iax" value="1" <?php if($iax==1 ) echo "checked ";?>disabled readonly title="Temporary out of service">
 	</li>
 	<div style="display:<?php if($sip==1) echo "block"; else echo "none";?>" id="ddd">
 	<li>

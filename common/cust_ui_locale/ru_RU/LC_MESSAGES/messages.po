@@ -1566,8 +1566,16 @@ msgid "SAY BALANCE AFTER AUTH"
 msgstr "ПРОГОВАРИВАТЬ БАЛАНС ПРИ ВХОДЕ В СИСТЕМУ"
 
 #: form_data/FG_var_callerid.inc
+msgid "SAY THE DIALED NUMBER"
+msgstr "ПРОГОВАРИВАТЬ НАБРАННЫЙ НОМЕР"
+
+#: form_data/FG_var_callerid.inc
 msgid "SAY RATE BEFORE CALL"
 msgstr "ПРОГОВАРИВАТЬ ЦЕНУ ПЕРЕД ЗВОНКОМ"
+
+#: form_data/FG_var_callerid.inc
+msgid "SAY HIGHEST POSSIBLE DURATION"
+msgstr "ОБЪЯВЛЯТЬ МАКСИМАЛЬНУЮ ПРОДОЛЖИТЕЛЬНОСТЬ РАЗГОВОРА"
 
 #: form_data/FG_var_callerid.inc
 msgid "with the warning threshold"

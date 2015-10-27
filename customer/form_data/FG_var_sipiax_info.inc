@@ -191,9 +191,27 @@ $HD_Form -> AddEditElement (gettext("SAY BALANCE AFTER AUTH"),
                                         "",
                                         "list", "", "", "", $limits_notify , "%1", "", gettext('currency : ').strtoupper(BASE_CURRENCY)." (".gettext("with the warning threshold").")", "", '<OPTION  value="-1" selected>'.gettext("ALWAYS").'&nbsp;</OPTION>');
 
+$HD_Form -> AddEditElement (gettext("SAY THE DIALED NUMBER"),
+                                        "say_dialednumber",
+                                        $say_dialednumber,
+                                        "SELECT",
+                                        "",
+                                        "",
+                                        "",
+                                        "list", "", "", "", $yesno, "%1");
+
 $HD_Form -> AddEditElement (gettext("SAY RATE BEFORE CALL"),
                                         "say_rateinitial",
                                         '0',
+                                        "SELECT",
+                                        "",
+                                        "",
+                                        "",
+                                        "list", "", "", "", $yesno, "%1");
+
+$HD_Form -> AddEditElement (gettext("SAY HIGHEST POSSIBLE DURATION"),
+                                        "say_timetotalk",
+                                        $say_timetotalk,
                                         "SELECT",
                                         "",
                                         "",
@@ -209,7 +227,7 @@ $HD_Form -> AddEditElement (gettext("SAY BALANCE AFTER CALL"),
                                         "",
                                         "list", "", "", "", $yesno, "%1");
 
-$field_list_edit = 'regexten, name, secret, callerid, nat, warning_threshold, say_rateinitial, say_balance_after_call';
+$field_list_edit = 'regexten, name, secret, callerid, nat, warning_threshold, say_dialednumber, say_rateinitial, say_timetotalk, say_balance_after_call';
 
 $HD_Form -> FieldEditElement ($field_list_edit);
 

@@ -145,7 +145,7 @@ if (!$popup_select) {
 	if ($use_lcr_callplan)
 		$HD_Form -> FieldViewElement ('id, destination, dialprefix, buyrate, '.$rateinitial_field);
 	else
-		$HD_Form -> FieldViewElement ('id, cc_prefix.destination, cc_ratecard.dialprefix, cc_ratecard.buyrate, '.$rateinitial_field);
+		$HD_Form -> FieldViewElement ('cc_ratecard.id, cc_prefix.destination, cc_ratecard.dialprefix, cc_ratecard.buyrate, '.$rateinitial_field);
 }
 
 if ($popup_select) {

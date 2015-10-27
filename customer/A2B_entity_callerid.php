@@ -88,9 +88,9 @@ $HD_Form -> FG_DELETION_LINK = $_SERVER['PHP_SELF']."?form_action=ask-delete&pop
 if (strlen($HD_Form -> FG_EDITION_CLAUSE)>0)
 	$HD_Form -> FG_EDITION_CLAUSE .= " AND ";
 $HD_Form -> FG_EDITION_CLAUSE .= "id_cc_card = ".$idcard;
-if ($form_action == "ask-delete" || $form_action == "delete") {
-	$HD_Form -> FG_EDITION_CLAUSE .= " AND verify = 0";
-}
+//if ($form_action == "ask-delete" || $form_action == "delete") {
+//	$HD_Form -> FG_EDITION_CLAUSE .= " AND verify = 0";
+//}
 if ($id!="" || !is_null($id)){
 	$HD_Form -> FG_EDITION_CLAUSE = str_replace("%id", "$id", $HD_Form -> FG_EDITION_CLAUSE);
 }

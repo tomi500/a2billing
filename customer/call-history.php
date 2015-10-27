@@ -849,6 +849,21 @@ if ($ACXSEERECORDING && $nb_record>0 && $terminatecauseid!="INCOMPLET" && !($pop
             <TABLE border=0 cellPadding=0 cellSpacing=0 width="100%">
                 <TR>
                   <TD><B><SPAN style="COLOR: #ffffff; FONT-SIZE: 11px"><?php echo $FG_HTML_TABLE_TITLE?></SPAN></B></TD>
+                                    <TD align="right"><SPAN style="COLOR: #ffffff; FONT-SIZE: 11px"><B> 
+                    <?php if ($current_page>0){?>
+                    <img src="<?php echo Images_Path_Main ?>/fleche-g.gif" width="5" height="10"> <a href="<?php echo $PHP_SELF?>?s=1&t=0&order=<?php echo $order?>&sens=<?php echo $sens?>&current_page=<?php  echo ($current_page-1)?><?php  if (!is_null($letter) && ($letter!="")){ echo "&letter=$letter";} 
+					echo "&popup_select=$popup_select&id=$id&posted=$posted&Period=$Period&frommonth=$frommonth&fromstatsmonth=$fromstatsmonth&tomonth=$tomonth&tostatsmonth=$tostatsmonth&fromday=$fromday&fromstatsday_sday=$fromstatsday_sday&fromstatsmonth_sday=$fromstatsmonth_sday&today=$today&tostatsday_sday=$tostatsday_sday&tostatsmonth_sday=$tostatsmonth_sday&fromtime=$fromtime&totime=$totime&fromstatsday_hour=$fromstatsday_hour&fromstatsday_min=$fromstatsday_min&tostatsday_hour=$tostatsday_hour&tostatsday_min=$tostatsday_min&calleridtype=$calleridtype&phonenumbertype=$phonenumbertype&sourcetype=$sourcetype&clidtype=$clidtype&channel=$channel&resulttype=$resulttype&callerid=$callerid&phonenumber=$phonenumber&clid=$clid&terminatecauseid=$terminatecauseid&choose_calltype=$choose_calltype&choose_currency=$choose_currency&choose_callowner=$choose_callowner&waitup1=$waitup1&waitup2=$waitup2&waitup1type=$waitup1type&waitup2type=$waitup2type";?>"> 
+                    <?php echo gettext("PREVIOUS");?> </a> -
+                    <?php }?>
+                    <?php echo ($current_page+1);?> / <?php  echo $nb_record_max;?> 
+                    <?php if ($current_page<$nb_record_max-1){?>
+                    - <a href="<?php echo $PHP_SELF?>?s=1&t=0&order=<?php echo $order?>&sens=<?php echo $sens?>&current_page=<?php  echo ($current_page+1)?><?php  if (!is_null($letter) && ($letter!="")){ echo "&letter=$letter";} 
+					echo "&popup_select=$popup_select&id=$id&posted=$posted&Period=$Period&frommonth=$frommonth&fromstatsmonth=$fromstatsmonth&tomonth=$tomonth&tostatsmonth=$tostatsmonth&fromday=$fromday&fromstatsday_sday=$fromstatsday_sday&fromstatsmonth_sday=$fromstatsmonth_sday&today=$today&tostatsday_sday=$tostatsday_sday&tostatsmonth_sday=$tostatsmonth_sday&fromtime=$fromtime&totime=$totime&fromstatsday_hour=$fromstatsday_hour&fromstatsday_min=$fromstatsday_min&tostatsday_hour=$tostatsday_hour&tostatsday_min=$tostatsday_min&calleridtype=$calleridtype&phonenumbertype=$phonenumbertype&sourcetype=$sourcetype&clidtype=$clidtype&channel=$channel&resulttype=$resulttype&callerid=$callerid&phonenumber=$phonenumber&clid=$clid&terminatecauseid=$terminatecauseid&choose_calltype=$choose_calltype&choose_currency=$choose_currency&choose_callowner=$choose_callowner&waitup1=$waitup1&waitup2=$waitup2&waitup1type=$waitup1type&waitup2type=$waitup2type";?>"> 
+                    <?php echo gettext("NEXT");?> </a> <img src="<?php echo Images_Path_Main ?>/fleche-d.gif" width="5" height="10">
+                    </B></SPAN> 
+                    <?php }?>
+                  </TD>
+
                 </TR>
             </TABLE></TD>
         </TR>

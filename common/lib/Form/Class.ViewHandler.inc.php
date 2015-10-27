@@ -101,6 +101,15 @@ if ((count($list)>0) && is_array($list)){
 		    <td><span class="viewhandler_span2"> - <?php echo $this->CV_TITLE_TEXT ?>  - </span>
 			<span class="viewhandler_span1"> <?php echo $this -> FG_NB_RECORD.' '.gettext("Records"); ?></span>
 		    </td>
+		    <td align="right">
+		    <span class="viewhandler_span2">
+			<?php
+			$c_url = $_SERVER['PHP_SELF'].'?stitle='.$stitle.'&atmenu='.$atmenu.'&current_page=%s'."&filterprefix=".$processed['filterprefix']."&order=".$processed['order']."&sens=".$processed['sens']."&mydisplaylimit=".$processed['mydisplaylimit']."&popup_select=".$processed["popup_select"]."&letter=".$processed["letter"].$this-> CV_FOLLOWPARAMETERS;
+			if (!is_null($letter) && ($letter!=""))   $c_url .= "&letter=".$processed['letter'];
+			$this -> printPages($this -> CV_CURRENT_PAGE+1, $this -> FG_NB_RECORD_MAX, $c_url) ;
+			?>
+		    </span>
+		    </td>
 		    </tr>
 		    </table>
 		</td>

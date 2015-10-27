@@ -33,9 +33,10 @@
 
 
 
-getpost_ifset(array('id_cc_card', 'cardnumber', 'id', 'name', 'amaflags', 'callgroup', 'namedcallgroup', 'namedpickupgroup', 'accountcode', 'callerid', 'canreinvite', 'context', 'defaultip', 'dtmfmode', 'videosupport', 
-'fromuser', 'fromdomain', 'host', 'insecure', 'language', 'mailbox', 'md5secret', 'directmedia', 'nat', 'permit', 'deny', 'mask', 'pickupgroup', 'port', 'qualify', 'warning_threshold', 'say_rateinitial', 'say_balance_after_call', 
-'restrictcid', 'rtptimeout', 'rtpholdtimeout', 'secret', 'type', 'username', 'disallow', 'allow', 'musiconhold', 'regseconds', 'ipaddr', 'regexten','friend_id', 'callbackextension', 'callcounter', 'call-limit', 'external'));
+getpost_ifset(array('id_cc_card', 'cardnumber', 'id', 'name', 'amaflags', 'callgroup', 'namedcallgroup', 'namedpickupgroup', 'accountcode', 'callerid', 'canreinvite', 'context', 
+'defaultip', 'dtmfmode', 'videosupport', 'fromuser', 'fromdomain', 'host', 'insecure', 'language', 'mailbox', 'md5secret', 'directmedia', 'nat', 'permit', 'deny', 'mask', 
+'pickupgroup', 'port', 'qualify', 'warning_threshold', 'say_dialednumber', 'say_rateinitial', 'say_timetotalk', 'say_balance_after_call', 'restrictcid', 'rtptimeout', 
+'rtpholdtimeout', 'secret', 'type', 'username', 'disallow', 'allow', 'musiconhold', 'regseconds', 'ipaddr', 'regexten','friend_id', 'callbackextension', 'callcounter', 'call-limit', 'external'));
 
 getpost_ifset(array('defaultuser', 'subscribemwi', 'vmexten', 'cid_number', 'callingpres', 'usereqphone', 'incominglimit', 'subscribecontext', 'musicclass', 
 'allowtransfer', 'autoframing', 'maxcallbitrate', 'outboundproxy', 'regserver', 'rtpkeepalive', 'dbsecret ', 'regcontext ', 'sourceaddress ', 'mohinterpret', 'cbe',
@@ -173,7 +174,7 @@ if ($form_action=="ask-add" || $form_action == "add_sip" || $form_action == "add
 	$RTPKEEPALIVE_default= "value='30'";
 	$QUALIFY_default= "value='".$A2B->config["peer_friend"]['qualify']."'";
 	$warning_threshold	='-2';
-	$say_rateinitial = $external = $say_balance_after_call	='0';
+	$say_rateinitial = $external = $say_balance_after_call = $say_dialednumber = $say_timetotalk = '0';
 	$type			= $A2B->config["peer_friend"]['type'];
 	$directmedia		= 'update,nonat';
 	$nat			= $A2B->config["peer_friend"]['nat'];
@@ -207,7 +208,6 @@ $HD_Form -> AddEditElement (gettext("ID CARD"),
 						    ", 'CardNumberSelection','width=590,height=550,top=100,left=100,scrollbars=1'",
 						    gettext("Insert the card ID."));
 
-
 $HD_Form -> AddEditElement (gettext("EXTERNAL"),
 						    "external",
 						    $external,
@@ -218,7 +218,7 @@ $HD_Form -> AddEditElement (gettext("EXTERNAL"),
 						    "list", "", "", "", $yesno, "%1", "", gettext("'Yes' for external line or 'No' for extension"));
 
 if ($atmenu=='sip') {
-	$HD_Form -> AddEditElement (gettext("SAY BALANCE AFTER AUTH"),
+	$HD_Form -> AddEditElement (gettext("SAY BALANCE BEFORE CALL"),
 						    "warning_threshold",
 						    $warning_threshold,
 						    "SELECT",
@@ -227,6 +227,14 @@ if ($atmenu=='sip') {
 						    "",
 						    "list", "", "", "", $limits_notify , "%1", "", gettext('currency : ').strtoupper(BASE_CURRENCY)." (".gettext("with the warning threshold").")", "", '<OPTION  value="-1">'.gettext("ALWAYS").'&nbsp;</OPTION>');
 
+	$HD_Form -> AddEditElement (gettext("SAY THE DIALED NUMBER"),
+						    "say_dialednumber",
+						    $say_dialednumber,
+						    "SELECT",
+						    "",
+						    "",
+						    "",
+						    "list", "", "", "", $yesno, "%1");
 
 	$HD_Form -> AddEditElement (gettext("SAY RATE BEFORE CALL"),
 						    "say_rateinitial",
@@ -237,6 +245,14 @@ if ($atmenu=='sip') {
 						    "",
 						    "list", "", "", "", $yesno, "%1");
 
+	$HD_Form -> AddEditElement (gettext("SAY HIGHEST POSSIBLE DURATION"),
+						    "say_timetotalk",
+						    $say_timetotalk,
+						    "SELECT",
+						    "",
+						    "",
+						    "",
+						    "list", "", "", "", $yesno, "%1");
 
 	$HD_Form -> AddEditElement (gettext("SAY BALANCE AFTER CALL"),
 						    "say_balance_after_call",
@@ -1117,7 +1133,7 @@ if ($atmenu=='sip') {
 
 
 if ($atmenu=='sip') {
-	$field_list_edit = 'id_cc_card, external, warning_threshold, say_rateinitial, say_balance_after_call, name, accountcode, regexten, callerid, cid_number, amaflags, type, defaultuser, secret, qualify, ' .
+	$field_list_edit = 'id_cc_card, external, warning_threshold, say_dialednumber, say_rateinitial, say_timetotalk, say_balance_after_call, name, accountcode, regexten, callerid, cid_number, amaflags, type, defaultuser, secret, qualify, ' .
 			'defaultip, deny, permit, dtmfmode, disallow, allow, videosupport, host, port, context, language, subscribecontext, mailbox, fromuser, fromdomain, insecure, auth, callgroup, pickupgroup, ' .
 			'namedcallgroup, namedpickupgroup, mohsuggest, setvar, encryption, ignorecryptolifetime, transport, t38pt_udptl, username, md5secret, directmedia, nat, canreinvite, mask, restrictcid, ' .
 			'rtpkeepalive, rtptimeout, rtpholdtimeout, musiconhold, allowtransfer, subscribemwi, vmexten, callingpres, usereqphone, callcounter, `call-limit`, musicclass, autoframing, maxcallbitrate, ' .

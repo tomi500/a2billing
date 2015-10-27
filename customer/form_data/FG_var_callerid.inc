@@ -33,7 +33,7 @@
 
 
 
-getpost_ifset(array('IDCust', 'id', 'idcust', 'id_cc_card', 'cid', 'blacklist', 'activated', 'atmenub'));
+getpost_ifset(array('IDCust', 'id', 'idcust', 'id_cc_card', 'cid', 'blacklist', 'activated', 'atmenub', 'say_dialednumber', 'say_timetotalk'));
 
 if (strlen($HD_Form -> FG_TABLE_CLAUSE)>0)
 	$HD_Form -> FG_TABLE_CLAUSE.=" AND ";
@@ -83,12 +83,16 @@ $HD_Form -> CV_DISPLAY_FILTER_ABOVE_TABLE = false;
 $HD_Form -> FG_LIMITE_DISPLAY = 10;
 $HD_Form -> FG_VIEW_TABLE_WITDH = '70%';
 
-$HD_Form -> FG_DELETION_CONDITION = '"|col4|" == "<font color=red>'.gettext('No').'</font>"';
+//$HD_Form -> FG_DELETION_CONDITION = '"|col4|" == "<font color=red>'.gettext('No').'</font>"';
 
 $HD_Form -> FG_ADDITION = false;
 $HD_Form -> FG_EDITION = true;
 $HD_Form -> FG_DELETION = true;
 
+if ($form_action=="ask-add") {
+	$warning_threshold      ='-2';
+	$say_rateinitial        = $say_balance_after_call = $verify = $say_dialednumber = $say_timetotalk = $cli_replace = $cli_localreplace = $cli_otherreplace = $blacklist = '0';
+}
 if (isset($form_action) && ($form_action=='ask-edit' || $form_action=='edit')) {
 
 	$QUERY = "SELECT status, currency FROM cc_card  WHERE id = $idcard";
@@ -205,6 +209,15 @@ if ($form_action != 'ask-delete') {
 			   "",
 			   "list", "", "", "", $limits_notify , "%1", "", $showcur." (".gettext("with the warning threshold").")", "", '<OPTION  value="-1" selected>'.gettext("ALWAYS").'&nbsp;</OPTION>');
 
+	$HD_Form -> AddEditElement (gettext("SAY THE DIALED NUMBER"),
+			    "say_dialednumber",
+			    $say_dialednumber,
+			    "SELECT",
+			    "",
+			    "",
+			    "",
+			    "list", "", "", "", $yesno, "%1");
+
 	$HD_Form -> AddEditElement (gettext("SAY RATE BEFORE CALL"),
 			   "say_rateinitial",
 			   '0',
@@ -213,6 +226,15 @@ if ($form_action != 'ask-delete') {
 			   "",
 			   "",
 			   "list", "", "", "", $yesno, "%1");
+
+	$HD_Form -> AddEditElement (gettext("SAY HIGHEST POSSIBLE DURATION"),
+			    "say_timetotalk",
+			    $say_timetotalk,
+			    "SELECT",
+			    "",
+			    "",
+			    "",
+			    "list", "", "", "", $yesno, "%1");
 
 	$HD_Form -> AddEditElement (gettext("SAY BALANCE AFTER CALL"),
 			   "say_balance_after_call",
@@ -265,7 +287,7 @@ if ($form_action != 'ask-delete') {
 			    "",
 			    "" , "", "", "", "" , "" , "NO", gettext("Present this CallerID, when calls are made to countries from listed prefixes. Insert the replaceable prefixes separated by comma, e.g. for UK,IT,RU,UA are '44,39,7,380'."));
 
-	$HD_Form -> FieldEditElement ('cid, activated, blacklist, phonenumber, callback, warning_threshold, say_rateinitial, say_balance_after_call, cli_replace, cli_localreplace, cli_otherreplace, cli_prefixreplace');
+	$HD_Form -> FieldEditElement ('cid, activated, blacklist, phonenumber, callback, warning_threshold, say_dialednumber, say_rateinitial, say_timetotalk, say_balance_after_call, cli_replace, cli_localreplace, cli_otherreplace, cli_prefixreplace');
 
 } else {
 	$HD_Form -> FieldEditElement ('cid');

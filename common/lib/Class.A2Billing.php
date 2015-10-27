@@ -283,7 +283,8 @@ class A2Billing {
 		
 		// VERBOSE
 		if ($this->agiconfig['verbosity_level'] >= $level && $agi) {
-			$agi -> verbose('file:'.$file.' - line:'.$line.' - uniqueid:'.$this->uniqueid.' - '.$buffer_debug);
+			if ($line == '') $agi -> verbose($buffer_debug);
+			else $agi -> verbose('file:'.$file.' - line:'.$line.' - uniqueid:'.$this->uniqueid.' - '.$buffer_debug);
 		}
 		
 		// LOG INTO FILE
@@ -763,11 +764,15 @@ class A2Billing {
 	/*
 	 * function to let audable not answer status
 	 */
-	function let_stream_listening($agi, $play_anyway=false)
+	function let_stream_listening($agi, $play_anyway=false, $ringing=false)
 	{
 		if (array_search($agi -> channel_status('',true), array(AST_STATE_UP, AST_STATE_DOWN)) === false
 		&& $this -> streamfirst && !$this -> agiconfig['answer_call'] && ($this -> agiconfig['play_audio'] || $play_anyway)) {
-			$agi -> exec('Progress');
+			if ($ringing) {
+				$agi -> exec('Ringing');
+			} else {
+				$agi -> exec('Progress');
+			}
 			$this -> streamfirst = false;
 			usleep(200000);
 		}
@@ -912,7 +917,7 @@ class A2Billing {
 	function callingcard_ivr_authorize($agi, &$RateEngine, $try_num = 0, $call2did = false, $callertodidcredit = NULL)
 	{
 		$res=0;
-		
+		$this -> caller_concat_id = 0;
 		/************** 	ASK DESTINATION 	******************/
 
 		$this -> debug( DEBUG, $agi, __FILE__, __LINE__,  "use_dnid:".$this->agiconfig['use_dnid']." && (!in_array:".in_array ($this->dnid, $this->agiconfig['no_auth_dnid']).") && len_dnid:(".strlen($this->dnid)." || len_exten:".strlen($this->extension). " ) && (try_num:$try_num)");
@@ -963,7 +968,7 @@ class A2Billing {
             $this->destination = $this->oldphonenumber = $this->redial;
             $this -> debug( DEBUG, $agi, __FILE__, __LINE__, "[REDIAL : DTMF DESTINATION ::> ".$this->destination."]");
         }
-	if ($try_num==0) {
+	if ($try_num==0 && $call2did !== -2) {
 	    if (!$this->CallerIDext) {
 		$this->transferername = $this->transfererchannel = $agi->get_variable("TRANSFERERNAME", true);
 		if ($this->transferername == "") {
@@ -1034,7 +1039,9 @@ class A2Billing {
 		else	$dest_wo_int_prefix = $this->destination;
 		if (strcmp($this->destination, $this->oldphonenumber) == 0) {
 			$this->destination = $this->apply_add_countryprefixto ($this->destination);
-			if ($this->removeinterprefix && $this->agiconfig['prefix_required'] && $call2did===false && strcmp($this->oldphonenumber, $this->destination) == 0 && !(preg_match("/^1[2-9]/", $this->oldphonenumber) && preg_match("/^[1a-zA-Z]/", $this->CallerID)) && strlen($this->oldphonenumber) > 5) {
+//$this -> debug( ERROR, $agi, __FILE__, __LINE__, "==================================================== prefix_required = " . var_export($this->agiconfig['prefix_required'],true));
+//$this -> debug( ERROR, $agi, __FILE__, __LINE__, "==================================================== call2did        = " . var_export($call2did,true));
+			if (($this->removeinterprefix || $this->agiconfig['prefix_required']) && $call2did===false && strcmp($this->oldphonenumber, $this->destination) == 0 && !(preg_match("/^1[2-9]/", $this->oldphonenumber) && preg_match("/^[1a-zA-Z]/", $this->CallerID)) && strlen($this->oldphonenumber) > 5) {
 				$this -> let_stream_listening($agi);
 				$agi-> stream_file('the-number-u-dialed', '#');
 				$agi-> say_digits($this->oldphonenumber, '#');
@@ -1599,7 +1606,12 @@ class A2Billing {
 						$dialparams = str_replace("%timeout%", min($time2call * 1000, $max_long), $this->agiconfig['dialcommand_param_call_2did']);
 						$dialstr .= str_replace("%timeoutsec%", min($time2call, $max_long), $dialparams);
 					} else {
-						$this -> let_stream_listening($agi);
+						$que = explode(",",$dialstr);
+						if (stripos($que[1],"r") === false && strpos($inst_listdestination[10],"38080021") !== 0) {
+							$this -> let_stream_listening($agi);
+						} else {
+							$this -> let_stream_listening($agi,false,true);
+						}
 					}
 					$this -> debug( DEBUG, $agi, __FILE__, __LINE__, "[A2Billing] DID call friend: Dialing '$dialstr' Friend.\n");
 
@@ -1941,7 +1953,12 @@ class A2Billing {
 		    $dialparams = str_replace("%timeout%", min($time2call * 1000, $max_long), $dialparams);
 		    $dialstr .= str_replace("%timeoutsec%", min($time2call, $max_long), $dialparams);
 		} else {
-		    $this -> let_stream_listening($agi);
+		    $que = explode(",",$dialstr);
+		    if (stripos($que[1],"r") === false) {
+			$this -> let_stream_listening($agi);
+		    } else {
+			$this -> let_stream_listening($agi,false,true);
+		    }
 		}
 		if ($call_did_free) $this -> debug( DEBUG, $agi, __FILE__, __LINE__, "[A2Billing] DID call friend: Dialing '$dialstr' Friend.\n");
 
@@ -2140,11 +2157,11 @@ class A2Billing {
 
                 $this->agiconfig['use_dnid'] = 1;
                 $this->agiconfig['say_timetocall'] = 0;
-
+                $this->myprefix = '';
                 $this->dnid = $this->destination;
                 $this->extension = $this->destination = $inst_listdestination[4];
                 if ($this->CC_TESTING) $this->extension = $this->dnid = $this->destination = "011324885";
-                $ast = $this -> callingcard_ivr_authorize($agi, $RateEngine, 0, -1);
+                $ast = $this -> callingcard_ivr_authorize($agi, $RateEngine, 0, -2);
                 if ($ast==1 ||  $ast=='2FAX') {
                   if ($ast==1) {
 /**

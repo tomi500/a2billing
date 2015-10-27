@@ -204,8 +204,8 @@ if ($this->FG_FILTER_SEARCH_FORM) {
 		$nu = $nu + 1;
 		?>
 			<tr>
-				<td class="<?php echo $classleft?>" align="left">
-					<font class="fontstyle_003">&nbsp;&nbsp;<?php echo $one_compare[0]?></font>
+				<td class="<?php echo $classleft?>" align="left" nowrap>
+					<font class="fontstyle_003">&nbsp;&nbsp;<?php echo $one_compare[0]?>&nbsp;&nbsp;</font>
 				</td>
 				<td class="<?php echo $classright?>" align="left" >
 				<table width="100%" border="0" cellspacing="0" cellpadding="0">

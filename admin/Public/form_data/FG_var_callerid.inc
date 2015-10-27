@@ -32,7 +32,7 @@
 **/
 
 
-getpost_ifset(array('IDCust', 'id', 'cid', 'activated', 'blacklist', 'verify'));
+getpost_ifset(array('IDCust', 'id', 'cid', 'activated', 'verify', 'callback', 'warning_threshold', 'say_dialednumber', 'say_rateinitial', 'say_timetotalk', 'say_balance_after_call', 'verify', 'cli_replace', 'cli_localreplace', 'cli_otherreplace'));
 
 $HD_Form = new FormHandler("cc_callerid", gettext("CallerID"));
 
@@ -73,6 +73,10 @@ $HD_Form -> FG_ADDITION = true;
 $HD_Form -> FG_EDITION = true;
 $HD_Form -> FG_DELETION = true;
 
+if ($form_action=="ask-add") {
+	$warning_threshold	='-2';
+	$say_rateinitial	= $say_balance_after_call = $verify = $say_dialednumber = $say_timetotalk = $cli_replace = $cli_localreplace = $cli_otherreplace = $blacklist = '0';
+}
 // Possible value to notify the user
 $instance_config_table = new Table("cc_config", "id, config_value");
 $QUERY = " config_key = 'values_notifications' ";
@@ -106,10 +110,10 @@ $HD_Form -> AddEditElement (gettext("CALLERID"),
 			"",
 			gettext("Insert the CallerID"),
 			"", "", "", "", "", "", "", "");
-
+;
 $HD_Form -> AddEditElement (gettext("BLACKLIST"),
 			"blacklist",
-			'0',
+			$blacklist,
 			"RADIOBUTTON",
 			"",
 			"",
@@ -119,7 +123,7 @@ $HD_Form -> AddEditElement (gettext("BLACKLIST"),
 
 $HD_Form -> AddEditElement (gettext("VERIFY"),
 			"verify",
-			'0',
+			$verify,
 			"SELECT",
 			"",
 			"",
@@ -140,7 +144,7 @@ $HD_Form -> AddEditElement (gettext("ID CARD"),
 
 $HD_Form -> AddEditElement (gettext("CALLBACK"),
 			"callback",
-			'0',
+			$callback,
 			"SELECT",
 			"",
 			"",
@@ -159,25 +163,43 @@ $HD_Form -> AddEditElement (gettext("PHONE NUMBER"),
 
 $HD_Form -> AddEditElement (gettext("SAY BALANCE AFTER AUTH"),
 			"warning_threshold",
-			'',
+			$warning_threshold,
 			"SELECT",
 			"",
 			"",
 			"",
 			"list", "", "", "", $limits_notify , "%1", "", gettext('currency : ').strtoupper(BASE_CURRENCY)." (".gettext("with the warning threshold").")", "", '<OPTION  value="-1" selected>'.gettext("ALWAYS").'&nbsp;</OPTION>');
 
+$HD_Form -> AddEditElement (gettext("SAY THE DIALED NUMBER"),
+                        "say_dialednumber",
+                        $say_dialednumber,
+                        "SELECT",
+                        "",
+                        "",
+                        "",
+                        "list", "", "", "", $yesno, "%1");
+
 $HD_Form -> AddEditElement (gettext("SAY RATE BEFORE CALL"),
 			"say_rateinitial",
-			'0',
+			$say_rateinitial,
 			"SELECT",
 			"",
 			"",
 			"",
 			"list", "", "", "", $yesno, "%1");
 
+$HD_Form -> AddEditElement (gettext("SAY HIGHEST POSSIBLE DURATION"),
+                        "say_timetotalk",
+			$say_timetotalk,
+                        "SELECT",
+                        "",
+                        "",
+                        "",
+                        "list", "", "", "", $yesno, "%1");
+
 $HD_Form -> AddEditElement (gettext("SAY BALANCE AFTER CALL"),
 			"say_balance_after_call",
-			'0',
+			$say_balance_after_call,
 			"SELECT",
 			"",
 			"",
@@ -186,7 +208,7 @@ $HD_Form -> AddEditElement (gettext("SAY BALANCE AFTER CALL"),
 
 $HD_Form -> AddEditElement (gettext("CONSPIRATION"),
 			"cli_replace",
-			'0',
+			$cli_replace,
 			"SELECT",
 			"",
 			"",
@@ -198,7 +220,7 @@ $HD_Form -> AddEditElement (gettext("CONSPIRATION"),
 
 $HD_Form -> AddEditElement (gettext("LOCAL REPLACE"),
 			"cli_localreplace",
-			'0',
+			$cli_localreplace,
 			"SELECT",
 			"",
 			"",
@@ -209,7 +231,7 @@ $HD_Form -> AddEditElement (gettext("LOCAL REPLACE"),
 
 $HD_Form -> AddEditElement (gettext("OTHER REPLACE"),
 			"cli_otherreplace",
-			'0',
+			$cli_otherreplace,
 			"SELECT",
 			"",
 			"",
@@ -226,7 +248,7 @@ $HD_Form -> AddEditElement (gettext("REPLACE BY PREFIX"),
 			"",
 			"", "", "", "", "", "", "NO", gettext("Present this CallerID, when calls are made to countries from listed prefixes. Insert the replaceable prefixes separated by comma, e.g. for UK,IT,RU,UA are '44,39,7,380'."));
 
-$HD_Form -> FieldEditElement ('activated, cid, blacklist, verify, id_cc_card, callback, phonenumber, warning_threshold, say_rateinitial, say_balance_after_call, cli_replace, cli_localreplace, cli_otherreplace, cli_prefixreplace');
+$HD_Form -> FieldEditElement ('activated, cid, blacklist, verify, id_cc_card, callback, phonenumber, warning_threshold, say_dialednumber, say_rateinitial, say_timetotalk, say_balance_after_call, cli_replace, cli_localreplace, cli_otherreplace, cli_prefixreplace');
 
 // Set the filter variables
 $HD_Form -> FG_FILTER_APPLY = true;

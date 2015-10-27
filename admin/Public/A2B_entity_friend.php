@@ -113,7 +113,7 @@ if ($batchupdate == 1 && is_array($check)) {
 getpost_ifset(array("id_cc_card", "cardnumber", "useralias"));
 
 
-if ( (isset ($id_cc_card) && (is_numeric($id_cc_card)  != "")) && ( $form_action == "add_sip" || $form_action == "add_iax") ) {
+if ((isset($id_cc_card) && is_numeric($id_cc_card)) && ($form_action == "add_sip" || $form_action == "add_iax")) {
 	
 	$HD_Form -> FG_GO_LINK_AFTER_ACTION = "A2B_entity_card.php?atmenu=card&stitle=Customers_Card&id=";
 
