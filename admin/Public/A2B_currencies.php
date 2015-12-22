@@ -85,6 +85,7 @@ echo $CC_help_currency;
 <table align="center" border="0" width="65%"  cellspacing="1" cellpadding="2">
 	<form name="updateForm" action="<?php echo $_SERVER['PHP_SELF']?>" method="post">
 	<INPUT type="hidden" name="updatecurrency" value="1">
+	<INPUT type="hidden" name="filterprefix" value="<?php echo $filterprefix?>">
 	<tr>
 	  <td align="center"  class="bgcolor_001">
 		&nbsp;<?php echo gettext("THE CURRENCY LIST IS BASED FROM YAHOO FINANCE"); ?>&nbsp;: 

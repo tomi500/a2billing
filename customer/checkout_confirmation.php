@@ -64,23 +64,10 @@ getpost_ifset(array('item_id','item_type'));
 $two_currency = false;
 $currencies_list = get_currencies();
 
-if (!is_numeric($amount) || $amount < 1 || $amount > 1500) {
-	Header ("Location: checkout_payment.php");
-	die();
-}
-
-$vat_amount= $amount*$vat/100;
-$amount_paypal = ($amount+$vat_amount+0.35)/0.961;
-//$amount_webmoney = ($amount+$vat_amount)/0.95;
-$mc_fee = (strcasecmp("paypal",$payment)==0)?round(($amount_paypal)*0.039,2)+0.35:0;
-//$mc_fee = (strcasecmp("webmoney",$payment)==0)?round(($amount_webmoney)*0.05,2):0;
-//$mc_fee = 0;
-$total_amount = $amount+$vat_amount+$mc_fee;
 //Test value:
 if (!isset($item_id) || is_null($item_id) || $item_id == "") {
 	$item_id = 0;
 }
-
 if (!isset($item_type) || is_null($item_type)) {
 	$item_type = '';
 }
@@ -92,14 +79,7 @@ $HD_Form -> init();
 $_SESSION["p_module"] = $payment;
 $_SESSION["p_amount"] = 3;
 
-
-$paymentTable = new Table();
-//$time_stamp = date("Y-m-d H:i:s");
-$time_stamp = time();
-$amount_string = sprintf("%.3F", $total_amount);
-
 $payment_modules = new payment($payment);
-$order = new order($amount_string);
 if (!isset($wm_purse_type)) {
 	$paycur = 1;
 	$getcur = mb_strtoupper(BASE_CURRENCY);
@@ -108,7 +88,29 @@ if (!isset($wm_purse_type)) {
 	$getcur = $payment_modules->get_CurrentCurrency();
     }
 }
+
+if (!is_numeric($amount) || ((strcasecmp("paypal",$payment)==0 && ($amount < 10 || $amount > 1000)) || $amount < 1 || ($getcur == "UAH" && $payment == "webmoneycreditcard" && $amount > 9950))) {
+	Header ("Location: checkout_payment.php");
+	die();
+}
+
+$paypalfixfee = 0.35; // For EUR
+if ($getcur == "USD")	$paypalfixfee = 0.3;
 $paycur = $currencies_list[$getcur][2];
+$vat_amount= $amount*$vat/100;
+$amount_paypal = ($amount+$vat_amount+$paypalfixfee)/0.961;
+//$amount_webmoney = ($amount+$vat_amount)/0.95;
+$mc_fee = (strcasecmp("paypal",$payment)==0)?round(($amount_paypal)*0.039,2)+$paypalfixfee:0;
+//$mc_fee = (strcasecmp("webmoney",$payment)==0)?round(($amount_webmoney)*0.05,2):0;
+//$mc_fee = 0;
+$total_amount = $amount+$vat_amount+$mc_fee;
+
+$paymentTable = new Table();
+//$time_stamp = date("Y-m-d H:i:s");
+$time_stamp = time();
+$amount_string = sprintf("%.3F", $total_amount);
+
+$order = new order($amount_string);
 
 if (mb_strtoupper($payment)=='PLUGNPAY') {
 	$QUERY_FIELDS = "cardid, amount, vat, paymentmethod, cc_owner, cc_number, cc_expires, creationdate, cvv, credit_card_type, currency , item_id , item_type";

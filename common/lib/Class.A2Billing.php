@@ -1049,7 +1049,7 @@ class A2Billing {
 				return -1;
 			}
 		}
-//$this -> debug( ERROR, $agi, __FILE__, __LINE__, $this->oldphonenumber." => ".$dest_wo_int_prefix." => ".$this->destination);
+//$this -> debug( ERROR, $agi, __FILE__, __LINE__, "================================ ".$this->oldphonenumber." => ".$dest_wo_int_prefix." => ".$this->destination);
 	}
 	if ($this->destination) {
 	    if (isset($this->transferername[0])) {
@@ -1759,7 +1759,7 @@ class A2Billing {
 
 					$this->agiconfig['use_dnid']=1;
 					$this->agiconfig['say_timetocall']=0;
-
+					$this->CID_handover = $this->CallerID;
 					$this->extension = $this->destination = $inst_listdestination[4];
 					if ($this->CC_TESTING) $this->extension = $this->dnid = $this->destination="011324885";
 					
@@ -3716,11 +3716,13 @@ $this -> debug( ERROR, $agi, __FILE__, __LINE__, "FAXRESOLUTION: ".$faxresolutio
 					if (strlen($this->dnid) >= 1 && $accountback == 0) {
 						$did = $this->dnid;
 						if ($this->removeinterprefix)
-							$did = $this -> apply_rules($did);
+							$this->extension = $did = $this -> apply_rules($did);
 //$this -> debug( ERROR, $agi, __FILE__, __LINE__, "removeinterprefix=".$this->removeinterprefix."   / did=".$did);
 						if ($this->myprefix == "")
-							$did = $this -> apply_add_countryprefixto($did);
+							$this->extension = $did = $this -> apply_add_countryprefixto($did);
+//$this -> debug( ERROR, $agi, __FILE__, __LINE__, "removeinterprefix=".$this->removeinterprefix."   / did=".$did);
 						$QUERY = "SELECT username FROM cc_did, cc_card WHERE did LIKE '$did' AND cc_did.activated=1 AND cc_card.id=iduser LIMIT 1";
+//						$QUERY = "SELECT username FROM cc_did, cc_card WHERE did LIKE '$did' AND cc_did.activated=1 LIMIT 1";
 						$result = $this->instance_table -> SQLExec ($this->DBHandle, $QUERY);
 						if (is_array($result)) {
 							$this->accountcode = $result[0][0];

@@ -32,7 +32,7 @@
 **/
 
 
-getpost_ifset(array('IDCust', 'id', 'cid', 'activated', 'verify', 'callback', 'warning_threshold', 'say_dialednumber', 'say_rateinitial', 'say_timetotalk', 'say_balance_after_call', 'verify', 'cli_replace', 'cli_localreplace', 'cli_otherreplace'));
+getpost_ifset(array('IDCust', 'id', 'cid', 'activated', 'verify', 'callback', 'warning_threshold', 'say_dialednumber', 'say_rateinitial', 'say_timetotalk', 'say_balance_after_call', 'cli_replace', 'cli_localreplace', 'cli_otherreplace'));
 
 $HD_Form = new FormHandler("cc_callerid", gettext("CallerID"));
 
@@ -110,7 +110,7 @@ $HD_Form -> AddEditElement (gettext("CALLERID"),
 			"",
 			gettext("Insert the CallerID"),
 			"", "", "", "", "", "", "", "");
-;
+
 $HD_Form -> AddEditElement (gettext("BLACKLIST"),
 			"blacklist",
 			$blacklist,

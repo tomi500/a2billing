@@ -707,7 +707,9 @@ if ($mode == 'standard') {
 
 			$A2B -> debug( INFO, $agi, __FILE__, __LINE__,  "TARIFF ID -> ". $A2B->tariff);
 			$A2B -> dnid = rtrim($agi -> request['agi_dnid'], "#");
-			$A2B -> extension = rtrim($agi -> request['agi_extension'], "#");
+//$A2B -> debug( ERROR, $agi, __FILE__, __LINE__, $A2B-> extension);
+			if (is_null($A2B -> extension)) 	$A2B -> extension = rtrim($agi -> request['agi_extension'], "#");
+//$A2B -> debug( ERROR, $agi, __FILE__, __LINE__, $A2B-> extension);
 
 			if ($A2B -> agiconfig['ivr_voucher']==1 && $i == 0 && $A2B -> vouchernumber == 0) {
 				if ($A2B -> first_dtmf != '') {
@@ -1063,9 +1065,11 @@ if ($mode == 'standard') {
 		}
 		$QUERY .= ") ORDER BY priority ASC";
 
-		$A2B -> debug( DEBUG, $agi, __FILE__, __LINE__, $QUERY);
+//		$A2B -> debug( DEBUG, $agi, __FILE__, __LINE__, $QUERY);
+//$A2B -> debug( ERROR, $agi, __FILE__, __LINE__, $QUERY);
 		$result = $A2B -> instance_table -> SQLExec ($A2B->DBHandle, $QUERY);
-		$A2B -> debug( DEBUG, $agi, __FILE__, __LINE__, $result);
+//		$A2B -> debug( DEBUG, $agi, __FILE__, __LINE__, var_export($result,true));
+//$A2B -> debug( ERROR, $agi, __FILE__, __LINE__, var_export($result,true));
         
 		if (is_array($result)) {
 		    //Off Net

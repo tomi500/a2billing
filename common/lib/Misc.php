@@ -1417,17 +1417,17 @@ function currencies_update_yahoo ($DBHandle, $instance_table)
 		}
 
 		// Call wget to download the URL to the .CVS file
-		$command = "wget '" . $url . "' -O /tmp/currencies.cvs  2>&1";
+		$command = "/usr/bin/wget '" . $url . "' -O /tmp/currencies.cvs 2>&1";
 		exec($command, $output);
 		if ($FG_DEBUG >= 1)
-			$return .= "wget '" . $url . "' -O /tmp/currencies.cvs\n" . $output;
+			$return .= "/usr/bin/wget '" . $url . "' -O /tmp/currencies.cvs\n" . $output;
 
 		// get the file with the currencies to update the database
 		$currencies = file("/tmp/currencies.cvs");
 
 		// trim off any leading/trailing comments/headers that may have been added
 		$i = 0;
-		while (!is_numeric(trim($currencies[$i])) && trim($currencies[$i]) != "N/A") {
+		while (isset($currencies[$i]) && !is_numeric(trim($currencies[$i])) && trim($currencies[$i]) != "N/A") {
 			$i++;
 		}
 /**		$num_res = count($currencies);
@@ -1470,7 +1470,29 @@ function currencies_update_yahoo ($DBHandle, $instance_table)
 			if ($currency != 0) {
 				$currency = $base_value / $currency;
 			}
-
+			if ($old_currencies[$i][1] == 'UAH') {
+				if ($currency > $old_currencies[$i][3])
+					$currency = $old_currencies[$i][3];
+				$url = "http://kurs.com.ua/ajax/valyuta_table/all/".date("d.m.Y")."/".strtolower(BASE_CURRENCY);
+				$command = "/usr/bin/wget '" . $url . "' -O /tmp/currency-uah.json 2>&1";
+				exec($command, $output);
+				$currency_uah = json_decode(file_get_contents("/tmp/currency-uah.json"),true,512);
+				$currency_uah = strstr($currency_uah['table'],BASE_CURRENCY);
+				$dlm = "<span>";
+				if ($currency_uah === false) {
+					$url = "http://m.kurs.com.ua/ajax/main_table/all/".strtolower(BASE_CURRENCY)."/".date("Y-m-d")."/bank";
+					$command = "/usr/bin/wget '" . $url . "' -O /tmp/currency-uah.cvs 2>&1";
+					exec($command, $output);
+					$currency_uah = strstr(file_get_contents("/tmp/currency-uah.cvs"),BASE_CURRENCY);
+					$dlm = "t";
+				}
+				if ($currency_uah !== false) {
+					preg_match_all("/(?<=".$dlm.")\d*\.\d*/", $currency_uah, $uah);
+					if (isset($uah[0][2]) && $uah[0][2] > 1/$currencies[$i])	$currency = 1/$uah[0][2];
+				}
+			}
+//if ($old_currencies[$i][1] == 'RUB')		$currency = $currency*0.83;
+//if ($old_currencies[$i][1] == 'USD')		$currency = $currency*0.96;
 			//  extremely weak currencies are assigned the smallest value the schema permits
 			if (round($currency, 5) < 0.00001) {
 				$currency = '0.00001';

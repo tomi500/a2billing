@@ -317,8 +317,8 @@ else
 write_log(LOGFILE_EPAYMENT, basename(__FILE__).' line:'.__LINE__." - curr amount $currAmount $currCurrency BASE_CURRENCY=".BASE_CURRENCY);
 $fee = convert_currency($currencies_list, $mc_fee, $currCurrency, BASE_CURRENCY);
 $amount_without_vat = convert_currency($currencies_list, ($currAmount-$mc_fee) / (1+$VAT/100), $currCurrency, BASE_CURRENCY);
-$amount_paid = convert_currency($currencies_list, $currAmount, $currCurrency, BASE_CURRENCY);
-$vat_amount = round($amount_paid - $amount_without_vat - $fee, 2);
+$amount_paid = convert_currency($currencies_list, ($currAmount-$mc_fee), $currCurrency, BASE_CURRENCY);
+$vat_amount = round($amount_paid - $amount_without_vat, 2);
 
 //If security verification fails then send an email to administrator as it may be a possible attack on epayment security.
 if ($security_verify == false) {
@@ -623,16 +623,16 @@ if (preg_match("/^[_A-Za-z0-9-]+(\\.[_A-Za-z0-9-]+)*@[A-Za-z0-9]+(\\.[A-Za-z0-9]
     try {
         $mail = new Mail(Mail::$TYPE_PAYMENT,$id);
         write_log(LOGFILE_EPAYMENT, basename(__FILE__).' line:'.__LINE__." - SENDING EMAIL TO CUSTOMER ".$customer_info["email"]);
-        $mail->replaceInEmail(Mail::$ITEM_AMOUNT_KEY,$amount_without_vat." ".BASE_CURRENCY);
         $mail->replaceInEmail(Mail::$ITEM_ID_KEY,$id_logrefill);
         $mail->replaceInEmail(Mail::$ITEM_NAME_KEY,$item_name);
         $mail->replaceInEmail(Mail::$PAYMENT_METHOD_KEY,mb_strtoupper($pmodule));
         $mail->replaceInEmail(Mail::$PAYMENT_STATUS_KEY,gettext($statusmessage));
-        $mail->replaceInEmail(Mail::$PAYMENT_FEE_KEY,$fee." ".BASE_CURRENCY);
+        $mail->replaceInEmail(Mail::$PAYMENT_CURCURRENCY_KEY,$currAmount." ".$currCurrency);
+        $mail->replaceInEmail(Mail::$PAYMENT_FEE_KEY,$mc_fee." ".$currCurrency);
+        $mail->replaceInEmail(Mail::$ITEM_AMOUNT_KEY,$amount_without_vat." ".BASE_CURRENCY);
         $mail->replaceInEmail(Mail::$PAYMENT_VAT_KEY,$VAT);
         $mail->replaceInEmail(Mail::$PAYMENT_VATAMOUNT_KEY,$vat_amount." ".BASE_CURRENCY);
         $mail->replaceInEmail(Mail::$PAYMENT_AMOUNT_KEY,$amount_paid." ".BASE_CURRENCY);
-        $mail->replaceInEmail(Mail::$PAYMENT_CURCURRENCY_KEY,$currAmount." ".$currCurrency);
         $mail->send($customer_info["email"]);
 
         write_log(LOGFILE_EPAYMENT, basename(__FILE__).' line:'.__LINE__." - transactionID=$transactionID"."- MAILTO:".$customer_info["email"]."-Sub=".$mail->getTitle()." , mtext=".$mail->getMessage());
