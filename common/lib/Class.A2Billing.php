@@ -967,7 +967,19 @@ class A2Billing {
         if ($this->destination == '0*' || $this->destination == '*0') {
             $this->destination = $this->oldphonenumber = $this->redial;
             $this -> debug( DEBUG, $agi, __FILE__, __LINE__, "[REDIAL : DTMF DESTINATION ::> ".$this->destination."]");
-        }
+        } else {
+		//REDIAL FIND THE LAST DIALED NUMBER (STORED IN THE DATABASE)
+		if ( strlen($this->destination) <= 2 && is_numeric($this->destination) && $this->destination >= 0) {
+			$QUERY = "SELECT phone FROM cc_speeddial WHERE id_cc_card='".$this->id_card."' AND speeddial='".$this->destination."'";
+			$result = $this -> instance_table -> SQLExec ($this->DBHandle, $QUERY);
+			if (is_array($result))
+				$this->destination = $result[0][0];
+			$this -> debug( INFO, $agi, __FILE__, __LINE__, "SPEEDIAL REPLACE DESTINATION ::> ".$this->destination);
+		}
+	}
+	// FOR TESTING : ENABLE THE DESTINATION NUMBER
+	if ($this->CC_TESTING) $this->destination="1800300200";
+
 	if ($try_num==0 && $call2did !== -2) {
 	    if (!$this->CallerIDext) {
 		$this->transferername = $this->transfererchannel = $agi->get_variable("TRANSFERERNAME", true);
@@ -1041,11 +1053,15 @@ class A2Billing {
 			$this->destination = $this->apply_add_countryprefixto ($this->destination);
 //$this -> debug( ERROR, $agi, __FILE__, __LINE__, "==================================================== prefix_required = " . var_export($this->agiconfig['prefix_required'],true));
 //$this -> debug( ERROR, $agi, __FILE__, __LINE__, "==================================================== call2did        = " . var_export($call2did,true));
-			if (($this->removeinterprefix || $this->agiconfig['prefix_required']) && $call2did===false && strcmp($this->oldphonenumber, $this->destination) == 0 && !(preg_match("/^1[2-9]/", $this->oldphonenumber) && preg_match("/^[1a-zA-Z]/", $this->CallerID)) && strlen($this->oldphonenumber) > 5) {
+//$this -> debug( ERROR, $agi, __FILE__, __LINE__, "=============== " . var_export($call2did,true));
+			if (($this->removeinterprefix || $this->agiconfig['prefix_required']) && $call2did===false && (strcmp($this->oldphonenumber, $this->destination) == 0 && !preg_match("/^[a-zA-Z]/", $this->oldphonenumber)) && !(preg_match("/^1[2-9]/", $this->oldphonenumber) && preg_match("/^[1a-zA-Z]/", $this->CallerID)) && strlen($this->oldphonenumber) > 5) {
+//				$agi -> answer();
 				$this -> let_stream_listening($agi);
-				$agi-> stream_file('the-number-u-dialed', '#');
-				$agi-> say_digits($this->oldphonenumber, '#');
-				$agi-> stream_file('pbx-invalid', '#');
+				if (!preg_match("/[a-zA-Z]/", $this->oldphonenumber)) {
+					$agi-> stream_file('the-number-u-dialed', '#');
+					$agi-> say_digits($this->oldphonenumber, '#');
+					$agi-> stream_file('pbx-invalid', '#');
+				}
 				return -1;
 			}
 		}
@@ -1144,17 +1160,6 @@ class A2Billing {
 		}
 	}
 
-	//REDIAL FIND THE LAST DIALED NUMBER (STORED IN THE DATABASE)
-	if ( strlen($this->destination) <= 2 && is_numeric($this->destination) && $this->destination >= 0) {
-		$QUERY = "SELECT phone FROM cc_speeddial WHERE id_cc_card='".$this->id_card."' AND speeddial='".$this->destination."'";
-		$result = $this -> instance_table -> SQLExec ($this->DBHandle, $QUERY);
-		if (is_array($result))	$this->destination = $result[0][0];
-		$this -> debug( INFO, $agi, __FILE__, __LINE__, "SPEEDIAL REPLACE DESTINATION ::> ".$this->destination);
-	}
-
-	// FOR TESTING : ENABLE THE DESTINATION NUMBER
-	if ($this->CC_TESTING) $this->destination="1800300200";
-		
         //Test if the destination is a did or fax
         //if call to did is authorized chez if the destination is a did of system
 	$iscall2did = $iscall2fax = false;
@@ -1289,23 +1294,24 @@ class A2Billing {
 				        }
 				}
 				return -1;
-	        }
-	        if ($this->destination<=0 && $this->destination!='RECORDER') {
+		}
+		if (!preg_match("/^[a-zA-Z]/", $this->destination) && $this->destination<=0) {
 			$prompt = "prepaid-invalid-digits";
                 // do not play the error message if the destination number is not numeric
                 // because most probably it wasn't entered by user (he has a phone keypad remember?)
                 // it helps with using "use_dnid" and extensions.conf routing
 			if (is_numeric($this->destination)) $agi-> stream_file($prompt, '#');
 			return -1;
-	        }
-	        // STRIP * FROM DESTINATION NUMBER
-	        $this->destination = str_replace('*', '', $this->destination);
+		}
+		// STRIP * FROM DESTINATION NUMBER
+		if (!preg_match("/^[a-z]/", $this->destination))
+			$this->destination = str_replace('*', '', $this->destination);
 
-	        $this->save_redial_number($agi, $this->destination);
+		$this->save_redial_number($agi, $this->destination);
 
-	        // LOOKUP RATE : FIND A RATE FOR THIS DESTINATION
-	        $resfindrate = $RateEngine->rate_engine_findrates($this, $this->destination,$this->tariff);
-	        if ($resfindrate==0) {
+		// LOOKUP RATE : FIND A RATE FOR THIS DESTINATION
+		$resfindrate = $RateEngine->rate_engine_findrates($this, $this->destination,$this->tariff);
+		if ($resfindrate==0) {
 				$this -> debug( ERROR, $agi, __FILE__, __LINE__, $this->destination." ::> RateEngine didnt succeed to match the dialed number over the ratecard (Please check : id the ratecard is well create ; if the removeInter_Prefix is set according to your prefix in the ratecard ; if you hooked the ratecard to the Call Plan)");
 				$this -> let_stream_listening($agi);
 				$agi-> stream_file('the-number-u-dialed', '#');

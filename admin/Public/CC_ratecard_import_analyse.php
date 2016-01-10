@@ -46,7 +46,7 @@ if (!has_rights(ACX_RATECARD)) {
 
 check_demo_mode();
 
-getpost_ifset(array ('tariffplan', 'trunk', 'search_sources', 'task', 'status', 'currencytype', 'uploadedfile_type', 'uploadedfile_name'));
+getpost_ifset(array ('tariffplan', 'trunk', 'search_sources', 'task', 'status', 'currencytype', 'uploadedfile_type', 'uploadedfile_name', 'importprefix'));
 
 $tariffplanval = preg_split('/-:-/', $tariffplan);
 if (!is_numeric($tariffplanval[0])) {
@@ -119,7 +119,7 @@ if ($task == 'upload') {
 		echo gettext('Error: Failed to open the file.');
 		exit ();
 	}
-
+	$prefix = (is_numeric($importprefix) && $importprefix>0) ? " AND dialprefix LIKE '$importprefix%'" : "";
 	$begin_date = date("Y");
 	$begin_date_plus = date("Y") + 15;
 	$end_date = date("-m-d H:i:s");
@@ -144,7 +144,7 @@ if ($task == 'upload') {
 			}
 			break;
 		}
-		if (substr($ligne, 0, 1) != '#' && $val[2] != '' && strlen($val[2]) > 0)
+		if (substr($ligne, 0, 1) != '#' && $val[2] != '' && strlen($val[2]) > 0 && ($prefix == "" || strpos($val[1],$importprefix) == 0))
 		{
 			$FG_ADITION_SECOND_ADD_TABLE = 'cc_ratecard';
 			$FG_ADITION_SECOND_ADD_FIELDS = 'idtariffplan, id_trunk, dialprefix, destination, rateinitial'; //$fieldtoimport_sql
@@ -155,7 +155,7 @@ if ($task == 'upload') {
 
 			$FG_ADITION_SECOND_ADD_VALUE = "'" . $tariffplanval[0] . "', '" . $trunkval[0] . "', '" . $val[1] . "', '" . intval($val[1]) . "', '" . $val[2] . "'";
 			$TT_UPDATE_QUERY = "UPDATE " . $FG_ADITION_SECOND_ADD_TABLE . " SET idtariffplan='" . $tariffplanval[0] . "', id_trunk='" . $trunkval[0] . "', dialprefix='" . $val[1] . "', destination='" . intval($val[1]) . "', rateinitial='" . $val[2] . "'";
-			
+
 			for ($k = 0; $k < count($fieldtoimport); $k++) {
 				if (!empty ($val[$k +3]) || $val[$k +3] == '0') {
 					if ($fieldtoimport[$k] == "startdate" && ($val[$k +3] == '0' || $val[$k +3] == ''))
@@ -213,8 +213,8 @@ if ($task == 'upload') {
 		
 		if ($TT_UPDATE_QUERY != '' && strlen($TT_UPDATE_QUERY) > 0 && ($nb_to_import == 1)) {
 			$nb_to_import = 0;
-			$result_query = $DBHandle->Execute($TT_UPDATE_QUERY);
-			$result_query = $DBHandle->Execute($TT_INSERT_QUERY);
+			$result_query = @ $DBHandle->Execute($TT_UPDATE_QUERY);
+			$result_query = @ $DBHandle->Execute($TT_INSERT_QUERY);
 			if ($result_query) {
 				$nb_imported++;
 			} else {
@@ -275,7 +275,7 @@ if ($status=="ok") {
 		$TT_QUERY .= "stopdate<>'" . $begin_date_plus . $end_date . "'";
 	}
 	if ($TT_QUERY != "") {
-		$TT_QUERY = "DELETE FROM " . $FG_ADITION_SECOND_ADD_TABLE . " WHERE idtariffplan='" . $tariffplanval[0] . "' AND " . $TT_QUERY;
+		$TT_QUERY = "DELETE FROM " . $FG_ADITION_SECOND_ADD_TABLE . " WHERE idtariffplan='" . $tariffplanval[0] . $prefix . "' AND " . $TT_QUERY;
 		$result_query = @ $DBHandle->Execute($TT_QUERY);
 	}
 	echo $CC_help_import_ratecard_confirm;

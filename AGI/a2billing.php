@@ -1054,7 +1054,7 @@ if ($mode == 'standard') {
                     " aleg_timeinterval, ".
                     " aleg_carrier_connect_charge_offp, aleg_carrier_cost_min_offp, aleg_retail_connect_charge_offp, aleg_retail_cost_min_offp, ".
                     " aleg_carrier_initblock_offp, aleg_carrier_increment_offp, aleg_retail_initblock_offp, aleg_retail_increment_offp,".
-                    " cc_did_destination.answer, playsound, timeout, margin, id_diller, voicebox, removeaddprefix, addprefixinternational".
+                    " cc_did_destination.answer, playsound, timeout, margin, id_diller, voicebox, removeaddprefix, addprefixinternational, chanlang".
 			        " FROM cc_did_destination, cc_did, cc_card, cc_country".
 			        " WHERE id_cc_did=cc_did.id AND cc_card.status=1 AND cc_card.id=id_cc_card AND cc_did_destination.activated=1 AND cc_did.activated=1 AND did LIKE '$mydnid' ".
 			        " AND cc_country.id=id_cc_country AND cc_did.startingdate<= CURRENT_TIMESTAMP AND (cc_did.expirationdate > CURRENT_TIMESTAMP OR cc_did.expirationdate IS NULL ".
@@ -1071,8 +1071,19 @@ if ($mode == 'standard') {
 //		$A2B -> debug( DEBUG, $agi, __FILE__, __LINE__, var_export($result,true));
 //$A2B -> debug( ERROR, $agi, __FILE__, __LINE__, var_export($result,true));
         
-		if (is_array($result)) {
+		if (is_array($result) && !is_null($result[0][1])) {
 		    //Off Net
+			$chanlang = $result[0][36];
+			if ($chanlang != 'not_set') {
+				if ($A2B->agiconfig['asterisk_version'] == "1_2") {
+					$lg_var_set = 'LANGUAGE()';
+				} else {
+					$lg_var_set = 'CHANNEL(language)';
+				}
+				$agi -> set_variable($lg_var_set, $chanlang);
+				$A2B -> debug( DEBUG, $agi, __FILE__, __LINE__, "[SET $lg_var_set $chanlang]");
+				$A2B -> current_language = $language;
+			}
 			$A2B -> call_did($agi, $RateEngine, $result);
 			if ($A2B->set_inuse_username) $A2B -> callingcard_acct_start_inuse($agi,0);
 		}

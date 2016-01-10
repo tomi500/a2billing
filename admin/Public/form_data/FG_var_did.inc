@@ -32,7 +32,7 @@
 **/
 
 
-getpost_ifset(array('id', 'did', 'activated', 'id_trunk', 'continuewithdid', 'allciduse', 'verify_callerid', 'voicebox', 'billingtype', 'startingdate', 'expirationdate', 'id_cc_didgroup', 'areaprefix', 'citylength', 'id_cc_country', 'fixrate', 'connection_charge','selling_rate', 'aleg_timeinterval', 'aleg_carrier_connect_charge', 'aleg_carrier_cost_min', 'aleg_carrier_initblock', 'aleg_carrier_increment', 'aleg_retail_connect_charge', 'aleg_retail_cost_min', 'aleg_retail_initblock', 'aleg_retail_increment', 'aleg_carrier_connect_charge_offp', 'aleg_carrier_cost_min_offp', 'aleg_carrier_initblock_offp', 'aleg_carrier_increment_offp', 'aleg_retail_connect_charge_offp', 'aleg_retail_cost_min_offp', 'aleg_retail_initblock_offp', 'aleg_retail_increment_offp'));
+getpost_ifset(array('id', 'did', 'activated', 'id_trunk', 'continuewithdid', 'allciduse', 'verify_callerid', 'voicebox', 'billingtype', 'startingdate', 'expirationdate', 'id_cc_didgroup', 'areaprefix', 'citylength', 'id_cc_country', 'fixrate', 'connection_charge','selling_rate', 'aleg_timeinterval', 'aleg_carrier_connect_charge', 'aleg_carrier_cost_min', 'aleg_carrier_initblock', 'aleg_carrier_increment', 'aleg_retail_connect_charge', 'aleg_retail_cost_min', 'aleg_retail_initblock', 'aleg_retail_increment', 'aleg_carrier_connect_charge_offp', 'aleg_carrier_cost_min_offp', 'aleg_carrier_initblock_offp', 'aleg_carrier_increment_offp', 'aleg_retail_connect_charge_offp', 'aleg_retail_cost_min_offp', 'aleg_retail_initblock_offp', 'aleg_retail_increment_offp', 'chanlang'));
 
 
 $HD_Form = new FormHandler("cc_did","did");
@@ -49,6 +49,9 @@ $HD_Form -> FG_ADDITIONAL_FUNCTION_AFTER_ADD = 'add_did_use';
 $HD_Form -> FG_ADDITIONAL_FUNCTION_AFTER_DELETE = 'did_use_delete';
 $HD_Form -> FG_ADDITIONAL_FUNCTION_BEFORE_DELETE = 'is_did_in_use';
 
+if (empty($chanlang)) $chanlang = 'not_set';
+$language_list = Constants::getLanguagesList();
+array_unshift($language_list, array( gettext("NOT SET"), "not_set"));
 $actived_list = Constants::getActivationList();
 $billingtype_list = Constants::getBillingTypeList();
 // -- billtype: 0 = fix per month + dialoutrate, 1= fix per month, 2 = dialoutrate, 3 = free
@@ -239,6 +242,13 @@ $HD_Form -> AddEditElement (gettext("COUNTRY"),
 	"cc_country",
 	"countryname, id, countryprefix",
 	"", "", "%1 +%3", "", "");
+
+$HD_Form->AddEditElement(gettext("CHANNEL LANGUAGE"),
+	"chanlang",
+	"$chanlang",
+	"SELECT",
+	"", "",
+	"", "list", "", "", "", $language_list, "%1", "", "");
 
 $HD_Form -> AddEditElement (gettext("MONTHLY RATE"),
 	"fixrate",
@@ -436,8 +446,7 @@ $HD_Form -> AddEditElement(gettext("RETAIL BILLING BLOCK OFF PEAK"),
    "" , "", "",	"", "", "", "NO", gettext("Set the billing increment in seconds to bill your customer."));
 
 
-
-$HD_Form -> FieldEditElement ('did, activated, id_trunk, continuewithdid, allciduse, verify_callerid, voicebox, billingtype, startingdate, expirationdate, id_cc_didgroup, areaprefix, citylength, id_cc_country, fixrate, connection_charge, selling_rate, aleg_timeinterval, aleg_carrier_connect_charge, aleg_carrier_cost_min, aleg_carrier_initblock, aleg_carrier_increment, aleg_retail_connect_charge, aleg_retail_cost_min, aleg_retail_initblock, aleg_retail_increment, aleg_carrier_connect_charge_offp, aleg_carrier_cost_min_offp, aleg_carrier_initblock_offp, aleg_carrier_increment_offp, aleg_retail_connect_charge_offp, aleg_retail_cost_min_offp, aleg_retail_initblock_offp, aleg_retail_increment_offp');
+$HD_Form -> FieldEditElement ('did, activated, id_trunk, continuewithdid, allciduse, verify_callerid, voicebox, billingtype, startingdate, expirationdate, id_cc_didgroup, areaprefix, citylength, id_cc_country, chanlang, fixrate, connection_charge, selling_rate, aleg_timeinterval, aleg_carrier_connect_charge, aleg_carrier_cost_min, aleg_carrier_initblock, aleg_carrier_increment, aleg_retail_connect_charge, aleg_retail_cost_min, aleg_retail_initblock, aleg_retail_increment, aleg_carrier_connect_charge_offp, aleg_carrier_cost_min_offp, aleg_carrier_initblock_offp, aleg_carrier_increment_offp, aleg_retail_connect_charge_offp, aleg_retail_cost_min_offp, aleg_retail_initblock_offp, aleg_retail_increment_offp');
 
 
 // Set the filter variables

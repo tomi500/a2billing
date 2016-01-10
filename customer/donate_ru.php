@@ -275,8 +275,8 @@ elseif ($length == 3) {
   header("Location: https://www.paypal.com/cgi-bin/webscr?cmd=_xclick-subscriptions&business=".$donate_email."&item_name=".$donate_org."&no_shipping=1&no_note=1&currency_code=".$currency_code."&bn=PP%2dSubscriptionsBF&charset=UTF%2d8&a3=".$amount."%2e00&p3=1&t3=Y&src=1&sra=1&return=".$link_return."&cancel=".$link_cancel);
 }
 */
-$currencies = array( 'USD' => '$ ', 'EUR' => '&euro; ' );
-//$currencies = array( 'USD' => '$ ', 'GBP' => '&pound; ', 'EUR' => '&euro; ' );
+//$currencies = array( 'USD' => '$ ', 'EUR' => '&euro; ' );
+$currencies = array( 'USD' => '$ ', 'GBP' => '&pound; ', 'EUR' => '&euro; ' );
 ?>
 <div id="paypal_logo">
 <img src="<?php echo $logopaypal?>" alt="PayPal" />
@@ -346,9 +346,12 @@ elseif ($donate_len == 1) {
 ?>
 <br>
 <br>
-<input type="submit" class="button" name="paypalsubmit" alt="Make payments with PayPal !" value="<?php echo $btntxt?>" />
+<input type="submit" class="button" name="paypalsubmit" value="<?php echo $btntxt?>" />
 </form>
 </div>
 </div>
+<script type="text/javascript">
+    donateChangeCurrency();
+</script>
 </body>
 </html>

@@ -236,7 +236,7 @@ echo $CC_help_import_ratecard;
 						</select>	
 						<br><br>
 				   <?php echo gettext("Choose the trunk to use");?> :
-						  <select NAME="trunk" size="1"  style="width=250" class="form_input_select">
+						<select NAME="trunk" size="1"  style="width=250" class="form_input_select">
 						  		<OPTION  value="-1" selected><?php echo gettext("NOT DEFINED");?></OPTION>
 								<?php					 
 								 foreach ($list_trunk as $recordset){
@@ -246,7 +246,9 @@ echo $CC_help_import_ratecard;
 								?>
 						</select>	
 						<br></br>
-				  		  
+				   <?php echo gettext("Choose dialprefix to import");?> :
+						<input class="form_input_text"  name="importprefix" size="10" maxlength="6" value="<?php if(is_numeric($importprefix) && $importprefix>0) echo $importprefix;?>">
+						<br></br>
 					<?php echo gettext("These fields are mandatory");?><br>
 
 					<select  name="bydefault" multiple="multiple" size="4" width="40" class="form_input_select">

@@ -246,8 +246,9 @@ $logopaypal_sm = $mosConfig_live_site.'/templates/default/images/kicons/logopayp
 		</table>
 	</form>
 </div>
-<!--------------------------- PayPal --------------------------->
-<div id="paypal" align="center" style="display:none;">
+<!--------------------------- PayPal -------------------------
+<div id="paypal" align="center" style="display:none;">        -->
+<div id="paypal" align="center">
 <?php
 /**
 $length = isset( $_POST[ 'paypallength' ] ) ? (int) $_POST[ 'paypallength' ] : "";
@@ -275,8 +276,8 @@ elseif ($length == 3) {
   header("Location: https://www.paypal.com/cgi-bin/webscr?cmd=_xclick-subscriptions&business=".$donate_email."&item_name=".$donate_org."&no_shipping=1&no_note=1&currency_code=".$currency_code."&bn=PP%2dSubscriptionsBF&charset=UTF%2d8&a3=".$amount."%2e00&p3=1&t3=Y&src=1&sra=1&return=".$link_return."&cancel=".$link_cancel);
 }
 */
-$currencies = array( 'USD' => '$ ', 'EUR' => '&euro; ' );
-//$currencies = array( 'USD' => '$ ', 'GBP' => '&pound; ', 'EUR' => '&euro; ' );
+//$currencies = array( 'USD' => '$ ', 'EUR' => '&euro; ' );
+$currencies = array( 'USD' => '$ ', 'GBP' => '&pound; ', 'EUR' => '&euro; ' );
 ?>
 <div id="paypal_logo">
 <img src="<?php echo $logopaypal?>" alt="PayPal" />
@@ -350,5 +351,8 @@ elseif ($donate_len == 1) {
 </form>
 </div>
 </div>
+<script type="text/javascript">
+    donateChangeCurrency();
+</script>
 </body>
 </html>

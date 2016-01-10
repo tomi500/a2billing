@@ -140,7 +140,7 @@ if (!$popup_select) {
 	if ($use_lcr_callplan)
 		$HD_Form -> FieldViewElement ("destination, dialprefix, buyrate, ".$rateinitial_field.", startdate, stopdate, initblock, connectcharge, IF(cc_ratecard.id_trunk=-1,cc_tariffplan.id_trunk,cc_ratecard.id_trunk) id_trunk , idtariffplan ");
 	else
-		$HD_Form -> FieldViewElement ("cc_prefix.destination, cc_ratecard.dialprefix, cc_ratecard.buyrate, cc_ratecard.rateinitial, IF(cc_ratecard.startdate>NOW(),CONCAT('<font color=red>',cc_ratecard.startdate,'</font>'),cc_ratecard.startdate) AS startdate, IF(cc_ratecard.stopdate<NOW(),CONCAT('<font color=red>',cc_ratecard.stopdate,'</font>'),cc_ratecard.stopdate) AS stopdate, cc_ratecard.initblock, cc_ratecard.connectcharge, IF(cc_ratecard.id_trunk=-1,cc_tariffplan.id_trunk,cc_ratecard.id_trunk) id_trunk, cc_ratecard.idtariffplan ");
+		$HD_Form -> FieldViewElement ("cc_prefix.destination, cc_ratecard.dialprefix, cc_ratecard.buyrate, IF(cc_ratecard.buyrate>cc_ratecard.rateinitial,CONCAT('<font color=red>',cc_ratecard.rateinitial,'</font>'),cc_ratecard.rateinitial), IF(cc_ratecard.startdate>NOW(),CONCAT('<font color=red>',cc_ratecard.startdate,'</font>'),cc_ratecard.startdate) AS startdate, IF(cc_ratecard.stopdate<NOW(),CONCAT('<font color=red>',cc_ratecard.stopdate,'</font>'),cc_ratecard.stopdate) AS stopdate, cc_ratecard.initblock, cc_ratecard.connectcharge, IF(cc_ratecard.id_trunk=-1,cc_tariffplan.id_trunk,cc_ratecard.id_trunk) id_trunk, cc_ratecard.idtariffplan ");
 } else {
 	if ($use_lcr_callplan)
 		$HD_Form -> FieldViewElement ('id, destination, dialprefix, buyrate, '.$rateinitial_field);
