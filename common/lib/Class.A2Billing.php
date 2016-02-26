@@ -142,6 +142,7 @@ class A2Billing {
 	var $uniqueid;
 	var $accountcode;
 	var $dnid;
+	var $cid2num = false;
 	var $extension;
 
 	// from apply_rules, if a prefix is removed we keep it to track exactly what the user introduce
@@ -1585,8 +1586,8 @@ class A2Billing {
 			if ($this -> callingcard_ivr_authenticate($agi)!=0) {
 				$this -> debug( INFO, $agi, __FILE__, __LINE__, "[A2Billing] DID call friend: AUTHENTICATION FAILS !!!\n");
 			} else {
-				// CHECK IF DESTINATION IS SET
-				if (strlen($inst_listdestination[4])==0) continue;
+				// CHECK IF DESTINATION IS SET AND CREDIT IS ENOUGH
+				if (strlen($inst_listdestination[4])==0 || $inst_listdestination[8]+$inst_listdestination[9]>$this->credit) continue;
 
 				if ($inst_listdestination[28]) $agi -> answer();
 				elseif ($inst_listdestination[29]) $this -> let_stream_listening($agi, true);

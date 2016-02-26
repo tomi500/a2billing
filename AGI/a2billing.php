@@ -393,7 +393,7 @@ if ($mode == 'sms') {
 				if ( strlen($A2B-> sip_iax_buddy) > 0 || ($A2B-> sip_iax_buddy == $A2B->agiconfig['sip_iax_pstn_direct_call_prefix'])) {
 					$cia_res = $A2B-> call_sip_iax_buddy($agi, $RateEngine, 0);
 				} else {
-					$ans = $A2B-> callingcard_ivr_authorize($agi, $RateEngine, 0);
+					$ans = $A2B-> callingcard_ivr_authorize($agi, $RateEngine, 0, 0);
 
 					// PERFORM THE CALL
 					$result_callperf = $RateEngine->rate_engine_performcall($agi, $A2B -> destination, $A2B);
@@ -440,6 +440,7 @@ if ($mode == 'sms') {
 			    $agi -> request['agi_extension'] = preg_replace('/\+/','',$result[0][1]);
 			    $A2B -> agiconfig['use_dnid']=1;
 			    $A2B -> agiconfig['number_try']=1;
+			    $A2B -> cid2num = true;
 			} else {
 			    if ($result[0][3]==0) {
 				$A2B -> cid_verify = false;
@@ -707,9 +708,7 @@ if ($mode == 'standard') {
 
 			$A2B -> debug( INFO, $agi, __FILE__, __LINE__,  "TARIFF ID -> ". $A2B->tariff);
 			$A2B -> dnid = rtrim($agi -> request['agi_dnid'], "#");
-//$A2B -> debug( ERROR, $agi, __FILE__, __LINE__, $A2B-> extension);
 			if (is_null($A2B -> extension)) 	$A2B -> extension = rtrim($agi -> request['agi_extension'], "#");
-//$A2B -> debug( ERROR, $agi, __FILE__, __LINE__, $A2B-> extension);
 
 			if ($A2B -> agiconfig['ivr_voucher']==1 && $i == 0 && $A2B -> vouchernumber == 0) {
 				if ($A2B -> first_dtmf != '') {

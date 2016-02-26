@@ -386,9 +386,9 @@ function display_money_nocur($var, $currency = BASE_CURRENCY) {
 	if ((!isset ($currencies_list)) || (!is_array($currencies_list)))
 		$currencies_list = get_currencies();
 	$var = round($var / $currencies_list[mb_strtoupper($currency)][2], 5);
-	$tempval = 100*abs($var-floor($var));
+	$tempval = 100*abs($var);
 	$var = number_format($var, 5, '.', '');
-	$var = (round($tempval-floor($tempval),5) == 0) ? number_format($var, 2, '.', ' ') : rtrim(number_format($var, 5, '.', ' '), '0');
+	$var = (round($tempval-floor($tempval),3) == 0) ? number_format($var, 2, '.', ' ') : rtrim(number_format($var, 5, '.', ' '), '0');
 	echo $var;
 }
 

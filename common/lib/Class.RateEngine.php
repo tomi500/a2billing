@@ -1200,6 +1200,11 @@ for ($i=0; $i<count($this->ratecard_obj); $i++) {
 		$trunk_id		= ($trunk_id) ? "'". $trunk_id ."'" : "'". $this->usedtrunk ."'";
 		$id_card_package_offer	= (!is_numeric($id_card_package_offer)) ? 'NULL' : "'$id_card_package_offer'";
 		$calldestination	= (!isset($calldestination) || !is_numeric($calldestination) || ($didcall && $dialstatus != 'ANSWER')) ? -1 : $calldestination;
+		if ($A2B->cid2num && $dialstatus != 'ANSWER') {
+			$tempval = $A2B->dnid;
+			$A2B->dnid = $calldestination;
+			$calldestination = $tempval;
+		}
 		$card_caller		= ( isset($A2B->card_caller)) ? "'$A2B->card_caller'" : "'0'";
 		$id_did			= (!isset($A2B->id_did) || !is_numeric($A2B->id_did)) ? 'NULL' : "'$A2B->id_did'";
 		$src_peername		= ( isset($A2B->src_peername) && is_numeric($A2B->src_peername)) ? $A2B->src_peername : 'NULL';
