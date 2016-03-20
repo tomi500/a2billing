@@ -216,6 +216,18 @@ $HD_Form -> AddEditElement(gettext("DIALPREFIX"),
    gettext("A) Add destination prefixes, ie '441' for UK Landlines.<br>B) Use 'defaultprefix' to setup a rate for all destinations where a specific rate is not provided.<br>C) if you ADD a rate, NOT an EDIT, you can define a range of prefixes. '32484-32487' adds all prefixes between 32484 and 32487. '32484,32386,32488' would add only the individual prefixes listed.<br>D) Asterisk extensions style + POSIX regex syntaxes are supported. '_447[7-9]XXXXXXXX' matches 12-digit UK mobiles. '_X{0,3}(112|999|911)' matches any 0-3 digits followed an emergency number. '_' can be used to add length, and raise the priority."));
 
 
+$HD_Form -> AddEditElement(gettext("LENGTH RANGE FROM"),
+   "length_range_from",
+   '$value',
+   "INPUT",
+   "size=30 maxlength=20", "4");
+
+$HD_Form -> AddEditElement(gettext("LENGTH RANGE TILL"),
+   "length_range_till",
+   '$value',
+   "INPUT",
+   "size=30 maxlength=20", "4");
+
 $HD_Form -> AddEditElement(gettext("Destination Prefix"),
    "destination",
    '$value',	
@@ -652,10 +664,10 @@ if (ADVANCED_MODE) {
 
 if (ADVANCED_MODE) {
 	// This Variable store the argument for the SQL query
-	$HD_Form -> FieldEditElement ('cc_ratecard.idtariffplan, dialprefix, cc_ratecard.destination, out_of_intern_prefix_for_sure, buyrate, buyrateinitblock, buyrateincrement, buyrateconnectcharge, rateinitial, initblock, billingblock, connectcharge, disconnectcharge,disconnectcharge_after, minimal_cost, stepchargea, chargea, timechargea, billingblocka, stepchargeb, chargeb, timechargeb, billingblockb, stepchargec, chargec, timechargec, billingblockc, announce_time_correction, startdate, stopdate, is_merged, rounding_calltime, rounding_threshold, additional_block_charge, additional_block_charge_time,additional_grace, id_trunk, ratecarddialprefix, id_outbound_cidgroup, tag, musiconhold');
+	$HD_Form -> FieldEditElement ('cc_ratecard.idtariffplan, dialprefix, length_range_from, length_range_till, cc_ratecard.destination, out_of_intern_prefix_for_sure, buyrate, buyrateinitblock, buyrateincrement, buyrateconnectcharge, rateinitial, initblock, billingblock, connectcharge, disconnectcharge,disconnectcharge_after, minimal_cost, stepchargea, chargea, timechargea, billingblocka, stepchargeb, chargeb, timechargeb, billingblockb, stepchargec, chargec, timechargec, billingblockc, announce_time_correction, startdate, stopdate, is_merged, rounding_calltime, rounding_threshold, additional_block_charge, additional_block_charge_time,additional_grace, id_trunk, ratecarddialprefix, id_outbound_cidgroup, tag, musiconhold');
 } else {
 	// This Variable store the argument for the SQL query
-	$HD_Form -> FieldEditElement ('cc_ratecard.idtariffplan, dialprefix, cc_ratecard.destination, out_of_intern_prefix_for_sure, buyrate, buyrateinitblock, buyrateincrement, buyrateconnectcharge, rateinitial, initblock, billingblock, connectcharge, disconnectcharge,disconnectcharge_after, minimal_cost, startdate, stopdate, is_merged, starttime, endtime, rounding_calltime, rounding_threshold, additional_block_charge, additional_block_charge_time,additional_grace, id_trunk, ratecarddialprefix, id_outbound_cidgroup, tag');
+	$HD_Form -> FieldEditElement ('cc_ratecard.idtariffplan, dialprefix, length_range_from, length_range_till, cc_ratecard.destination, out_of_intern_prefix_for_sure, buyrate, buyrateinitblock, buyrateincrement, buyrateconnectcharge, rateinitial, initblock, billingblock, connectcharge, disconnectcharge,disconnectcharge_after, minimal_cost, startdate, stopdate, is_merged, starttime, endtime, rounding_calltime, rounding_threshold, additional_block_charge, additional_block_charge_time,additional_grace, id_trunk, ratecarddialprefix, id_outbound_cidgroup, tag');
 }
 
 $HD_Form->FG_ADITION_HIDDEN_PARAM		= $HD_Form->FG_EDITION_HIDDEN_PARAM		= 'filterprefix,current_page';

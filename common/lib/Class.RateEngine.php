@@ -196,7 +196,7 @@ class RateEngine
 		cc_ratecard.tag,
 		id_seller,
 		IFNULL(ratecarddialprefix,sellerdialprefix),
-		buyrateconnectcharge
+		buyrateconnectcharge, length_range_from, length_range_till
 
 		FROM cc_ratecard
 
@@ -1430,7 +1430,7 @@ for ($i=0; $i<count($this->ratecard_obj); $i++) {
 				$this -> td = $this -> prefixclause = $outprefix = $outprefixrequest = "";
 				$CID_handover = NULL;
 				$this -> real_answeredtime = $this -> answeredtime = $wrapuptime = 0;
-				$destination=$old_destination;
+				$destination = $old_destination;
 
 //$A2B -> debug( ERROR, $agi, __FILE__, __LINE__, "[A2B->CID_handover: ={$A2B->CID_handover}]");
 				if ($loop_failover == 0 && $intellect_count == -1) {
@@ -1456,6 +1456,10 @@ for ($i=0; $i<count($this->ratecard_obj); $i++) {
 				    $cidgroupid		= $this -> ratecard_obj[$k][68];
 				    $trunkcode		= $this -> ratecard_obj[$k][70];
 				    $wrapuprange	= explode(",",$this -> ratecard_obj[$k][71]);
+				    $length_range_from	= $this -> ratecard_obj[$k][76];
+				    $length_range_till	= $this -> ratecard_obj[$k][77];
+				    if (strlen($destination)<$length_range_from || $length_range_till<strlen($destination))
+					continue 2;
 //$A2B -> debug( ERROR, $agi, __FILE__, __LINE__, "ratecard_obj[{$k}][69] = ".$this -> ratecard_obj[$k][69]);
 				    if ($this -> ratecard_obj[$k][69] || !$A2B->extext)
 					$CID_handover	= $A2B -> CID_handover;

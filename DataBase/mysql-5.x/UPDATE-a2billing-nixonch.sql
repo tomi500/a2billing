@@ -202,6 +202,9 @@ ALTER TABLE cc_tariffplan ADD tariff_lcr INT( 11 ) NOT NULL DEFAULT '1' AFTER `s
 ALTER TABLE cc_ratecard ADD buyrateconnectcharge DECIMAL( 15, 5 ) NOT NULL DEFAULT 0 AFTER `buyrateincrement`;
 ALTER TABLE cc_ratecard ADD ratecarddialprefix char(20) COLLATE utf8_bin NULL DEFAULT NULL AFTER `id_trunk`;
 ALTER TABLE cc_ratecard ADD out_of_intern_prefix_for_sure INT( 11 ) NOT NULL DEFAULT '0' AFTER `ratecarddialprefix`;
+ALTER TABLE cc_ratecard ADD length_range_from INT( 11 ) NOT NULL DEFAULT '1';
+ALTER TABLE cc_ratecard ADD length_range_till INT( 11 ) NOT NULL DEFAULT '100';
+UPDATE `cc_ratecard` SET `length_range_from` = '12', `length_range_till` = '12' WHERE `dialprefix` LIKE '380%';
 
 ALTER TABLE cc_callerid ADD callback INT( 11 ) NOT NULL DEFAULT '0';
 ALTER TABLE cc_callerid ADD phonenumber VARCHAR( 100 ) CHARACTER SET utf8 COLLATE utf8_bin NOT NULL;
