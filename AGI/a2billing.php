@@ -340,11 +340,12 @@ if ($mode == 'sms') {
 	    $result = $A2B -> instance_table -> SQLExec ($A2B->DBHandle, $QUERY);
 	    if (is_array($result)) {
 		$didyes = true;
+		$did_id = $result[0][3];
 		$diddest = $result[0][4];
 		$A2B -> CID_handover = $A2B->CallerID = $A2B->did_apply_add_countryprefixfrom($result[0], $A2B->CallerID);
 		if ($A2B->CallerID != $agi -> request['agi_callerid'])
 			$agi -> set_callerid($A2B -> CallerID);
-		$QUERY = "SELECT 1 FROM cc_did, cc_callerid WHERE cc_did.id = {$result[0][3]} AND cid LIKE '$A2B->CallerID' AND cc_callerid.activated = 't' AND ((id_cc_card = iduser AND allciduse <> 3) OR iduser = 0 OR allciduse = 1) LIMIT 1";
+		$QUERY = "SELECT 1 FROM cc_did, cc_callerid WHERE cc_did.id = $did_id AND cid LIKE '$A2B->CallerID' AND cc_callerid.activated = 't' AND ((id_cc_card = iduser AND allciduse <> 3) OR iduser = 0 OR allciduse = 1 OR allciduse = 5) LIMIT 1";
 		$result = $A2B -> instance_table -> SQLExec ($A2B->DBHandle, $QUERY);
 		if (is_array($result) && count($result) > 0) {
 			$didyes = false;
@@ -426,12 +427,12 @@ if ($mode == 'sms') {
 		    $A2B -> agiconfig['use_dnid']=0;
 		}
 	    } else {
-		$QUERY = "SELECT callback, phonenumber, username, verify FROM cc_callerid, cc_card WHERE cid LIKE '$A2B->CallerID' AND cc_callerid.activated='t' AND status=1 AND cc_card.id=id_cc_card LIMIT 1";
+		$QUERY = "SELECT callback, phonenumber, username, verify, allciduse FROM cc_callerid, cc_card, cc_did WHERE cc_did.id = $did_id AND cid LIKE '$A2B->CallerID' AND cc_callerid.activated='t' AND status=1 AND cc_card.id=id_cc_card LIMIT 1";
 		$result = $A2B -> instance_table -> SQLExec ($A2B->DBHandle, $QUERY);
 		if (is_array($result)) {
 		    $A2B -> agiconfig['cid_enable'] = 1;
 		    $A2B -> cardnumber = $result[0][2];
-		    if ($result[0][0] == 1) {
+		    if ($result[0][0] == 1 && $result[0][4] < 3) {
 			$A2B -> mode = $mode = 'cid-callback';
 			$caller_areacode = "";
 		    } else {

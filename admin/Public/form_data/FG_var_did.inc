@@ -63,6 +63,8 @@ $scu[1][0] = gettext("All CIDs");
 //$scu[] = array( gettext("Client`s & Personal CIDs").'&nbsp;', "2");
 //
 $scu[] = array( gettext("CID Ignore"), "3");
+$scu[] = array( gettext("All CIDs,&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbspBan callback"), "4");
+$scu[] = array( gettext("Personal CIDs, Ban callback"), "5");
 
 $HD_Form -> AddViewElement(gettext("DID"), "did", "13%", "center", "sort");
 $HD_Form -> AddViewElement(gettext("CUSTOMER"), "iduser", "15%", "center", "sort", "", "lie_link", "cc_card", "lastname, id, firstname", "id='%id'", "%1 %3", "", "A2B_entity_card.php");
