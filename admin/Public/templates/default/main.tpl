@@ -83,6 +83,7 @@
 				<li><a href="A2B_entity_speeddial.php?atmenu=speeddial&section=1">{php} echo gettext("Speed Dial");{/php}</a></li>
 				<li><a href="card-history.php?atmenu=cardhistory&section=1">{php} echo gettext("History");{/php}</a></li>
 				<li><a href="A2B_entity_statuslog.php?atmenu=statuslog&section=1">{php} echo gettext("Status");{/php}</a></li>
+				<li><a href="A2B_entity_voicemail.php?&section=1">{php} echo gettext("Voicemail");{/php}</a></li>
 		</ul></li>
 	</ul>
 	</div>
@@ -176,14 +177,15 @@
 	{/if}
 		<ul>
 			<li><ul>
-					<li><a href="call-log-customers.php?nodisplay=1&posted=1&section=5">{php} echo gettext("CDRs");{/php}</a></li>
-					<li><a href="call-count-reporting.php?nodisplay=1&posted=1&section=5">{php} echo gettext("Call Count");{/php}</a></li>
-					<li><a href="A2B_trunk_report.php?section=5">{php} echo gettext("Trunk");{/php}</a></li>
-					<li><a href="call-dnid.php?nodisplay=1&posted=1&section=5">{php} echo gettext("DNID");{/php}</a></li>
-					<li><a href="call-pnl-report.php?section=5">{php} echo gettext("PNL");{/php}</a></li>
-					<li><a href="call-comp.php?section=5">{php} echo gettext("Compare Calls");{/php}</a></li>
-					<li><a href="call-daily-load.php?section=5">{php} echo gettext("Daily Traffic");{/php}</a></li>
-					<li><a href="call-last-month.php?section=5">{php} echo gettext("Monthly Traffic");{/php}</a></li>
+				<li><a href="call-log-customers.php?nodisplay=1&posted=1&section=5">{php} echo gettext("CDRs");{/php}</a></li>
+				<li><a href="CC_call_log_import.php?atmenu=ratecard&section=5">»» {php} echo gettext("Import");{/php}</a></li>
+				<li><a href="call-count-reporting.php?nodisplay=1&posted=1&section=5">{php} echo gettext("Call Count");{/php}</a></li>
+				<li><a href="A2B_trunk_report.php?section=5">{php} echo gettext("Trunk");{/php}</a></li>
+				<li><a href="call-dnid.php?nodisplay=1&posted=1&section=5">{php} echo gettext("DNID");{/php}</a></li>
+				<li><a href="call-pnl-report.php?section=5">{php} echo gettext("PNL");{/php}</a></li>
+				<li><a href="call-comp.php?section=5">{php} echo gettext("Compare Calls");{/php}</a></li>
+				<li><a href="call-daily-load.php?section=5">{php} echo gettext("Daily Traffic");{/php}</a></li>
+				<li><a href="call-last-month.php?section=5">{php} echo gettext("Monthly Traffic");{/php}</a></li>
 			</ul></li>
 		</ul>
 	</div>

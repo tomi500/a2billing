@@ -94,17 +94,19 @@ if ($popup_select) {
 	$HD_Form -> FieldViewElement ('id_trunk, trunkcode, id_provider');
 } else {
 	$HD_Form -> AddViewElement(gettext("LABEL"), "trunkcode", "14%", "center", "sort");
-	$HD_Form -> AddViewElement(gettext("ADD_PREFIX"), "trunkprefix", "6%", "center", "sort");
-	$HD_Form -> AddViewElement(gettext("REMOVE_PREFIX"), "removeprefix", "6%", "center", "sort");
+	$HD_Form -> AddViewElement(gettext("ADD PREFIX"), "trunkprefix", "6%", "center", "sort");
+	$HD_Form -> AddViewElement(gettext("REMOVE PREFIX"), "removeprefix", "6%", "center", "sort");
 	$HD_Form -> AddViewElement(gettext("TECH"), "providertech", "6%", "center", "sort");
 	$HD_Form -> AddViewElement(gettext("IP/HOST"), "providerip" , "14%", "center", "sort");
 	$HD_Form -> AddViewElement(gettext("PROVIDER"), "id_provider" ,"9%", "center", "sort", "15", "lie", "cc_provider", "provider_name", "id='%id'", "%1");
-	$HD_Form -> AddViewElement(gettext("MINUTES USED"), "secondusedreal", "%9", "center", "SORT", "30", "", "", "", "", "", "display_minute");
+	$HD_Form -> AddViewElement(gettext("MINUTES USED"), "secondusedreal", "9%", "center", "SORT", "30", "", "", "", "", "", "display_minute");
+	$HD_Form -> AddViewElement(gettext("LEFT_1"), "left1", "4%", "center", "SORT", "30", "", "", "", "", "", "display_minute");
+	$HD_Form -> AddViewElement(gettext("LEFT_2"), "left2", "4%", "center", "SORT", "30", "", "", "", "", "", "display_minute");
 	$HD_Form -> AddViewElement(gettext("STATUS"), "status", "7%", "center", "sort", "", "list", $actived_list);
 	$HD_Form -> AddViewElement(gettext("INUSE"), "inuse" , "2%", "center", "sort");
 	$HD_Form -> AddViewElement(gettext("MAXUSE"), "maxuse" , "3%", "center", "sort");
 
-	$HD_Form -> FieldViewElement ('trunkcode, trunkprefix, removeprefix, providertech, providerip, id_provider, secondusedreal, status, inuse, maxuse');
+	$HD_Form -> FieldViewElement ("trunkcode, trunkprefix, removeprefix, providertech, providerip, id_provider, secondusedreal, IF(dialprefixa='',0,maxsecperperioda-IF(periodexpirya<now(),0,periodcounta)) left1, IF(dialprefixb='',0,maxsecperperiodb-IF(periodexpiryb<now(),0,periodcountb)) left2, status, inuse, maxuse");
 }
 
 $HD_Form -> FG_FILTER_SEARCH_FORM = true;

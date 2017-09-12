@@ -94,8 +94,14 @@ if (!is_numeric($amount) || ((strcasecmp("paypal",$payment)==0 && ($amount < 10 
 	die();
 }
 
-$paypalfixfee = 0.35; // For EUR
-if ($getcur == "USD")	$paypalfixfee = 0.3;
+switch($getcur)
+{
+	case 'USD': $paypalfixfee = 0.3; break;
+	case 'EUR': $paypalfixfee = 0.35; break;
+	case 'RUB': $paypalfixfee = 10; break;
+	case 'THB': $paypalfixfee = 11; break;
+	default   : $paypalfixfee = 0.3; break;
+}
 $paycur = $currencies_list[$getcur][2];
 $vat_amount= $amount*$vat/100;
 $amount_paypal = ($amount+$vat_amount+$paypalfixfee)/0.961;

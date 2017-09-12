@@ -1,4 +1,4 @@
-<?
+<?php
 
 //require_once('./lib/epayment/includes/methods/webmoney.php');
 define('MODULE_PAYMENT_WM_TEXT_TITLE', 'WebMoney');

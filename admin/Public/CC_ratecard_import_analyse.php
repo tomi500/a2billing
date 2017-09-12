@@ -119,7 +119,7 @@ if ($task == 'upload') {
 		echo gettext('Error: Failed to open the file.');
 		exit ();
 	}
-	$prefix = (is_numeric($importprefix) && $importprefix>0) ? " AND dialprefix LIKE '$importprefix%'" : "";
+	$prefix = (is_numeric($importprefix) && $importprefix>0) ? " AND dialprefix LIKE '".$importprefix."%'" : "";
 	$begin_date = date("Y");
 	$begin_date_plus = date("Y") + 15;
 	$end_date = date("-m-d H:i:s");
@@ -144,7 +144,7 @@ if ($task == 'upload') {
 			}
 			break;
 		}
-		if (substr($ligne, 0, 1) != '#' && $val[2] != '' && strlen($val[2]) > 0 && ($prefix == "" || strpos($val[1],$importprefix) == 0))
+		if (substr($ligne, 0, 1) != '#' && $val[2] != '' && strlen($val[2]) > 0 && ($prefix == "" || strpos($val[1],$importprefix) === 0))
 		{
 			$FG_ADITION_SECOND_ADD_TABLE = 'cc_ratecard';
 			$FG_ADITION_SECOND_ADD_FIELDS = 'idtariffplan, id_trunk, dialprefix, destination, rateinitial'; //$fieldtoimport_sql
@@ -328,6 +328,7 @@ if ($status=="ok") {
 	<INPUT type="hidden" name="trunk" value="<?php echo $trunk?>">
 	<INPUT type="hidden" name="currencytype" value="<?php echo $currencytype?>">
 	<INPUT type="hidden" name="search_sources" value="<?php echo $search_sources?>">
+	<INPUT type="hidden" name="importprefix" value="<?php echo $importprefix?>">
 	<INPUT TYPE="hidden" VALUE="<?php echo $tag?>" NAME="tag">
 	
 	<tr> 

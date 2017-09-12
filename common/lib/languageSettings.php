@@ -145,7 +145,7 @@ function SetLocalLanguage()
 	putenv("LANGUAGE=$slectedLanguage");
 	setlocale(LC_ALL, $slectedLanguage);
 	setlocale(LC_MESSAGES,  $languageEncoding);
-	
+	setlocale(LC_NUMERIC, "C");
 	$domain = 'messages';
 	bindtextdomain("messages", BINDTEXTDOMAIN);
 	textdomain($domain);

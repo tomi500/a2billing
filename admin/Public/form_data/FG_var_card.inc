@@ -363,7 +363,7 @@ if (has_rights (ACX_MODIFY_CUSTOMERS) && !($popup_select>=1)) {
 		
 	} else {
 		$balance_access = 'readonly';
-		$payment_status= 'disabled="true" style="color: gray;" ';
+//		$payment_status= 'disabled="true" style="color: gray;" ';
 	}
 
 	$HD_Form -> AddEditElement (gettext("BALANCE"),
@@ -577,7 +577,7 @@ if (has_rights (ACX_MODIFY_CUSTOMERS) && !($popup_select>=1)) {
 				   gettext("Insert the company website of this customer"),
 				   "" , "", "",	"", "", "" , "NO", "");
 	
-	if ($form_action != "edit") {
+//	if ($form_action != "edit") {
 		
 		$update_field_typepaid = 'typepaid ,';
 	
@@ -589,7 +589,7 @@ if (has_rights (ACX_MODIFY_CUSTOMERS) && !($popup_select>=1)) {
 					   "",
 					   "",
 					   "list" , "", "",	"", $typepaid_list, "%1", "", '', null, null, gettext("Customer Status") );
-	}
+//	}
 	
 	$HD_Form -> AddEditElement (gettext("CALL PLAN"),
 				   "tariff",

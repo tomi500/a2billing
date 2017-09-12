@@ -108,8 +108,10 @@ class RateEngine
 		// Race condiction on $minutes ?!
 		$minutes_since_monday = ($daytag * 1440) + ($hours * 60) + $minutes;
 		if ($this -> debug_st) echo "$minutes_since_monday<br> ";
-
+//		$sql_clause_time = "weekdays LIKE CONCAT('%',WEEKDAY(NOW()),'%') AND ((CURTIME() BETWEEN timefrom AND timetill) OR (timetill<=timefrom AND (CURTIME()<timetill OR CURTIME()>=timefrom)))";
+//		$sql_clause_days = "startdate<= CURRENT_TIMESTAMP AND (stopdate > CURRENT_TIMESTAMP OR stopdate = 0)";
 		$sql_clause_days = "(startdate<= CURRENT_TIMESTAMP AND (stopdate > CURRENT_TIMESTAMP OR stopdate = 0) AND (csr.id_ratecard IS NULL OR (weekdays LIKE CONCAT('%',WEEKDAY(NOW()),'%') AND (CURTIME() BETWEEN timefrom AND timetill OR (timetill<=timefrom AND (CURTIME()<timetill OR CURTIME()>=timefrom))))))";
+//		$sql_clause_days = "(startdate<= CURRENT_TIMESTAMP AND (stopdate > CURRENT_TIMESTAMP OR stopdate = 0) AND (starttime <= ".$minutes_since_monday." AND endtime >=".$minutes_since_monday."))";
 
 		$mydnid = $mycallerid = "";
 		if (strlen($A2B->dnid)>=1) $mydnid = $A2B->dnid;
@@ -137,8 +139,8 @@ class RateEngine
 		$QUERY = "SELECT DISTINCT
 		tariffgroupname,
 		lcrtype,
-		idtariffgroup,
-		cc_tariffgroup_plan.idtariffplan,
+		cc_tariffgroup.id,
+		cc_tariffplan.id,
 		tariffname,
 		destination,
 		cc_ratecard.id,
@@ -214,9 +216,16 @@ class RateEngine
 		AND ('$mycallerid' LIKE CONCAT(calleridprefix,'%') OR (calleridprefix='all' $CID_SUB_QUERY) OR calleridprefix LIKE '$mycallerid,%' OR calleridprefix LIKE '%,$mycallerid,%' OR calleridprefix LIKE '%,$mycallerid')
 		GROUP BY cc_ratecard.id
 		ORDER BY LENGTH(dialprefix) DESC";
+//		AND ( calleridprefix=SUBSTRING('$mycallerid',1,length(calleridprefix)) OR (calleridprefix='all' $CID_SUB_QUERY))
+//		AND (rateinitial<0.14 OR rateinitial=100 OR dialprefix LIKE '37%' OR dialprefix LIKE '380%')
+//		IF(tariff_lcr=1 OR ($sql_clause_days AND csr.id_ratecard IS NOT NULL),cc_trunk.status,0) status,
+//		LEFT JOIN (SELECT * FROM cc_sheduler_ratecard WHERE $sql_clause_time) csr ON id_ratecard=cc_ratecard.id OR id_tariffplan=cc_tariffplan.id
+//		AND (tariff_lcr=0 OR ($sql_clause_days AND csr.id_ratecard IS NOT NULL))
 
 		$A2B->instance_table = new Table();
 		$result = $A2B->instance_table -> SQLExec ($A2B -> DBHandle, $QUERY);
+
+//if ($this->webui) $A2B -> debug( ERROR, $agi, "", __LINE__, "=================== QUERY:\n".$QUERY);
 
 		if (!is_array($result) || count($result)==0) return 0; // NO RATE FOR THIS NUMBER
 
@@ -1036,7 +1045,7 @@ for ($i=0; $i<count($this->ratecard_obj); $i++) {
 	 * RATE ENGINE - UPDATE SYSTEM (DURATIONCALL)
 	 * Calcul the duration allowed for the caller to this number
 	 */
-	function rate_engine_updatesystem (&$A2B, &$agi, $calledstation, $doibill = 1, $didcall=0, $callback=0, $trunk_id=0, $td=NULL, $callback_mode=0)
+	function rate_engine_updatesystem (&$A2B, $agi, $calledstation, $doibill = 1, $didcall=0, $callback=0, $trunk_id=0, $td=NULL, $callback_mode=0, $starttime=0, $buycost=0)
 	{
 		$K = $this->usedratecard;
 		
@@ -1158,9 +1167,9 @@ for ($i=0; $i<count($this->ratecard_obj); $i++) {
 //			$rateapply	 = $this -> ratecard_obj[$K][12];
 			$trunkcode	 = $this -> ratecard_obj[$K][70];
 		}
-		$buycost = 0;
+//		$buycost = 0;
 		$cost = ($doibill==0 || $sessiontime < $A2B->agiconfig['min_duration_2bill']) ? 0 : $this -> lastcost;
-		$buycost = abs($this -> lastbuycost);
+		if ($buycost == 0) $buycost = abs($this -> lastbuycost);
 
 		if ($cost<=0) {
 			$signe = '-';
@@ -1174,23 +1183,23 @@ for ($i=0; $i<count($this->ratecard_obj); $i++) {
 
 		if ($dialstatus && strlen($this -> dialstatus_rev_list[$dialstatus]) > 0) {
 			$terminatecauseid = $this -> dialstatus_rev_list[$dialstatus];
-        } else {
+		} else {
 			$terminatecauseid = 0;
-        }
+		}
 
         // CALLTYPE -  0 = NORMAL CALL ; 1 = VOIP CALL (SIP/IAX) ; 2= DIDCALL + TRUNK ; 3 = VOIP CALL DID ; 4 = CALLBACK call
-        if ($didcall == 3) {
+	        if ($didcall == 3) {
 			$calltype = $didcall;
-        } elseif ($didcall) {
+	        } elseif ($didcall) {
 			$calltype = 2;
-        } elseif ($callback) {
+	        } elseif ($callback) {
 			$calltype = 4;
-		$terminatecauseid = 1;
-        } elseif ($A2B->recalltime) {
+			$terminatecauseid = 1;
+	        } elseif ($A2B->recalltime) {
 			$calltype = 5;
-        } else {
+	        } else {
 			$calltype = 0;
-        }
+	        }
 
 		$card_id		= (!is_numeric($A2B->id_card)) ? "'-1'" : "'". $A2B->id_card ."'";
 		$real_sessiontime	= (!is_numeric($this->real_answeredtime)) ? 'NULL' : "'". $this->real_answeredtime ."'";
@@ -1242,14 +1251,16 @@ for ($i=0; $i<count($this->ratecard_obj); $i++) {
 		    if ($A2B->config["global"]['cache_enabled']) {
 			$QUERY .= " datetime( strftime('%s','now') - $sessiontime, 'unixepoch','localtime')";	
 		    } else {
-			$QUERY .= "SUBDATE(CURRENT_TIMESTAMP, INTERVAL $sessiontime SECOND) ";
+			if ($starttime) $QUERY .= "'$starttime' ";
+			else $QUERY .= "SUBDATE(CURRENT_TIMESTAMP, INTERVAL $sessiontime SECOND) ";
 		    }
 
 		    $QUERY .= 	", '$sessiontime', $real_sessiontime, '$calledstation', $terminatecauseid, ";
 		    if ($A2B->config["global"]['cache_enabled']) {
 			$QUERY .= "datetime('now','localtime')";
 		    } else {
-			$QUERY .= "now()";
+			if ($starttime) $QUERY .= "ADDDATE('$starttime', INTERVAL $sessiontime SECOND) ";
+			else $QUERY .= "now()";
 		    }
 
 		    $QUERY .= " , '$signe_cc_call".a2b_round(abs($cost))."', ".
@@ -1420,11 +1431,13 @@ for ($i=0; $i<count($this->ratecard_obj); $i++) {
 			$loop_failover = $loop_intellect = $outcid = 0;
 			$destination = $old_destination;
 			$firstrand = false;
-			$intellect_count = $trunkrand = -1;
+			$intellect_count = $trunkrand = $intellect_failover_trunk = -1;
 			$status = 1;
 			// LOOOOP FOR THE FAILOVER LIMITED TO failover_recursive_limit
 			while ((($loop_failover == 0 && !$this->dialstatus) || ($loop_failover <= $A2B->agiconfig['failover_recursive_limit']
-			    && $failover_trunk > 0 && (time()-$timecur) < 24 && (in_array($this->dialstatus, array("","CHANUNAVAIL","CONGESTION")) || $intellect_count >= 0)))
+//			    && $failover_trunk > 0 && (time()-$timecur) < 24 && (in_array($this->dialstatus, array("","CHANUNAVAIL","CONGESTION")) || $intellect_count >= 0)))
+//			    && $failover_trunk > 0 && (time()-$timecur) < 24 && (in_array($this->dialstatus, array("","CHANUNAVAIL")) || $intellect_count >= 0)))
+			    && $failover_trunk > 0 && (time()-$timecur) < 24 && (in_array($this->dialstatus, array("","CHANUNAVAIL","CONGESTION")) && $intellect_count < 0)))
 			    && $this->dialstatus != "ANSWER" && $this->dialstatus != "CANCEL") {
 
 				$this -> td = $this -> prefixclause = $outprefix = $outprefixrequest = "";
@@ -1458,11 +1471,15 @@ for ($i=0; $i<count($this->ratecard_obj); $i++) {
 				    $wrapuprange	= explode(",",$this -> ratecard_obj[$k][71]);
 				    $length_range_from	= $this -> ratecard_obj[$k][76];
 				    $length_range_till	= $this -> ratecard_obj[$k][77];
-				    if (strlen($destination)<$length_range_from || $length_range_till<strlen($destination))
+				    $length_destination = strlen($destination);
+				    if ($length_destination<$length_range_from || $length_range_till<$length_destination) {
+$A2B -> debug( ERROR, $agi, __FILE__, __LINE__, "Out of length range destination. ".$length_destination." NOT IN ".$length_range_from."..".$length_range_till);
 					continue 2;
+				    }
 //$A2B -> debug( ERROR, $agi, __FILE__, __LINE__, "ratecard_obj[{$k}][69] = ".$this -> ratecard_obj[$k][69]);
 				    if ($this -> ratecard_obj[$k][69] || !$A2B->extext)
 					$CID_handover	= $A2B -> CID_handover;
+//$A2B -> debug( ERROR, $agi, __FILE__, __LINE__, "[CID_handover: ={$CID_handover}]");
 				} else {
 				    $this -> usedtrunk = $failover_trunk;
 				    $QUERY = "SELECT trunkprefix, providertech, providerip, removeprefix, IF(dialprefixmain='',failover_trunk,'-1'), status, inuse, IF(wrapnexttime>NOW() AND lastdial NOT LIKE '$A2B->destination',0,maxuse), if_max_use, outbound_cidgroup_id, addparameter, cid_handover, wrapuptime, trunkcode FROM cc_trunk WHERE id_trunk='$this->usedtrunk' LIMIT 1";
@@ -1487,6 +1504,7 @@ for ($i=0; $i<count($this->ratecard_obj); $i++) {
 //$A2B -> debug( ERROR, $agi, __FILE__, __LINE__, "trunk_result[0][11] = ".$result[0][11]);
 					if ($result[0][11] || !$A2B->extext) {
 						$CID_handover	= $A2B -> CID_handover;
+//$A2B -> debug( ERROR, $agi, __FILE__, __LINE__, "[CID_handover: ={$CID_handover}]");
 					}
 				    } else {
 					break;
@@ -1951,8 +1969,8 @@ for ($i=0; $i<count($this->ratecard_obj); $i++) {
 					$errmess = "Trunk $this->usedtrunk is $this->dialstatus. ";
 					if ($next_failover_trunk != -1 && $trunkrand != $this -> usedtrunk && $intellect_count >= 0) {
 						$failover_trunk = $next_failover_trunk;
-						$A2B -> debug( DEBUG, $agi, __FILE__, __LINE__, $errmess."Now using failover trunk {$failover_trunk} (".$intellect_trunkcode.").");
-					} elseif ($intellect_count > 0) {
+						$A2B -> debug( ERROR, $agi, __FILE__, __LINE__, $errmess."Now using failover trunk {$failover_trunk} (".$intellect_trunkcode.").");
+					} elseif ($intellect_count > 0 && $this->dialstatus!="CONGESTION") {
 						$failover_trunk = $trunkrand;
 						$firstrand = false;
 						$A2B -> debug( DEBUG, $agi, __FILE__, __LINE__, $errmess."Now return to current intellect selecting.");
@@ -1976,7 +1994,7 @@ for ($i=0; $i<count($this->ratecard_obj); $i++) {
 				$loop_failover++;
 
 			} // END while LOOP FAILOVER
-			if ($typecall == 8) {
+			if ($typecall == 8 && !($intellect_count >= 0 && $this->dialstatus=="CONGESTION")) {
 			    if ($this -> dialstatus  == "CHANUNAVAIL" || $this -> dialstatus  == "CONGESTION") {
 				$this -> real_answeredtime = $this -> answeredtime = 0;
 				if ($A2B->agiconfig['failover_lc_prefix'] || $ifmaxuse == 1 || ($intellect_count == 0 && $intellect_ifmaxuse == 1)) {
@@ -2018,7 +2036,8 @@ for ($i=0; $i<count($this->ratecard_obj); $i++) {
 //			} elseif ($this->dialstatus == "CHANUNAVAIL") {
 				$this -> real_answeredtime = $this -> answeredtime = 0;
 				// Check if we will failover for LCR/LCD prefix - better false for an exact billing on resell
-				if ($A2B->agiconfig['failover_lc_prefix'] || $ifmaxuse == 1 || ($intellect_count == 0 && $intellect_ifmaxuse == 1)) {
+				if (($A2B->agiconfig['failover_lc_prefix'] || $ifmaxuse == 1 || ($intellect_count == 0 && $intellect_ifmaxuse == 1))
+					&& !($intellect_count >= 0 && $this->dialstatus=="CONGESTION")) {
 					continue;
 				}
 				$this->usedratecard = $k-$loop_failover;

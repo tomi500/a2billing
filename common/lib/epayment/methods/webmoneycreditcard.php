@@ -1,4 +1,4 @@
-<?
+<?php
 
 define('MODULE_PAYMENT_WM_TEXT_TITLE', 'WebMoney');
 define('MODULE_PAYMENT_WM_TEXT_DESCRIPTION', 'WebMoney');

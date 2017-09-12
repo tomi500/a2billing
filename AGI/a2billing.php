@@ -345,7 +345,7 @@ if ($mode == 'sms') {
 		$A2B -> CID_handover = $A2B->CallerID = $A2B->did_apply_add_countryprefixfrom($result[0], $A2B->CallerID);
 		if ($A2B->CallerID != $agi -> request['agi_callerid'])
 			$agi -> set_callerid($A2B -> CallerID);
-		$QUERY = "SELECT 1 FROM cc_did, cc_callerid WHERE cc_did.id = $did_id AND cid LIKE '$A2B->CallerID' AND cc_callerid.activated = 't' AND ((id_cc_card = iduser AND allciduse <> 3) OR iduser = 0 OR allciduse = 1 OR allciduse = 5) LIMIT 1";
+		$QUERY = "SELECT 1 FROM cc_did, cc_callerid WHERE cc_did.id = $did_id AND cid LIKE '$A2B->CallerID' AND cc_callerid.activated = 't' AND ((id_cc_card = iduser AND allciduse <> 3) OR iduser = 0 OR allciduse = 1 OR allciduse = 4) LIMIT 1";
 		$result = $A2B -> instance_table -> SQLExec ($A2B->DBHandle, $QUERY);
 		if (is_array($result) && count($result) > 0) {
 			$didyes = false;
@@ -1184,11 +1184,18 @@ if ($mode == 'standard') {
 			$A2B -> debug( DEBUG, $agi, __FILE__, __LINE__, '[resfindrate: - '.$resfindrate.']');
 
 			$instance_table = new Table("cc_callback_spool");
-			$FG_TABLE_CLAUSE = "callerid='{$A2B->config['callback']['callerid']}' AND exten_leg_a='{$A2B->destination}' AND timediff(now(),entry_time)<{$A2B->config['callback']['sec_avoid_repeate']}";
+			$FG_TABLE_CLAUSE = "(status='PENDING' OR status='PROCESSING') AND account='{$A2B->accountcode} AND 'callerid='{$A2B->config['callback']['callerid']}' AND exten_leg_a='{$A2B->destination}' AND timediff(now(),entry_time)<{$A2B->config['callback']['sec_avoid_repeate']}";
 			$FG_NB_RECORD = $instance_table -> Table_count ($A2B -> DBHandle, $FG_TABLE_CLAUSE);
 
+			$sec_wait_before_callback = $A2B -> config["callback"]['sec_wait_before_callback'];
+			if (!is_numeric($sec_wait_before_callback) || $sec_wait_before_callback<1) {
+				$sec_wait_before_callback = 1;
+			}
+			if ($FG_NB_RECORD > 0) {
+				$QUERY = "num_attempt='0', entry_time=now(), `next_attempt_time`=ADDDATE( CURRENT_TIMESTAMP, INTERVAL $sec_wait_before_callback SECOND )";
+				$result = $instance_table -> Update_table ($A2B -> DBHandle, $QUERY, $FG_TABLE_CLAUSE);
 			// IF FIND RATE
-			if ($resfindrate!=0 && $FG_NB_RECORD == 0) {
+			} elseif ($resfindrate!=0 && $FG_NB_RECORD == 0) {
 				//$RateEngine -> debug_st	=1;
 				$res_all_calcultimeout = $RateEngine->rate_engine_all_calcultimeout($A2B, $A2B->credit);
 				//echo ("RES_ALL_CALCULTIMEOUT ::> $res_all_calcultimeout");
@@ -1293,12 +1300,6 @@ if ($mode == 'standard') {
 					$server_ip = 'localhost';
 					$num_attempt = 0;
 
-					if (is_numeric($A2B -> config["callback"]['sec_wait_before_callback']) && $A2B -> config["callback"]['sec_wait_before_callback']>=1){
-						$sec_wait_before_callback = $A2B -> config["callback"]['sec_wait_before_callback'];
-					} else {
-						$sec_wait_before_callback = 1;
-					}
-
 					$QUERY = "INSERT INTO cc_callback_spool (uniqueid, status, server_ip, num_attempt, channel, exten, context, priority, variable, id_server_group, callback_time, account, callerid, timeout, next_attempt_time, exten_leg_a)" .
 						" VALUES ('$uniqueid', '$status', '$server_ip', '$num_attempt', '$channel', '$exten', '$context', '$priority', '$variable', '$id_server_group', ADDDATE( CURRENT_TIMESTAMP, INTERVAL $sec_wait_before_callback SECOND ), '$account', '$callerid', '$timeout', ADDDATE( CURRENT_TIMESTAMP, INTERVAL $sec_wait_before_callback SECOND ), '$A2B->destination')";
 					$res = $A2B -> DBHandle -> Execute($QUERY);
@@ -1371,10 +1372,17 @@ if ($mode == 'standard') {
 			$result = $A2B -> instance_table -> SQLExec ($A2B->DBHandle, $QUERY);
 
 			$instance_table = new Table("cc_callback_spool");
-			$FG_TABLE_CLAUSE = "callerid='{$A2B->config['callback']['callerid']}' and exten_leg_a='{$A2B->destination}' and timediff(now(),entry_time)<{$A2B->config['callback']['sec_avoid_repeate']}";
+			$FG_TABLE_CLAUSE = "(status='PENDING' OR status='PROCESSING') AND account='{$A2B->accountcode} AND 'callerid='{$A2B->config['callback']['callerid']}' AND exten_leg_a='{$A2B->destination}' AND timediff(now(),entry_time)<{$A2B->config['callback']['sec_avoid_repeate']}";
 			$FG_NB_RECORD = $instance_table -> Table_count ($A2B -> DBHandle, $FG_TABLE_CLAUSE);
 
-			if (!is_array($result) && $FG_NB_RECORD == 0) {
+			$sec_wait_before_callback = $A2B -> config["callback"]['sec_wait_before_callback'];
+			if (!is_numeric($sec_wait_before_callback) || $sec_wait_before_callback<1) {
+				$sec_wait_before_callback = 1;
+			}
+			if ($FG_NB_RECORD) {
+				$QUERY = "num_attempt='0', entry_time=now(), `next_attempt_time`=ADDDATE( CURRENT_TIMESTAMP, INTERVAL $sec_wait_before_callback SECOND )";
+				$result = $instance_table -> Update_table ($A2B -> DBHandle, $QUERY, $FG_TABLE_CLAUSE);
+			} elseif (!is_array($result) && $FG_NB_RECORD == 0) {
 			    $resfindrate = $RateEngine->rate_engine_findrates($A2B, $A2B -> destination, $A2B -> tariff);
 
 			    // IF FIND RATE
@@ -1413,11 +1421,6 @@ if ($mode == 'standard') {
 					$server_ip = 'localhost';
 					$num_attempt = 0;
 
-					if (is_numeric($A2B -> config["callback"]['sec_wait_before_callback']) && $A2B -> config["callback"]['sec_wait_before_callback']>=1) {
-						$sec_wait_before_callback = $A2B -> config["callback"]['sec_wait_before_callback'];
-					}else{
-						$sec_wait_before_callback = 1;
-					}
 					$QUERY = "INSERT INTO cc_callback_spool (uniqueid, status, server_ip, num_attempt, channel, exten, context, priority, variable, id_server_group, callback_time, account, callerid, timeout, next_attempt_time, exten_leg_a)" .
 						" VALUES ('$uniqueid', '$status', '$server_ip', '$num_attempt', '$channel', '$exten', '$context', '$priority', '$variable', '$id_server_group', ADDDATE( CURRENT_TIMESTAMP, INTERVAL $sec_wait_before_callback SECOND ), '$account', '$callerid', '$timeout', ADDDATE( CURRENT_TIMESTAMP, INTERVAL $sec_wait_before_callback SECOND ), '$A2B->destination')";
 					$res = $A2B -> DBHandle -> Execute($QUERY);

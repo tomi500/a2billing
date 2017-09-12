@@ -288,6 +288,8 @@ Browse here the pending and completed callbacks. You will see that different par
 
 	$CC_help_signup_agent = create_help(gettext("This shows a list of all signup key create for the Agents, this key is used to identify the default paramater for the subscription on the signup page"));
 
+	$CC_help_list_voicemail_users = create_help(gettext("Voicemail users - The section below shows all the voicemail accounts"));
+
 } //ENDIF SHOW_HELP
 
 $SPOT['paypal'] = '<a href="https://www.paypal.com/ru/mrb/pal=PGSJEXAEXKTBU" target="_blank"><img src="' . KICON_PATH . '/paypal_logo.gif" alt="Paypal"/></a>';

@@ -46,7 +46,6 @@ $skin_name = $_SESSION["stylefile"];
 
 
 $smarty->template_dir = TEMPLATE_DIR . $skin_name.'/';
-
 $smarty->compile_dir = TEMPLATE_C_DIR;
 $smarty->plugins_dir= "./plugins/";
 

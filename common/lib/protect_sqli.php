@@ -36,8 +36,8 @@ if (!get_magic_quotes_gpc())
 if ( function_exists('mysql_real_escape_string'))
 {
 //    $_POST = array_map_recursive('mysql_real_escape_string',$_POST);
-    $_GET  = array_map_recursive('mysql_real_escape_string', $_GET);
-    $_COOKIE  = array_map_recursive('mysql_real_escape_string', $_COOKIE);
+//    $_GET  = array_map_recursive('mysql_real_escape_string', $_GET);
+//    $_COOKIE  = array_map_recursive('mysql_real_escape_string', $_COOKIE);
 }
 else
 {

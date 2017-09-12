@@ -94,12 +94,19 @@ if($posted == 1) {
 		foreach ($fields_array as $val) {
 			$update_src .= ",".$val;
 			$update_des .= ",aa.".$val."=bb.".$val;
+			if ($val == "rateinitial") {
+//				$condition .= " AND aa.buyrate < bb.rateinitial";
+				$condition .= " AND aa.buyrate < bb.rateinitial AND aa.rateinitial < bb.rateinitial"; //обновлять только где в источнике цена продажи выше
+			}
 		}
 		$instance_table = new Table("cc_ratecard aa, (SELECT dialprefix$update_src FROM cc_ratecard WHERE idtariffplan = $ratecard_src_val) bb");
-		$result_updated  = $instance_table->Update_table ($HD_Form -> DBHandle, "aa.dialprefix = bb.dialprefix$update_des", "aa.idtariffplan = $ratecard_des_val AND aa.dialprefix = bb.dialprefix$condition");
-		if($result_updated)
+		$result_updated = $instance_table->Update_table ($HD_Form -> DBHandle, "aa.dialprefix = bb.dialprefix$update_des", "aa.idtariffplan = $ratecard_des_val AND aa.dialprefix = bb.dialprefix$condition");
+//		$instance_table = new Table();
+//		$result_updated = $instance_table->ExecuteQuery ($HD_Form -> DBHandle, "UPDATE cc_ratecard aa, (SELECT dialprefix$update_src FROM cc_ratecard WHERE idtariffplan = $ratecard_src_val) bb SET aa.dialprefix = bb.dialprefix$update_des WHERE aa.idtariffplan = $ratecard_des_val AND aa.dialprefix = bb.dialprefix$condition");
+		if ($result_updated) {
+//			$count = var_export($result_updated,true);
 			$msg = "Ratecard is successfully merged.";
-		else
+		} else
 			$msg = "Ratecard is not merged, please try again with different search criteria.";
 	}
 	$_SESSION['search_ratecard'] = "";

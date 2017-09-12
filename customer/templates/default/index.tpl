@@ -121,7 +121,7 @@
 
     $show_logo .= '<a href="http://www.gnu.org/licenses/agpl.html" target="_blank"><img src="' . KICON_PATH . '/agplv3-155x51.png" alt="AGPLv3"/></a> &nbsp; ';
 
-    $show_logo .= <<<'EOD'
+    $show_logo .= <<<EOD
 <!--LiveInternet counter-->
 <script type="text/javascript">
 document.write("<a href='http://www.liveinternet.ru/click' "+

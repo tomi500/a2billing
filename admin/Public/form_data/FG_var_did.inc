@@ -35,7 +35,11 @@
 getpost_ifset(array('id', 'did', 'activated', 'id_trunk', 'continuewithdid', 'allciduse', 'verify_callerid', 'voicebox', 'billingtype', 'startingdate', 'expirationdate', 'id_cc_didgroup', 'areaprefix', 'citylength', 'id_cc_country', 'fixrate', 'connection_charge','selling_rate', 'aleg_timeinterval', 'aleg_carrier_connect_charge', 'aleg_carrier_cost_min', 'aleg_carrier_initblock', 'aleg_carrier_increment', 'aleg_retail_connect_charge', 'aleg_retail_cost_min', 'aleg_retail_initblock', 'aleg_retail_increment', 'aleg_carrier_connect_charge_offp', 'aleg_carrier_cost_min_offp', 'aleg_carrier_initblock_offp', 'aleg_carrier_increment_offp', 'aleg_retail_connect_charge_offp', 'aleg_retail_cost_min_offp', 'aleg_retail_initblock_offp', 'aleg_retail_increment_offp', 'chanlang'));
 
 
-$HD_Form = new FormHandler("cc_did","did");
+if ( (empty($form_action) || $form_action=="list") && $deleteselected != 'true') {
+    $HD_Form = new FormHandler("cc_did LEFT JOIN cc_trunk ON cc_trunk.id_trunk=cc_did.id_trunk","did");
+} else {
+    $HD_Form = new FormHandler("cc_did","did");
+}
 
 $HD_Form ->FG_LIST_ADDING_BUTTON1 = true;
 $HD_Form ->FG_LIST_ADDING_BUTTON_LINK1 = "A2B_entity_did.php?form_action=ask-add&section=".$_SESSION["menu_section"];
@@ -56,18 +60,19 @@ $actived_list = Constants::getActivationList();
 $billingtype_list = Constants::getBillingTypeList();
 // -- billtype: 0 = fix per month + dialoutrate, 1= fix per month, 2 = dialoutrate, 3 = free
 $billingtype_list_short = Constants::getBillingTypeShortList();
-$scu = $yesno = Constants::getYesNoList();
-$scu[0][0] = gettext("Personal CIDs");
-$scu[1][0] = gettext("All CIDs");
+$yesno = Constants::getYesNoList();
+//
+$scu[] = array( gettext("Ignore&nbsp&nbsp&nbsp&nbspCIDs"), "3");
+$scu[] = array( gettext("All&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbspCIDs"), "1");
+$scu[] = array( gettext("Personal CIDs"), "0");
 //For future
 //$scu[] = array( gettext("Client`s & Personal CIDs").'&nbsp;', "2");
-//
-$scu[] = array( gettext("CID Ignore"), "3");
-$scu[] = array( gettext("All CIDs,&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbspBan callback"), "4");
+$scu[] = array( gettext("All&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbspCIDs, Ban callback"), "4");
 $scu[] = array( gettext("Personal CIDs, Ban callback"), "5");
 
 $HD_Form -> AddViewElement(gettext("DID"), "did", "13%", "center", "sort");
-$HD_Form -> AddViewElement(gettext("CUSTOMER"), "iduser", "15%", "center", "sort", "", "lie_link", "cc_card", "lastname, id, firstname", "id='%id'", "%1 %3", "", "A2B_entity_card.php");
+$HD_Form -> AddViewElement(gettext("TRUNK"), "trunkcode", "14%", "center", "sort");
+$HD_Form -> AddViewElement(gettext("CUSTOMER"), "iduser", "10%", "center", "sort", "", "lie_link", "cc_card", "lastname, id, firstname", "id='%id'", "%1 %3", "", "A2B_entity_card.php");
 $HD_Form -> AddViewElement(gettext("BILLING"), "billingtype", "5%", "center", "sort", "", "list", $billingtype_list_short);
 $HD_Form -> AddViewElement(gettext("START DATE"), "startingdate", "16%", "center", "sort", "19", "", "", "", "",  "display_dateformat");
 $HD_Form -> AddViewElement(gettext("DIDGROUP"), "id_cc_didgroup", "10%", "center", "sort", "15", "lie", "cc_didgroup", "didgroupname", "id='%id'", "%1");
@@ -78,7 +83,7 @@ $HD_Form -> AddViewElement("<acronym title=\"".gettext("RESERVED")."\">".gettext
 $HD_Form -> AddViewElement("<acronym title=\"".gettext("MONTHLY RATE")."\">".gettext("MR")."</acronym>", "fixrate", "3%", "center", "SORT", "30");
 $HD_Form -> AddViewElement("<acronym title=\"".gettext("SELLING RATE")."\">".gettext("SR")."</acronym>", "selling_rate", "5%", "center", "SORT", "30");
 
-$HD_Form -> FieldViewElement ('did, iduser, billingtype, startingdate, id_cc_didgroup, id_cc_country, activated, secondusedreal, reserved, fixrate, selling_rate');
+$HD_Form -> FieldViewElement ('cc_did.did, cc_trunk.trunkcode, cc_did.iduser, cc_did.billingtype, cc_did.startingdate, cc_did.id_cc_didgroup, cc_did.id_cc_country, cc_did.activated, cc_did.secondusedreal, cc_did.reserved, cc_did.fixrate, cc_did.selling_rate');
 
 //$HD_Form -> FG_ACTION_SIZE_COLUMN = '10%';
 

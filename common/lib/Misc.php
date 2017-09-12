@@ -373,8 +373,8 @@ function display_refill_money($value, $currency = BASE_CURRENCY) {
 	if (isset($body[1]))
 		$currency = $body[1];
 	$tempval = 100*abs($value-floor($value));
-	$value = number_format($value, 5, '.', ' ');
-	$value = (round($tempval-floor($tempval),5) == 0) ? number_format($value, 2, '.', ' ') : rtrim($value, '0');
+	$value = number_format($value, 5, '.', '');
+	$value = (round($tempval-floor($tempval),5) == 0) ? number_format($value, 2, '.', ' ') : rtrim(number_format($value, 5, '.', ' '), '0');
 	echo $value . ' ' . mb_strtoupper($currency);
 }
 
@@ -401,7 +401,7 @@ function display_2bill($var, $currency = BASE_CURRENCY) {
 		$currencies_list = get_currencies();
 	$var = round($var / $currencies_list[mb_strtoupper($currency)][2], 5);
 	$tempval = 100*abs($var-floor($var));
-	$var = number_format($var, 5, '.', ' ');
+	$var = number_format($var, 5, '.', '');
 	$var = (round($tempval-floor($tempval),5) == 0) ? number_format($var, 2, '.', ' ') : rtrim($var, '0');
 	echo $var . ' ' . mb_strtoupper($currency);
 //	echo number_format($var, 5) . ' ' . strtoupper($currency);
@@ -713,7 +713,10 @@ function MDP_NUMERIC($chrs = LEN_CARDNUMBER)
 {
     $myrand = "";
     for($i = 0; $i < $chrs; $i++){
-        $myrand .= mt_rand(0,9);
+        if ($i == 0)
+    	    $myrand .= mt_rand(1,9);
+	else
+    	    $myrand .= mt_rand(0,9);
     }
     
     return $myrand;

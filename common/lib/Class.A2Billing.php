@@ -4215,9 +4215,13 @@ $this -> debug( ERROR, $agi, __FILE__, __LINE__, "FAXRESOLUTION: ".$faxresolutio
 			$datasource = 'mysqli://'.$this->config['database']['user'].':'.$this->config['database']['password'].'@'.$this->config['database']['hostname'].'/'.$this->config['database']['dbname'];
 		}
 		$this->DBHandle = NewADOConnection($datasource);
-		if (!$this->DBHandle) die("Connection failed");
-		
-		if ($this->config['database']['dbtype'] == "mysqli") {
+//		if (!$this->DBHandle) die("Connection failed");
+//		
+		if (!$this->DBHandle) {
+			die("Connection failed");
+		}
+//		if ($this->config['database']['dbtype'] == "mysqli") {
+		if ($this->config['database']['dbtype'] == "mysql") {
 			$this->DBHandle -> Execute("SET AUTOCOMMIT=1");
 			$this->DBHandle -> Execute("SET NAMES 'UTF8'");
 		}
@@ -4255,7 +4259,7 @@ $this -> debug( ERROR, $agi, __FILE__, __LINE__, "FAXRESOLUTION: ".$faxresolutio
 				$this -> debug( FATAL, $agi, __FILE__, __LINE__, "[DB CONNECTION LOST] CDR NOT POSTED");
 				die("Reconnection failed");
 			}
-			if ($this->config['database']['dbtype'] == "mysqli") {
+			if ($this->config['database']['dbtype'] == "mysql") {
 				$this->DBHandle -> Execute('SET AUTOCOMMIT=1');
 			}
 			

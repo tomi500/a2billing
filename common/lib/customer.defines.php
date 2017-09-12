@@ -34,7 +34,9 @@
 define ("PHP_QUICK_PROFILER", false);
 // Include PHP-Quick-Profiler
 require_once('PhpQuickProfiler.php');
-$profiler = new PhpQuickProfiler(PhpQuickProfiler::getMicroTime());
+$objProf = new PhpQuickProfiler(0);
+$profiler = new PhpQuickProfiler($objProf->getMicroTime());
+//$profiler = new PhpQuickProfiler(PhpQuickProfiler::getMicroTime());
 
 
 define ("WRITELOG_QUERY",false);
