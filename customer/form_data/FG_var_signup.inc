@@ -136,6 +136,24 @@ if (!$agent_conf) {
 
 $table_key = new Table("cc_agent_signup", "*");
 
+$maxi = $maxi2 = $maxi3 = $maxi4 = '';
+//	-= Need to install GeoIP http://ua2.php.net/manual/en/geoip.setup.php =-
+if (($form_action == 'ask-add' || $form_action == 'add') && (geoip_db_avail(GEOIP_REGION_EDITION_REV0) || geoip_db_avail(GEOIP_REGION_EDITION_REV1))) {
+	$countryregion = geoip_record_by_name($_SERVER['REMOTE_ADDR']);
+	$maxi4 = "value='".$countryregion['postal_code']."'";
+} else {
+	$country = $region = "";
+}
+
+$country_city_list = array (array('Jeru'  ,'Israel' ),
+			    array('Berlin','Germany')
+			    );
+$town = "";
+foreach ($country_city_list as $cur_value) {
+	if ($cur_value[1]==$countryregion['country_name'])
+	    $town = $cur_value[0];
+}
+
 //end check subscriber
 
 $currency_list = array ();
@@ -171,7 +189,6 @@ if (($popup_select >= 1))
 
 $HD_Form->CV_FOLLOWPARAMETERS = "&popup_select=" . $popup_select . "&popup_formname=" . $popup_formname . "&popup_fieldname=" . $popup_fieldname;
 
-$maxi = $maxi2 = $maxi3 = '';
 if (isset ($form_action) && $form_action == "add") {
 	$array_card_generated = gen_card_with_alias();
 	$maxi = $array_card_generated[0];
@@ -305,12 +322,13 @@ if (STATE_ENABLE)  {
 								gettext("Insert your state"), "", "", "", "", "", "", "NO", "");
 	$state_editFG = ",state";
 }
-//if ($_SERVER['REMOTE_ADDR'] == '188.231.191.208') $_SERVER['REMOTE_ADDR'] = '217.10.79.9';
 
 if (COUNTRY_ENABLE)  {
 	if (isset($form_action) && $form_action == 'ask-add') {
-	// -= Need to install GeoIP http://ua2.php.net/manual/en/geoip.setup.php =-
-		$country = (function_exists('geoip_country_code3_by_name'))?geoip_country_code3_by_name($_SERVER['REMOTE_ADDR']):'USA';
+		$country = $countryregion['country_code3'];
+		if ($country=="") {
+			$country = 'USA';
+		}
 	}
 	$HD_Form->AddEditElement(gettext("COUNTRY")." *",
 								"country",
@@ -327,31 +345,40 @@ if (ZIPCODE_ENABLE)  {
 								"zipcode",
 								'$value',
 								"INPUT",
-								"size=30 maxlength=20","0",
+								"size=30 maxlength=20 $maxi4","0",
 								gettext("Insert your zipcode"), "", "", "", "", "", "", "", "");
 	$zipcode_editFG = ",zipcode";
 }
 
 if (TIMEZONE_ENABLE)  {
 	if (isset($form_action)) {
-	// -= Need to install GeoIP http://ua2.php.net/manual/en/geoip.setup.php =-
+//	-= Need to install GeoIP http://ua2.php.net/manual/en/geoip.setup.php =-
 		$timezone_list = get_timezones();
 		$one_select = false;
 		if (function_exists('geoip_time_zone_by_country_and_region') && ($form_action == 'ask-add' || $form_action == 'add')) {
-			if (geoip_db_avail(GEOIP_REGION_EDITION_REV0) || geoip_db_avail(GEOIP_REGION_EDITION_REV1)) {
-				$countryregion = geoip_region_by_name($_SERVER['REMOTE_ADDR']);
+			if ($countryregion===false) {
+				$country = $region = "";
+			} else {
 				$country = $countryregion['country_code'];
 				$region = $countryregion['region'];
-			} else $region = "";
+			}
 			if ($region == "") {
-				$country = geoip_country_code_by_name($_SERVER['REMOTE_ADDR']);
+				if ($country == "") $country = geoip_country_code_by_name($_SERVER['REMOTE_ADDR']);
 				$region = '01';
 			}
-			$UserDateTimeZone	= new DateTimeZone(geoip_time_zone_by_country_and_region($country,$region));
+			if ($country == "") {
+				$country = 'US';
+				$region = 'CA';
+			}
+			try {
+				$UserDateTimeZone	= new \DateTimeZone(geoip_time_zone_by_country_and_region($country,$region));
+			} catch (\Exception $e) {
+				$UserDateTimeZone	= new \DateTimeZone('UTC');
+			}
 			$zonename		= $UserDateTimeZone->getName();
 //			$UserDateTime		= new DateTime(null, $UserDateTimeZone);
 //			$servergmt		= $UserDateTimeZone->getOffset($UserDateTime);
-			$UserDateTime		= new DateTime('2013-12-21', $UserDateTimeZone);
+			$UserDateTime		= new DateTime('2017-12-14', $UserDateTimeZone);
 			$servergmt		= $UserDateTime->getOffset();
 		} else $servergmt = SERVER_GMT;
 		foreach ($timezone_list as $key => $cur_value) {
@@ -362,10 +389,13 @@ if (TIMEZONE_ENABLE)  {
 			if ($form_action == 'ask-add' || $form_action == 'add') {
 				if (in_array($servergmt, $cur_value) && !$one_select) {
 					$cur_id_timezone = $key.";".$zonename;
-					$timezone_list[$key][1] = $cur_id_timezone;
-					if (!isset($id_timezone) || $key == $id_timezone)
-						$id_timezone = $cur_id_timezone;
-					$one_select = true;
+					if ($town=="" || strpos($cur_value[2], $town) !== false) {
+						$timezone_list[$key][1] = $cur_id_timezone;
+						if ($zonename != "") $timezone_list[$key][0] = substr_replace($cur_value[2],") ".$zonename,strpos($cur_value[2],')'));
+						if (!isset($id_timezone) || $key == $id_timezone)
+							$id_timezone = $cur_id_timezone;
+						$one_select = true;
+					}
 				}
 			}
 		}
