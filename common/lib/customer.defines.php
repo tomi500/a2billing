@@ -58,7 +58,17 @@ include (dirname(__FILE__)."/Class.NotificationsDAO.php");
 include (dirname(__FILE__)."/Class.Notification.php");
 include (dirname(__FILE__)."/Class.Mail.php");
 
+// The system will not log for Public/index.php and signup/index.php
+if (isset($_SERVER['REQUEST_URI'])) {
+    $URI = $_SERVER['REQUEST_URI'];
+} else {
+    $URI = '';
+}
+
+// Enable UI Logger
+define ("ENABLE_LOG", 1);
 include (FSROOT."lib/Class.Logger.php");
+$log = new Logger();
 
 session_name("UICSESSION");
 session_start();
@@ -274,7 +284,12 @@ define ("ADMIN_EMAIL", isset($A2B->config["global"]['admin_email'])?$A2B->config
 // INCLUDE HELP
 include (LIBDIR."customer.help.php");
 
-define ("ENABLE_LOG", 0);
+if(stripos($URI, "=ask-add")===false && stripos($URI, "=add")===false && stripos($URI, "index.php")===false && stripos($URI, "logout.php")===false && isset($_SESSION["card_id"]) && stripos($URI, $_SESSION["last_page"])===false) {
+	// Insert Log
+	$log -> insertLog($_SESSION["card_id"], 1, "Page Visit", "User Visited the Page", '', $_SERVER['REMOTE_ADDR'], $_SERVER['REQUEST_URI'],'',2);
+	$log = null;
+	$_SESSION["last_page"] = array_shift(explode('?', basename($URI)));
+}
 
 //SQLi
 $DBHandle  = DbConnect();

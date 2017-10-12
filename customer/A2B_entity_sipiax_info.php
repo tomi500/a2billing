@@ -95,6 +95,11 @@ if ($atmenu == "SIP")
 		if ( !is_numeric($quantity) || !is_numeric($startnumber) || $quantity == '0' || startnumber == '0' || $quantity > $extquantity || $startnumber < $extmin || $extmax < $startnumber + $quantity -1 )
 			break;
 		$extcreated = gen_friends($cardid,$startnumber,$quantity,$extmin,$extmax,$DBHandle_max,$A2B,$language);
+		if (count($extcreated)>0) {
+			$log = new Logger();
+			$log -> insertLog_Update($_SESSION["card_id"], 1, "SIP EXTENSION".(($quantity>1)?"S":"")." ADDED", implode(',', $extcreated), '', $_SERVER['REMOTE_ADDR'], $_SERVER['REQUEST_URI'],'',2);
+			$log = null;
+		}
 		if (!USE_REALTIME) {
 //			include_once ("./lib/Form/Class.Realtime.php");
 			$instance_realtime = new Realtime();
@@ -170,7 +175,7 @@ if ($form_action == "list") {
 </center>
 <?php
 }
-if (isset($extcreated)) echo 'You have just created '.$extcreated.' extensions';
+if (isset($extcreated)) echo 'You have just created '.count($extcreated).' extensions';
 if ($atmenu == "SIP" && $form_action == "list") {
 ?>
 <script language="JavaScript" src="./javascript/sipiax.js"></script>

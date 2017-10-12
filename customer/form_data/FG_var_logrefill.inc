@@ -28,7 +28,7 @@ LEFT JOIN cc_card ON username=usedcardnumber WHERE cc_card.id = ".$_SESSION["car
 	$HD_Form -> FG_TABLE_ID = 'aa.id';
 	$HD_Form -> FG_TABLE_DEFAULT_ORDER = 'date';
 } else {
-	$HD_Form = new FormHandler("cc_logrefill",gettext("Refill"));
+	$HD_Form = new FormHandler("cc_logrefill","Refill");
 	unset($list_refill_type[0]);
 	$HD_Form -> FG_TABLE_ID = 'cc_logrefill.id';
 }

@@ -31,40 +31,42 @@
  * 
 **/
 
-
-include ("../lib/admin.defines.php");
-include ("../lib/admin.module.access.php");
-include ("../lib/Form/Class.FormHandler.inc.php");
+include ("lib/customer.defines.php");
+include ("lib/customer.module.access.php");
+include ("./lib/Form/Class.FormHandler.inc.php");
+include ("lib/customer.smarty.php");
 include ("./form_data/FG_var_log_viewer.inc");
-include ("../lib/admin.smarty.php");
 
-if (! has_rights (ACX_MAINTENANCE)) {
-	Header ("HTTP/1.0 401 Unauthorized");
-	Header ("Location: PP_error.php?c=accessdenied");
+if (!has_rights(ACX_SIP_IAX)) {
+	Header("HTTP/1.0 401 Unauthorized");
+	Header("Location: PP_error.php?c=accessdenied");
 	die();
 }
 
-$HD_Form -> setDBHandler (DbConnect());
-$HD_Form -> init();
 
-if ($id!="" || !is_null($id)) {
-	$HD_Form -> FG_EDITION_CLAUSE = str_replace("%id", "$id", $HD_Form -> FG_EDITION_CLAUSE);
+$HD_Form->setDBHandler(DbConnect());
+$HD_Form->init();
+
+$HD_Form -> FG_EDITION_LINK	= $_SERVER['PHP_SELF']."?form_action=ask-edit&atmenu=$atmenu&id=";
+$HD_Form -> FG_DELETION_LINK	= $_SERVER['PHP_SELF']."?form_action=ask-delete&atmenu=$atmenu&id=";
+
+if ($id != "" || !is_null($id)) {
+	$HD_Form->FG_EDITION_CLAUSE = str_replace("%id", "$id", $HD_Form->FG_EDITION_CLAUSE);
 }
 
-if (!isset($form_action))  $form_action="list"; //ask-add
-if (!isset($action)) $action = $form_action;
+if (!isset ($form_action)) $form_action = "list"; //ask-add
+if (!isset ($action)) $action = $form_action;
 
-$list = $HD_Form -> perform_action($form_action);
+$list = $HD_Form->perform_action($form_action);
 
 // #### HEADER SECTION
 $smarty->display('main.tpl');
 
 // #### HELP SECTION
-echo $CC_help_list_log;
+echo $CC_help_log_viewer_info;
 
 // #### TOP SECTION PAGE
-$HD_Form -> create_toppage ($form_action);
-
+$HD_Form->create_toppage($form_action);
 
 if($form_action=="list"){
 ?>
@@ -74,50 +76,35 @@ if($form_action=="list"){
 	<INPUT TYPE="hidden" NAME="current_page" value=0>	
 		<table class="bar-status" width="70%" border="0" cellspacing="1" cellpadding="2" align="center">
 			<tbody>
-			<?php  if ($_SESSION["pr_groupID"]==2 && is_numeric($_SESSION["pr_IDCust"])){ ?>
-			<?php  }else{ ?>
 			<tr>
-				<td align="left" valign="top" class="bgcolor_004">					
-					<font class="fontstyle_003">&nbsp;&nbsp;<?php echo gettext("CUSTOMERS");?></font>
-				</td>				
-				<td class="bgcolor_005" align="left">
-				<table width="100%" border="0" cellspacing="0" cellpadding="0"><tr>
-					<td class="fontstyle_searchoptions">
-						<?php echo gettext("ADMIN USER");?>: <INPUT TYPE="text" NAME="enteradmin" value="<?php echo $enteradmin?>" class="form_input_text">
-						<a href="#" onclick="window.open('A2B_entity_user.php?popup_select=1&popup_formname=myForm&popup_fieldname=enteradmin' , 'AdminSelection','scrollbars=1,width=550,height=330,top=20,left=100,scrollbars=1');"><img src="<?php echo Images_Path;?>/icon_arrow_orange.gif"></a>
-					</td>					
-				</tr></table></td>
-			</tr>			
-			<?php  }?>
-			<tr>
-        		<td class="bgcolor_002" align="left">
+        		<td class="bgcolor_004" align="left">
 
 					<input type="radio" name="Period" value="Month" <?php  if (($Period=="Month") || !isset($Period)){ ?>checked="checked" <?php  } ?>> 
 					<font class="fontstyle_003"><?php echo gettext("SELECT MONTH");?></font>
 				</td>
-      			<td class="bgcolor_003" align="left">
+      			<td class="bgcolor_005" align="left">
 					<table width="100%" border="0" cellspacing="0" cellpadding="0">
 					<tr><td class="fontstyle_searchoptions">
 	  				<input type="checkbox" name="frommonth" value="true" <?php  if ($frommonth){ ?>checked<?php }?>>
 					<?php echo gettext("From");?> : <select name="fromstatsmonth" class="form_input_select">
 					<?php
 						$monthname = array( gettext("January"), gettext("February"),gettext("March"), gettext("April"), gettext("May"), gettext("June"), gettext("July"), gettext("August"), gettext("September"), gettext("October"), gettext("November"), gettext("December"));
-						$year_actual = date("Y");  	
+						$year_actual = date("Y");
 						for ($i=$year_actual;$i >= $year_actual-1;$i--)
-						{		   
+						{
 						   if ($year_actual==$i){
 							$monthnumber = date("n")-1; // Month number without lead 0.
 						   }else{
 							$monthnumber=11;
-						   }		   
-						   for ($j=$monthnumber;$j>=0;$j--){	
+						   }
+						   for ($j=$monthnumber;$j>=0;$j--){
 							$month_formated = sprintf("%02d",$j+1);
 				   			if ($fromstatsmonth=="$i-$month_formated")	$selected="selected";
 							else $selected="";
-							echo "<OPTION value=\"$i-$month_formated\" $selected> $monthname[$j]-$i </option>";				
+							echo "<OPTION value=\"$i-$month_formated\" $selected> $monthname[$j]-$i </option>";
 						   }
 						}
-					?>		
+					?>
 					</select>
 					</td><td  class="fontstyle_searchoptions">&nbsp;&nbsp;
 					<input type="checkbox" name="tomonth" value="true" <?php  if ($tomonth){ ?>checked<?php }?>> 
@@ -144,11 +131,11 @@ if($form_action=="list"){
     		</tr>
 			
 			<tr>
-        		<td align="left" class="bgcolor_004">
+        		<td align="left" class="bgcolor_002">
 					<input type="radio" name="Period" value="Day" <?php  if ($Period=="Day"){ ?>checked="checked" <?php  } ?>> 
 					<font class="fontstyle_003"><?php echo gettext("SELECT DAY");?></font>
 				</td>
-      			<td align="left" class="bgcolor_005">
+      			<td align="left" class="bgcolor_003">
 					<table width="100%" border="0" cellspacing="0" cellpadding="0">
 					<tr><td class="fontstyle_searchoptions">
 	  				<input type="checkbox" name="fromday" value="true" <?php  if ($fromday){ ?>checked<?php }?>> <?php echo gettext("From");?> :
@@ -212,10 +199,10 @@ if($form_action=="list"){
 	  			</td>
     		</tr>
 			<tr>
-				<td class="bgcolor_002" align="left">			
+				<td class="bgcolor_004" align="left">			
 					<font class="fontstyle_003">&nbsp;&nbsp;<?php echo gettext("LOG LEVEL");?></font>
 				</td>				
-				<td class="bgcolor_003" align="left">
+				<td class="bgcolor_005" align="left">
 				<select name="loglevel" style="width:90px;">
 				<option value="0" <?php if ($loglevel == 0) echo "selected"?>>ALL</option>
 				<option value="1" <?php if ($loglevel == 1) echo "selected"?>>Level-1</option>
@@ -225,9 +212,9 @@ if($form_action=="list"){
 				</td>
 			</tr>			
 			<tr>
-        		<td class="bgcolor_004" align="left" > </td>
+        		<td class="bgcolor_002" align="left" > </td>
 
-				<td class="bgcolor_005" align="center" >
+				<td class="bgcolor_003" align="center" >
 					<input type="image"  name="image16" align="top" border="0" src="<?php echo Images_Path;?>/button-search.gif" />
 					
 	  			</td>
@@ -237,8 +224,9 @@ if($form_action=="list"){
 
 <?php
 }
-$HD_Form -> create_form ($form_action, $list, $id=null) ;
+
+
+$HD_Form->create_form($form_action, $list, $id = null);
 
 // #### FOOTER SECTION
 $smarty->display('footer.tpl');
-

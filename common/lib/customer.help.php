@@ -162,6 +162,8 @@ if (SHOW_HELP) {
 
 	$CC_help_surveillance = create_help("Назначьте номер телефона, принадлежащий Вашему записывающему устройству, и частоту нарезки роликов для аудио или видео наблюдения.",$credit_cur,$limit_cur);
 
+	$CC_help_log_viewer_info = create_help(gettext("The system log helps you track all events on your application. Log levels are the Importance Levels for the events - 1 is lowest level and 3 is highest level. 1 is used for Login, Logout and Page Visit. 2 is used for Add, Import, Export. 3 is for Update and Delete."),$credit_cur,$limit_cur);
+
 } //ENDIF SHOW_HELP
 
 if (!isset ($disable_load_conf) || !($disable_load_conf)) {

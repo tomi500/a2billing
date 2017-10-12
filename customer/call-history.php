@@ -194,7 +194,6 @@ if ($posted==1) {
 			$SQLcmd .= $tmpcmd . $wheretmp . " < " . $waitup2;
 		}
 	} else $waitup2 = "";
-//echo "- ".$SQLcmd;
 }
 
 $date_clause = '';

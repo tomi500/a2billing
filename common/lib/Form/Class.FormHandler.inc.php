@@ -1630,9 +1630,12 @@ class FormHandler
 			} else {
 				if ($this->VALID_SQL_REG_EXP) $this -> RESULT_QUERY = $instance_table -> Add_table ($this->DBHandle, $param_add_value, null, null, $this->FG_TABLE_ID);
 			}
+			$agent  = (isset($_SESSION["card_id"])) ? 2 : 0 ;
+			$idcust = ($agent) ? $_SESSION["card_id"]:$_SESSION["admin_id"];
 			if($this -> FG_ENABLE_LOG == 1) {
-				$this -> logger -> insertLog_Add($_SESSION["admin_id"], 2, "NEW ".strtoupper($this->FG_INSTANCE_NAME)." CREATED" , "User added a new record in database", $this->FG_TABLE_NAME, $_SERVER['REMOTE_ADDR'], $_SERVER['REQUEST_URI'], $param_add_fields, $param_add_value);
+				$this -> logger -> insertLog_Add($idcust, 2, "NEW ".strtoupper($this->FG_INSTANCE_NAME)." CREATED" , "Record is added in database", $this->FG_TABLE_NAME, $_SERVER['REMOTE_ADDR'], $_SERVER['REQUEST_URI'], $param_add_fields, $param_add_value, $agent);
 			}
+			$_SESSION["last_page"] = array_shift(explode('?', basename($_SERVER['REQUEST_URI'])));
 			// CALL DEFINED FUNCTION AFTER THE ACTION ADDITION
 			if (strlen($this->FG_ADDITIONAL_FUNCTION_AFTER_ADD)>0 && ($this->VALID_SQL_REG_EXP))
 				$res_funct = call_user_func(array('FormBO', $this->FG_ADDITIONAL_FUNCTION_AFTER_ADD));
@@ -1799,9 +1802,12 @@ class FormHandler
 					}
 				}
 			}
+			$agent  = (isset($_SESSION["card_id"])) ? 2 : 0 ;
+			$idcust = ($agent) ? $_SESSION["card_id"]:$_SESSION["admin_id"];
 			if($this -> FG_ENABLE_LOG == 1) {
-				$this -> logger -> insertLog_Update($_SESSION["admin_id"], 3, "A ".strtoupper($this->FG_INSTANCE_NAME)." UPDATED", "A RECORD IS UPDATED, EDITION CALUSE USED IS ".$this->FG_EDITION_CLAUSE, $this->FG_TABLE_NAME, $_SERVER['REMOTE_ADDR'], $_SERVER['REQUEST_URI'], $param_update);
+				$this -> logger -> insertLog_Update($idcust, 3, strtoupper($this->FG_INSTANCE_NAME)." IS UPDATED", "A RECORD IS UPDATED, EDITION CLAUSE USED IS ".$this->FG_EDITION_CLAUSE, $this->FG_TABLE_NAME, $_SERVER['REMOTE_ADDR'], $_SERVER['REQUEST_URI'], $param_update, $agent);
 			}
+			$_SESSION["last_page"] = array_shift(explode('?', basename($_SERVER['REQUEST_URI'])));
 			if ($this->FG_DEBUG == 1) echo $this -> RESULT_QUERY;
 				// CALL DEFINED FUNCTION AFTER THE ACTION ADDITION
 			if (strlen($this->FG_ADDITIONAL_FUNCTION_AFTER_EDITION)>0 && ($this->VALID_SQL_REG_EXP))
@@ -1850,9 +1856,12 @@ class FormHandler
 		$instance_table->FK_DELETE = ($this->FG_FK_WARNONLY ? false : true);
 
 		$this -> RESULT_QUERY = $instance_table -> Delete_table ($this->DBHandle, $this->FG_EDITION_CLAUSE, $func_table = null);
+		$agent  = (isset($_SESSION["card_id"])) ? 2 : 0 ;
+		$idcust = ($agent) ? $_SESSION["card_id"]:$_SESSION["admin_id"];
 		if ($this -> FG_ENABLE_LOG == 1) {
-		    $this -> logger -> insertLog($_SESSION["admin_id"], 3, "A ".strtoupper($this->FG_INSTANCE_NAME)." DELETED" , "A RECORD IS DELETED, EDITION CLAUSE USED IS ".$this->FG_EDITION_CLAUSE, $this->FG_TABLE_NAME, $_SERVER['REMOTE_ADDR'], $_SERVER['REQUEST_URI'], $param_update);
+		    $this -> logger -> insertLog($idcust, 3, "A ".strtoupper($this->FG_INSTANCE_NAME)." DELETED" , "A RECORD IS DELETED, EDITION CLAUSE USED IS ".$this->FG_EDITION_CLAUSE, $this->FG_TABLE_NAME, $_SERVER['REMOTE_ADDR'], $_SERVER['REQUEST_URI'], $param_update, $agent);
 		}
+		$_SESSION["last_page"] = array_shift(explode('?', basename($_SERVER['REQUEST_URI'])));
 		if (!$this -> RESULT_QUERY)  echo gettext("error deletion");
 
 		$this->FG_INTRO_TEXT_DELETION = str_replace("%id", $processed['id'], $this->FG_INTRO_TEXT_DELETION);

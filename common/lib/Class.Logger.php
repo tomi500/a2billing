@@ -42,7 +42,7 @@ class Logger
 	}
 	//Function insertLog
 	// Inserts the Log into table
-	function insertLog_Add($userID, $logLevel, $actionPerformed, $description, $tableName, $ipAddress, $pageName, $param_add_fields, $param_add_value)
+	function insertLog_Add($userID, $logLevel, $actionPerformed, $description, $tableName, $ipAddress, $pageName, $param_add_fields, $param_add_value, $agent=0)
 	{
 		$DB_Handle = DBConnect();
 		$table_log = new Table();		
@@ -60,14 +60,29 @@ class Logger
 				$str_name_value_pair .= "|";
 			}
 		}
-		$QUERY = "INSERT INTO cc_system_log (iduser, loglevel, action, description, tablename, pagename, ipaddress, data) ";
-		$QUERY .= " VALUES('".$userID."','".$logLevel."','".$actionPerformed."','".$description."','".$tableName."','".$pageName."','".$ipAddress."','".$str_name_value_pair."')";
+		$QUERY = "INSERT INTO cc_system_log (iduser, loglevel, action, description, tablename, pagename, ipaddress, data, agent) ";
+		$QUERY .= " VALUES('".$userID."','".$logLevel."','".$actionPerformed."','".$description."','".$tableName."','".$pageName."','".$ipAddress."','".$str_name_value_pair."','".$agent."')";
 		if ($this -> do_debug) echo $QUERY;
 
 		$table_log -> SQLExec($DB_Handle, $QUERY);		
 	}
 	
-	function insertLog_Update($userID, $logLevel, $actionPerformed, $description, $tableName, $ipAddress, $pageName, $param_update)
+	function insertLog_noBlob($userID, $logLevel, $actionPerformed, $description, $tableName, $ipAddress, $pageName, $param_update, $agent=0)
+	{
+		$DB_Handle = DBConnect();
+		$table_log = new Table();
+		$pageName = basename($pageName);
+		$pageName    = array_shift(explode('?', $pageName));		
+		$description = str_replace("'", "", $description) . implode(',', $param_update);
+		$QUERY = "INSERT INTO cc_system_log (iduser, loglevel, action, description, tablename, pagename, ipaddress, agent) ";
+		$QUERY .= " VALUES('".$userID."','".$logLevel."','".$actionPerformed."','".$description."','".$tableName."','".$pageName."','".$ipAddress."','".$agent."')";
+		
+		if ($this -> do_debug) echo $QUERY;
+
+		$table_log -> SQLExec($DB_Handle, $QUERY);
+	}
+	
+	function insertLog_Update($userID, $logLevel, $actionPerformed, $description, $tableName, $ipAddress, $pageName, $param_update, $agent=0)
 	{
 		$DB_Handle = DBConnect();
 		$table_log = new Table();		
@@ -84,28 +99,30 @@ class Logger
 				$str_name_value_pair .= "|";
 			}
 		}
-		$QUERY = "INSERT INTO cc_system_log (iduser, loglevel, action, description, tablename, pagename, ipaddress, data) ";
-		$QUERY .= " VALUES('".$userID."','".$logLevel."','".$actionPerformed."','".$description."','".$tableName."','".$pageName."','".$ipAddress."','".$str_name_value_pair."')";
+		$QUERY = "INSERT INTO cc_system_log (iduser, loglevel, action, description, tablename, pagename, ipaddress, data, agent) ";
+		$QUERY .= " VALUES('".$userID."','".$logLevel."','".$actionPerformed."','".$description."','".$tableName."','".$pageName."','".$ipAddress."','".$str_name_value_pair."','".$agent."')";
 		
 		if ($this -> do_debug) echo $QUERY;
 
 		$table_log -> SQLExec($DB_Handle, $QUERY);		
 	}	
 	
-	function insertLog($userID, $logLevel, $actionPerformed, $description, $tableName, $ipAddress, $pageName, $data='')
+	function insertLog($userID, $logLevel, $actionPerformed, $description, $tableName, $ipAddress, $pageName, $data='', $agent=0)
 	{
+	    if ($agent==0 || !isset($_SESSION["admin_ip"] ) || $_SESSION["admin_ip"] != $_SERVER["REMOTE_ADDR"]) {
 		$DB_Handle = DBConnect();
-		$table_log = new Table();		
+		$table_log = new Table();
 		$pageName = basename($pageName);
 		$pageArray = explode('?', $pageName);
 		$pageName = array_shift($pageArray);
 		$description = str_replace("'", "", $description);
 		
-		$QUERY = "INSERT INTO cc_system_log (iduser, loglevel, action, description, tablename, pagename, ipaddress, data) ";
-		$QUERY .= " VALUES('".$userID."','".$logLevel."','".$actionPerformed."','".$description."','".$tableName."','".$pageName."','".$ipAddress."','".$data."')";
+		$QUERY = "INSERT INTO cc_system_log (iduser, loglevel, action, description, tablename, pagename, ipaddress, data, agent) ";
+		$QUERY .= " VALUES('".$userID."','".$logLevel."','".$actionPerformed."','".$description."','".$tableName."','".$pageName."','".$ipAddress."','".$data."','".$agent."')";
 		if ($this -> do_debug) echo $QUERY;
 
-		$table_log -> SQLExec($DB_Handle, $QUERY);		
+		$table_log -> SQLExec($DB_Handle, $QUERY);
+	    }
 	}
 	
 	function insertLogAgent($userID, $logLevel, $actionPerformed, $description, $tableName, $ipAddress, $pageName, $data='')

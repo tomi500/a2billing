@@ -72,14 +72,19 @@ if(strlen(RETURN_URL_DISTANT_LOGIN)>1) {
 	$C_RETURN_URL_DISTANT_LOGIN = 'index.php?';
 }
 
-if (isset($_GET["logout"]) && $_GET["logout"]=="true") { 
+if (isset($_GET["logout"]) && $_GET["logout"]=="true") {
+//	if(stripos($URI, "logout.php")===false && isset($_SESSION["card_id"])) {
+	    $log = new Logger();
+	    $log -> insertLog($_SESSION["card_id"], 1, "LOGGED OUT", "User Logged out from website", '', $_SERVER['REMOTE_ADDR'], '', '', 2);
+	    $log = null;
+//	}
 	session_destroy();
 	$cus_rights=0;
 	Header ("HTTP/1.0 401 Unauthorized");
-	Header ("Location: $C_RETURN_URL_DISTANT_LOGIN");	   
+	Header ("Location: $C_RETURN_URL_DISTANT_LOGIN");
 	die();
 }
-	
+
 getpost_ifset (array('pr_login', 'pr_password'));
 
 
@@ -143,6 +148,17 @@ if ((!isset($_SESSION['pr_login']) || !isset($_SESSION['pr_password']) || !isset
 			$_SESSION["timezone"]		= $return[14];
 			$_SESSION["dillertariffs"]	= $return[15];
 			$_SESSION["dillergroups"]	= $return[16];
+			
+			$QUERY = "SELECT ipaddress from cc_system_log WHERE agent=0 ORDER BY creationdate DESC LIMIT 1";
+			$res = $DBHandle -> Execute($QUERY);
+			if ($res!==false) {
+				$row [] = $res -> fetchRow();
+				$_SESSION["admin_ip"] = $row [0][0];
+			}
+			
+			$log = new Logger();
+			$log -> insertLog($return[3], 1, "LOGGED IN", "User Logged in to website", '', $_SERVER['REMOTE_ADDR'], '', '', 2);
+			$log = null;
 		}
 	} else {
 		$_SESSION["cus_rights"]=0;

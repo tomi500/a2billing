@@ -150,7 +150,7 @@ if ($form_action == "list") {
 </center>
 <?php
 }
-if (isset($extcreated)) echo 'You have just created '.$extcreated.' extensions';
+if (isset($extcreated)) echo 'You have just created '.count($extcreated).' extensions';
 if ($atmenu == "SIP" && $form_action == "list" && false) {
 ?>
 <script language="JavaScript" src="./javascript/sipiax.js"></script>

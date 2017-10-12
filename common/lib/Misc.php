@@ -595,7 +595,9 @@ function linktocustomer_id($id) {
 	$list_customer = $inst_table->Get_list($handle, $FG_TABLE_CLAUSE, "", "", "", "", "", "", "", 10);
 	$value = $list_customer[0][0];
 	$customer = $list_customer[0][1];
-	if ($id > 0) {
+	if (!is_numeric($id)) {
+		echo $id;
+	} else if ($id > 0) {
 		echo "<a href=\"A2B_entity_card.php?form_action=ask-edit&id=$id\" title=\"$customer\">$value</a>";
 	} else {
 		echo $value;
@@ -846,6 +848,7 @@ function gen_friends($card_id, $start, $quantity, $min, $max, $DBHandle = null, 
 	$rtpholdtimeout	= "'300'";
 	$rtpkeepalive	= "'30'";
 	$allowtransfer	= "'yes'";
+	$nums		= array();
 
 		for ($i = 1; $i <= $quantity; $i++) {
 		    for ($k = 0; $k <= 1000; $k++) {
@@ -890,13 +893,14 @@ function gen_friends($card_id, $start, $quantity, $min, $max, $DBHandle = null, 
 		$QUERY = "INSERT INTO cc_sip_buddies (id_cc_card, name, defaultuser, accountcode, secret, regexten, callerid, amaflags, type, nat, dtmfmode, allow, host, context, regseconds, language, mailbox, rtptimeout, rtpholdtimeout, rtpkeepalive, qualify, allowtransfer)
 			VALUES ('$card_id', '{$name[1]}', '{$name[1]}', '" . $_SESSION["pr_login"] . "', '$pass', '$start', 'Internal-$start', '$amaflags', '$type', '$nat', '$dtmfmode', '$allow', '$host', '$context', $regseconds, '$language', '{$start}@{$_SESSION["pr_login"]}', $rtptimeout, $rtpholdtimeout, $rtpkeepalive, '$qualify', $allowtransfer)";
 		$result = $inst_table->SQLExec($DBHandle, $QUERY, 0);
+		$nums[] = $start;
 //echo $QUERY."<br/>";
 		$QUERY = "INSERT INTO cc_voicemail_users (customer_id, sip_buddy_id, context, mailbox, password, fullname, email, language)
 					SELECT cc_card.id, cc_sip_buddies.id, cc_card.username, '$start', '0000', concat(lastname,' ',firstname) fullname, email, cc_card.language FROM cc_card, cc_sip_buddies WHERE cc_card.id='$card_id' AND cc_sip_buddies.name='{$name[1]}'";
 		$result = $inst_table->SQLExec($DBHandle, $QUERY, 0);
 		$start++;
 		}
-		return --$i;
+		return $nums;
 }
 
 /**

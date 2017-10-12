@@ -4136,42 +4136,46 @@ msgid "MY PROFILE"
 msgstr "ПРОФИЛЬ"
 
 #: templates/default/main.tpl:16
+msgid "ACTIVITY"
+msgstr "ИСТОРИЯ ПОСЕЩЕНИЙ"
+
+#: templates/default/main.tpl:17
 msgid "MY PBX"
 msgstr "МОЯ АТС"
 
-#: templates/default/main.tpl:17
+#: templates/default/main.tpl:18
 msgid "MY CUSTOMERS"
 msgstr "КЛИЕНТЫ"
 
-#: templates/default/main.tpl:18
+#: templates/default/main.tpl:19
 msgid "LIST CUSTOMERS"
 msgstr "СПИСОК"
 
-#: templates/default/main.tpl:19
+#: templates/default/main.tpl:20
 msgid "COMMISSION ACCRUED"
 msgstr "КОМИССИОННЫЕ"
 
-#: templates/default/main.tpl:22
+#: templates/default/main.tpl:21
 msgid "Refills"
 msgstr "Пополнения/Переводы"
 
-#: templates/default/main.tpl:20
+#: templates/default/main.tpl:22
 msgid "MARGIN"
 msgstr "НАЦЕНКА"
 
-#: templates/default/main.tpl:21
+#: templates/default/main.tpl:23
 msgid "TO PAY"
 msgstr "К ОПЛАТЕ"
 
-#: templates/default/main.tpl:23
+#: templates/default/main.tpl:24
 msgid "EXTENSIONS "
 msgstr "ВНУТРЕННИЕ НОМЕРА"
 
-#: templates/default/main.tpl:24
+#: templates/default/main.tpl:25
 msgid "EXTENSIONS"
 msgstr "ЛИНИИ"
 
-#: templates/default/main.tpl:25
+#: templates/default/main.tpl:26
 msgid "EXTERNAL LINES"
 msgstr "ВНЕШНИЕ ЛИНИИ"
 

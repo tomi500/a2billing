@@ -76,6 +76,9 @@ if (strlen($add_callerid)>0) {
 	if ($result < $A2B->config["webcustomerui"]['limit_callerid']) {
 		$QUERY = "INSERT INTO cc_callerid (id_cc_card, cid) VALUES ($idcard, '".$add_callerid."')";
 		$result = $instance_sub_table -> SQLExec ($HD_Form -> DBHandle, $QUERY, 0);
+		$log = new Logger();
+		$log -> insertLog_Update($_SESSION["card_id"], 1, "СALLERID IS ADDED", $add_callerid, '', $_SERVER['REMOTE_ADDR'], 'cc_callerid', '', 2);
+		$log = null;
 	}
 }
 

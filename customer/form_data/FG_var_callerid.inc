@@ -56,7 +56,7 @@ if (has_rights(ACX_DISTRIBUTION) && $popup_select>=1 && (!isset($form_action) ||
 	$HD_Form = new FormHandler("cc_callerid", gettext("CallerID"));
 	$HD_Form -> FG_TABLE_CLAUSE .= "id_cc_card = ".$_SESSION['card_id'].$listclause;
 } else {
-	$HD_Form = new FormHandler("cc_callerid", gettext("CallerID"));
+	$HD_Form = new FormHandler("cc_callerid", "CallerID");
 	$HD_Form -> FG_TABLE_CLAUSE .= "id_cc_card = ".$idcard.$listclause;
 }
 

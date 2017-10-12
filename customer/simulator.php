@@ -200,7 +200,7 @@ $FG_TABLE_ALTERNATE_ROW_COLOR[1]='#EEE9E9';
 		<?php if (count($RateEngine->ratecard_obj)>1 && strpos($RateEngine->ratecard_obj[0][7],"_")===false && strpos($RateEngine->ratecard_obj[1][7],"_")===false){ ?>
 		<TR>
           <td height="15" class="bgcolor_005" style="padding-left: 5px; padding-right: 3px;" colspan="2">
-					<b><?php echo gettext("We found several destinations:");?></b></td>
+					<font class="fontstyle_008"><?php echo gettext("We found several destinations:");?></font></td>
         </TR>
 		<?php } ?>
 		<?php 
