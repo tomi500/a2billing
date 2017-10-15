@@ -109,6 +109,8 @@ $HD_Form -> FG_ADDITION = false;
 $HD_Form -> FG_INFO = true;
 $HD_Form -> FG_INFO_LINK = "A2B_log_activity_info.php?id=";
 $HD_Form -> FG_LIMITE_DISPLAY = 50;
+$HD_Form -> CV_FOLLOWPARAMETERS= "&enteradmin=".$enteradmin."&Period=".$Period."&frommonth=".$frommonth."&fromstatsmonth=".$fromstatsmonth."&tomonth=".$tomonth."&tostatsmonth=".$tostatsmonth."&fromday=".$fromday."&fromstatsday_sday=".$fromstatsday_sday."&fromstatsmonth_sday=".$fromstatsmonth_sday."&today=".$today."&tostatsday_sday=".$tostatsday_sday."&tostatsmonth_sday=".$tostatsmonth_sday."&loglevel=".$loglevel;
+
 
 $HD_Form -> CV_DISPLAY_LINE_TITLE_ABOVE_TABLE = false;
 $HD_Form -> CV_TEXT_TITLE_ABOVE_TABLE = '';

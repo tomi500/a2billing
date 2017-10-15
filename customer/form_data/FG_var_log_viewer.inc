@@ -99,6 +99,7 @@ $HD_Form -> FG_DELETION = false;
 $HD_Form -> FG_ADDITION = false;
 $HD_Form -> FG_INFO = false;
 $HD_Form -> FG_INFO_LINK = "A2B_log_activity_info.php?id=";
+$HD_Form -> CV_FOLLOWPARAMETERS= "&Period=".$Period."&frommonth=".$frommonth."&fromstatsmonth=".$fromstatsmonth."&tomonth=".$tomonth."&tostatsmonth=".$tostatsmonth."&fromday=".$fromday."&fromstatsday_sday=".$fromstatsday_sday."&fromstatsmonth_sday=".$fromstatsmonth_sday."&today=".$today."&tostatsday_sday=".$tostatsday_sday."&tostatsmonth_sday=".$tostatsmonth_sday."&loglevel=".$loglevel;
 
 
 $HD_Form -> CV_DISPLAY_LINE_TITLE_ABOVE_TABLE = false;
