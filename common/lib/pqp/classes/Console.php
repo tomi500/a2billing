@@ -65,8 +65,9 @@ class Console {
 	-------------------------------------*/
 	
 	public function logSpeed($name = 'Point in Time') {
+		$obj= new PhpQuickProfiler(0);
 		$logItem = array(
-			"data" => PhpQuickProfiler::getMicroTime(),
+			"data" => $obj->getMicroTime(),
 			"type" => 'speed',
 			"name" => $name
 		);

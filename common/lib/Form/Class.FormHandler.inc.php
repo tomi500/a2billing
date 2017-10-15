@@ -523,9 +523,10 @@ class FormHandler
 
 	function FormHandler ($tablename=null, $instance_name=null, $action=null, $tablename_count=null)
 	{
-		Console::log('Construct FormHandler');
-		Console::logMemory($this, 'FormHandler Class : Line '.__LINE__);
-		Console::logSpeed('FormHandler Class : Line '.__LINE__);
+		$cons = new Console();
+		$cons->log('Construct FormHandler');
+		$cons->logMemory($this, 'FormHandler Class : Line '.__LINE__);
+		$cons->logSpeed('FormHandler Class : Line '.__LINE__);
 		self :: $Instance = $this;
 		$this -> FG_TABLE_NAME = $tablename;
 		$this -> FG_INSTANCE_NAME = $instance_name;
@@ -587,9 +588,10 @@ class FormHandler
 
 	function setDBHandler  ($DBHandle=null)
 	{
-		Console::log('FormHandler -> setDBHandler');
-		Console::logMemory($this, 'FormHandler -> setDBHandler : Line '.__LINE__);
-		Console::logSpeed('FormHandler -> setDBHandler : Line '.__LINE__);
+		$cons = new Console();
+		$cons->log('FormHandler -> setDBHandler');
+		$cons->logMemory($this, 'FormHandler -> setDBHandler : Line '.__LINE__);
+		$cons->logSpeed('FormHandler -> setDBHandler : Line '.__LINE__);
 		
 		$this->DBHandle = $DBHandle;
 	}
@@ -602,9 +604,10 @@ class FormHandler
 	{
 		$processed = $this->getProcessed();
 		
-		Console::log('FormHandler -> init');
-		Console::logMemory($this, 'FormHandler -> init : Line '.__LINE__);
-		Console::logSpeed('FormHandler -> init : Line '.__LINE__);
+		$cons = new Console();
+		$cons->log('FormHandler -> init');
+		$cons->logMemory($this, 'FormHandler -> init : Line '.__LINE__);
+		$cons->logSpeed('FormHandler -> init : Line '.__LINE__);
 		
 		global $_SERVER;	
 		
@@ -650,9 +653,10 @@ class FormHandler
      */	
 	function def_list ()
 	{
-		Console::log('FormHandler -> def_list');
-		Console::logMemory($this, 'FormHandler -> def_list : Line '.__LINE__);
-		Console::logSpeed('FormHandler -> def_list : Line '.__LINE__);
+		$cons = new Console();
+		$cons->log('FormHandler -> def_list');
+		$cons->logMemory($this, 'FormHandler -> def_list : Line '.__LINE__);
+		$cons->logSpeed('FormHandler -> def_list : Line '.__LINE__);
 			
 		$this -> tablelist['status_list']["1"] = array( gettext("INSERTED"), "1");
 		$this -> tablelist['status_list']["2"] = array( gettext("ENABLE"), "2");
@@ -2235,7 +2239,8 @@ class FormHandler
 	*/
 	function create_search_form()
 	{
-		Console::logSpeed('Time taken to get to line '.__LINE__);
+		$cons = new Console();
+		$cons->logSpeed('Time taken to get to line '.__LINE__);
 		$processed = $this->getProcessed();
 		
 		$cur = 0;
@@ -2260,7 +2265,8 @@ class FormHandler
      */
 	function create_form ($form_action, $list, $id=null)
 	{
-		Console::logSpeed('Time taken to get to line '.__LINE__);
+		$cons = new Console();
+		$cons->logSpeed('Time taken to get to line '.__LINE__);
 		include_once (FSROOT."lib/Class.Table.php");
 		$processed = $this->getProcessed();
 		
@@ -2330,7 +2336,8 @@ class FormHandler
 	 */
 	function printPages($page, $pages, $url, $max_width = 20)
 	{
-		Console::logSpeed('Time taken to get to line '.__LINE__);
+		$cons = new Console();
+		$cons->logSpeed('Time taken to get to line '.__LINE__);
 		global $lang;
 		$window = 8;
 

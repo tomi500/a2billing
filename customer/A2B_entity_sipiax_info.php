@@ -97,8 +97,9 @@ if ($atmenu == "SIP")
 		$extcreated = gen_friends($cardid,$startnumber,$quantity,$extmin,$extmax,$DBHandle_max,$A2B,$language);
 		if (count($extcreated)>0) {
 			$log = new Logger();
-			$log -> insertLog_Update($_SESSION["card_id"], 1, "SIP EXTENSION".(($quantity>1)?"S":"")." ADDED", implode(',', $extcreated), '', $_SERVER['REMOTE_ADDR'], $_SERVER['REQUEST_URI'],'',2);
+			$log -> insertLog_Update($_SESSION["card_id"], 1, "SIP EXTENSION".(($quantity>1)?"S":"")." ADDED", implode(',', $extcreated), '', $_SERVER['REMOTE_ADDR'], 'A2B_entity_sipiax_info.php','',2);
 			$log = null;
+			$_SESSION["last_page"] = "A2B_entity_sipiax_info.php";
 		}
 		if (!USE_REALTIME) {
 //			include_once ("./lib/Form/Class.Realtime.php");

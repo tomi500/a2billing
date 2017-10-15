@@ -284,11 +284,13 @@ define ("ADMIN_EMAIL", isset($A2B->config["global"]['admin_email'])?$A2B->config
 // INCLUDE HELP
 include (LIBDIR."customer.help.php");
 
-if(stripos($URI, "=ask-add")===false && stripos($URI, "=add")===false && stripos($URI, "index.php")===false && stripos($URI, "logout.php")===false && isset($_SESSION["card_id"]) && stripos($URI, $_SESSION["last_page"])===false) {
+//if(stripos($URI, "=ask-add")===false && stripos($URI, "=add")===false && stripos($URI, "index.php")===false && stripos($URI, "logout.php")===false && isset($_SESSION["card_id"]) && stripos($URI, $_SESSION["last_page"])===false) {
+if(isset($_SESSION["card_id"]) && stripos($URI, "index.php")===false && stripos($URI, "logout.php")===false && (!isset( $_SESSION["last_page"]) || stripos($URI, $_SESSION["last_page"])===false)
+    && (stripos($URI, "=ask-edit")!==false || stripos($URI, "=list")!==false || stripos($URI, "?")===false) ) {
 	// Insert Log
-	$log -> insertLog($_SESSION["card_id"], 1, "Page Visit", "User Visited the Page", '', $_SERVER['REMOTE_ADDR'], $_SERVER['REQUEST_URI'],'',2);
-	$log = null;
 	$_SESSION["last_page"] = array_shift(explode('?', basename($URI)));
+	$log -> insertLog($_SESSION["card_id"], 1, "Page Visit", "User Visited the Page", '', $_SERVER['REMOTE_ADDR'], $_SESSION["last_page"],'',2);
+	$log = null;
 }
 
 //SQLi

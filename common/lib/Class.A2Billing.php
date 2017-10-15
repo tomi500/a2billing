@@ -1186,6 +1186,7 @@ class A2Billing {
 		$result_did = $this -> instance_table -> SQLExec ($this->DBHandle, $QUERY);
 		if (is_array($result_did) && !empty($result_did[0][0])) {
 			$iscall2did =true;
+//			$this->auth_through_accountcode=false;
 			if ($this -> cardnumber != $result_did[0][0]) {
 				if ($this -> set_inuse_username) {
 					$this -> callingcard_acct_start_inuse($agi,0);

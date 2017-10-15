@@ -1082,7 +1082,7 @@ function getAcceptLanguage($languages)
     $result = $languages[0];
     $max_q = 0;
 
-    for ($i = 0; $i < count($matches); $i++) {
+    for ($i = 0; $i < count($matches[1]); $i++) {
         // Выделяем очередной язык
         $lang = $matches[1][$i];
         if (!empty($matches[2][$i])) {

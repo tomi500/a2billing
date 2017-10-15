@@ -32,7 +32,8 @@ class Constants
 	}
 	
 	public static function getLanguagesRevertList() {
-		return Constants::reverse_array(Constants::getLanguagesList());
+		$cons = new Constants();
+		return $cons -> reverse_array(Constants::getLanguagesList());
 	}
 	
 	public static function getLanguages(){
@@ -142,7 +143,8 @@ class Constants
 	}
 	
 	public static function getPaidTypeList_Revert_List(){
-		return Constants::reverse_array(Constants::getPaidTypeList());
+		$cons = new Constants();
+		return $cons -> reverse_array(Constants::getPaidTypeList());
 	}
 
 	public static function getExpirationList(){
@@ -372,7 +374,8 @@ class Constants
 	}
 	
 	public static function getCardStatus_Revert_List() {
-		return Constants::reverse_array(Constants::getCardStatus_List());
+		$cons = new Constants();
+		return $cons -> reverse_array(Constants::getCardStatus_List());
 	}
 	
 	public static function getCardStatus_Acronym_List(){
@@ -416,7 +419,8 @@ class Constants
 	}
 	
 	public static function getCardAccess_Revert_List() {
-		return Constants::reverse_array(Constants::getCardAccess_List());
+		$cons = new Constants();
+		return $cons -> reverse_array(Constants::getCardAccess_List());
 	}
 	
 	public static function getCardExpire_List(){

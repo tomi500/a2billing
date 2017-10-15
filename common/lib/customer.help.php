@@ -78,7 +78,7 @@ function create_help($text,$balance=null,$limit=null) {
 
 $inst_table = new Table();
 
-$QUERY = "SELECT creditlimit, credit, currency, credit_notification, paypal, users_perms FROM cc_card LEFT JOIN cc_card_group ON cc_card_group.id = id_group WHERE username = '" . $_SESSION["pr_login"] . "' AND uipass = '" . $_SESSION["pr_password"] . "'";
+$QUERY = "SELECT creditlimit, credit, currency, credit_notification, paypal, users_perms FROM cc_card LEFT JOIN cc_card_group ON cc_card_group.id = id_group WHERE username = '" . ((isset($_SESSION["pr_login"]))?$_SESSION["pr_login"]:"") . "' AND uipass = '" . ((isset($_SESSION["pr_password"]))?$_SESSION["pr_password"]:"") . "'";
 
 $DBHandle = DbConnect();
 

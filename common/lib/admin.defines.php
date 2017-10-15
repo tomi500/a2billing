@@ -221,9 +221,9 @@ if(isset($cssname) && $cssname != "") {
 		foreach (glob("./templates_c/*.*") as $filename)
 		{
 			unlink($filename);
-		}			
+		}
 	}
-	$_SESSION["stylefile"] = $cssname;		
+	$_SESSION["stylefile"] = $cssname;
 }
 
 if(!isset($_SESSION["stylefile"]) || $_SESSION["stylefile"]=='') {
@@ -249,11 +249,11 @@ if (!isset($disable_check_cp) || $disable_check_cp != true)
 
 define ("RELOAD_ASTERISK_IF_SIPIAX_CREATED", isset($A2B->config["signup"]['reload_asterisk_if_sipiax_created'])?$A2B->config["signup"]['reload_asterisk_if_sipiax_created']:0);
 
-if(stripos($URI, "=ask-add")===false && stripos($URI, "=add")===false && stripos($URI, "Public/index.php") === false && isset($_SESSION["admin_id"]) && stripos($URI, $_SESSION["last_page"])===false) {
+if(stripos($URI, "=ask-add")===false && stripos($URI, "=add")===false && stripos($URI, "Public/index.php") === false && isset($_SESSION["admin_id"]) && (!isset( $_SESSION["last_page"]) || stripos($URI, $_SESSION["last_page"])===false)) {
 	// Insert Log
-	$log -> insertLog($_SESSION["admin_id"], 1, "Page Visit", "User Visited the Page", '', $_SERVER['REMOTE_ADDR'], $_SERVER['REQUEST_URI'],'');
-	$log = null;
 	$_SESSION["last_page"] = array_shift(explode('?', basename($URI)));
+	$log -> insertLog($_SESSION["admin_id"], 1, "Page Visit", "User Visited the Page", '', $_SERVER["REMOTE_ADDR"], $_SESSION["last_page"],'');
+	$log = null;
 }
 
 //SQLi

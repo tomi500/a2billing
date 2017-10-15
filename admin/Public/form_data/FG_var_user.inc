@@ -57,6 +57,7 @@ $HD_Form -> FG_DEBUG = 0;
 $HD_Form -> FG_TABLE_ID = " userid";
 $HD_Form -> FG_TABLE_DEFAULT_ORDER = " datecreation";
 $HD_Form -> FG_TABLE_DEFAULT_SENS = "ASC";
+$HD_Form -> FG_ACTION_SIZE_COLUMN = '1%';
 
 $HD_Form ->FG_LIST_ADDING_BUTTON1 = true;
 $HD_Form ->FG_LIST_ADDING_BUTTON_LINK1 = $ADDING_BUTTON_LINK1;
@@ -113,7 +114,16 @@ $HD_Form -> CV_TEXT_TITLE_ABOVE_TABLE = '';
 $HD_Form -> CV_DISPLAY_FILTER_ABOVE_TABLE = false;
 
 
-if (!$popup_select) {
+	$HD_Form -> CV_FOLLOWPARAMETERS= "&popup_select=".$popup_select."&popup_formname=".$popup_formname."&popup_fieldname=".$popup_fieldname;
+if ($popup_select>=1) {
+	$HD_Form -> FG_OTHER_BUTTON1 	 = true;
+	$HD_Form -> FG_OTHER_BUTTON1_ALT = '<font color="red">&lt;select&gt;</font>';
+	$HD_Form -> FG_OTHER_BUTTON1_IMG = '';
+	
+	if ($popup_select==1) {
+		$HD_Form -> FG_OTHER_BUTTON1_LINK = "javascript:sendValue('|param|');";
+	}
+} else {
 	$HD_Form -> FG_ADDITION = true;	
 	$HD_Form -> FG_INFO = true;
 	$HD_Form -> FG_INFO_LINK = "A2B_admin_info.php?groupID=$groupID&id=";
@@ -302,16 +312,6 @@ if (has_rights (ACX_MODIFY_ADMINS) && !($popup_select)) {
 	} else {
 		$HD_Form -> FG_QUERY_ADITION_HIDDEN_FIELDS .= "groupID";
 		$HD_Form -> FG_QUERY_ADITION_HIDDEN_VALUE  .= "1";
-	}
-	
-	if (($popup_select>=1)){
-		$HD_Form -> FG_OTHER_BUTTON1 = true;
-		$HD_Form -> FG_OTHER_BUTTON1_ALT = '<font color="red">&lt;select&gt;</font>';
-		$HD_Form -> FG_OTHER_BUTTON1_IMG = '';
-		
-		if ($popup_select==1) {
-			$HD_Form -> FG_OTHER_BUTTON1_LINK = "javascript:sendValue('|param|');";
-		}
 	}
 	
 	$HD_Form -> FG_INTRO_TEXT_EDITION= gettext("Modify the properties of the")." ".$HD_Form->FG_INSTANCE_NAME;

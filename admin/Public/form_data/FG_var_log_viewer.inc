@@ -74,6 +74,17 @@ if($loglevel != "" && $loglevel > 0)
 
 $HD_Form -> FG_TABLE_CLAUSE = implode(' AND ', $condition_ary);
 
+if (!isset($_SESSION["type_user"])) $_SESSION["type_user"] = 2;
+if ($atmenu == "") $atmenu = $_SESSION["type_user"];
+$atmenu = (int) $atmenu;
+if ($atmenu!=3) {
+    if (strlen($HD_Form -> FG_TABLE_CLAUSE)>0)
+	$HD_Form -> FG_TABLE_CLAUSE.=" AND ";
+
+    $HD_Form -> FG_TABLE_CLAUSE.="agent=".$atmenu;
+}
+$_SESSION["type_user"] = $atmenu;
+
 //$HD_Form -> FG_EDITION_CLAUSE = " id = $id";
 
 $HD_Form -> AddViewElement(gettext("ID"), "id", "5%", "center", "sort");
@@ -85,7 +96,7 @@ $HD_Form -> AddViewElement(gettext("description"), "description", "15%", "center
 $HD_Form -> AddViewElement(gettext("TABLENAME"), "tablename", "12%", "center", "sort", "15");
 $HD_Form -> AddViewElement(gettext("PAGENAME"), "pagename", "5%", "center", "sort");
 $HD_Form -> AddViewElement(gettext("IPADDRESS"), "ipaddress", "4%", "center", "sort");
-$HD_Form -> AddViewElement(gettext("DATE"), "creationdate", "14%", "center", "sort", "16");
+$HD_Form -> AddViewElement(gettext("DATE"), "creationdate", "14%", "center", "sort", "30", "", "", "", "", "", "display_dateformat");
 //$HD_Form -> AddViewElement(gettext("DATA"), "data", "8%", "center", "SORT");
 
 // added a parameter to append  FG_TABLE_ID  ( by default ) or disable 0.
@@ -97,7 +108,7 @@ $HD_Form -> FG_DELETION = false;
 $HD_Form -> FG_ADDITION = false;
 $HD_Form -> FG_INFO = true;
 $HD_Form -> FG_INFO_LINK = "A2B_log_activity_info.php?id=";
-
+$HD_Form -> FG_LIMITE_DISPLAY = 50;
 
 $HD_Form -> CV_DISPLAY_LINE_TITLE_ABOVE_TABLE = false;
 $HD_Form -> CV_TEXT_TITLE_ABOVE_TABLE = '';

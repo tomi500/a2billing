@@ -41,11 +41,9 @@ include ("../lib/admin.smarty.php");
 
 if (! has_rights (ACX_ADMINISTRATOR)) {
 	Header ("HTTP/1.0 401 Unauthorized");
-	Header ("Location: PP_error.php?c=accessdenied");	   
-	die();	   
+	Header ("Location: PP_error.php?c=accessdenied");
+	die();
 }
-
-
 
 $HD_Form -> setDBHandler (DbConnect());
 $HD_Form -> init();
@@ -54,7 +52,7 @@ $HD_Form -> FG_EDITION_LINK= $_SERVER[PHP_SELF]."?form_action=ask-edit&groupID=$
 $HD_Form -> FG_DELETION_LINK= $_SERVER[PHP_SELF]."?form_action=ask-delete&groupID=$groupID&id=";
 
 if ($id!="" || !is_null($id)) {
-	$HD_Form -> FG_EDITION_CLAUSE = str_replace("%id", "$id", $HD_Form -> FG_EDITION_CLAUSE);	
+	$HD_Form -> FG_EDITION_CLAUSE = str_replace("%id", "$id", $HD_Form -> FG_EDITION_CLAUSE);
 }
 
 
@@ -79,7 +77,7 @@ if($popup_select == "") {
 	else echo $CC_help_admin_list;
 }
 
-if ($popup_select != "") {
+if ($popup_select) {
 
 ?>
 
@@ -90,9 +88,7 @@ function sendValue(selvalue){
 	window.close();
 }
 // End -->
-</script>
-
-
+</SCRIPT>
 <?php
 }
 

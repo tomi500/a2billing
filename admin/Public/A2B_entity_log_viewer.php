@@ -68,7 +68,28 @@ $HD_Form -> create_toppage ($form_action);
 
 if($form_action=="list"){
 ?>
+<br/>
 <center>
+<table width="70%" border="0" align="center" cellpadding="0" cellspacing="1">
+        <tr>
+          <td  class="bgcolor_021">
+          <table width="20%" border="0" cellspacing="1" cellpadding="0">
+                  <tr>
+                        <td bgcolor="#FFFFFF" class="fontstyle_006" nowrap>&nbsp;<?php echo gettext("TYPE OF USER")?>:&nbsp;</td>
+                        <td bgcolor="#FFFFFF" class="fontstyle_006" align="right">
+                            <form name="form1" method="post" action="">
+                                <select name="atmenu" id="col_configtype" onChange="window.document.form1.elements['PMChange'].value='Change';window.document.form1.submit();">
+                                <option value="0"<?php if($atmenu == "0")echo " selected"?>>&nbsp;ADMINS</option>
+                                <option value="2"<?php if($atmenu == "2")echo " selected"?>>&nbsp;CUSTOMERS&nbsp;</option>
+                                <option value="3"<?php if($atmenu == "3")echo " selected"?>>&nbsp;ALL</option>
+                                </select>
+                                <input name="PMChange" type="hidden" id="PMChange">
+                            </form>
+                        </td>
+                  </tr>
+          </table></td>
+        </tr>
+</table>
 <FORM METHOD=POST name="myForm" ACTION="<?php echo $PHP_SELF?>?s=1&t=0&order=<?php echo $order?>&sens=<?php echo $sens?>&current_page=<?php echo $current_page?>">
 	<INPUT TYPE="hidden" NAME="posted" value=1>
 	<INPUT TYPE="hidden" NAME="current_page" value=0>	
@@ -78,13 +99,18 @@ if($form_action=="list"){
 			<?php  }else{ ?>
 			<tr>
 				<td align="left" valign="top" class="bgcolor_004">					
-					<font class="fontstyle_003">&nbsp;&nbsp;<?php echo gettext("CUSTOMERS");?></font>
+					<font class="fontstyle_003">&nbsp;&nbsp;<?php echo gettext(($atmenu == '2')?'CUSTOMER':'ADMIN');?></font>
 				</td>				
 				<td class="bgcolor_005" align="left">
 				<table width="100%" border="0" cellspacing="0" cellpadding="0"><tr>
-					<td class="fontstyle_searchoptions">
-						<?php echo gettext("ADMIN USER");?>: <INPUT TYPE="text" NAME="enteradmin" value="<?php echo $enteradmin?>" class="form_input_text">
-						<a href="#" onclick="window.open('A2B_entity_user.php?popup_select=1&popup_formname=myForm&popup_fieldname=enteradmin' , 'AdminSelection','scrollbars=1,width=550,height=330,top=20,left=100,scrollbars=1');"><img src="<?php echo Images_Path;?>/icon_arrow_orange.gif"></a>
+					<td class="fontstyle_searchoptions" width="5%" nowrap>
+						&nbsp;ID:&nbsp;<INPUT TYPE="text" NAME="enteradmin" value="<?php echo $enteradmin?>" class="form_input_text"><a href="#"
+					    <?php if ($atmenu == "2") {?>
+						onclick="window.open('A2B_entity_card.php?popup_select=1&popup_formname=myForm&popup_fieldname=enteradmin' , 'CardNumberSelection','width=550,height=520,top=20,left=100,scrollbars=1');"
+					    <?php }else{ ?>
+						onclick="window.open('A2B_entity_user.php?popup_select=1&popup_formname=myForm&popup_fieldname=enteradmin' , 'AdminSelection','width=550,height=330,top=20,left=100,scrollbars=1');"
+					    <?php } ?>
+						><img src="<?php echo Images_Path;?>/icon_arrow_orange.gif"></a>
 					</td>					
 				</tr></table></td>
 			</tr>			
