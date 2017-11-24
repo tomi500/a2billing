@@ -157,7 +157,7 @@ if ((!isset($_SESSION['pr_login']) || !isset($_SESSION['pr_password']) || !isset
 			}
 			
 			$log = new Logger();
-			$log -> insertLog($return[3], 1, "LOGGED IN", "User Logged in to website", '', $_SERVER['REMOTE_ADDR'], '', '', 2);
+			$log -> insertLog($return[3], 1, "<b>LOGGED IN</b>", "User Logged in to website", '', $_SERVER['REMOTE_ADDR'], '', '', 2);
 			$log = null;
 		}
 	} else {

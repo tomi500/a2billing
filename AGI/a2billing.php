@@ -936,12 +936,19 @@ if ($mode == 'standard') {
 //$A2B -> debug( ERROR, $agi, __FILE__, __LINE__, $A2B-> destination);
 				if ($ans==1) {
 				    do {
+//$A2B -> debug( ERROR, $agi, __FILE__, __LINE__, $A2B-> destination);
+//$A2B -> debug( ERROR, $agi, __FILE__, __LINE__, "extension=".$A2B->extension." ====== dnid=".$A2B->dnid." ====== destination=".$A2B-> destination);
 					$RateEngine -> Reinit();
 					// PERFORM THE CALL
 					$result_callperf = $RateEngine->rate_engine_performcall ($agi, $A2B-> destination, $A2B);
 					if (!$result_callperf && !(!$A2B->extext && $A2B->voicemail && !is_null($A2B->voicebox) && !isset($A2B->transferername[0]))) {
 						$A2B -> let_stream_listening($agi);
-						$prompt = "prepaid-dest-unreachable";
+						if ($A2B -> outoflength == true) {
+							$prompt = "pbx-invalid";
+							$A2B -> outoflength = false;
+						} else {
+							$prompt = "prepaid-dest-unreachable";
+						}
 						$agi -> stream_file($prompt, '#');
 					}
 					// INSERT CDR  & UPDATE SYSTEM

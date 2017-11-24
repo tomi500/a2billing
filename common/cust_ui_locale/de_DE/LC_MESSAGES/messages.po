@@ -667,6 +667,14 @@ msgstr "Ihr Passwort ist"
 msgid "SIGNUP"
 msgstr "REGISTIRIEREN"
 
+#: FG_var_logrefill:80
+msgid "BILLING"
+msgstr "FINANZEN"
+
+#: A2B_entity_logrefill:81
+msgid "ACCOUNT ACTIVITY"
+msgstr "TRANSAKTIONEN"
+
 #: form_data/FG_var_card.inc:59
 msgid "Insert the lastname of the customers"
 msgstr "Füge den Nachnamen des Kunden ein"
@@ -3406,6 +3414,19 @@ msgstr "Ihr Konto ist bereits aktiviert."
 msgid "Your account cannot be activated please contact <br/> the website administrator or retry later."
 msgstr "Ihr Konto kann nicht aktiviert werden, wenden Sie sich bitte an die <br> Website-Administrator oder versuchen Sie später."
 
+#: form_data/FG_var_moneysituation.inc:100
+msgid "Add Customer"
+msgstr "Kunden hinzufügen"
+
+#: templates/default/main.tpl:10
+msgid "FAX HISTORY"
+msgstr "FAXVERLAUF"
+# msgstr "EMPFANGENE FAXNACHRICHTEN"
+
+#: templates/default/main.tpl:11
+msgid "FAX Logs"
+msgstr "Faxliste"
+
 #: templates/default/main.tpl:12
 msgid "ACCOUNT INFO"
 msgstr "KONTO INFO"
@@ -3413,6 +3434,26 @@ msgstr "KONTO INFO"
 #: templates/default/main.tpl:15
 msgid "MY PROFILE"
 msgstr "MEIN PROFIL"
+
+#: templates/default/main.tpl:16
+msgid "ACTIVITY"
+msgstr "BESUCHER"
+
+#: templates/default/main.tpl:17
+msgid "MY PBX"
+msgstr "MEINE PBX"
+
+#: templates/default/main.tpl:18
+msgid "MY CUSTOMERS"
+msgstr "MEINE KUNDEN"
+
+#: templates/default/main.tpl:19
+msgid "LIST CUSTOMERS"
+msgstr "KUNDENVERZEICHNIS"
+
+#: templates/default/main.tpl:20
+msgid "COMMISSION ACCRUED"
+msgstr "PROVISION"
 
 #: templates/default/main.tpl:17
 msgid "VOICEMAIL"
@@ -3468,7 +3509,7 @@ msgstr "PASSWORT"
 
 #: templates/default/main.tpl:90
 msgid "SUPPORT"
-msgstr "SUPPORT"
+msgstr "UNTERSTÜTZUNG"
 
 #: templates/default/main.tpl:94
 msgid "NOTIFICATION"

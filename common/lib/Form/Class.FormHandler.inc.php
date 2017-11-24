@@ -1639,7 +1639,8 @@ class FormHandler
 			if($this -> FG_ENABLE_LOG == 1) {
 				$this -> logger -> insertLog_Add($idcust, 2, "NEW ".strtoupper($this->FG_INSTANCE_NAME)." CREATED" , "Record is added in database", $this->FG_TABLE_NAME, $_SERVER['REMOTE_ADDR'], $_SERVER['REQUEST_URI'], $param_add_fields, $param_add_value, $agent);
 			}
-			$_SESSION["last_page"] = array_shift(explode('?', basename($_SERVER['REQUEST_URI'])));
+			$pageName = explode('?', basename($_SERVER['REQUEST_URI']));
+			$_SESSION["last_page"] = array_shift($pageName);
 			// CALL DEFINED FUNCTION AFTER THE ACTION ADDITION
 			if (strlen($this->FG_ADDITIONAL_FUNCTION_AFTER_ADD)>0 && ($this->VALID_SQL_REG_EXP))
 				$res_funct = call_user_func(array('FormBO', $this->FG_ADDITIONAL_FUNCTION_AFTER_ADD));
@@ -1811,7 +1812,8 @@ class FormHandler
 			if($this -> FG_ENABLE_LOG == 1) {
 				$this -> logger -> insertLog_Update($idcust, 3, strtoupper($this->FG_INSTANCE_NAME)." IS UPDATED", "A RECORD IS UPDATED, EDITION CLAUSE USED IS ".$this->FG_EDITION_CLAUSE, $this->FG_TABLE_NAME, $_SERVER['REMOTE_ADDR'], $_SERVER['REQUEST_URI'], $param_update, $agent);
 			}
-			$_SESSION["last_page"] = array_shift(explode('?', basename($_SERVER['REQUEST_URI'])));
+			$pageName = explode('?', basename($_SERVER['REQUEST_URI']));
+			$_SESSION["last_page"] = array_shift($pageName);
 			if ($this->FG_DEBUG == 1) echo $this -> RESULT_QUERY;
 				// CALL DEFINED FUNCTION AFTER THE ACTION ADDITION
 			if (strlen($this->FG_ADDITIONAL_FUNCTION_AFTER_EDITION)>0 && ($this->VALID_SQL_REG_EXP))
@@ -1865,7 +1867,8 @@ class FormHandler
 		if ($this -> FG_ENABLE_LOG == 1) {
 		    $this -> logger -> insertLog($idcust, 3, "A ".strtoupper($this->FG_INSTANCE_NAME)." DELETED" , "A RECORD IS DELETED, EDITION CLAUSE USED IS ".$this->FG_EDITION_CLAUSE, $this->FG_TABLE_NAME, $_SERVER['REMOTE_ADDR'], $_SERVER['REQUEST_URI'], $param_update, $agent);
 		}
-		$_SESSION["last_page"] = array_shift(explode('?', basename($_SERVER['REQUEST_URI'])));
+		$pageName = explode('?', basename($_SERVER['REQUEST_URI']));
+		$_SESSION["last_page"] = array_shift($pageName);
 		if (!$this -> RESULT_QUERY)  echo gettext("error deletion");
 
 		$this->FG_INTRO_TEXT_DELETION = str_replace("%id", $processed['id'], $this->FG_INTRO_TEXT_DELETION);

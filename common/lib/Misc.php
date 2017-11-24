@@ -746,11 +746,11 @@ function gen_card($table = "cc_card, cc_voucher", $len = LEN_CARDNUMBER, $field1
 function generate_unique_value($table, $len, $field1, $field2 = false)
 {
 	$DBHandle_max = DbConnect();
-	for ($k = 0; $k <= 10000; $k++) {
+	for ($k = 0; $k <= 100000; $k++) {
 		do {
 			$card_gen = MDP($len);
 		} while ($card_gen < pow(10,$len-1));
-		if ($k == 10000) {
+		if ($k == 100000) {
 			echo "ERROR : Impossible to generate a $field1 not yet used!<br>Perhaps check the LEN_CARDNUMBER (value:" . LEN_CARDNUMBER . ")";
 			exit ();
 		}
@@ -1810,7 +1810,6 @@ function Display_Login_Button ($DBHandle, $id) {
 	} else {
 		$link = $link . '/userinfo.php';
 	}
-
 	$content = '<div align="right" style="padding-right:20px;">
 		<form action="'.$link.'" method="POST" target="_blank">
 			<input type="hidden" name="done" value="submit_log"/>

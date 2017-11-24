@@ -77,7 +77,7 @@ if (strlen($add_callerid)>0) {
 		$QUERY = "INSERT INTO cc_callerid (id_cc_card, cid) VALUES ($idcard, '".$add_callerid."')";
 		$result = $instance_sub_table -> SQLExec ($HD_Form -> DBHandle, $QUERY, 0);
 		$log = new Logger();
-		$log -> insertLog_Update($_SESSION["card_id"], 1, "СALLERID IS ADDED", $add_callerid, '', $_SERVER['REMOTE_ADDR'], 'A2B_entity_callerid.php', '', 2);
+		$log -> insertLog_Update($_SESSION["card_id"], 2, "СALLERID IS ADDED", $add_callerid, 'cc_callerid', $_SERVER['REMOTE_ADDR'], 'A2B_entity_callerid.php', '', 2);
 		$log = null;
 		$_SESSION["last_page"] = "A2B_entity_callerid.php";
 	}

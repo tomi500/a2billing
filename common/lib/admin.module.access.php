@@ -136,7 +136,7 @@ if ((!isset($_SESSION['pr_login']) || !isset($_SESSION['pr_password']) || !isset
 			$_SESSION["pr_groupID"]=$pr_groupID;
 			$_SESSION["admin_id"] = $admin_id;
 			$log = new Logger();
-			$log -> insertLog($admin_id, 1, "User Logged In", "User Logged in to website", '', $_SERVER['REMOTE_ADDR'], 'PP_Intro.php','');
+			$log -> insertLog($admin_id, 1, "<b>User Logged In</b>", "User Logged in to website", '', $_SERVER['REMOTE_ADDR'], 'PP_Intro.php','');
 			$log = null;
 		}
 

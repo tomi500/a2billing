@@ -40,15 +40,32 @@ class Logger
 	{
 	
 	}
+
+	//Funtion deleteLog
+	//Delete the log from table
+	function deleteLog($id = 0)
+	{
+		$DB_Handle = DBConnect();
+		$table_log = new Table();
+		$QUERY = "DELETE FROM cc_system_log WHERE id = ".$id;		
+		if ($this -> do_debug) echo $QUERY;		
+		$table_log -> SQLExec($DB_Handle, $QUERY);
+	}
+
 	//Function insertLog
 	// Inserts the Log into table
 	function insertLog_Add($userID, $logLevel, $actionPerformed, $description, $tableName, $ipAddress, $pageName, $param_add_fields, $param_add_value, $agent=0)
 	{
 		$DB_Handle = DBConnect();
-		$table_log = new Table();		
-		$pageName = basename($pageName);
-		$pageName    = array_shift(explode('?', $pageName));		
-		$description = str_replace("'", "", $description);
+		$table_log = new Table();
+		$pageName    = explode('?', basename($pageName));
+		$pageName    = array_shift($pageName);
+/**		$QUERY = "SELECT id,loglevel,pagename FROM cc_system_log WHERE agent = ".$agent." AND iduser = " . $userID . " ORDER BY id DESC LIMIT 1";
+		$resmax = $table_log -> SQLExec ($DB_Handle, $QUERY, 1);
+		if ($resmax && $resmax[0][1]==1 && $resmax[0][2]==$pageName) {
+			$this -> deleteLog($resmax[0][0]);
+		}
+**/		$description = str_replace("'", "", $description);
 		$str_submitted_fields = explode(',', $param_add_fields);
 		$str_submitted_values = explode(',', $param_add_value);
 		$num_records = count($str_submitted_fields);
@@ -66,13 +83,13 @@ class Logger
 
 		$table_log -> SQLExec($DB_Handle, $QUERY);		
 	}
-	
+/**
 	function insertLog_noBlob($userID, $logLevel, $actionPerformed, $description, $tableName, $ipAddress, $pageName, $param_update, $agent=0)
 	{
 		$DB_Handle = DBConnect();
 		$table_log = new Table();
-		$pageName = basename($pageName);
-		$pageName    = array_shift(explode('?', $pageName));		
+		$pageName    = explode('?', basename($pageName));
+		$pageName    = array_shift($pageName);
 		$description = str_replace("'", "", $description) . implode(',', $param_update);
 		$QUERY = "INSERT INTO cc_system_log (iduser, loglevel, action, description, tablename, pagename, ipaddress, agent) ";
 		$QUERY .= " VALUES('".$userID."','".$logLevel."','".$actionPerformed."','".$description."','".$tableName."','".$pageName."','".$ipAddress."','".$agent."')";
@@ -81,15 +98,20 @@ class Logger
 
 		$table_log -> SQLExec($DB_Handle, $QUERY);
 	}
-	
+**/
 	function insertLog_Update($userID, $logLevel, $actionPerformed, $description, $tableName, $ipAddress, $pageName, $param_update, $agent=0)
 	{
 		$DB_Handle = DBConnect();
-		$table_log = new Table();		
-		$pageName = basename($pageName);
-		$pageName    = array_shift(explode('?', $pageName));		
+		$table_log = new Table();
+		$pageName    = explode('?', basename($pageName));
+		$pageName    = array_shift($pageName);
+		$QUERY = "SELECT id,loglevel,pagename FROM cc_system_log WHERE iduser = ".$userID." AND agent = ".$agent." ORDER BY id DESC LIMIT 1";
+		$resmax = $table_log -> SQLExec ($DB_Handle, $QUERY, 1);
+		if ($resmax && $resmax[0][1]==1 && $resmax[0][2]==$pageName) {
+			$this -> deleteLog($resmax[0][0]);
+		}
 		$description = str_replace("'", "", $description);
-		$str_submitted_fields = explode(',', $param_update);		
+		$str_submitted_fields = explode(',', $param_update);
 		$num_records = count($str_submitted_fields);
 		for($num = 0; $num < $num_records; $num++)
 		{
@@ -109,12 +131,16 @@ class Logger
 	
 	function insertLog($userID, $logLevel, $actionPerformed, $description, $tableName, $ipAddress, $pageName, $data='', $agent=0)
 	{
-	    if ($agent==0 || !isset($_SESSION["admin_ip"] ) || $_SESSION["admin_ip"] != $_SERVER["REMOTE_ADDR"]) {
+	    if ($agent==0 || $logLevel!=1 || !isset($_SESSION["admin_ip"] ) || $_SESSION["admin_ip"] != $_SERVER["REMOTE_ADDR"]) {
 		$DB_Handle = DBConnect();
 		$table_log = new Table();
-		$pageName = basename($pageName);
-		$pageArray = explode('?', $pageName);
-		$pageName = array_shift($pageArray);
+		$pageName    = explode('?', basename($pageName));
+		$pageName    = array_shift($pageName);
+		$QUERY = "SELECT pagename FROM cc_system_log WHERE iduser = ".$userID." AND agent = ".$agent." AND (loglevel = 1 OR pagename = '".$pageName."') ORDER BY id DESC LIMIT 1";
+		$resmax = $table_log -> SQLExec ($DB_Handle, $QUERY, 1);
+		if ($logLevel==1 && $resmax && $resmax[0][0] && $resmax[0][0]==$pageName) {
+			return;
+		}
 		$description = str_replace("'", "", $description);
 		
 		$QUERY = "INSERT INTO cc_system_log (iduser, loglevel, action, description, tablename, pagename, ipaddress, data, agent) ";
@@ -129,9 +155,8 @@ class Logger
 	{
 		$DB_Handle = DBConnect();
 		$table_log = new Table();		
-		$pageName = basename($pageName);
-		$pageArray = explode('?', $pageName);
-		$pageName = array_shift($pageArray);
+		$pageName    = explode('?', basename($pageName));
+		$pageName    = array_shift($pageName);
 		$description = str_replace("'", "", $description);
 		
 		$QUERY = "INSERT INTO cc_system_log (iduser, loglevel, action, description, tablename, pagename, ipaddress, data, agent) ";
@@ -140,17 +165,4 @@ class Logger
 
 		$table_log -> SQLExec($DB_Handle, $QUERY);		
 	}
-	
-	//Funtion deleteLog
-	//Delete the log from table
-	function deleteLog($id = 0)
-	{
-		$DB_Handle = DBConnect();
-		$table_log = new Table();
-		$QUERY = "DELETE FROM cc_system_log WHERE id = ".$id;		
-		if ($this -> do_debug) echo $QUERY;		
-		$table_log -> SQLExec($DB_Handle, $QUERY);
-	}
 }
-
-

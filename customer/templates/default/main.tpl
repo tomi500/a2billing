@@ -170,8 +170,9 @@
 
 	{if $ACX_PERSONALINFO >0 }
 	<div class="toggle_menu"><li><a href="A2B_entity_card.php?atmenu=password&form_action=ask-edit&stitle=Personal+Information"><strong>{php} echo gettext("MY PROFILE");{/php}</strong></a></li></div>
-	<div class="toggle_menu"><li><a href="A2B_entity_log_viewer.php"><strong>{php} echo gettext("ACTIVITY");{/php}</strong></a></li></div>
 	{/if}
+
+	<div class="toggle_menu"><li><a href="A2B_entity_log_viewer.php"><strong>{php} echo gettext("ACTIVITY");{/php}</strong></a></li></div>
 
 	{if $ACXSUPPORT >0 }
 	<div class="toggle_menu"><li><a href="A2B_support.php"><strong>{php} echo gettext("SUPPORT");{/php}</strong></a></li></div>

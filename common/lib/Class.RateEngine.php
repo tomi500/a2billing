@@ -308,8 +308,9 @@ class RateEngine
 		foreach ($result as $key => $row) {
 		    $strprefix[$key]  = (ctype_digit($row[7]))?1:(($row[12] != 100)?strlen($row[7]):0);
 		    $lcrsort[$key] = ($row[72]=="EMERGENCY")?-1:(($LCtype==0)?$row[9]:$row[12]);
+		    $buysort[$key] = $row[9];
 		}
-		array_multisort($strprefix, SORT_DESC, $lcrsort, $result);
+		array_multisort($strprefix, SORT_DESC, $lcrsort, $buysort, $result);
 		
 		// WE ADD THE DEFAULTPREFIX WE REMOVE BEFORE
 		if ($ind_stop_default > 0) {
@@ -324,9 +325,17 @@ class RateEngine
 
 		// 3) REMOVE THOSE THAT USE THE SAME TRUNK - MAKE A DISTINCT
 		//    AND THOSE THAT ARE DISABLED.
+//		$mylistoftrunk = array();
 		for ($i=0;$i<count($result);$i++) {
+//			$status 	= $result[$i][39];
+//			$mycurrenttrunk = $result[$i][29];
 
 			// Check if we already have the same trunk in the ratecard
+//			if (($i==0 || !in_array ($mycurrenttrunk , $mylistoftrunk)) && $status == 1) {
+//				$distinct_result[]	= $result[$i];
+//			}
+//			if ($status == 1)
+//				$mylistoftrunk[]	= $mycurrenttrunk;
 			if ($result[$i][39])
 				$distinct_result[]	= $result[$i];
 		}
@@ -1423,6 +1432,7 @@ for ($i=0; $i<count($this->ratecard_obj); $i++) {
 		$max_long = 36000000; //Maximum 10 hours
 		$old_destination = $destination;
 		$firstgo = true;
+		$outoflength = false;
 //		$timecur = time();
 		$this -> dialstatus = $A2B -> first_dtmf = '';
 		$timeoutlast = $rateinitlast = 0;
@@ -1474,6 +1484,7 @@ for ($i=0; $i<count($this->ratecard_obj); $i++) {
 				    $length_destination = strlen($destination);
 				    if ($length_destination<$length_range_from || $length_range_till<$length_destination) {
 $A2B -> debug( ERROR, $agi, __FILE__, __LINE__, "Out of length range destination. ".$length_destination." NOT IN ".$length_range_from."..".$length_range_till);
+					$A2B -> outoflength = true;
 					continue 2;
 				    }
 //$A2B -> debug( ERROR, $agi, __FILE__, __LINE__, "ratecard_obj[{$k}][69] = ".$this -> ratecard_obj[$k][69]);

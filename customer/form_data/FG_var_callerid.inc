@@ -156,7 +156,7 @@ $HD_Form -> AddEditElement (gettext("CALLERID"),
 			   "INPUT",
 			   "size=20 maxlength=30".$cidRO,
 			   "18",
-			   gettext("Insert the CallerID"));
+			   gettext("Insert the CallerID"), "", "", "", "", "", "");
 
 if ($form_action != 'ask-delete') {
 

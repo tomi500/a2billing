@@ -195,6 +195,9 @@ if ($batchupdate == 1 && is_array($check)) {
 }
 /********************************* END BATCH UPDATE ***********************************/
 
+$HD_Form -> FG_EDITION_LINK  = $_SERVER['PHP_SELF']."?form_action=ask-edit&atmenu=$atmenu&current_page=$current_page&filterprefix=$filterprefix&filterprefix2=$filterprefix2&id=";
+$HD_Form -> FG_DELETION_LINK = $_SERVER['PHP_SELF']."?form_action=ask-delete&atmenu=$atmenu&current_page=$current_page&filterprefix=$filterprefix&filterprefix2=$filterprefix2&id=";
+
 if ($id != "" || !is_null($id)) {
 	$HD_Form->FG_EDITION_CLAUSE = str_replace("%id", "$id", $HD_Form->FG_EDITION_CLAUSE);
 }
@@ -321,6 +324,7 @@ if ($form_action == "list" && !$popup_select) {
 		<INPUT type="hidden" name="popup_fieldname" value="<?php echo $popup_fieldname?>">
 		<INPUT type="hidden" name="form_action" value="<?php echo $form_action?>">
 		<INPUT type="hidden" name="filterprefix" value="<?php echo $filterprefix?>">
+		<INPUT type="hidden" name="filterprefix2" value="<?php echo $filterprefix2?>">
 		<INPUT type="hidden" name="filterfield" value="<?php echo $filterfield?>">
 		<tr>		
           <td align="left" class="bgcolor_001">

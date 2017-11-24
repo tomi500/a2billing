@@ -144,6 +144,7 @@ class A2Billing {
 	var $dnid;
 	var $cid2num = false;
 	var $extension;
+	var $outoflength = false;
 
 	// from apply_rules, if a prefix is removed we keep it to track exactly what the user introduce
 	

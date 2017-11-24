@@ -41,7 +41,7 @@ getpost_ifset(array('id', 'idtariffplan', 'dialprefix', 'destination', 'buyrate'
 'billingblockb', 'stepchargec', 'chargec', 'timechargec', 'billingblockc', 'startdate', 'stopdate', 'is_merged',
 'starttime', 'endtime', 'id_trunk', 'musiconhold','tariffplan', 'tariffgroup','posted','id_outbound_cidgroup','rounding_calltime', 
 'rounding_threshold', 'additional_block_charge', 'additional_block_charge_time', 'additional_grace','minimal_cost','announce_time_correction',
-'cancelsearch_callplanlcr', 'deleteselected', 'filterprefix'));
+'cancelsearch_callplanlcr', 'deleteselected', 'filterprefix', 'filterprefix2'));
 
 $destination = strtolower ($destination);
 
@@ -114,7 +114,7 @@ $HD_Form -> FG_FK_EDITION_CLAUSE = array("id_ratecard");
 
 if (!$popup_select) {
     $HD_Form ->FG_LIST_ADDING_BUTTON1 = true;
-    $HD_Form ->FG_LIST_ADDING_BUTTON_LINK1 = "A2B_entity_def_ratecard.php?form_action=ask-add&atmenu=ratecard&current_page=$current_page&filterprefix=$filterprefix&section=".$_SESSION["menu_section"];
+    $HD_Form ->FG_LIST_ADDING_BUTTON_LINK1 = "A2B_entity_def_ratecard.php?form_action=ask-add&atmenu=ratecard&current_page=$current_page&filterprefix=$filterprefix&filterprefix2=$filterprefix2&section=".$_SESSION["menu_section"];
     $HD_Form ->FG_LIST_ADDING_BUTTON_ALT1 = $HD_Form ->FG_LIST_ADDING_BUTTON_MSG1 = gettext("Add Rate");
     $HD_Form ->FG_LIST_ADDING_BUTTON_IMG1 = Images_Path ."/world_add.png" ;
 }
@@ -670,8 +670,8 @@ if (ADVANCED_MODE) {
 	$HD_Form -> FieldEditElement ('cc_ratecard.idtariffplan, dialprefix, length_range_from, length_range_till, cc_ratecard.destination, out_of_intern_prefix_for_sure, buyrate, buyrateinitblock, buyrateincrement, buyrateconnectcharge, rateinitial, initblock, billingblock, connectcharge, disconnectcharge,disconnectcharge_after, minimal_cost, startdate, stopdate, is_merged, starttime, endtime, rounding_calltime, rounding_threshold, additional_block_charge, additional_block_charge_time,additional_grace, id_trunk, ratecarddialprefix, id_outbound_cidgroup, tag');
 }
 
-$HD_Form->FG_ADITION_HIDDEN_PARAM		= $HD_Form->FG_EDITION_HIDDEN_PARAM		= 'filterprefix,current_page';
-$HD_Form->FG_ADITION_HIDDEN_PARAM_VALUE 	= $HD_Form->FG_EDITION_HIDDEN_PARAM_VALUE	= $filterprefix.",".$current_page;
+$HD_Form->FG_ADITION_HIDDEN_PARAM		= $HD_Form->FG_EDITION_HIDDEN_PARAM		= 'filterprefix,filterprefix2,current_page';
+$HD_Form->FG_ADITION_HIDDEN_PARAM_VALUE 	= $HD_Form->FG_EDITION_HIDDEN_PARAM_VALUE	= $filterprefix.",".$filterprefix2.",".$current_page;
 
 $HD_Form -> FG_SPLITABLE_FIELD = 'dialprefix';
 
@@ -692,12 +692,22 @@ $HD_Form -> FG_FILTERFIELDNAME = 'dialprefix';
 $HD_Form -> FG_FILTER_FORM_ACTION = 'list';
 
 if (isset($filterprefix)  &&  (strlen($filterprefix)>0)) {
-	if (strlen($HD_Form -> FG_TABLE_CLAUSE) > 0) {
-        $HD_Form -> FG_TABLE_CLAUSE.=" AND ";
-    }
+	if (strlen($HD_Form -> FG_TABLE_CLAUSE) > 0)
+		$HD_Form -> FG_TABLE_CLAUSE.=" AND ";
 	$HD_Form -> FG_TABLE_CLAUSE.="dialprefix like '$filterprefix%'";
 }
 
-$HD_Form -> FG_GO_LINK_AFTER_ACTION_ADD = $_SERVER['PHP_SELF']."?atmenu=document&stitle=Document&wh=AC&filterprefix=$filterprefix&current_page=$current_page&filterfield=dialprefix&id=";
-$HD_Form -> FG_GO_LINK_AFTER_ACTION_EDIT = $_SERVER['PHP_SELF']."?atmenu=document&stitle=Document&wh=AC&filterprefix=$filterprefix&filterfield=dialprefix&id=";
-$HD_Form -> FG_GO_LINK_AFTER_ACTION_DELETE = $_SERVER['PHP_SELF']."?atmenu=document&stitle=Document&wh=AC&filterprefix=$filterprefix&filterfield=dialprefix&id=";
+$HD_Form -> FG_FILTER_APPLY2 = true;
+$HD_Form -> FG_FILTERFIELD2 = 'cc_ratecard.id';
+$HD_Form -> FG_FILTERFIELDNAME2 = ' id';
+$HD_Form -> FG_FILTER_FORM_ACTION2 = 'list';
+
+if (isset($filterprefix2)  &&  is_numeric($filterprefix2)) {
+	if (strlen($HD_Form -> FG_TABLE_CLAUSE)>0)
+		$HD_Form -> FG_TABLE_CLAUSE.=" AND ";
+	$HD_Form -> FG_TABLE_CLAUSE .= "cc_ratecard.id='".$filterprefix2."'";
+}
+
+$HD_Form -> FG_GO_LINK_AFTER_ACTION_ADD = $_SERVER['PHP_SELF']."?atmenu=document&stitle=Document&wh=AC&filterprefix=$filterprefix&current_page=$current_page&filterfield=dialprefix&filterprefix2=$filterprefix2&id=";
+$HD_Form -> FG_GO_LINK_AFTER_ACTION_EDIT = $_SERVER['PHP_SELF']."?atmenu=document&stitle=Document&wh=AC&filterprefix=$filterprefix&filterfield=dialprefix&filterprefix2=$filterprefix2&id=";
+$HD_Form -> FG_GO_LINK_AFTER_ACTION_DELETE = $_SERVER['PHP_SELF']."?atmenu=document&stitle=Document&wh=AC&filterprefix=$filterprefix&filterfield=dialprefix&filterprefix2=$filterprefix2&id=";

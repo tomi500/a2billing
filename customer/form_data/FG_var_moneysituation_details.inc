@@ -317,7 +317,7 @@ if (ACT_VOICEMAIL && $ACXVOICEMAIL) {
 			   "",
 			   "",
 			   gettext("Customer can choose to enable the voicemail for this card"),
-			   "" , "", "", gettext("Yes")." :1, - ".gettext("No").":0");
+			   "" , "", "", gettext("Yes")." :1, - ".gettext("No").":0", "", "" , "", gettext("Customer can choose to enable the voicemail for this card"));
 $add_fields_voicemail = ', voicemail_activated';
 } else $add_fields_voicemail = '';
 

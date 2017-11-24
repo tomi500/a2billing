@@ -307,8 +307,10 @@ $HD_Form -> FG_FILTER_FORM_ACTION = 'list';
 
 if (isset($filterprefix)  &&  (strlen($filterprefix)>0)) {
 	if (strlen($HD_Form -> FG_TABLE_CLAUSE)>0) $HD_Form -> FG_TABLE_CLAUSE.=" AND ";
-	$card_length_min = (int) array_shift(explode('-', basename($A2B->config['global']['interval_len_cardnumber'])));
-	$HD_Form -> FG_TABLE_CLAUSE.="((LENGTH('$filterprefix')>='$card_length_min' AND username like '$filterprefix%') OR id='$filterprefix')";
+	$pageName = basename($A2B->config['global']['interval_len_cardnumber']);
+	$card_length_min = (int) array_shift(explode('-', $pageName));
+	$HD_Form -> FG_TABLE_CLAUSE.="(username like '$filterprefix%' OR id='$filterprefix')";
+//	$HD_Form -> FG_TABLE_CLAUSE.="((LENGTH('$filterprefix')>='$card_length_min' AND username like '$filterprefix%') OR id='$filterprefix')";
 }
 
 $HD_Form -> FG_ADDITION = true;
