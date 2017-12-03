@@ -1379,7 +1379,7 @@ if ($mode == 'standard') {
 			$result = $A2B -> instance_table -> SQLExec ($A2B->DBHandle, $QUERY);
 
 			$instance_table = new Table("cc_callback_spool");
-			$FG_TABLE_CLAUSE = "(status='PENDING' OR status='PROCESSING') AND account='{$A2B->accountcode} AND 'callerid='{$A2B->config['callback']['callerid']}' AND exten_leg_a='{$A2B->destination}' AND timediff(now(),entry_time)<{$A2B->config['callback']['sec_avoid_repeate']}";
+			$FG_TABLE_CLAUSE = "(status='PENDING' OR status='PROCESSING') AND account='{$A2B->accountcode}' AND callerid='".$A2B->config['callback']['callerid']."' AND exten_leg_a='{$A2B->destination}' AND timediff(now(),entry_time)<".$A2B->config['callback']['sec_avoid_repeate'];
 			$FG_NB_RECORD = $instance_table -> Table_count ($A2B -> DBHandle, $FG_TABLE_CLAUSE);
 
 			$sec_wait_before_callback = $A2B -> config["callback"]['sec_wait_before_callback'];

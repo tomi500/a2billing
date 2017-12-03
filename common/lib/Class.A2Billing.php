@@ -1646,8 +1646,12 @@ class A2Billing {
 							$answeredtime	= 0;
 							$dialstatus	= $this -> get_dialstatus_from_queuestatus($agi);
 						}
-					} else	$dialstatus		= $agi->get_variable("DIALSTATUS", true);
-
+$tempdebug="ANSWEREDTIME: $answeredtime sec";
+					} else	{
+							$dialstatus	= $agi->get_variable("DIALSTATUS", true);
+$tempdebug="DIALSTATUS: $this->dialstatus";
+					}
+$this -> debug( ERROR, $agi, __FILE__, __LINE__, "[ \033[1;34m".$agi->get_variable('QUEUEDNID', true)." > $tempdebug\33[0m ]");
 					if ($this->monitor == 1 || $this->agiconfig['record_call'] == 1) {
 						$myres = $agi->exec($this -> format_parameters ("StopMixMonitor"));
 						$this -> debug( INFO, $agi, __FILE__, __LINE__, "EXEC StopMixMonitor (".$this->uniqueid.")");
@@ -1824,7 +1828,6 @@ class A2Billing {
 							$this -> callingcard_acct_start_inuse($agi,0);
 //						break;
 					    }
-
 						// CC_DID & CC_DID_DESTINATION - cc_did.id, cc_did_destination.id
 						$QUERY = "UPDATE cc_did SET secondusedreal = secondusedreal + ".$answeredtime." WHERE id='$this->id_did'";
 						$result = $this->instance_table -> SQLExec ($this -> DBHandle, $QUERY, 0);
@@ -3923,7 +3926,7 @@ $this -> debug( ERROR, $agi, __FILE__, __LINE__, "FAXRESOLUTION: ".$faxresolutio
 				
 				// CHECK credit > min_credit_2call / you have zero balance
 				if ( !$this -> enough_credit_to_call() ) $prompt = "prepaid-no-enough-credit-stop";
-				
+//$this -> debug( ERROR, $agi, __FILE__, __LINE__, "========================================================== prepaid-no-enough-credit-stop");
 				// CHECK activated=t / CARD NOT ACTIVE, CONTACT CUSTOMER SUPPORT
 				if ( $this->status != "1") 	$prompt = "prepaid-auth-fail";	// not expired but inactive.. probably not yet sold.. find better prompt
 				

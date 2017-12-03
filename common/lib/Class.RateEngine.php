@@ -1444,11 +1444,15 @@ for ($i=0; $i<count($this->ratecard_obj); $i++) {
 			$intellect_count = $trunkrand = $intellect_failover_trunk = -1;
 			$status = 1;
 			// LOOOOP FOR THE FAILOVER LIMITED TO failover_recursive_limit
-			while ((($loop_failover == 0 && !$this->dialstatus) || ($loop_failover <= $A2B->agiconfig['failover_recursive_limit']
+			while ((($loop_failover == 0 && !$this->dialstatus)
+				|| ($loop_failover <= $A2B->agiconfig['failover_recursive_limit'] && $failover_trunk > 0 && time()-$timecur < 24 && (
+					(in_array($this->dialstatus, array("","CHANUNAVAIL","CONGESTION")) && $intellect_count < 0)
+				    ||	($typecall == 8 && $intellect_count >= 0) // Rule for callback daemon
+				)))
+			    && !in_array($this->dialstatus, array("ANSWER","CANCEL"))
+			      ) {
 //			    && $failover_trunk > 0 && (time()-$timecur) < 24 && (in_array($this->dialstatus, array("","CHANUNAVAIL","CONGESTION")) || $intellect_count >= 0)))
 //			    && $failover_trunk > 0 && (time()-$timecur) < 24 && (in_array($this->dialstatus, array("","CHANUNAVAIL")) || $intellect_count >= 0)))
-			    && $failover_trunk > 0 && (time()-$timecur) < 24 && (in_array($this->dialstatus, array("","CHANUNAVAIL","CONGESTION")) && $intellect_count < 0)))
-			    && $this->dialstatus != "ANSWER" && $this->dialstatus != "CANCEL") {
 
 				$this -> td = $this -> prefixclause = $outprefix = $outprefixrequest = "";
 				$CID_handover = NULL;
@@ -1966,14 +1970,14 @@ $A2B -> debug( ERROR, $agi, __FILE__, __LINE__, "Out of length range destination
 					$answeredtime					= $agi->get_variable("ANSWEREDTIME",true);
 					if ($answeredtime == "")	$answeredtime	= $agi->get_variable("CDR(billsec)",true);
 					if ($answeredtime == $this -> ratecard_obj[$k]['alltimeout'] + 1)	$answeredtime--;
-//$tempdebug="ANSWEREDTIME: $answeredtime sec";
+$tempdebug="ANSWEREDTIME: $answeredtime sec";
 				    } else {
 					$answeredtime					= 0;
-//$tempdebug="DIALSTATUS: $this->dialstatus";
+$tempdebug="DIALSTATUS: $this->dialstatus";
 				    }
 				    $this -> real_answeredtime = $this -> answeredtime	= $answeredtime;
 
-//$A2B -> debug( ERROR, $agi, __FILE__, __LINE__, "[ \033[1;34m$A2B->destination > $tempdebug\33[0m ]");
+$A2B -> debug( ERROR, $agi, __FILE__, __LINE__, "[ \033[1;34m$A2B->destination > $tempdebug\33[0m ]");
 				    $A2B -> debug( INFO, $agi, __FILE__, __LINE__, "[FAILOVER K=$k]:[ANSWEREDTIME=".$this->answeredtime."]:[DIALSTATUS=".$this->dialstatus."]");
 				}
 				if (($this->dialstatus  == "CHANUNAVAIL" || $this->dialstatus  == "CONGESTION") && $intellect_count >= 0) {
@@ -1981,7 +1985,7 @@ $A2B -> debug( ERROR, $agi, __FILE__, __LINE__, "Out of length range destination
 					if ($next_failover_trunk != -1 && $trunkrand != $this -> usedtrunk && $intellect_count >= 0) {
 						$failover_trunk = $next_failover_trunk;
 						$A2B -> debug( ERROR, $agi, __FILE__, __LINE__, $errmess."Now using failover trunk {$failover_trunk} (".$intellect_trunkcode.").");
-					} elseif ($intellect_count > 0 && $this->dialstatus!="CONGESTION") {
+					} elseif ($intellect_count > 0 && ($this->dialstatus!="CONGESTION" || $typecall == 8)) {
 						$failover_trunk = $trunkrand;
 						$firstrand = false;
 						$A2B -> debug( DEBUG, $agi, __FILE__, __LINE__, $errmess."Now return to current intellect selecting.");
