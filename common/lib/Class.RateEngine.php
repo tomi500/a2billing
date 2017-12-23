@@ -845,8 +845,12 @@ for ($i=0; $i<count($this->ratecard_obj); $i++) {
 			$cost -= $disconnectcharge;
 		}
 		
-		$this -> real_answeredtime = $callduration;
+		$this -> real_answeredtime = $didcallduration = $callduration;
 		$callduration = $callduration + $additional_grace_time;
+		$mod_sec = $didcallduration % $A2B->billblock;
+		if ($mod_sec>0) {
+			$didcallduration += $A2B->billblock - $mod_sec;
+		}
 		
 		/*
 		 * In following condition callduration will be updated
@@ -871,9 +875,12 @@ for ($i=0; $i<count($this->ratecard_obj); $i++) {
 
 		
 		// #### 	CALCUL BUYRATE COST   #####
+		$buyratecost = - ($didcallduration/60) * $A2B -> didbuyrate;
+		$A2B -> didbuyrate = 0;
+
 		$buyratecallduration = $this -> real_answeredtime + $additional_grace_time;
 
-		$buyratecost =0;
+//		$buyratecost =0;
 		if ($buyratecallduration < $buyrateinitblock) $buyratecallduration = $buyrateinitblock;
 		if (($buyrateincrement > 0) && ($buyratecallduration > $buyrateinitblock)) {
 			$mod_sec = $buyratecallduration % $buyrateincrement; // 12 = 30 % 18
@@ -897,7 +904,8 @@ for ($i=0; $i<count($this->ratecard_obj); $i++) {
 			$callduration = $initblock;
 		}
 
-
+		$tempcost = ($A2B -> margintotal > 0) ? ($didcallduration/60) * $A2B -> didsellrate / $A2B -> margintotal : 0;
+		$A2B -> didsellrate = 0;
 		// 2 KIND OF CALCULATION : PROGRESSIVE RATE & FLAT RATE
 		// IF FLAT RATE
 		if (empty($chargea) || $chargea==0 || empty($timechargea) || $timechargea==0) {
@@ -913,7 +921,7 @@ for ($i=0; $i<count($this->ratecard_obj); $i++) {
 				$this -> freetimetocall_used = $callduration;
 				$callduration = 0;
 			}
-			$tempcost = ($callduration/60) * $rateinitial;
+			$tempcost += ($callduration/60) * $rateinitial;
 			$tempmargin = $tempcost * ($A2B -> margintotal - 1);
 			$cost -= $tempcost;
 			$this -> margindillers	+= $tempmargin;
@@ -998,7 +1006,7 @@ for ($i=0; $i<count($this->ratecard_obj); $i++) {
 					$mod_sec = $duration_report % $billingblock;
 					if ($mod_sec>0) $duration_report += ($billingblock - $mod_sec);
 				}
-				$tempcost = ($duration_report/60) * $rateinitial;
+				$tempcost += ($duration_report/60) * $rateinitial;
 				$tempmargin = $tempcost * ($A2B -> margintotal - 1);
 				$cost -= $tempcost;
 				$this -> margindillers	+= $tempmargin;

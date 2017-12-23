@@ -234,6 +234,8 @@ ALTER TABLE cc_did ADD citylength SMALLINT( 6 ) NULL DEFAULT NULL;
 ALTER TABLE cc_did ADD verify_callerid SMALLINT( 6 ) NOT NULL DEFAULT '0';
 ALTER TABLE cc_did ADD voicebox VARCHAR( 20 ) CHARACTER SET utf8 COLLATE utf8_bin NULL DEFAULT NULL;
 ALTER TABLE cc_did ADD chanlang CHAR(20) CHARACTER SET utf8 COLLATE utf8_bin NOT NULL DEFAULT 'not_set';
+ALTER TABLE cc_did ADD buyrate DECIMAL( 15, 5 ) NOT NULL DEFAULT 0 AFTER `fixrate`;
+ALTER TABLE cc_did ADD billblock int(11) NOT NULL DEFAULT '1' AFTER `buyrate`;
 
 CREATE TABLE IF NOT EXISTS `cc_sheduler_ratecard` (
   `id_ratecard` BIGINT(20) NOT NULL DEFAULT '0',

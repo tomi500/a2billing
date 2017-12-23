@@ -162,8 +162,8 @@ if (!isset ($action_release) || $action_release == "confirm_release" || $action_
 		
 		$result = $instance_table_did_use->SQLExec($HD_Form->DBHandle, $QUERY, 0);
 		if ($confirm_buy_did == 2) {
-			$QUERY1 = "INSERT INTO cc_charge (id_cc_card, amount, chargetype, description, id_cc_did) " .
-					"VALUES ('" . $_SESSION["card_id"] . "', '" . $rate . "', '2', 'DID: ".$did_name."', '" . $choose_did . "')";
+			$QUERY1 = "INSERT INTO cc_charge (id_cc_card, amount, chargetype, description, id_cc_did, charged_status) " .
+					"VALUES ('" . $_SESSION["card_id"] . "', '" . $rate . "', '2', 'DID: ".$did_name."', '" . $choose_did . "', '1')";
 			$result = $instance_table_did_use->SQLExec($HD_Form->DBHandle, $QUERY1, 0);
 
 			$QUERY1 = "UPDATE cc_did set iduser = " . $_SESSION["card_id"] . ",reserved=1 where id = '" . $choose_did . "'";

@@ -1,0 +1,44 @@
+[Unit]
+Description=MySQL Community Server
+After=network.target
+After=syslog.target
+
+[Install]
+WantedBy=multi-user.target
+Alias=mysql.service
+
+[Service]
+#Type=notify
+User=mysql
+Group=mysql
+PIDFile=/var/run/mysqld/mysql.pid
+Environment="PATH=/usr/local/mysql/bin:$PATH"
+WorkingDirectory=/usr/local/mysql/bin
+
+PermissionsStartOnly=true
+# Execute pre and post scripts as root
+
+ExecStartPre=-/bin/mkdir -p /var/run/mysqld
+ExecStartPre=/bin/chown mysql:mysql -R /var/run/mysqld
+
+#ExecStartPre=-/bin/killall check_db.sh
+
+# Start main service
+
+ExecStart=/usr/local/mysql/bin/mysqld --basedir=/usr/local/mysql --datadir=/var/lib/mysql --log-error=/var/log/mysql/error.log --skip-stack-trace
+
+# Don't signal startup success before a ping works
+
+#ExecStartPost=-/bin/rm -f /tmp/mysql.sock
+#ExecStartPost=-/bin/ln -s /run/mysqld/mysql.sock /tmp/
+
+ExecStartPost=-/home/billing/addons/script/check_db.sh
+
+#ExecStopPost=-/bin/rm -f /tmp/mysql.sock
+
+# Give up if ping don't get an answer
+
+RestartSec=5
+TimeoutSec=120
+Restart=always
+PrivateTmp=false

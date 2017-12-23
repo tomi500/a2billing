@@ -79,6 +79,9 @@ $HD_Form -> FG_FILTERFIELDNAME = gettext('LASTNAME').gettext(' OR ').gettext('CO
 $HD_Form -> FG_FILTER_FORM_ACTION = 'list';
 $HD_Form -> FG_LIMITE_DISPLAY = 13;
 
+if (strlen($HD_Form -> FG_TABLE_CLAUSE)>0) $HD_Form -> FG_TABLE_CLAUSE.=" AND";
+$HD_Form -> FG_TABLE_CLAUSE.=" (refill_type != 2 OR credit >= 0 OR card_id >= 0)"; // не показывать отрицательные бонусы клиентам
+
 if (isset($filterprefix)  &&  (strlen($filterprefix)>0)) {
 	if (strlen($HD_Form -> FG_TABLE_CLAUSE)>0) $HD_Form -> FG_TABLE_CLAUSE.=" AND";
 	$HD_Form -> FG_TABLE_CLAUSE.=" (upper(lastname) like upper('$filterprefix%') OR upper(company_name) like upper('$filterprefix%'))";

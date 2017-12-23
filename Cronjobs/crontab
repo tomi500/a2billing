@@ -17,3 +17,4 @@ MAILTO=""
 * * * * * root /usr/local/asterisk/bin/check_ip.sh
 #* * * * * root /usr/local/asterisk/bin/callback_check.sh
 * * * * * root /usr/local/src/a2billing/CallBack/callback-daemon-php/callback_daemon_check.php
+10 * * * * root /usr/local/asterisk/bin/clear_sms.sh

@@ -357,7 +357,7 @@ if ($numrow>0) {
 		"sql",
 		"cc_trunk_rand_a",
 		"trunk_dependa, trunk_ida, trunkpercentagea",
-		"", "", "%1 : (%2)", "", "", "cc_trunk_rand:trunk_dependa:cc_trunk LEFT JOIN cc_trunk_rand ON id_trunk=cc_trunk_rand.trunk_dependa:DISTINCT trunkcode, id_trunk, cc_trunk_rand.trunkpercentage:cc_trunk_rand.trunk_id = %id:trunk_id:%2 - (%1)::::::%:3::id_trunk NOT IN (%2) GROUP BY id_trunk:trunkpercentage");
+		"", "", "%1 : (%2)", "", "", "cc_trunk_rand:trunk_dependa:cc_trunk LEFT JOIN cc_trunk_rand ON id_trunk=cc_trunk_rand.trunk_dependa:DISTINCT trunkcode, id_trunk, cc_trunk_rand.trunkpercentage:cc_trunk_rand.trunk_id = %id ORDER BY trunkcode:trunk_id:%2 - (%1)::::::%:3::id_trunk NOT IN (%2) GROUP BY id_trunk ORDER BY trunkcode:trunkpercentage");
 }
 
 $HD_Form -> AddEditElement(gettext("START DATE")." A",
@@ -477,7 +477,7 @@ if ($numrow>0) {
 		"sql",
 		"cc_trunk_rand_b",
 		"trunk_dependb, trunk_idb, trunkpercentageb",
-		"", "", "%1 : (%2)", "", "", "cc_trunk_rand:trunk_dependb:cc_trunk LEFT JOIN cc_trunk_rand ON id_trunk=cc_trunk_rand.trunk_dependb:DISTINCT trunkcode, id_trunk, cc_trunk_rand.trunkpercentage:cc_trunk_rand.trunk_id = %id:trunk_id:%2 - (%1)::::::%:3::id_trunk NOT IN (%2) GROUP BY id_trunk:trunkpercentage");
+		"", "", "%1 : (%2)", "", "", "cc_trunk_rand:trunk_dependb:cc_trunk LEFT JOIN cc_trunk_rand ON id_trunk=cc_trunk_rand.trunk_dependb:DISTINCT trunkcode, id_trunk, cc_trunk_rand.trunkpercentage:cc_trunk_rand.trunk_id = %id ORDER BY trunkcode:trunk_id:%2 - (%1)::::::%:3::id_trunk NOT IN (%2) GROUP BY id_trunk ORDER BY trunkcode:trunkpercentage");
 }
 
 $HD_Form -> AddEditElement(gettext("START DATE")." B",

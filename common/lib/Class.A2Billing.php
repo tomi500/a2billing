@@ -221,6 +221,9 @@ class A2Billing {
 	var $ivr_voucher;
 	var $vouchernumber = 0;
 	var $add_credit;
+	var $didsellrate = 0;
+	var $didbuyrate = 0;
+	var $billblock = 1;
 
 	var $cardnumber_range;
 
@@ -1556,6 +1559,12 @@ class A2Billing {
 		$this->agiconfig['say_balance_after_auth'] = 0;
 		$this->agiconfig['say_timetocall'] = 0;
 		$didvoicebox = NULL;
+		$connection_charge = $listdestination[0][8];
+		$selling_rate = $this->didsellrate = $listdestination[0][9];
+		$this->didbuyrate   = $listdestination[0][37];
+		$this->billblock = $listdestination[0][38];
+		if ($this->billblock < 1)
+		    $this->billblock = 1;
 
 		$callcount=0;
 		foreach ($listdestination as $inst_listdestination) {
@@ -1751,12 +1760,17 @@ $this -> debug( ERROR, $agi, __FILE__, __LINE__, "[ \033[1;34m".$agi->get_variab
 					$this -> debug( INFO, $agi, __FILE__, __LINE__, "[DID CALL - LOG CC_CALL: SQL: $QUERY]:[result:$result]");
 
 					if ($answeredtime > 0) {
+						$mod_sec = $answeredtime % $this->billblock;
+						$didans  = $answeredtime;
+						if ($mod_sec>0) {
+						    $didans += $this->billblock - $mod_sec;
+						}
 						// CC_DID & CC_DID_DESTINATION - cc_did.id, cc_did_destination.id
-						$QUERY = "UPDATE cc_did SET secondusedreal = secondusedreal + $answeredtime WHERE id='$this->id_did'";
+						$QUERY = "UPDATE cc_did SET secondusedreal = secondusedreal + $didans WHERE id='$this->id_did'";
 						$result = $this->instance_table -> SQLExec ($this -> DBHandle, $QUERY, 0);
 						$this -> debug( INFO, $agi, __FILE__, __LINE__, "[UPDATE DID]:[result:$result]");
 						
-						$QUERY = "UPDATE cc_did_destination SET secondusedreal = secondusedreal + $answeredtime WHERE id='".$inst_listdestination[1]."'";
+						$QUERY = "UPDATE cc_did_destination SET secondusedreal = secondusedreal + $didans WHERE id='".$inst_listdestination[1]."'";
 						$result = $this->instance_table -> SQLExec ($this -> DBHandle, $QUERY, 0);
 						$this -> debug( INFO, $agi, __FILE__, __LINE__, "[UPDATE DID_DESTINATION]:[result:$result]");
 						
@@ -1828,12 +1842,17 @@ $this -> debug( ERROR, $agi, __FILE__, __LINE__, "[ \033[1;34m".$agi->get_variab
 							$this -> callingcard_acct_start_inuse($agi,0);
 //						break;
 					    }
+						$mod_sec = $answeredtime % $this->billblock;
+						$didans  = $answeredtime;
+						if ($mod_sec>0) {
+						    $didans += $this->billblock - $mod_sec;
+						}
 						// CC_DID & CC_DID_DESTINATION - cc_did.id, cc_did_destination.id
-						$QUERY = "UPDATE cc_did SET secondusedreal = secondusedreal + ".$answeredtime." WHERE id='$this->id_did'";
+						$QUERY = "UPDATE cc_did SET secondusedreal = secondusedreal + ".$didans." WHERE id='$this->id_did'";
 						$result = $this->instance_table -> SQLExec ($this -> DBHandle, $QUERY, 0);
 						$this -> debug( DEBUG, $agi, __FILE__, __LINE__, "[UPDATE DID]:[result:$result]");
 
-						$QUERY = "UPDATE cc_did_destination SET secondusedreal = secondusedreal + ".$answeredtime." WHERE id='".$inst_listdestination[1]."'";
+						$QUERY = "UPDATE cc_did_destination SET secondusedreal = secondusedreal + ".$didans." WHERE id='".$inst_listdestination[1]."'";
 						$result = $this->instance_table -> SQLExec ($this -> DBHandle, $QUERY, 0);
 						$this -> debug( DEBUG, $agi, __FILE__, __LINE__, "[UPDATE DID_DESTINATION]:[result:$result]");
 						
@@ -1868,7 +1887,7 @@ $this -> debug( ERROR, $agi, __FILE__, __LINE__, "[ \033[1;34m".$agi->get_variab
         $nbused = $this -> nbused;
 		$res = 0;
         $connection_charge = $listdestination[0][8];
-        $selling_rate = $listdestination[0][9];
+        $selling_rate = $this->didsellrate = $listdestination[0][9];
 
         if ($connection_charge == 0 && $selling_rate == 0) {
 		$call_did_free = true;

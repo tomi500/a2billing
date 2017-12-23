@@ -1,0 +1,23 @@
+[Unit]
+Description=AsteriskSkype PBX
+Wants=network.target
+After=network.target
+After=mysqld.service
+After=asterisk.service
+Requires=mysqld.service
+[Service]
+Type=simple
+Environment=HOME=/var/lib/asteriskskype
+WorkingDirectory=/var/lib/asteriskskype
+User=asteriskskype
+Group=asteriskskype
+PIDFile=/run/asteriskskype/asterisk.pid
+ExecStart=/usr/local/asteriskskype/sbin/asterisk -ftTnpC /etc/asteriskskype/asterisk.conf
+ExecStop=/usr/local/asteriskskype/sbin/asterisk -rx 'core stop now'
+ExecReload=/usr/local/asteriskskype/sbin/asterisk -rx 'core reload'
+PrivateTmp=true
+Restart=on-failure
+RestartSec=10
+TimeoutSec=120
+[Install]
+WantedBy=multi-user.target

@@ -288,6 +288,24 @@ $HD_Form -> AddEditElement(gettext("SELLING RATE"),
    gettext("Insert the rate"),
    "" , "", "",	"", "" , "", "", gettext("The retail rate; or the cost per minute to apply to the customer to connect DID together, e.g. 0.02"));
 
+$HD_Form -> AddEditElement(gettext("BUYING RATE"),
+   "buyrate",
+   '$value',
+   "INPUT",
+   "size=30 maxlength=20 $fixval",
+   "12",
+   gettext("Insert the rate"),
+   "", "", "", "", "", "", "", gettext("Set the carrier cost, the price you pay for minutes."));
+
+$HD_Form -> AddEditElement(gettext("BILLING BLOCK"),
+    "billblock",
+    '$value',
+    "INPUT",
+    "size=30 maxlength=20",
+    "4",
+    gettext("Insert the billing block"),
+    "", "", "", "", "", "", "NO", gettext("Set the billing increment in seconds to bill your customer."));
+
 $HD_Form -> AddEditElement (gettext("TIME INTERVAL"),
    "aleg_timeinterval",
    '$value',
@@ -453,8 +471,11 @@ $HD_Form -> AddEditElement(gettext("RETAIL BILLING BLOCK OFF PEAK"),
    "" , "", "",	"", "", "", "NO", gettext("Set the billing increment in seconds to bill your customer."));
 
 
-$HD_Form -> FieldEditElement ('did, activated, id_trunk, continuewithdid, allciduse, verify_callerid, voicebox, billingtype, startingdate, expirationdate, id_cc_didgroup, areaprefix, citylength, id_cc_country, chanlang, fixrate, connection_charge, selling_rate, aleg_timeinterval, aleg_carrier_connect_charge, aleg_carrier_cost_min, aleg_carrier_initblock, aleg_carrier_increment, aleg_retail_connect_charge, aleg_retail_cost_min, aleg_retail_initblock, aleg_retail_increment, aleg_carrier_connect_charge_offp, aleg_carrier_cost_min_offp, aleg_carrier_initblock_offp, aleg_carrier_increment_offp, aleg_retail_connect_charge_offp, aleg_retail_cost_min_offp, aleg_retail_initblock_offp, aleg_retail_increment_offp');
+$HD_Form -> FieldEditElement ('did, activated, id_trunk, continuewithdid, allciduse, verify_callerid, voicebox, billingtype, startingdate, expirationdate, id_cc_didgroup, areaprefix, citylength, id_cc_country, chanlang, fixrate, connection_charge, selling_rate, buyrate, billblock, aleg_timeinterval, aleg_carrier_connect_charge, aleg_carrier_cost_min, aleg_carrier_initblock, aleg_carrier_increment, aleg_retail_connect_charge, aleg_retail_cost_min, aleg_retail_initblock, aleg_retail_increment, aleg_carrier_connect_charge_offp, aleg_carrier_cost_min_offp, aleg_carrier_initblock_offp, aleg_carrier_increment_offp, aleg_retail_connect_charge_offp, aleg_retail_cost_min_offp, aleg_retail_initblock_offp, aleg_retail_increment_offp');
 
+
+$HD_Form -> FG_ADITION_HIDDEN_PARAM             = $HD_Form -> FG_EDITION_HIDDEN_PARAM           = "filterprefix";
+$HD_Form -> FG_ADITION_HIDDEN_PARAM_VALUE       = $HD_Form -> FG_EDITION_HIDDEN_PARAM_VALUE     = "$filterprefix";
 
 // Set the filter variables
 $HD_Form -> FG_FILTER_APPLY = true;
@@ -476,7 +497,7 @@ $HD_Form -> FG_TEXT_ADITION_CONFIRMATION = gettext("Your new")." ".$HD_Form->FG_
 $HD_Form -> FG_BUTTON_EDITION_SRC = $HD_Form -> FG_BUTTON_ADITION_SRC  = Images_Path . "/cormfirmboton.gif";
 $HD_Form -> FG_BUTTON_EDITION_BOTTOM_TEXT = $HD_Form -> FG_BUTTON_ADITION_BOTTOM_TEXT = gettext("Click 'Confirm Data' to continue");
 
-$HD_Form -> FG_GO_LINK_AFTER_ACTION_ADD = $_SERVER['PHP_SELF']."?atmenu=document&stitle=Document&wh=AC&id=";
-$HD_Form -> FG_GO_LINK_AFTER_ACTION_EDIT = $_SERVER['PHP_SELF']."?atmenu=document&stitle=Document&wh=AC&id=";
-$HD_Form -> FG_GO_LINK_AFTER_ACTION_DELETE = $_SERVER['PHP_SELF']."?atmenu=document&stitle=Document&wh=AC&id=";
+$HD_Form -> FG_GO_LINK_AFTER_ACTION_ADD = $_SERVER['PHP_SELF']."?atmenu=document&stitle=Document&wh=AC&id="."&filterprefix=$filterprefix&id=";
+$HD_Form -> FG_GO_LINK_AFTER_ACTION_EDIT = $_SERVER['PHP_SELF']."?atmenu=document&stitle=Document&wh=AC&id="."&filterprefix=$filterprefix&id=";
+$HD_Form -> FG_GO_LINK_AFTER_ACTION_DELETE = $_SERVER['PHP_SELF']."?atmenu=document&stitle=Document&wh=AC&id="."&filterprefix=$filterprefix&id=";
 

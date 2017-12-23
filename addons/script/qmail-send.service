@@ -1,0 +1,41 @@
+[Unit]
+Description=Qmail mail delivery daemons
+After=network.target
+
+[Install]
+WantedBy=multi-user.target
+Alias=qmail.service
+
+[Service]
+#Type=notify
+#User=mysql
+#Group=mysql
+#PIDFile=/var/run/mysqld/mysql.pid
+#Environment="PATH=/usr/local/mysql/bin:$PATH"
+Environment="PATH=/var/qmail/bin:$PATH"
+WorkingDirectory=/var/qmail
+
+PermissionsStartOnly=true
+# Execute pre and post scripts as root
+
+#ExecStartPre=/bin/mkdir -p /var/run/mysqld
+#ExecStartPre=/bin/chown mysql:mysql -R /var/run/mysqld
+
+#ExecStartPre=-/bin/killall check_db.sh
+
+# Start main service
+
+ExecStart=/var/qmail/bin/qmail-start ./Maildir/ splogger qmail
+
+# Don't signal startup success before a ping works
+
+#ExecStartPost=-/bin/rm -f /tmp/mysql.sock
+#ExecStartPost=-/bin/ln -s /run/mysqld/mysql.sock /tmp/
+
+#ExecStopPost=-/bin/rm -f /tmp/mysql.sock
+
+# Give up if ping don't get an answer
+
+TimeoutSec=600
+Restart=always
+PrivateTmp=false

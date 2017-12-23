@@ -1061,7 +1061,7 @@ if ($mode == 'standard') {
                     " aleg_timeinterval, ".
                     " aleg_carrier_connect_charge_offp, aleg_carrier_cost_min_offp, aleg_retail_connect_charge_offp, aleg_retail_cost_min_offp, ".
                     " aleg_carrier_initblock_offp, aleg_carrier_increment_offp, aleg_retail_initblock_offp, aleg_retail_increment_offp,".
-                    " cc_did_destination.answer, playsound, timeout, margin, id_diller, voicebox, removeaddprefix, addprefixinternational, chanlang".
+                    " cc_did_destination.answer, playsound, timeout, margin, id_diller, voicebox, removeaddprefix, addprefixinternational, chanlang, buyrate, billblock".
 			        " FROM cc_did_destination, cc_did, cc_card, cc_country".
 			        " WHERE id_cc_did=cc_did.id AND cc_card.status=1 AND cc_card.id=id_cc_card AND cc_did_destination.activated=1 AND cc_did.activated=1 AND did LIKE '$mydnid' ".
 			        " AND cc_country.id=id_cc_country AND cc_did.startingdate<= CURRENT_TIMESTAMP AND (cc_did.expirationdate > CURRENT_TIMESTAMP OR cc_did.expirationdate IS NULL ".
@@ -1389,6 +1389,7 @@ if ($mode == 'standard') {
 			if ($FG_NB_RECORD) {
 				$QUERY = "num_attempt='0', entry_time=now(), `next_attempt_time`=ADDDATE( CURRENT_TIMESTAMP, INTERVAL $sec_wait_before_callback SECOND )";
 				$result = $instance_table -> Update_table ($A2B -> DBHandle, $QUERY, $FG_TABLE_CLAUSE);
+				write_log(LOGFILE_API_CALLBACK, " ======================== Attempt of double number insert detected =====================> ".$A2B->destination);
 			} elseif (!is_array($result) && $FG_NB_RECORD == 0) {
 			    $resfindrate = $RateEngine->rate_engine_findrates($A2B, $A2B -> destination, $A2B -> tariff);
 

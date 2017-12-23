@@ -1,0 +1,32 @@
+[Unit]
+Description=callback-daemon
+After=asterisk.service
+Requires=asterisk.service
+#StopWhenUnneeded=true
+
+[Install]
+WantedBy=multi-user.target
+Alias=callback.service
+
+[Service]
+#Type=notify
+WorkingDirectory=/home/billing/CallBack
+User=billing
+Group=asterisk
+PIDFile=/var/run/a2billing/a2b-callback-daemon.pid
+PermissionsStartOnly=true
+
+#ExecStartPre=-/bin/mkdir /run/a2billing
+#ExecStartPre=/bin/chown -Rf billing:asterisk /var/run/a2billing
+
+ExecStart=/home/billing/CallBack/callback-daemon-php/callback_daemon.php
+
+# Send SIGWINCH for graceful stop
+#KillSignal=SIGWINCH
+#KillMode=mixed
+
+PrivateTmp=true
+Restart=on-failure
+
+RestartSec=5
+#TimeoutSec=10
