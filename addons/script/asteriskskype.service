@@ -5,6 +5,7 @@ After=network.target
 After=mysqld.service
 After=asterisk.service
 Requires=mysqld.service
+
 [Service]
 Type=simple
 Environment=HOME=/var/lib/asteriskskype
@@ -19,5 +20,6 @@ PrivateTmp=true
 Restart=on-failure
 RestartSec=10
 TimeoutSec=120
+
 [Install]
 WantedBy=multi-user.target

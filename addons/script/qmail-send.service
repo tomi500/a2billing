@@ -2,10 +2,6 @@
 Description=Qmail mail delivery daemons
 After=network.target
 
-[Install]
-WantedBy=multi-user.target
-Alias=qmail.service
-
 [Service]
 #Type=notify
 #User=mysql
@@ -39,3 +35,7 @@ ExecStart=/var/qmail/bin/qmail-start ./Maildir/ splogger qmail
 TimeoutSec=600
 Restart=always
 PrivateTmp=false
+
+[Install]
+WantedBy=multi-user.target
+Alias=qmail.service

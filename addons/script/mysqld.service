@@ -3,10 +3,6 @@ Description=MySQL Community Server
 After=network.target
 After=syslog.target
 
-[Install]
-WantedBy=multi-user.target
-Alias=mysql.service
-
 [Service]
 #Type=notify
 User=mysql
@@ -42,3 +38,7 @@ RestartSec=5
 TimeoutSec=120
 Restart=always
 PrivateTmp=false
+
+[Install]
+WantedBy=multi-user.target
+Alias=mysql.service

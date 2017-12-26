@@ -72,7 +72,7 @@ $scu[] = array( gettext("Personal CIDs, Ban callback"), "5");
 
 $HD_Form -> AddViewElement(gettext("DID"), "did", "13%", "center", "sort");
 $HD_Form -> AddViewElement(gettext("TRUNK"), "trunkcode", "14%", "center", "sort");
-$HD_Form -> AddViewElement(gettext("CUSTOMER"), "iduser", "10%", "center", "sort", "", "lie_link", "cc_card", "lastname, id, firstname", "id='%id'", "%1 %3", "", "A2B_entity_card.php");
+$HD_Form -> AddViewElement(gettext("CUSTOMER"), "iduser", "10%", "center", "sort", "", "lie_link", "cc_card", "CONCAT_WS(' ',lastname,firstname,IF(company_name='','',CONCAT('(',company_name,')'))) AS customer, id", "id='%id'", "%1", "", "A2B_entity_card.php");
 $HD_Form -> AddViewElement(gettext("BILLING"), "billingtype", "5%", "center", "sort", "", "list", $billingtype_list_short);
 $HD_Form -> AddViewElement(gettext("START DATE"), "startingdate", "16%", "center", "sort", "19", "", "", "", "",  "display_dateformat");
 $HD_Form -> AddViewElement(gettext("DIDGROUP"), "id_cc_didgroup", "10%", "center", "sort", "15", "lie", "cc_didgroup", "didgroupname", "id='%id'", "%1");

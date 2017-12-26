@@ -47,36 +47,12 @@ $HD_Form->FG_ADDITION = true;
 
 $HD_Form->setDBHandler(DbConnect());
 
-$agent_conf = false;
 if (!empty ($key)) {
-	$_SESSION["key"] = $agentkey = $key;
+	$_SESSION["key"] = $key;
 }
-elseif (!empty ($_SESSION["key"])) {
-	$agentkey = $_SESSION["key"];
-}
+
 if (empty($language)) $language = LANG;
 
-if (!empty ($agentkey)) {
-	$table_key = new Table("cc_agent_signup", "*");
-	$data = $table_key->Get_list($HD_Form->DBHandle, "code= '" . $agentkey . "'");
-	if (is_array($data)) {
-		$groupid = $data[0]['id_group'];
-		$tariffid = $data[0]['id_tariffgroup'];
-		$agentid = $data[0]['id_agent'];
-		// check if groupid and tariff in already in this agent
-		$instance_table_agent_check = new Table("cc_agent JOIN cc_agent_tariffgroup ON cc_agent_tariffgroup.id_agent =  cc_agent.id JOIN cc_card_group ON cc_card_group.id_agent =  cc_agent.id  ", "cc_agent.id");
-		$list_agent_check = $instance_table_agent_check->Get_list($HD_Form->DBHandle, "cc_agent.id= $agentid AND cc_agent_tariffgroup.id_tariffgroup = $tariffid  AND cc_card_group.id = $groupid", "cc_agent.id", "ASC", null, null, null, null);
-		if (is_array($list_agent_check)) {
-			if (!empty ($groupid) && is_numeric($groupid) && !empty ($tariffid) && is_numeric($tariffid)) {
-				$agent_conf = true;
-			} else {
-				$agent_conf = false;
-			}
-		} else {
-			$agent_conf = false;
-		}
-	}
-}
 $callPlan_idlist = isset($A2B->config["signup"]['callplan_id_list']) ? $A2B->config["signup"]['callplan_id_list'] : NULL;
 $group_idlist = isset($A2B->config["signup"]['group_id_list']) ? $A2B->config["signup"]['group_id_list'] : NULL;
 if (has_rights (ACX_DISTRIBUTION) && (isset($id_diller) && $id_diller > 0)) {
@@ -87,54 +63,51 @@ if (has_rights (ACX_DISTRIBUTION) && (isset($id_diller) && $id_diller > 0)) {
 		$group_idlist = $_SESSION["dillergroups"];
 	}
 }
-if (!$agent_conf) {
-	if (strlen($callPlan_idlist) == 0) {
-		exit ("No Call Plan Defined.");
-	}
-	$call_table = new Table("cc_tariffgroup", "tariffgroupname,id");
-	$callPlan_list = $call_table->Get_list($HD_Form->DBHandle, "id in ($callPlan_idlist)", "FIELD(id,".$callPlan_idlist.")", "ASC");
 
-	if (!is_array($callPlan_list) && count($callPlan_list) <= 0) {
-		exit (gettext("No Call Plan id are defined"));
-	}
-	$flag = true;
-	if ($tariff != "" || $tariff != null) {
-		$callPlan_count = count($callPlan_list);
-		for ($i = 0; $i < $callPlan_count; $i++) {
-			if ($callPlan_list[$i][1] == trim($tariff, "\'")) {
-				$flag = false;
-			}
-		}
-		if ($flag) {
-			exit ("Invalid Call Plan Id");
-		}
-	}
-	if (strlen($group_idlist) == 0) {
-		exit ("No Groups Defined.");
-	}
-	$call_table = new Table("cc_card_group", "name,id");
-	$group_list = $call_table->Get_list($HD_Form->DBHandle, "id in ($group_idlist)", "FIELD(id,".$group_idlist.")", "ASC");
+if (strlen($callPlan_idlist) == 0) {
+	exit ("No Call Plan Defined.");
+}
+$call_table = new Table("cc_tariffgroup", "tariffgroupname,id");
+$callPlan_list = $call_table->Get_list($HD_Form->DBHandle, "id in ($callPlan_idlist)", "FIELD(id,".$callPlan_idlist.")", "ASC");
 
-	if (!is_array($group_list) && count($group_list) <= 0) {
-		exit (gettext("No Group id are defined"));
+if (!is_array($callPlan_list) && count($callPlan_list) <= 0) {
+	exit (gettext("No Call Plan id are defined"));
+}
+$flag = true;
+if ($tariff != "" || $tariff != null) {
+	$callPlan_count = count($callPlan_list);
+	for ($i = 0; $i < $callPlan_count; $i++) {
+		if ($callPlan_list[$i][1] == trim($tariff, "\'")) {
+			$flag = false;
+		}
 	}
-	$flag = true;
-	if ($id_group != "" || $id_group != null) {
-		$group_count = count($group_list);
-		for ($i = 0; $i < $group_count; $i++) {
-			if ($group_list[$i][1] == trim($id_group, "\'")) {
-				$flag = false;
-			}
+	if ($flag) {
+		exit ("Invalid Call Plan Id");
+	}
+}
+if (strlen($group_idlist) == 0) {
+	exit ("No Groups Defined.");
+}
+$call_table = new Table("cc_card_group", "name,id");
+$group_list = $call_table->Get_list($HD_Form->DBHandle, "id in ($group_idlist)", "FIELD(id,".$group_idlist.")", "ASC");
+
+if (!is_array($group_list) && count($group_list) <= 0) {
+	exit (gettext("No Group id are defined"));
+}
+$flag = true;
+if ($id_group != "" || $id_group != null) {
+	$group_count = count($group_list);
+	for ($i = 0; $i < $group_count; $i++) {
+		if ($group_list[$i][1] == trim($id_group, "\'")) {
+			$flag = false;
 		}
-		if ($flag) {
-			exit ("Invalid Group Id");
-		}
+	}
+	if ($flag) {
+		exit ("Invalid Group Id");
 	}
 }
 
 //check subscriber
-
-$table_key = new Table("cc_agent_signup", "*");
 
 $maxi = $maxi2 = $maxi3 = $maxi4 = '';
 //	-= Need to install GeoIP http://ua2.php.net/manual/en/geoip.setup.php =-
@@ -223,7 +196,7 @@ if (isset ($form_action) && $form_action == "ask-add") {
 	$end_date = date("-m-d H:i:s");
 	$comp_date = "value='" . $begin_date . $end_date . "'";
 	$comp_date_plus = "value='" . $begin_date_plus . $end_date . "'";
-	$paypal = 1;
+	$paypal = $_SESSION["paypal"];
 }
 if (LASTNAME_ENABLE)  {
 $HD_Form->AddEditElement(gettext("LASTNAME")." *",
@@ -254,7 +227,7 @@ $HD_Form->AddEditElement(gettext("COMPANY NAME"),
 $company_name_editFG = "company_name,";
 }
 $group_editFG = "";
-if (!$agent_conf && strpos($group_idlist, ',') !== false && !($subscriber_signup>0)) {
+if (strpos($group_idlist, ',') !== false && !($subscriber_signup>0)) {
 	$HD_Form->AddEditElement(gettext("CUSTOMER GROUP"),
 		"id_group",
 		"$id_group",
@@ -264,7 +237,7 @@ if (!$agent_conf && strpos($group_idlist, ',') !== false && !($subscriber_signup
 $group_editFG = "id_group,";
 }
 
-if (!$agent_conf && strpos($callPlan_idlist, ',') !== false && !($subscriber_signup>0)) {
+if (strpos($callPlan_idlist, ',') !== false && !($subscriber_signup>0)) {
 	$HD_Form->AddEditElement(gettext("CALL PLAN"),
 								"tariff",
 								"$tariff",
@@ -483,7 +456,7 @@ if (has_rights (ACX_DISTRIBUTION) || (isset($id_diller) && $id_diller > 0))  {
 								"6",
 								"", "", "", "", "", "", "", "", "");
 	$subscriber_editFG = ",id_diller";
-
+    if ($_SESSION["paypal"]) {
 	$HD_Form -> AddEditElement (gettext("PAYPAL PAYMENT"),
 								"paypal",
 								$paypal,
@@ -493,6 +466,7 @@ if (has_rights (ACX_DISTRIBUTION) || (isset($id_diller) && $id_diller > 0))  {
 								"",
 								"list", "", "", "", $yesno_list, "%1", "", gettext("Apply PayPal payment to this customer"));
 	$subscriber_editFG .= ",paypal";
+    }
 } elseif (CAPTCHA_ENABLE) {
 
 	$HD_Form->AddEditElement(gettext("VERIFICATION"),
@@ -555,11 +529,6 @@ elseif ($A2B->config["signup"]['activated']) {
 $HD_Form->FG_QUERY_ADITION_HIDDEN_FIELDS = "iax_buddy, sip_buddy, expiredays, expirationdate, typepaid, enableexpire, runservice, simultaccess, credit, username, useralias, uipass, loginkey, status";
 $HD_Form->FG_QUERY_ADITION_HIDDEN_VALUE = "$iax_account, $sip_account, $myexpiredays, $myexpirationdate, $mytypepaid, $myenableexpire, $myrunservice, $mysimultaccess, $mycredit, $maxi, $maxi2, $pass, $loginkey, $status";
 
-if ($agent_conf) {
-	$HD_Form->FG_QUERY_ADITION_HIDDEN_FIELDS .= ",id_group";
-	$HD_Form->FG_QUERY_ADITION_HIDDEN_VALUE .= ", $groupid";
-}
-
 // username, useralias, uipass, loginkey
 $HD_Form->FG_QUERY_EXTRA_HIDDED = array (
 	$maxi,
@@ -569,14 +538,11 @@ $HD_Form->FG_QUERY_EXTRA_HIDDED = array (
 );
 
 if (!is_numeric($subscriber_signup)) {
-	if (!$agent_conf && strpos($callPlan_idlist, ',') === false) {
+	if (strpos($callPlan_idlist, ',') === false) {
 		$HD_Form->FG_QUERY_ADITION_HIDDEN_FIELDS .= ", tariff";
 		$HD_Form->FG_QUERY_ADITION_HIDDEN_VALUE .= ", $callPlan_idlist";
-	} elseif ($agent_conf) {
-		$HD_Form->FG_QUERY_ADITION_HIDDEN_FIELDS .= ", tariff";
-		$HD_Form->FG_QUERY_ADITION_HIDDEN_VALUE .= ", $tariffid";
 	}
-	if (!$agent_conf && strpos($group_idlist, ',') === false) {
+	if (strpos($group_idlist, ',') === false) {
 		$HD_Form->FG_QUERY_ADITION_HIDDEN_FIELDS .= ", id_group";
 		$HD_Form->FG_QUERY_ADITION_HIDDEN_VALUE .= ", $group_idlist";
 	}

@@ -4,6 +4,7 @@ Wants=network.target
 After=network.target
 After=mysqld.service
 Requires=mysqld.service
+
 [Service]
 Type=simple
 Environment=HOME=/var/lib/asterisk
@@ -18,5 +19,6 @@ PrivateTmp=true
 Restart=on-failure
 RestartSec=10
 TimeoutSec=120
+
 [Install]
 WantedBy=multi-user.target
