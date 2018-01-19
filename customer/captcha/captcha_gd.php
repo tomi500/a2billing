@@ -16,7 +16,7 @@
 */
 class captcha
 {
-	var $width = 240;
+	var $width = 260;
 	var $height = 60;
 	var $captcha_gd_noise = 0;
 
@@ -79,7 +79,7 @@ class captcha
 			{
 				$size	= mt_rand(8, 23);
 				$angle	= mt_rand(0, 360);
-				$x		= mt_rand(0, 360);
+				$x		= mt_rand(0, $this -> width);
 				$y		= mt_rand(0, (int)($this->height - ($size / 5)));
 				$color	= $func2($image, mt_rand(160, 224), mt_rand(160, 224), mt_rand(160, 224));
 				$text	= $chars_allowed[mt_rand(0, sizeof($chars_allowed) - 1)];				
@@ -112,7 +112,7 @@ class captcha
 			$angle	= mt_rand(-30, 30);
 			
 			$size	= mt_rand(20, 40);
-			$y	= mt_rand((int)($size - $size/5), (int)($this->height + $size/5));
+			$y	= mt_rand($size, $this->height);
 
 			$color	= $func2($image, mt_rand(0, 127), mt_rand(0, 127), mt_rand(0, 127));
 			$shadow = $func2($image, mt_rand(127, 254), mt_rand(127, 254), mt_rand(127, 254));			

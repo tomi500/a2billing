@@ -85,11 +85,13 @@ $HD_Form -> AddViewElement(gettext("DESTINATION"), "destination", "15%", "center
 $HD_Form -> AddViewElement(gettext("VOIP"), "voip_call", "5%", "center", "sort", "", "list", $actived_list);
 $HD_Form -> AddViewElement(gettext("CREATION DATE"), "creationdate", "15%", "center", "sort", "16", "", "", "", "", "", "display_dateformat");
 $HD_Form -> AddViewElement(gettext("ACCOUNT NUMBER"), "id_cc_card", "15%", "center", "sort", "", "lie_link", "cc_card", "username,id", "id='%id'", "%1", "", "A2B_entity_card.php");
+$HD_Form -> AddViewElement(gettext("INUSE"), "destinuse" , "2%", "center", "sort");
+$HD_Form -> AddViewElement(gettext("MAXUSE"), "destmaxuse" , "3%", "center", "sort");
 $HD_Form -> AddViewElement(gettext("MINUTES USED"), "secondusedreal", "10%", "center", "SORT", "30", "", "", "", "", "", "display_minute");
 $HD_Form -> AddViewElement(gettext("VALIDATED"), "validated", "10%", "center", "sort", "", "list", $validated_list);
 
 // added a parameter to append  FG_TABLE_ID  ( by default ) or disable 0.
-$HD_Form -> FieldViewElement ('cc_did.did, cc_did_destination.activated, priority, destination, voip_call, cc_did_destination.creationdate, id_cc_card, cc_did_destination.secondusedreal, validated');
+$HD_Form -> FieldViewElement ('cc_did.did, cc_did_destination.activated, priority, destination, voip_call, cc_did_destination.creationdate, id_cc_card, destinuse, destmaxuse, cc_did_destination.secondusedreal, validated');
 
 $HD_Form -> FG_ACTION_SIZE_COLUMN = '15%';
 
@@ -146,6 +148,24 @@ $HD_Form -> AddEditElement (gettext("VOIP_CALL"),
 	"",
 	gettext("Choose if you want to not use the trunk and let the asterisk go to QUEUE or call directly the destination (ie, Destination : SIP/jeremy@182.212.1.45)"),
 	"", "",  "", gettext("Yes").":1, - ".gettext("No").":0", "", "", "", gettext("If the call is VoIP or QUEUE, that must be set to 'Yes'"));
+
+$HD_Form -> AddEditElement (gettext("CURRENT CONNECTIONS"),
+        "destinuse",
+        "",
+        "INPUT",
+        "size=30 $def_value_inuse maxlength=30",
+        "4",
+        gettext("Number of current connections"),
+        "" , "", "", "", "", "", "", gettext("Updated to show the number of channels currently in use on this destination.If there are no channels in use, and the system shows that there are, manually reset this field back to zero.") );
+
+$HD_Form -> AddEditElement (gettext("MAX CONCURRENT CALLER"),
+        "destmaxuse",
+        "",
+        "INPUT",
+        "size=30 $def_value_maxuse maxlength=30",
+        "29",
+        gettext("Number of maximum simultaneous connections"),
+        "" , "", "", "", "", "", "", gettext("The maximum number of channels available to this destination. Set to -1 to have an unlimited number of channels") );
 
 $HD_Form -> AddEditElement (gettext("CUSTOMER ID"),
 	"id_cc_card",
@@ -215,7 +235,7 @@ $HD_Form -> AddEditElement (gettext("CID_PRESENT"),
 	gettext("Choose 'Yes' if you want to present real CID though CID_GROUP applied"),
 	"" , "", "", gettext("Yes").":1, - ".gettext("No").":0", "", "", "", gettext("Choose 'Yes' if you want to present real CID though CID_GROUP applied"));
 **/
-	$HD_Form -> FieldEditElement ('activated, destination, timeout, voip_call, id_cc_card, id_cc_did, validated, priority, answer, playsound');
+	$HD_Form -> FieldEditElement ('activated, destination, timeout, voip_call, destinuse, destmaxuse, id_cc_card, id_cc_did, validated, priority, answer, playsound');
 
 $HD_Form->FG_ADITION_HIDDEN_PARAM		= $HD_Form->FG_EDITION_HIDDEN_PARAM		= 'filterprefix,current_page';
 $HD_Form->FG_ADITION_HIDDEN_PARAM_VALUE 	= $HD_Form->FG_EDITION_HIDDEN_PARAM_VALUE	= $filterprefix.",".$current_page;

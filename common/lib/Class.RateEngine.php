@@ -1838,12 +1838,12 @@ $A2B -> debug( ERROR, $agi, __FILE__, __LINE__, "Out of length range destination
 				}
 				$this -> trunk_start_inuse($agi, $A2B, 1);
 				if ($agi) {
-				    if ($A2B->dtmf_destination && strlen($A2B->oldphonenumber) && $firstgo && (!isset($trunkcode) || strpos($trunkcode,"-INFOLINE") === false) && $typecall != 44) {
+				    if ($A2B->dtmf_destination && strlen($A2B->oldphonenumber) && $firstgo && (!isset($trunkcode) || strpos($trunkcode,"-INFOLINE") === false) && $typecall < 44) {
 					$agi -> say_digits($A2B->oldphonenumber, '#');
 					$firstgo = false;
 				    }
 				    if (($this -> ratecard_obj[$k][12] > 0 && !($A2B->cardnumber != $A2B->accountcode)) || ($this -> ratecard_obj[$k][12] == 0 && $A2B->extext && $this -> ratecard_obj[$k][4] != $A2B->cardnumber && $ipaddress != $prefix.$destination && $this -> ratecard_obj[$k][72] != 'EMERGENCY')) {
-					if ($A2B->auth_through_accountcode && $typecall != 44) {
+					if ($A2B->auth_through_accountcode && $typecall < 44) {
 						$A2B -> debug( DEBUG, $agi, __FILE__, __LINE__, "[A2Billing] SAY BALANCE : $A2B->credit");
 						$A2B -> fct_say_balance ($agi, $A2B->credit);
 						$A2B -> auth_through_accountcode = false;
@@ -1852,7 +1852,7 @@ $A2B -> debug( ERROR, $agi, __FILE__, __LINE__, "Out of length range destination
 //$A2B -> debug( ERROR, $agi, "", "", "========================".$currencies_list[strtoupper($A2B->currency)][2]);
 					if (!isset($currencies_list[strtoupper($A2B->currency)][2]) || !is_numeric($currencies_list[strtoupper($A2B->currency)][2])) $mycur = 1;
 					else $mycur = $currencies_list[strtoupper($A2B->currency)][2];
-					if ((!isset($trunkcode) || strpos($trunkcode,"-INFOLINE") === false) && $typecall != 44 && $loop_failover == 0 && $loop_intellect <= 1 && $this -> ratecard_obj[$k]['alltimeout'] != $timeoutlast && round($this -> ratecard_obj[$k][12] * $A2B->margintotal / $mycur, 2) != $rateinitlast) {
+					if ((!isset($trunkcode) || strpos($trunkcode,"-INFOLINE") === false) && $typecall < 44 && $loop_failover == 0 && $loop_intellect <= 1 && $this -> ratecard_obj[$k]['alltimeout'] != $timeoutlast && round($this -> ratecard_obj[$k][12] * $A2B->margintotal / $mycur, 2) != $rateinitlast) {
 						$timeoutlast = $this -> ratecard_obj[$k]['alltimeout'];
 						$rateinitlast = round($this -> ratecard_obj[$k][12] * $A2B->margintotal / $mycur, 2);
 						if ($A2B -> fct_say_time_2_call($agi, $timeoutlast, $this -> ratecard_obj[$k][12]) == -1) break;
@@ -1897,15 +1897,16 @@ $A2B -> debug( ERROR, $agi, __FILE__, __LINE__, "Out of length range destination
 //				    $agi -> set_variable('MASTER_CHANNEL(CALACCOUNT)', $A2B->cardnumber);
 //					if (is_array($cidresult) && count($cidresult)>0) { }
 //$A2B -> debug( ERROR, $agi, __FILE__, __LINE__, " [===================                                      CALLERID(num): ".$agi -> get_variable('CALLERID(num)', true)." ]");
-//$A2B -> debug( ERROR, $agi, __FILE__, __LINE__, " [===================                                       agi_callerid: ".$agi -> request['agi_callerid']." ]");
+//$A2B -> debug( ERROR, $agi, __FILE__, __LINE__, " [===================                                       agi_callerid: {$agi->request['agi_callerid']} ]");
 //$A2B -> debug( ERROR, $agi, __FILE__, __LINE__, " [===================                                    A2B -> CallerID: ".$A2B -> CallerID." ]");
-//$A2B -> debug( ERROR, $agi, __FILE__, __LINE__, " [===================                                   A2B -> src: ".$A2B -> src." ]");
-//$A2B -> debug( ERROR, $agi, __FILE__, __LINE__, " [===================                                             OUTCID: ".$outcid." ]");
+//$A2B -> debug( ERROR, $agi, __FILE__, __LINE__, " [===================                                         A2B -> src: ".$A2B -> src." ]");
+//$A2B -> debug( ERROR, $agi, __FILE__, __LINE__, " [===================                                             OUTCID: {$outcid} ]");
 
-					if ($outcid != 0 && $agi -> request['agi_callerid'] != $outcid) {
+					if ($outcid != 0 && "{$outcid}" !== "{$agi->request['agi_callerid']}") {
 						//Uncomment this line if you want to save the outbound_cid in the CDR
 						//$A2B -> CallerID = $outcid;
 						$calleridname = $agi -> get_variable('CALLERID(name)', true);
+$A2B -> debug( ERROR, $agi, __FILE__, __LINE__, "[calleridname : $calleridname]");
 						$agi -> set_callerid('"'.$outcid.'"<'.$outcid.'>');
 //						$agi -> set_variable('CALLERID(ani)', $outcid);
 						$A2B -> debug( DEBUG, $agi, __FILE__, __LINE__, "[EXEC SetCallerID : $outcid]");
@@ -2032,6 +2033,8 @@ $A2B -> debug( ERROR, $agi, __FILE__, __LINE__, "[ \033[1;34m$A2B->destination >
 			//# Ooh, something actually happened!
 			if ($this->dialstatus  == "BUSY") {
 				$this -> real_answeredtime = $this -> answeredtime = 0;
+				if ($typecall<=44) {
+$A2B -> debug( ERROR, $agi, __FILE__, __LINE__, "[typecall=".$typecall."]");
 				if ($A2B->agiconfig['busy_timeout'] > 0 && !(!$A2B->extext && $A2B->voicemail && !is_null($A2B->voicebox))) {
 					$A2B -> let_stream_listening($agi);
 					$agi->exec("Playtones busy");
@@ -2039,7 +2042,7 @@ $A2B -> debug( ERROR, $agi, __FILE__, __LINE__, "[ \033[1;34m$A2B->destination >
 				} elseif (!(!$A2B->extext && $A2B->voicemail && !is_null($A2B->voicebox))) {
 					$A2B -> let_stream_listening($agi);
 					$agi-> stream_file('prepaid-isbusy', '#');
-				}
+				}}
 			} elseif ($this->dialstatus == "NOANSWER") {
 				$this -> real_answeredtime = $this -> answeredtime = 0;
 				if (isset($trunkcode) && strpos($trunkcode,"-INFOLINE") !== false) {

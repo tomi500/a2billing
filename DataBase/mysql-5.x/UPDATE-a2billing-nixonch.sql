@@ -205,6 +205,7 @@ ALTER TABLE cc_ratecard ADD out_of_intern_prefix_for_sure INT( 11 ) NOT NULL DEF
 ALTER TABLE cc_ratecard ADD length_range_from INT( 11 ) NOT NULL DEFAULT '1';
 ALTER TABLE cc_ratecard ADD length_range_till INT( 11 ) NOT NULL DEFAULT '100';
 UPDATE `cc_ratecard` SET `length_range_from` = '12', `length_range_till` = '12' WHERE `dialprefix` LIKE '380%';
+ALTER TABLE cc_ratecard CHANGE `destination` `destination` BIGINT( 20 ) NULL DEFAULT '0';
 
 ALTER TABLE cc_callerid ADD callback INT( 11 ) NOT NULL DEFAULT '0';
 ALTER TABLE cc_callerid ADD phonenumber VARCHAR( 100 ) CHARACTER SET utf8 COLLATE utf8_bin NOT NULL;
@@ -223,6 +224,8 @@ ALTER TABLE cc_callerid ADD blacklist SMALLINT( 6 ) NOT NULL DEFAULT '0';
 ALTER TABLE cc_did_destination ADD answer INT( 11 ) NOT NULL DEFAULT '0';
 ALTER TABLE cc_did_destination ADD playsound VARCHAR( 100 ) CHARACTER SET utf8 COLLATE utf8_bin NOT NULL;
 ALTER TABLE cc_did_destination ADD timeout VARCHAR( 3 ) NOT NULL ;
+ALTER TABLE cc_did_destination ADD destinuse int(11) NOT NULL DEFAULT '0' AFTER `activated`;
+ALTER TABLE cc_did_destination ADD destmaxuse int(11) NOT NULL DEFAULT '-1' AFTER `destinuse`;
 
 ALTER TABLE cc_did ADD verify_did INT( 11 ) NOT NULL DEFAULT '0' AFTER `did`;
 ALTER TABLE cc_did ADD id_trunk INT( 11 ) NOT NULL DEFAULT '-1';
@@ -732,6 +735,7 @@ ALTER TABLE `cc_prefix` CHANGE `prefix` `prefix` BIGINT( 20 ) NOT NULL;
 INSERT IGNORE INTO cc_prefix (`prefix`, `destination`) VALUES ('0', 'Internal Call');
 INSERT IGNORE INTO cc_prefix (`prefix`, `destination`) VALUES ('-1', '');
 INSERT IGNORE INTO cc_prefix (`prefix`, `destination`) VALUES ('-2', '<b>FAX</b>');
+INSERT IGNORE INTO cc_prefix (`prefix`, `destination`) VALUES ('-3', '<b>Incoming</b>');
 
 INSERT IGNORE INTO cc_templatemail (`id_language`, `mailtype`, `fromemail`, `fromname`, `subject`, `messagetext`, `messagehtml`) VALUES
 ('en', 'fax_success', 'fax_robot@sipde.net', 'Fax Robot', 'FAX received from $cid_number$', 'You have just received a $count$ page fax from $cid_number$ $cid_name$, at phone number $dest_exten$, on $datetime$.\r\nThe original fax document is attached in $format$ format.\r\n\r\nYou may also download copy of fax from your personal web page <a href="https://customer.sipde.net/fax-history.php">https://customer.sipde.net/fax-history.php</a>\r\n\r\nKind regards,\r\nTeam <a href="http://www.sipde.net/">SIPDE.NET</a>', NULL),

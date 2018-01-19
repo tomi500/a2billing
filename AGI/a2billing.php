@@ -108,7 +108,7 @@ if ($argc > 2 && strlen($argv[2]) > 0) {
 $A2B = new A2Billing();
 $A2B -> load_conf($agi, NULL, 0, $idconfig, $optconfig);
 $A2B -> mode = $mode;
-$A2B -> G_startime = $G_startime;
+//$A2B -> G_startime = $G_startime;
 
 
 $A2B -> debug( INFO, $agi, __FILE__, __LINE__, "IDCONFIG : $idconfig");
@@ -464,6 +464,7 @@ if ($mode == 'sms') {
 if ($mode == 'standard') {
 
 	if ($A2B -> agiconfig['answer_call']==1) {
+		$A2B -> G_startime = time();
 		$A2B -> debug( INFO, $agi, __FILE__, __LINE__, '[ANSWER CALL]');
 		$agi -> answer();
 //		$status_channel=AST_STATE_UP;
@@ -998,7 +999,7 @@ if ($mode == 'standard') {
 						" aleg_timeinterval, ".
 						" aleg_carrier_connect_charge_offp, aleg_carrier_cost_min_offp, aleg_retail_connect_charge_offp, aleg_retail_cost_min_offp, ".
 						" aleg_carrier_initblock_offp, aleg_carrier_increment_offp, aleg_retail_initblock_offp, aleg_retail_increment_offp, ".
-						" cc_card.id, playsound, timeout, margin, id_diller, voicebox, removeaddprefix, addprefixinternational".
+						" cc_card.id, playsound, timeout, margin, id_diller, voicebox, removeaddprefix, addprefixinternational, cc_did_destination.answer".
 						" FROM cc_did, cc_did_destination, cc_card, cc_country".
 						" WHERE id_cc_did=cc_did.id AND cc_card.status=1 AND cc_card.id=id_cc_card AND cc_did_destination.activated=1 AND cc_did.activated=1 AND did LIKE '$A2B->destination'".
 						" AND cc_country.id=id_cc_country AND cc_did.startingdate <= CURRENT_TIMESTAMP".
@@ -1038,6 +1039,7 @@ if ($mode == 'standard') {
 } elseif ($mode == 'did') {
 	
 	if ($A2B -> agiconfig['answer_call']==1) {
+		$A2B -> G_startime = time();
 		$A2B -> debug( INFO, $agi, __FILE__, __LINE__, '[ANSWER CALL]');
 		$agi -> answer();
 	} else {
