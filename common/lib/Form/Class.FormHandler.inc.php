@@ -1117,6 +1117,10 @@ class FormHandler
 		$this -> FG_regular[]  = array(	"^[1-9]+\d*\,(\d+\d*)*(\,([1-9]+\d*)\,(\d+\d*)*)*$",
 						gettext("(ONLY NUMERIC CHARACTERS WITH COMMA SEPARATED)"));
 		
+		// 32
+		$this -> FG_regular[]  = array("^(|(\d|\*|#)+)$",
+						gettext("(ONLY DTMF CHARACTERS 0123456789*# OR NOTHING)"));
+		
 	}
 	
 	
@@ -1786,7 +1790,7 @@ class FormHandler
 			if ($this->VALID_SQL_REG_EXP) {
 				$this -> RESULT_QUERY = $instance_table -> Update_table ($this->DBHandle, $param_update, $this->FG_EDITION_CLAUSE);
 				for($i=0;$i<$this->FG_NB_TABLE_EDITION;$i++) {
-					if (strtoupper ($this->FG_TABLE_EDITION[$i][3]) == 'POPUPDAYTIME') {
+					if (stripos($this->FG_TABLE_EDITION[$i][3],"POPUPDAYTIME")===0) {
 						$instance_sub_table = new Table($this->FG_TABLE_EDITION[$i][8], $this->FG_TABLE_EDITION[$i][9]);
 						$instance_sub_table -> Delete_table ($this->DBHandle, str_replace("%id", "$id", $this->FG_TABLE_EDITION[$i][10]));
 						$QUERY = "INSERT INTO ".$this->FG_TABLE_EDITION[$i][8]." (".$this->FG_TABLE_EDITION[$i][15].") VALUES ";

@@ -74,6 +74,7 @@ if (($download == "file") && $file && $ACXSEERECORDING && !$accdie) {
 ".			"WHERE uniqueid LIKE '$value' AND (cc_card.id=$customer OR cc_card.id IN
 ".				"(SELECT aa.concat_card_id FROM cc_card_concat aa LEFT JOIN cc_card_concat bb ON bb.concat_id=aa.concat_id WHERE bb.concat_card_id=$customer AND bb.foreignrecords=1 AND aa.myrecords=1))
 ".			"ORDER BY cc_call.id DESC LIMIT 1";
+	$DBHandle_max -> Execute("SET @@session.time_zone=@@global.time_zone");
 	$result = $instance_table -> SQLExec ($DBHandle_max, $QUERY);
 	if (is_array($result) && count($result)>0) {
 

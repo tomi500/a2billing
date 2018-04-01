@@ -70,6 +70,27 @@ $scu[] = array( gettext("Personal CIDs"), "0");
 $scu[] = array( gettext("All&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbspCIDs, Ban callback"), "4");
 $scu[] = array( gettext("Personal CIDs, Ban callback"), "5");
 
+$instance_config_table = new Table("cc_card, cc_did", "username");
+$return = $instance_config_table -> Get_list($DBHandle,"cc_did.id=$id AND cc_card.id=cc_did.iduser");
+
+$soundlist = array();
+$soundlist[] = array(gettext("NOT ACTIVE")."&nbsp", "");
+if (is_array($return)) {
+    $username = $return[0][0];
+    $return = scandir(DIR_STORE_AUDIO."/$username/");
+    if ($return!==false) {
+	foreach ($return as $val) {
+	    if ($val != "." && $val != "..") {
+//echo preg_replace('/\.[^\.\/]+$/', '', $val)."<br>";
+		$soundlist[] = array(preg_replace('/\.[^\.\/]+$/', '', $val),$username."/".preg_replace('/\.[^\.\/]+$/', '', $val));
+	    }
+	}
+    }
+}
+
+//echo "../addons/sounds/$username/"."<br>";
+//echo var_export($return)."<br>";
+
 $HD_Form -> AddViewElement(gettext("DID"), "did", "13%", "center", "sort");
 $HD_Form -> AddViewElement(gettext("TRUNK"), "trunkcode", "14%", "center", "sort");
 $HD_Form -> AddViewElement(gettext("CUSTOMER"), "iduser", "10%", "center", "sort", "", "lie_link", "cc_card", "CONCAT_WS(' ',lastname,firstname,IF(company_name='','',CONCAT('(',company_name,')'))) AS customer, id", "id='%id'", "%1", "", "A2B_entity_card.php");
@@ -175,6 +196,13 @@ $HD_Form -> AddEditElement (gettext("VERIFY CALLERID"),
 	"list", "", "", "", $yesno, "%1", "",
 	gettext("Choose 'Yes' to do CallerID verifing if incoming CLI is exist into CallerID table of database"));
 
+$HD_Form->AddEditElement(gettext("CHANNEL LANGUAGE"),
+	"chanlang",
+	"$chanlang",
+	"SELECT",
+	"", "",
+	"", "list", "", "", "", $language_list, "%1", "", "");
+
 $HD_Form -> AddEditElement (gettext("VOICEBOX"),
 	"voicebox",
 	'',
@@ -185,6 +213,62 @@ $HD_Form -> AddEditElement (gettext("VOICEBOX"),
 	"", "", "", "", "", "", "NO-NULL",
 	gettext("Insert extension number that receive voicemail when nobody answered on incoming call"));
 
+$HD_Form -> AddEditElement (gettext("ALLOW PREFIXes"),
+	"callbackprefixallow",
+	"$value",
+	"INPUT",
+	"size=30 maxlength=30 ",
+	"28",
+	"",
+	"", "", "", "", "", "", "NO", gettext("Allow Callback and/or Spam Filter only for the listed prefixes. Insert the prefixes separated by comma, e.g. for UK,IT,RU,UA are '44,39,7,380'."), null, null, gettext("Before All-Callback"));
+
+$HD_Form -> AddEditElement (gettext("SOUND BEFORE CALLBACK"),
+        "callbacksound",
+        '$callbacksound',
+        "SELECT",
+        "",
+        "",
+        gettext("Insert the path and name of sound file"),
+        "list", "", "", "", $soundlist, "%1", "", gettext("Play sound before hangup. Choose to activate callback engine."));
+
+$HD_Form -> AddEditElement (gettext("SOUND AFTER CALLBACK"),
+        "aftercallbacksound",
+        '$aftercallbacksound',
+        "SELECT",
+        "",
+        "",
+        gettext("Insert the path and name of sound file"),
+	"list", "", "", "", $soundlist, "%1", "", gettext("Play sound after callback will be answered"), null, null, gettext("After All-Callback"));
+//        "" , "", "", "", "", "", "", gettext("Play sound after callback will be answered"), null, null, gettext("After All-Callback"));
+//"list", "", "", "", $unions,    "%1", "", gettext("Choose Union for this Member"), "", '<OPTION  value="0" selected>'.gettext("NEW").'&nbsp;</OPTION>');
+
+$HD_Form -> AddEditElement(gettext("DTMF DIGIT GUARD"),
+	"digitaftercallbacksound",
+	'$value',
+	"INPUT",
+	"size=30 maxlength=12",
+	"32",
+	"",
+	"", "", "", "", "", "", "NO-NULL", gettext("Set DTMF digit which caller must pressed any of them, i.e. 0123456789*#"));
+
+$HD_Form -> AddEditElement (gettext("SPAM FILTER"),
+	"spamfilter",
+	'0',
+	"RADIOBUTTON",
+	"",
+	"",
+	"",
+	"" , "", "", gettext("Yes").":1, - ".gettext("No").":0", "", "", "" , gettext("Use special IVR menu to guard against spam-calls"), null, null, gettext("Spam Filter"));
+
+$HD_Form -> AddEditElement (gettext("KNOWN CALLERID, days"),
+	"secondtimedays",
+	'$value',
+        "INPUT",
+        "size=30 maxlength=20",
+        "4",
+        "",
+        "" , "", "", "", "", "" , "NO", gettext("Define number of days ago for use DID calls from known CallerID without spam-filter"));
+
 $HD_Form -> AddEditElement (gettext("BILLING"),
 	"billingtype",
 	"",
@@ -192,7 +276,7 @@ $HD_Form -> AddEditElement (gettext("BILLING"),
 	"",
 	"",
 	"",
-	"list" , "", "",  "", $billingtype_list, "%1" , "", "");
+	"list" , "", "",  "", $billingtype_list, "%1" , "", "", null, null, gettext("Basic"));
 
 $HD_Form -> AddEditElement (gettext("START DATE"),
 	"startingdate",
@@ -250,13 +334,6 @@ $HD_Form -> AddEditElement (gettext("COUNTRY"),
 	"countryname, id, countryprefix",
 	"", "", "%1 +%3", "", "");
 
-$HD_Form->AddEditElement(gettext("CHANNEL LANGUAGE"),
-	"chanlang",
-	"$chanlang",
-	"SELECT",
-	"", "",
-	"", "list", "", "", "", $language_list, "%1", "", "");
-
 $HD_Form -> AddEditElement (gettext("MONTHLY RATE"),
 	"fixrate",
 	'$value',
@@ -266,7 +343,6 @@ $HD_Form -> AddEditElement (gettext("MONTHLY RATE"),
 	gettext("Insert the monthly rate"),
 	"" , "", "", "", "", "", "", gettext("currency : ").strtoupper(BASE_CURRENCY),
 	null, null, gettext("Define the renting cost for the customers.") );
-
 
 $HD_Form -> AddEditElement(gettext("CONNECT CHARGE"),
    "connection_charge",
@@ -344,7 +420,6 @@ $HD_Form -> AddEditElement(gettext("CARRIER MIN DURATION"),
    gettext("Insert the buyrate init block"),
    "" , "", "",	"", "", "" , "NO", gettext("Set the minimum duration charged by the carrier. (i.e. 30 secs)"));
 
-
 $HD_Form -> AddEditElement(gettext("CARRIER BILLING BLOCK"),
    "aleg_carrier_increment",
    '$value',
@@ -353,7 +428,6 @@ $HD_Form -> AddEditElement(gettext("CARRIER BILLING BLOCK"),
    "4",
    gettext("Insert the billing block"),
    "" , "", "",	"", "", "" , "NO", gettext("Set the billing increment, in seconds (billing block), that the carrier applies. (ie 30 secs)"));
-
 
 $HD_Form -> AddEditElement(gettext("RETAIL CONNECTION CHARGE"),
    "aleg_retail_connect_charge",
@@ -373,7 +447,6 @@ $HD_Form -> AddEditElement(gettext("RETAIL COST PER MINUTE"),
    gettext("Insert the connect cost"),
    "" , "", "",	"", "", "" , "NO", gettext("The cost can be negative where there is an out payment, or more usually, positive"));
 
-
 $HD_Form -> AddEditElement(gettext("RETAIL MIN DURATION"),
    "aleg_retail_initblock",		
    '$value',	
@@ -382,7 +455,6 @@ $HD_Form -> AddEditElement(gettext("RETAIL MIN DURATION"),
    "4",	
    gettext("Insert the init block"),
    "" , "", "",	"", "", "", "NO", gettext("Set the minimum duration to charge the customer (ie 60 seconds)"));
-
 
 $HD_Form -> AddEditElement(gettext("RETAIL BILLING BLOCK"),
    "aleg_retail_increment",
@@ -421,7 +493,6 @@ $HD_Form -> AddEditElement(gettext("CARRIER MIN DURATION OFF PEAK"),
    gettext("Insert the buyrate init block"),
    "" , "", "",	"", "", "" , "NO", gettext("Set the minimum duration charged by the carrier. (i.e. 30 secs)"));
 
-
 $HD_Form -> AddEditElement(gettext("CARRIER BILLING BLOCK OFF PEAK"),
    "aleg_carrier_increment_offp",
    '$value',
@@ -430,7 +501,6 @@ $HD_Form -> AddEditElement(gettext("CARRIER BILLING BLOCK OFF PEAK"),
    "4",
    gettext("Insert the billing block"),
    "" , "", "",	"", "", "" , "NO", gettext("Set the billing increment, in seconds (billing block), that the carrier applies. (ie 30 secs)"));
-
 
 $HD_Form -> AddEditElement(gettext("RETAIL CONNECTION CHARGE OFF PEAK"),
    "aleg_retail_connect_charge_offp",
@@ -450,16 +520,14 @@ $HD_Form -> AddEditElement(gettext("RETAIL COST PER MINUTE OFF PEAK"),
    gettext("Insert the connect cost"),
    "" , "", "",	"", "", "" , "NO", gettext("The cost can be negative where there is an out payment, or more usually, positive"));
 
-
 $HD_Form -> AddEditElement(gettext("RETAIL MIN DURATION OFF PEAK"),
-   "aleg_retail_initblock_offp",		
-   '$value',	
-   "INPUT",	
-   "size=30 maxlength=20",	
-   "4",	
+   "aleg_retail_initblock_offp",
+   '$value',
+   "INPUT",
+   "size=30 maxlength=20",
+   "4",
    gettext("Insert the init block"),
    "" , "", "",	"", "", "", "NO", gettext("Set the minimum duration to charge the customer (ie 60 seconds)"));
-
 
 $HD_Form -> AddEditElement(gettext("RETAIL BILLING BLOCK OFF PEAK"),
    "aleg_retail_increment_offp",
@@ -471,7 +539,7 @@ $HD_Form -> AddEditElement(gettext("RETAIL BILLING BLOCK OFF PEAK"),
    "" , "", "",	"", "", "", "NO", gettext("Set the billing increment in seconds to bill your customer."));
 
 
-$HD_Form -> FieldEditElement ('did, activated, id_trunk, continuewithdid, allciduse, verify_callerid, voicebox, billingtype, startingdate, expirationdate, id_cc_didgroup, areaprefix, citylength, id_cc_country, chanlang, fixrate, connection_charge, selling_rate, buyrate, billblock, aleg_timeinterval, aleg_carrier_connect_charge, aleg_carrier_cost_min, aleg_carrier_initblock, aleg_carrier_increment, aleg_retail_connect_charge, aleg_retail_cost_min, aleg_retail_initblock, aleg_retail_increment, aleg_carrier_connect_charge_offp, aleg_carrier_cost_min_offp, aleg_carrier_initblock_offp, aleg_carrier_increment_offp, aleg_retail_connect_charge_offp, aleg_retail_cost_min_offp, aleg_retail_initblock_offp, aleg_retail_increment_offp');
+$HD_Form -> FieldEditElement ('did, activated, id_trunk, continuewithdid, allciduse, verify_callerid, chanlang, voicebox, callbackprefixallow, callbacksound, aftercallbacksound, digitaftercallbacksound, spamfilter, secondtimedays, billingtype, startingdate, expirationdate, id_cc_didgroup, areaprefix, citylength, id_cc_country, fixrate, connection_charge, selling_rate, buyrate, billblock, aleg_timeinterval, aleg_carrier_connect_charge, aleg_carrier_cost_min, aleg_carrier_initblock, aleg_carrier_increment, aleg_retail_connect_charge, aleg_retail_cost_min, aleg_retail_initblock, aleg_retail_increment, aleg_carrier_connect_charge_offp, aleg_carrier_cost_min_offp, aleg_carrier_initblock_offp, aleg_carrier_increment_offp, aleg_retail_connect_charge_offp, aleg_retail_cost_min_offp, aleg_retail_initblock_offp, aleg_retail_increment_offp');
 
 
 $HD_Form -> FG_ADITION_HIDDEN_PARAM             = $HD_Form -> FG_EDITION_HIDDEN_PARAM           = "filterprefix";

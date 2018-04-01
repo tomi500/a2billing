@@ -3,7 +3,10 @@ var PopUpDayTimeJson = {
         {
             "weekdays[]": "",
             "timefrom[]": "0",
-            "timetill[]": "0"
+            "timetill[]": "0",
+              "inputa[]": "10",
+              "inputb[]": "1",
+              "inputc[]": "60"
         }
 	]
 };

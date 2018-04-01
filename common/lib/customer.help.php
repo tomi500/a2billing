@@ -154,13 +154,17 @@ if (SHOW_HELP) {
 
 	$CC_help_speeddial = create_help(gettext("Map single digit to your most dialed numbers."),$credit_cur,$limit_cur);
 
-	$CC_help_callback = create_help(gettext("Callback : Entre your phone number and the phone number you wish to call."),$credit_cur,$limit_cur);
+	$CC_help_callback = create_help(gettext("Callback : Enter your phone number and the phone number you wish to call."),$credit_cur,$limit_cur);
 
 	$CC_help_money_situation = create_help(gettext("This screen shows refills and payments made against each account, along with the current credit on each card. The initial amount of credit applied to the card is not included. The amount owing is calculated by subtracting payments from refills."),$credit_cur,$limit_cur);
 
 	$CC_help_view_refill = create_help(gettext("Customers Refill history - The section below allows you to see customers refill"),$credit_cur,$limit_cur);
 
 	$CC_help_surveillance = create_help("Назначьте номер телефона, принадлежащий Вашему записывающему устройству, и частоту нарезки роликов для аудио или видео наблюдения.",$credit_cur,$limit_cur);
+
+	$CC_help_ringuplist = create_help("Список номеров периодического дозвона.",$credit_cur,$limit_cur);
+
+	$CC_help_ringupedit = create_help("Назначьте расписание событий дозвона, паузу между событиями, количество звонков каждый раз и ограничение максимальной продолжительности звонка.",$credit_cur,$limit_cur);
 
 	$CC_help_log_viewer_info = create_help(gettext("The system log helps you track all events on your application. Log levels are the Importance Levels for the events - 1 is lowest level and 3 is highest level. 1 is used for Login, Logout and Page Visit. 2 is used for Add, Import, Export. 3 is for Update and Delete."),$credit_cur,$limit_cur);
 

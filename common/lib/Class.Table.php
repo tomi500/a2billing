@@ -269,7 +269,7 @@ class Table {
 	}
 
 
-	function Table_count ($DBHandle, $clause=null, $id_Value = null, $cache = 0)
+	function Table_count ($DBHandle, $clause=null, $id_Value = null, $cache = 0, $grouping = true)
 	{
 		if (!is_null($this -> table_count))
 			$sql = 'SELECT count(*) FROM '.trim($this -> table_count);
@@ -287,8 +287,10 @@ class Table {
 
 		$QUERY = $sql.$sql_clause;
 		
-		if (preg_match("/[ ]+group[ ]+by[ ]+/i",$sql_clause)) $QUERY="SELECT count(*) FROM (".$QUERY.") as tmp";
-		
+		if (preg_match("/[ ]+group[ ]+by[ ]+/i",$sql_clause) && $grouping) {
+			$QUERY="SELECT count(*) FROM (".$QUERY.") as tmp";
+		}
+//echo "<br>".$QUERY;
 		$res = $this -> ExecuteQuery ($DBHandle, $QUERY, $cache);
 		if (!$res) return false;
 		

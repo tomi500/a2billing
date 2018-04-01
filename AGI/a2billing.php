@@ -242,6 +242,8 @@ if ($A2B -> CC_TESTING) {
 	$accountcode = '2222222222';
 }
 
+$callbacksound = '';
+
 if ($mode == 'sms') {
 //	$A2B -> Reinit();
 	$messfrom = addslashes($caller_areacode);
@@ -331,7 +333,7 @@ if ($mode == 'sms') {
 	$didyes = $diddest = false;
 
 	if (strlen($mydnid) > 0){
-	    $QUERY = "SELECT areaprefix, citylength, countryprefix, cc_did.id, cc_did_destination.activated FROM cc_country, cc_did
+	    $QUERY = "SELECT areaprefix, citylength, countryprefix, cc_did.id, cc_did_destination.activated, callbacksound, answer, callbackprefixallow, secondtimedays, iduser FROM cc_country, cc_did
 ".			"LEFT JOIN cc_did_destination ON id_cc_did=cc_did.id
 ".			"WHERE cc_did.activated=1 AND did LIKE '$mydnid' AND startingdate<=CURRENT_TIMESTAMP AND (expirationdate>CURRENT_TIMESTAMP OR expirationdate IS NULL";
 	    // if MYSQL
@@ -342,6 +344,11 @@ if ($mode == 'sms') {
 		$didyes = true;
 		$did_id = $result[0][3];
 		$diddest = $result[0][4];
+		$callbacksound = $result[0][5];
+		$callbackanswer = $result[0][6];
+		$callbackprefixallow = explode(",",$result[0][7]);
+		$secondtimedays = $result[0][8];
+		$did_user_id = $result[0][9];
 		$A2B -> CID_handover = $A2B->CallerID = $A2B->did_apply_add_countryprefixfrom($result[0], $A2B->CallerID);
 		if ($A2B->CallerID != $agi -> request['agi_callerid'])
 			$agi -> set_callerid($A2B -> CallerID);
@@ -360,7 +367,7 @@ if ($mode == 'sms') {
 ".			"INNER JOIN cc_did ON cc_did.id_trunk = cc_call.id_trunk
 ".			"WHERE did LIKE '$mydnid' AND calledstation LIKE '$A2B->CallerID' AND LENGTH(calledstation) > 6 ORDER BY cc_call.id DESC LIMIT 1";
 **/		$QUERY="SELECT IF(od.src=od.src_exten,od.src_peername,od.src) src, cc_card.username, cc_card.recalltime, continuewithdid FROM cc_card
-".			"INNER JOIN (SELECT id, card_id, src, src_exten, src_peername, id_trunk, starttime FROM cc_call WHERE calledstation LIKE '$A2B->CallerID' AND LENGTH(calledstation) > 6) AS od ON od.starttime > DATE_SUB(NOW(), INTERVAL recalldays DAY) AND od.card_id = cc_card.id
+".			"INNER JOIN (SELECT id, card_id, src, src_exten, src_peername, id_trunk, starttime FROM cc_call WHERE calledstation LIKE '$A2B->CallerID' AND LENGTH(calledstation) > 6 AND sipiax <> 4) AS od ON od.starttime > DATE_SUB(NOW(), INTERVAL recalldays DAY) AND od.card_id = cc_card.id
 ".			"INNER JOIN cc_did ON cc_did.id_trunk = od.id_trunk
 ".			"WHERE did LIKE '$mydnid' ORDER BY od.id DESC LIMIT 1";
 		$result = $A2B -> instance_table -> SQLExec ($A2B->DBHandle, $QUERY);
@@ -415,11 +422,61 @@ if ($mode == 'sms') {
 		} elseif ($caller_areacode == 'didless') {
 		    break;
 		} elseif ($diddest){
-		    $A2B -> mode = $mode = 'did';
 		    $A2B -> agiconfig['answer_call']=0;
-		    $A2B -> agiconfig['cid_enable']=0;
-		    $A2B -> agiconfig['use_dnid']=1;
-		    $A2B -> agiconfig['number_try']=1;
+		    $QUERY="SELECT calledstation FROM cc_call ".
+				"LEFT JOIN cc_callerid ON cid LIKE src AND id_cc_card = card_id ".//AND activated = 't'
+				"WHERE src LIKE '$A2B->CallerID' AND cid IS NULL ".
+					"AND ((sipiax IN (0,2,3) AND starttime > DATE_SUB(NOW(), INTERVAL '$secondtimedays' DAY) AND sessiontime>20) OR ((sipiax=7 OR sipiax=4) AND starttime > DATE_SUB(NOW(), INTERVAL '2' MINUTE))) ".
+				"ORDER BY starttime DESC LIMIT 1";
+		    $result = $A2B -> instance_table -> SQLExec ($A2B->DBHandle, $QUERY);
+		    foreach ($callbackprefixallow as $value) {
+			$A2B -> prefixallow = false; // Пропускаем без защитного IVR если колбек (SOUND BEFORE CALLBACK -> NOT ACTIVE) запрещен в принципе, но защитное IVR разрешено
+			if (strpos($A2B->CallerID,$value)===0) {
+			    $A2B -> prefixallow = true; // Если префикс калерайди (Before All-Callback -> ALLOW PREFIXES) соответствует заданному, разрешаем колбек
+			    break;
+			}
+		    }
+		    if ($callbacksound && strlen($A2B->CallerID)>1 && is_numeric($A2B->CallerID) && !(is_array($result) && count($result) > 0) && $A2B -> prefixallow) {
+			$accountcode = $agi -> get_variable("CDR(accountcode)", true);
+
+			$QUERY = "SELECT IF(status='SENT',0,id) FROM cc_callback_spool WHERE (status='PENDING' OR status='PROCESSING' OR status='SENT') AND account='$accountcode' AND callerid='".$A2B->config['callback']['callerid']."' AND exten_leg_a='{$A2B->CallerID}' AND timediff(now(),entry_time)<".$A2B->config['callback']['sec_avoid_repeate'];
+			$result = $A2B -> instance_table -> SQLExec($A2B -> DBHandle, $QUERY);
+			if (is_array($result)) {
+				if ($result[0][0]) {
+					$sec_wait_before_callback = $A2B -> config["callback"]['sec_wait_before_callback'];
+					if (!is_numeric($sec_wait_before_callback) || $sec_wait_before_callback<1) {
+						$sec_wait_before_callback = 2;
+					}
+					$QUERY = "UPDATE cc_callback_spool SET num_attempt='0', entry_time=now(), `next_attempt_time`=ADDDATE( CURRENT_TIMESTAMP, INTERVAL $sec_wait_before_callback SECOND ) WHERE id={$result[0][0]}";
+					$A2B -> DBHandle -> Execute($QUERY);
+					$agi -> exec('HangUp', 29);
+					write_log(LOGFILE_API_CALLBACK, " ==========UPDATE======== Attempt of double number insert detected =====================> ".$A2B->CallerID);
+					break;
+				} else {
+					$agi -> exec('HangUp', 29);
+					write_log(LOGFILE_API_CALLBACK, " ==========CANCEL======== Attempt of double number insert detected =====================> ".$A2B->CallerID);
+					break;
+				}
+			}
+
+			if ($callbackanswer) {
+			    if ($A2B -> G_startime == 0)
+				$A2B -> G_startime = time();
+			    $agi -> answer();
+			} else {
+			    $A2B -> let_stream_listening($agi, true);
+			    $agi -> exec('Playtones ring');
+			    sleep(2);
+			}
+			$res_dtmf = $agi->get_data($callbacksound, 1, 1);
+			$A2B -> mode = $mode = 'all-callback';
+			$A2B -> config["callback"]['extension'] = $mydnid;
+		    } else {
+			$A2B -> mode = $mode = 'did';
+			$A2B -> agiconfig['cid_enable']=0;
+			$A2B -> agiconfig['use_dnid']=1;
+			$A2B -> agiconfig['number_try']=1;
+		    }
 		} elseif ($A2B -> agiconfig['cid_auto_create_card']==1) {
 		    $A2B -> mode = $mode = 'standard';
 		    $A2B -> agiconfig['cid_enable']=1;
@@ -999,7 +1056,7 @@ if ($mode == 'standard') {
 						" aleg_timeinterval, ".
 						" aleg_carrier_connect_charge_offp, aleg_carrier_cost_min_offp, aleg_retail_connect_charge_offp, aleg_retail_cost_min_offp, ".
 						" aleg_carrier_initblock_offp, aleg_carrier_increment_offp, aleg_retail_initblock_offp, aleg_retail_increment_offp, ".
-						" cc_card.id, playsound, timeout, margin, id_diller, voicebox, removeaddprefix, addprefixinternational, cc_did_destination.answer".
+						" cc_card.id, playsound, timeout, margin, id_diller, voicebox, removeaddprefix, addprefixinternational, answer".
 						" FROM cc_did, cc_did_destination, cc_card, cc_country".
 						" WHERE id_cc_did=cc_did.id AND cc_card.status=1 AND cc_card.id=id_cc_card AND cc_did_destination.activated=1 AND cc_did.activated=1 AND did LIKE '$A2B->destination'".
 						" AND cc_country.id=id_cc_country AND cc_did.startingdate <= CURRENT_TIMESTAMP".
@@ -1063,7 +1120,7 @@ if ($mode == 'standard') {
                     " aleg_timeinterval, ".
                     " aleg_carrier_connect_charge_offp, aleg_carrier_cost_min_offp, aleg_retail_connect_charge_offp, aleg_retail_cost_min_offp, ".
                     " aleg_carrier_initblock_offp, aleg_carrier_increment_offp, aleg_retail_initblock_offp, aleg_retail_increment_offp,".
-                    " cc_did_destination.answer, playsound, timeout, margin, id_diller, voicebox, removeaddprefix, addprefixinternational, chanlang, buyrate, billblock".
+                    " answer, playsound, timeout, margin, id_diller, voicebox, removeaddprefix, addprefixinternational, chanlang, buyrate, billblock, spamfilter, secondtimedays".
 			        " FROM cc_did_destination, cc_did, cc_card, cc_country".
 			        " WHERE id_cc_did=cc_did.id AND cc_card.status=1 AND cc_card.id=id_cc_card AND cc_did_destination.activated=1 AND cc_did.activated=1 AND did LIKE '$mydnid' ".
 			        " AND cc_country.id=id_cc_country AND cc_did.startingdate<= CURRENT_TIMESTAMP AND (cc_did.expirationdate > CURRENT_TIMESTAMP OR cc_did.expirationdate IS NULL ".
@@ -1378,7 +1435,7 @@ if ($mode == 'standard') {
 // !!!!!!!!!!!!!!!!!!!!!!!!!!!
 // Accountcode of incoming trunk & cid_card_id are not compare now !!!!!!!
 			$QUERY = "SELECT callback FROM cc_callerid WHERE cid LIKE '$A2B->destination' AND (activated='f' OR (activated='t' AND (callback=0 OR blacklist=1)))";
-			$result = $A2B -> instance_table -> SQLExec ($A2B->DBHandle, $QUERY);
+			$result = ($callbacksound) ? false : $A2B -> instance_table -> SQLExec ($A2B->DBHandle, $QUERY);
 
 			$instance_table = new Table("cc_callback_spool");
 			$FG_TABLE_CLAUSE = "(status='PENDING' OR status='PROCESSING') AND account='{$A2B->accountcode}' AND callerid='".$A2B->config['callback']['callerid']."' AND exten_leg_a='{$A2B->destination}' AND timediff(now(),entry_time)<".$A2B->config['callback']['sec_avoid_repeate'];
@@ -1418,8 +1475,9 @@ if ($mode == 'standard') {
 					$id_server_group = $A2B -> config["callback"]['id_server_group'];
 					$priority = 1;
 					$timeout = $A2B -> config["callback"]['timeout']*1000;
-					if ($channeloutcid[1]) $callerid = $channeloutcid[1];
+					if ($channeloutcid[1] && $channeloutcid[1] != $A2B->destination) $callerid = $channeloutcid[1];
 					else $callerid = $A2B -> config["callback"]['callerid'];
+//$A2B -> debug( ERROR, $agi, __FILE__, __LINE__, "[CALLBACK-CALLERID : CALLED=".$callerid." / ".$A2B -> config["callback"]['callerid']);
 					$application = '';
 					$account = $A2B -> accountcode;
 
@@ -1496,6 +1554,7 @@ if ($mode == 'standard') {
 	$callback_usedtrunk		= $agi -> get_variable("TRUNK", true);
 	$called_party = $calling_num	= $agi -> get_variable("CALLED", true);
 	$calling_party			= $agi -> get_variable("CALLING", true);
+	$cid				= $agi -> get_variable("CID", true);
 	$callback_mode			= $agi -> get_variable("MODE", true);
 	$callback_tariff		= $agi -> get_variable("TARIFF", true);
 	$callback_uniqueid		= $agi -> get_variable("CBID", true);
@@ -1621,7 +1680,17 @@ if ($mode == 'standard') {
 			}
 			if ($ans==1) {
 				// PERFORM THE CALL
-				if ($A2B-> destination != 'RECORDER') {
+				$QUERY = "SELECT flagringup, timeout1, sound1 FROM cc_callback_spool WHERE uniqueid LIKE '$callback_uniqueid' AND flagringup=1 LIMIT 1";
+				$result = $A2B -> instance_table -> SQLExec ($A2B->DBHandle, $QUERY);
+				if (is_array($result) && $result[0][0]) {
+					sleep($result[0][1]);
+					if ($result[0][2])	//$agi -> evaluate("STREAM FILE {$result[0][2]} 0123456789*#");
+								$agi-> stream_file($result[0][2], "0123456789*#");
+					$RateEngine -> answeredtime = $agi->get_variable("CDR(billsec)",true);
+					$RateEngine -> dialstatus = "ANSWER";
+					$result_callperf = true;
+					
+				} else if ($A2B-> destination != 'RECORDER') {
 					$result_callperf = $RateEngine->rate_engine_performcall ($agi, $A2B-> destination, $A2B);
 				} else {
                                         $A2B->dl_short = MONITOR_PATH . "/" . $A2B->username . "/" . date('Y') . "/" . date('n') . "/" . date('j') . "/";
@@ -1648,7 +1717,8 @@ if ($mode == 'standard') {
 				}
 
 				// INSERT CDR  & UPDATE SYSTEM
-				$RateEngine->rate_engine_updatesystem($A2B, $agi, $A2B-> destination);
+				if ($A2B-> destination != 'RINGUP')
+					$RateEngine->rate_engine_updatesystem($A2B, $agi, $A2B-> destination);
 
 				if ($A2B -> agiconfig['say_balance_after_call']==1) {
 					$A2B-> fct_say_balance ($agi, $A2B->credit);
@@ -1672,7 +1742,8 @@ if ($mode == 'standard') {
 					" aleg_timeinterval, ".
 					" aleg_carrier_connect_charge_offp, aleg_carrier_cost_min_offp, aleg_retail_connect_charge_offp, aleg_retail_cost_min_offp, ".
 					" aleg_carrier_initblock_offp, aleg_carrier_increment_offp, aleg_retail_initblock_offp, aleg_retail_increment_offp, ".
-					" cc_card.id, playsound, timeout, margin, id_diller, voicebox, removeaddprefix, addprefixinternational".
+					" cc_card.id, playsound, timeout, margin, id_diller, voicebox, removeaddprefix, addprefixinternational, answer, chanlang, ".
+					" aftercallbacksound, digitaftercallbacksound, spamfilter, secondtimedays".
 					" FROM cc_did, cc_did_destination, cc_card, cc_country".
 					" WHERE id_cc_did=cc_did.id AND cc_card.status=1 AND cc_card.id=id_cc_card and cc_did_destination.activated=1 AND cc_did.activated=1 AND did LIKE '$A2B->destination'".
 					" AND cc_country.id=id_cc_country AND cc_did.startingdate <= CURRENT_TIMESTAMP AND (cc_did.expirationdate > CURRENT_TIMESTAMP OR cc_did.expirationdate IS NULL ".
@@ -1685,7 +1756,22 @@ if ($mode == 'standard') {
 				$A2B -> debug( DEBUG, $agi, __FILE__, __LINE__, $QUERY);
 				$result = $A2B -> instance_table -> SQLExec ($A2B->DBHandle, $QUERY);
 				if (is_array($result)) {
-					$A2B -> call_2did($agi, $RateEngine, $result);
+					$chanlang = $result[0][37];
+					if ($chanlang != 'not_set') {
+						$lg_var_set = 'CHANNEL(language)';
+						$agi -> set_variable($lg_var_set, $chanlang);
+						$A2B -> current_language = $language;
+					}
+					if ($result[0][38]) {
+						sleep(1); 
+						$res_dtmf = $agi->get_data($result[0][38], 10000, 1);
+						$dtmf = (string)$res_dtmf["result"];
+						if ($result[0][39]!==NULL && strpos((string)$result[0][39], $dtmf)===false) {
+							$agi -> hangup();
+							break;
+						}
+					}
+					$A2B -> call_2did($agi, $RateEngine, $result, true);
 					if ($A2B->set_inuse_username) $A2B -> callingcard_acct_start_inuse($agi,0);
 				}
 			}
@@ -2082,7 +2168,11 @@ if ($charge_callback) {
 				$RateEngine -> dialstatus = 'ANSWERED';
 				$A2B -> debug( INFO, $agi, __FILE__, __LINE__, "[CALLBACK]:[RateEngine -> answeredtime=".$RateEngine -> answeredtime."]");
 				
-				$A2B -> CallerID =  $A2B -> config["callback"]['callerid'];
+				if (isset($cid)) {
+					$A2B -> CallerID	= $cid;
+					$A2B -> src_peername	= 'NULL';
+				} else
+					$A2B -> CallerID =  $A2B -> config["callback"]['callerid'];
 				unset($A2B->src);
 				//(ST) replace above code with the code below to store CDR for all callbacks and to only charge for the callback if requested
 				if ($callback_been_connected==1 || ($A2B -> agiconfig['callback_bill_1stleg_ifcall_notconnected']==1) )  {

@@ -1,0 +1,152 @@
+<?php
+
+$json_data = $_POST["json_data"];
+if (isset($json_data))		extract(json_decode($json_data,true,512));
+else
+getpost_ifset(array('id', 'exten_leg_a', 'exten', 'max_attempt'));
+
+$HD_Form = new FormHandler("cc_callback_spool","ring-up");
+
+$HD_Form -> FG_DEBUG = 0;
+
+$HD_Form -> FG_TABLE_DEFAULT_ORDER = "id";
+$HD_Form -> FG_TABLE_DEFAULT_SENS = "DESC";
+
+$HD_Form -> FG_EDITION = true;
+$HD_Form -> FG_DELETION = true;
+
+// Dependent Tables
+$HD_Form -> FG_FK_DELETE_ALLOWED = true;
+$HD_Form -> FG_FK_DELETE_CONFIRM = false;
+$HD_Form -> FG_FK_WARNONLY = false;
+$HD_Form -> FG_FK_TABLENAMES = array("cc_sheduler_ratecard");
+$HD_Form -> FG_FK_EDITION_CLAUSE = array("id_callback");
+
+$soundlist = array();
+$soundlist[] = array(gettext("NOT ACTIVE")."&nbsp", "");
+$username = $_SESSION["pr_login"];
+$return = scandir(DIR_STORE_AUDIO."/$username/");
+if ($return!==false) {
+    foreach ($return as $val) {
+        if (is_file(DIR_STORE_AUDIO."/$username/".$val)) {
+            $soundlist[] = array(preg_replace('/\.[^\.\/]+$/', '', $val),$username."/".preg_replace('/\.[^\.\/]+$/', '', $val));
+        }
+    }
+}
+
+$HD_Form -> AddViewElement(gettext(" PhoneNumber"), "leg_a", "18%", "center", "sort", "", "lie_link", "", "", "", "", "", "call-history.php?s=1&t=0&order=t1.starttime&sens=DESC&current_page=0&posted=1&Period=&frommonth=&fromstatsmonth=&tomonth=&tostatsmonth=&fromday=true&fromstatsday_sday=1&fromstatsmonth_sday=".date('Y')."-".date('m')."&today=&tostatsday_sday=".date('d')."&tostatsmonth_sday=".date('Y')."-".date('m')."&calleridtype=1&phonenumbertype=1&sourcetype=&clidtype=&channel=&resulttype=min&callerid=&phonenumber=%0&src=&clid=&terminatecauseid=ANSWER&choose_calltype=-1&choose_currency=");
+//$HD_Form -> AddViewElement(gettext("DURATION"), "surveillance", "18%", "center", "sort", "26", "", "", "", "", "", "display_minute");
+//$HD_Form -> AddViewElement(gettext("TIME LEFT"), "timeleft", "18%", "center", "sort", "", "timeleft", "%2");
+$HD_Form -> AddViewElement(gettext("STATUS"), "last_status", "18%", "center", "sort");
+$HD_Form -> AddViewElement(gettext("CALLS MADE"), "num_attempt" , "2%", "center", "sort");
+$HD_Form -> AddViewElement(gettext("MAX CALLS"), "max_attempt" , "3%", "center", "sort");
+
+$HD_Form -> FieldViewElement ("IFNULL((SELECT regexten FROM cc_sip_buddies
+                                        LEFT JOIN cc_card_concat bb ON id_cc_card = bb.concat_card_id
+                                        LEFT JOIN ( SELECT aa.concat_id FROM cc_card_concat aa WHERE aa.concat_card_id = {$_SESSION['card_id']} ) AS v ON v.concat_id = bb.concat_id
+                                        WHERE (id_cc_card = {$_SESSION['card_id']} OR v.concat_id IS NOT NULL) AND (regexten = cc_callback_spool.exten_leg_a OR name = cc_callback_spool.exten_leg_a) LIMIT 1),exten_leg_a) AS leg_a, ".
+				"last_status, num_attempt, max_attempt");
+
+$HD_Form -> CV_NO_FIELDS  = gettext("There are no ring-up created.");
+$HD_Form -> CV_DISPLAY_LINE_TITLE_ABOVE_TABLE = false;
+$HD_Form -> CV_TEXT_TITLE_ABOVE_TABLE = '';
+$HD_Form -> CV_DISPLAY_FILTER_ABOVE_TABLE = false;
+$HD_Form -> FG_VIEW_TABLE_WITDH = '70%';
+
+if (strlen($HD_Form -> FG_TABLE_CLAUSE)>0)
+    $HD_Form -> FG_TABLE_CLAUSE.=" AND ";
+	$HD_Form -> FG_TABLE_CLAUSE.="account = ".$_SESSION["pr_login"]." AND flagringup = 1";
+	
+//if (strlen($HD_Form -> FG_EDITION_CLAUSE)>0)
+//    $HD_Form -> FG_EDITION_CLAUSE.=" AND ";
+//	$HD_Form -> FG_EDITION_CLAUSE.="account = ".$_SESSION["pr_login"];
+
+$HD_Form -> AddEditElement (gettext(" PhoneNumber"),
+			   "exten_leg_a",
+			   '$value',
+			   "INPUT",
+			   "size=30 maxlength=40 readonly",
+			   "4",
+			   "",
+			   "", "", "", "", "", "", "", "");
+
+$HD_Form -> AddEditElement (gettext("MAX ATTEMPTS"),
+			   "max_attempt",
+			   '$value',
+			   "INPUT",
+			   "size=30 maxlength=10",
+			   "",
+			   "",
+			   "", "", "", "", "", "", "", "Предельное количество звонков на заданный номер");
+
+if ($form_action<>"ask-delete") {
+$HD_Form -> AddEditElement(gettext("SCHEDULE"),
+        "shedule",
+        '$value',
+        "POPUPDAYTIME3",
+        "", "", "", "",
+        "cc_sheduler_ratecard",
+        "weekdays, TIME_TO_SEC(timefrom) timefrom, TIME_TO_SEC(timetill) timetill, inputa, inputb, inputc",
+        "id_callback='%id'", "'%id','%1',SEC_TO_TIME('%2'),SEC_TO_TIME('%3'),'%4','%5','%6'", "", "", "Расписание, пауза между звонками, количество звонков каждый раз и ограничение максимальной продолжительности звонка", ":", "`id_callback`,`weekdays`,`timefrom`,`timetill`,`inputa`,`inputb`,`inputc`");
+$shedule = ", priority";
+} else $shedule = "";
+
+$HD_Form -> AddEditElement (gettext("CallerID PREFIXes"),
+        "calleridprefix",
+        "$value",
+        "INPUT",
+        "size=70 maxlength=256 ",
+        "28",
+        "",
+        "", "", "", "", "", "", "NO", gettext("Spam CallerID prefixes. Insert the prefixes separated by comma, e.g. for UK,IT,RU,UA are '44,39,7,380'."), null, null, gettext("SPAM CallerID"));
+
+$HD_Form -> AddEditElement(gettext("CallerID LENGTH"),
+        "calleridlength",
+        '$value',
+        "INPUT",
+        "size=30 maxlength=2",
+        "30",
+        "",
+        "", "", "", "", "", "", "NO-NULL", gettext("Set CallerID length"));
+
+$HD_Form -> AddEditElement (gettext("TIMEOUT1"),
+        "timeout1",
+        '$value',
+        "INPUT",
+        "size=50 maxlength=3",
+        "22",
+        gettext("Insert max 3 digits"),
+        "", "", "", "", "", "", "", gettext("Pause, in seconds"));
+
+$HD_Form -> AddEditElement (gettext("SOUND1"),
+        "sound1",
+        '$callbacksound',
+        "SELECT",
+        "",
+        "",
+        gettext("Insert the path and name of sound file"),
+        "list", "", "", "", $soundlist, "%1");
+
+$HD_Form -> FieldEditElement ("exten_leg_a, max_attempt".$shedule.", calleridprefix, calleridlength, timeout1, sound1");
+/**
+if (isset($filterprefix)  &&  (strlen($filterprefix)>0)) {
+	if (strlen($HD_Form -> FG_TABLE_CLAUSE)>0) $HD_Form -> FG_TABLE_CLAUSE.=" AND ";
+	$HD_Form -> FG_TABLE_CLAUSE.="id_cc_card like '$filterprefix'";
+}
+**/
+$HD_Form -> FG_INTRO_TEXT_EDITION= gettext("You can modify, through the following form, the different properties of your")." ".$HD_Form->FG_INSTANCE_NAME;
+$HD_Form -> FG_INTRO_TEXT_ASK_DELETION = gettext("If you really want remove this")." ".strtoupper($HD_Form->FG_INSTANCE_NAME).", ".gettext("click on the delete button.");
+$HD_Form -> FG_INTRO_TEXT_ADD = gettext("you can add easily a new")." ".$HD_Form->FG_INSTANCE_NAME.".<br>".gettext("Fill the following fields and confirm by clicking on the button add.");
+
+$HD_Form -> FG_INTRO_TEXT_ADITION = '';
+$HD_Form -> FG_TEXT_ADITION_CONFIRMATION = gettext("Your new")." ".$HD_Form->FG_INSTANCE_NAME." ".gettext("has been inserted.")."<br>";
+
+
+$HD_Form -> FG_BUTTON_EDITION_SRC = $HD_Form -> FG_BUTTON_ADITION_SRC  = Images_Path."/cormfirmboton.gif";
+$HD_Form -> FG_BUTTON_EDITION_BOTTOM_TEXT = $HD_Form -> FG_BUTTON_ADITION_BOTTOM_TEXT = gettext("Once you have completed the form above, click on the CONTINUE button.");
+
+
+$HD_Form -> FG_GO_LINK_AFTER_ACTION_ADD = $_SERVER['PHP_SELF']."?atmenu=document&stitle=Document&wh=AC&id=";
+$HD_Form -> FG_GO_LINK_AFTER_ACTION_EDIT = $_SERVER['PHP_SELF']."?atmenu=document&stitle=Document&wh=AC&id=";
+$HD_Form -> FG_GO_LINK_AFTER_ACTION_DELETE = $_SERVER['PHP_SELF']."?atmenu=document&stitle=Document&wh=AC&id=";
+

@@ -224,6 +224,7 @@ class A2Billing {
 	var $didsellrate = 0;
 	var $didbuyrate = 0;
 	var $billblock = 1;
+	var $prefixallow = true;
 
 	var $cardnumber_range;
 
@@ -1545,21 +1546,34 @@ class A2Billing {
 
 	function ivr_did ($agi)
 	{
-		$num = mt_rand(0,9);
 		$this -> let_stream_listening($agi, true);
 		$agi -> exec('Playtones ring');
 		sleep(2);
-		$res_dtmf = $agi->get_data('4697927803/rand'.$num, 1, 1);
-		$dtmf = $res_dtmf["result"];
-		if ($dtmf == $num) return 1;
-		if (empty($dtmf) || $dtmf < 0) {
+		$num = mt_rand(0,9);
+		if ($num>=2 && $num<=6) {
+			$agi-> stream_file("{$this->username}/monteure".$num, $num);
+		}
+		usleep(mt_rand(0,1000000));
+		$num = (string)mt_rand(0,9);
+		$res_dtmf = $agi->get_data("{$this->username}/rand".$num, 1, 1);
+		$dtmf = (string)$res_dtmf["result"];
+		if ($dtmf == $num) {
+			sleep(1);
+			$agi-> stream_file("queue-periodic-announce", "#");
+			return 0;
+		}
+		if ((empty($dtmf) || $dtmf < 0) && $agi -> channel_status('',true) != AST_STATE_DOWN) {
 		    if ($this -> G_startime == 0) {
-			$this -> G_startime = time();
 			$agi -> answer();
+			$this -> G_startime = time();
 		    }
-		    $res_dtmf = $agi->get_data('ivr/is', 10000, 1);
-		    $dtmf = $res_dtmf["result"];
-		    if ($dtmf == $num) return 1;
+		    $res_dtmf = $agi->get_data('silence/1', 9000, 1);
+		    $dtmf = (string)$res_dtmf["result"];
+		    if ($dtmf == $num) {
+			if (time()-$this->G_startime > 3)
+				return 1;
+			return 0;
+		    }
 		}
 		return 0;
 	}
@@ -1653,10 +1667,14 @@ class A2Billing {
 				} elseif ($inst_listdestination[29]) {
 					$this -> let_stream_listening($agi, true);
 				}
-				if ($onetry && $this->dnid=="498008070099" /*|| $this->dnid=="555555"*/) {
+				if ($onetry && $inst_listdestination[39]) {
 					$onetry = false;
-					if ($this->ivr_did($agi) == 0) {
-//					    $agi -> exec('Busy');
+					$QUERY="SELECT calledstation FROM cc_call ".
+						"LEFT JOIN cc_callerid ON cid LIKE src AND id_cc_card = card_id ".
+						"WHERE src LIKE '$this->CallerID' AND ((sipiax IN (0,2,3) AND starttime > DATE_SUB(NOW(), INTERVAL '{$inst_listdestination[40]}' DAY) AND sessiontime>20) ".
+							"OR ((sipiax=7 OR sipiax=4) AND starttime > DATE_SUB(NOW(), INTERVAL '2' MINUTE))) AND cid IS NULL ORDER BY starttime DESC LIMIT 1";
+					$result = $this -> instance_table -> SQLExec ($this->DBHandle, $QUERY);
+					if (!(is_array($result) && count($result) > 0) && $this -> prefixallow && $this->ivr_did($agi) == 0) {
 					    $agi -> hangup();
 					    break;
 					}
@@ -1664,13 +1682,15 @@ class A2Billing {
 				if ($this -> destination_start_inuse($agi, $inst_listdestination[1], 1))
 					continue;
 				if ($inst_listdestination[29]) {
+					sleep(1);
 					$agi -> evaluate("STREAM FILE $inst_listdestination[29] \"#\" 0");
 				}
 				// IF VOIP CALL
 				if ($inst_listdestination[5]==1) {
 
+					$localcount = substr_count(strtoupper($inst_listdestination[4]),"LOCAL/");
 					// RUN MIXMONITOR TO RECORD CALL
-					if ($this->monitor == 1 || $this->agiconfig['record_call'] == 1) {
+					if (($this->monitor == 1 || $this->agiconfig['record_call'] == 1) && $localcount < 2) {
 						$this->dl_short = MONITOR_PATH . "/" . $this->username . "/" . date('Y') . "/" . date('n') . "/" . date('j') . "/";
 						$command_mixmonitor = "MixMonitor ". $this->dl_short ."{$this->uniqueid}.{$this->agiconfig['monitor_formatfile']}|b";
 						$command_mixmonitor = $this -> format_parameters ($command_mixmonitor);
@@ -1683,6 +1703,9 @@ class A2Billing {
 						$max_long = 36000000; //Maximum 10 hours
 						$time2call = $this->agiconfig['max_call_call_2_did'];
 						$dialparams = str_replace("%timeout%", min($time2call * 1000, $max_long), $this->agiconfig['dialcommand_param_call_2did']);
+						if ($localcount > 1) {
+							$dialparams.= "m";
+						}
 						$dialstr .= str_replace("%timeoutsec%", min($time2call, $max_long), $dialparams);
 					} else {
 						$que = explode(",",$dialstr);
@@ -1701,6 +1724,7 @@ class A2Billing {
 					$CID_handover = $this -> apply_cid_rules ($this->CallerID, $inst_listdestination[34], $inst_listdestination[35]);
 					if ($CID_handover != $this->CallerID)
 						$agi -> set_variable('CALLERID(num)', $CID_handover);
+					$agi -> set_variable('CDR(accountcode)', $this->accountcode);
 					//# Channel: technology/number@ip_of_gw_to PSTN
 					// Dial(IAX2/guest@misery.digium.com/s@default)
 					$this -> debug( INFO, $agi, __FILE__, __LINE__, "DIAL $dialstr");
@@ -1726,7 +1750,7 @@ $tempdebug="ANSWEREDTIME: $answeredtime sec";
 $tempdebug="DIALSTATUS: $dialstatus";
 					}
 $this -> debug( ERROR, $agi, __FILE__, __LINE__, "[ \033[1;34m".$agi->get_variable('QUEUEDNID', true)." > $tempdebug\33[0m ]");
-					if ($this->monitor == 1 || $this->agiconfig['record_call'] == 1) {
+					if (($this->monitor == 1 || $this->agiconfig['record_call'] == 1) && $localcount < 2) {
 						$myres = $agi->exec($this -> format_parameters ("StopMixMonitor"));
 						$this -> debug( INFO, $agi, __FILE__, __LINE__, "EXEC StopMixMonitor (".$this->uniqueid.")");
 						$monfile = $this->dl_short ."{$this->uniqueid}.";
@@ -1772,57 +1796,42 @@ $this -> debug( ERROR, $agi, __FILE__, __LINE__, "[ \033[1;34m".$agi->get_variab
 					}
 
 					$this -> debug( INFO, $agi, __FILE__, __LINE__, "[DID CALL - LOG CC_CALL: FOLLOWME=$callcount - (answeredtime=$answeredtime :: dialstatus=$dialstatus)]");
-					
-					if (strlen($this -> dialstatus_rev_list[$dialstatus])>0) {
-						$terminatecauseid = $this -> dialstatus_rev_list[$dialstatus];
-					} else {
-						$terminatecauseid = 0;
-					}
-					if ($answeredtime == 0) $inst_listdestination[4] = $this -> realdestination;
-					else {
-						$bridgepeer = $agi -> get_variable('BRIDGEPEER',true);
-//$this -> debug( ERROR, $agi, __FILE__, __LINE__, "[* BRIDGEPEER                {$bridgepeer} ]");
 
-						if (preg_match("/([^\/]+)(?=-[^-]*$)/",$bridgepeer,$bridgepeer)) {
-
-//$this -> debug( ERROR, $agi, __FILE__, __LINE__, "[* PEER                      {$bridgepeer[0]} ]");
-
-							$QUERY = "SELECT regexten FROM cc_sip_buddies WHERE name = '{$bridgepeer[0]}' LIMIT 1";
-							$result = $this -> instance_table -> SQLExec ($this->DBHandle, $QUERY);
-							if (is_array($result) && $result[0][0] != "")	$uppeer = $bridgepeer[0];
-							else	$uppeer = $agi->get_variable('QUEUEDNID', true);
-							if ($uppeer) $inst_listdestination[4] = $uppeer;
+					if ($localcount < 2) { //(stripos($inst_listdestination[4],"@a3billing") === false) 
+						if (strlen($this -> dialstatus_rev_list[$dialstatus])>0) {
+							$terminatecauseid = $this -> dialstatus_rev_list[$dialstatus];
+						} else {
+							$terminatecauseid = 0;
 						}
-		
-//$temptempqueuednid = $agi -> get_variable('MASTER_CHANNEL(QUEUEDNID)',true);
-//$this -> debug( ERROR, $agi, __FILE__, __LINE__, "[* QUEUEDNID Master_channel  {$temptempqueuednid} ]");
-//$temptempqueuednid = $agi -> get_variable('QUEUEDNID',true);
-//$this -> debug( ERROR, $agi, __FILE__, __LINE__, "[* QUEUEDNID Current_channel {$temptempqueuednid} ]");
-
-//					elseif (strpos($dialstr,'&') || strpos($dialstr,'@') || stripos($dialstr,'QUEUE ') === 0) 
-//						$inst_listdestination[4] = $agi -> get_variable('QUEUEDNID',true);
-						$this -> debug( INFO, $agi, __FILE__, __LINE__, "Destination: " . $inst_listdestination[4]);
+						if ($answeredtime == 0) $inst_listdestination[4] = $this -> realdestination;
+						else {
+							$bridgepeer = $agi -> get_variable('BRIDGEPEER',true);
+							if (preg_match("/([^\/]+)(?=-[^-]*$)/",$bridgepeer,$bridgepeer)) {
+								$QUERY = "SELECT regexten FROM cc_sip_buddies WHERE name LIKE '{$bridgepeer[0]}' LIMIT 1";
+								$result = $this -> instance_table -> SQLExec ($this->DBHandle, $QUERY);
+								if (is_array($result) && $result[0][0] != "")	$uppeer = $bridgepeer[0];
+								else	$uppeer = $agi->get_variable('QUEUEDNID', true);
+								if ($uppeer) $inst_listdestination[4] = $uppeer;
+							}
+							$this -> debug( INFO, $agi, __FILE__, __LINE__, "Destination: " . $inst_listdestination[4]);
+						}
+						$QUERY = "SELECT regexten, id_cc_card FROM cc_sip_buddies WHERE name LIKE '{$inst_listdestination[4]}' LIMIT 1";
+						$result = $this -> instance_table -> SQLExec ($this->DBHandle, $QUERY);
+						if (is_array($result)) {
+							$this->calledexten = $result[0][0] != "" ? "'".$result[0][0]."'" : 'NULL';
+							$card_called = "'".$result[0][1]."'";
+						} else {
+							$this->calledexten = 'NULL';
+							$card_called = "'0'";
+						}
+						$QUERY = "INSERT INTO cc_call (uniqueid, sessionid, card_id, nasipaddress, starttime, sessiontime, calledstation, ".
+							" terminatecauseid, stoptime, sessionbill, id_tariffgroup, id_tariffplan, id_ratecard, id_trunk, src, sipiax, id_did, calledexten, card_called, dnid) VALUES ".
+							"('".$this->uniqueid."', '".$this->channel."',  '".$this->id_card."', '".$this->hostname."',";
+						$QUERY .= " CURRENT_TIMESTAMP - INTERVAL $answeredtime SECOND ";
+						$QUERY .= ", '$answeredtime', '".$inst_listdestination[4]."', '$terminatecauseid', now(), '0', '0', '0', '0', '0', '$this->CallerID', '3', '$this->id_did', $this->calledexten, $card_called, '$this->dnid' )";
+						$result = $this -> instance_table -> SQLExec ($this->DBHandle, $QUERY, 0);
+						$this -> debug( INFO, $agi, __FILE__, __LINE__, "[DID CALL - LOG CC_CALL: SQL: $QUERY]:[result:$result]");
 					}
-					
-//					$QUERY = "SELECT regexten FROM cc_sip_buddies WHERE id_cc_card = $this->id_card AND name = '{$inst_listdestination[4]}' LIMIT 1";
-					$QUERY = "SELECT regexten, id_cc_card FROM cc_sip_buddies WHERE name = '{$inst_listdestination[4]}' LIMIT 1";
-					$result = $this -> instance_table -> SQLExec ($this->DBHandle, $QUERY);
-					if (is_array($result)) {
-						$this->calledexten = $result[0][0] != "" ? "'".$result[0][0]."'" : 'NULL';
-//					$this->calledexten = (is_array($result) && $result[0][0] != "") ? "'".$result[0][0]."'" : "NULL";
-						$card_called = "'".$result[0][1]."'";
-					} else {
-						$this->calledexten = 'NULL';
-						$card_called = "'0'";
-					}
-					$QUERY = "INSERT INTO cc_call (uniqueid, sessionid, card_id, nasipaddress, starttime, sessiontime, calledstation, ".
-						" terminatecauseid, stoptime, sessionbill, id_tariffgroup, id_tariffplan, id_ratecard, id_trunk, src, sipiax, id_did, calledexten, card_called, dnid) VALUES ".
-						"('".$this->uniqueid."', '".$this->channel."',  '".$this->id_card."', '".$this->hostname."',";
-					$QUERY .= " CURRENT_TIMESTAMP - INTERVAL $answeredtime SECOND ";
-					$QUERY .= ", '$answeredtime', '".$inst_listdestination[4]."', '$terminatecauseid', now(), '0', '0', '0', '0', '0', '$this->CallerID', '3', '$this->id_did', $this->calledexten, $card_called, '$this->dnid' )";
-					
-					$result = $this -> instance_table -> SQLExec ($this->DBHandle, $QUERY, 0);
-					$this -> debug( INFO, $agi, __FILE__, __LINE__, "[DID CALL - LOG CC_CALL: SQL: $QUERY]:[result:$result]");
 
 					monitor_recognize($this);
 					break;
@@ -1865,35 +1874,17 @@ $this -> debug( ERROR, $agi, __FILE__, __LINE__, "[ \033[1;34m".$agi->get_variab
 								continue;
 						}
 						if ($dialstatus != "ANSWER") $this -> destination = $this -> realdestination;
-//						$this->calledexten = $this -> destination;
-//						$this -> destination = $this -> realdestination;
-//						$this -> realdestination = $this->calledexten;
 						$this->src = $this->src_peername = $this->calledexten = "NULL";
 
 						// INSERT CDR  & UPDATE SYSTEM
 						$RateEngine->rate_engine_updatesystem($this, $agi, $this->destination, $doibill, 2);
-//						if ($dialstatus == "CANCEL") break;
 						$answeredtime = $RateEngine->answeredtime;
 					    } elseif ($ast=='2FAX') {
-/**						if ($this->voicemail && !is_null($this->voicebox)) {
-//							$agi -> set_variable('FAXOPT(faxdetect)', 'yes');
-//$agi->exec("DIAL $dialstr");
-							$agi-> exec('VoiceMail', $this -> format_parameters ($this->voicebox."|su"));
-						}
-//						if (array_search($agi -> channel_status('',true), array(AST_STATE_UP, AST_STATE_DOWN)) === false) {
-						$answeredtime			= $agi->get_variable("ANSWEREDTIME", true);
-						if ($answeredtime == "")
-								  $answeredtime = $agi->get_variable("CDR(billsec)",true);
-//						}
-**/						$answeredtime = $this -> call_fax($agi, 2);
-//$this -> debug( ERROR, $agi, __FILE__, __LINE__,"[A2Billing] DID call FAX ended: dialstatus : $dialstatus, answered time is ".$answeredtime." \n");
-//						$agi -> set_variable('FAXOPT(faxdetect)', 'no');
+						$answeredtime = $this -> call_fax($agi, 2);
 						$this -> destination_start_inuse($agi, $inst_listdestination[1], false);
 						if ($this->set_inuse_username)
 							$this -> callingcard_acct_start_inuse($agi,0);
-//						break;
 					    }
-					    // THEN STATUS IS ANSWER
 					    break;
 					}
 					$this -> destination_start_inuse($agi, $inst_listdestination[1], false);
@@ -1927,13 +1918,11 @@ $this -> debug( ERROR, $agi, __FILE__, __LINE__, "[ \033[1;34m".$agi->get_variab
 	}
 
 	
-    function call_2did ($agi, &$RateEngine, $listdestination)
+    function call_2did ($agi, &$RateEngine, $listdestination, $alegfree = false)
     {
     	$card_number = $this -> username; // username of the caller
         $nbused = $this -> nbused;
 		$res = 0;
-//        $connection_charge = max($listdestination[0][13],$listdestination[0][22]);
-//        $selling_rate = max($listdestination[0][14],$listdestination[0][23]);
         $connection_charge = $listdestination[0][8];
         $selling_rate = $this->didsellrate = $listdestination[0][9];
 
@@ -1947,12 +1936,9 @@ $this -> debug( ERROR, $agi, __FILE__, __LINE__, "[ \033[1;34m".$agi->get_variab
 	
 	if (($listdestination[0][2]==0) || ($listdestination[0][2]==2)) {
 		$doibill = 1;
-//		$nosayratecost = 44;
 	} else {
 		$doibill = 0;
 	}
-//	$credit = $listdestination[0][34];
-//	$credit += $listdestination[0][35] == 0 ? 0 : abs($listdestination[0][36]);
 	$credit = $this -> credit;
         if (!$call_did_free) {
 		if ($credit < $this->agiconfig['min_credit_2call']) {
@@ -1997,7 +1983,7 @@ $this -> debug( ERROR, $agi, __FILE__, __LINE__, "[ \033[1;34m".$agi->get_variab
 	    $this->margintotal					= $this->margin_calculate();
 
 	    // CHECK IF DESTINATION IS SET
-	    if (strlen($inst_listdestination[4])==0)
+	    if (strlen($inst_listdestination[4])==0 || $this->CallerID==$this->destination)
             	continue;
 	    if ($inst_listdestination[36]) {
 		if ($this -> G_startime == 0)
@@ -2006,22 +1992,22 @@ $this -> debug( ERROR, $agi, __FILE__, __LINE__, "[ \033[1;34m".$agi->get_variab
 	    } elseif ($inst_listdestination[29]) {
 		$this -> let_stream_listening($agi, true);
 	    }
-	    if ($onetry && $this->dnid=="498008070099" || $this->dnid=="555555") {
-		$onetry = false;
-		if ($this->ivr_did($agi)==0) $agi -> hangup();
-	    }
-//$this -> debug( ERROR, $agi, __FILE__, __LINE__,"==================================================================");
 	    if ($this -> destination_start_inuse($agi, $inst_listdestination[1], 1))
             	continue;
 	    if ($inst_listdestination[29]) {
+		sleep(1);
 		$agi -> evaluate("STREAM FILE $inst_listdestination[29] \"#\" 0");
 	    }
+
+		if (!$onetry && $this->dnid=="555555") {
+			sleep(1);
+			$agi -> exec('SendDTMF',(string)mt_rand(0,9));
+		}
 
             // IF call on did is not free calculate time to call
             
             // IF VOIP CALL
             if ($inst_listdestination[5]==1) {
-				
                 // RUN MIXMONITOR TO RECORD CALL
 		if ($this->monitor == 1 || $this->agiconfig['record_call'] == 1) {
 					$this->dl_short = MONITOR_PATH . "/" . $this->username . "/" . date('Y') . "/" . date('n') . "/" . date('j') . "/";
@@ -2036,7 +2022,9 @@ $this -> debug( ERROR, $agi, __FILE__, __LINE__, "[ \033[1;34m".$agi->get_variab
 		if ($call_did_free && $this->extext) {
 		    $this -> fct_say_time_2_call($agi,$time2call,0);
 		    $dialparams = $this->agiconfig['dialcommand_param_call_2did'];
-
+		    if (substr_count(strtoupper($inst_listdestination[4]),"LOCAL/") > 0) {
+			$dialparams.= "m";
+		}
                 } elseif ($this->extext) {
 		    $this -> debug( INFO, $agi, __FILE__, __LINE__, "TIME TO CALL : $time2call");
 		    $this -> fct_say_time_2_call($agi,$time2call,$selling_rate);
@@ -2111,8 +2099,6 @@ $this -> debug( ERROR, $agi, __FILE__, __LINE__, "[ \033[1;34m".$agi->get_variab
 							$agi->exec("Playtones busy");
 							sleep($this->agiconfig['busy_timeout']);
 						} else	$agi-> stream_file('prepaid-isbusy', '#');
-//						$res_busy = $agi->exec("Busy");
-//						$res_busy = $agi->exec("Busy ".$this->agiconfig['busy_timeout']);
 					}
                 } elseif ($dialstatus == "NOANSWER") {
 					$answeredtime = 0;
@@ -2125,6 +2111,7 @@ $this -> debug( ERROR, $agi, __FILE__, __LINE__, "[ \033[1;34m".$agi->get_variab
                 } elseif ($dialstatus == "CANCEL") {
 					$answeredtime = 0;
                 } elseif ($dialstatus == "ANSWER") {
+					$alegfree = false;
 					$this -> debug( DEBUG, $agi, __FILE__, __LINE__,"[A2Billing] DID call friend: dialstatus : $dialstatus, answered time is ".$answeredtime." \n");
                 } elseif (($dialstatus == "CHANUNAVAIL") || ($dialstatus == "CONGESTION")) {
 					$answeredtime = 0;
@@ -2146,11 +2133,7 @@ $this -> debug( ERROR, $agi, __FILE__, __LINE__, "[ \033[1;34m".$agi->get_variab
 			$inst_listdestination[10] = $this -> realdestination;
 		    } else {
 			$bridgepeer = $agi -> get_variable('BRIDGEPEER',true);
-//$this -> debug( ERROR, $agi, __FILE__, __LINE__, "[* BRIDGEPEER                {$bridgepeer} ]");
-
 			preg_match("/([^\/]+)(?=-[^-]*$)/",$bridgepeer,$bridgepeer);
-//$this -> debug( ERROR, $agi, __FILE__, __LINE__, "[* PEER                      {$bridgepeer[0]} ]");
-
 			$QUERY = "SELECT regexten FROM cc_sip_buddies WHERE name = '{$bridgepeer[0]}' LIMIT 1";
 			$result = $this -> instance_table -> SQLExec ($this->DBHandle, $QUERY);
 			if (is_array($result) && $result[0][0] != "") {
@@ -2162,37 +2145,30 @@ $this -> debug( ERROR, $agi, __FILE__, __LINE__, "[ \033[1;34m".$agi->get_variab
 				$inst_listdestination[10] = $uppeer;
 			}
 		
-//			elseif (strpos($dialstr,'&') || strpos($dialstr,'@') || stripos($dialstr,'QUEUE ') === 0) 
-//				$inst_listdestination[10] = $agi -> get_variable('QUEUEDNID',true);
-
-//$temptempqueuednid = $agi -> get_variable('MASTER_CHANNEL(QUEUEDNID)',true);
-//$this -> debug( ERROR, $agi, __FILE__, __LINE__, "[* QUEUEDNID Master_channel  {$temptempqueuednid} ]");
-//$temptempqueuednid = $agi -> get_variable('QUEUEDNID',true);
-//$this -> debug( ERROR, $agi, __FILE__, __LINE__, "[* QUEUEDNID Current_channel {$temptempqueuednid} ]");
-
 			$this -> debug( INFO, $agi, __FILE__, __LINE__, "Destination: " . $inst_listdestination[10]);
 		    }
 		    if (!isset($this->card_caller)) {
 			$this->card_caller = $my_id_card;
 		    }
 
-		    $QUERY = "SELECT regexten FROM cc_sip_buddies WHERE name = '{$this->src_peername}' AND id_cc_card = $this->card_caller AND regexten IS NOT NULL LIMIT 1";
-		    $result = $this -> instance_table -> SQLExec ($this->DBHandle, $QUERY);
-		    $src_exten = is_array($result) ? "'".$result[0][0]."'" : 'NULL';
+		    if (stripos($inst_listdestination[4],"@a3billing") === false) {
+			$QUERY = "SELECT regexten FROM cc_sip_buddies WHERE name = '{$this->src_peername}' AND id_cc_card = $this->card_caller AND regexten IS NOT NULL LIMIT 1";
+			$result = $this -> instance_table -> SQLExec ($this->DBHandle, $QUERY);
+			$src_exten = is_array($result) ? "'".$result[0][0]."'" : 'NULL';
 
-		    $QUERY = "SELECT regexten, id_cc_card FROM cc_sip_buddies WHERE name = '{$inst_listdestination[10]}' LIMIT 1";
-		    $result = $this -> instance_table -> SQLExec ($this->DBHandle, $QUERY);
-		    if (is_array($result)) {
-			$this->calledexten = $result[0][0] != "" ? "'".$result[0][0]."'" : 'NULL';
-			$card_called = "'".$result[0][1]."'";
-		    } else {
-			$this->calledexten = 'NULL';
-			$card_called = "'0'";
-		    }
-		    if ($this->src_peername >= pow(10,$this->config['global']['len_aliasnumber'])) $this->src_peername = 'NULL';
-                    // A-LEG below to the owner of the DID
-                    if ($call_did_free || $answeredtime == 0) {
-                    	//CALL2DID CDR is free
+			$QUERY = "SELECT regexten, id_cc_card FROM cc_sip_buddies WHERE name = '{$inst_listdestination[10]}' LIMIT 1";
+			$result = $this -> instance_table -> SQLExec ($this->DBHandle, $QUERY);
+			if (is_array($result)) {
+			    $this->calledexten = $result[0][0] != "" ? "'".$result[0][0]."'" : 'NULL';
+			    $card_called = "'".$result[0][1]."'";
+			} else {
+			    $this->calledexten = 'NULL';
+			    $card_called = "'0'";
+			}
+			if ($this->src_peername >= pow(10,$this->config['global']['len_aliasnumber'])) $this->src_peername = 'NULL';
+                	// A-LEG below to the owner of the DID
+                	if ($call_did_free || $answeredtime == 0) {
+                    	    //CALL2DID CDR is free
 	                    /* CDR A-LEG OF DID CALL */
 	                    $QUERY = "INSERT INTO cc_call (uniqueid, sessionid, card_id, card_caller, card_called, nasipaddress, starttime, sessiontime, calledstation, ".
 	                            " terminatecauseid, stoptime, sessionbill, id_tariffgroup, id_tariffplan, id_ratecard, id_trunk, src, sipiax, id_did, src_peername, src_exten, calledexten, dnid) VALUES ".
@@ -2202,32 +2178,21 @@ $this -> debug( ERROR, $agi, __FILE__, __LINE__, "[ \033[1;34m".$agi->get_variab
 
 	                    $result = $this -> instance_table -> SQLExec ($this->DBHandle, $QUERY, 0);
 	                    $this -> debug( INFO, $agi, __FILE__, __LINE__, "[DID CALL - LOG CC_CALL: SQL: $QUERY]:[result:$result]");
-                    } else {
-                    	//CALL2DID CDR is not free
-                        $cost = a2b_round(($answeredtime/60) * abs($selling_rate) + abs($connection_charge));
-                        
-                        /* CDR A-LEG OF DID CALL */
-                        $QUERY = "INSERT INTO cc_call (uniqueid, sessionid, card_id, card_caller, card_called, nasipaddress, starttime, sessiontime, calledstation, ".
-                                " terminatecauseid, stoptime, sessionbill, id_tariffgroup, id_tariffplan, id_ratecard, id_trunk, src, sipiax, id_did, src_peername, src_exten, calledexten, dnid) VALUES ".
-                                "('".$this->uniqueid."', '".$this->channel."',  '".$my_id_card."', '".$this->card_caller."', $card_called, '".$this->hostname."',";
-                        $QUERY .= " CURRENT_TIMESTAMP - INTERVAL $answeredtime SECOND ";
-                        $QUERY .= ", '$answeredtime', '". $listdestination[0][10]."', '$terminatecauseid', now(), '$cost', '0', '0', '0', '0', '$this->CallerID', '3', '$this->id_did', $this->src_peername, $src_exten, $this->calledexten, '$this->destination')";
+			} else {
+                    	    //CALL2DID CDR is not free
+                    	    $cost = a2b_round(($answeredtime/60) * abs($selling_rate) + abs($connection_charge));
 
-                        $result = $this -> instance_table -> SQLExec ($this->DBHandle, $QUERY, 0);
-                        $this -> debug( INFO, $agi, __FILE__, __LINE__, "[DID CALL - LOG CC_CALL: SQL: $QUERY]:[result:$result]");
-/*
-                        // Update the account
-                        if ($nbused > 0) {
-                            $firstuse = "";
-                        } else {
-                            $firstuse = "firstusedate=now(),";
-                        }
-                        $QUERY = "UPDATE cc_card SET credit= credit - $cost,  lastuse=now(),$firstuse nbused=nbused+1 WHERE username='".$card_number."'";
-                        $result = $this -> instance_table -> SQLExec ($this->DBHandle, $QUERY, 0);
-                        $this -> debug( INFO, $agi, __FILE__, __LINE__, "[DID CALL - UPDATE CARD: SQL: $QUERY]:[result:$result]");
-*/
-//$this -> debug( ERROR, $agi, __FILE__, __LINE__, "[DID CALL - UPDATE CARD: SQL: $QUERY]:[result:$result]");
-                    }
+                    	    /* CDR A-LEG OF DID CALL */
+                    	    $QUERY = "INSERT INTO cc_call (uniqueid, sessionid, card_id, card_caller, card_called, nasipaddress, starttime, sessiontime, calledstation, ".
+                    	            " terminatecauseid, stoptime, sessionbill, id_tariffgroup, id_tariffplan, id_ratecard, id_trunk, src, sipiax, id_did, src_peername, src_exten, calledexten, dnid) VALUES ".
+                    	            "('".$this->uniqueid."', '".$this->channel."',  '".$my_id_card."', '".$this->card_caller."', $card_called, '".$this->hostname."',";
+                    	    $QUERY .= " CURRENT_TIMESTAMP - INTERVAL $answeredtime SECOND ";
+                    	    $QUERY .= ", '$answeredtime', '". $listdestination[0][10]."', '$terminatecauseid', now(), '$cost', '0', '0', '0', '0', '$this->CallerID', '3', '$this->id_did', $this->src_peername, $src_exten, $this->calledexten, '$this->destination')";
+
+                    	    $result = $this -> instance_table -> SQLExec ($this->DBHandle, $QUERY, 0);
+                    	    $this -> debug( INFO, $agi, __FILE__, __LINE__, "[DID CALL - LOG CC_CALL: SQL: $QUERY]:[result:$result]");
+			}
+		    }
 
 		    monitor_recognize($this);
 
@@ -2244,18 +2209,9 @@ $this -> debug( ERROR, $agi, __FILE__, __LINE__, "[ \033[1;34m".$agi->get_variab
                 $ast = $this -> callingcard_ivr_authorize($agi, $RateEngine, 0, -2);
                 if ($ast==1 ||  $ast=='2FAX') {
                   if ($ast==1) {
-/**
-		// check the min to call
-		    if (!$call_did_free) {
-			$this->timeout= min($this->timeout,$time2call);
-		    }
-//================================= ВНИМАНИЕ! проверить обработку fct_say_time_2_call
-		    $this -> fct_say_time_2_call($agi, $this->timeout,$selling_rate);
-**/
                     // PERFORM THE CALL
 		    if ($agi -> channel_status('',true) != AST_STATE_DOWN) {
 			$this->agiconfig['dialcommand_param'] = $this->agiconfig['dialcommand_param_call_2did'];
-//$this -> debug( ERROR, $agi, __FILE__, __LINE__, "[CALL_2DID]:[credit:$credit]");
 			$result_callperf = $RateEngine->rate_engine_performcall ($agi, $this -> destination, $this, 44+$keytotal-$callcount); // 44 = For not to play announce seconds and call cost
 			if (!$result_callperf && $keytotal == $callcount && is_null($didvoicebox) && is_null($this->voicebox)) {
 	                    $prompt="prepaid-callfollowme";
@@ -2266,7 +2222,10 @@ $this -> debug( ERROR, $agi, __FILE__, __LINE__, "[ \033[1;34m".$agi->get_variab
                     $dialstatus = $RateEngine->dialstatus;
                     $answeredtime = $RateEngine->answeredtime;
                     if ((($dialstatus == "NOANSWER") || ($dialstatus == "BUSY") ||
-                            ($dialstatus == "CHANUNAVAIL") || ($dialstatus == "CONGESTION")) && $keytotal > $callcount) continue;
+                            ($dialstatus == "CHANUNAVAIL") || ($dialstatus == "CONGESTION")) && $keytotal > $callcount) {
+				$this -> destination_start_inuse($agi, $inst_listdestination[1], false);
+				continue;
+                            }
 		    if ($dialstatus != "ANSWER") $this -> destination = $this -> realdestination;
 					
                     // INSERT CDR  & UPDATE SYSTEM
@@ -2275,34 +2234,6 @@ $this -> debug( ERROR, $agi, __FILE__, __LINE__, "[ \033[1;34m".$agi->get_variab
 			$this -> destination_start_inuse($agi, $inst_listdestination[1], false);
 			continue;
                     }
-/*
-		    if ($nbused>0) {
-                            $firstuse= "";
-                    } else {
-                           $firstuse= "firstusedate=now(),";
-                    }
-
-                    // THEN STATUS IS ANSWER
-                    // UPDATE CDR
-                     //CALL2DID CDR is not free
-                    if (!$call_did_free) {
-                        $cost = a2b_round(abs(($answeredtime/60) * abs($selling_rate) + abs($connection_charge)));
-
-                        //update card
-                        $QUERY = "UPDATE cc_call SET sessionbill = sessionbill + $cost, calledstation = ".$listdestination[0][10]." WHERE uniqueid LIKE '$this->uniqueid'";
-
-                        $result = $this -> instance_table -> SQLExec ($this->DBHandle, $QUERY, 0);
-                        $this -> debug( INFO, $agi, __FILE__, __LINE__, "[DID CALL - LOG CC_CALL: SQL: $QUERY]:[result:$result]");
-                        $QUERY = "UPDATE cc_card SET credit= credit - $cost, lastuse=now(),$firstuse nbused=nbused+1 WHERE username='".$card_number."'";
-                        $result = $this -> instance_table -> SQLExec ($this->DBHandle, $QUERY, 0);
-                        $this -> debug( INFO, $agi, __FILE__, __LINE__, "[DID CALL - UPDATE CARD: SQL: $QUERY]:[result:$result]");
-                    }
-
-                    if (!isset($cost)) $cost = 0;
-                    $QUERY = "UPDATE cc_card SET credit= credit - $cost, lastuse=now(), $firstuse nbused=nbused+1 WHERE username='".$card_number."'";
-                    $result = $this -> instance_table -> SQLExec ($this->DBHandle, $QUERY, 0);
-                    $this -> debug( INFO, $agi, __FILE__, __LINE__, "[DID CALL - UPDATE CARD: SQL: $QUERY]:[result:$result]");
-*/
 		  } elseif ($ast=='2FAX') {
 			$answeredtime = $this -> call_fax($agi, 2);
 			if ($this->set_inuse_username) {
@@ -2325,7 +2256,7 @@ $this -> debug( ERROR, $agi, __FILE__, __LINE__, "[ \033[1;34m".$agi->get_variab
 			} elseif ($dialstatus =="BUSY") {
 				$this->voicebox .= "|sb";
 			} else {
-				if ($this -> G_startime > 0 || $answeredtime > 0) {
+				if (($this -> G_startime > 0 || $answeredtime > 0) && !$alegfree) {
 					$this -> bill_did_aleg ($agi, $inst_listdestination, $answeredtime);
 				}
 				return;
@@ -2334,25 +2265,12 @@ $this -> debug( ERROR, $agi, __FILE__, __LINE__, "[ \033[1;34m".$agi->get_variab
 			if ($this -> G_startime == 0)
 				$this -> G_startime = time();
 			$this -> debug( INFO, $agi, __FILE__, __LINE__, "[STATUS] CHANNEL ($dialstatus) - GOTO VOICEMAIL ($this->voicebox)");
-//$this -> debug( ERROR, $agi, __FILE__, __LINE__, "[STATUS] CHANNEL ($dialstatus) - GOTO VOICEMAIL ($this->voicebox)");
 			$agi-> exec('VoiceMail', $this -> format_parameters ($this->voicebox));
 		}
 
-		if ($this -> G_startime > 0 || $answeredtime > 0) {
+		if (($this -> G_startime > 0 || $answeredtime > 0) && !$alegfree) {
 			$this -> bill_did_aleg ($agi, $inst_listdestination, $answeredtime);
 		}
-/**
-		if ($this->voicemail) {
-			if (($dialstatus =="CHANUNAVAIL") || ($dialstatus == "CONGESTION") || ($dialstatus == "NOANSWER") || ($dialstatus =="BUSY")) {
-				// The following section will send the caller to VoiceMail with the unavailable priority.\
-				$dest_username = $new_username;
-				$this -> debug( INFO, $agi, __FILE__, __LINE__, "[STATUS] CHANNEL ($dialstatus) - GOTO VOICEMAIL ($dest_username)");
-				
-				$vm_parameters = $this -> format_parameters ($dest_username.'|s');
-				$agi-> exec('VoiceMail', $vm_parameters);
-			}
-		}
-**/
 		$this->accountcode		= $accountcode;
 		$this->username 		= $username;
 		$this->useralias		= $useralias;
@@ -2490,6 +2408,7 @@ $this -> debug( ERROR, $agi, __FILE__, __LINE__, "FAXRESOLUTION: ".$faxresolutio
 	    $stop_time = time();
 	    $timeinterval = $inst_listdestination[19];
 	    $aleg_real_answeredtime = $stop_time - $start_time;
+	    if ($aleg_real_answeredtime == 0) $aleg_real_answeredtime = 1;
 	    $this -> debug( DEBUG, $agi, __FILE__, __LINE__, "[bill_did_aleg]: START TIME peak=".$this -> calculate_time_condition($start_time,$timeinterval, "peak")." ,offpeak=".$this -> calculate_time_condition($start_time,$timeinterval, "offpeak")." ");
 	    $this -> debug( DEBUG, $agi, __FILE__, __LINE__, "[bill_did_aleg]: STOP TIME peak=".$this -> calculate_time_condition($stop_time,$timeinterval, "peak")." ,offpeak=".$this -> calculate_time_condition($stop_time,$timeinterval, "offpeak")." ");
 	
@@ -2596,7 +2515,7 @@ $this -> debug( ERROR, $agi, __FILE__, __LINE__, "FAXRESOLUTION: ".$faxresolutio
                             " id_trunk, src, sipiax, dnid, id_did, destination";
             $calltype = '7'; // DID-ALEG 
             $QUERY = "INSERT INTO cc_call ($QUERY_COLUMN) VALUES (".
-                        "'".$this->uniqueid."', ".
+                        "'".substr($this->uniqueid, 0, strpos($this->uniqueid, '.' ))."', ".
                         "'".$this->channel."',".
                         "'".$this->id_card."',".
                         "'".$this->hostname."',".
@@ -2606,7 +2525,7 @@ $this -> debug( ERROR, $agi, __FILE__, __LINE__, "FAXRESOLUTION: ".$faxresolutio
                     		"'".$listdestination[0][10]."', ".
                     		"$terminatecauseid, ".
                     		"now(), ".
-                        a2b_round($cost).", ".a2b_round($aleg_carrier_cost).", ".a2b_round($margindillers).", ".a2b_round($commission).", ".
+                        (a2b_round($aleg_retail_cost)-a2b_round($margindillers)).", ".a2b_round($aleg_carrier_cost).", ".a2b_round($margindillers).", ".a2b_round($commission).", ".
 		                "'0', '0', '0', '0', ".
 		                "'".$this->CallerID."', ".
 		                "'$calltype', ".

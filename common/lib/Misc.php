@@ -527,6 +527,7 @@ function remove_prefix($phonenumber) {
  */
 function linkonmonitorfile($value) {
 	$handle = DbConnect();
+	$handle -> Execute("SET @@session.time_zone=@@global.time_zone");
 	$instance_table = new Table();
 	$QUERY = "SELECT YEAR(starttime), MONTH(starttime), DAYOFMONTH(starttime), cc_card.username FROM cc_call LEFT JOIN cc_card ON cc_card.id=card_id WHERE uniqueid LIKE '$value' ORDER BY cc_call.id DESC LIMIT 1";
 	$result = $instance_table -> SQLExec ($handle, $QUERY);
@@ -554,6 +555,7 @@ function linkonmonitorfile($value) {
  */
 function linkonfaxfile_customer($value) {
 	$handle = DbConnect();
+	$handle -> Execute("SET @@session.time_zone=@@global.time_zone");
 	$instance_table = new Table();
 	$QUERY = "SELECT YEAR(starttime), MONTH(starttime), DAYOFMONTH(starttime), cc_card.username, faxstatus FROM cc_call LEFT JOIN cc_card ON cc_card.id=card_id WHERE uniqueid LIKE '$value' ORDER BY cc_call.id DESC LIMIT 1";
 	$result = $instance_table -> SQLExec ($handle, $QUERY);

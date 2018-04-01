@@ -3,8 +3,7 @@
 $processed = $this->getProcessed();
 $dynaform = $multform = false;
 foreach ($this->FG_TABLE_EDITION as $sts) {
-	if ($sts[3]=='POPUPDAYTIME') {
-
+	if (stripos($sts[3],"POPUPDAYTIME")===0) {
 		$WeekDaysList = Constants::getWeekDays();
 		foreach ($WeekDaysList as $key => $val) {
 			$weekdays .= '"'.$val[0].'"';
@@ -52,7 +51,12 @@ foreach ($this->FG_TABLE_EDITION as $sts) {
 	<style type="text/css">.span12{padding:3px 10px;}</style>
 	&nbsp;&nbsp;&nbsp;
 		<?php echo gettext("From")?>: <b><input name="timefrom[]" value="0" /></b>&nbsp;
-		<?php echo gettext("To")?>: <b><input name="timetill[]" value="0" /></b>
+		<?php echo gettext("To")?>: <b><input name="timetill[]" value="0" /></b>&nbsp;
+		<?php if (substr($sts[3], -1) == "3") { ?>&nbsp;
+		<?php echo gettext("Action every")?> <b><input class="form_input_text" name="inputa[]" value="10" size="4" maxlength="3" /></b>&nbsp;<font style="color:#BC2222"><?php echo gettext("sec")?></font>&nbsp;&nbsp;
+		<?php echo gettext("Num calls per action")?>: <b><input class="form_input_text" name="inputb[]" value="1" size="4" maxlength="1" /></b>&nbsp;&nbsp;
+		<?php echo gettext("Max duration, sec")?>: <b><input class="form_input_text" name="inputc[]" value="60" size="4" maxlength="3" /></b>
+		<?php } ?>
     </div>
 </div>
 <?php
@@ -369,16 +373,24 @@ function updatecontent(id_el, record, field_inst, instance)
                           //-->
                           </script>
 			<?php
-				} elseif (strtoupper ($this->FG_TABLE_EDITION[$i][3])=="POPUPDAYTIME") {
+				} elseif (stripos($this->FG_TABLE_EDITION[$i][3],"POPUPDAYTIME")===0) {
+					$k = substr($this->FG_TABLE_EDITION[$i][3], -1);
 					$instance_sub_table = new Table($this->FG_TABLE_EDITION[$i][8], $this->FG_TABLE_EDITION[$i][9]);
 					$select_list = $instance_sub_table -> Get_list ($this->DBHandle, str_replace("%id", "$id", $this->FG_TABLE_EDITION[$i][10]), null, null, null, null, null, null);
 					if ($this->FG_DEBUG >= 2) { echo "<br>"; print_r($select_list);}
 					//echo $select_list."<br>";
 					if($this->VALID_SQL_REG_EXP) {
 						if ($select_list !== 0) {
+							$select_list = array_reverse($select_list);
 							$json_list = array();
-							foreach ($select_list as $value) {
-								$json_list[] = array('weekdays[]'=>$value[0],'timefrom[]'=>$value[1],'timetill[]'=>$value[2]);
+							if ($k=="3") {
+								foreach ($select_list as $value) {
+									$json_list[] = array('weekdays[]'=>$value[0],'timefrom[]'=>$value[1],'timetill[]'=>$value[2],'inputa[]'=>$value[3],'inputb[]'=>$value[4],'inputc[]'=>$value[5]);
+								}
+							} else {
+								foreach ($select_list as $value) {
+									$json_list[] = array('weekdays[]'=>$value[0],'timefrom[]'=>$value[1],'timetill[]'=>$value[2]);
+								}
 							}
 							$json_str = json_encode($json_list);
 							?>
@@ -392,8 +404,13 @@ function updatecontent(id_el, record, field_inst, instance)
 						<script language="JavaScript"> PopUpDayTimeJson={"<?php echo $this->FG_TABLE_EDITION[$i][1]?>Array":<?php echo $json_str;?>}; </script>
 						<?php
 					}
+					if ($k==3) {
+			?>
+				    <div class="blockDynaLong">
+			<?php		} else {
 			?>
 				    <div class="blockDyna">
+			<?php		}?>
 				        <div data-holder-for="<?php echo $this->FG_TABLE_EDITION[$i][1];?>"></div>
 				    </div>
 				    <div class="clear"></div>

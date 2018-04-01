@@ -33,10 +33,11 @@ function reasondesc($reason) {
 function originateresponse($e, $parameters, $server, $port, &$ast) {
 
     if ($parameters['ActionID'] == $ast->actionid) {
-	$ansnum = $parameters['Reason'];
+	$ansnum   = $parameters['Reason'];
+	$channel  = $parameters['Channel'];
 	$ansalpha = reasondesc($ansnum);
 //	write_log(LOGFILE_API_CALLBACK, "OriginateResponse{$ansalpha}: ".var_export($parameters, true));
-	return array($ansnum,$ansalpha);
+	return array($ansnum,$ansalpha,$channel);
     }
     return false;
 }
@@ -181,15 +182,22 @@ else
 
 $instance_table = new Table();
 $A2B -> set_instance_table ($instance_table);
+$intid = 0;
 
 while(true)
 {
     pcntl_wait($status, WNOHANG);
-    $query="SELECT `id`,`status`,`exten_leg_a`,`account`,`callerid`,`exten`,`context`,`priority`,`variable`,`timeout`,`reason`,`num_attempts_unavailable`,`num_attempts_busy`,`num_attempts_noanswer`,TIMEDIFF(now(),`callback_time`),`id_server_group`, `surveillance`";
-    $query.=" FROM `cc_callback_spool` WHERE `status`='PENDING' AND (`next_attempt_time`<=now() OR ISNULL(`next_attempt_time`))";
+    $query="SELECT `id`,`status`,`exten_leg_a`,`account`,`callerid`,`exten`,`context`,`priority`,`variable`,`timeout`,`reason`,`num_attempts_unavailable`,`num_attempts_busy`,`num_attempts_noanswer`,".
+			"TIMEDIFF(now(),`callback_time`),`id_server_group`, `surveillance`, `inputa`, `inputb`, `inputc`, `calleridprefix`, `calleridlength`, `flagringup`".
+		" FROM `cc_callback_spool` LEFT JOIN `cc_sheduler_ratecard` ON `id_callback`=`id`".
+		" WHERE `status`='PENDING' AND (`next_attempt_time`<=now() OR ISNULL(`next_attempt_time`)) AND (max_attempt=-1 OR num_attempt<max_attempt)".
+		" AND (flagringup=0 OR (`weekdays` LIKE CONCAT('%',WEEKDAY(CONVERT_TZ(NOW(),@@global.time_zone,localtz)),'%') AND (TIME(CONVERT_TZ(NOW(),@@global.time_zone,localtz)) BETWEEN `timefrom` AND `timetill`".
+		"	OR (`timetill`<=`timefrom` AND (TIME(CONVERT_TZ(NOW(),@@global.time_zone,localtz))<`timetill` OR TIME(CONVERT_TZ(NOW(),@@global.time_zone,localtz))>=`timefrom`)))))".
+		" GROUP BY id";
+		
     $result=$instance_table->SQLExec($A2B->DBHandle, $query);
     foreach ($result as $value) {
-	list($cc_id,$cc_status,$cc_exten_leg_a,$cc_account,$cc_callerid,$cc_exten,$cc_context,$cc_priority,$cc_variable,$cc_timeout,$cc_reason,$cc_num_attempts_unavailable,$cc_num_attempts_busy,$cc_num_attempts_noanswer,$cc_timediff,$id_server_group,$duration)=$value;
+	list($cc_id,$cc_status,$cc_exten_leg_a,$cc_account,$cc_callerid,$cc_exten,$cc_context,$cc_priority,$cc_variable,$cc_timeout,$cc_reason,$cc_num_attempts_unavailable,$cc_num_attempts_busy,$cc_num_attempts_noanswer,$cc_timediff,$id_server_group,$duration,$secperaction,$callsperaction,$maxduration,$calleridprefix,$calleridlength,$flagringup)=$value;
 	if ($duration > 0) {
 		$cc_timediff = 0;
 	}
@@ -210,28 +218,29 @@ while(true)
 	if ($duration > 0) {
 		$acc_to_unav=$acc_to_busy=$acc_to_noansw=$cc_num_attempts_unavailable=$cc_num_attempts_busy=$cc_num_attempts_noanswer=0;
 	}
-	if ($acc_timeout_res < 0)
+	if ($flagringup != 1 && $acc_timeout_res < 0)
 	{
 	    $query="UPDATE `cc_callback_spool` SET `status`='ERROR_TIMEOUT',`id_server`='$manager_id' WHERE `id`=$cc_id";
 	    if (!$A2B->DBHandle->Execute($query)) die("Can't execute query '$query'\n");
 	}
-	elseif($acc_max_unav<=$cc_num_attempts_unavailable)
+	elseif($flagringup != 1 && $acc_max_unav<=$cc_num_attempts_unavailable)
 	{
 	    $query="UPDATE `cc_callback_spool` SET `status`='ERROR_UNAVAILABLE',`id_server`='$manager_id' WHERE `id`=$cc_id";
 	    if (!$A2B->DBHandle->Execute($query)) die("Can't execute query '$query'\n");
 	}
-	elseif($acc_max_busy<=$cc_num_attempts_busy)
+	elseif($flagringup != 1 && $acc_max_busy<=$cc_num_attempts_busy)
 	{
 	    $query="UPDATE `cc_callback_spool` SET `status`='ERROR_BUSY',`id_server`='$manager_id' WHERE `id`=$cc_id";
 	    if (!$A2B->DBHandle->Execute($query)) die("Can't execute query '$query'\n");
 	}
-	elseif($acc_max_noansw<=$cc_num_attempts_noanswer)
+	elseif($flagringup != 1 && $acc_max_noansw<=$cc_num_attempts_noanswer)
 	{
 	    $query="UPDATE `cc_callback_spool` SET `status`='ERROR_NO-ANSWER',`id_server`='$manager_id' WHERE `id`=$cc_id";
 	    if (!$A2B->DBHandle->Execute($query)) die("Can't execute query '$query'\n");
 	}
 	else {
 	    $A2B->DbDisconnect();
+	    $intid++;
 	    $pid=pcntl_fork();
 	    if($pid==-1) {
 		print("Can't fork!\n");
@@ -248,9 +257,25 @@ while(true)
 
 		$A2B -> DbConnect($agi);
 		$A2B -> set_instance_table ($instance_table);
-		$query="UPDATE `cc_callback_spool` SET `status`='PROCESSING',`num_attempt`=`num_attempt`+1,`last_attempt_time`=now(),`id_server`='$manager_id' WHERE `id`=$cc_id";
+		if ($flagringup) {
+			$query="UPDATE `cc_callback_spool` SET `status`='PENDING',`num_attempt`=`num_attempt`+1,`last_attempt_time`=now(),`next_attempt_time`=ADDTIME(now(),SEC_TO_TIME($secperaction)),`id_server`='$manager_id' WHERE `id`=$cc_id";
+		} else {
+			$query="UPDATE `cc_callback_spool` SET `status`='PROCESSING',`num_attempt`=`num_attempt`+1,`last_attempt_time`=now(),`id_server`='$manager_id' WHERE `id`=$cc_id";
+		}
 		if (!$A2B->DBHandle->Execute($query)) die("Can't execute query '$query'\n");
-		$return=callback_engine($A2B, $manager_host.":5038", $manager_username, $manager_secret, array($cc_exten,$cc_priority,$cc_callerid,$cc_variable,$cc_account,$cc_id), $cc_exten_leg_a, $acc_tariff);
+		if ($maxduration==0)	$maxduration = $A2B -> config['callback']['timeout'];
+		if ($calleridprefix) {
+			$prefixes = explode(",", $calleridprefix);
+			$countprefixes = count($prefixes) - 1;
+			$numcid = mt_rand(0,$countprefixes);
+			$cc_callerid = $prefixes[$numcid];
+			$chrs = $calleridlength-strlen($cc_callerid);
+			for($i = 0; $i < $chrs; $i++){
+			        $cc_callerid .= mt_rand(0,9);
+			}
+//write_log(LOGFILE_API_CALLBACK, basename(__FILE__) . ' line:' . __LINE__ ."cc_callerid= ". $cc_callerid);
+		}
+		$return=callback_engine($A2B, $manager_host.":5038", $manager_username, $manager_secret, array($cc_exten,$cc_priority,$cc_callerid,$cc_variable,$cc_account,$cc_id."-".$intid,$cc_context,$maxduration), $cc_exten_leg_a, $acc_tariff);
 		$timeout=-1;
 		$fatal=0;
 		switch($return)
@@ -267,14 +292,14 @@ while(true)
 		    case  8: $last_status="ERROR_CONGESTION_OR_CHANNEL-UNAVAILABLE";$fatal=0;$timeout=$acc_to_unav;break;
 		    default: $last_status="ERROR_UNKNOWN (#$return)";$fatal=1;break;
 		}
-		if($fatal && ($duration == 0 || $return == 4)) {
+		if($fatal && ($duration == 0 || $return == 4) && $flagringup==0) {
 			$status=$last_status;
 		} else	$status='PENDING';
 		$query="UPDATE `cc_callback_spool` SET `status`='$status',`last_status`='$last_status',`manager_result`='$last_status'";
 		if($return==-2 || $return==0 || $return==8) $query.=",`num_attempts_unavailable`=`num_attempts_unavailable`+1";
 		if($return==1) $query.=",`num_attempts_busy`=`num_attempts_busy`+1";
 		if($return==3) $query.=",`num_attempts_noanswer`=`num_attempts_noanswer`+1";
-		if($timeout>=0) $query.=",`next_attempt_time`=ADDTIME(now(),SEC_TO_TIME($timeout))";
+		if($timeout>=0 && $maxduration==0) $query.=",`next_attempt_time`=ADDTIME(now(),SEC_TO_TIME($timeout))";
 		$query.=" WHERE `id`=$cc_id";
 		if (!$A2B->DBHandle->Execute($query)) die("Can't execute query '$query'\n");
 		$A2B->DbDisconnect();

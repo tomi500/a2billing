@@ -239,11 +239,6 @@ switch($transaction_data[0][4])
 		$transaction_detail = serialize($pnp_transaction_array);
 		break;
 		
-	case "iridium":
-		$currCurrency           = BASE_CURRENCY;
-		$currAmount             = $transaction_data[0][2];
-		break;
-		
 	case "webmoneycreditcard":
 		
 	case "webmoney":
@@ -294,7 +289,7 @@ switch($transaction_data[0][4])
 //				$sign = wmsign($_SETTINGS['wmid'].$purse.$pay_no.$_REQUEST['number'].$_REQUEST['number_type']);
 //				$merchant->appendChild($xml->createElement('sign'))->appendChild($xml->createTextNode($sign));
 				$security_verify = false;
-				write_log(LOGFILE_EPAYMENT, basename(__FILE__).' line:'.__LINE__." - WebMoney check by SIGN not support");
+				write_log(LOGFILE_EPAYMENT, basename(__FILE__).' line:'.__LINE__." - WebMoney check by SIGN not support now");
 				break;
 		    default:
 				$security_verify = false;

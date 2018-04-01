@@ -3072,10 +3072,10 @@ msgstr "После подтверждения освобождение теле�
 
 #: lib/customer.help.php:87
 msgid "Map single digit to your most dialed numbers."
-msgstr "Назначьте 1 цифру на ваши самые используемые номера"
+msgstr "Назначте 1 цифру на ваши самые используемые номера"
 
 #: lib/customer.help.php:89
-msgid "Callback : Entre your phone number and the phone number you wish to call."
+msgid "Callback : Enter your phone number and the phone number you wish to call."
 msgstr "Вы можете назначить обратный звонок, чтобы не платить за исходящую связь!"
 
 #: A2B_ticket_view.php:58
@@ -4581,6 +4581,14 @@ msgstr "ФАКС НОМЕРА"
 #:
 msgid "SURVEILLANCE"
 msgstr "РЕГИСТРАТОР"
+
+#:
+msgid "RING-UP"
+msgstr "ДОЗВОНКА"
+
+#:
+msgid "ADD"
+msgstr "ДОБАВИТЬ"
 
 #:
 msgid "CALL"

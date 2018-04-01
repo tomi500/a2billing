@@ -181,7 +181,7 @@ $smarty->display( 'main.tpl');
 echo $CC_help_callback;
 
 if ($calling == '' && $called == '') {
-	$QUERY = "SELECT leg_a, exten FROM cc_callback_spool WHERE account = $A2B->cardnumber AND exten_leg_a != '' ORDER BY id DESC LIMIT 1";
+	$QUERY = "SELECT leg_a, exten FROM cc_callback_spool WHERE account = $A2B->cardnumber AND exten_leg_a != '' AND leg_a != '' AND exten NOT LIKE 'RINGUP' ORDER BY id DESC LIMIT 1";
 	$result = $A2B -> instance_table -> SQLExec ($A2B->DBHandle, $QUERY);
 	if (is_array($result)) {
 		$called 	= $result[0][0];

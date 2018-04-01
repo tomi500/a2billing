@@ -238,7 +238,13 @@ ALTER TABLE cc_did ADD verify_callerid SMALLINT( 6 ) NOT NULL DEFAULT '0';
 ALTER TABLE cc_did ADD voicebox VARCHAR( 20 ) CHARACTER SET utf8 COLLATE utf8_bin NULL DEFAULT NULL;
 ALTER TABLE cc_did ADD chanlang CHAR(20) CHARACTER SET utf8 COLLATE utf8_bin NOT NULL DEFAULT 'not_set';
 ALTER TABLE cc_did ADD buyrate DECIMAL( 15, 5 ) NOT NULL DEFAULT 0 AFTER `fixrate`;
-ALTER TABLE cc_did ADD billblock int(11) NOT NULL DEFAULT '1' AFTER `buyrate`;
+ALTER TABLE cc_did ADD billblock INT(11) NOT NULL DEFAULT '1' AFTER `buyrate`;
+ALTER TABLE cc_did ADD spamfilter INT( 11 ) NOT NULL DEFAULT '0' AFTER `verify_did`;
+ALTER TABLE cc_did ADD secondtimedays INT(11) NOT NULL DEFAULT '10' AFTER `spamfilter`;
+ALTER TABLE cc_did ADD callbackprefixallow CHAR( 30 ) CHARACTER SET utf8 COLLATE utf8_bin NOT NULL DEFAULT '' AFTER `voicebox`;
+ALTER TABLE cc_did ADD callbacksound VARCHAR( 100 ) CHARACTER SET utf8 COLLATE utf8_bin NOT NULL AFTER `callbackprefixallow`;
+ALTER TABLE cc_did ADD aftercallbacksound VARCHAR( 100 ) CHARACTER SET utf8 COLLATE utf8_bin NOT NULL AFTER `callbacksound`;
+ALTER TABLE cc_did ADD digitaftercallbacksound VARCHAR( 20 ) CHARACTER SET utf8 COLLATE utf8_bin NULL DEFAULT NULL AFTER `aftercallbacksound`;
 
 CREATE TABLE IF NOT EXISTS `cc_sheduler_ratecard` (
   `id_ratecard` BIGINT(20) NOT NULL DEFAULT '0',
@@ -249,9 +255,15 @@ CREATE TABLE IF NOT EXISTS `cc_sheduler_ratecard` (
   INDEX `id` ( `id_ratecard` , `id_tariffplan` )
 ) ENGINE=MyISAM DEFAULT CHARSET=utf8 COLLATE=utf8_bin;
 ALTER TABLE `cc_sheduler_ratecard`
-  ADD `id_ringup` BIGINT(20) NOT NULL DEFAULT '0' AFTER `id_tariffplan`,
   DROP INDEX `id`,
-  ADD INDEX `id` ( `id_ratecard` , `id_tariffplan` , `id_ringup` );
+  ADD `ids` BIGINT(20) NOT NULL AUTO_INCREMENT FIRST,
+  ADD PRIMARY KEY(`ids`),
+  ADD `id_ringup` BIGINT(20) NOT NULL DEFAULT '0' AFTER `id_tariffplan`,
+  ADD `id_callback` BIGINT(20) NOT NULL DEFAULT '0' AFTER `id_ringup`,
+  ADD `inputa` SMALLINT(6) NOT NULL DEFAULT '0' AFTER `id_callback`,
+  ADD `inputb` SMALLINT(6) NOT NULL DEFAULT '0' AFTER `secperaction`,
+  ADD `inputc` SMALLINT(6) NOT NULL DEFAULT '1' AFTER `callsperaction`,
+  ADD INDEX `id` ( `id_ratecard` , `id_tariffplan` , `id_ringup`, `id_callback` );
 
 #ALTER TABLE `cc_ratecard`
 #  DROP `starttime`,
@@ -559,6 +571,14 @@ ALTER TABLE cc_callback_spool ADD `exten_leg_a` varchar(60) COLLATE utf8_bin NOT
 ALTER TABLE cc_callback_spool ADD `leg_a` varchar(60) COLLATE utf8_bin NOT NULL;
 ALTER TABLE cc_callback_spool ADD `last_status` varchar(80) COLLATE utf8_bin DEFAULT NULL;
 ALTER TABLE cc_callback_spool ADD `surveillance` INT( 11 ) NOT NULL DEFAULT '0';
+ALTER TABLE cc_callback_spool ADD `max_attempt` int(11) NOT NULL DEFAULT '-1' AFTER `num_attempt`;
+ALTER TABLE cc_callback_spool ADD `timeout1` SMALLINT( 6 ) NOT NULL DEFAULT '0';
+ALTER TABLE cc_callback_spool ADD `sound1` VARCHAR( 100 ) CHARACTER SET utf8 COLLATE utf8_bin NOT NULL;
+ALTER TABLE cc_callback_spool ADD `timeout2` SMALLINT( 6 ) NOT NULL DEFAULT '0';
+ALTER TABLE cc_callback_spool ADD `flagringup` int(11) DEFAULT '0';
+ALTER TABLE cc_callback_spool ADD `calleridprefix` CHAR( 255 ) CHARACTER SET utf8 COLLATE utf8_bin NOT NULL DEFAULT '';
+ALTER TABLE cc_callback_spool ADD `calleridlength` SMALLINT( 6 ) NOT NULL DEFAULT '12';
+ALTER TABLE cc_callback_spool ADD `localtz` CHAR( 40 ) CHARACTER SET utf8 COLLATE utf8_bin DEFAULT NULL;
 
 ALTER TABLE cc_payment_methods ADD UNIQUE `SECONDARY` ( `payment_method` );
 INSERT IGNORE INTO cc_payment_methods (`payment_method`, `payment_filename`) VALUES

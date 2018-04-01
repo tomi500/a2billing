@@ -80,6 +80,7 @@
 
 	{if $ACXSURVEILLANCE >0 }
 	<div class="toggle_menu"><li><a href="A2B_entity_surveillance.php"><strong>{php} echo gettext("SURVEILLANCE");{/php}</strong></a></li></div>
+	<div class="toggle_menu"><li><a href="A2B_entity_ringup.php"><strong>{php} echo gettext("RING-UP");{/php}</strong></a></li></div>
 	{/if}
 
 	{if $ACXSPEED_DIAL >0 }

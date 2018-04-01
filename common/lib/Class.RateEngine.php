@@ -1505,7 +1505,7 @@ $A2B -> debug( ERROR, $agi, __FILE__, __LINE__, "Out of length range destination
 //$A2B -> debug( ERROR, $agi, __FILE__, __LINE__, "[CID_handover: ={$CID_handover}]");
 				} else {
 				    $this -> usedtrunk = $failover_trunk;
-				    $QUERY = "SELECT trunkprefix, providertech, providerip, removeprefix, IF(dialprefixmain='',failover_trunk,'-1'), status, inuse, IF(wrapnexttime>NOW() AND lastdial NOT LIKE '$A2B->destination',0,maxuse), if_max_use, outbound_cidgroup_id, addparameter, cid_handover, wrapuptime, trunkcode FROM cc_trunk WHERE id_trunk='$this->usedtrunk' LIMIT 1";
+				    $QUERY = "SELECT trunkprefix, providertech, providerip, removeprefix, IF(dialprefixmain='',failover_trunk,'-1'), status, inuse, IF(UNIX_TIMESTAMP(wrapnexttime)>UNIX_TIMESTAMP() AND lastdial NOT LIKE '$A2B->destination',0,maxuse), if_max_use, outbound_cidgroup_id, addparameter, cid_handover, wrapuptime, trunkcode FROM cc_trunk WHERE id_trunk='$this->usedtrunk' LIMIT 1";
 				    $A2B->instance_table = new Table();
 				    $result = $A2B->instance_table -> SQLExec ($A2B -> DBHandle, $QUERY);
 
@@ -1794,7 +1794,9 @@ $A2B -> debug( ERROR, $agi, __FILE__, __LINE__, "Out of length range destination
 						$outprefixrequest		= "cid LIKE '{$outprefix}%' DESC,";
 					}
 				}
-				if (!is_null($CID_handover) && $CID_handover == '' && $outprefix) {
+				$chantype = ($agi) ? $agi -> get_variable('CHANNEL(channeltype)', true) : "";
+//$A2B -> debug( ERROR, $agi, __FILE__, __LINE__, "==============================================================[chantype : $chantype]");
+				if (!is_null($CID_handover) && $CID_handover == '' && $outprefix && $chantype != "Local") {
 					$QUERY = "SELECT cid FROM cc_callerid
 							WHERE id_cc_card = {$A2B->id_card} AND verify = 1 AND cid NOT LIKE '{$A2B->destination}'
 								AND ((cli_localreplace = 1 AND cid LIKE '$outprefix%') OR (cli_otherreplace = 1 AND cid NOT LIKE '$outprefix%') OR cli_prefixreplace LIKE '%$outprefix%')
@@ -1806,15 +1808,18 @@ $A2B -> debug( ERROR, $agi, __FILE__, __LINE__, "Out of length range destination
 				}
 				if ($CID_handover) {
 					$cidresult[0][0] = $CID_handover;
-				} else {
+				} else if ($chantype != "Local") {
 					$QUERY = "SELECT cid FROM cc_outbound_cid_list WHERE activated = 1 AND outbound_cid_group = $cidgroupid AND cid NOT LIKE '{$A2B->destination}' ORDER BY $outprefixrequest RAND() LIMIT 1";
 					$cidresult = $A2B->instance_table -> SQLExec ($A2B -> DBHandle, $QUERY);
-				}
+				} else $cidresult = 0;
 				if (is_array($cidresult) && count($cidresult) > 0) {
 					$outcid = $cidresult[0][0];
 				}
 
-				if ($typecall != 8 && (!$agi || $typecall == 9)) return array( $channel, $outcid, $this -> usedtrunk, $this -> td, $k );
+				if ($typecall != 8 && (!$agi || $typecall == 9)) {
+$A2B -> debug( ERROR, $agi, "", "", "\r                  CallBack for Trunk=$this->usedtrunk to ".$channel);
+					return array( $channel, $outcid, $this -> usedtrunk, $this -> td, $k );
+				}
 
 				$A2B -> debug( DEBUG, $agi, __FILE__, __LINE__, "app_callingcard: CIDGROUPID='$cidgroupid' OUTBOUND CID SELECTED IS '$outcid'.");
 
@@ -1906,7 +1911,6 @@ $A2B -> debug( ERROR, $agi, __FILE__, __LINE__, "Out of length range destination
 						//Uncomment this line if you want to save the outbound_cid in the CDR
 						//$A2B -> CallerID = $outcid;
 						$calleridname = $agi -> get_variable('CALLERID(name)', true);
-$A2B -> debug( ERROR, $agi, __FILE__, __LINE__, "[calleridname : $calleridname]");
 						$agi -> set_callerid('"'.$outcid.'"<'.$outcid.'>');
 //						$agi -> set_variable('CALLERID(ani)', $outcid);
 						$A2B -> debug( DEBUG, $agi, __FILE__, __LINE__, "[EXEC SetCallerID : $outcid]");
@@ -1937,21 +1941,20 @@ $A2B -> debug( ERROR, $agi, __FILE__, __LINE__, "[calleridname : $calleridname]"
 				    write_log(LOGFILE_API_CALLBACK, " ActionID = {$amicmd[5]} [#### Starting AMI ORIGINATE     ####] $channel ");
 				    $ast->log("ActionID = {$amicmd[5]} [#### Starting AMI ORIGINATE     ####] $channel");
 				    $ast -> add_event_handler('OriginateResponse', 'originateresponse');
-//				    $ast -> add_event_handler('Newstate', 'newstateresponse');
 				    $ast -> actionid = $amicmd[5];
-				    $amicmd[3] = substr_replace($amicmd[3],"RATECARD={$this->ratecard_obj[$k][6]},TRUNK={$this->usedtrunk},TD={$this->td}",strpos($amicmd[3],"RATECARD")).",ACTIONID={$ast->actionid}";
-				    $res = $ast -> Originate($channel,$amicmd[0],$A2B -> config['callback']['context_callback'],$amicmd[1],NULL,NULL,
-					$A2B -> config['callback']['timeout']*1000,$amicmd[2],$amicmd[3],$amicmd[4],true,$amicmd[5]);
+				    $amicmd[3] = substr_replace($amicmd[3],"RATECARD={$this->ratecard_obj[$k][6]},TRUNK={$this->usedtrunk},TD={$this->td}",strpos($amicmd[3],"RATECARD")).",ACTIONID={$ast->actionid},CID={$amicmd[2]}";
+				    $res = $ast -> Originate($channel,$amicmd[0],$amicmd[6],$amicmd[1],NULL,NULL,
+								$A2B -> config['callback']['timeout']*1000,$amicmd[2],$amicmd[3],$amicmd[4],true,$amicmd[5]);
 				    write_log(LOGFILE_API_CALLBACK, " ActionID = {$amicmd[5]} [#### RESULT AMI ORIGINATE       ####] ".var_export($res, true));
 				    $ast->log("ActionID = {$amicmd[5]} [#### RESULT AMI ORIGINATE       ####] ".var_export($res, true));
 				    if ($res['Response'] == "Success") {
 					write_log(LOGFILE_API_CALLBACK, " ActionID = {$amicmd[5]} [#### Starting AMI WAIT_RESPONSE ####] $channel ");
-					$ast->log("ActionID = {$amicmd[5]} [#### Starting AMI WAIT_RESPONSE ####] $channel");
-//					$response = $ast -> wait_response(true);
-//					write_log(LOGFILE_API_CALLBACK, " ActionID = {$amicmd[5]} [#### RESULT AMI WAIT RESPONSE   ####] ChannelStateDesc = ".var_export($response, true)." ");
-//					$ast->log("ActionID = {$amicmd[5]} [#### RESULT AMI WAIT RESPONSE   ####] ChannelStateDesc = ".var_export($response, true));
+					$ast->log("ActionID = {$amicmd[5]} [#### Starting AMI WAIT_RESPONSE ####] $channel / res= ".var_export($res, true));
 					$response = $ast -> wait_response(true);
 					$this->dialstatus = $response[1];
+					if ($this->dialstatus == "ANSWER" && $amicmd[7] > 0) {
+						$res = $ast -> AbsoluteTimeout($response[2], $amicmd[7]);
+					}
 				    } else {
 					$this->dialstatus = "CHANUNAVAIL";
 					$response[0] = 0;
@@ -1986,7 +1989,7 @@ $tempdebug="DIALSTATUS: $this->dialstatus";
 				    }
 				    $this -> real_answeredtime = $this -> answeredtime	= $answeredtime;
 
-$A2B -> debug( ERROR, $agi, __FILE__, __LINE__, "[ \033[1;34m$A2B->destination > $tempdebug\33[0m ]");
+$A2B -> debug( ERROR, $agi, __FILE__, __LINE__, "[ \033[1;34m> $A2B->destination  $tempdebug\33[0m ]");
 				    $A2B -> debug( INFO, $agi, __FILE__, __LINE__, "[FAILOVER K=$k]:[ANSWEREDTIME=".$this->answeredtime."]:[DIALSTATUS=".$this->dialstatus."]");
 				}
 				if (($this->dialstatus  == "CHANUNAVAIL" || $this->dialstatus  == "CONGESTION") && $intellect_count >= 0) {
@@ -2034,7 +2037,7 @@ $A2B -> debug( ERROR, $agi, __FILE__, __LINE__, "[ \033[1;34m$A2B->destination >
 			if ($this->dialstatus  == "BUSY") {
 				$this -> real_answeredtime = $this -> answeredtime = 0;
 				if ($typecall<=44) {
-$A2B -> debug( ERROR, $agi, __FILE__, __LINE__, "[typecall=".$typecall."]");
+//$A2B -> debug( ERROR, $agi, __FILE__, __LINE__, "[typecall=".$typecall."]");
 				if ($A2B->agiconfig['busy_timeout'] > 0 && !(!$A2B->extext && $A2B->voicemail && !is_null($A2B->voicebox))) {
 					$A2B -> let_stream_listening($agi);
 					$agi->exec("Playtones busy");

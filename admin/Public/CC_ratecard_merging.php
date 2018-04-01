@@ -218,7 +218,7 @@ function removeSource()
 				  		<select NAME="ratecard_source" size="1"  style="width=250" class="form_input_select">
 							<option value=''><?php echo gettext("SOURCE RATECARD");?></option>
 							<?php foreach ($list_tariffname as $recordset){?>
-								<option class=input value='<?php  echo $recordset[0]?>' <?php if ($recordset[0]==$tariffplan) echo "selected";?>><?php echo $recordset[1]?></option>                        
+								<option class=input value='<?php  echo $recordset[0]?>' <?php if ($recordset[0]==$ratecard_source) echo "selected";?>><?php echo $recordset[1]?></option>
 							<?php }?>
 						</select>
 					 </td>
@@ -229,7 +229,7 @@ function removeSource()
 				  		<select NAME="ratecard_destination" size="1"  style="width=250" class="form_input_select">
 							<option value=''><?php echo gettext("DESTINATION RATECARD");?></option>
 							<?php foreach ($list_tariffname as $recordset){?>
-								<option class=input value='<?php  echo $recordset[0]?>' <?php if ($recordset[0]==$tariffplan) echo "selected";?>><?php echo $recordset[1]?></option>                        
+								<option class=input value='<?php  echo $recordset[0]?>' <?php if ($recordset[0]==$ratecard_destination) echo "selected";?>><?php echo $recordset[1]?></option>
 							<?php }?>
 						</select>
 					 </td>

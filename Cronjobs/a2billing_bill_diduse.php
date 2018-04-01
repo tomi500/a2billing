@@ -103,12 +103,12 @@ $QUERY = "SELECT id_did, reservationdate, month_payed, fixrate, cc_card.id, cred
 
 if ($verbose_level >= 1)
 	echo "==> SELECT CARD WIHT DID'S QUERY : $QUERY\n";
-$result = $instance_table->SQLExec($A2B->DBHandle, $QUERY);
+$res = $instance_table->SQLExec($A2B->DBHandle, $QUERY);
 
 if ($verbose_level >= 1)
-	print_r($result);
+	print_r($res);
 
-if (!is_array($result)) {
+if (!is_array($res)) {
 	if ($verbose_level >= 1)
 		echo "[No DID in use to run the DIDBilling recurring service]\n";
 	write_log(LOGFILE_CRONT_BILL_DIDUSE, basename(__FILE__) . ' line:' . __LINE__ . "[No DID in use to run the DIDBilling recurring service]");
@@ -125,7 +125,7 @@ if ($verbose_level >= 1)
 $last_idcard = null;
 $new_card = true;
 $last_invoice = null;
-foreach ($result as $mydids) {
+foreach ($res as $mydids) {
 
 	if ($last_idcard != $mydids[4]) {
 		$new_card = true;
@@ -169,6 +169,12 @@ foreach ($result as $mydids) {
 					if ($verbose_level >= 1) {
 						echo "==> UPDATE CARD QUERY: 	$QUERY\n";
 					}
+					$mydids[5] -= $mydids[3];
+					for ($i=0;$i<count($res);$i++) {
+						if ($res[$i][4]==$mydids[4]) {
+							$res[$i][5] = $mydids[5];
+						}
+					}
 					write_log(LOGFILE_CRONT_BILL_DIDUSE, basename(__FILE__) . ' line:' . __LINE__ . " ==> UPDATE CARD QUERY: 	$QUERY");
 					$QUERY = "UPDATE cc_did_use set month_payed = month_payed + 1, reminded = 0 WHERE id_did = '" . $mydids[0] .
 							 "' AND activated = 1 AND ( releasedate IS NULL OR releasedate < '1984-01-01 00:00:00') ";
@@ -189,7 +195,7 @@ foreach ($result as $mydids) {
 					
 					$mail_user = true;
 					$mail = new Mail(Mail::$TYPE_DID_PAID,$mydids[4] );
-					$mail -> replaceInEmail(Mail::$BALANCE_REMAINING_KEY,$mydids[5] - $mydids[3]);
+					$mail -> replaceInEmail(Mail::$BALANCE_REMAINING_KEY,$mydids[5]);
 					$mail -> replaceInEmail(Mail::$DID_NUMBER_KEY,$mydids[7]);
 					$mail -> replaceInEmail(Mail::$DID_COST_KEY,$mydids[3]);
 
