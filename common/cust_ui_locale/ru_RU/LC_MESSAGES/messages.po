@@ -2724,6 +2724,62 @@ msgstr "REGISTERED"
 msgid "USED"
 msgstr "REGISTERED"
 
+#: lib/interface/constants.php:280
+msgid "CallerID LENGTH"
+msgstr "Длина номера CallerID"
+
+#: lib/interface/constants.php:281
+msgid "CallerID PREFIXes"
+msgstr "CallerID префиксы"
+
+#: lib/interface/constants.php:282
+msgid "SCHEDULE"
+msgstr "РАСПИСАНИЕ"
+
+#: lib/interface/constants.php:282
+msgid "MAX ATTEMPTS"
+msgstr "ПОПЫТОК ДОЗВОНА"
+
+#: lib/interface/constants.php:283
+msgid "From"
+msgstr "С"
+
+#: lib/interface/constants.php:286
+msgid "To"
+msgstr "До"
+
+#: lib/interface/constants.php:287
+msgid "Max duration, sec"
+msgstr "Завершать звонок после ответа через, сек"
+
+#: lib/interface/constants.php:288
+msgid "Num calls per action"
+msgstr "Количество звонков за событие"
+
+#: lib/interface/constants.php:289
+msgid "Action every"
+msgstr "Событие каждые"
+
+#: lib/interface/constants.php:290
+msgid "LAST CALL"
+msgstr "ПОСЛЕДНИЙ ЗВОНОК"
+
+#: lib/interface/constants.php:291
+msgid "ANSWERED"
+msgstr "Отвечено"
+
+#: lib/interface/constants.php:292
+msgid "MAX CALLS"
+msgstr "ПРЕДЕЛ"
+
+#: lib/interface/constants.php:293
+msgid "CALLS MADE"
+msgstr "СДЕЛАНО"
+
+#: lib/interface/constants.php:294
+msgid "UNAVAILABLE"
+msgstr "Недоступно"
+
 #: lib/interface/constants.php:295
 msgid "ANSWER"
 msgstr "Ответ"

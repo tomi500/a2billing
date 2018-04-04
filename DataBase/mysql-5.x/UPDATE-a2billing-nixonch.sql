@@ -34,12 +34,16 @@ ALTER TABLE cc_trunk ADD credit_posix_extract VARCHAR( 30 ) NULL DEFAULT NULL;
 ALTER TABLE cc_trunk ADD ussd_rest_package VARCHAR( 10 ) NULL DEFAULT NULL;
 ALTER TABLE cc_trunk ADD ussd_vaucher_prefix VARCHAR( 10 ) NULL DEFAULT NULL;
 ALTER TABLE cc_trunk ADD ussd_check_time TIMESTAMP NOT NULL DEFAULT '0000-00-00 00:00:00';
+ALTER TABLE cc_trunk ADD lastdial VARCHAR( 50 ) COLLATE utf8_bin NOT NULL;
+ALTER TABLE cc_trunk ADD attract int(3) NOT NULL DEFAULT '0';
 ALTER TABLE cc_trunk
   CHANGE removeprefix removeprefix CHAR( 30 ) CHARACTER SET utf8 COLLATE utf8_bin NULL DEFAULT NULL,
   CHANGE stopdatea    stopdatea    DATETIME NOT NULL DEFAULT '0000-00-00 00:00:00',
-  CHANGE stopdateb    stopdateb    DATETIME NOT NULL DEFAULT '0000-00-00 00:00:00';
-ALTER TABLE cc_trunk ADD lastdial VARCHAR( 50 ) COLLATE utf8_bin NOT NULL;
-ALTER TABLE cc_trunk ADD attract int(3) NOT NULL DEFAULT '0';
+  CHANGE stopdateb    stopdateb    DATETIME NOT NULL DEFAULT '0000-00-00 00:00:00',
+  CHANGE `dialprefixmain` `dialprefixmain` CHAR(30) CHARACTER SET utf8 COLLATE utf8_bin NOT NULL DEFAULT '',
+  CHANGE `dialprefixa` `dialprefixa` CHAR(40) CHARACTER SET utf8 COLLATE utf8_bin NOT NULL DEFAULT '',
+  CHANGE `dialprefixb` `dialprefixb` CHAR(40) CHARACTER SET utf8 COLLATE utf8_bin NOT NULL DEFAULT '',
+  CHANGE `lastdial` `lastdial` VARCHAR(50) CHARACTER SET utf8 COLLATE utf8_bin NOT NULL DEFAULT '';
 
 ALTER TABLE cc_voucher ADD callplan INT(11) NOT NULL;
 
@@ -206,6 +210,7 @@ ALTER TABLE cc_ratecard ADD length_range_from INT( 11 ) NOT NULL DEFAULT '1';
 ALTER TABLE cc_ratecard ADD length_range_till INT( 11 ) NOT NULL DEFAULT '100';
 UPDATE `cc_ratecard` SET `length_range_from` = '12', `length_range_till` = '12' WHERE `dialprefix` LIKE '380%';
 ALTER TABLE cc_ratecard CHANGE `destination` `destination` BIGINT( 20 ) NULL DEFAULT '0';
+ALTER TABLE cc_ratecard CHANGE `musiconhold` `musiconhold` CHAR(100) CHARACTER SET utf8 COLLATE utf8_bin NOT NULL DEFAULT '';
 
 ALTER TABLE cc_callerid ADD callback INT( 11 ) NOT NULL DEFAULT '0';
 ALTER TABLE cc_callerid ADD phonenumber VARCHAR( 100 ) CHARACTER SET utf8 COLLATE utf8_bin NOT NULL;
@@ -254,15 +259,15 @@ CREATE TABLE IF NOT EXISTS `cc_sheduler_ratecard` (
   `timetill` TIME NOT NULL DEFAULT '0',
   INDEX `id` ( `id_ratecard` , `id_tariffplan` )
 ) ENGINE=MyISAM DEFAULT CHARSET=utf8 COLLATE=utf8_bin;
+ALTER TABLE `cc_sheduler_ratecard` ADD `id_ringup` BIGINT(20) NOT NULL DEFAULT '0' AFTER `id_tariffplan`;
 ALTER TABLE `cc_sheduler_ratecard`
   DROP INDEX `id`,
   ADD `ids` BIGINT(20) NOT NULL AUTO_INCREMENT FIRST,
-  ADD PRIMARY KEY(`ids`),
-  ADD `id_ringup` BIGINT(20) NOT NULL DEFAULT '0' AFTER `id_tariffplan`,
   ADD `id_callback` BIGINT(20) NOT NULL DEFAULT '0' AFTER `id_ringup`,
   ADD `inputa` SMALLINT(6) NOT NULL DEFAULT '0' AFTER `id_callback`,
-  ADD `inputb` SMALLINT(6) NOT NULL DEFAULT '0' AFTER `secperaction`,
-  ADD `inputc` SMALLINT(6) NOT NULL DEFAULT '1' AFTER `callsperaction`,
+  ADD `inputb` SMALLINT(6) NOT NULL DEFAULT '0' AFTER `inputa`,
+  ADD `inputc` SMALLINT(6) NOT NULL DEFAULT '1' AFTER `inputb`,
+  ADD PRIMARY KEY(`ids`),
   ADD INDEX `id` ( `id_ratecard` , `id_tariffplan` , `id_ringup`, `id_callback` );
 
 #ALTER TABLE `cc_ratecard`

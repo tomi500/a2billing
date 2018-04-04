@@ -111,15 +111,15 @@ if ($A2B -> callingcard_ivr_authenticate_light ($error_msg) && $callback) {
 							 " '$timeout', now(), '$A2B->dnid', '1', '".$_SESSION["timezone"]."')";
 					$res = $A2B -> DBHandle -> Execute($QUERY);
 					if (!$res) {
-						$error_msg = gettext("Cannot insert the surveillance request in the spool!")."</br>";
+						$error_msg = gettext("Cannot insert the ringup request in the spool!")."</br>";
 					} else {
-						$error_msg = gettext("Your surveillance request has been queued correctly")."!</br>";
+						$error_msg = gettext("Your ringup request has been queued correctly")."!</br>";
 						$color_msg = 'green';
 					}
 					sleep(1);
 				    } else $error_msg = gettext("Error : Sorry, not enough free trunk for make call. Try again later!")."</br>";
-				} else $error_msg = gettext("Error : You don t have enough credit to set surveillance!")."</br>";
-			} else $error_msg = gettext("Error : There is no route to call for surveillance your phonenumber!")."</br>";
+				} else $error_msg = gettext("Error : You don t have enough credit to set ringup!")."</br>";
+			} else $error_msg = gettext("Error : There is no route to call for ringup your phonenumber!")."</br>";
 	} else $error_msg = gettext("Error : You have to specify at least phonenumber1!")."</br>";
 }
 

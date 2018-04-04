@@ -35,9 +35,11 @@ if ($return!==false) {
 }
 
 $HD_Form -> AddViewElement(gettext(" PhoneNumber"), "leg_a", "18%", "center", "sort", "", "lie_link", "", "", "", "", "", "call-history.php?s=1&t=0&order=t1.starttime&sens=DESC&current_page=0&posted=1&Period=&frommonth=&fromstatsmonth=&tomonth=&tostatsmonth=&fromday=true&fromstatsday_sday=1&fromstatsmonth_sday=".date('Y')."-".date('m')."&today=&tostatsday_sday=".date('d')."&tostatsmonth_sday=".date('Y')."-".date('m')."&calleridtype=1&phonenumbertype=1&sourcetype=&clidtype=&channel=&resulttype=min&callerid=&phonenumber=%0&src=&clid=&terminatecauseid=ANSWER&choose_calltype=-1&choose_currency=");
-//$HD_Form -> AddViewElement(gettext("DURATION"), "surveillance", "18%", "center", "sort", "26", "", "", "", "", "", "display_minute");
-//$HD_Form -> AddViewElement(gettext("TIME LEFT"), "timeleft", "18%", "center", "sort", "", "timeleft", "%2");
-$HD_Form -> AddViewElement(gettext("STATUS"), "last_status", "18%", "center", "sort");
+$HD_Form -> AddViewElement(gettext("LAST CALL"), "last_attempt_time", "18%", "center", "sort", "30", "", "", "", "", "", "display_dateformat");
+$HD_Form -> AddViewElement(gettext("NOANSWER"), "num_attempts_noanswer" , "2%", "center", "sort");
+$HD_Form -> AddViewElement(gettext("BUSY"), "num_attempts_busy" , "3%", "center", "sort");
+$HD_Form -> AddViewElement(gettext("UNAVAILABLE"), "num_attempts_unavailable" , "2%", "center", "sort");
+$HD_Form -> AddViewElement(gettext("ANSWERED"), "num_attempts_answered" , "3%", "center", "sort");
 $HD_Form -> AddViewElement(gettext("CALLS MADE"), "num_attempt" , "2%", "center", "sort");
 $HD_Form -> AddViewElement(gettext("MAX CALLS"), "max_attempt" , "3%", "center", "sort");
 
@@ -45,7 +47,7 @@ $HD_Form -> FieldViewElement ("IFNULL((SELECT regexten FROM cc_sip_buddies
                                         LEFT JOIN cc_card_concat bb ON id_cc_card = bb.concat_card_id
                                         LEFT JOIN ( SELECT aa.concat_id FROM cc_card_concat aa WHERE aa.concat_card_id = {$_SESSION['card_id']} ) AS v ON v.concat_id = bb.concat_id
                                         WHERE (id_cc_card = {$_SESSION['card_id']} OR v.concat_id IS NOT NULL) AND (regexten = cc_callback_spool.exten_leg_a OR name = cc_callback_spool.exten_leg_a) LIMIT 1),exten_leg_a) AS leg_a, ".
-				"last_status, num_attempt, max_attempt");
+				"last_attempt_time, num_attempts_noanswer, num_attempts_busy, num_attempts_unavailable, num_attempt-num_attempts_noanswer-num_attempts_busy-num_attempts_unavailable num_attempts_answered, num_attempt, max_attempt");
 
 $HD_Form -> CV_NO_FIELDS  = gettext("There are no ring-up created.");
 $HD_Form -> CV_DISPLAY_LINE_TITLE_ABOVE_TABLE = false;
