@@ -16,7 +16,7 @@ if (!has_rights(ACX_SURVEILLANCE)) {
 $FG_DEBUG = 0;
 $color_msg = 'red';
 
-getpost_ifset(array ('callback', 'called', 'calling', 'duration'));
+getpost_ifset(array ('callback', 'data', 'called', 'calling', 'duration'));
 
 $HD_Form->setDBHandler(DbConnect());
 $HD_Form->init();
@@ -105,10 +105,10 @@ if ($A2B -> callingcard_ivr_authenticate_light ($error_msg) && $callback) {
 						"RATECARD=".$RateEngine->ratecard_obj[$channeloutcid[4]][6].$sep."TRUNK=".$channeloutcid[2].$sep."TD=".$channeloutcid[3];
 					
 					$QUERY = " INSERT INTO cc_callback_spool (uniqueid, status, server_ip, num_attempt, max_attempt, last_attempt_time, channel, exten, context, priority," .
-							 " variable, id_server_group, callback_time, account, callerid, timeout, next_attempt_time, exten_leg_a, flagringup, localtz) " .
+							 " variable, id_server_group, callback_time, account, callerid, timeout, next_attempt_time, exten_leg_a, flagringup, localtz, data) " .
 							 " VALUES ('$uniqueid', '$status', '$server_ip', '$num_attempt', '0', now(), '$channel', '$exten', '$context'," .
 							 " '$priority', '$variable', '$id_server_group', now(), '$account', '$callerid'," .
-							 " '$timeout', now(), '$A2B->dnid', '1', '".$_SESSION["timezone"]."')";
+							 " '$timeout', now(), '$A2B->dnid', '1', '".$_SESSION["timezone"]."', '$data')";
 					$res = $A2B -> DBHandle -> Execute($QUERY);
 					if (!$res) {
 						$error_msg = gettext("Cannot insert the ringup request in the spool!")."</br>";
@@ -160,7 +160,9 @@ if ($form_action == "list") {
 		<INPUT type="hidden" name="callback" value="1">
 		<tr class="bgcolor_001">
 		<td align="center" valign="top">
-				<font class="fontstyle_002"><?php echo gettext(" PhoneNumber");?> :</font>
+				<font class="fontstyle_002"><?php echo gettext("Name");?> :</font>
+				<input class="form_input_text" name="data" size="15" maxlength="60" >
+				&nbsp;<font class="fontstyle_002"><?php echo gettext(" PhoneNumber");?> :</font>
 				<input class="form_input_text" name="called" size="15" maxlength="40" >
 				&nbsp;&nbsp;&nbsp;&nbsp;
 						<input class="form_input_button"  value="<?php echo "&nbsp;".gettext("ADD")."&nbsp;";?>"  type="submit">

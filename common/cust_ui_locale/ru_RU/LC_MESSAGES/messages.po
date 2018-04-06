@@ -2761,8 +2761,8 @@ msgid "Action every"
 msgstr "Событие каждые"
 
 #: lib/interface/constants.php:290
-msgid "LAST CALL"
-msgstr "ПОСЛЕДНИЙ ЗВОНОК"
+msgid "LAST ACTIVITY"
+msgstr "ПОСЛЕДНЯЯ АКТИВНОСТЬ"
 
 #: lib/interface/constants.php:291
 msgid "ANSWERED"

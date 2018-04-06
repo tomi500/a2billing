@@ -37,13 +37,13 @@ ALTER TABLE cc_trunk ADD ussd_check_time TIMESTAMP NOT NULL DEFAULT '0000-00-00 
 ALTER TABLE cc_trunk ADD lastdial VARCHAR( 50 ) COLLATE utf8_bin NOT NULL;
 ALTER TABLE cc_trunk ADD attract int(3) NOT NULL DEFAULT '0';
 ALTER TABLE cc_trunk
-  CHANGE removeprefix removeprefix CHAR( 30 ) CHARACTER SET utf8 COLLATE utf8_bin NULL DEFAULT NULL,
-  CHANGE stopdatea    stopdatea    DATETIME NOT NULL DEFAULT '0000-00-00 00:00:00',
-  CHANGE stopdateb    stopdateb    DATETIME NOT NULL DEFAULT '0000-00-00 00:00:00',
+  CHANGE `stopdatea`      `stopdatea`      DATETIME NOT NULL DEFAULT '0000-00-00 00:00:00',
+  CHANGE `stopdateb`      `stopdateb`      DATETIME NOT NULL DEFAULT '0000-00-00 00:00:00',
+  CHANGE `removeprefix`   `removeprefix`   CHAR(30) CHARACTER SET utf8 COLLATE utf8_bin NULL DEFAULT NULL,
   CHANGE `dialprefixmain` `dialprefixmain` CHAR(30) CHARACTER SET utf8 COLLATE utf8_bin NOT NULL DEFAULT '',
-  CHANGE `dialprefixa` `dialprefixa` CHAR(40) CHARACTER SET utf8 COLLATE utf8_bin NOT NULL DEFAULT '',
-  CHANGE `dialprefixb` `dialprefixb` CHAR(40) CHARACTER SET utf8 COLLATE utf8_bin NOT NULL DEFAULT '',
-  CHANGE `lastdial` `lastdial` VARCHAR(50) CHARACTER SET utf8 COLLATE utf8_bin NOT NULL DEFAULT '';
+  CHANGE `dialprefixa`    `dialprefixa`    CHAR(40) CHARACTER SET utf8 COLLATE utf8_bin NOT NULL DEFAULT '',
+  CHANGE `dialprefixb`    `dialprefixb`    CHAR(40) CHARACTER SET utf8 COLLATE utf8_bin NOT NULL DEFAULT '',
+  CHANGE `lastdial`       `lastdial`       VARCHAR(50) CHARACTER SET utf8 COLLATE utf8_bin NOT NULL DEFAULT '';
 
 ALTER TABLE cc_voucher ADD callplan INT(11) NOT NULL;
 
@@ -578,11 +578,11 @@ ALTER TABLE cc_callback_spool ADD `last_status` varchar(80) COLLATE utf8_bin DEF
 ALTER TABLE cc_callback_spool ADD `surveillance` INT( 11 ) NOT NULL DEFAULT '0';
 ALTER TABLE cc_callback_spool ADD `max_attempt` int(11) NOT NULL DEFAULT '-1' AFTER `num_attempt`;
 ALTER TABLE cc_callback_spool ADD `timeout1` SMALLINT( 6 ) NOT NULL DEFAULT '0';
-ALTER TABLE cc_callback_spool ADD `sound1` VARCHAR( 100 ) CHARACTER SET utf8 COLLATE utf8_bin NOT NULL;
+ALTER TABLE cc_callback_spool ADD `sound1` VARCHAR( 100 ) CHARACTER SET utf8 COLLATE utf8_bin NOT NULL DEFAULT '';
 ALTER TABLE cc_callback_spool ADD `timeout2` SMALLINT( 6 ) NOT NULL DEFAULT '0';
 ALTER TABLE cc_callback_spool ADD `flagringup` int(11) DEFAULT '0';
 ALTER TABLE cc_callback_spool ADD `calleridprefix` CHAR( 255 ) CHARACTER SET utf8 COLLATE utf8_bin NOT NULL DEFAULT '';
-ALTER TABLE cc_callback_spool ADD `calleridlength` SMALLINT( 6 ) NOT NULL DEFAULT '12';
+ALTER TABLE cc_callback_spool ADD `calleridlength` SMALLINT( 6 ) NOT NULL DEFAULT '13';
 ALTER TABLE cc_callback_spool ADD `localtz` CHAR( 40 ) CHARACTER SET utf8 COLLATE utf8_bin DEFAULT NULL;
 
 ALTER TABLE cc_payment_methods ADD UNIQUE `SECONDARY` ( `payment_method` );

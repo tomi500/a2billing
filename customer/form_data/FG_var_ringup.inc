@@ -14,6 +14,7 @@ $HD_Form -> FG_TABLE_DEFAULT_SENS = "DESC";
 
 $HD_Form -> FG_EDITION = true;
 $HD_Form -> FG_DELETION = true;
+$HD_Form -> FG_ACTION_SIZE_COLUMN = '5%';
 
 // Dependent Tables
 $HD_Form -> FG_FK_DELETE_ALLOWED = true;
@@ -34,8 +35,9 @@ if ($return!==false) {
     }
 }
 
-$HD_Form -> AddViewElement(gettext(" PhoneNumber"), "leg_a", "18%", "center", "sort", "", "lie_link", "", "", "", "", "", "call-history.php?s=1&t=0&order=t1.starttime&sens=DESC&current_page=0&posted=1&Period=&frommonth=&fromstatsmonth=&tomonth=&tostatsmonth=&fromday=true&fromstatsday_sday=1&fromstatsmonth_sday=".date('Y')."-".date('m')."&today=&tostatsday_sday=".date('d')."&tostatsmonth_sday=".date('Y')."-".date('m')."&calleridtype=1&phonenumbertype=1&sourcetype=&clidtype=&channel=&resulttype=min&callerid=&phonenumber=%0&src=&clid=&terminatecauseid=ANSWER&choose_calltype=-1&choose_currency=");
-$HD_Form -> AddViewElement(gettext("LAST CALL"), "last_attempt_time", "18%", "center", "sort", "30", "", "", "", "", "", "display_dateformat");
+$HD_Form -> AddViewElement(gettext("NAME"), "data", "15%", "center\" nowrap \"", "sort");
+$HD_Form -> AddViewElement(gettext(" PhoneNumber"), "leg_a", "10%", "center", "sort", "", "lie_link", "", "", "", "", "", "call-history.php?s=1&t=0&order=t1.starttime&sens=DESC&current_page=0&posted=1&Period=&frommonth=&fromstatsmonth=&tomonth=&tostatsmonth=&fromday=true&fromstatsday_sday=1&fromstatsmonth_sday=".date('Y')."-".date('m')."&today=&tostatsday_sday=".date('d')."&tostatsmonth_sday=".date('Y')."-".date('m')."&calleridtype=1&phonenumbertype=1&sourcetype=&clidtype=&channel=&resulttype=min&callerid=&phonenumber=%0&src=&clid=&terminatecauseid=ANSWER&choose_calltype=-1&choose_currency=");
+$HD_Form -> AddViewElement(gettext("LAST ACTIVITY"), "last_attempt_time", "15%", "center\" nowrap \"", "sort", "30", "", "", "", "", "", "display_dateformat");
 $HD_Form -> AddViewElement(gettext("NOANSWER"), "num_attempts_noanswer" , "2%", "center", "sort");
 $HD_Form -> AddViewElement(gettext("BUSY"), "num_attempts_busy" , "3%", "center", "sort");
 $HD_Form -> AddViewElement(gettext("UNAVAILABLE"), "num_attempts_unavailable" , "2%", "center", "sort");
@@ -43,7 +45,7 @@ $HD_Form -> AddViewElement(gettext("ANSWERED"), "num_attempts_answered" , "3%", 
 $HD_Form -> AddViewElement(gettext("CALLS MADE"), "num_attempt" , "2%", "center", "sort");
 $HD_Form -> AddViewElement(gettext("MAX CALLS"), "max_attempt" , "3%", "center", "sort");
 
-$HD_Form -> FieldViewElement ("IFNULL((SELECT regexten FROM cc_sip_buddies
+$HD_Form -> FieldViewElement ("data, IFNULL((SELECT regexten FROM cc_sip_buddies
                                         LEFT JOIN cc_card_concat bb ON id_cc_card = bb.concat_card_id
                                         LEFT JOIN ( SELECT aa.concat_id FROM cc_card_concat aa WHERE aa.concat_card_id = {$_SESSION['card_id']} ) AS v ON v.concat_id = bb.concat_id
                                         WHERE (id_cc_card = {$_SESSION['card_id']} OR v.concat_id IS NOT NULL) AND (regexten = cc_callback_spool.exten_leg_a OR name = cc_callback_spool.exten_leg_a) LIMIT 1),exten_leg_a) AS leg_a, ".
@@ -63,6 +65,15 @@ if (strlen($HD_Form -> FG_TABLE_CLAUSE)>0)
 //    $HD_Form -> FG_EDITION_CLAUSE.=" AND ";
 //	$HD_Form -> FG_EDITION_CLAUSE.="account = ".$_SESSION["pr_login"];
 
+$HD_Form -> AddEditElement (gettext("NAME"),
+			   "data",
+			   '$value',
+			   "INPUT",
+			   "size=30 maxlength=60",
+			   "",
+			   "",
+			   "", "", "", "", "", "", "", "");
+
 $HD_Form -> AddEditElement (gettext(" PhoneNumber"),
 			   "exten_leg_a",
 			   '$value',
@@ -77,7 +88,7 @@ $HD_Form -> AddEditElement (gettext("MAX ATTEMPTS"),
 			   '$value',
 			   "INPUT",
 			   "size=30 maxlength=10",
-			   "",
+			   "4",
 			   "",
 			   "", "", "", "", "", "", "", "Предельное количество звонков на заданный номер");
 
@@ -129,7 +140,7 @@ $HD_Form -> AddEditElement (gettext("SOUND1"),
         gettext("Insert the path and name of sound file"),
         "list", "", "", "", $soundlist, "%1");
 
-$HD_Form -> FieldEditElement ("exten_leg_a, max_attempt".$shedule.", calleridprefix, calleridlength, timeout1, sound1");
+$HD_Form -> FieldEditElement ("data, exten_leg_a, max_attempt".$shedule.", calleridprefix, calleridlength, timeout1, sound1");
 /**
 if (isset($filterprefix)  &&  (strlen($filterprefix)>0)) {
 	if (strlen($HD_Form -> FG_TABLE_CLAUSE)>0) $HD_Form -> FG_TABLE_CLAUSE.=" AND ";
