@@ -188,7 +188,7 @@ while(true)
 {
     pcntl_wait($status, WNOHANG);
     $query="SELECT `id`,`status`,`exten_leg_a`,`account`,`callerid`,`exten`,`context`,`priority`,`variable`,`timeout`,`reason`,`num_attempts_unavailable`,`num_attempts_busy`,`num_attempts_noanswer`,".
-			"TIMEDIFF(now(),`callback_time`),`id_server_group`, `surveillance`, `inputa`, `inputb`, `inputc`, `calleridprefix`, `calleridlength`, `flagringup`".
+			"TIMEDIFF(now(),`callback_time`),`id_server_group`, `surveillance`, `inputa`, IFNULL(`inputb`,1), `inputc`, `calleridprefix`, `calleridlength`, `flagringup`".
 		" FROM `cc_callback_spool` LEFT JOIN `cc_sheduler_ratecard` ON `id_callback`=`id`".
 		" WHERE `status`='PENDING' AND (`next_attempt_time`<=now() OR ISNULL(`next_attempt_time`)) AND (max_attempt=-1 OR num_attempt<max_attempt)".
 		" AND (flagringup=0 OR (`weekdays` LIKE CONCAT('%',WEEKDAY(CONVERT_TZ(NOW(),@@global.time_zone,localtz)),'%') AND (TIME(CONVERT_TZ(NOW(),@@global.time_zone,localtz)) BETWEEN `timefrom` AND `timetill`".
@@ -238,7 +238,7 @@ while(true)
 	    $query="UPDATE `cc_callback_spool` SET `status`='ERROR_NO-ANSWER',`id_server`='$manager_id' WHERE `id`=$cc_id";
 	    if (!$A2B->DBHandle->Execute($query)) die("Can't execute query '$query'\n");
 	}
-	else {
+	else for (;$callsperaction>0;$callsperaction--) {
 	    $A2B->DbDisconnect();
 	    $intid++;
 	    $pid=pcntl_fork();
@@ -250,6 +250,7 @@ while(true)
 		pcntl_wait($status, WNOHANG);
 		$A2B -> DbConnect($agi);
 		$A2B -> set_instance_table ($instance_table);
+		continue;
 	    }
 	    else {
 		ob_start();

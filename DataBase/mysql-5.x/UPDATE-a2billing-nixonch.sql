@@ -266,7 +266,7 @@ ALTER TABLE `cc_sheduler_ratecard`
   ADD `id_callback` BIGINT(20) NOT NULL DEFAULT '0' AFTER `id_ringup`,
   ADD `inputa` SMALLINT(6) NOT NULL DEFAULT '0' AFTER `id_callback`,
   ADD `inputb` SMALLINT(6) NOT NULL DEFAULT '0' AFTER `inputa`,
-  ADD `inputc` SMALLINT(6) NOT NULL DEFAULT '1' AFTER `inputb`,
+  ADD `inputc` SMALLINT(6) NOT NULL DEFAULT '0' AFTER `inputb`,
   ADD PRIMARY KEY(`ids`),
   ADD INDEX `id` ( `id_ratecard` , `id_tariffplan` , `id_ringup`, `id_callback` );
 

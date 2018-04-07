@@ -54,12 +54,12 @@ $HD_Form -> FieldViewElement (	"data, IFNULL((SELECT regexten FROM cc_sip_buddie
                                         LEFT JOIN cc_card_concat bb ON id_cc_card = bb.concat_card_id
                                         LEFT JOIN ( SELECT aa.concat_id FROM cc_card_concat aa WHERE aa.concat_card_id = {$_SESSION['card_id']} ) AS v ON v.concat_id = bb.concat_id
                                         WHERE (id_cc_card = {$_SESSION['card_id']} OR v.concat_id IS NOT NULL) AND (regexten = cc_callback_spool.exten_leg_a OR name = cc_callback_spool.exten_leg_a) LIMIT 1),exten_leg_a) AS leg_a, ".
-				"IF(status='PENDING' AND num_attempt<max_attempt AND (weekdays LIKE CONCAT('%',WEEKDAY(CONVERT_TZ(NOW(),@@global.time_zone,localtz)),'%') AND (TIME(CONVERT_TZ(NOW(),@@global.time_zone,localtz)) BETWEEN timefrom AND timetill ".
-					"OR (timetill<=timefrom AND (TIME(CONVERT_TZ(NOW(),@@global.time_zone,localtz))<timetill OR TIME(CONVERT_TZ(NOW(),@@global.time_zone,localtz))>=`timefrom`)))),".
+				"IF(status='PENDING' AND num_attempt<max_attempt ".
+					"AND (weekdays LIKE CONCAT('%',WEEKDAY(NOW()),'%') AND (TIME(NOW()) BETWEEN timefrom AND timetill OR (timetill<=timefrom AND (TIME(NOW())<timetill OR TIME(NOW())>=`timefrom`)))),".
 						"CONCAT('<font color=green>',DATE_FORMAT(last_attempt_time,'%Y-%m-%d %T'),'</font>'),".
-						"IF(ISNULL(ids) OR num_attempt>=max_attempt,CONCAT('<font color=red>',DATE_FORMAT(last_attempt_time,'%Y-%m-%d %T'),'</font>'),CONCAT('<font color=blue>',DATE_FORMAT(last_attempt_time,'%Y-%m-%d %T'),'</font>'))".
+						"IF(ISNULL(ids) OR num_attempt>=max_attempt,DATE_FORMAT(last_attempt_time,'%Y-%m-%d %T'),CONCAT('<font color=blue>',DATE_FORMAT(last_attempt_time,'%Y-%m-%d %T'),'</font>'))".
 				") AS lastactivity, ".
-				"num_attempt, max_attempt, num_attempts_noanswer, num_attempts_busy, num_attempts_unavailable, num_attempt-num_attempts_noanswer-num_attempts_busy-num_attempts_unavailable num_attempts_answered");
+				"num_attempt, max_attempt, num_attempts_noanswer, num_attempts_busy, num_attempts_unavailable, num_attempt-num_attempts_noanswer-num_attempts_busy-num_attempts_unavailable AS num_attempts_answered");
 
 $HD_Form -> CV_NO_FIELDS  = gettext("There are no ring-up created.");
 $HD_Form -> CV_DISPLAY_LINE_TITLE_ABOVE_TABLE = false;
