@@ -41,22 +41,25 @@ if ($return!==false) {
 }
 
 $HD_Form -> AddViewElement(gettext("NAME"), "data", "15%", "center\" nowrap \"", "sort");
-$HD_Form -> AddViewElement(gettext(" PhoneNumber"), "leg_a", "10%", "center", "sort", "", "lie_link", "", "", "", "", "", "call-history.php?s=1&t=0&order=t1.starttime&sens=DESC&current_page=0&posted=1&Period=&frommonth=&fromstatsmonth=&tomonth=&tostatsmonth=&fromday=true&fromstatsday_sday=1&fromstatsmonth_sday=".date('Y')."-".date('m')."&today=&tostatsday_sday=".date('d')."&tostatsmonth_sday=".date('Y')."-".date('m')."&calleridtype=1&phonenumbertype=1&sourcetype=&clidtype=&channel=&resulttype=min&callerid=&phonenumber=%0&src=&clid=&terminatecauseid=ANSWER&choose_calltype=-1&choose_currency=");
+$HD_Form -> AddViewElement(gettext(" PhoneNumber"), "leg_a", "10%", "center", "sort", "", "lie_link", "", "", "", "", "", "call-history.php?s=1&t=0&order=t1.starttime&sens=DESC&current_page=0&posted=1&Period=&frommonth=&fromstatsmonth=&tomonth=&tostatsmonth=&fromday=true&fromstatsday_sday=1&fromstatsmonth_sday=".date('Y')."-".date('m')."&today=&tostatsday_sday=".date('d')."&tostatsmonth_sday=".date('Y')."-".date('m')."&calleridtype=1&phonenumbertype=1&sourcetype=&clidtype=&channel=&resulttype=min&callerid=&phonenumber=%1&src=&clid=&terminatecauseid=ANSWER&choose_calltype=-1&choose_currency=");
 $HD_Form -> AddViewElement(gettext("LAST ACTIVITY"), "lastactivity", "15%", "center\" nowrap \"", "sort", "50");
+$HD_Form -> AddViewElement(gettext("CALLS MADE"), "num_attempt" , "2%", "center", "sort");
+$HD_Form -> AddViewElement(gettext("MAX CALLS"), "max_attempt" , "3%", "center", "sort");
 $HD_Form -> AddViewElement(gettext("NOANSWER"), "num_attempts_noanswer" , "2%", "center", "sort");
 $HD_Form -> AddViewElement(gettext("BUSY"), "num_attempts_busy" , "3%", "center", "sort");
 $HD_Form -> AddViewElement(gettext("UNAVAILABLE"), "num_attempts_unavailable" , "2%", "center", "sort");
 $HD_Form -> AddViewElement(gettext("ANSWERED"), "num_attempts_answered" , "3%", "center", "sort");
-$HD_Form -> AddViewElement(gettext("CALLS MADE"), "num_attempt" , "2%", "center", "sort");
-$HD_Form -> AddViewElement(gettext("MAX CALLS"), "max_attempt" , "3%", "center", "sort");
 
-$HD_Form -> FieldViewElement ("data, IFNULL((SELECT regexten FROM cc_sip_buddies
+$HD_Form -> FieldViewElement (	"data, IFNULL((SELECT regexten FROM cc_sip_buddies
                                         LEFT JOIN cc_card_concat bb ON id_cc_card = bb.concat_card_id
                                         LEFT JOIN ( SELECT aa.concat_id FROM cc_card_concat aa WHERE aa.concat_card_id = {$_SESSION['card_id']} ) AS v ON v.concat_id = bb.concat_id
                                         WHERE (id_cc_card = {$_SESSION['card_id']} OR v.concat_id IS NOT NULL) AND (regexten = cc_callback_spool.exten_leg_a OR name = cc_callback_spool.exten_leg_a) LIMIT 1),exten_leg_a) AS leg_a, ".
 				"IF(status='PENDING' AND num_attempt<max_attempt AND (weekdays LIKE CONCAT('%',WEEKDAY(CONVERT_TZ(NOW(),@@global.time_zone,localtz)),'%') AND (TIME(CONVERT_TZ(NOW(),@@global.time_zone,localtz)) BETWEEN timefrom AND timetill ".
-"OR (timetill<=timefrom AND (TIME(CONVERT_TZ(NOW(),@@global.time_zone,localtz))<timetill OR TIME(CONVERT_TZ(NOW(),@@global.time_zone,localtz))>=`timefrom`)))),CONCAT('<font color=green>',last_attempt_time,'</font>'),CONCAT('<font color=red>',DATE_FORMAT(last_attempt_time,'%Y-%m-%d %T'),'</font>')) AS lastactivity, ".
-				"num_attempts_noanswer, num_attempts_busy, num_attempts_unavailable, num_attempt-num_attempts_noanswer-num_attempts_busy-num_attempts_unavailable num_attempts_answered, num_attempt, max_attempt");
+					"OR (timetill<=timefrom AND (TIME(CONVERT_TZ(NOW(),@@global.time_zone,localtz))<timetill OR TIME(CONVERT_TZ(NOW(),@@global.time_zone,localtz))>=`timefrom`)))),".
+						"CONCAT('<font color=green>',DATE_FORMAT(last_attempt_time,'%Y-%m-%d %T'),'</font>'),".
+						"IF(ISNULL(ids) OR num_attempt>=max_attempt,CONCAT('<font color=red>',DATE_FORMAT(last_attempt_time,'%Y-%m-%d %T'),'</font>'),CONCAT('<font color=blue>',DATE_FORMAT(last_attempt_time,'%Y-%m-%d %T'),'</font>'))".
+				") AS lastactivity, ".
+				"num_attempt, max_attempt, num_attempts_noanswer, num_attempts_busy, num_attempts_unavailable, num_attempt-num_attempts_noanswer-num_attempts_busy-num_attempts_unavailable num_attempts_answered");
 
 $HD_Form -> CV_NO_FIELDS  = gettext("There are no ring-up created.");
 $HD_Form -> CV_DISPLAY_LINE_TITLE_ABOVE_TABLE = false;
