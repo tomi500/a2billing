@@ -59,7 +59,7 @@ $HD_Form -> FieldViewElement (	"data, IFNULL((SELECT regexten FROM cc_sip_buddie
 						"CONCAT('<font color=green>',DATE_FORMAT(last_attempt_time,'%Y-%m-%d %T'),'</font>'),".
 						"IF(ISNULL(ids) OR num_attempt>=max_attempt,DATE_FORMAT(last_attempt_time,'%Y-%m-%d %T'),CONCAT('<font color=blue>',DATE_FORMAT(last_attempt_time,'%Y-%m-%d %T'),'</font>'))".
 				") AS lastactivity, ".
-				"num_attempt, max_attempt, num_attempts_noanswer, num_attempts_busy, num_attempts_unavailable, num_attempt-num_attempts_noanswer-num_attempts_busy-num_attempts_unavailable AS num_attempts_answered");
+				"IF(num_attempt=max_attempt,CONCAT('<font color=red>',num_attempt,'</font>'),num_attempt) num_attempt, max_attempt, num_attempts_noanswer, num_attempts_busy, num_attempts_unavailable, num_attempt-num_attempts_noanswer-num_attempts_busy-num_attempts_unavailable AS num_attempts_answered");
 
 $HD_Form -> CV_NO_FIELDS  = gettext("There are no ring-up created.");
 $HD_Form -> CV_DISPLAY_LINE_TITLE_ABOVE_TABLE = false;

@@ -188,7 +188,7 @@ while(true)
 {
     pcntl_wait($status, WNOHANG);
     $query="SELECT `id`,`status`,`exten_leg_a`,`account`,`callerid`,`exten`,`context`,`priority`,`variable`,`timeout`,`reason`,`num_attempts_unavailable`,`num_attempts_busy`,`num_attempts_noanswer`,".
-			"TIMEDIFF(now(),`callback_time`),`id_server_group`, `surveillance`, `inputa`, IFNULL(`inputb`,1), `inputc`, `calleridprefix`, `calleridlength`, `flagringup`".
+			"TIMEDIFF(now(),`callback_time`),`id_server_group`, `surveillance`, `inputa`, LEAST(IF(`max_attempt`<0,1,`max_attempt`-`num_attempt`),IFNULL(`inputb`,1)), `inputc`, `calleridprefix`, `calleridlength`, `flagringup`".
 		" FROM `cc_callback_spool` LEFT JOIN `cc_sheduler_ratecard` ON `id_callback`=`id`".
 		" WHERE `status`='PENDING' AND (`next_attempt_time`<=now() OR ISNULL(`next_attempt_time`)) AND (max_attempt=-1 OR num_attempt<max_attempt)".
 		" AND (flagringup=0 OR (`weekdays` LIKE CONCAT('%',WEEKDAY(CONVERT_TZ(NOW(),@@global.time_zone,localtz)),'%') AND (TIME(CONVERT_TZ(NOW(),@@global.time_zone,localtz)) BETWEEN `timefrom` AND `timetill`".
