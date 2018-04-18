@@ -300,6 +300,7 @@ while(true)
 		if($return==-2 || $return==0 || $return==8) $query.=",`num_attempts_unavailable`=`num_attempts_unavailable`+1";
 		if($return==1) $query.=",`num_attempts_busy`=`num_attempts_busy`+1";
 		if($return==3) $query.=",`num_attempts_noanswer`=`num_attempts_noanswer`+1";
+		if($return<=-3 || $return==-1) $query.=",`num_attempt`=`num_attempt`-1";
 		if($timeout>=0 && $maxduration==0) $query.=",`next_attempt_time`=ADDTIME(now(),SEC_TO_TIME($timeout))";
 		$query.=" WHERE `id`=$cc_id";
 		if (!$A2B->DBHandle->Execute($query)) die("Can't execute query '$query'\n");

@@ -57,9 +57,13 @@ $HD_Form -> FieldViewElement (	"data, IFNULL((SELECT regexten FROM cc_sip_buddie
 				"IF(status='PENDING' AND num_attempt<max_attempt ".
 					"AND (weekdays LIKE CONCAT('%',WEEKDAY(NOW()),'%') AND (TIME(NOW()) BETWEEN timefrom AND timetill OR (timetill<=timefrom AND (TIME(NOW())<timetill OR TIME(NOW())>=`timefrom`)))),".
 						"CONCAT('<font color=green>',DATE_FORMAT(last_attempt_time,'%Y-%m-%d %T'),'</font>'),".
-						"IF(ISNULL(ids) OR num_attempt>=max_attempt,DATE_FORMAT(last_attempt_time,'%Y-%m-%d %T'),CONCAT('<font color=blue>',DATE_FORMAT(last_attempt_time,'%Y-%m-%d %T'),'</font>'))".
+						"IF(ISNULL(ids) OR num_attempt>=max_attempt,".
+							"IF(num_attempt>=max_attempt AND DATEDIFF(NOW(),last_attempt_time)<=2,".
+								"CONCAT('<font color=red>',DATE_FORMAT(last_attempt_time,'%Y-%m-%d %T'),'</font>'),".
+								"IF(last_status LIKE 'ERROR_NO%',last_status,DATE_FORMAT(last_attempt_time,'%Y-%m-%d %T'))),".
+							"CONCAT('<font color=blue>',DATE_FORMAT(last_attempt_time,'%Y-%m-%d %T'),'</font>'))".
 				") AS lastactivity, ".
-				"IF(num_attempt=max_attempt,CONCAT('<font color=red>',num_attempt,'</font>'),num_attempt) num_attempt, max_attempt, num_attempts_noanswer, num_attempts_busy, num_attempts_unavailable, num_attempt-num_attempts_noanswer-num_attempts_busy-num_attempts_unavailable AS num_attempts_answered");
+				"IF(num_attempt>=max_attempt AND num_attempt>0,CONCAT('<font color=red>',num_attempt,'</font>'),num_attempt) num_attempt, max_attempt, num_attempts_noanswer, num_attempts_busy, num_attempts_unavailable, num_attempt-num_attempts_noanswer-num_attempts_busy-num_attempts_unavailable AS num_attempts_answered");
 
 $HD_Form -> CV_NO_FIELDS  = gettext("There are no ring-up created.");
 $HD_Form -> CV_DISPLAY_LINE_TITLE_ABOVE_TABLE = false;
