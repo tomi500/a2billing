@@ -155,7 +155,8 @@ if (isset($form_action) && $form_action=="ask-add"){
 	$def_timeleft = "value='60'";
 	$def_billblocksec = "value='1'";
 	$begin_date = date("Y");
-	$begin_date_plus = date("Y")+15;
+//	$begin_date_plus = date("Y")+15;
+	$begin_date_plus = "2036";
 	$end_date = date("-m-d H:i:s");
 	$comp_date = "value='".$begin_date.$end_date."'";
 	$comp_date_plus = "value='".$begin_date_plus.$end_date."'";

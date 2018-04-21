@@ -14,7 +14,7 @@ if ( (empty($form_action) || $form_action=="list") && $deleteselected != 'true')
 
 $HD_Form -> FG_DEBUG = 0;
 
-$HD_Form -> FG_TABLE_DEFAULT_ORDER = "id";
+$HD_Form -> FG_TABLE_DEFAULT_ORDER = "entry_time";
 $HD_Form -> FG_TABLE_DEFAULT_SENS = "DESC";
 
 $HD_Form -> FG_EDITION = true;
@@ -54,16 +54,15 @@ $HD_Form -> FieldViewElement (	"data, IFNULL((SELECT regexten FROM cc_sip_buddie
                                         LEFT JOIN cc_card_concat bb ON id_cc_card = bb.concat_card_id
                                         LEFT JOIN ( SELECT aa.concat_id FROM cc_card_concat aa WHERE aa.concat_card_id = {$_SESSION['card_id']} ) AS v ON v.concat_id = bb.concat_id
                                         WHERE (id_cc_card = {$_SESSION['card_id']} OR v.concat_id IS NOT NULL) AND (regexten = cc_callback_spool.exten_leg_a OR name = cc_callback_spool.exten_leg_a) LIMIT 1),exten_leg_a) AS leg_a, ".
-				"IF(status='PENDING' AND num_attempt<max_attempt ".
-					"AND (weekdays LIKE CONCAT('%',WEEKDAY(NOW()),'%') AND (TIME(NOW()) BETWEEN timefrom AND timetill OR (timetill<=timefrom AND (TIME(NOW())<timetill OR TIME(NOW())>=`timefrom`)))),".
-						"IF(last_status LIKE 'ERROR_NO%',".
-							"last_status,".
-							"CONCAT('<font color=green>',DATE_FORMAT(last_attempt_time,'%Y-%m-%d %T'),'</font>')),".
-						"IF(ISNULL(ids) OR num_attempt>=max_attempt,".
-							"IF(num_attempt>=max_attempt AND DATEDIFF(NOW(),last_attempt_time)<=2,".
-								"CONCAT('<font color=red>',DATE_FORMAT(last_attempt_time,'%Y-%m-%d %T'),'</font>'),".
-								"DATE_FORMAT(last_attempt_time,'%Y-%m-%d %T')),".
-							"CONCAT('<font color=blue>',DATE_FORMAT(last_attempt_time,'%Y-%m-%d %T'),'</font>'))".
+				"IF(status='PENDING' AND num_attempt<max_attempt AND (weekdays LIKE CONCAT('%',WEEKDAY(NOW()),'%') AND (TIME(NOW()) BETWEEN timefrom AND timetill OR (timetill<=timefrom AND (TIME(NOW())<timetill OR TIME(NOW())>=`timefrom`)))),".
+					"IF(last_status LIKE 'ERROR_NO%',".
+						"CONCAT('<font color=green>',last_status,'</font>'),".
+						"CONCAT('<font color=green>',DATE_FORMAT(last_attempt_time,'%Y-%m-%d %T'),'</font>')),".
+					"IF(ISNULL(ids) OR num_attempt>=max_attempt,".
+						"IF(num_attempt>=max_attempt AND DATEDIFF(NOW(),last_attempt_time)<=2,".
+							"CONCAT('<font color=red>',DATE_FORMAT(last_attempt_time,'%Y-%m-%d %T'),'</font>'),".
+							"DATE_FORMAT(last_attempt_time,'%Y-%m-%d %T')),".
+						"CONCAT('<font color=blue>',DATE_FORMAT(last_attempt_time,'%Y-%m-%d %T'),'</font>'))".
 				") AS lastactivity, ".
 				"IF(num_attempt>=max_attempt AND num_attempt>0,CONCAT('<font color=red>',num_attempt,'</font>'),num_attempt) num_attempt, max_attempt, num_attempts_noanswer, num_attempts_busy, num_attempts_unavailable, num_attempt-num_attempts_noanswer-num_attempts_busy-num_attempts_unavailable AS num_attempts_answered");
 
@@ -157,7 +156,23 @@ $HD_Form -> AddEditElement (gettext("SOUND1"),
         gettext("Insert the path and name of sound file"),
         "list", "", "", "", $soundlist, "%1");
 
-$HD_Form -> FieldEditElement ("data, exten_leg_a, max_attempt".$shedule.", calleridprefix, calleridlength, timeout1, sound1");
+if ($form_action == 'edit') {
+$HD_Form -> AddEditElement("ENTRY TIME",
+	"entry_time",
+	'$value',
+	"INPUT",
+	"size=40 maxlength=40",
+	"",
+	gettext("Insert the starting date"),
+	"", "", "", "", "", "", "" , gettext("Format YYYY-MM-DD HH:MM:SS. For instance, '2004-12-31 00:00:00'"),
+	null, "res_display_dateformat", gettext("Define the period when this rate table is active."));
+}
+
+$HD_Form -> FieldEditElement ("data, exten_leg_a, max_attempt".$shedule.", calleridprefix, calleridlength, timeout1, sound1, entry_time");
+
+$HD_Form->FG_EDITION_HIDDEN_PARAM	= 'entry_time';
+$HD_Form->FG_EDITION_HIDDEN_PARAM_VALUE = date("Y-m-d H:i:s");
+
 /**
 if (isset($filterprefix)  &&  (strlen($filterprefix)>0)) {
 	if (strlen($HD_Form -> FG_TABLE_CLAUSE)>0) $HD_Form -> FG_TABLE_CLAUSE.=" AND ";

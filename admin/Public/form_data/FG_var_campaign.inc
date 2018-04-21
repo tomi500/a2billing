@@ -148,7 +148,8 @@ if ($form_action!="ask-add") {
 // TODO integrate in new framework
 if ($form_action=="ask-add") {
 	$begin_date = date("Y");
-	$begin_date_plus = date("Y")+20;
+//	$begin_date_plus = date("Y")+20;
+	$begin_date_plus = "2036";
 	$end_date = date("-m-d H:i:s");
 	$time = "value= '10:00:00'";
 	$time_plus = "value= '18:00:00'";

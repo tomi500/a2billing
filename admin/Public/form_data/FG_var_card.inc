@@ -826,7 +826,8 @@ if (has_rights (ACX_MODIFY_CUSTOMERS) && !($popup_select>=1)) {
 	$comp_zero = $comp_date_plus='';
 	if (isset($form_action) && $form_action=="ask-add"){
 		$begin_date = date("Y");
-		$begin_date_plus = date("Y")+10;
+//		$begin_date_plus = date("Y")+10;
+		$begin_date_plus = "2036";
 		$end_date = date("-m-d H:i:s");
 		$comp_date = "value='".$begin_date.$end_date."'";
 		$comp_date_plus = "value='".$begin_date_plus.$end_date."'";

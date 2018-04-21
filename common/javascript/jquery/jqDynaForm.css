@@ -17,6 +17,5 @@ p {margin:0px}
 textarea {width:100%}
 input[type='text'] {width:150px}
 input.short {width:50px}
-.blockDyna {float:left; width:500px; white-space: nowrap; font-family:Verdana; font-size:10px}
-.blockDynaLong {float:left; width:900px; white-space: nowrap; font-family:Verdana; font-size:10px}
+.blockDyna {float:left; max-width:1100px; white-space:nowrap; font-family:Verdana; font-size:10px}
 code {color:#3333FF}

@@ -304,8 +304,8 @@ function updatecontent(id_el, record, field_inst, instance)
 ?>			<TD width="%25" valign="middle" class="form_head_red">		<?php echo $this->FG_TABLE_EDITION[$i][0]?>		</TD>
 			<TD width="%75" valign="top" class="tableBodyRight" background="<?php echo Images_Path;?>/background_cells_red.gif" >
 <?php		} else { ?>
-			<TD width="%25" valign="middle" class="form_head">		<?php echo $this->FG_TABLE_EDITION[$i][0]?>		</TD>
-			<TD width="%75" valign="top" class="tableBodyRight" background="<?php echo Images_Path;?>/background_cells.gif" >
+			<TD valign="middle" class="form_head">		<?php echo $this->FG_TABLE_EDITION[$i][0]?>		</TD>
+			<TD valign="top" class="tableBodyRight" background="<?php echo Images_Path;?>/background_cells.gif" >
 <?php		}
 
 			if ($this->FG_DEBUG == 1) print($this->FG_TABLE_EDITION[$i][3]);
@@ -401,17 +401,10 @@ function updatecontent(id_el, record, field_inst, instance)
 						}
 					} else {
 						$json_str = json_encode($processed[$this->FG_TABLE_ADITION[$i][1]]);?>
-						<script language="JavaScript"> PopUpDayTimeJson={"<?php echo $this->FG_TABLE_EDITION[$i][1]?>Array":<?php echo $json_str;?>}; </script>
-						<?php
-					}
-					if ($k==3) {
-			?>
-				    <div class="blockDynaLong">
-			<?php		} else {
-			?>
+						<script language="JavaScript"> PopUpDayTimeJson={"<?php echo $this->FG_TABLE_EDITION[$i][1]?>Array":<?php echo $json_str;?>}; </script><?php
+						}?>
 				    <div class="blockDyna">
-			<?php		}?>
-				        <div data-holder-for="<?php echo $this->FG_TABLE_EDITION[$i][1];?>"></div>
+				    <div data-holder-for="<?php echo $this->FG_TABLE_EDITION[$i][1];?>"></div>
 				    </div>
 				    <div class="clear"></div>
 			<?php
