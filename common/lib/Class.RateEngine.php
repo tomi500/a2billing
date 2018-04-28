@@ -1814,6 +1814,14 @@ $A2B -> debug( ERROR, $agi, __FILE__, __LINE__, "Out of length range destination
 				} else $cidresult = 0;
 				if (is_array($cidresult) && count($cidresult) > 0) {
 					$outcid = $cidresult[0][0];
+					$outcid = explode(',', $outcid);
+					$outcid = $outcid[rand(0,count($outcid)-1)];
+					$outcid = explode('-', $outcid);
+					if (count($outcid)==2) {
+						$outcid = rand($outcid[0],$outcid[1]);
+					} else {
+						$outcid = $outcid[0];
+					}
 				}
 
 				if ($typecall != 8 && (!$agi || $typecall == 9)) {
@@ -1952,7 +1960,7 @@ $A2B -> debug( ERROR, $agi, "", "", "\r                  CallBack for Trunk=$thi
 					$ast->log("ActionID = {$amicmd[5]} [#### Starting AMI WAIT_RESPONSE ####] $channel / res= ".var_export($res, true));
 					$response = $ast -> wait_response(true);
 					$this->dialstatus = $response[1];
-					if ($this->dialstatus == "ANSWER" && $amicmd[7] > 0) {
+					if ($this->dialstatus == "ANSWER" && $amicmd[7] >= 0) {
 						$res = $ast -> AbsoluteTimeout($response[2], $amicmd[7]);
 					}
 				    } else {

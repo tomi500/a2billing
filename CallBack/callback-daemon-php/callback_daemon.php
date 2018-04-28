@@ -188,7 +188,7 @@ while(true)
 {
     pcntl_wait($status, WNOHANG);
     $query="SELECT `id`,`status`,`exten_leg_a`,`account`,`callerid`,`exten`,`context`,`priority`,`variable`,`timeout`,`reason`,`num_attempts_unavailable`,`num_attempts_busy`,`num_attempts_noanswer`,".
-			"TIMEDIFF(now(),`callback_time`),`id_server_group`, `surveillance`, `inputa`, LEAST(IF(`max_attempt`<0,1,`max_attempt`-`num_attempt`),IFNULL(`inputb`,1)), `inputc`, `calleridprefix`, `calleridlength`, `flagringup`".
+			"TIMEDIFF(now(),`callback_time`),`id_server_group`, `surveillance`, `inputa`, LEAST(IF(`max_attempt`<0,1,`max_attempt`-`num_attempt`),IFNULL(`inputb`,1)), IFNULL(`inputc`,-1), `calleridprefix`, `calleridlength`, `flagringup`".
 		" FROM `cc_callback_spool` LEFT JOIN `cc_sheduler_ratecard` ON `id_callback`=`id`".
 		" WHERE `status`='PENDING' AND (`next_attempt_time`<=now() OR ISNULL(`next_attempt_time`)) AND (max_attempt=-1 OR num_attempt<max_attempt)".
 		" AND (flagringup=0 OR (`weekdays` LIKE CONCAT('%',WEEKDAY(CONVERT_TZ(NOW(),@@global.time_zone,localtz)),'%') AND (TIME(CONVERT_TZ(NOW(),@@global.time_zone,localtz)) BETWEEN `timefrom` AND `timetill`".
@@ -264,7 +264,6 @@ while(true)
 			$query="UPDATE `cc_callback_spool` SET `status`='PROCESSING',`num_attempt`=`num_attempt`+1,`last_attempt_time`=now(),`id_server`='$manager_id' WHERE `id`=$cc_id";
 		}
 		if (!$A2B->DBHandle->Execute($query)) die("Can't execute query '$query'\n");
-		if ($maxduration==0)	$maxduration = $A2B -> config['callback']['timeout'];
 		if ($calleridprefix) {
 			$prefixes = explode(",", $calleridprefix);
 			$countprefixes = count($prefixes) - 1;
@@ -274,7 +273,6 @@ while(true)
 			for($i = 0; $i < $chrs; $i++){
 			        $cc_callerid .= mt_rand(0,9);
 			}
-//write_log(LOGFILE_API_CALLBACK, basename(__FILE__) . ' line:' . __LINE__ ."cc_callerid= ". $cc_callerid);
 		}
 		$return=callback_engine($A2B, $manager_host.":5038", $manager_username, $manager_secret, array($cc_exten,$cc_priority,$cc_callerid,$cc_variable,$cc_account,$cc_id."-".$intid,$cc_context,$maxduration), $cc_exten_leg_a, $acc_tariff);
 		$timeout=-1;

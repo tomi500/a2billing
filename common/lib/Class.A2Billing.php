@@ -445,7 +445,7 @@ class A2Billing {
 		if (!isset($this->config['callback']['ani_callback_delay']))	$this->config['callback']['ani_callback_delay'] = '10';
 		if (!isset($this->config['callback']['extension']))		$this->config['callback']['extension'] = '1000';
 		if (!isset($this->config['callback']['sec_avoid_repeate']))	$this->config['callback']['sec_avoid_repeate'] = '30';
-		if (!isset($this->config['callback']['timeout']))		$this->config['callback']['timeout'] = '20';
+		if (!isset($this->config['callback']['timeout']))		$this->config['callback']['timeout'] = '50';
 		if (!isset($this->config['callback']['answer_call']))		$this->config['callback']['answer_call'] = '1';
 		if (!isset($this->config['callback']['nb_predictive_call']))	$this->config['callback']['nb_predictive_call'] = '10';
 		if (!isset($this->config['callback']['nb_day_wait_before_retry']))	$this->config['callback']['nb_day_wait_before_retry'] = '1';
