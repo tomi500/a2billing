@@ -231,6 +231,7 @@ ALTER TABLE cc_did_destination ADD playsound VARCHAR( 100 ) CHARACTER SET utf8 C
 ALTER TABLE cc_did_destination ADD timeout VARCHAR( 3 ) NOT NULL ;
 ALTER TABLE cc_did_destination ADD destinuse int(11) NOT NULL DEFAULT '0' AFTER `activated`;
 ALTER TABLE cc_did_destination ADD destmaxuse int(11) NOT NULL DEFAULT '-1' AFTER `destinuse`;
+ALTER TABLE cc_did_destination ADD calleridname VARCHAR( 40 ) CHARACTER SET utf8 COLLATE utf8_bin NULL DEFAULT NULL AFTER `destination`;
 
 ALTER TABLE cc_did ADD verify_did INT( 11 ) NOT NULL DEFAULT '0' AFTER `did`;
 ALTER TABLE cc_did ADD id_trunk INT( 11 ) NOT NULL DEFAULT '-1';

@@ -132,6 +132,15 @@ $HD_Form -> AddEditElement (gettext("DESTINATION"),
 	gettext("Insert the DID"),
 	"", "", "", "", "", "", "", gettext("Enter the phone number you wish to call, or the VoIP client to reach, or QUEUE to go. (ie: 347894999 or SIP/jeremy@182.212.1.45 or QUEUE myqueue,hknRt,,,300). If the call is VoIP or QUEUE, the 'VoIP_Call' must be set to yes."));
 
+$HD_Form -> AddEditElement (gettext("CALLERIDNAME"),
+	"calleridname",
+	'$value',
+	"INPUT",
+	"size=50 maxlength=40",
+	"",
+	gettext("Insert the CallerID Name"),
+	"", "", "", "", "", "", "NO-NULL", gettext("Enter CALLERID(name) if you wish to replace the caller name"));
+
 $HD_Form -> AddEditElement (gettext("TIMEOUT"),
 	"timeout",
 	'$value',
@@ -236,7 +245,7 @@ $HD_Form -> AddEditElement (gettext("CID_PRESENT"),
 	gettext("Choose 'Yes' if you want to present real CID though CID_GROUP applied"),
 	"" , "", "", gettext("Yes").":1, - ".gettext("No").":0", "", "", "", gettext("Choose 'Yes' if you want to present real CID though CID_GROUP applied"));
 **/
-	$HD_Form -> FieldEditElement ('activated, destination, timeout, voip_call, destinuse, destmaxuse, id_cc_card, id_cc_did, validated, priority, answer, playsound');
+	$HD_Form -> FieldEditElement ('activated, destination, calleridname, timeout, voip_call, destinuse, destmaxuse, id_cc_card, id_cc_did, validated, priority, answer, playsound');
 
 $HD_Form->FG_ADITION_HIDDEN_PARAM		= $HD_Form->FG_EDITION_HIDDEN_PARAM		= 'filterprefix,current_page';
 $HD_Form->FG_ADITION_HIDDEN_PARAM_VALUE 	= $HD_Form->FG_EDITION_HIDDEN_PARAM_VALUE	= $filterprefix.",".$current_page;

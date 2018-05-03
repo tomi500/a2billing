@@ -1648,6 +1648,7 @@ class A2Billing {
 			$this->dnid					= $inst_listdestination[10];
 			$this->margin					= $inst_listdestination[31];
 			$this->id_diller				= $inst_listdestination[32];
+			$calleridname					= $inst_listdestination[41];
 			$didvoicebox				= is_null($inst_listdestination[33]) ? NULL : $inst_listdestination[33]."@".$this->username;
 			
 			if ($this -> set_inuse_username) $this -> callingcard_acct_start_inuse($agi,0);
@@ -1725,6 +1726,8 @@ class A2Billing {
 					if ($CID_handover != $this->CallerID)
 						$agi -> set_variable('CALLERID(num)', $CID_handover);
 					$agi -> set_variable('CDR(accountcode)', $this->accountcode);
+					if (!is_null($calleridname))
+						$agi -> set_variable('CALLERID(name)', $calleridname);
 					//# Channel: technology/number@ip_of_gw_to PSTN
 					// Dial(IAX2/guest@misery.digium.com/s@default)
 					$this -> debug( INFO, $agi, __FILE__, __LINE__, "DIAL $dialstr");
