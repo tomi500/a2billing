@@ -1961,7 +1961,7 @@ $A2B -> debug( ERROR, $agi, "", "", "\r                  CallBack for Trunk=$thi
 					$response = $ast -> wait_response(true);
 					$this->dialstatus = $response[1];
 					if ($this->dialstatus == "ANSWER" && $amicmd[7] >= 0) {
-						$res = $ast -> AbsoluteTimeout($response[2], $amicmd[7]);
+						$res = $ast -> AbsoluteTimeout($response[2], $amicmd[7]-0.2);
 					}
 				    } else {
 					$this->dialstatus = "CHANUNAVAIL";

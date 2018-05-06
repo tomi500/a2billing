@@ -1821,7 +1821,7 @@ $this -> debug( ERROR, $agi, __FILE__, __LINE__, "[ \033[1;34m".$agi->get_variab
 						$QUERY = "SELECT regexten, id_cc_card FROM cc_sip_buddies WHERE name LIKE '{$inst_listdestination[4]}' LIMIT 1";
 						$result = $this -> instance_table -> SQLExec ($this->DBHandle, $QUERY);
 						if (is_array($result)) {
-							$this->calledexten = $result[0][0] != "" ? "'".$result[0][0]."'" : 'NULL';
+							$this->calledexten = ($result[0][0] != "") ? "'".$result[0][0]."'" : 'NULL';
 							$card_called = "'".$result[0][1]."'";
 						} else {
 							$this->calledexten = 'NULL';

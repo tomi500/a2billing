@@ -61,7 +61,8 @@ $HD_Form -> FG_TABLE_DEFAULT_SENS = "ASC";
 $HD_Form -> FG_VIEW_TABLE_WITDH = "65%";
 $HD_Form -> FG_FILTER_SEARCH_SESSION_NAME = 'entity_ratecard_selection';
 
-$HD_Form -> FG_TABLE_CLAUSE = "(tariffgroup_id = '".$_SESSION["tariff"]."' OR tariffname = '".$_SESSION["pr_login"]."') AND SUBSTRING(dialprefix,1,1) != '_' ";
+//$HD_Form -> FG_TABLE_CLAUSE = "(tariffgroup_id = '".$_SESSION["tariff"]."' OR tariffname = '".$_SESSION["pr_login"]."') AND SUBSTRING(dialprefix,1,1) != '_' ";
+$HD_Form -> FG_TABLE_CLAUSE = "(tariffgroup_id = '".$_SESSION["tariff"]."' OR tariffname = '".$_SESSION["pr_login"]."') AND CONCAT('',dialprefix * 1) = dialprefix AND startdate<= CURRENT_TIMESTAMP AND (stopdate > CURRENT_TIMESTAMP OR stopdate = 0) ";
 $HD_Form -> SQL_GROUP = "GROUP BY dialprefix";
 
 $HD_Form -> AddViewElement("<acronym title=\"DIALING PREFIX\">".gettext("PREFIX")."</acronym>", "dialprefix", "20%", "center", "sort", "");
