@@ -508,6 +508,29 @@ delimiter //
 create procedure a2b_trf_check()
 begin
     declare a int;
+    select count(*) into a from cc_config where config_key='google_speech_key';
+    if a=0 then
+	INSERT INTO cc_config (id, config_title, config_key, config_value, config_description, config_valuetype, config_listvalues, config_group_title)
+	VALUES	(NULL, 'Google Cloud Text-to-Speech API Key', 'google_tts_key', '', 'Your API Key for Google Cloud Text-to-Speech', 0, NULL, 'global'),
+		(NULL, 'Google Cloud Speech API Key', 'google_speech_key', '', 'Your API Key for Google Cloud Speech', 0, NULL, 'global');
+    elseif a>1 then
+	select id into a from cc_config where config_key='google_speech_key' order by id limit 0,1;
+	delete from cc_config where config_key='google_tts_key' and id>a;
+	delete from cc_config where config_key='google_speech_key' and id>a;
+    end if;
+end //
+
+delimiter ;
+
+call a2b_trf_check;
+
+drop procedure if exists a2b_trf_check;
+
+delimiter //
+
+create procedure a2b_trf_check()
+begin
+    declare a int;
     select count(*) into a from cc_config where config_key='startup_time';
     if a=0 then
 	INSERT INTO cc_config (id, config_title, config_key, config_value, config_description, config_valuetype, config_listvalues, config_group_title)
@@ -585,6 +608,8 @@ ALTER TABLE cc_callback_spool ADD `flagringup` int(11) DEFAULT '0';
 ALTER TABLE cc_callback_spool ADD `calleridprefix` CHAR( 255 ) CHARACTER SET utf8 COLLATE utf8_bin NOT NULL DEFAULT '';
 ALTER TABLE cc_callback_spool ADD `calleridlength` SMALLINT( 6 ) NOT NULL DEFAULT '13';
 ALTER TABLE cc_callback_spool ADD `localtz` CHAR( 40 ) CHARACTER SET utf8 COLLATE utf8_bin DEFAULT NULL;
+
+ALTER TABLE `cc_callback_spool` ADD INDEX `status` (`status`);
 
 ALTER TABLE cc_payment_methods ADD UNIQUE `SECONDARY` ( `payment_method` );
 INSERT IGNORE INTO cc_payment_methods (`payment_method`, `payment_filename`) VALUES
@@ -755,6 +780,23 @@ CREATE TABLE IF NOT EXISTS `cc_fax` (
   `printer_type` varchar(60) COLLATE utf8_bin NOT NULL,
   `printer_ip` varchar(60) COLLATE utf8_bin NOT NULL,
   PRIMARY KEY (`id`,`ext_num`)
+) ENGINE=MyISAM DEFAULT CHARSET=utf8 COLLATE=utf8_bin;
+
+CREATE TABLE IF NOT EXISTS `cc_greeting_records` (
+  `id` bigint(20) NOT NULL AUTO_INCREMENT,
+  `id_cc_card` int(11) NOT NULL DEFAULT '0',
+  `no_browther_cache` smallint(6) NOT NULL DEFAULT '1',
+  `technology` varchar(20) COLLATE utf8_bin NOT NULL,
+  `lang_locale` varchar(20) COLLATE utf8_bin NOT NULL,
+  `voice_name` varchar(30) COLLATE utf8_bin NOT NULL,
+  `gender` varchar(20) COLLATE utf8_bin NOT NULL,
+  `speed` varchar(4) COLLATE utf8_bin NOT NULL,
+  `greet_text` varchar(140) COLLATE utf8_bin NOT NULL,
+  `greet_filename` varchar(100) COLLATE utf8_bin NOT NULL,
+  `download_payed` smallint(6) NOT NULL DEFAULT '0',
+  `updatetime` TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
+  PRIMARY KEY (`id`),
+  UNIQUE `unikey` (`id_cc_card`, `greet_filename`)
 ) ENGINE=MyISAM DEFAULT CHARSET=utf8 COLLATE=utf8_bin;
 
 ALTER TABLE `cc_prefix` CHANGE `prefix` `prefix` BIGINT( 20 ) NOT NULL;

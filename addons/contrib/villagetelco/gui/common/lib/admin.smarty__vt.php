@@ -31,6 +31,8 @@
  * 
 **/
 
+use Factory\SmartyFactory;
+
 error_reporting(E_ALL ^ (E_NOTICE | E_WARNING));
 
 define( 'FULL_PATH', dirname(__FILE__) . '/' );
@@ -39,11 +41,12 @@ define( 'TEMPLATE_DIR',  '../Public/templates/' );
 define( 'TEMPLATE_C_DIR', '../templates_c/' );
 
 
-require_once SMARTY_DIR . 'Smarty.class.php';
-$smarty = new Smarty;
+$smarty = SmartyFactory::getInstance();
+
+$objProf  = new PhpQuickProfiler(0);
+$profiler = new PhpQuickProfiler($objProf->getMicroTime());
 
 $skin_name = $_SESSION["stylefile"];
-
 
 $smarty->template_dir = TEMPLATE_DIR . $skin_name.'/';
 

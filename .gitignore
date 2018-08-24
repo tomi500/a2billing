@@ -8,3 +8,8 @@
 /admin/Public/templates/default/footer.tpl
 /admin/Public/templates/default/index.tpl
 /customer/templates/default/index.tpl
+.idea/
+*.iml
+/common/lib/composer.lock
+/common/lib/composer.phar
+/common/lib/vendor/

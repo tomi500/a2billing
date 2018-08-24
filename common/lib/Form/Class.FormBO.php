@@ -525,6 +525,14 @@ class FormBO {
 		self::create_notification_signup();
 	}
 	
+	static public function processing_greeting_erase()
+	{
+		$FormHandler = FormHandler::GetInstance();
+		$processed = $FormHandler->getProcessed();
+		$voicename = DIR_STORE_AUDIO . "/" . $_SESSION["pr_login"] . "/" . $processed['greet_filename'];
+		@unlink($voicename);
+	}
+
 	static public function processing_sipiax_generate()
 	{
 		$FormHandler = FormHandler::GetInstance();

@@ -94,6 +94,7 @@ class A2Billing {
 	var $CallerIDext = '';
 	var $CID_handover = '';
 	var $cid_verify = true;
+	var $id_did = NULL;
 
 
 	/**
@@ -998,21 +999,23 @@ class A2Billing {
 			$this->src_peername = $this->transferername[0];
 		}
 	    }
-	    $QUERY = "SELECT regexten, concat_id, id_cc_card FROM cc_sip_buddies
+	    if ($call2did != -1) {
+		$QUERY = "SELECT regexten, concat_id, id_cc_card FROM cc_sip_buddies
 			LEFT JOIN cc_card_concat ON id_cc_card = concat_card_id
 			WHERE name = '{$this->src_peername}' AND regexten IS NOT NULL LIMIT 1";
-	    $result = $this -> instance_table -> SQLExec ($this->DBHandle, $QUERY);
-	    if (is_array($result)) {
-		if (!is_null($result[0][1]))
-			$this -> caller_concat_id = $result[0][1];
-		$this -> src = $this -> src_exten = $result[0][0];
-		$this -> card_caller = $result[0][2];
-		$this -> CID_handover	= '';
-	    } else {
-		$QUERY = "SELECT concat_id FROM cc_card_concat WHERE concat_card_id = {$this->id_card}";
 		$result = $this -> instance_table -> SQLExec ($this->DBHandle, $QUERY);
 		if (is_array($result)) {
+		    if (!is_null($result[0][1]))
+			$this -> caller_concat_id = $result[0][1];
+		    $this -> src = $this -> src_exten = $result[0][0];
+		    $this -> card_caller = $result[0][2];
+		    $this -> CID_handover	= '';
+		} else {
+		    $QUERY = "SELECT concat_id FROM cc_card_concat WHERE concat_card_id = {$this->id_card}";
+		    $result = $this -> instance_table -> SQLExec ($this->DBHandle, $QUERY);
+		    if (is_array($result)) {
 			$this -> caller_concat_id = $result[0][0];
+		    }
 		}
 	    }
 	}
@@ -1057,9 +1060,6 @@ class A2Billing {
 		else	$dest_wo_int_prefix = $this->destination;
 		if (strcmp($this->destination, $this->oldphonenumber) == 0) {
 			$this->destination = $this->apply_add_countryprefixto ($this->destination);
-//$this -> debug( ERROR, $agi, __FILE__, __LINE__, "==================================================== prefix_required = " . var_export($this->agiconfig['prefix_required'],true));
-//$this -> debug( ERROR, $agi, __FILE__, __LINE__, "==================================================== call2did        = " . var_export($call2did,true));
-//$this -> debug( ERROR, $agi, __FILE__, __LINE__, "=============== " . var_export($call2did,true));
 			if (($this->removeinterprefix || $this->agiconfig['prefix_required']) && $call2did===false && (strcmp($this->oldphonenumber, $this->destination) == 0 && !preg_match("/^[a-zA-Z]/", $this->oldphonenumber)) && !(preg_match("/^1[2-9]/", $this->oldphonenumber) && preg_match("/^[1a-zA-Z]/", $this->CallerID)) && strlen($this->oldphonenumber) > 5) {
 //				$agi -> answer();
 				$this -> let_stream_listening($agi);
@@ -1071,7 +1071,6 @@ class A2Billing {
 				return -1;
 			}
 		}
-//$this -> debug( ERROR, $agi, __FILE__, __LINE__, "================================ ".$this->oldphonenumber." => ".$dest_wo_int_prefix." => ".$this->destination);
 	}
 	if ($this->destination) {
 	    if (isset($this->transferername[0])) {
@@ -4237,7 +4236,7 @@ $this -> debug( ERROR, $agi, __FILE__, __LINE__, "FAXRESOLUTION: ".$faxresolutio
 	{
 		$ADODB_CACHE_DIR = '/tmp';
 		/*	$ADODB_FETCH_MODE = ADODB_FETCH_ASSOC;	*/
-		require_once('adodb/adodb.inc.php');
+//		require_once('adodb/adodb.inc.php');
 
 		if ($this->config['database']['dbtype'] == "postgres") {
 			$datasource = 'pgsql://'.$this->config['database']['user'].':'.$this->config['database']['password'].'@'.$this->config['database']['hostname'].'/'.$this->config['database']['dbname'];

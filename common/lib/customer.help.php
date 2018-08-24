@@ -99,7 +99,8 @@ if (!isset ($currencies_list[strtoupper($customer_info[2])][2]) || !is_numeric($
 }
 
 $credit_cur = $customer_info[1] / $mycur;
-$credit_cur = round($credit_cur, 5).' '.gettext($customer_info[2]);
+//$credit_cur = round($credit_cur, 5).' '.gettext($customer_info[2]);
+$credit_cur = display_refill_money($credit_cur,gettext($customer_info[2]),false);
 if ($credit_cur < 0) {
 	$limit_cur = $customer_info[0] / $mycur;
 	if ($limit_cur) $limit_cur = round($limit_cur, 2).' '.gettext($customer_info[2]);

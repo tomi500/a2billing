@@ -396,7 +396,7 @@ $list_language = Constants::getLanguagesList();
 	<?php echo gettext("Yes");?> <input class="form_input_checkbox" name="runservice" value="1" <?php if($runservice==1) echo "checked='checked'" ?> type="radio"> - <?php echo gettext("No");?> <input class="form_input_checkbox" name="runservice" value="0" <?php if($runservice==0 || empty($runservice) ) echo "checked='checked'" ?>  type="radio">
 	</li>
 	<li>
-   <?php echo gettext("Create SIP/IAX Friends");?>&nbsp;: <?php echo gettext("SIP")?> <input class="form_input_checkbox" type="checkbox" name="sip" value="1" <?php if($sip==1) echo "checked" ?> onclick="onoff.call(this)"> <?php echo gettext("IAX")?> : <input class="form_input_checkbox" type="checkbox" name="iax" value="1" <?php if($iax==1 ) echo "checked ";?>disabled readonly title="Temporary out of service">
+   <?php echo gettext("Create SIP/IAX Extension");?>&nbsp;: <?php echo gettext("SIP")?> <input class="form_input_checkbox" type="checkbox" name="sip" value="1" <?php if($sip==1) echo "checked" ?> onclick="onoff.call(this)"> <?php echo gettext("IAX")?> : <input class="form_input_checkbox" type="checkbox" name="iax" value="1" <?php if($iax==1 ) echo "checked ";?>disabled readonly title="Temporary out of service">
 	</li>
 	<div style="display:<?php if($sip==1) echo "block"; else echo "none";?>" id="ddd">
 	<li>

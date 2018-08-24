@@ -27,17 +27,16 @@ function openURLFilter(theLINK)
 </script>
 
 <div style="" align="center">
-<table width="100%" border="0" cellpadding="0" cellspacing="0">
+<table width="<?php echo $this->FG_VIEW_TABLE_WITDH; ?>" border="0" cellpadding="0" cellspacing="0">
 <?php
-if( !($popup_select>=1) &&($this->FG_LIST_ADDING_BUTTON1 || $this->FG_LIST_ADDING_BUTTON2)) {
+if( !($popup_select>=1) && ($this->FG_LIST_ADDING_BUTTON1 || $this->FG_LIST_ADDING_BUTTON2) && (strlen($this -> FG_LIST_ADDING_BUTTON_MSG1)>0 || !is_array($list))) {
 	?>
 	<tr><td align="right">
 		<?php if($this->FG_LIST_ADDING_BUTTON1) {?>
-			<a href="<?php echo $this -> FG_LIST_ADDING_BUTTON_LINK1	?>"> <?php echo $this -> FG_LIST_ADDING_BUTTON_MSG1?>&nbsp;&nbsp;<img src="<?php echo $this -> FG_LIST_ADDING_BUTTON_IMG1?>" border="0" title="<?php echo $this->FG_LIST_ADDING_BUTTON_ALT1?>" alt="<?php echo $this->FG_LIST_ADDING_BUTTON_ALT1?>"></a>
+			<a href="<?php echo $this -> FG_LIST_ADDING_BUTTON_LINK1	?>"><?php if ($this -> FG_LIST_ADDING_BUTTON_MSG1) echo $this -> FG_LIST_ADDING_BUTTON_MSG1."&nbsp;&nbsp;"?><img src="<?php echo $this -> FG_LIST_ADDING_BUTTON_IMG1?>" border="0" title="<?php echo $this->FG_LIST_ADDING_BUTTON_ALT1?>" alt="<?php echo $this->FG_LIST_ADDING_BUTTON_ALT1?>"></a>
 		<?php  } //END IF ?>
 		<?php if($this->FG_LIST_ADDING_BUTTON2) {?>
-			&nbsp;
-			<a href="<?php echo $this -> FG_LIST_ADDING_BUTTON_LINK2	?>"> <?php echo $this -> FG_LIST_ADDING_BUTTON_MSG2?>&nbsp;&nbsp;<img src="<?php echo $this -> FG_LIST_ADDING_BUTTON_IMG2?>" border="0" title="<?php echo $this->FG_LIST_ADDING_BUTTON_ALT2?>" alt="<?php echo $this->FG_LIST_ADDING_BUTTON_ALT2?>"></a>
+			<a href="<?php echo $this -> FG_LIST_ADDING_BUTTON_LINK2	?>"><?php if ($this -> FG_LIST_ADDING_BUTTON_MSG2) echo "&nbsp;".$this -> FG_LIST_ADDING_BUTTON_MSG2."&nbsp;&nbsp;"?><img src="<?php echo $this -> FG_LIST_ADDING_BUTTON_IMG2?>" border="0" title="<?php echo $this->FG_LIST_ADDING_BUTTON_ALT2?>" alt="<?php echo $this->FG_LIST_ADDING_BUTTON_ALT2?>"></a>
 		<?php  } //END IF ?>
 	</td></tr>
 	<?php
@@ -48,7 +47,7 @@ if ((count($list)>0) && is_array($list)){
 ?>
 
 	<tr><td align="center">
-	<table width="<?php echo $this->FG_VIEW_TABLE_WITDH; ?>" border="0" cellpadding="0" cellspacing="0">
+	<table width="100%" border="0" cellpadding="0" cellspacing="0">
 	  <?php  IF ($this -> CV_DISPLAY_LINE_TITLE_ABOVE_TABLE){ ?>
 		<TR>
 		<TD class="tdstyle_002"><span>
@@ -100,6 +99,11 @@ if ((count($list)>0) && is_array($list)){
 		    <tr>
 		    <td><span class="viewhandler_span2"> - <?php echo $this->CV_TITLE_TEXT ?>  - </span>
 			<span class="viewhandler_span1"> <?php echo $this -> FG_NB_RECORD.' '.gettext("Records"); ?></span>
+		<?php if($this->FG_LIST_ADDING_BUTTON1 &&  strlen($this -> FG_LIST_ADDING_BUTTON_MSG1)==0) {?>
+			<a href="<?php echo $this -> FG_LIST_ADDING_BUTTON_LINK1;?>"><img src="<?php echo $this -> FG_LIST_ADDING_BUTTON_IMG1?>" valign="bottom" border="0" title="<?php echo $this->FG_LIST_ADDING_BUTTON_ALT1?>" alt="<?php echo $this->FG_LIST_ADDING_BUTTON_ALT1?>"></a>
+		<?php if($this->FG_LIST_ADDING_BUTTON2) {?>
+			<a href="<?php echo $this -> FG_LIST_ADDING_BUTTON_LINK2;?>"><img src="<?php echo $this -> FG_LIST_ADDING_BUTTON_IMG2?>" valign="bottom" border="0" title="<?php echo $this->FG_LIST_ADDING_BUTTON_ALT2?>" alt="<?php echo $this->FG_LIST_ADDING_BUTTON_ALT2?>"></a>
+		<?php }} ?>
 		    </td>
 		    <td align="right">
 		    <span class="viewhandler_span2">
@@ -425,6 +429,7 @@ if ((count($list)>0) && is_array($list)){
 					  		?>
 							<a href="<?php
 								$new_FG_OTHER_BUTTON1_LINK = $this -> FG_OTHER_BUTTON1_LINK;
+								$new_FG_OTHER_BUTTON1_IMG = $this -> FG_OTHER_BUTTON1_IMG;
 								// we should depreciate |param| and only use |col|
 								if (strpos($this -> FG_OTHER_BUTTON1_LINK,"|param|")){
 									$new_FG_OTHER_BUTTON1_LINK = str_replace("|param|",$list[$ligne_number][$this->FG_NB_TABLE_COL],$this -> FG_OTHER_BUTTON1_LINK);
@@ -441,6 +446,17 @@ if ((count($list)>0) && is_array($list)){
 										$pos = stripos($new_FG_OTHER_BUTTON1_LINK, $findme);
 										if ($pos !== false) {
 											$new_FG_OTHER_BUTTON1_LINK = str_replace($findme,$list[$ligne_number][$h],$new_FG_OTHER_BUTTON1_LINK);
+										}
+									}
+								}
+
+								// REPLACE |colX|  where is a numero of the column by the column value
+								if ((preg_match ('/col[0-9]/i', $new_FG_OTHER_BUTTON1_IMG))) {
+									for ($h=count($list[$ligne_number]);$h>=0;$h--) {
+										$findme = "|col$h|";
+										$pos = stripos($new_FG_OTHER_BUTTON1_IMG, $findme);
+										if ($pos !== false) {
+											$new_FG_OTHER_BUTTON1_IMG = str_replace($findme,$list[$ligne_number][$h],$new_FG_OTHER_BUTTON1_IMG);
 										}
 									}
 								}
@@ -480,7 +496,7 @@ if ((count($list)>0) && is_array($list)){
 								if (strlen($this -> FG_OTHER_BUTTON1_IMG)==0) {
 									echo '"'.$extra_html.'> '.'<span class="cssbutton">'.$this->FG_OTHER_BUTTON1_ALT.'</span>';
 								} else {
-									?>"<?php echo $extra_html ?>><img src="<?php echo $this -> FG_OTHER_BUTTON1_IMG?>" border="0" title="<?php echo $this->FG_OTHER_BUTTON1_ALT?>" alt="<?php echo $this->FG_OTHER_BUTTON1_ALT?>"><?php
+									?>"<?php echo $extra_html ?>><img src="<?php echo $new_FG_OTHER_BUTTON1_IMG?>" border="0" title="<?php echo $this->FG_OTHER_BUTTON1_ALT?>" alt="<?php echo $this->FG_OTHER_BUTTON1_ALT?>"><?php
 								}
 								?></a>
 						<?php } 
@@ -506,6 +522,7 @@ if ((count($list)>0) && is_array($list)){
 							?>
 							<a href="<?php
 								$new_FG_OTHER_BUTTON2_LINK = $this -> FG_OTHER_BUTTON2_LINK;
+								$new_FG_OTHER_BUTTON2_IMG = $this -> FG_OTHER_BUTTON2_IMG;
 								if (strpos($this -> FG_OTHER_BUTTON2_LINK,"|param|")){
 									$new_FG_OTHER_BUTTON2_LINK = str_replace("|param|",$list[$ligne_number][$this->FG_NB_TABLE_COL],$this -> FG_OTHER_BUTTON2_LINK);
 									// SHOULD DO SMTH BETTER WITH paramx and get the x number to find the value to use
@@ -521,6 +538,17 @@ if ((count($list)>0) && is_array($list)){
 										$pos = stripos($new_FG_OTHER_BUTTON2_LINK, $findme);
 										if ($pos !== false) {
 											$new_FG_OTHER_BUTTON2_LINK = str_replace($findme,$list[$ligne_number][$h],$new_FG_OTHER_BUTTON2_LINK);
+										}
+									}
+								}
+
+								// REPLACE |colX|  where is a numero of the column by the column value
+								if ((preg_match ('/col[0-9]/i', $new_FG_OTHER_BUTTON2_IMG))) {
+									for ($h=count($list[$ligne_number]);$h>=0;$h--) {
+										$findme = "|col$h|";
+										$pos = stripos($new_FG_OTHER_BUTTON2_IMG, $findme);
+										if ($pos !== false) {
+											$new_FG_OTHER_BUTTON2_IMG = str_replace($findme,$list[$ligne_number][$h],$new_FG_OTHER_BUTTON2_IMG);
 										}
 									}
 								}
@@ -562,8 +590,7 @@ if ((count($list)>0) && is_array($list)){
 								if (strlen($this -> FG_OTHER_BUTTON2_IMG)==0){
 									echo '"'.$extra_html.'> '.'<span class="cssbutton">'.$this->FG_OTHER_BUTTON2_ALT.'</span>';
 								}else{
-									?>" <?php echo $extra_html ?> ><img src="<?php echo $this -> FG_OTHER_BUTTON2_IMG?>" border="0" title="<?php echo $this->FG_OTHER_BUTTON2_ALT?>" alt="<?php echo $this->FG_OTHER_BUTTON2_ALT?>"><?php
-
+									?>"<?php echo $extra_html ?>><img src="<?php echo $new_FG_OTHER_BUTTON2_IMG?>" border="0" title="<?php echo $this->FG_OTHER_BUTTON2_ALT?>" alt="<?php echo $this->FG_OTHER_BUTTON2_ALT?>"><?php
 								}
 								?></a>
 						<?php }

@@ -1223,10 +1223,10 @@ msgstr "ТЕЛЕФОН"
 #: form_data/FG_var_campaign.inc:294 form_data/FG_var_speeddial.inc:117
 #: form_data/FG_var_phonebook.inc:108 form_data/FG_var_phonenumber.inc:143
 msgid "You can modify, through the following form, the different properties of your"
-msgstr "Вы можете изменить , используя форму, разные свойства "
+msgstr "Вы можете изменить, используя форму, разные свойства "
 
 #: form_data/FG_var_callerid.inc:115 lib/Form/Class.FormHandler.inc.php:553
-msgid "You can modify, through the following form, the different properties of your CallerID"
+msgid "You can modify here different properties of your CallerID"
 msgstr "Вы можете изменить разные свойства номера"
 
 #: form_data/FG_var_campaign.inc:299

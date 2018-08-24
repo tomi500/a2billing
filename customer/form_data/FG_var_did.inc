@@ -60,6 +60,20 @@ $validated_list = array();
 $validated_list["0"] = array( gettext("Pending"), "0");
 $validated_list["1"] = array( gettext("Validated"), "1");
 
+$diraudio = DIR_STORE_AUDIO."/" . $_SESSION["pr_login"] . "/";
+$soundlist = array();
+$soundlist[] = array(gettext("NOT ACTIVE")."&nbsp", "");
+$return = scandir($diraudio);
+if ($return!==false) {
+        foreach ($return as $val) {
+            if (is_file($diraudio.$val) && $val != 'tempplay.wav') {
+                $soundlist[] = array(preg_replace('/\.[^\.\/]+$/', '', $val),$_SESSION["pr_login"]."/".preg_replace('/\.[^\.\/]+$/', '', $val));
+            }
+        }
+}
+//echo $diraudio."<br>";
+//print_r($return);
+
 $HD_Form -> AddViewElement(gettext("DID"), "id_cc_did", "15%", "center", "sort", "30", "lie", "cc_did", "did", "id='%id'", "%1");
 $HD_Form -> AddViewElement(gettext("ACTIVATED"), "t1.activated", "10%", "center", "sort", "", "list", $actived_list);
 $HD_Form -> AddViewElement(gettext("PRIORITY"), "priority", "10%", "center", "sort", "", "list", $priority_list);
@@ -117,7 +131,8 @@ $HD_Form -> CV_TEXT_TITLE_ABOVE_TABLE = '';
 $HD_Form -> CV_DISPLAY_FILTER_ABOVE_TABLE = false;
 $HD_Form -> FG_LIMITE_DISPLAY = 14;
 
-if ($_SESSION["card_id"] == 6) $HD_Form -> FG_EDITION = true;
+//if ($_SESSION["card_id"] == 6) 
+$HD_Form -> FG_EDITION = true;
 $HD_Form -> FG_DELETION = false;
 $HD_Form -> FG_ADDITION = true;
 $HD_Form -> FG_OTHER_BUTTON1 = false;
@@ -135,21 +150,31 @@ $HD_Form -> AddEditElement (gettext("ACTIVATED"),
 
 if (isset($form_action) && ($form_action=='ask-edit' || $form_action=='ask-delete')) {
 
+$HD_Form -> AddEditElement (gettext("DID"),
+	"id_cc_did",
+	'$value',
+	"SELECT",
+	"readonly", "", "",
+	"sql",
+	"cc_did",
+	"did, id",
+	"id=(SELECT id_cc_did FROM cc_did_destination WHERE id='%id')", "", "%1", "" , "");
+
     $HD_Form -> AddEditElement (gettext("DESTINATION"),
 	    "destination",
 	    '$value',
 	    "INPUT",
-	    "size=50 maxlength=120",
+	    "size=120 maxlength=120 readonly",
 	    "0",
 	    "Insert the Destination",
-	    "" , "", "", "", "" , "", "", gettext("Enter here the phonenumber you wish to call or the SIP/IAX/H323 peer to reach (ie: 347894999 or SIP/jeremy@182.212.1.45). To call SIP/IAX/H323 peer, you need to enable the voip_call below (voip_call = Yes) "));
+	    "" , "", "", "", "" , "", "");//, gettext("Enter here the phonenumber you wish to call or the SIP/IAX/H323 peer to reach (ie: 347894999 or SIP/jeremy@182.212.1.45). To call SIP/IAX/H323 peer, you need to enable the voip_call below (voip_call = Yes) "));
 }
 
 $HD_Form -> AddEditElement (gettext("TIMEOUT"),
 	"timeout",
 	'$value',
 	"INPUT",
-	"size=50 maxlength=3",
+	"size=10 maxlength=3",
 	"22",
 	gettext("Insert max 3 digits"),
 	"", "", "", "", "", "", "", gettext("Maximum time, in seconds, that the Dial command is to wait for a channel to answer"));
@@ -181,23 +206,32 @@ $HD_Form -> AddEditElement (gettext("ANSWER"),
 	gettext("Choose 'Yes' if you want to answer on the call"),
 	"" , "", "", gettext("Yes").":1, - ".gettext("No").":0", "", "", "", gettext("Choose if you want to answer on the call before playing PLAY_SOUND"));
 
+if (isset($form_action) && $form_action=="ask-edit") {
+	$instance_table = new Table("cc_did_destination", "playsound");
+	$clause = "id = $id";
+	$list = $instance_table -> Get_list($DBHandle_max, $clause, 0);;
+	if (is_array($list) && count($list)>0) {
+		$playsound = preg_replace('/\.[^\.\/]+$/', '', basename($list[0][0]));
+		$selectedgreeting = ($playsound && array_search($playsound,array_column($soundlist,0))===false) ? "<OPTION  value=\"$playsound\" selected>".$playsound."&nbsp;</OPTION>" : NULL;
+	} else	$selectedgreeting = NULL;
+} else		$selectedgreeting = NULL;
 $HD_Form -> AddEditElement (gettext("PLAY_SOUND"),
 	"playsound",
 	'$value',
-	"INPUT",
-	"size=50 maxlength=50",
+	"SELECT",
+	"",
 	"",
 	gettext("Insert the path and name of sound file"),
-	"" , "", "", "", "", "", "", gettext("Play sound before calling DESTINATION. ie 'ivr/wait-please'"));
+	"list", "", "", "", $soundlist, "%1", "", gettext("Play sound before calling DESTINATION."), NULL, $selectedgreeting);
 
 if (isset($form_action) && ($form_action=='ask-edit' || $form_action=='ask-delete')) {
-    $HD_Form -> FieldEditElement ('activated, destination, timeout, voip_call, priority, answer, playsound');
+    $HD_Form -> FieldEditElement ('activated, id_cc_did, destination, timeout, voip_call, priority, answer, playsound');
 } else {
     $HD_Form -> FG_QUERY_EDITION_HIDDEN_FIELDS = "destination, validated, voip_call";
     $HD_Form -> FG_QUERY_EDITION_HIDDEN_VALUE = "$destination, $validated, $voip_call";
 }
 
-$HD_Form -> FG_INTRO_TEXT_EDITION= '';
+$HD_Form -> FG_INTRO_TEXT_EDITION= gettext("You can modify, through the following form, the different properties of your DID number <b>".$number."</b>");
 $HD_Form -> FG_INTRO_TEXT_ASK_DELETION = gettext("If you really want remove this")." ".$HD_Form->FG_INSTANCE_NAME.", ".gettext("click on the delete button.");
 $HD_Form -> FG_INTRO_TEXT_ADD = gettext("you can add easily a new")." ".$HD_Form->FG_INSTANCE_NAME.".<br>".gettext("Fill the following fields and confirm by clicking on the button add.");
 

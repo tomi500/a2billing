@@ -39,8 +39,6 @@
 	{/if}
 	<ul>
 		<li><ul>
-			<li><a href="A2B_entity_fax.php?section=15&form_action=list"><strong>{php} echo gettext("VIRTUAL FAX");{/php}</strong></a></li>
-
 			{if $ACXSIP_IAX >0 }
 				<li><a href="A2B_entity_sipiax_info.php?section=15"><strong>{php} echo gettext("EXTENSIONS ");{/php}</strong></a></li>
 				<li><a href="A2B_entity_sipiax_info.php?section=15"><strong>{php} echo gettext("Outbound call plan");{/php}</strong></a></li>
@@ -49,7 +47,8 @@
 				<li><a href="A2B_entity_did_info.php?section=15"><strong>{php} echo gettext("EXTERNAL LINES");{/php}</strong></a></li>
 				<li><a href="A2B_entity_did.php?section=15&form_action=list"><strong>{php} echo gettext("Incoming call plan and IVR");{/php}</strong></a></li>
 			{/if}
-
+			<li><a href="A2B_entity_fax.php?section=15&form_action=list"><strong>{php} echo gettext("VIRTUAL FAX");{/php}</strong></a></li>
+			<li><a href="A2B_entity_greeting.php?section=15&form_action=list"><strong>{php} echo gettext("VOICE GREETINGS");{/php}</strong></a></li>
 		</ul></li>
 	</ul>
 	</div>

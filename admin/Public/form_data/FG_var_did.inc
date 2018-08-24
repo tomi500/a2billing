@@ -80,7 +80,7 @@ if (is_array($return)) {
     $return = scandir(DIR_STORE_AUDIO."/$username/");
     if ($return!==false) {
 	foreach ($return as $val) {
-	    if ($val != "." && $val != "..") {
+	    if (is_file(DIR_STORE_AUDIO."/$username/".$val) && $val != 'tempplay.wav') {
 //echo preg_replace('/\.[^\.\/]+$/', '', $val)."<br>";
 		$soundlist[] = array(preg_replace('/\.[^\.\/]+$/', '', $val),$username."/".preg_replace('/\.[^\.\/]+$/', '', $val));
 	    }

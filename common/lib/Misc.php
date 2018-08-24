@@ -368,14 +368,17 @@ function display_money($value, $currency = BASE_CURRENCY) {
 	echo number_format($body[0], 2, '.', ' ') . ' ' . mb_strtoupper($currency);
 }
 
-function display_refill_money($value, $currency = BASE_CURRENCY) {
+function display_refill_money($value, $currency = BASE_CURRENCY, $echoreturn = true) {
 	$body = explode(" ", $value);
 	if (isset($body[1]))
 		$currency = $body[1];
 	$tempval = 100*abs($value-floor($value));
 	$value = number_format($value, 5, '.', '');
 	$value = (round($tempval-floor($tempval),5) == 0) ? number_format($value, 2, '.', ' ') : rtrim(number_format($value, 5, '.', ' '), '0');
-	echo $value . ' ' . mb_strtoupper($currency);
+	if ($echoreturn)
+	    echo $value . ' ' . mb_strtoupper($currency);
+	else
+	    return $value . ' ' . mb_strtoupper($currency);
 }
 
 function display_money_nocur($var, $currency = BASE_CURRENCY) {

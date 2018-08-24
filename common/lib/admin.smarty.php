@@ -31,23 +31,25 @@
  * 
 **/
 
+//use Factory\SmartyFactory;
+
 error_reporting(E_ALL ^ (E_NOTICE | E_WARNING));
 
 define( 'FULL_PATH', dirname(__FILE__) . '/' );
-define( 'SMARTY_DIR', FULL_PATH . '/smarty/' );
+define( 'SMARTY_DIR', '../lib/vendor/smarty/smarty/libs/' );
 define( 'TEMPLATE_DIR',  '../Public/templates/' );
 define( 'TEMPLATE_C_DIR', '../templates_c/' );
 
 
-require_once SMARTY_DIR . 'Smarty.class.php';
-$smarty = new Smarty;
+require_once SMARTY_DIR . 'SmartyBC.class.php';
+$smarty = new SmartyBC();
 
 $skin_name = $_SESSION["stylefile"];
 
 
-$smarty->template_dir = TEMPLATE_DIR . $skin_name.'/';
-$smarty->compile_dir = TEMPLATE_C_DIR;
-$smarty->plugins_dir= "./plugins/";
+$smarty->setTemplateDir(TEMPLATE_DIR . $skin_name.'/');
+$smarty->setCompileDir(TEMPLATE_C_DIR);
+$smarty->setPluginsDir("./plugins/");
 
 $smarty->assign("TEXTCONTACT", TEXTCONTACT);
 $smarty->assign("EMAILCONTACT", EMAILCONTACT);

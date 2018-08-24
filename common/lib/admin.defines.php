@@ -31,6 +31,8 @@
  * 
 **/
 
+require_once ('vendor/autoload.php');
+
 define ("PHP_QUICK_PROFILER", false);
 // Include PHP-Quick-Profiler
 require_once('PhpQuickProfiler.php');
@@ -45,7 +47,7 @@ define ("LIBDIR", FSROOT."lib/");
 
 include_once (FSROOT."lib/interface/constants.php");
 include_once (dirname(__FILE__)."/Class.A2Billing.php");
-require_once('adodb/adodb.inc.php'); // AdoDB
+//require_once('adodb/adodb.inc.php'); // AdoDB
 include_once (dirname(__FILE__)."/Class.Table.php");
 include_once (dirname(__FILE__)."/Class.Connection.php");
 include_once (dirname(__FILE__)."/Class.Realtime.php");
@@ -114,6 +116,8 @@ define("DEMO_MODE", false);
 define("ASTERISK_GUI_LINK", false);
 
 
+define ("GOOGLE_TTS_KEY", isset($A2B->config['global']['google_tts_key'])?$A2B->config['global']['google_tts_key']:null);
+define ("GOOGLE_SPEECH_KEY", isset($A2B->config['global']['google_speech_key'])?$A2B->config['global']['google_speech_key']:null);
 define ("LEN_ALIASNUMBER", isset($A2B->config['global']['len_aliasnumber'])?$A2B->config['global']['len_aliasnumber']:null);
 define ("LEN_VOUCHER", isset($A2B->config['global']['len_voucher'])?$A2B->config['global']['len_voucher']:null);
 define ("BASE_CURRENCY", isset($A2B->config['global']['base_currency'])?$A2B->config['global']['base_currency']:null);

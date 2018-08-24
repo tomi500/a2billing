@@ -63,7 +63,7 @@ function keytoDownNumber(e,id_el)
 {
 	if (e.keyCode!=13) {
 		var key = (typeof e.charCode == 'undefined' ? e.keyCode : e.charCode);
-		if (e.ctrlKey || e.altKey || key < 58)  {
+		if (e.ctrlKey || e.altKey || (key>47 && key<58) || key==0)  {
 			document.getElementById(id_el).style.color = "blue";
 			return true;
 		}

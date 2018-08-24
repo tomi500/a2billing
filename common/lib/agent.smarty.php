@@ -46,11 +46,9 @@ $smarty = new Smarty;
 
 $skin_name = $_SESSION["stylefile"];
 
-
-$smarty->template_dir = TEMPLATE_DIR . $skin_name.'/';
-
-$smarty->compile_dir = TEMPLATE_C_DIR;
-$smarty->plugins_dir= "./plugins/";
+$smarty->setTemplateDir(TEMPLATE_DIR . $skin_name.'/');
+$smarty->setCompileDir(TEMPLATE_C_DIR);
+$smarty->setPluginsDir("./plugins/");
 
 $smarty->assign("TEXTCONTACT", TEXTCONTACT);
 $smarty->assign("EMAILCONTACT", EMAILCONTACT);

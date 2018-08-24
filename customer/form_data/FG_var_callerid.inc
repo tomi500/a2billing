@@ -304,7 +304,7 @@ if (isset($filterprefix)  &&  (strlen($filterprefix)>0)) {
 
 $HD_Form -> CV_FOLLOWPARAMETERS = "&popup_select=$popup_select&idcust=$idcust&displayheader=0";
 
-$HD_Form -> FG_INTRO_TEXT_EDITION= gettext("You can modify, through the following form, the different properties of your CallerID");
+$HD_Form -> FG_INTRO_TEXT_EDITION= gettext("You can modify here different properties of your CallerID");
 $HD_Form -> FG_INTRO_TEXT_ASK_DELETION = gettext("If you really want remove this")." ".$HD_Form->FG_INSTANCE_NAME.", ".gettext("click on the delete button.");
 $HD_Form -> FG_INTRO_TEXT_ADD = gettext("you can add easily a new")." ".$HD_Form->FG_INSTANCE_NAME.".<br>".gettext("Fill the following fields and confirm by clicking on the button add.");
 
