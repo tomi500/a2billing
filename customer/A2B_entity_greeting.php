@@ -97,7 +97,7 @@ if ($play==1 || $play==3) {
 	    ]
 	];
 	try {
-	    $response = $client->request('POST', 'https://texttospeech.googleapis.com/v1beta1/text:synthesize?key=' . GOOGLE_TTS_KEY, ['json' => $requestData]);
+	    $response = $client->request('POST', 'https://texttospeech.googleapis.com/v1/text:synthesize?key=' . GOOGLE_TTS_KEY, ['json' => $requestData]);
 	} catch (Exception $e) {
 	    die('Something went wrong');//: ' . $e->getMessage());
 	}
@@ -163,15 +163,12 @@ if (isset($soundlist) && count($soundlist)>0) {
 }
 
 try {
-    $response = $client->request('GET', 'https://texttospeech.googleapis.com/v1beta1/voices?key=' . GOOGLE_TTS_KEY);//, ['json' => $requestData]);
+    $response = $client->request('GET', 'https://texttospeech.googleapis.com/v1/voices?key=' . GOOGLE_TTS_KEY);
 } catch (Exception $e) {
     die('Something went wrong, e.g. make sure that GOOGLE_TTS_KEY is setted.');//: ' . $e->getMessage());
 }
 $fileData = json_decode($response->getBody()->getContents(), true);
 
-//file_put_contents('tts.mp3', base64_decode($fileData['audioContent']));
-
-//echo var_export($fileData,true);
 foreach ($fileData['voices'] as $eachvoice) {
 	$langlist[]=$eachvoice['languageCodes'][0];
 }
@@ -180,13 +177,14 @@ sort($langlist);
 
 foreach ($langlist as $eachvoice) {
 	foreach ($fileData['voices'] as $eachname) {
-		if ($eachname['languageCodes'][0]==$eachvoice)
+		if ($eachname['languageCodes'][0]==$eachvoice) {
 			$voicenamelist[$eachvoice][] = array(0 => $eachname['name'], 1 => $eachname['ssmlGender'], 2 => $eachname['naturalSampleRateHertz']);
+			$wavesort[] = (strpos($eachname['name'],'Wavenet'))?0:1;
+		}
 	}
-	sort($voicenamelist[$eachvoice]);
+	array_multisort($wavesort,$voicenamelist[$eachvoice]);
+	unset($wavesort);
 }
-
-//print_r($voicenamelist);
 
 if ($id!="" || !is_null($id)) {
 	$HD_Form -> FG_EDITION_CLAUSE = str_replace("%id", "$id", $HD_Form -> FG_EDITION_CLAUSE);
