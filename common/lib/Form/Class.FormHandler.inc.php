@@ -476,6 +476,7 @@ class FormHandler
     //Foreign Key Delete Message Display, it will display the confirm delete dialog if there is some
     //some detail table exists. depends on the values of FG_FK_DELETE_ALLOWED
     var $FG_FK_DELETE_CONFIRM = false;
+    var $FG_FK_DELETE_BUTTON_IF_DEPENDENT = true;
 
     //Foreign Key Records Count
     var $FG_FK_RECORDS_COUNT = 0;

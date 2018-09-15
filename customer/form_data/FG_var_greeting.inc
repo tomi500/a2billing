@@ -81,6 +81,15 @@ $HD_Form -> FG_ADDITION = false;
 $HD_Form -> FG_EDITION = false;
 $HD_Form -> FG_DELETION = true;
 
+$HD_Form -> FG_FK_DELETE_ALLOWED = true;
+$HD_Form -> FG_FK_DELETE_CONFIRM = true;
+$HD_Form -> FG_FK_DELETE_BUTTON_IF_DEPENDENT = false;
+$HD_Form -> FG_FK_WARNONLY = true;
+$HD_Form -> FG_FK_TABLENAMES = array("cc_did_destination");
+$HD_Form -> FG_FK_EDITION_CLAUSE = array("INSTR(playsound, (SELECT SUBSTRING_INDEX(greet_filename, '.', 1) FROM cc_greeting_records WHERE id = '%id'))>0 AND '%id'");
+
+$HD_Form -> FG_FK_DELETE_MESSAGE = gettext("There are some inbound DID destinations where this greeting message included.<br>Please edit the dependent destinations first.");
+
 $HD_Form -> FG_OTHER_BUTTON1 = true;
 $HD_Form -> FG_OTHER_BUTTON1_CONDITION = '"|col1|" != ""';
 $HD_Form -> FG_OTHER_BUTTON2 = true;

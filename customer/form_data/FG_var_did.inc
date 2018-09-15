@@ -75,9 +75,10 @@ if ($return!==false) {
 //print_r($return);
 
 $HD_Form -> AddViewElement(gettext("DID"), "id_cc_did", "15%", "center", "sort", "30", "lie", "cc_did", "did", "id='%id'", "%1");
+$HD_Form -> AddViewElement(gettext("DESTINATION"), "destination", "10%", "center\" nowrap \"", "sort");
+$HD_Form -> AddViewElement(gettext("PLAY_SOUND"), "playsound", "10%", "center\" nowrap \"", "sort");
 $HD_Form -> AddViewElement(gettext("ACTIVATED"), "t1.activated", "10%", "center", "sort", "", "list", $actived_list);
 $HD_Form -> AddViewElement(gettext("PRIORITY"), "priority", "10%", "center", "sort", "", "list", $priority_list);
-$HD_Form -> AddViewElement(gettext("DESTINATION"), "destination", "20%", "center", "sort");
 $HD_Form -> AddViewElement(gettext("USED MINUTE"), "t1.secondusedreal", "10%", "center", "SORT", "30", "", "", "", "", "", "display_minute");
 $HD_Form -> AddViewElement(gettext("COUNTRY"), "id_cc_country", "15%", "center", "sort", "15", "lie", "cc_country", "countryname", "id='%id'", "%1");
 $HD_Form -> AddViewElement(gettext("VALIDATED"), "validated", "10%", "center", "sort", "", "list", $validated_list);
@@ -123,7 +124,7 @@ if (isset($form_action) && ($form_action=='ask-edit' || $form_action=='edit')) {
 	$validated = 0;
 }
 
-$HD_Form -> FG_COL_QUERY = 'id_cc_did, t1.activated, priority, destination, t1.secondusedreal,'. $country_field .'  t1.validated, t1.id ';
+$HD_Form -> FG_COL_QUERY = "id_cc_did, destination, SUBSTRING_INDEX(playsound, '/', -1) playsound, t1.activated, priority, t1.secondusedreal,". $country_field ."  t1.validated, t1.id ";
 
 $HD_Form -> CV_NO_FIELDS  = gettext("There are no destinations created");
 $HD_Form -> CV_DISPLAY_LINE_TITLE_ABOVE_TABLE = false;

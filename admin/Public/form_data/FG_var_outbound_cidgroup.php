@@ -20,7 +20,7 @@ $HD_Form ->FG_LIST_ADDING_BUTTON_IMG1 = Images_Path ."/server_connect.png" ;
 $HD_Form -> FG_FK_DELETE_ALLOWED = true;
 $HD_Form -> FG_FK_DELETE_CONFIRM = true;
 
-$HD_Form->FG_FK_DELETE_OR_UPDATE = true;
+//$HD_Form->FG_FK_DELETE_OR_UPDATE = true;
 
 $HD_Form -> FG_FK_WARNONLY = true;
 $HD_Form -> FG_FK_TABLENAMES = array("cc_outbound_cid_list");

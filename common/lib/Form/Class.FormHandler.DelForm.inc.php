@@ -2,20 +2,14 @@
 
 $processed = $this->getProcessed();
 
-if ($form_action == "ask-delete")
-{
-    if ($this -> isFKDataExists() == false)
-    {
+if ($form_action == "ask-delete") {
+    if ($this -> isFKDataExists() == false) {
         //if($this-> FG_FK_DELETE_ALLOWED == true && $this->FG_FK_WARNONLY == false)
-        {
-            $this-> FG_FK_DELETE_ALLOWED = false;
-            $this -> FG_ISCHILDS = false;
-            $this-> FG_FK_WARNONLY = false;
-            $this->FG_FK_DELETE_CONFIRM = false;
-        }
-
+        $this -> FG_FK_DELETE_ALLOWED = false;
+        $this -> FG_ISCHILDS = false;
+        $this -> FG_FK_WARNONLY = false;
+        $this -> FG_FK_DELETE_CONFIRM = false;
     }
-
 }
 ?>
 
@@ -60,10 +54,11 @@ if ($this->FG_FK_DELETE_CONFIRM && $form_action == "ask-del-confirm" && $this-> 
                 </tr>
                 <tr height="50px">
                     <td align=center class="bgcolor_006">
-                    <?php echo gettext("You have ").$processed["fkCount"].gettext(" dependent records.<br>") ?>
+                    <?php echo gettext("You have ").$processed["fkCount"].gettext(" dependent record".(($processed["fkCount"]>1)?"s":"").".<br>") ?>
                     <?php echo $this -> FG_FK_DELETE_MESSAGE;?>
                     </td>
                 </tr>
+                <?php if ($this -> FG_FK_DELETE_BUTTON_IF_DEPENDENT) { ?>
                 <tr>
                     <td class="bgcolor_006">&nbsp;</td>
                 </tr>
@@ -72,6 +67,7 @@ if ($this->FG_FK_DELETE_CONFIRM && $form_action == "ask-del-confirm" && $this-> 
                         <INPUT title="Delete this record" alt="Delete this Record" hspace=2 id=submit22 name=submit22 src="<?php echo Images_Path_Main;?>/btn_Delete_94x20.gif" type="image">
                     </td>
                 </tr>
+                <?php } ?>
                 <tr height="5px">
                     <td class="bgcolor_006">&nbsp;</td>
                 </tr>
