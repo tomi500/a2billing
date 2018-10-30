@@ -162,7 +162,7 @@ if (has_rights (ACX_DELETE_CDR)) {
 $FG_COL_QUERY = "t1.starttime, t1.src, t1.dnid, t1.calledstation, t1.destination AS dest, t4.buyrate, t4.rateinitial, ROUND(UNIX_TIMESTAMP(t1.starttime)-INSERT(t1.uniqueid,1,1,1)) AS waitup, t1.sessiontime, t1.card_id, t3.trunkcode, t1.terminatecauseid, t1.sipiax, 
 t1.buycost, t1.sessionbill, IF(t1.sessionbill!=0, ((t1.sessionbill-t1.buycost)/t1.sessionbill)*100, NULL) margin, IF(t1.buycost!=0, ((t1.sessionbill-t1.buycost)/t1.buycost)*100, NULL) markup";
 $et = $resulttype=="sec" ? "t1.sessiontime" : "sec_to_time(t1.sessiontime)";
-$FG_EXPORT_QUERY = "t1.starttime Date, t1.src CallerID, t1.dnid DNID, t1.calledstation `Phone Number`, t2.destination Destination, t4.buyrate `Buy Rate`, t4.rateinitial `Sell Rate`, ROUND(UNIX_TIMESTAMP(t1.starttime)-INSERT(t1.uniqueid,1,1,1)) WaitUp, $et Duration, t1.card_id Account, t3.trunkcode Trunk, t1.terminatecauseid `Terminate Cause`, t1.sipiax CallType, t1.buycost Buy, t1.sessionbill Sell, case when t1.sessionbill!=0 then ROUND(((t1.sessionbill-t1.buycost)/t1.sessionbill)*100,2) else NULL end as Margin, case when t1.buycost!=0 then ROUND(((t1.sessionbill-t1.buycost)/t1.buycost)*100,2) else NULL end as Markup";
+$FG_EXPORT_QUERY = "t1.starttime Date, t1.src CallerID, t1.dnid DNID, t1.calledstation `Phone Number`, t2.destination Destination, t4.buyrate `Buy Rate`, t4.rateinitial `Sell Rate`, ABS(GREATEST(0,IF(ROUND(UNIX_TIMESTAMP(t1.starttime)-INSERT(t1.uniqueid,1,1,1))>3000,ROUND(UNIX_TIMESTAMP(t1.starttime)-INSERT(t1.uniqueid,1,1,1))-3600,ROUND(UNIX_TIMESTAMP(t1.starttime)-INSERT(t1.uniqueid,1,1,1))))) WaitUp, $et Duration, t1.card_id Account, t3.trunkcode Trunk, t1.terminatecauseid `Terminate Cause`, t1.sipiax CallType, t1.buycost Buy, t1.sessionbill Sell, case when t1.sessionbill!=0 then ROUND(((t1.sessionbill-t1.buycost)/t1.sessionbill)*100,2) else NULL end as Margin, case when t1.buycost!=0 then ROUND(((t1.sessionbill-t1.buycost)/t1.buycost)*100,2) else NULL end as Markup";
 
 if (LINK_AUDIO_FILE) {
 	$FG_COL_QUERY .= ', t1.uniqueid';
@@ -197,7 +197,7 @@ if ($posted == 1) {
 	$SQLcmd = do_field ( $SQLcmd, 'dnid', 'dnid' );
 	if ($SQLcmd == "")	$tmpcmd = " WHERE ";
 	else			$tmpcmd = " AND ";
-	$wheretmp = "IF(ROUND(UNIX_TIMESTAMP(t1.starttime)-INSERT(t1.uniqueid,1,1,1))>0,ROUND(UNIX_TIMESTAMP(t1.starttime)-INSERT(t1.uniqueid,1,1,1)),0)";
+	$wheretmp = "GREATEST(0,IF(ROUND(UNIX_TIMESTAMP(t1.starttime)-INSERT(t1.uniqueid,1,1,1))>3000,ROUND(UNIX_TIMESTAMP(t1.starttime)-INSERT(t1.uniqueid,1,1,1))-3600,ROUND(UNIX_TIMESTAMP(t1.starttime)-INSERT(t1.uniqueid,1,1,1))))";
 	if (ctype_digit($waitup1)) {
 		if ($waitup1type == "4") {
 			$SQLcmd .= $tmpcmd . $waitup1 . " < " . $wheretmp;

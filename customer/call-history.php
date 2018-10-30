@@ -379,7 +379,7 @@ IF(t1.sipiax IN (2,3,7) AND t1.terminatecauseid<>1,'',IF(t1.card_called$calledsb
 	,IF(t1.card_id$calledsbquery,t1.calledstation,t1.dnid))) calledstation,
 IF(t1.card_called$calledsbquery OR t1.card_id$calledsbquery,t1.destination,-1),
 id_ratecard AS route,
-IF(ROUND(UNIX_TIMESTAMP(t1.starttime)-INSERT(t1.uniqueid,1,1,1))>0,ROUND(UNIX_TIMESTAMP(t1.starttime)-INSERT(t1.uniqueid,1,1,1)),0) AS waitup,
+IF(ROUND(UNIX_TIMESTAMP(t1.starttime)-INSERT(t1.uniqueid,1,1,1))>3000,ROUND(UNIX_TIMESTAMP(t1.starttime)-INSERT(t1.uniqueid,1,1,1))-3600,ROUND(UNIX_TIMESTAMP(t1.starttime)-INSERT(t1.uniqueid,1,1,1))) AS waitup,
 t1.sessiontime$tc,
 IF(t1.card_id$calledsbquery, t1.sessionbill+margindillers, 0) sessionbill";
 
@@ -443,9 +443,9 @@ $FG_EXPORT_SESSION_VAR = "pr_export_entity_call";
 // Query Preparation for the Export Functionality
 $_SESSION [$FG_EXPORT_SESSION_VAR] = "SELECT $FG_EXPORT_QUERY FROM $FG_TABLE_NAME LEFT JOIN cc_prefix t2 ON prefix = t1.destination WHERE $FG_TABLE_CLAUSE GROUP BY t1.id";
 
-$QUERY = "SELECT day, SUM(sessiontime) calltime, SUM(cost) cost, COUNT(*) nbcall, SUM(waitup) waitup FROM 
+$QUERY = "SELECT day, SUM(sessiontime) calltime, SUM(cost) cost, COUNT(*) nbcall, SUM(GREATEST(WaitUp,0)) waitup FROM 
 (SELECT DATE(t1.starttime) AS day, t1.sessiontime, IF(t1.card_id$calledsbquery,t1.sessionbill+margindillers,0) AS cost, 
-IF(ROUND(UNIX_TIMESTAMP(t1.starttime)-INSERT(t1.uniqueid,1,1,1))>0,ROUND(UNIX_TIMESTAMP(t1.starttime)-INSERT(t1.uniqueid,1,1,1)),0) AS waitup FROM ".$FG_TABLE_NAME." WHERE ".$FG_TABLE_CLAUSE." GROUP by t1.id) tt GROUP BY day ORDER BY day"; //extract(DAY from calldate)
+IF(ROUND(UNIX_TIMESTAMP(t1.starttime)-INSERT(t1.uniqueid,1,1,1))>3000,ROUND(UNIX_TIMESTAMP(t1.starttime)-INSERT(t1.uniqueid,1,1,1))-3600,ROUND(UNIX_TIMESTAMP(t1.starttime)-INSERT(t1.uniqueid,1,1,1))) AS WaitUp FROM ".$FG_TABLE_NAME." WHERE ".$FG_TABLE_CLAUSE." GROUP by t1.id) tt GROUP BY day ORDER BY day"; //extract(DAY from calldate)
 //echo $QUERY;
 $mmax = $totalcall = $totalminutes = $totalcost = $totalwaitup = $nb_record = 0;
 if (!$nodisplay) {
