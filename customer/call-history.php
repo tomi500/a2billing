@@ -78,24 +78,31 @@ if (($download == "file") && $file && $ACXSEERECORDING && !$accdie) {
 	$result = $instance_table -> SQLExec ($DBHandle_max, $QUERY);
 	if (is_array($result) && count($result)>0) {
 
-	    $dl_full = MONITOR_PATH . "/" . $result[0][3] . "/" . $result[0][0] . "/" . $result[0][1] . "/" . $result[0][2] . "/" . $value_de;
-	    $dl_name = $value_de;
+	    $dl_full = $dl_path_name = MONITOR_PATH . "/" . $result[0][3] . "/" . $result[0][0] . "/" . $result[0][1] . "/" . $result[0][2] . "/" . $value_de;
 
 	    if (! file_exists ( $dl_full )) {
 		echo gettext ( "ERROR: Cannot download file " . $dl_name . ", it does not exist.<br>" );
 		exit ();
 	    }
 
-	    header ( "Content-Type: application/octet-stream" );
+	    $dl_name = $value_de;
+	    if ($sens!=1) {
+		$dl_path_name = "/tmp/".$value_de;
+		$sox = "/usr/bin/sox ".$dl_full." -c 1 -r 8k -e signed-integer ".$dl_path_name;
+		exec($sox);
+	    }
+
+	    header ( "Content-Type: audio/wav" );
 	    header ( "Content-Disposition: attachment; filename=$dl_name" );
-	    header ( "Content-Length: " . filesize ( $dl_full ) );
+	    header ( "Content-Length: " . filesize ( $dl_path_name ) );
 	    header ( "Accept-Ranges: bytes" );
 	    header ( "Pragma: no-cache" );
 	    header ( "Expires: 0" );
 	    header ( "Cache-Control: must-revalidate, post-check=0, pre-check=0" );
 	    header ( "Content-transfer-encoding: binary" );
 
-	    @readfile ( $dl_full );
+	    @readfile ( $dl_path_name );
+	    if ($sens!=1) unlink( $dl_path_name );
 	}
 	exit ();
 }
@@ -488,13 +495,7 @@ $smarty->display( 'main.tpl');
 if (!($popup_select>=1)) {
 	// #### HELP SECTION
 	echo $CC_help_balance_customer;
-} //else	echo '</br>';
-
-if ($ACXSEERECORDING && $nb_record>0 && $terminatecauseid!="INCOMPLET" && !($popup_select>=1) && $choose_callowner != 4){ echo '
-<script src="./javascript/WavPlayer/domready.js"></script>
-<script src="./javascript/WavPlayer/swfobject.js"></script>
-<script src="./javascript/WavPlayer/wavplayer.js"></script>
-';}?>
+} ?>
 
 <!-- ** ** ** ** ** Part for the research ** ** ** ** ** -->
 	<center>
@@ -842,7 +843,13 @@ if ($ACXSEERECORDING && $nb_record>0 && $terminatecauseid!="INCOMPLET" && !($pop
 
 
 <!-- ** ** ** ** ** Part to display the CDR ** ** ** ** ** -->
-<center><?php echo gettext("Number of Calls");?> : <?php if (is_array($list) && count($list)>0){ echo $nb_record . "<h3></h3>";}else{echo "0";}?>
+<center><?php echo gettext("Number of Calls");?> : <?php if (is_array($list) && count($list)>0){
+							    echo $nb_record;
+							    if ($ACXSEERECORDING && $nb_record>0 && $terminatecauseid!="INCOMPLET" && !($popup_select>=1) && $choose_callowner != 4) {?>
+								<br><audio id="sound1" preload="none" style="width: 60%;" controls controlsList="nodownload">Ваш браузер не поддерживает тег audio!</audio>
+								<script language="JavaScript" src="./javascript/playaudio.js"></script><?php
+							    }
+							}else{echo "0";}?>
      <table width="<?php echo $FG_HTML_TABLE_WIDTH?>" border="0" align="center" cellpadding="0" cellspacing="0">
 		<TR bgcolor="#ffffff"> 
           <TD class="callhistory_td11"> 

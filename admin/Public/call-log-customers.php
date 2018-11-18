@@ -68,24 +68,32 @@ if (($download == "file") && $file) {
 	$QUERY = "SELECT YEAR(starttime), MONTH(starttime), DAYOFMONTH(starttime), cc_card.username FROM cc_call LEFT JOIN cc_card ON cc_card.id=card_id WHERE uniqueid LIKE '$value' ORDER BY cc_call.id DESC LIMIT 1";
 	$result = $instance_table -> SQLExec ($handle, $QUERY);
 	if (is_array($result) && count($result)>0) {
-	    $dl_full = MONITOR_PATH . "/" . $result[0][3] . "/" . $result[0][0] . "/" . $result[0][1] . "/" . $result[0][2] . "/" . $value_de;
-	    $dl_name = $value_de;
+	    $dl_full = $dl_path_name = MONITOR_PATH . "/" . $result[0][3] . "/" . $result[0][0] . "/" . $result[0][1] . "/" . $result[0][2] . "/" . $value_de;
 	
 	    if (! file_exists ( $dl_full )) {
 		echo gettext ( "ERROR: Cannot download file " . $dl_full . ", it does not exist.<br>" );
 		exit ();
 	    }
 	
-	    header ( "Content-Type: application/octet-stream" );
+	    $dl_name = $value_de;
+	    if ($sens!=1) {
+		$dl_path_name = "/tmp/".$value_de;
+		$sox = "/usr/bin/sox ".$dl_full." -c 1 -r 8k -e signed-integer ".$dl_path_name;
+		exec($sox);
+	    }
+	
+	    header ( "Content-Type: audio/wav" );
+//	    header ( "Attachment-mime-type: audio/x-wav" );
 	    header ( "Content-Disposition: attachment; filename=$dl_name" );
-	    header ( "Content-Length: " . filesize ( $dl_full ) );
+	    header ( "Content-Length: " . filesize ( $dl_path_name ) );
 	    header ( "Accept-Ranges: bytes" );
 	    header ( "Pragma: no-cache" );
 	    header ( "Expires: 0" );
 	    header ( "Cache-Control: must-revalidate, post-check=0, pre-check=0" );
 	    header ( "Content-transfer-encoding: binary" );
 	
-	    @readfile ( $dl_full );
+	    @readfile ( $dl_path_name );
+	    if ($sens!=1) unlink( $dl_path_name );
 	}
 	exit ();
 }
@@ -405,13 +413,7 @@ if ($FG_DEBUG == 3)
 	echo "<br>Nb_record_max : $nb_record_max";
 
 $smarty->display ( 'main.tpl' );
-
-if (LINK_AUDIO_FILE && $nb_record){ echo '
-<script src="./javascript/WavPlayer/domready.js"></script>
-<script src="./javascript/WavPlayer/swfobject.js"></script>
-<script src="./javascript/WavPlayer/wavplayer.js"></script>
-';}?>
-
+?>
 <!-- ** ** ** ** ** Part for the research ** ** ** ** ** -->
 <center>
 <FORM METHOD=POST name="myForm"
@@ -1043,7 +1045,11 @@ if (LINK_AUDIO_FILE && $nb_record){ echo '
 echo gettext ( "Number of call" );
 ?> : <?php
 if (is_array ( $list ) && count ( $list ) > 0) {
-	echo $nb_record . "<h3></h3>";
+	echo $nb_record;
+	if (LINK_AUDIO_FILE && $nb_record) {?>
+	    <br><audio id="sound1" preload="none" style="width: 50%;" controls controlsList="nodownload">Ваш браузер не поддерживает тег audio!</audio>
+	    <script language="JavaScript" src="./javascript/playaudio.js"></script><?php
+	}
 } else {
 	echo "0";
 }

@@ -548,8 +548,8 @@ function linkonmonitorfile($value) {
 	    }
 	    if (!$find_record) return false;
 	    $myfile = base64_encode($myfile);
-	    echo '<a href="'.$_SERVER['PHP_SELF'].'?download=file&file=' . $myfile . '&.' . $c_format . '"></a>';
-	    echo '<a target=_blank href="'.$_SERVER['PHP_SELF'].'?download=file&file=' . $myfile . '"><img src="' . Images_Path . '/icoDisk.gif" height="16"/></a>';
+	    echo '<a href="javascript:;"><img src="' . Images_Path . "/flv.gif\" height=\"16\" onClick=\"GreetPlay(this,'".$_SERVER['PHP_SELF']."?download=file&file=" . $myfile . "')\" border=\"0\"></a>";
+	    echo '<a target=_blank href="'.$_SERVER['PHP_SELF'].'?download=file&file=' . $myfile . '&sens=1"><img src="' . Images_Path . '/icoDisk.gif" height="16"/></a>';
 	} else return false;
 }
 
