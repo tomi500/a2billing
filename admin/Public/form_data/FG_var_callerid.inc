@@ -38,10 +38,10 @@ $HD_Form = new FormHandler("cc_callerid", gettext("CallerID"));
 
 $HD_Form -> FG_DEBUG = 0;
 
-$HD_Form ->FG_LIST_ADDING_BUTTON2 = true;
-$HD_Form ->FG_LIST_ADDING_BUTTON_LINK2 = "A2B_entity_callerid.php?form_action=ask-add&section=".$_SESSION["menu_section"];
-$HD_Form ->FG_LIST_ADDING_BUTTON_ALT2 = $HD_Form ->FG_LIST_ADDING_BUTTON_MSG2 = gettext("Add CallerID");
-$HD_Form ->FG_LIST_ADDING_BUTTON_IMG2 = Images_Path ."/page_white_add.png" ;
+$HD_Form ->FG_LIST_ADDING_BUTTON1 = true;
+$HD_Form ->FG_LIST_ADDING_BUTTON_LINK1 = "A2B_entity_callerid.php?form_action=ask-add&section=".$_SESSION["menu_section"];
+$HD_Form ->FG_LIST_ADDING_BUTTON_ALT1 = $HD_Form ->FG_LIST_ADDING_BUTTON_MSG1 = gettext("Add CallerID");
+$HD_Form ->FG_LIST_ADDING_BUTTON_IMG1 = Images_Path ."/page_white_add.png" ;
 
 $HD_Form -> FG_OTHER_BUTTON3 = true;
 $HD_Form -> FG_OTHER_BUTTON3_LINK = "A2B_entity_logrefill.php?form_action=ask-add&card_id=|col_orig1|";

@@ -94,7 +94,7 @@ $HD_Form -> FG_OTHER_BUTTON1 = true;
 $HD_Form -> FG_OTHER_BUTTON1_CONDITION = '"|col1|" != ""';
 $HD_Form -> FG_OTHER_BUTTON2 = true;
 $HD_Form -> FG_OTHER_BUTTON1_LINK= $_SERVER['PHP_SELF']."?form_action=list&id=|param|";
-$HD_Form -> FG_OTHER_BUTTON2_LINK= "javascript:;\"";
+$HD_Form -> FG_OTHER_BUTTON2_LINK= "javascript:;";
 $HD_Form -> FG_OTHER_BUTTON1_IMG = Images_Path . "/edit.png";
 $HD_Form -> FG_OTHER_BUTTON2_IMG = Images_Path . "/flv.gif\" height=\"16\" onClick=\"GreetPlay(this,'".$_SERVER['PHP_SELF']."?download=file&file=|col2|&nbc=|col4|')";
 

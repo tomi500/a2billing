@@ -25,10 +25,10 @@ if (is_numeric($current_page)) {
 }
 $HD_Form -> FG_GO_LINK_AFTER_ACTION_ADD 	= $_SERVER['PHP_SELF']."?atmenu=document&stitle=Document&wh=AC&".$addpost."id=";
 
-$HD_Form -> FG_LIST_ADDING_BUTTON2	= true;
-$HD_Form -> FG_LIST_ADDING_BUTTON_LINK2 = "A2B_entity_card_union.php?form_action=ask-add&".$addpost."section=".$_SESSION["menu_section"];
-$HD_Form -> FG_LIST_ADDING_BUTTON_ALT2	= $HD_Form ->FG_LIST_ADDING_BUTTON_MSG2 = gettext("Add Member");
-$HD_Form -> FG_LIST_ADDING_BUTTON_IMG2	= Images_Path ."/page_white_add.png" ;
+$HD_Form -> FG_LIST_ADDING_BUTTON1	= true;
+$HD_Form -> FG_LIST_ADDING_BUTTON_LINK1 = "A2B_entity_card_union.php?form_action=ask-add&".$addpost."section=".$_SESSION["menu_section"];
+$HD_Form -> FG_LIST_ADDING_BUTTON_ALT1	= $HD_Form ->FG_LIST_ADDING_BUTTON_MSG1 = gettext("Add Member");
+$HD_Form -> FG_LIST_ADDING_BUTTON_IMG1	= Images_Path ."/page_white_add.png" ;
 
 $yesno = Constants::getYesNoList();
 

@@ -195,8 +195,8 @@ $HD_Form -> AddEditElement (gettext("DID"),
 	'$value',
 	"SELECT",
 	"", "", "",
-	"sql",
-	"cc_did",
+	"SQL",
+	"cc_did ORDER BY did ASC",
 	"did, id",
 	"", "", "%1", "" , "");
 
