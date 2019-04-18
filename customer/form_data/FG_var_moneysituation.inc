@@ -53,7 +53,7 @@ if (has_rights (ACX_DISTRIBUTION) && !($popup_select>=1)) {
 //$HD_Form -> AddViewElement(gettext("ID"), "cc_card.id", "7%", "center", "sort", "");
 //$HD_Form -> AddViewElement(gettext("CardNumber"), "username", "7%", "center", "sort", "", "30", "", "", "", "", "linktocustomer");
 //$HD_Form -> AddViewElement(gettext("CUSTOMER"), "customer", "18%", "center", "sort");
-$HD_Form -> AddViewElement(gettext("CUSTOMER"), "lastname", "25%", "center", "sort", "", "link2cust", "cc_card", "CONCAT_WS(' ',lastname,firstname,IF(company_name='','',CONCAT('(',company_name,')'))), id, tariff", "id='%id'", "%1", "", "javascript:;\" onClick=\"MM_openBrWindow('A2B_entity_moneysituation_details.php?form_action=ask-edit&displayheader=0&popup_select=1&idcust=%2&tariff=%3','','status=no,toolbar=no,menubar=no,location=no,directories=no,scrollbars=yes,resizable=yes,width=675,height=680,left=500,top=40,screenX=500,screenY=40')");
+$HD_Form -> AddViewElement(gettext("CUSTOMER"), "lastname", "25%", "center", "sort", "", "link2cust", "cc_card", "CONCAT_WS(' ',IF(status=0,'<del>',''),lastname,firstname,IF(company_name='','',CONCAT('(',company_name,')')),IF(status=0,'</del>','')), id, tariff", "id='%id'", "%1", "", "javascript:;\" onClick=\"MM_openBrWindow('A2B_entity_moneysituation_details.php?form_action=ask-edit&displayheader=0&popup_select=1&idcust=%2&tariff=%3','','status=no,toolbar=no,menubar=no,location=no,directories=no,scrollbars=yes,resizable=yes,width=675,height=680,left=500,top=40,screenX=500,screenY=40')");
 $HD_Form -> AddViewElement(gettext("BALANCE"), "credit", "11%", "center", "sort", "", "", "", "", "", "", "display_refill_money");
 $HD_Form -> AddViewElement(gettext("COMMISSION ACCRUED"), "commission", "17%", "center", "sort", "", "", "", "", "", "", "display_refill_money");
 $HD_Form -> AddViewElement(gettext("MARGIN"), "margin", "7%", "center", "sort");
@@ -102,6 +102,7 @@ if (has_rights (ACX_DISTRIBUTION) && !($popup_select>=1)) {
 	$HD_Form -> FG_OTHER_BUTTON3_ALT = '<font color="red">'.gettext('DID').'</font>';
 	$HD_Form -> FG_OTHER_BUTTON4_ALT = '<font color="red">'.gettext('LOG').'</font>';
 	$HD_Form -> FG_OTHER_BUTTON5_ALT = gettext('Add Refill to this Card');
+	$HD_Form -> FG_OTHER_BUTTON5_CONDITION = 'strpos("|col0|", "<del>") === false';
 //	$HD_Form -> FG_OTHER_BUTTON4_ALT = '<font color="red">'.gettext('REFILL').'</font>';
 
 	$HD_Form -> FG_OTHER_BUTTON1_IMG = '';

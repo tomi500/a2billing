@@ -6,7 +6,8 @@ ALTER TABLE cc_trunk ADD wrapnexttime timestamp NOT NULL DEFAULT '0000-00-00 00:
 
 ALTER TABLE cc_trunk ADD dialprefixa char(30) COLLATE utf8_bin NOT NULL;
 ALTER TABLE cc_trunk ADD periodcounta int(11) DEFAULT '0';
-ALTER TABLE cc_trunk ADD periodexpirya timestamp NOT NULL DEFAULT '0000-00-00 00:00:00';
+ALTER TABLE cc_trunk ADD periodexpirya datetime NOT NULL DEFAULT '0000-00-00 00:00:00';
+ALTER TABLE `cc_trunk` CHANGE `periodexpirya` `periodexpirya` DATETIME NOT NULL DEFAULT '0000-00-00 00:00:00';
 ALTER TABLE cc_trunk ADD timelefta int(11) NOT NULL DEFAULT '60';
 ALTER TABLE cc_trunk ADD perioda int(11) DEFAULT '0';
 ALTER TABLE cc_trunk ADD startdatea timestamp NOT NULL DEFAULT '0000-00-00 00:00:00';
@@ -18,7 +19,8 @@ ALTER TABLE cc_trunk ADD failover_trunka int(11) NULL DEFAULT NULL;
 
 ALTER TABLE cc_trunk ADD dialprefixb char(30) COLLATE utf8_bin NOT NULL;
 ALTER TABLE cc_trunk ADD periodcountb int(11) DEFAULT '0';
-ALTER TABLE cc_trunk ADD periodexpiryb timestamp NOT NULL DEFAULT '0000-00-00 00:00:00';
+ALTER TABLE cc_trunk ADD periodexpiryb datetime NOT NULL DEFAULT '0000-00-00 00:00:00';
+ALTER TABLE `cc_trunk` CHANGE `periodexpiryb` `periodexpiryb` DATETIME NOT NULL DEFAULT '0000-00-00 00:00:00';
 ALTER TABLE cc_trunk ADD timeleftb int(11) NOT NULL DEFAULT '60';
 ALTER TABLE cc_trunk ADD periodb int(11) DEFAULT '0';
 ALTER TABLE cc_trunk ADD startdateb timestamp NOT NULL DEFAULT '0000-00-00 00:00:00';

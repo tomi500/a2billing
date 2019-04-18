@@ -34,7 +34,7 @@ $username = $_SESSION["pr_login"];
 $return = scandir(DIR_STORE_AUDIO."/$username/");
 if ($return!==false) {
     foreach ($return as $val) {
-        if (is_file(DIR_STORE_AUDIO."/$username/".$val)) {
+        if (is_file(DIR_STORE_AUDIO."/$username/".$val) && $val != 'tempplay.wav') {
             $soundlist[] = array(preg_replace('/\.[^\.\/]+$/', '', $val),$username."/".preg_replace('/\.[^\.\/]+$/', '', $val));
         }
     }

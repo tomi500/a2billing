@@ -3,7 +3,7 @@ include(dirname(__FILE__).'/../includes/methods/paypal.php');
 
 class paypal {
     var $code, $title, $description, $enabled;
-    var $paypal_allowed_currencies = array('EUR', 'USD');
+    var $paypal_allowed_currencies;// = array('EUR', 'USD');
 //    var $paypal_allowed_currencies = array('CAD', 'EUR', 'GBP', 'JPY', 'USD', 'MXN', 'AUD', 'NZD', 'BRL');
 
 	// class constructorform_action_url
@@ -18,6 +18,7 @@ class paypal {
 		//$this->enabled = true;
 
 		$this->form_action_url = PAYPAL_PAYMENT_URL;
+		$this->paypal_allowed_currencies = explode(', ', MODULE_PAYMENT_PAYPAL_CURRENCY);
     }
 
 	// class methods
