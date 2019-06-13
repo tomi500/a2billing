@@ -32,7 +32,9 @@
 **/
 
 
-
+$json_data = $_POST["json_data"];
+if (isset($json_data))		extract(json_decode($json_data,true,512));
+else
 getpost_ifset(array('id', 'destination', 'id_cc_card', 'id_cc_did', 'activated', 'priority', 'id_trunk', 'voip_call', 'answer', 'playsound', 'filterprefix'));
 
 if ( (empty($form_action) || $form_action=="list")) {
@@ -104,6 +106,13 @@ $HD_Form -> FG_EDITION = true;
 $HD_Form -> FG_DELETION = true;
 $HD_Form -> FG_ADDITION = true;
 
+// Dependent Tables
+$HD_Form -> FG_FK_DELETE_ALLOWED = true;
+$HD_Form -> FG_FK_DELETE_CONFIRM = false;
+$HD_Form -> FG_FK_WARNONLY = false;
+$HD_Form -> FG_FK_TABLENAMES = array("cc_sheduler_ratecard");
+$HD_Form -> FG_FK_EDITION_CLAUSE = array("id_did_destination");
+
 // TODO integrate in Framework
 if ($form_action=="ask-add"){
 	$begin_date = date("Y");
@@ -112,6 +121,11 @@ if ($form_action=="ask-add"){
 	$end_date = date("-m-d H:i:s");
 	$comp_date = "value='".$begin_date.$end_date."'";
 	$comp_date_plus = "value='".$begin_date_plus.$end_date."'";
+	$def_value_inuse = "value='0'";
+	$def_value_maxuse = "value='-1'";
+} else {
+	$def_value_inuse = "";
+	$def_value_maxuse = "";
 }
 
 $HD_Form -> AddEditElement (gettext("ACTIVATED"),
@@ -122,6 +136,16 @@ $HD_Form -> AddEditElement (gettext("ACTIVATED"),
 	"",
 	gettext("Choose if you want to activate this card"),
 	"" , "", "", gettext("Yes").":1, - ".gettext("No").":0",   "", "" , "", "");
+
+if ($form_action<>"ask-add")
+$HD_Form -> AddEditElement(gettext("SCHEDULE"),
+	"shedule",
+	'$value',
+	"POPUPDAYTIME",
+	"", "", "", "",
+	"cc_sheduler_ratecard",
+	"weekdays, TIME_TO_SEC(timefrom) timefrom, TIME_TO_SEC(timetill) timetill",
+	"id_did_destination='%id'", "'%id','%1',SEC_TO_TIME('%2'),SEC_TO_TIME('%3')", "", "", "", ":", "`id_did_destination`,`weekdays`,`timefrom`,`timetill`");
 
 $HD_Form -> AddEditElement (gettext("DESTINATION"),
 	"destination",
@@ -245,7 +269,7 @@ $HD_Form -> AddEditElement (gettext("CID_PRESENT"),
 	gettext("Choose 'Yes' if you want to present real CID though CID_GROUP applied"),
 	"" , "", "", gettext("Yes").":1, - ".gettext("No").":0", "", "", "", gettext("Choose 'Yes' if you want to present real CID though CID_GROUP applied"));
 **/
-	$HD_Form -> FieldEditElement ('activated, destination, calleridname, timeout, voip_call, destinuse, destmaxuse, id_cc_card, id_cc_did, validated, priority, answer, playsound');
+	$HD_Form -> FieldEditElement ('activated, id_cc_did, destination, calleridname, timeout, voip_call, destinuse, destmaxuse, id_cc_card, id_cc_did, validated, priority, answer, playsound');
 
 $HD_Form->FG_ADITION_HIDDEN_PARAM		= $HD_Form->FG_EDITION_HIDDEN_PARAM		= 'filterprefix,current_page';
 $HD_Form->FG_ADITION_HIDDEN_PARAM_VALUE 	= $HD_Form->FG_EDITION_HIDDEN_PARAM_VALUE	= $filterprefix.",".$current_page;

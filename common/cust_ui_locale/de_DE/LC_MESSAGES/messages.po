@@ -3414,6 +3414,34 @@ msgstr "Ihr Konto ist bereits aktiviert."
 msgid "Your account cannot be activated please contact <br/> the website administrator or retry later."
 msgstr "Ihr Konto kann nicht aktiviert werden, wenden Sie sich bitte an die <br> Website-Administrator oder versuchen Sie später."
 
+#: A2B_entity_greeting.php:119
+msgid "Speed"
+msgstr "Tempo"
+
+#: A2B_entity_greeting.php:251
+msgid "Let type text of greeting here"
+msgstr "Geben Sie hier einen Grußtext ein"
+
+#: A2B_entity_greeting.php:262
+msgid "Filename"
+msgstr "Dateiname"
+
+#: form_data/FG_var_greeting.inc:62
+msgid "FileName"
+msgstr "DATEINAME"
+
+#: form_data/FG_var_greeting.inc:60
+msgid "Voice"
+msgstr "STIMME"
+
+#: form_data/FG_var_greeting.inc:61
+msgid "Greeting text"
+msgstr "Grußtext"
+
+#: form_data/FG_var_greeting.inc:119
+msgid "You can upload, generate and edit greeting messages"
+msgstr "Sie können Begrüßungsnachrichten hochladen, generieren und bearbeiten"
+
 #: form_data/FG_var_moneysituation.inc:100
 msgid "Add Customer"
 msgstr "Kunden hinzufügen"
@@ -3494,6 +3522,10 @@ msgstr "Vorschau nächste Fakturierung"
 #: templates/default/main.tpl:66
 msgid "SPEED DIAL"
 msgstr "KURZWAHL"
+
+#: templates/default/main.tpl:60
+msgid "VOICE GREETINGS"
+msgstr "STIMMENGRÜSSE"
 
 #: templates/default/main.tpl:74
 msgid "SIMULATOR"

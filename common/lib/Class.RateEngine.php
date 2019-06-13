@@ -1452,11 +1452,12 @@ for ($i=0; $i<count($this->ratecard_obj); $i++) {
 			$intellect_count = $trunkrand = $intellect_failover_trunk = -1;
 			$status = 1;
 			// LOOOOP FOR THE FAILOVER LIMITED TO failover_recursive_limit
-			while ((($loop_failover <= $A2B->agiconfig['failover_recursive_limit'] && !$this->dialstatus)
-				|| ($loop_failover <= $A2B->agiconfig['failover_recursive_limit'] && $failover_trunk > 0 && time()-$timecur < 24 && (
-					(in_array($this->dialstatus, array("","CHANUNAVAIL","CONGESTION")) && $intellect_count < 0)
-				    ||	($typecall == 8 && $intellect_count >= 0) // Rule for callback daemon
-				)))
+			while ($loop_failover <= $A2B->agiconfig['failover_recursive_limit']
+			    && (!$this->dialstatus
+				|| ($failover_trunk > 0 && time()-$timecur < 24
+				    && ((in_array($this->dialstatus, array("","CHANUNAVAIL","CONGESTION")) && $intellect_count < 0) || ($typecall == 8 && $intellect_count >= 0)) // Rule for callback daemon
+				   )
+			       )
 			    && !in_array($this->dialstatus, array("ANSWER","CANCEL"))
 			      ) {
 //			    && $failover_trunk > 0 && (time()-$timecur) < 24 && (in_array($this->dialstatus, array("","CHANUNAVAIL","CONGESTION")) || $intellect_count >= 0)))

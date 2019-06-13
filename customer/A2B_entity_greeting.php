@@ -248,18 +248,18 @@ if ($form_action == "list") {
 			</select>
 		</td>
 		<td align="right" valign="top" colspan="2">
-			<input class="form_input_text" style="width: 100%;" id="greettext" name="greettext" value="<?php echo $greettext?>" placeholder=" Print text of greeting here" onkeypress="return keytoDownAny(event,id);" onchange="setsrcaudio();" size="100%" maxlength="140" required>
+			<input class="form_input_text" style="width: 100%;" id="greettext" name="greettext" value="<?php echo $greettext?>" placeholder=" <?php echo gettext("Let type text of greeting here");?>" onkeypress="return keytoDownAny(event,id);" onchange="setsrcaudio();" size="100%" maxlength="140" required>
 		</td>
 		</tr>
 		<tr>
 		<td align="left" colspan="2" nowrap><!--	     max="4.0" min="0.25" -->
-			Speed: <input type="range" id="speakingRate" max="1.5" min="0.5" style="width: 61%;" name="speakingRate" step="0.05" value="<?php echo $speakingRate?>" oninput="range_weight_disp.value = speakingRate.value;" onchange="setsrcaudio();"> <output id="range_weight_disp"></output></input>
+			<?php echo gettext("Speed");?>: <input type="range" id="speakingRate" max="1.5" min="0.5" style="width: 61%;" name="speakingRate" step="0.05" value="<?php echo $speakingRate?>" oninput="range_weight_disp.value = speakingRate.value;" onchange="setsrcaudio();"> <output id="range_weight_disp"></output></input>
 		</td>
 		<td align="left" width="95%" valign="bottom">
 			<audio id="sound2" preload="none" style="width: 100%;" controls controlsList="nodownload"></audio>
 		</td>
 		<td align="right" width="5%">
-			<input class="form_input_text" style="width: 100%;" id="greetname" name="greetname" value="<?php echo $greetname?>" placeholder=" Filename" onkeypress="return keytoDownNumber(event,id,'<?php echo gettext("Enter filename without extension");?>');" size="16" maxlength="96" required></br>
+			<input class="form_input_text" style="width: 100%;" id="greetname" name="greetname" value="<?php echo $greetname?>" placeholder=" <?php echo gettext("Filename");?>" onkeypress="return keytoDownNumber(event,id,'<?php echo gettext("Enter filename without extension");?>');" size="16" maxlength="96" required></br>
 			<input class="form_input_button" style="width: 100%;" type="button" value="&nbsp;<?php echo gettext("SAVE/UPDATE");?>&nbsp;" onClick="openURL('<?php echo $_SERVER['PHP_SELF']?>?langlocale=','<?php echo gettext("Enter greeting text");?>','<?php echo gettext("Enter filename without extension");?>',3);">
 		</td>
 		<tr>

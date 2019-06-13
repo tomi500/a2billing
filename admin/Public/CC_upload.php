@@ -95,7 +95,7 @@ $file_ext_allow = arr_rid_blank($file_ext_allow);
 //Any other action the user must be logged in!
 
 if ($method) {
-	session_register('message');
+	$_SESSION['message']='';
 
 	//Upload the file
 	if ($method == "upload") {
@@ -103,9 +103,6 @@ if ($method) {
 		$file_array = $_FILES['file'];
 		$_SESSION['message'] = "";
 		$uploads = false;
-
-		//print_r($file_ext_allow);
-		//echo "<br>files_to_upload=$files_to_upload</br>";
 
 		for ($i = 0; $i < $files_to_upload; $i++) {
 			if ($_FILES['file']['name'][$i]) {
@@ -115,10 +112,8 @@ if ($method) {
 					$fileupload_name = $_FILES['file']['name'][0];
 
 					for ($i = 0; $i < count($file_ext_allow); $i++) {
-						//if (getlast($fileupload_name)!=$file_ext_allow[$i]){
 						if (strcmp(getlast($fileupload_name), $file_ext_allow[$i]) != 0) {
 							$test .= "~~";
-							//echo "<br>'".getlast($fileupload_name)."' - '".$file_ext_allow[$i]."'<br>";
 						}
 					}
 					$exp = explode("~~", $test);
@@ -130,8 +125,8 @@ if ($method) {
 						} else {
 							$file_to_upload = $upload_dir . "/" . $_FILES['file']['name'][0];
 							move_uploaded_file($_FILES['file']['tmp_name'][0], $file_to_upload);
-							//echo "<br>::$file_to_upload</br>";
-							//chmod($file_to_upload,0777);
+							chmod($upload_dir, 0755);
+							chmod($file_to_upload,0644);
 							$_SESSION['message'] .= $_FILES['file']['name'][0] . " uploaded.<br>";
 						}
 					}
@@ -244,7 +239,7 @@ $smarty->display('main.tpl');
 
       <?php
         //When there is a message, after an action, show it
-        if(session_is_registered('message'))
+        if(isset($_SESSION['message']))
         {
           echo "<br></br><font color='red'>" . $_SESSION['message'] . "</font>";
         }

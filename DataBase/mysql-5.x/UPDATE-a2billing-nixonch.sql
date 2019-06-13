@@ -272,6 +272,7 @@ ALTER TABLE `cc_sheduler_ratecard`
   ADD `inputc` SMALLINT(6) NOT NULL DEFAULT '0' AFTER `inputb`,
   ADD PRIMARY KEY(`ids`),
   ADD INDEX `id` ( `id_ratecard` , `id_tariffplan` , `id_ringup`, `id_callback` );
+ALTER TABLE `cc_sheduler_ratecard` ADD `id_did_destination` BIGINT(20) NOT NULL DEFAULT '0' AFTER `id_callback`;
 
 #ALTER TABLE `cc_ratecard`
 #  DROP `starttime`,
@@ -612,6 +613,8 @@ ALTER TABLE cc_callback_spool ADD `calleridlength` SMALLINT( 6 ) NOT NULL DEFAUL
 ALTER TABLE cc_callback_spool ADD `localtz` CHAR( 40 ) CHARACTER SET utf8 COLLATE utf8_bin DEFAULT NULL;
 
 ALTER TABLE `cc_callback_spool` ADD INDEX `status` (`status`);
+
+DELETE FROM `cc_payment_methods` WHERE `payment_method` LIKE 'iridium'
 
 ALTER TABLE cc_payment_methods ADD UNIQUE `SECONDARY` ( `payment_method` );
 INSERT IGNORE INTO cc_payment_methods (`payment_method`, `payment_filename`) VALUES

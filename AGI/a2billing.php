@@ -218,7 +218,7 @@ if ($startUpSystem && $startUpOS == "") {
 	} elseif ($startUpSystem > $startUpTime+30) {
 		$QUERY = "UPDATE cc_config SET config_value=$startUpSystem WHERE config_key='startup_time' AND config_group_title='global'";
 		$A2B -> DBHandle -> Execute($QUERY);
-		$QUERY = "UPDATE cc_card, cc_trunk SET cc_card.inuse=0, cc_trunk.inuse=0";
+		$QUERY = "UPDATE cc_card, cc_trunk, cc_did_destination SET cc_card.inuse=0, cc_trunk.inuse=0, cc_did_destination.destinuse=0";
 		$A2B -> DBHandle -> Execute($QUERY);
 		$QUERY = "UPDATE cc_callback_spool SET status='PENDING', last_attempt_time='1980-01-01 00:00:00', next_attempt_time=NOW() WHERE surveillance > 0 AND agi_result='AGI PROCESSING'";
 		$A2B -> DBHandle -> Execute($QUERY);
@@ -1125,9 +1125,12 @@ if ($mode == 'standard') {
                     " aleg_carrier_initblock_offp, aleg_carrier_increment_offp, aleg_retail_initblock_offp, aleg_retail_increment_offp,".
                     " answer, playsound, timeout, margin, id_diller, voicebox, removeaddprefix, addprefixinternational, chanlang, buyrate, billblock, spamfilter, secondtimedays, calleridname".
 			        " FROM cc_did_destination, cc_did, cc_card, cc_country".
+			        " LEFT JOIN cc_sheduler_ratecard ON id_did_destination=cc_did_destination.id".
 			        " WHERE id_cc_did=cc_did.id AND cc_card.status=1 AND cc_card.id=id_cc_card AND cc_did_destination.activated=1 AND cc_did.activated=1 AND did LIKE '$mydnid' ".
 			        " AND cc_country.id=id_cc_country AND cc_did.startingdate<= CURRENT_TIMESTAMP AND (cc_did.expirationdate > CURRENT_TIMESTAMP OR cc_did.expirationdate IS NULL ".
-			        " AND cc_did_destination.validated=1";
+			        " AND cc_did_destination.validated=1 ".
+			        " AND (`cc_sheduler_ratecard`.`id_did_destination` IS NULL OR (`weekdays` LIKE CONCAT('%',WEEKDAY(CONVERT_TZ(NOW(),@@global.time_zone,localtz)),'%') AND (TIME(CONVERT_TZ(NOW(),@@global.time_zone,localtz)) BETWEEN `timefrom` AND `timetill`".
+			               " OR (`timetill`<=`timefrom` AND (TIME(CONVERT_TZ(NOW(),@@global.time_zone,localtz))<`timetill` OR TIME(CONVERT_TZ(NOW(),@@global.time_zone,localtz))>=`timefrom`)))))";
 		if ($A2B->config["database"]['dbtype'] != "postgres") {
 			// MYSQL
 			$QUERY .= " OR cc_did.expirationdate = '0000-00-00 00:00:00'";
@@ -1441,25 +1444,25 @@ if ($mode == 'standard') {
 			$result = ($callbacksound) ? false : $A2B -> instance_table -> SQLExec ($A2B->DBHandle, $QUERY);
 
 			$instance_table = new Table("cc_callback_spool");
-			$FG_TABLE_CLAUSE = "(status='PENDING' OR status='PROCESSING') AND account='{$A2B->accountcode}' AND callerid='".$A2B->config['callback']['callerid']."' AND exten_leg_a='{$A2B->destination}' AND timediff(now(),entry_time)<".$A2B->config['callback']['sec_avoid_repeate'];
+			$FG_TABLE_CLAUSE = "(status LIKE 'PENDING' OR status LIKE 'PROCESSING' OR (timediff(now(),entry_time)<".$A2B->config['callback']['sec_avoid_repeate']." AND status='SENT')) AND account='{$A2B->accountcode}' AND callerid='".$A2B->config['callback']['callerid']."' AND exten_leg_a='{$A2B->destination}'";
 			$FG_NB_RECORD = $instance_table -> Table_count ($A2B -> DBHandle, $FG_TABLE_CLAUSE);
 
 			$sec_wait_before_callback = $A2B -> config["callback"]['sec_wait_before_callback'];
 			if (!is_numeric($sec_wait_before_callback) || $sec_wait_before_callback<1) {
 				$sec_wait_before_callback = 1;
 			}
-			if ($FG_NB_RECORD) {
+			if ($FG_NB_RECORD > 0) {
 				$QUERY = "num_attempt='0', entry_time=now(), `next_attempt_time`=ADDDATE( CURRENT_TIMESTAMP, INTERVAL $sec_wait_before_callback SECOND )";
 				$result = $instance_table -> Update_table ($A2B -> DBHandle, $QUERY, $FG_TABLE_CLAUSE);
-				write_log(LOGFILE_API_CALLBACK, " ======================== Attempt of double number insert detected =====================> ".$A2B->destination);
-			} elseif (!is_array($result) && $FG_NB_RECORD == 0) {
+$A2B -> debug( ERROR, $agi, __FILE__, __LINE__, "\033[1;31m============UPDATE============   Attempt of double number insert detected > ".$A2B->destination."\33[0m");
+				write_log(LOGFILE_API_CALLBACK, " =========UPDATE========= Attempt of double number insert detected =====================> ".$A2B->destination);
+			} elseif (!is_array($FG_NB_RECORD) && !is_array($result) && $FG_NB_RECORD == 0) {
 			    $resfindrate = $RateEngine->rate_engine_findrates($A2B, $A2B -> destination, $A2B -> tariff);
-
+$A2B -> debug( ERROR, $agi, __FILE__, __LINE__, "\033[1;32m============INSERT============  Try to inserting CallBack to > ".$A2B->destination."\33[0m");
 			    // IF FIND RATE
 			    if ($resfindrate!=0) {
 				//$RateEngine -> debug_st = 1;
 				$res_all_calcultimeout = $RateEngine->rate_engine_all_calcultimeout($A2B, $A2B->credit);
-
 				if ($res_all_calcultimeout){
 				    // MAKE THE CALL
 				    $channeloutcid = $RateEngine->rate_engine_performcall($agi, $A2B->destination, $A2B, 9);
@@ -1748,9 +1751,12 @@ if ($mode == 'standard') {
 					" cc_card.id, playsound, timeout, margin, id_diller, voicebox, removeaddprefix, addprefixinternational, answer, chanlang, ".
 					" aftercallbacksound, digitaftercallbacksound, spamfilter, secondtimedays, calleridname".
 					" FROM cc_did, cc_did_destination, cc_card, cc_country".
+					" LEFT JOIN cc_sheduler_ratecard ON id_did_destination=cc_did_destination.id".
 					" WHERE id_cc_did=cc_did.id AND cc_card.status=1 AND cc_card.id=id_cc_card and cc_did_destination.activated=1 AND cc_did.activated=1 AND did LIKE '$A2B->destination'".
 					" AND cc_country.id=id_cc_country AND cc_did.startingdate <= CURRENT_TIMESTAMP AND (cc_did.expirationdate > CURRENT_TIMESTAMP OR cc_did.expirationdate IS NULL ".
-					" AND cc_did_destination.validated = 1 ";
+					" AND cc_did_destination.validated = 1 ".
+					" AND (`cc_sheduler_ratecard`.`id_did_destination` IS NULL OR (`weekdays` LIKE CONCAT('%',WEEKDAY(CONVERT_TZ(NOW(),@@global.time_zone,localtz)),'%') AND (TIME(CONVERT_TZ(NOW(),@@global.time_zone,localtz)) BETWEEN `timefrom` AND `timetill`".
+						" OR (`timetill`<=`timefrom` AND (TIME(CONVERT_TZ(NOW(),@@global.time_zone,localtz))<`timetill` OR TIME(CONVERT_TZ(NOW(),@@global.time_zone,localtz))>=`timefrom`)))))";
 				if ($A2B->config["database"]['dbtype'] == "mysql") {
 					$QUERY .= " OR cc_did.expirationdate = '0000-00-00 00:00:00'";
 				}
