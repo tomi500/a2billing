@@ -312,10 +312,10 @@ while(true)
     LEFT JOIN `cc_card` ON `cc_card`.`id`=`account_id`
     LEFT JOIN `cc_sheduler_ratecard` ON `id_ringup`=`cc_ringup`.`id`
     WHERE `cc_ringup`.`status`='1' AND `cc_ringup`.`inuse`<`simult`
-	AND (`cc_sheduler_ratecard`.`id_ringup` IS NULL OR (`weekdays` LIKE CONCAT('%',WEEKDAY(CONVERT_TZ(NOW(),@@global.time_zone,localtz)),'%') AND (TIME(CONVERT_TZ(NOW(),@@global.time_zone,localtz)) BETWEEN `timefrom` AND `timetill`
-		OR (`timetill`<=`timefrom` AND (TIME(CONVERT_TZ(NOW(),@@global.time_zone,localtz))<`timetill` OR TIME(CONVERT_TZ(NOW(),@@global.time_zone,localtz))>=`timefrom`)))))";
-//	AND (`cc_sheduler_ratecard`.`id_ringup` IS NULL OR (`weekdays` LIKE CONCAT('%',WEEKDAY(NOW()),'%') AND (CURTIME() BETWEEN `timefrom` AND `timetill`
-//	OR (`timetill`<=`timefrom` AND (CURTIME()<`timetill` OR CURTIME()>=`timefrom`)))))";
+	AND (`cc_sheduler_ratecard`.`id_ringup` IS NULL OR (`weekdays` LIKE CONCAT('%',WEEKDAY(NOW()),'%') AND (CURTIME() BETWEEN `timefrom` AND `timetill`
+	OR (`timetill`<=`timefrom` AND (CURTIME()<`timetill` OR CURTIME()>=`timefrom`)))))";
+//	AND (`cc_sheduler_ratecard`.`id_ringup` IS NULL OR (`weekdays` LIKE CONCAT('%',WEEKDAY(CONVERT_TZ(NOW(),@@global.time_zone,localtz)),'%') AND (TIME(CONVERT_TZ(NOW(),@@global.time_zone,localtz)) BETWEEN `timefrom` AND `timetill`
+//		OR (`timetill`<=`timefrom` AND (TIME(CONVERT_TZ(NOW(),@@global.time_zone,localtz))<`timetill` OR TIME(CONVERT_TZ(NOW(),@@global.time_zone,localtz))>=`timefrom`)))))";
     $result1 = $instance_table->SQLExec($A2B->DBHandle, $query);
     foreach ($result1 as $value) {
 	$query = "SELECT `id_trunk`,`trunkprefix`,`providertech`,`providerip`,`removeprefix`,`outbound_cidgroup_id` FROM `cc_trunk` WHERE `id_trunk` IN ({$value[2]}) AND `status`='1' AND (`maxuse`='-1' OR `inuse`<`maxuse`) ORDER BY RAND() LIMIT 1";
