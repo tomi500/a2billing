@@ -130,10 +130,17 @@ $HD_Form -> CV_DISPLAY_FILTER_ABOVE_TABLE = false;
 $HD_Form -> FG_LIMITE_DISPLAY = 14;
 
 $HD_Form -> FG_EDITION = true;
-$HD_Form -> FG_DELETION = false;
+$HD_Form -> FG_DELETION = true;
 $HD_Form -> FG_ADDITION = true;
 $HD_Form -> FG_OTHER_BUTTON1 = false;
 $HD_Form -> FG_VIEW_TABLE_WITDH = '80%';
+
+// Dependent Tables
+$HD_Form -> FG_FK_DELETE_ALLOWED = true;
+$HD_Form -> FG_FK_DELETE_CONFIRM = false;
+$HD_Form -> FG_FK_WARNONLY = false;
+$HD_Form -> FG_FK_TABLENAMES = array("cc_sheduler_ratecard");
+$HD_Form -> FG_FK_EDITION_CLAUSE = array("id_did_destination");
 
 $HD_Form -> AddEditElement (gettext("ACTIVATED"),
 	"activated",
@@ -152,12 +159,49 @@ $HD_Form -> AddEditElement (gettext("DID"),
 	'$value',
 	"SELECT",
 	"readonly", "", "",
-	"sql",
+	"SQL",
 	"cc_did",
 	"did, id",
 	"id=(SELECT id_cc_did FROM cc_did_destination WHERE id='%id')", "", "%1", "" , "");
 
-    $HD_Form -> AddEditElement (gettext("DESTINATION"),
+if ($form_action<>"ask-add" && $form_action<>"ask-delete")
+$HD_Form -> AddEditElement(gettext("SCHEDULE"),
+        "shedule",
+        '$value',
+        "POPUPDAYTIME",
+        "", "", "", "",
+        "cc_sheduler_ratecard",
+        "weekdays, TIME_TO_SEC(timefrom) timefrom, TIME_TO_SEC(timetill) timetill",
+        "id_did_destination='%id'", "'%id','%1',SEC_TO_TIME('%2'),SEC_TO_TIME('%3')", "", "", "", ":", "`id_did_destination`,`weekdays`,`timefrom`,`timetill`");
+
+$HD_Form -> AddEditElement (gettext("ANSWER"),
+	"answer",
+	'0',
+	"RADIOBUTTON",
+	"",
+	"",
+	gettext("Choose 'Yes' if you want to answer on the call"),
+	"" , "", "", gettext("Yes").":1, - ".gettext("No").":0", "", "", "", gettext("Choose if you want to answer on the call before playing PLAY_SOUND"));
+
+if (isset($form_action) && $form_action=="ask-edit") {
+	$instance_table = new Table("cc_did_destination", "playsound");
+	$clause = "id = $id";
+	$list = $instance_table -> Get_list($DBHandle_max, $clause, 0);;
+	if (is_array($list) && count($list)>0) {
+		$playsound = preg_replace('/\.[^\.\/]+$/', '', basename($list[0][0]));
+		$selectedgreeting = ($playsound && array_search($playsound,array_column($soundlist,0))===false) ? "<OPTION value=\"$playsound\">".$playsound."</OPTION>" : NULL;
+	} else	$selectedgreeting = NULL;
+} else		$selectedgreeting = NULL;
+$HD_Form -> AddEditElement (gettext("PLAY_SOUND"),
+	"playsound",
+	'$value',
+	($form_action=='ask-delete')?"INPUT":"DATALIST",
+	"size=50 maxlength=50",
+	"",
+	gettext("Insert the path and name of sound file"),
+	"list", "", "", "", $soundlist, "%1", "", gettext("Play sound before calling DESTINATION."), NULL, $selectedgreeting);
+
+$HD_Form -> AddEditElement (gettext("DESTINATION"),
 	    "destination",
 	    '$value',
 	    "INPUT",
@@ -194,35 +238,10 @@ $HD_Form -> AddEditElement (gettext("PRIORITY"),
 	"",
 	"list" , "", "",  "", $priority_list, "%1" , "" , "");
 
-$HD_Form -> AddEditElement (gettext("ANSWER"),
-	"answer",
-	'0',
-	"RADIOBUTTON",
-	"",
-	"",
-	gettext("Choose 'Yes' if you want to answer on the call"),
-	"" , "", "", gettext("Yes").":1, - ".gettext("No").":0", "", "", "", gettext("Choose if you want to answer on the call before playing PLAY_SOUND"));
-
-if (isset($form_action) && $form_action=="ask-edit") {
-	$instance_table = new Table("cc_did_destination", "playsound");
-	$clause = "id = $id";
-	$list = $instance_table -> Get_list($DBHandle_max, $clause, 0);;
-	if (is_array($list) && count($list)>0) {
-		$playsound = preg_replace('/\.[^\.\/]+$/', '', basename($list[0][0]));
-		$selectedgreeting = ($playsound && array_search($playsound,array_column($soundlist,0))===false) ? "<OPTION value=\"$playsound\">".$playsound."</OPTION>" : NULL;
-	} else	$selectedgreeting = NULL;
-} else		$selectedgreeting = NULL;
-$HD_Form -> AddEditElement (gettext("PLAY_SOUND"),
-	"playsound",
-	'$value',
-	"DATALIST",
-	"size=50 maxlength=50",
-	"",
-	gettext("Insert the path and name of sound file"),
-	"list", "", "", "", $soundlist, "%1", "", gettext("Play sound before calling DESTINATION."), NULL, $selectedgreeting);
-
-if (isset($form_action) && ($form_action=='ask-edit' || $form_action=='ask-delete')) {
-    $HD_Form -> FieldEditElement ('activated, id_cc_did, destination, timeout, voip_call, priority, answer, playsound');
+if (isset($form_action) && $form_action=='ask-edit') {
+    $HD_Form -> FieldEditElement ('activated, id_cc_did, id_cc_did, answer, playsound, destination, timeout, voip_call, priority');
+} elseif (isset($form_action) && $form_action=='ask-delete') {
+    $HD_Form -> FieldEditElement ('activated, id_cc_did, answer, playsound, destination, timeout, voip_call, priority');
 } else {
     $HD_Form -> FG_QUERY_EDITION_HIDDEN_FIELDS = "destination, validated, voip_call";
     $HD_Form -> FG_QUERY_EDITION_HIDDEN_VALUE = "$destination, $validated, $voip_call";

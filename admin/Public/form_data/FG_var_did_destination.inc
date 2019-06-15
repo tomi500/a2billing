@@ -137,6 +137,16 @@ $HD_Form -> AddEditElement (gettext("ACTIVATED"),
 	gettext("Choose if you want to activate this card"),
 	"" , "", "", gettext("Yes").":1, - ".gettext("No").":0",   "", "" , "", "");
 
+$HD_Form -> AddEditElement (gettext("DID"),
+	"id_cc_did",
+	'$value',
+	"SELECT",
+	"", "", "",
+	"SQL",
+	"cc_did ORDER BY did ASC",
+	"did, id",
+	"", "", "%1", "" , "");
+
 if ($form_action<>"ask-add")
 $HD_Form -> AddEditElement(gettext("SCHEDULE"),
 	"shedule",
@@ -146,6 +156,47 @@ $HD_Form -> AddEditElement(gettext("SCHEDULE"),
 	"cc_sheduler_ratecard",
 	"weekdays, TIME_TO_SEC(timefrom) timefrom, TIME_TO_SEC(timetill) timetill",
 	"id_did_destination='%id'", "'%id','%1',SEC_TO_TIME('%2'),SEC_TO_TIME('%3')", "", "", "", ":", "`id_did_destination`,`weekdays`,`timefrom`,`timetill`");
+
+$HD_Form -> AddEditElement (gettext("ANSWER"),
+	"answer",
+	'0',
+	"RADIOBUTTON",
+	"",
+	"",
+	gettext("Choose 'Yes' if you want to answer on the call"),
+	"" , "", "", gettext("Yes").":1, - ".gettext("No").":0", "", "", "", gettext("Choose if you want to answer on the call before playing PLAY_SOUND"));
+
+$soundlist = array();
+if (isset($form_action) && $form_action=="ask-edit") {
+	$DBHandle_max = DbConnect();
+	$instance_table = new Table("cc_card","username");
+	$result_card = $instance_table -> Get_list($DBHandle_max, "id=(SELECT id_cc_card FROM cc_did_destination WHERE id=$id)", 0);
+	$diraudio = DIR_STORE_AUDIO."/".$result_card[0][0]."/";
+	$return = scandir($diraudio);
+	if ($return!==false) {
+	    foreach ($return as $val) {
+		if (is_file($diraudio.$val) && $val != 'tempplay.wav') {
+			$soundlist[] = array(preg_replace('/\.[^\.\/]+$/', '', $val),preg_replace('/\.[^\.\/]+$/', '', $val));
+		}
+	    }
+	}
+        $instance_table = new Table("cc_did_destination", "playsound");
+        $list = $instance_table -> Get_list($DBHandle_max, "id = $id", 0);
+        if (is_array($list) && count($list)>0) {
+            $playsound = preg_replace('/\.[^\.\/]+$/', '', basename($list[0][0]));
+            $selectedgreeting = ($playsound && array_search($playsound,array_column($soundlist,0))===false) ? "<OPTION value=\"$playsound\">".$playsound."</OPTION>" : NULL;
+        } else $selectedgreeting = NULL;
+} else {
+	$selectedgreeting = NULL;
+}
+$HD_Form -> AddEditElement (gettext("PLAY_SOUND"),
+	"playsound",
+	'$value',
+	($form_action=='ask-delete')?"INPUT":"DATALIST",
+	"size=50 maxlength=50",
+	"",
+	gettext("Insert the path and name of sound file"),
+	"list", "", "", "", $soundlist, "%1", "", gettext("Play sound before calling DESTINATION. ie 'ivr/wait-please'"), NULL, $selectedgreeting);
 
 $HD_Form -> AddEditElement (gettext("DESTINATION"),
 	"destination",
@@ -213,17 +264,6 @@ $HD_Form -> AddEditElement (gettext("CUSTOMER ID"),
 	", 'CardNumberSelection','width=550,height=550,top=100,left=100,scrollbars=1'" ,
 	gettext("Set the Customer ID."));
 
-
-$HD_Form -> AddEditElement (gettext("DID"),
-	"id_cc_did",
-	'$value',
-	"SELECT",
-	"", "", "",
-	"SQL",
-	"cc_did ORDER BY did ASC",
-	"did, id",
-	"", "", "%1", "" , "");
-
 $HD_Form -> AddEditElement (gettext("VALIDATED"),
 	"validated",
 	"",
@@ -241,47 +281,6 @@ $HD_Form -> AddEditElement (gettext("PRIORITY"),
 	"",
 	"",
 	"list" , "", "",  "", $priority_list, "%1" , "" , "");
-
-$HD_Form -> AddEditElement (gettext("ANSWER"),
-	"answer",
-	'0',
-	"RADIOBUTTON",
-	"",
-	"",
-	gettext("Choose 'Yes' if you want to answer on the call"),
-	"" , "", "", gettext("Yes").":1, - ".gettext("No").":0", "", "", "", gettext("Choose if you want to answer on the call before playing PLAY_SOUND"));
-
-$soundlist = array();
-if (isset($form_action) && $form_action=="ask-edit") {
-	$DBHandle_max = DbConnect();
-	$instance_table = new Table("cc_card","username");
-	$result_card = $instance_table -> Get_list($DBHandle_max, "id=(SELECT id_cc_card FROM cc_did_destination WHERE id=$id)", 0);
-	$diraudio = DIR_STORE_AUDIO."/".$result_card[0][0]."/";
-	$return = scandir($diraudio);
-	if ($return!==false) {
-	    foreach ($return as $val) {
-		if (is_file($diraudio.$val) && $val != 'tempplay.wav') {
-			$soundlist[] = array(preg_replace('/\.[^\.\/]+$/', '', $val),preg_replace('/\.[^\.\/]+$/', '', $val));
-		}
-	    }
-	}
-        $instance_table = new Table("cc_did_destination", "playsound");
-        $list = $instance_table -> Get_list($DBHandle_max, "id = $id", 0);
-        if (is_array($list) && count($list)>0) {
-            $playsound = preg_replace('/\.[^\.\/]+$/', '', basename($list[0][0]));
-            $selectedgreeting = ($playsound && array_search($playsound,array_column($soundlist,0))===false) ? "<OPTION value=\"$playsound\">".$playsound."</OPTION>" : NULL;
-        } else $selectedgreeting = NULL;
-} else {
-	$selectedgreeting = NULL;
-}
-$HD_Form -> AddEditElement (gettext("PLAY_SOUND"),
-	"playsound",
-	'$value',
-	"DATALIST",
-	"size=50 maxlength=50",
-	"",
-	gettext("Insert the path and name of sound file"),
-	"list", "", "", "", $soundlist, "%1", "", gettext("Play sound before calling DESTINATION. ie 'ivr/wait-please'"), NULL, $selectedgreeting);
 /**
 $HD_Form -> AddEditElement (gettext("CID_PRESENT"),
 	"outbound_cidgroup_ignore",
@@ -292,7 +291,7 @@ $HD_Form -> AddEditElement (gettext("CID_PRESENT"),
 	gettext("Choose 'Yes' if you want to present real CID though CID_GROUP applied"),
 	"" , "", "", gettext("Yes").":1, - ".gettext("No").":0", "", "", "", gettext("Choose 'Yes' if you want to present real CID though CID_GROUP applied"));
 **/
-	$HD_Form -> FieldEditElement ('activated, id_cc_did, destination, calleridname, timeout, voip_call, destinuse, destmaxuse, id_cc_card, id_cc_did, validated, priority, answer, playsound');
+	$HD_Form -> FieldEditElement ('activated, id_cc_did, id_cc_did, answer, playsound, destination, calleridname, timeout, voip_call, destinuse, destmaxuse, id_cc_card, validated, priority');
 
 $HD_Form->FG_ADITION_HIDDEN_PARAM		= $HD_Form->FG_EDITION_HIDDEN_PARAM		= 'filterprefix,current_page';
 $HD_Form->FG_ADITION_HIDDEN_PARAM_VALUE 	= $HD_Form->FG_EDITION_HIDDEN_PARAM_VALUE	= $filterprefix.",".$current_page;
