@@ -248,7 +248,7 @@ class A2Billing {
 	
 
 	/* CONSTRUCTOR */
-	function A2Billing()
+	public function __construct()
 	{
 		// $this -> agiconfig['debug'] = true;
 		// $this -> DBHandle = $DBHandle;
@@ -1649,6 +1649,7 @@ class A2Billing {
 			$this->id_diller				= $inst_listdestination[32];
 			$calleridname					= $inst_listdestination[41];
 			$didvoicebox				= is_null($inst_listdestination[33]) ? NULL : $inst_listdestination[33]."@".$this->username;
+			$file				       = basename($inst_listdestination[29]);
 			
 			if ($this -> set_inuse_username) $this -> callingcard_acct_start_inuse($agi,0);
 			
@@ -1681,9 +1682,11 @@ class A2Billing {
 				}
 				if ($this -> destination_start_inuse($agi, $inst_listdestination[1], 1))
 					continue;
-				if ($inst_listdestination[29]) {
+				if ($file) {
+					$diraudio = $this->config['webui']['dir_store_audio']."/".$this->accountcode."/".$file.".wav";
+					if (file_exists($diraudio)) $file = $this->accountcode."/".$file;
 					sleep(1);
-					$agi -> evaluate("STREAM FILE $inst_listdestination[29] \"#\" 0");
+					$agi -> evaluate("STREAM FILE $file \"#\" 0");
 				}
 				// IF VOIP CALL
 				if ($inst_listdestination[5]==1) {
@@ -1982,6 +1985,7 @@ $this -> debug( ERROR, $agi, __FILE__, __LINE__, "[ \033[1;34m".$agi->get_variab
 	    $this->margin					= $inst_listdestination[31];
 	    $this->id_diller					= $inst_listdestination[32];
 	    $didvoicebox 				= is_null($inst_listdestination[33]) ? NULL : $inst_listdestination[33]."@".$this->username;
+	    $file				       = basename($inst_listdestination[29]);
 	    $this->margintotal					= $this->margin_calculate();
 
 	    // CHECK IF DESTINATION IS SET
@@ -1996,9 +2000,11 @@ $this -> debug( ERROR, $agi, __FILE__, __LINE__, "[ \033[1;34m".$agi->get_variab
 	    }
 	    if ($this -> destination_start_inuse($agi, $inst_listdestination[1], 1))
             	continue;
-	    if ($inst_listdestination[29]) {
+	    if ($file) {
+		$diraudio = $this->config['webui']['dir_store_audio']."/".$this->accountcode."/".$file.".wav";
+		if (file_exists($diraudio)) $file = $this->accountcode."/".$file;
 		sleep(1);
-		$agi -> evaluate("STREAM FILE $inst_listdestination[29] \"#\" 0");
+		$agi -> evaluate("STREAM FILE $file \"#\" 0");
 	    }
 
 		if (!$onetry && $this->dnid=="555555") {

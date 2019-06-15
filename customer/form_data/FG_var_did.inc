@@ -62,17 +62,14 @@ $validated_list["1"] = array( gettext("Validated"), "1");
 
 $diraudio = DIR_STORE_AUDIO."/" . $_SESSION["pr_login"] . "/";
 $soundlist = array();
-$soundlist[] = array(gettext("NOT ACTIVE")."&nbsp", "");
 $return = scandir($diraudio);
 if ($return!==false) {
         foreach ($return as $val) {
             if (is_file($diraudio.$val) && $val != 'tempplay.wav') {
-                $soundlist[] = array(preg_replace('/\.[^\.\/]+$/', '', $val),$_SESSION["pr_login"]."/".preg_replace('/\.[^\.\/]+$/', '', $val));
+                $soundlist[] = array(preg_replace('/\.[^\.\/]+$/', '', $val),preg_replace('/\.[^\.\/]+$/', '', $val));
             }
         }
 }
-//echo $diraudio."<br>";
-//print_r($return);
 
 $HD_Form -> AddViewElement(gettext("DID"), "id_cc_did", "15%", "center", "sort", "30", "lie", "cc_did", "did", "id='%id'", "%1");
 $HD_Form -> AddViewElement(gettext("DESTINATION"), "destination", "10%", "center\" nowrap \"", "sort");
@@ -132,7 +129,6 @@ $HD_Form -> CV_TEXT_TITLE_ABOVE_TABLE = '';
 $HD_Form -> CV_DISPLAY_FILTER_ABOVE_TABLE = false;
 $HD_Form -> FG_LIMITE_DISPLAY = 14;
 
-//if ($_SESSION["card_id"] == 6) 
 $HD_Form -> FG_EDITION = true;
 $HD_Form -> FG_DELETION = false;
 $HD_Form -> FG_ADDITION = true;
@@ -213,14 +209,14 @@ if (isset($form_action) && $form_action=="ask-edit") {
 	$list = $instance_table -> Get_list($DBHandle_max, $clause, 0);;
 	if (is_array($list) && count($list)>0) {
 		$playsound = preg_replace('/\.[^\.\/]+$/', '', basename($list[0][0]));
-		$selectedgreeting = ($playsound && array_search($playsound,array_column($soundlist,0))===false) ? "<OPTION  value=\"$playsound\" selected>".$playsound."&nbsp;</OPTION>" : NULL;
+		$selectedgreeting = ($playsound && array_search($playsound,array_column($soundlist,0))===false) ? "<OPTION value=\"$playsound\">".$playsound."</OPTION>" : NULL;
 	} else	$selectedgreeting = NULL;
 } else		$selectedgreeting = NULL;
 $HD_Form -> AddEditElement (gettext("PLAY_SOUND"),
 	"playsound",
 	'$value',
-	"SELECT",
-	"",
+	"DATALIST",
+	"size=50 maxlength=50",
 	"",
 	gettext("Insert the path and name of sound file"),
 	"list", "", "", "", $soundlist, "%1", "", gettext("Play sound before calling DESTINATION."), NULL, $selectedgreeting);

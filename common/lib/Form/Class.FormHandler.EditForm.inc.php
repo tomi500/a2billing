@@ -497,7 +497,89 @@ function updatecontent(id_el, record, field_inst, instance)
 						}//END_IF
 ?>			</SELECT>
 <?php
-				}elseif (strtoupper ($this->FG_TABLE_EDITION[$i][3])=="RADIOBUTTON"){
+				} elseif (strtoupper ($this->FG_TABLE_EDITION[$i][3])=="DATALIST")	{
+					if (strtoupper ($this->FG_TABLE_EDITION[$i][7])=="SQL") {
+						$instance_sub_table = new Table($this->FG_TABLE_EDITION[$i][8], $this->FG_TABLE_EDITION[$i][9]);
+						$select_list = $instance_sub_table -> Get_list ($this->DBHandle, str_replace("%id", "$id", $this->FG_TABLE_EDITION[$i][10]), null, null, null, null, null, null);
+						if ($this->FG_DEBUG >= 2) { echo "<br>"; print_r($select_list);}
+											
+					} elseif (strtoupper ($this->FG_TABLE_EDITION[$i][7])=="LIST")
+					{
+						$select_list = $this->FG_TABLE_EDITION[$i][11];
+						if ($this->FG_DEBUG >= 2) { echo "<br>"; print_r($select_list);}
+					}
+					 if ($this->FG_DEBUG >= 2) print_r ($list);			 
+					 if ($this->FG_DEBUG >= 2) echo "<br>#$i<br>::>".$this->VALID_SQL_REG_EXP;
+					 if ($this->FG_DEBUG >= 2) echo "<br><br>::>".$list[0][$i];
+					 if ($this->FG_DEBUG >= 2) echo "<br><br>::>".$this->FG_TABLE_ADITION[$i][1];
+					 $myname = $this->FG_TABLE_EDITION[$i][1];
+					 if (strpos($this->FG_TABLE_EDITION[$i][4], "multiple"))
+						$myname.= "[]";
+					 ?>
+					<INPUT type="text" list="list_<?php echo $myname;?>" name="<?php echo $myname;?>" class="form_input_text" <?php echo $this->FG_TABLE_EDITION[$i][4];?> value="<?php if($this->VALID_SQL_REG_EXP){ echo stripslashes($list[0][$i]); }else{ echo $processed[$this->FG_TABLE_ADITION[$i][1]];  }?>">
+					<datalist id="list_<?php echo $myname;?>" autocomplete="off">
+						<?php echo ($this->FG_TABLE_EDITION[$i][15]);
+						if (count($select_list)>0) {
+							$select_number=0;
+							foreach ($select_list as $select_recordset){
+								$select_number++;?>
+
+						<OPTION value="<?php
+								$recordshow = "";
+								if ($this->VALID_SQL_REG_EXP) {
+									if (strpos($this->FG_TABLE_EDITION[$i][4], "multiple")) {
+										$recordshow .= $select_recordset[1]."\"";
+										if (intval($select_recordset[1]) & intval($list[0][$i]))
+											$recordshow .= "selected";
+									} else {
+										$temprecord = explode(';', $list[0][$i]);
+										if (strcmp($temprecord[0],$select_recordset[1])==0) {
+											$recordshow .= $list[0][$i]."\" selected";
+										} else {
+											$recordshow .= $select_recordset[1]."\"";
+										}
+									}
+								} else {
+									if (strpos($this->FG_TABLE_EDITION[$i][4], "multiple")) {
+										$recordshow .= $select_recordset[1]."\"";
+										if (is_array($processed[$this->FG_TABLE_EDITION[$i][1]]) && (intval($select_recordset[1]) & array_sum($processed[$this->FG_TABLE_EDITION[$i][1]])))
+											$recordshow .= "selected";
+									} else {
+										$temprecord = explode(';', $processed[$this->FG_TABLE_EDITION[$i][1]]);
+										if (strcmp($temprecord[0],$select_recordset[1])==0) {
+											$recordshow .= $processed[$this->FG_TABLE_EDITION[$i][1]]."\" selected";
+										} else {
+											$recordshow .= $select_recordset[1]."\"";
+										}
+									}
+								}
+								echo $recordshow.'>';
+								
+								if ($this->FG_TABLE_EDITION[$i][12] != "") {
+									$value_display = $this->FG_TABLE_EDITION[$i][12];
+									$nb_recor_k = count($select_recordset);
+									for ($k=1;$k<=$nb_recor_k;$k++) {
+										$value_display  = str_replace("%$k", $select_recordset[$k-1], $value_display );
+									}
+								} else {
+									$value_display = $select_recordset[0];	
+								}
+								// DISPLAY THE VALUE
+								echo $value_display;
+								// CLOSE THE <OPTION
+?></OPTION><?php
+							}// END_FOREACH
+							preg_match('/"([^"]+)"/', $this->FG_TABLE_EDITION[$i][12], $m);
+							if ($m[1]!="") $value_display = " value=\"".$m[1]."\"";
+							else $value_display = "";
+						}else{
+							echo gettext("No data found !!!");
+						}//END_IF
+?>
+
+					</datalist>
+<?php
+				} elseif (strtoupper ($this->FG_TABLE_EDITION[$i][3])=="RADIOBUTTON"){
 						$radio_table = preg_split("/,/",trim($this->FG_TABLE_EDITION[$i][10]));
 						foreach ($radio_table as $radio_instance){
 							$radio_composant = preg_split("/:/",$radio_instance);
@@ -625,7 +707,7 @@ echo $this->FG_TABLE_COMMENT[$i]?>&nbsp;<?php
 <?php
 					} else {
 						
-						if (strtoupper ($this->FG_TABLE_EDITION[$i][3])=="SELECT") {
+						if (strtoupper ($this->FG_TABLE_EDITION[$i][3])=="SELECT" || strtoupper ($this->FG_TABLE_EDITION[$i][3])=="DATALIST") {
 							$table_split = preg_split("/:/",$this->FG_TABLE_EDITION[$i][14]);
 ?>		<TR>
 						<!-- ******************** PARTIE EXTERN : SELECT ***************** -->

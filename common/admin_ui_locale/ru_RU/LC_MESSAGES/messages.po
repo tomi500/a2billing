@@ -1798,7 +1798,7 @@ msgstr "ИСПАНСКИЙ"
 #: Public/A2B_mass_mail.php:76 Public/A2B_data_archiving.php:59
 #: Public/A2B_data_archiving.php:64
 msgid "FRENCH"
-msgstr "ФРАНЗУСКИЙ"
+msgstr "ФРАНЦУЗСКИЙ"
 
 #: lib/interface/constants.php:27 lib/interface/constants.php:41
 msgid "RUSSIAN"

@@ -160,6 +160,52 @@ $processed = $this->getProcessed();
 	?>
         </SELECT>
 	<?php   
+		}elseif (strtoupper ($this->FG_TABLE_ADITION[$i][3])=="DATALIST"){
+			if ($this->FG_DEBUG == 1) { echo "<br> TYPE DE DATALIST :".$this->FG_TABLE_ADITION[$i][7];}
+			if (strtoupper ($this->FG_TABLE_ADITION[$i][7])=="SQL") {
+				
+				$instance_sub_table = new Table($this->FG_TABLE_ADITION[$i][8], $this->FG_TABLE_ADITION[$i][9]);
+				$select_list = $instance_sub_table -> Get_list ($this->DBHandle, str_replace("%id", "$id", $this->FG_TABLE_EDITION[$i][10]), null, null, null, null, null, null);
+				if ($this->FG_DEBUG >= 2) { echo "<br>"; print_r($select_list);}
+			} elseif (strtoupper ($this->FG_TABLE_ADITION[$i][7])=="LIST") {
+				$select_list = $this->FG_TABLE_ADITION[$i][11];
+			}
+			$myname = $this->FG_TABLE_EDITION[$i][1];
+			if (strpos($this->FG_TABLE_EDITION[$i][4], "multiple"))
+				$myname.= "[]";
+	?>
+			<INPUT type="text" list="list_<?php echo $myname;?>" name="<?php echo $myname;?>" class="form_input_text" <?php echo $this->FG_TABLE_EDITION[$i][4];?>>
+			<datalist id="list_<?php echo $myname;?>" autocomplete="off">
+	<?php  
+			echo ($this->FG_TABLE_ADITION[$i][15]);
+				if (count($select_list)>0){
+					$select_number=0;
+					foreach ($select_list as $select_recordset) {
+						$select_number++;
+						if ($this->FG_TABLE_ADITION[$i][12] != "") {
+							$value_display = $this->FG_TABLE_ADITION[$i][12];
+							$nb_recor_k = count($select_recordset);
+							for ($k=1;$k<=$nb_recor_k;$k++) {
+								$value_display  = str_replace("%$k", $select_recordset[$k-1], $value_display );
+							}
+						} else {
+							$value_display = $select_recordset[0];
+						}
+						$temprecordset = "<OPTION  value='";
+						if ($this->FG_TABLE_ADITION[$i][2] == $select_recordset[1])
+							$temprecordset .= $this->FG_TABLE_ADITION[$i][2] . "' selected";
+						else $temprecordset .= $select_recordset[1] . "'";
+						
+						// CLOSE THE <OPTION
+						echo $temprecordset . '> ' . $value_display.'</OPTION>';
+						
+					 } // END_FOREACH
+				 } else {
+					echo gettext("No data found !!!");
+				 }//END_IF				
+	?>
+        </datalist>
+	<?php
 			} elseif (strtoupper ($this->FG_TABLE_ADITION[$i][3])=="RADIOBUTTON") {
 				$radio_table = preg_split("/,/",trim($this->FG_TABLE_ADITION[$i][10]));
 				foreach ($radio_table as $radio_instance){

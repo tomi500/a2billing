@@ -2509,7 +2509,7 @@ msgstr "ФИНСКИЙ"
 
 #: lib/interface/constants.php:26 lib/interface/constants.php:43
 msgid "FRENCH"
-msgstr "ФРАНЦУЗКИЙ"
+msgstr "ФРАНЦУЗСКИЙ"
 
 #: lib/interface/constants.php:28 lib/interface/constants.php:44
 msgid "BRAZILIAN"
