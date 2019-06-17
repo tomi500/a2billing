@@ -1060,10 +1060,13 @@ if ($mode == 'standard') {
 						" aleg_carrier_initblock_offp, aleg_carrier_increment_offp, aleg_retail_initblock_offp, aleg_retail_increment_offp,".
 						" cc_card.id, playsound, timeout, margin, id_diller, voicebox, removeaddprefix, addprefixinternational, answer, chanlang,".
 						" aftercallbacksound, digitaftercallbacksound, spamfilter, secondtimedays, calleridname, speech2mail".
-						" FROM cc_did, cc_did_destination, cc_card, cc_country".
+						" FROM cc_did, cc_card, cc_country, cc_did_destination".
+						" LEFT JOIN cc_sheduler_ratecard ON id_did_destination=cc_did_destination.id".
 						" WHERE id_cc_did=cc_did.id AND cc_card.status=1 AND cc_card.id=id_cc_card AND cc_did_destination.activated=1 AND cc_did.activated=1 AND did LIKE '$A2B->destination'".
 						" AND cc_country.id=id_cc_country AND cc_did.startingdate <= CURRENT_TIMESTAMP".
-						" AND (cc_did.expirationdate > CURRENT_TIMESTAMP OR cc_did.expirationdate IS NULL AND cc_did_destination.validated = 1";
+						" AND (cc_did.expirationdate > CURRENT_TIMESTAMP OR cc_did.expirationdate IS NULL AND cc_did_destination.validated = 1".
+						" AND (`cc_sheduler_ratecard`.`id_did_destination` IS NULL OR (`weekdays` LIKE CONCAT('%',WEEKDAY(NOW()),'%') AND (CURTIME() BETWEEN `timefrom` AND `timetill`
+						    OR (`timetill`<=`timefrom` AND (CURTIME()<`timetill` OR CURTIME()>=`timefrom`)))))";
 					if ($A2B->config["database"]['dbtype'] == "mysql") {
 						$QUERY .= " OR cc_did.expirationdate = '0000-00-00 00:00:00'";
 					}
@@ -1124,7 +1127,7 @@ if ($mode == 'standard') {
                     " aleg_carrier_connect_charge_offp, aleg_carrier_cost_min_offp, aleg_retail_connect_charge_offp, aleg_retail_cost_min_offp, ".
                     " aleg_carrier_initblock_offp, aleg_carrier_increment_offp, aleg_retail_initblock_offp, aleg_retail_increment_offp,".
                     " answer, playsound, timeout, margin, id_diller, voicebox, removeaddprefix, addprefixinternational, chanlang, buyrate, billblock, spamfilter, secondtimedays, calleridname, speech2mail".
-			        " FROM cc_did_destination, cc_did, cc_card, cc_country".
+			        " FROM cc_did, cc_card, cc_country, cc_did_destination".
 			        " LEFT JOIN cc_sheduler_ratecard ON id_did_destination=cc_did_destination.id".
 			        " WHERE id_cc_did=cc_did.id AND cc_card.status=1 AND cc_card.id=id_cc_card AND cc_did_destination.activated=1 AND cc_did.activated=1 AND did LIKE '$mydnid' ".
 			        " AND cc_country.id=id_cc_country AND cc_did.startingdate<= CURRENT_TIMESTAMP AND (cc_did.expirationdate > CURRENT_TIMESTAMP OR cc_did.expirationdate IS NULL ".
@@ -1750,7 +1753,7 @@ $A2B -> debug( ERROR, $agi, __FILE__, __LINE__, "\033[1;32m============INSERT===
 					" aleg_carrier_initblock_offp, aleg_carrier_increment_offp, aleg_retail_initblock_offp, aleg_retail_increment_offp, ".
 					" cc_card.id, playsound, timeout, margin, id_diller, voicebox, removeaddprefix, addprefixinternational, answer, chanlang, ".
 					" aftercallbacksound, digitaftercallbacksound, spamfilter, secondtimedays, calleridname, speech2mail".
-					" FROM cc_did, cc_did_destination, cc_card, cc_country".
+					" FROM cc_did, cc_card, cc_country, cc_did_destination".
 					" LEFT JOIN cc_sheduler_ratecard ON id_did_destination=cc_did_destination.id".
 					" WHERE id_cc_did=cc_did.id AND cc_card.status=1 AND cc_card.id=id_cc_card and cc_did_destination.activated=1 AND cc_did.activated=1 AND did LIKE '$A2B->destination'".
 					" AND cc_country.id=id_cc_country AND cc_did.startingdate <= CURRENT_TIMESTAMP AND (cc_did.expirationdate > CURRENT_TIMESTAMP OR cc_did.expirationdate IS NULL ".

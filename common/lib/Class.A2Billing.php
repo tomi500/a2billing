@@ -1650,7 +1650,7 @@ class A2Billing {
 			$calleridname					= $inst_listdestination[41];
 			$this->speech2mail				= $inst_listdestination[42];
 			$didvoicebox				= is_null($inst_listdestination[33]) ? NULL : $inst_listdestination[33]."@".$this->username;
-			$file				       = basename($inst_listdestination[29]);
+			$file  = preg_replace('/\.[^\.\/]+$/','',basename($inst_listdestination[29]));
 			
 			if ($this -> set_inuse_username) $this -> callingcard_acct_start_inuse($agi,0);
 			
@@ -1990,7 +1990,7 @@ $this -> debug( ERROR, $agi, __FILE__, __LINE__, "[ \033[1;34m".$agi->get_variab
 	    $this->margin					= $inst_listdestination[31];
 	    $this->id_diller					= $inst_listdestination[32];
 	    $didvoicebox 				= is_null($inst_listdestination[33]) ? NULL : $inst_listdestination[33]."@".$this->username;
-	    $file				       = basename($inst_listdestination[29]);
+	    $file    = preg_replace('/\.[^\.\/]+$/', '', basename($inst_listdestination[29]));
 	    $this->margintotal					= $this->margin_calculate();
 	    $this->speech2mail					= $inst_listdestination[43];
 
