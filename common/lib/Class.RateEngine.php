@@ -1411,6 +1411,8 @@ for ($i=0; $i<count($this->ratecard_obj); $i++) {
 			$A2B->instance_table -> SQLExec ($A2B -> DBHandle, $myclause_nodidcall, 0);
 		}
 		monitor_recognize($A2B);
+		$A2B -> send_talk($A2B -> speech2mail, $this -> monfile);
+		$this -> monfile = false;
 	}
 	
 	/*
@@ -1941,7 +1943,8 @@ $A2B -> debug( ERROR, $agi, "", "", "\r                  CallBack for Trunk=$thi
 						$A2B -> debug( INFO, $agi, __FILE__, __LINE__, "EXEC StopMixMonitor (".$A2B->uniqueid.")");
 						if (file_exists($monfile) && filesize($monfile) == 60) {
 							unlink($monfile);
-						}
+							$this->monfile = false;
+						} else	$this->monfile = $monfile;
 					}
 					$this -> dialstatus = $agi -> get_variable("DIALSTATUS",true);
 				    }

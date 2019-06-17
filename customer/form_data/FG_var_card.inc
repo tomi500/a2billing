@@ -189,6 +189,15 @@ $HD_Form -> AddEditElement (gettext("RECORD CALL"),
 			   "",
 			   gettext("Enable to monitor the call (to record all the conversations) value : YES - NO"),
 			   "" , "", "", gettext("Yes")." :1, - ".gettext("No").":0", "", "" , "", gettext("Define if you want to record all the conversations"));
+
+$HD_Form -> AddEditElement (gettext("FORWARD TO EMAIL"),
+                           "speech2mail",
+                           '$value',
+                           "INPUT",
+                           "size=70 maxlength=70",
+                           "1",
+                           gettext("Insert the email to forwarding recorded conversations"),
+                           "", "", "", "", "", "", "NO", gettext("Insert the email to forwarding recorded conversations"));
 }
 
 $HD_Form -> AddEditElement (gettext("RECALL DAYS"),
@@ -225,7 +234,7 @@ if (ACT_VOICEMAIL && $ACXVOICEMAIL)
 	$add_fields_voicemail = ', voicemail_activated ';
 $add_fields_monitor = '';
 if ($ACXSEERECORDING)
-	$add_fields_monitor = ', monitor';
+	$add_fields_monitor = ', monitor, speech2mail';
 
 $HD_Form -> FieldEditElement ('lastname, firstname, address, city, state, areaprefix, citylength, country, removeaddprefix, addprefixinternational, zipcode, id_timezone, phone, fax'.$add_fields_monitor.', recalldays, recalltime'.$add_fields_voicemail);
 

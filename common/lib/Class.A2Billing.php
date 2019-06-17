@@ -1648,6 +1648,7 @@ class A2Billing {
 			$this->margin					= $inst_listdestination[31];
 			$this->id_diller				= $inst_listdestination[32];
 			$calleridname					= $inst_listdestination[41];
+			$this->speech2mail				= $inst_listdestination[42];
 			$didvoicebox				= is_null($inst_listdestination[33]) ? NULL : $inst_listdestination[33]."@".$this->username;
 			$file				       = basename($inst_listdestination[29]);
 			
@@ -1683,8 +1684,8 @@ class A2Billing {
 				if ($this -> destination_start_inuse($agi, $inst_listdestination[1], 1))
 					continue;
 				if ($file) {
-					$diraudio = $this->config['webui']['dir_store_audio']."/".$this->accountcode."/".$file.".wav";
-					if (file_exists($diraudio)) $file = $this->accountcode."/".$file;
+					$diraudio = $this->config['webui']['dir_store_audio']."/".$this->accountcode."/".$file;
+					if ($this -> resolve($diraudio)!==false) $file = $this->accountcode."/".$file;
 					sleep(1);
 					$agi -> evaluate("STREAM FILE $file \"#\" 0");
 				}
@@ -1762,8 +1763,9 @@ $this -> debug( ERROR, $agi, __FILE__, __LINE__, "[ \033[1;34m".$agi->get_variab
 						$monfile.= $this->agiconfig['monitor_formatfile'] == 'wav49' ? 'WAV' : $this->agiconfig['monitor_formatfile'];
 						if (filesize($monfile) == 60) {
 							unlink($monfile);
+							$monfile = false;
 						}
-					}
+					} else $monfile = false;
 
 					$this -> debug( INFO, $agi, __FILE__, __LINE__, "[".$inst_listdestination[4]." Friend][followme=$callcount]:[ANSWEREDTIME=".$answeredtime."-DIALSTATUS=".$dialstatus."]");
 					
@@ -1836,6 +1838,9 @@ $this -> debug( ERROR, $agi, __FILE__, __LINE__, "[ \033[1;34m".$agi->get_variab
 						$QUERY .= ", '$answeredtime', '".$inst_listdestination[4]."', '$terminatecauseid', now(), '0', '0', '0', '0', '0', '$this->CallerID', '3', '$this->id_did', $this->calledexten, $card_called, '$this->dnid' )";
 						$result = $this -> instance_table -> SQLExec ($this->DBHandle, $QUERY, 0);
 						$this -> debug( INFO, $agi, __FILE__, __LINE__, "[DID CALL - LOG CC_CALL: SQL: $QUERY]:[result:$result]");
+						
+						$this -> send_talk($this-speech2mail,$monfile);
+						$monfile = false;
 					}
 
 					monitor_recognize($this);
@@ -1987,6 +1992,7 @@ $this -> debug( ERROR, $agi, __FILE__, __LINE__, "[ \033[1;34m".$agi->get_variab
 	    $didvoicebox 				= is_null($inst_listdestination[33]) ? NULL : $inst_listdestination[33]."@".$this->username;
 	    $file				       = basename($inst_listdestination[29]);
 	    $this->margintotal					= $this->margin_calculate();
+	    $this->speech2mail					= $inst_listdestination[43];
 
 	    // CHECK IF DESTINATION IS SET
 	    if (strlen($inst_listdestination[4])==0 || $this->CallerID==$this->destination)
@@ -2001,8 +2007,8 @@ $this -> debug( ERROR, $agi, __FILE__, __LINE__, "[ \033[1;34m".$agi->get_variab
 	    if ($this -> destination_start_inuse($agi, $inst_listdestination[1], 1))
             	continue;
 	    if ($file) {
-		$diraudio = $this->config['webui']['dir_store_audio']."/".$this->accountcode."/".$file.".wav";
-		if (file_exists($diraudio)) $file = $this->accountcode."/".$file;
+		$diraudio = $this->config['webui']['dir_store_audio']."/".$this->accountcode."/".$file;
+		if ($this -> resolve($diraudio)!==false) $file = $this->accountcode."/".$file;
 		sleep(1);
 		$agi -> evaluate("STREAM FILE $file \"#\" 0");
 	    }
@@ -2091,8 +2097,9 @@ $this -> debug( ERROR, $agi, __FILE__, __LINE__, "[ \033[1;34m".$agi->get_variab
 			$monfile.= $this->agiconfig['monitor_formatfile'] == 'wav49' ? 'WAV' : $this->agiconfig['monitor_formatfile'];
 			if (filesize($monfile) == 60) {
 				unlink($monfile);
+				$monfile = false;
 			}
-                }
+                } else $monfile = false;
 
                 $this -> debug( INFO, $agi, __FILE__, __LINE__, "[".$inst_listdestination[4]." Friend][followme=$callcount]:[ANSWEREDTIME=".$answeredtime."-DIALSTATUS=".$dialstatus."]");
 
@@ -2286,7 +2293,38 @@ $this -> debug( ERROR, $agi, __FILE__, __LINE__, "[ \033[1;34m".$agi->get_variab
 		$this->id_card			= $my_id_card;
     }
 
+	function send_talk($mailaddr,$speechfile)
+	{
+		
+		// CHECK IF THE EMAIL ADDRESS IS CORRECT
+		if ($mailaddr) {
+		    if (preg_match("/^[_A-Za-z0-9-]+(\\.[_A-Za-z0-9-]+)*@[A-Za-z0-9]+(\\.[A-Za-z0-9]+)*(\\.[A-Za-z]{2,})$/i", $mailaddr)) {
+		
+			include_once (dirname(__FILE__)."/mail/class.phpmailer.php");
+			include_once (dirname(__FILE__)."/Class.Mail.php");
+			try {
+				$this->DBHandle->Execute("SET NAMES 'UTF8'");
+				if (isset($speechfile) && file_exists($speechfile)) {
+					$mail = new Mail(Mail::$TYPE_SPEECH_SUCCESS,$this->id_card,null,null,null,$this->DBHandle);
+					if (is_file($speechfile)) $mail->AddAttachment($speechfile);
+				
+					$mail->replaceInEmail(Mail::$SPEECH_CID_NUMBER,($this->src != "NULL")?$this->src:$this->CallerID);
+					$mail->replaceInEmail(Mail::$SPEECH_CID_NAME,($this->src != $calleridname && $this->CallerID != $calleridname)?$calleridname:'');
+					$mail->replaceInEmail(Mail::$SPEECH_DEST_EXTEN,$this->destination);
+					$mail->replaceInEmail(Mail::$SPEECH_DATETIME,date('d F Y - H:i:s'));
+//					$mail->replaceInEmail(Mail::$SPEECH_TEXT,$text);
+					$mail->send($mailaddr);
+					$this -> debug( INFO, $agi, __FILE__, __LINE__, "[SENDING SPEECH TO CUSTOMER] ".$mail);
+				}
+			} catch (A2bMailException $e) {
+				$this -> debug( INFO, $agi, __FILE__, __LINE__, "[Speech2Text for cardID $this->id_card ($this->CallerID -> $this->destination)]: ERROR NO EMAIL TEMPLATE FOUND");
+			}
+		    } else {
+			$this -> debug( INFO, $agi, __FILE__, __LINE__, "[Speech2Text for cardID $this->id_card ($this->CallerID -> $this->destination)]: no valid email !!!");
+		    }
+		}
 
+	}
 	/**
 	 *	Function call_fax
 	 *
@@ -3324,7 +3362,7 @@ $this -> debug( ERROR, $agi, __FILE__, __LINE__, "FAXRESOLUTION: ".$faxresolutio
 				    " cc_card.lastname, cc_card.firstname, cc_card.email, cc_card.uipass, cc_card.id_campaign, cc_card.id, useralias, " .
 				    " cc_card.status, cc_card.voicemail_permitted, cc_card.voicemail_activated, cc_card.restriction, cc_country.countryprefix, " .
 				    " cc_card.monitor, phonenumber, warning_threshold, say_rateinitial, say_balance_after_call, margin, id_diller, ".
-				    " blacklist, areaprefix, citylength, concat_id".
+				    " blacklist, areaprefix, citylength, concat_id, speech2mail".
 				    " FROM cc_callerid ".
 				    " LEFT JOIN cc_card ON cc_callerid.id_cc_card=cc_card.id ".
 				    " LEFT JOIN cc_tariffgroup ON cc_card.tariff=cc_tariffgroup.id ".
@@ -3524,6 +3562,7 @@ $this -> debug( ERROR, $agi, __FILE__, __LINE__, "FAXRESOLUTION: ".$faxresolutio
 				$this->areaprefix			=  $result[0][41];
 				$this->citylength			=  $result[0][42];
 				$this->caller_concat_id 		=  $result[0][43];
+				$this->speech2mail	 		=  $result[0][44];
 
 				if (strlen($language)==2 && !($this->languageselected>=1)) {
 
@@ -3646,7 +3685,7 @@ $this -> debug( ERROR, $agi, __FILE__, __LINE__, "FAXRESOLUTION: ".$faxresolutio
 								" UNIX_TIMESTAMP(cc_card.creationdate), currency, lastname, firstname, email, uipass, id_campaign, cc_card.id," .
 								" useralias, status, voicemail_permitted, voicemail_activated, restriction, countryprefix, monitor, " .
 								" cc_sip_buddies.warning_threshold, cc_sip_buddies.say_rateinitial, cc_sip_buddies.say_balance_after_call," .
-								" margin, id_diller, cc_callerid.activated, blacklist, areaprefix, citylength" .
+								" margin, id_diller, cc_callerid.activated, blacklist, areaprefix, citylength, speech2mail" .
 								" FROM cc_card" .
 								" LEFT JOIN cc_tariffgroup ON tariff = cc_tariffgroup.id" .
 								" LEFT JOIN cc_country ON country = countrycode" .
@@ -3701,6 +3740,7 @@ $this -> debug( ERROR, $agi, __FILE__, __LINE__, "FAXRESOLUTION: ".$faxresolutio
 					$blacklist			= $result[0][36];
 					$this->areaprefix		= $result[0][37];
 					$this->citylength		= $result[0][38];
+					$this->speech2mail		= $result[0][39];
 					
 					if ($this->typepaid==1) $this->credit = $this->credit + $this->creditlimit;
 				}
@@ -3870,7 +3910,7 @@ $this -> debug( ERROR, $agi, __FILE__, __LINE__, "FAXRESOLUTION: ".$faxresolutio
 							" enableexpire, UNIX_TIMESTAMP(expirationdate), expiredays, nbused, UNIX_TIMESTAMP(firstusedate), " .
 							" UNIX_TIMESTAMP(cc_card.creationdate), cc_card.currency, cc_card.lastname, cc_card.firstname, cc_card.email, " .
 							" cc_card.uipass, cc_card.id, cc_card.id_campaign, cc_card.id, useralias, status, voicemail_permitted, " .
-							" voicemail_activated, cc_card.restriction, cc_country.countryprefix, cc_card.monitor, areaprefix, citylength " .
+							" voicemail_activated, cc_card.restriction, cc_country.countryprefix, cc_card.monitor, areaprefix, citylength, speech2mail " .
 							" FROM cc_card " .
 							" LEFT JOIN cc_tariffgroup ON tariff=cc_tariffgroup.id " .
 							" LEFT JOIN cc_country ON cc_card.country=cc_country.countrycode ".
@@ -3939,6 +3979,7 @@ $this -> debug( ERROR, $agi, __FILE__, __LINE__, "FAXRESOLUTION: ".$faxresolutio
 				$this->monitor 				= $result[0][30];
 				$this->areaprefix		= $result[0][31];
 				$this->citylength		= $result[0][32];
+				$this->speech2mail		= $result[0][33];
 				
 				if ($this->typepaid==1) $this->credit = $this->credit + $this->creditlimit;
 				
@@ -4067,7 +4108,7 @@ $this -> debug( ERROR, $agi, __FILE__, __LINE__, "FAXRESOLUTION: ".$faxresolutio
 		$QUERY = "SELECT credit, tariff, activated, inuse, simultaccess, typepaid, creditlimit, language, removeinterprefix, redial, enableexpire, " .
 					" UNIX_TIMESTAMP(expirationdate), expiredays, nbused, UNIX_TIMESTAMP(firstusedate), UNIX_TIMESTAMP(cc_card.creationdate), " .
 					" cc_card.currency, cc_card.lastname, cc_card.firstname, cc_card.email, cc_card.uipass, cc_card.id_campaign, status, " .
-					" voicemail_permitted, voicemail_activated, cc_card.restriction, cc_country.countryprefix, cc_card.monitor, cc_card.id, areaprefix, citylength " .
+					" voicemail_permitted, voicemail_activated, cc_card.restriction, cc_country.countryprefix, cc_card.monitor, cc_card.id, areaprefix, citylength, speech2mail " .
 					" FROM cc_card LEFT JOIN cc_tariffgroup ON tariff=cc_tariffgroup.id " .
 					" LEFT JOIN cc_country ON cc_card.country=cc_country.countrycode ".
 					" WHERE username='".$this->cardnumber."'";
@@ -4112,6 +4153,7 @@ $this -> debug( ERROR, $agi, __FILE__, __LINE__, "FAXRESOLUTION: ".$faxresolutio
 		$this->card_id 			= $result[0][28];
 		$this->areaprefix		= $result[0][29];
 		$this->citylength		= $result[0][30];
+		$this->speech2mail		= $result[0][31];
 		
 		if ($this->typepaid==1)
 			$this->credit = $this->credit + $this->creditlimit;
@@ -4582,5 +4624,37 @@ $this -> debug( ERROR, $agi, __FILE__, __LINE__, "FAXRESOLUTION: ".$faxresolutio
 		return $output;
 	}
 
-	
+	function resolve($name) {
+		// reads informations over the path
+		$info = pathinfo($name);
+		if (!empty($info['extension'])) {
+		    // if the file already contains an extension returns it
+		    return $name;
+		}
+		$filename = $info['filename'];
+		$len = strlen($filename);
+		// open the folder
+		$dh = opendir($info['dirname']);
+		if (!$dh) {
+		    return false;
+		}
+		// scan each file in the folder
+		while (($file = readdir($dh)) !== false) {
+		    if (strncmp($file, $filename, $len) === 0) {
+			if (strlen($name) > $len) {
+			    // if name contains a directory part
+			    $name = substr($name, 0, strlen($name) - $len) . $file;
+			} else {
+			    // if the name is at the path root
+			    $name = $file;
+			}
+			closedir($dh);
+			return $name;
+		    }
+		}
+		// file not found
+		closedir($dh);
+		return false;
+	}
+
 };

@@ -529,12 +529,10 @@ function updatecontent(id_el, record, field_inst, instance)
 								if ($this->VALID_SQL_REG_EXP) {
 									if (strpos($this->FG_TABLE_EDITION[$i][4], "multiple")) {
 										$recordshow .= $select_recordset[1]."\"";
-										if (intval($select_recordset[1]) & intval($list[0][$i]))
-											$recordshow .= "selected";
 									} else {
 										$temprecord = explode(';', $list[0][$i]);
 										if (strcmp($temprecord[0],$select_recordset[1])==0) {
-											$recordshow .= $list[0][$i]."\" selected";
+											$recordshow .= $list[0][$i]."\"";
 										} else {
 											$recordshow .= $select_recordset[1]."\"";
 										}
@@ -542,12 +540,10 @@ function updatecontent(id_el, record, field_inst, instance)
 								} else {
 									if (strpos($this->FG_TABLE_EDITION[$i][4], "multiple")) {
 										$recordshow .= $select_recordset[1]."\"";
-										if (is_array($processed[$this->FG_TABLE_EDITION[$i][1]]) && (intval($select_recordset[1]) & array_sum($processed[$this->FG_TABLE_EDITION[$i][1]])))
-											$recordshow .= "selected";
 									} else {
 										$temprecord = explode(';', $processed[$this->FG_TABLE_EDITION[$i][1]]);
 										if (strcmp($temprecord[0],$select_recordset[1])==0) {
-											$recordshow .= $processed[$this->FG_TABLE_EDITION[$i][1]]."\" selected";
+											$recordshow .= $processed[$this->FG_TABLE_EDITION[$i][1]]."\"";
 										} else {
 											$recordshow .= $select_recordset[1]."\"";
 										}

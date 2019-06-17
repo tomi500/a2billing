@@ -68,6 +68,8 @@ class Mail {
 	static public $TYPE_FAX_SUCCESS = 'fax_success';
 	static public $TYPE_FAX_FAILED = 'fax_failed';
 
+	static public $TYPE_SPEECH_SUCCESS = 'call_success';
+
 	//Used by mail type = fax_success AND fax_failed
 	static public $FAX_CID_NUMBER = '$cid_number$';
 	static public $FAX_CID_NAME = '$cid_name$';
@@ -76,6 +78,13 @@ class Mail {
 	static public $FAX_DATETIME = '$datetime$';
 	static public $FAX_RESULT = '$fax_result$';
 	static public $FAX_FORMAT = '$format$';
+
+	//Used by mail type = speech2mail
+	static public $SPEECH_CID_NUMBER = '$cid_number$';
+	static public $SPEECH_CID_NAME = '$cid_name$';
+	static public $SPEECH_DEST_EXTEN = '$dest_exten$';
+	static public $SPEECH_DATETIME = '$datetime$';
+	static public $SPEECH_TEXT = '$text$';
 
 	//Used by mail type = invoice_to_pay
 	static public $INVOICE_TITLE_KEY = '$invoice_title$';

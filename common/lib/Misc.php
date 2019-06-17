@@ -536,7 +536,7 @@ function linkonmonitorfile($value) {
 	$result = $instance_table -> SQLExec ($handle, $QUERY);
 	if (is_array($result) && count($result)>0) {
 	    $dl_short = MONITOR_PATH . "/" . $result[0][3] . "/" . $result[0][0] . "/" . $result[0][1] . "/" . $result[0][2];
-	    $format_list = array ('WAV','wav','gsm','mp3','sln','g723','g729');
+	    $format_list = array ('WAV','wav','gsm','GSM','mp3','MP3','sln','g723','g729');
 	    $find_record = false;
 	    foreach ($format_list as $c_format){
 		$myfile = $value . "." . $c_format;

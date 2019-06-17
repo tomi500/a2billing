@@ -75,6 +75,7 @@ ALTER TABLE cc_card ADD showcallstypedefault INT(11) NOT NULL DEFAULT '0';
 ALTER TABLE cc_card ADD dillertariffs varchar(60) COLLATE utf8_bin NOT NULL AFTER `tariff`;
 ALTER TABLE cc_card ADD dillergroups varchar(60) COLLATE utf8_bin NOT NULL AFTER `id_group`;
 ALTER TABLE cc_card ADD max_concurrent INT(11) NOT NULL DEFAULT '10';
+ALTER TABLE cc_card ADD speech2mail varchar(70) COLLATE utf8_bin NOT NULL AFTER `notify_email`;
 
 ALTER TABLE cc_card CHANGE id_campaign id_campaign  INT( 11 ) NULL DEFAULT '-1';
 ALTER TABLE cc_card CHANGE id_timezone id_timezone CHAR( 40 ) NULL DEFAULT '0';
@@ -614,9 +615,10 @@ ALTER TABLE cc_callback_spool ADD `localtz` CHAR( 40 ) CHARACTER SET utf8 COLLAT
 
 ALTER TABLE `cc_callback_spool` ADD INDEX `status` (`status`);
 
-DELETE FROM `cc_payment_methods` WHERE `payment_method` LIKE 'iridium'
+DELETE FROM `cc_payment_methods` WHERE `payment_method` LIKE 'iridium';
 
-ALTER TABLE cc_payment_methods ADD UNIQUE `SECONDARY` ( `payment_method` );
+ALTER TABLE `cc_payment_methods` ADD UNIQUE `SECONDARY` ( `payment_method` );
+
 INSERT IGNORE INTO cc_payment_methods (`payment_method`, `payment_filename`) VALUES
 	('WebMoney', 'webmoney.php'),
 	('WebMoneyCreditCard', 'webmoneycreditcard.php'),
@@ -820,6 +822,9 @@ INSERT IGNORE INTO cc_templatemail (`id_language`, `mailtype`, `fromemail`, `fro
 ('ru', 'did_paid', 'info@sipde.net', 'SIPDE.NET', 'DID уведомление - ($did$)', '\r\nОСТАТОК НА БАЛАНСЕ ПОСЛЕ ОПЛАТЫ: $balance_remaining$ $base_currency$\r\n\r\nАвтоматически списано $did_cost$ $base_currency$ с Вашего счёта чтобы оплатить ежемесячный взнос за Ваш DID номер ($did$).\r\n\r\nЕжемесячный взнос за DID номер : $did_cost$ $base_currency$\r\n\r\n--\r\n<a href="http://www.sipde.net/">SIPDE.NET</a>', NULL),
 ('ru', 'did_unpaid', 'info@sipde.net', 'SIPDE.NET', 'DID уведомление - ($did$)', '\r\nОСТАТОК НА БАЛАНСЕ: $balance_remaining$ $base_currency$\r\n\r\nУ Вас не хватает средств чтобы оплатить Ваш DID номер ($did$), ежемесячный платёж составляет: $did_cost$ $base_currency$\r\n\r\nПроизведено резервирование номера на дополнительные $days_remaining$ дней чтобы Вы могли оплатить выставленный счёт (REF: $invoice_ref$). После истечения этого срока DID номер станет свободен для заказа в обычном порядке.\r\n\r\n--\r\n<a href="http://www.sipde.net/">SIPDE.NET</a>', NULL),
 ('ru', 'did_released', 'info@sipde.net', 'SIPDE.NET', 'DID уведомление - ($did$)', '\r\nУ Вас не хватило средств чтобы оплатить Ваш DID номер ($did$), ежемесячный платёж составлял: $did_cost$ $base_currency$\r\n\r\nDID номер $did$ был автоматически отключен и переведен в свободную продажу!\r\nВы можете заказать его вновь в обычном порядке.\r\n\r\n--\r\n<a href="http://www.sipde.net/">SIPDE.NET</a>', NULL);
+INSERT IGNORE INTO cc_templatemail (`id_language`, `mailtype`, `fromemail`, `fromname`, `subject`, `messagetext`, `messagehtml`) VALUES
+('en', 'call_success', 'speech_robot@sipde.net', 'SIPDE.NET Speech Robot', 'Conversation recognitioned',
+'You have just finish the call between $cid_number$ and $dest_exten$ on $datetime$.\r\nThe original speech is attached.\r\n\r\nKind regards,\r\nTeam <a href="http://www.sipde.net/">SIPDE.NET</a>', NULL);
 
 CREATE TABLE IF NOT EXISTS `cc_trunk_credit` (
   `trunk_id` int(11) NOT NULL,

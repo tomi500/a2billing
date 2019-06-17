@@ -32,9 +32,11 @@
 **/
 
 
-
-getpost_ifset(array('id', 'billingtype', 'did', 'startingdate', 'expirationdate', 'id_cc_didgroup', 'id_cc_country', 'activated', 'fixrate', 'id_trunk', 'choose_country', 'choose_did', 'assign', 'countrycode', 'arecode', 'phonenumber', 'voip_call', 'destination', 'choose_did_rate', 'new_did_page', 'confirm_buy_did', 'action_release'));
-
+$json_data = $_POST["json_data"];
+if (isset($json_data))
+    extract(json_decode($json_data,true,512));
+else
+    getpost_ifset(array('id', 'billingtype', 'did', 'startingdate', 'expirationdate', 'id_cc_didgroup', 'id_cc_country', 'activated', 'fixrate', 'id_trunk', 'choose_country', 'choose_did', 'assign', 'countrycode', 'arecode', 'phonenumber', 'voip_call', 'destination', 'choose_did_rate', 'new_did_page', 'confirm_buy_did', 'action_release'));
 
 $HD_Form = new FormHandler("cc_did_destination",gettext("Destination"));
 
@@ -150,9 +152,8 @@ $HD_Form -> AddEditElement (gettext("ACTIVATED"),
 	"",
 	gettext("Choose if you want to activate this card"),
 	"" , "", "", gettext("Yes").":1, - ".gettext("No").":0", "", "", "", "");
-	
 
-if (isset($form_action) && ($form_action=='ask-edit' || $form_action=='ask-delete')) {
+//if (isset($form_action) && ($form_action=='ask-edit' || $form_action=='edit' || $form_action=='ask-delete')) {
 
 $HD_Form -> AddEditElement (gettext("DID"),
 	"id_cc_did",
@@ -164,7 +165,7 @@ $HD_Form -> AddEditElement (gettext("DID"),
 	"did, id",
 	"id=(SELECT id_cc_did FROM cc_did_destination WHERE id='%id')", "", "%1", "" , "");
 
-if ($form_action<>"ask-add" && $form_action<>"ask-delete")
+if (isset($form_action) && $form_action=="ask-edit")
 $HD_Form -> AddEditElement(gettext("SCHEDULE"),
         "shedule",
         '$value',
@@ -185,13 +186,13 @@ $HD_Form -> AddEditElement (gettext("ANSWER"),
 
 if (isset($form_action) && $form_action=="ask-edit") {
 	$instance_table = new Table("cc_did_destination", "playsound");
-	$clause = "id = $id";
-	$list = $instance_table -> Get_list($DBHandle_max, $clause, 0);;
+	$list = $instance_table -> Get_list($DBHandle_max, "id = $id", 0);;
 	if (is_array($list) && count($list)>0) {
 		$playsound = preg_replace('/\.[^\.\/]+$/', '', basename($list[0][0]));
 		$selectedgreeting = ($playsound && array_search($playsound,array_column($soundlist,0))===false) ? "<OPTION value=\"$playsound\">".$playsound."</OPTION>" : NULL;
 	} else	$selectedgreeting = NULL;
 } else		$selectedgreeting = NULL;
+
 $HD_Form -> AddEditElement (gettext("PLAY_SOUND"),
 	"playsound",
 	'$value',
@@ -209,7 +210,7 @@ $HD_Form -> AddEditElement (gettext("DESTINATION"),
 	    "0",
 	    "Insert the Destination",
 	    "" , "", "", "", "" , "", "");//, gettext("Enter here the phonenumber you wish to call or the SIP/IAX/H323 peer to reach (ie: 347894999 or SIP/jeremy@182.212.1.45). To call SIP/IAX/H323 peer, you need to enable the voip_call below (voip_call = Yes) "));
-}
+//}
 
 $HD_Form -> AddEditElement (gettext("TIMEOUT"),
 	"timeout",
@@ -238,13 +239,14 @@ $HD_Form -> AddEditElement (gettext("PRIORITY"),
 	"",
 	"list" , "", "",  "", $priority_list, "%1" , "" , "");
 
-if (isset($form_action) && $form_action=='ask-edit') {
-    $HD_Form -> FieldEditElement ('activated, id_cc_did, id_cc_did, answer, playsound, destination, timeout, voip_call, priority');
-} elseif (isset($form_action) && $form_action=='ask-delete') {
-    $HD_Form -> FieldEditElement ('activated, id_cc_did, answer, playsound, destination, timeout, voip_call, priority');
+if (isset($form_action) && ($form_action=="ask-edit" || $form_action=="edit")) {
+    $HD_Form -> FieldEditElement ('activated, id_cc_did, id_cc_card, answer, playsound, destination, timeout, voip_call, priority');
 } else {
-    $HD_Form -> FG_QUERY_EDITION_HIDDEN_FIELDS = "destination, validated, voip_call";
-    $HD_Form -> FG_QUERY_EDITION_HIDDEN_VALUE = "$destination, $validated, $voip_call";
+    $HD_Form -> FieldEditElement ('activated, id_cc_did, answer, playsound, destination, timeout, voip_call, priority');
+    $HD_Form -> FG_QUERY_EDITION_HIDDEN_FIELDS = "validated";
+    $HD_Form -> FG_QUERY_EDITION_HIDDEN_VALUE = "$validated";
+//    $HD_Form -> FG_QUERY_EDITION_HIDDEN_FIELDS = "destination, validated, voip_call";
+//    $HD_Form -> FG_QUERY_EDITION_HIDDEN_VALUE = "$destination, $validated, $voip_call";
 }
 
 $HD_Form -> FG_INTRO_TEXT_EDITION= gettext("You can modify, through the following form, the different properties of your DID number <b>".$number."</b>");
