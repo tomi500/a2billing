@@ -69,19 +69,18 @@ if (($download == "file") && $file) {
 	$result = $instance_table -> SQLExec ($handle, $QUERY);
 	if (is_array($result) && count($result)>0) {
 	    $dl_full = $dl_path_name = MONITOR_PATH . "/" . $result[0][3] . "/" . $result[0][0] . "/" . $result[0][1] . "/" . $result[0][2] . "/" . $value_de;
-	
+
 	    if (! file_exists ( $dl_full )) {
 		echo gettext ( "ERROR: Cannot download file " . $dl_full . ", it does not exist.<br>" );
 		exit ();
 	    }
-	
 	    $dl_name = $value_de;
-	    if ($sens!=1) {
+	    if ($sens!=1 && $parts['extension']=='WAV') {
 		$dl_path_name = "/tmp/".$value_de;
 		$sox = "/usr/bin/sox ".$dl_full." -c 1 -r 8k -e signed-integer ".$dl_path_name;
 		exec($sox);
 	    }
-	
+
 	    header ( "Content-Type: audio/wav" );
 //	    header ( "Attachment-mime-type: audio/x-wav" );
 	    header ( "Content-Disposition: attachment; filename=$dl_name" );
@@ -93,7 +92,7 @@ if (($download == "file") && $file) {
 	    header ( "Content-transfer-encoding: binary" );
 	
 	    @readfile ( $dl_path_name );
-	    if ($sens!=1) unlink( $dl_path_name );
+	    if ($sens!=1 && $parts['extension']=='WAV') unlink( $dl_path_name );
 	}
 	exit ();
 }

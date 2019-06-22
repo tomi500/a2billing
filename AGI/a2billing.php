@@ -1157,8 +1157,8 @@ if ($mode == 'standard') {
 				}
 				$agi -> set_variable($lg_var_set, $chanlang);
 				$A2B -> debug( DEBUG, $agi, __FILE__, __LINE__, "[SET $lg_var_set $chanlang]");
-				$A2B -> current_language = $language;
 			}
+			$A2B -> current_language = $agi -> get_variable('CHANNEL(language)', true);
 			$A2B -> call_did($agi, $RateEngine, $result);
 			if ($A2B->set_inuse_username) $A2B -> callingcard_acct_start_inuse($agi,0);
 		}
@@ -1772,7 +1772,7 @@ $A2B -> debug( ERROR, $agi, __FILE__, __LINE__, "\033[1;32m============INSERT===
 					if ($chanlang != 'not_set') {
 						$lg_var_set = 'CHANNEL(language)';
 						$agi -> set_variable($lg_var_set, $chanlang);
-						$A2B -> current_language = $language;
+//						$A2B -> debug( DEBUG, $agi, __FILE__, __LINE__, "[SET $lg_var_set $chanlang]");
 					}
 					if ($result[0][38]) {
 						sleep(1); 

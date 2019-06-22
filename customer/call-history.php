@@ -86,7 +86,7 @@ if (($download == "file") && $file && $ACXSEERECORDING && !$accdie) {
 	    }
 
 	    $dl_name = $value_de;
-	    if ($sens!=1) {
+	    if ($sens!=1 && $parts['extension']=='WAV') {
 		$dl_path_name = "/tmp/".$value_de;
 		$sox = "/usr/bin/sox ".$dl_full." -c 1 -r 8k -e signed-integer ".$dl_path_name;
 		exec($sox);
@@ -101,7 +101,7 @@ if (($download == "file") && $file && $ACXSEERECORDING && !$accdie) {
 	    header ( "Cache-Control: must-revalidate, post-check=0, pre-check=0" );
 	    header ( "Content-transfer-encoding: binary" );
 
-	    @readfile ( $dl_path_name );
+	    @readfile ($dl_path_name && $parts['extension']=='WAV');
 	    if ($sens!=1) unlink( $dl_path_name );
 	}
 	exit ();

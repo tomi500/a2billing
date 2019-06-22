@@ -59,6 +59,7 @@ class RateEngine
 	var $margindillers		= 0;
 	var $commission			= 0;
 	var $pos_dialingnumber		= true;
+	var $monfile			= false;
 
 	// List of dialstatus
 	var $dialstatus_rev_list;
@@ -1411,7 +1412,7 @@ for ($i=0; $i<count($this->ratecard_obj); $i++) {
 			$A2B->instance_table -> SQLExec ($A2B -> DBHandle, $myclause_nodidcall, 0);
 		}
 		monitor_recognize($A2B);
-		$A2B -> send_talk($A2B -> speech2mail, $this -> monfile);
+		$A2B -> send_talk($A2B -> speech2mail, $this -> monfile, $A2B -> current_language);
 		$this -> monfile = false;
 	}
 	
@@ -1876,17 +1877,25 @@ $A2B -> debug( ERROR, $agi, "", "", "\r                  CallBack for Trunk=$thi
 					$timecur = time();
 				    }
 				    $A2B -> debug( INFO, $agi, __FILE__, __LINE__, "FAILOVER app_callingcard: Dialing '$dialstr' with timeout of '$trunktimeout'.\n");
+				    $this -> monfile = false;
 //				    if (array_search($agi -> channel_status('',true), array(AST_STATE_DOWN)) === false) { }
 				    if ($agi -> channel_status('',true) != AST_STATE_DOWN) {
 					if ($A2B->monitor == 1 || $A2B -> agiconfig['record_call'] == 1) {
 						$A2B->dl_short = MONITOR_PATH . "/" . $A2B->username . "/" . date('Y') . "/" . date('n') . "/" . date('j') . "/";
 						$monfile = $dl_short = $A2B->dl_short . $A2B->uniqueid . ".";
-						$monfile .= $A2B->agiconfig['monitor_formatfile'] == 'wav49' ? 'WAV' : $A2B->agiconfig['monitor_formatfile'];
+						if ($A2B -> speech2mail) {
+						    $format_file = 'wav';
+						    $monfile .= $format_file;
+						    $this -> monfile = $monfile;
+						} else {
+						    $format_file = $A2B->agiconfig['monitor_formatfile'];
+						    $monfile .= $format_file == 'wav49' ? 'WAV' : $format_file;
+						}
 						$j = 100;
 						while (file_exists($monfile)) {
 							$sizemonfile = filesize($monfile);
-							if ($sizemonfile == 60 || $sizemonfile === false) {
-								if ($sizemonfile == 60) {
+							if ($sizemonfile < 100 || $sizemonfile === false) {
+								if ($sizemonfile < 100) {
 									unlink($monfile);
 								}
 								$j--;
@@ -1902,9 +1911,17 @@ $A2B -> debug( ERROR, $agi, "", "", "\r                  CallBack for Trunk=$thi
 							$newuniqueid[0] = time();
 							$A2B->uniqueid = implode('.',$newuniqueid);
 							$monfile = $dl_short = $A2B->dl_short . $A2B->uniqueid . ".";
-							$monfile .= $A2B->agiconfig['monitor_formatfile'] == 'wav49' ? 'WAV' : $A2B->agiconfig['monitor_formatfile'];
+							if ($A2B -> speech2mail) {
+							    $format_file = 'wav';
+							    $monfile .= $format_file;
+							    $this -> monfile = $monfile;
+							} else {
+							    $format_file = $A2B->agiconfig['monitor_formatfile'];
+							    $monfile .= $format_file == 'wav49' ? 'WAV' : $format_file;
+							    $this -> monfile = false;
+							}
 						}
-						$command_mixmonitor = $A2B -> format_parameters ("MixMonitor {$dl_short}{$A2B->agiconfig['monitor_formatfile']}|b");
+						$command_mixmonitor = $A2B -> format_parameters ("MixMonitor {$dl_short}{$format_file}|b");
 						$myres = $agi->exec($command_mixmonitor);
 						$A2B -> debug( INFO, $agi, __FILE__, __LINE__, "EXEC ". $command_mixmonitor);
 					}
@@ -1941,10 +1958,10 @@ $A2B -> debug( ERROR, $agi, "", "", "\r                  CallBack for Trunk=$thi
 					if ($A2B->monitor == 1 || $A2B -> agiconfig['record_call'] == 1) {
 						$myres = $agi->exec($A2B -> format_parameters ("StopMixMonitor"));
 						$A2B -> debug( INFO, $agi, __FILE__, __LINE__, "EXEC StopMixMonitor (".$A2B->uniqueid.")");
-						if (file_exists($monfile) && filesize($monfile) == 60) {
+						if (file_exists($monfile) && filesize($monfile) < 100) {
 							unlink($monfile);
 							$this->monfile = false;
-						} else	$this->monfile = $monfile;
+						}
 					}
 					$this -> dialstatus = $agi -> get_variable("DIALSTATUS",true);
 				    }

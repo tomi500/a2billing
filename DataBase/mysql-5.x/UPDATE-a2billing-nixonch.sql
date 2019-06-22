@@ -507,20 +507,83 @@ call a2b_trf_check;
 
 drop procedure if exists a2b_trf_check;
 
+DELETE FROM cc_config WHERE config_key='google_speech_key';
+
 delimiter //
 
 create procedure a2b_trf_check()
 begin
     declare a int;
-    select count(*) into a from cc_config where config_key='google_speech_key';
+    select count(*) into a from cc_config where config_key='google_tts_key';
     if a=0 then
 	INSERT INTO cc_config (id, config_title, config_key, config_value, config_description, config_valuetype, config_listvalues, config_group_title)
-	VALUES	(NULL, 'Google Cloud Text-to-Speech API Key', 'google_tts_key', '', 'Your API Key for Google Cloud Text-to-Speech', 0, NULL, 'global'),
-		(NULL, 'Google Cloud Speech API Key', 'google_speech_key', '', 'Your API Key for Google Cloud Speech', 0, NULL, 'global');
+	VALUES	(NULL, 'Google Cloud Text-to-Speech API Key', 'google_tts_key', '', 'Your API Key for Google Cloud Text-to-Speech', 0, NULL, 'global');
     elseif a>1 then
-	select id into a from cc_config where config_key='google_speech_key' order by id limit 0,1;
+	select id into a from cc_config where config_key='google_tts_key' order by id limit 0,1;
 	delete from cc_config where config_key='google_tts_key' and id>a;
-	delete from cc_config where config_key='google_speech_key' and id>a;
+    end if;
+end //
+
+delimiter ;
+
+call a2b_trf_check;
+
+drop procedure if exists a2b_trf_check;
+
+delimiter //
+
+create procedure a2b_trf_check()
+begin
+    declare a int;
+    select count(*) into a from cc_config where config_key='google_cloud_credential';
+    if a=0 then
+	INSERT INTO cc_config (id, config_title, config_key, config_value, config_description, config_valuetype, config_listvalues, config_group_title)
+	VALUES	(NULL, 'Google Cloud Credentials Path', 'google_cloud_credential', '/etc/credentials.json', 'Path to Google Cloud credentials.json', 0, NULL, 'global');
+    elseif a>1 then
+	select id into a from cc_config where config_key='google_cloud_credential' order by id limit 0,1;
+	delete from cc_config where config_key='google_cloud_credential' and id>a;
+    end if;
+end //
+
+delimiter ;
+
+call a2b_trf_check;
+
+drop procedure if exists a2b_trf_check;
+
+delimiter //
+
+create procedure a2b_trf_check()
+begin
+    declare a int;
+    select count(*) into a from cc_config where config_key='google_storage_bucketname';
+    if a=0 then
+	INSERT INTO cc_config (id, config_title, config_key, config_value, config_description, config_valuetype, config_listvalues, config_group_title)
+	VALUES	(NULL, 'Google Cloud Storage Bucket Name', 'google_storage_bucketname', 'wav_folder', 'Name of the Cloud Storage Bucket', 0, NULL, 'global');
+    elseif a>1 then
+	select id into a from cc_config where config_key='google_storage_bucketname' order by id limit 0,1;
+	delete from cc_config where config_key='google_storage_bucketname' and id>a;
+    end if;
+end //
+
+delimiter ;
+
+call a2b_trf_check;
+
+drop procedure if exists a2b_trf_check;
+
+delimiter //
+
+create procedure a2b_trf_check()
+begin
+    declare a int;
+    select count(*) into a from cc_config where config_key='bucket_location';
+    if a=0 then
+	INSERT INTO cc_config (id, config_title, config_key, config_value, config_description, config_valuetype, config_listvalues, config_group_title)
+	VALUES	(NULL, 'Google Cloud Storage Bucket Location', 'bucket_location', 'eu', 'The location of the Cloud Storage Bucket. US - USA. EU - Europe. ASIA - some regions of Asia. EUR4 - Finland and Niderlands. NAM4 - Iowa and South Carolina.', 0,'us,eu,asia,eur4,nam4', 'global');
+    elseif a>1 then
+	select id into a from cc_config where config_key='bucket_location' order by id limit 0,1;
+	delete from cc_config where config_key='bucket_location' and id>a;
     end if;
 end //
 
@@ -823,8 +886,8 @@ INSERT IGNORE INTO cc_templatemail (`id_language`, `mailtype`, `fromemail`, `fro
 ('ru', 'did_unpaid', 'info@sipde.net', 'SIPDE.NET', 'DID уведомление - ($did$)', '\r\nОСТАТОК НА БАЛАНСЕ: $balance_remaining$ $base_currency$\r\n\r\nУ Вас не хватает средств чтобы оплатить Ваш DID номер ($did$), ежемесячный платёж составляет: $did_cost$ $base_currency$\r\n\r\nПроизведено резервирование номера на дополнительные $days_remaining$ дней чтобы Вы могли оплатить выставленный счёт (REF: $invoice_ref$). После истечения этого срока DID номер станет свободен для заказа в обычном порядке.\r\n\r\n--\r\n<a href="http://www.sipde.net/">SIPDE.NET</a>', NULL),
 ('ru', 'did_released', 'info@sipde.net', 'SIPDE.NET', 'DID уведомление - ($did$)', '\r\nУ Вас не хватило средств чтобы оплатить Ваш DID номер ($did$), ежемесячный платёж составлял: $did_cost$ $base_currency$\r\n\r\nDID номер $did$ был автоматически отключен и переведен в свободную продажу!\r\nВы можете заказать его вновь в обычном порядке.\r\n\r\n--\r\n<a href="http://www.sipde.net/">SIPDE.NET</a>', NULL);
 INSERT IGNORE INTO cc_templatemail (`id_language`, `mailtype`, `fromemail`, `fromname`, `subject`, `messagetext`, `messagehtml`) VALUES
-('en', 'call_success', 'speech_robot@sipde.net', 'SIPDE.NET Speech Robot', 'Conversation recognitioned',
-'You have just finish the call between $cid_number$ and $dest_exten$ on $datetime$.\r\nThe original speech is attached.\r\n\r\nKind regards,\r\nTeam <a href="http://www.sipde.net/">SIPDE.NET</a>', NULL);
+('en', 'call_success', 'speech_robot@my.domain', 'Speech Robot', 'Conversation $cid_number$->$dest_exten$',
+'<font face="Verdana"><i>$text$</i></font>\r\n---------------------------------------------------------\r\nKind regards,\r\nTeam <a href="http://www.my.domain/">IP Ltd</a>', NULL);
 
 CREATE TABLE IF NOT EXISTS `cc_trunk_credit` (
   `trunk_id` int(11) NOT NULL,
