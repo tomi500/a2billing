@@ -105,6 +105,7 @@ class A2Billing {
 	var $CID_handover = '';
 	var $cid_verify = true;
 	var $id_did = NULL;
+	var $speech2mail = '';
 
 
 	/**
@@ -1702,14 +1703,22 @@ class A2Billing {
 				// IF VOIP CALL
 				if ($inst_listdestination[5]==1) {
 
+					$monfile = false;
 					$localcount = substr_count(strtoupper($inst_listdestination[4]),"LOCAL/");
 					// RUN MIXMONITOR TO RECORD CALL
 					if (($this->monitor == 1 || $this->agiconfig['record_call'] == 1) && $localcount < 2) {
 						$this->dl_short = MONITOR_PATH . "/" . $this->username . "/" . date('Y') . "/" . date('n') . "/" . date('j') . "/";
-						$command_mixmonitor = "MixMonitor ". $this->dl_short ."{$this->uniqueid}.{$this->agiconfig['monitor_formatfile']}|b";
-						$command_mixmonitor = $this -> format_parameters ($command_mixmonitor);
+						$monfile = $dl_short = $this->dl_short . $this->uniqueid . ".";
+						if ($this -> speech2mail) {
+						    $format_file = 'wav';
+						    $monfile .= $format_file;
+						} else {
+						    $format_file = $A2B->agiconfig['monitor_formatfile'];
+						    $monfile .= $format_file == 'wav49' ? 'WAV' : $format_file;
+						}
+						$command_mixmonitor = $this -> format_parameters ("MixMonitor {$dl_short}{$format_file}|b");
 						$myres = $agi->exec($command_mixmonitor);
-						$this -> debug( INFO, $agi, __FILE__, __LINE__, $command_mixmonitor);
+						$this -> debug( INFO, $agi, __FILE__, __LINE__, "Exec ". $command_mixmonitor);
 					}
 					
 					$dialstr = $inst_listdestination[4];
@@ -1769,8 +1778,8 @@ $this -> debug( ERROR, $agi, __FILE__, __LINE__, "[ \033[1;34m".$agi->get_variab
 					if (($this->monitor == 1 || $this->agiconfig['record_call'] == 1) && $localcount < 2) {
 						$myres = $agi->exec($this -> format_parameters ("StopMixMonitor"));
 						$this -> debug( INFO, $agi, __FILE__, __LINE__, "EXEC StopMixMonitor (".$this->uniqueid.")");
-						$monfile = $this->dl_short ."{$this->uniqueid}.";
-						$monfile.= $this->agiconfig['monitor_formatfile'] == 'wav49' ? 'WAV' : $this->agiconfig['monitor_formatfile'];
+//						$monfile = $this->dl_short ."{$this->uniqueid}.";
+//						$monfile.= $this->agiconfig['monitor_formatfile'] == 'wav49' ? 'WAV' : $this->agiconfig['monitor_formatfile'];
 						if (filesize($monfile) < 100) {
 							unlink($monfile);
 							$monfile = false;
@@ -1849,16 +1858,15 @@ $this -> debug( ERROR, $agi, __FILE__, __LINE__, "[ \033[1;34m".$agi->get_variab
 						$result = $this -> instance_table -> SQLExec ($this->DBHandle, $QUERY, 0);
 						$this -> debug( INFO, $agi, __FILE__, __LINE__, "[DID CALL - LOG CC_CALL: SQL: $QUERY]:[result:$result]");
 						
-						$this -> send_talk($this -> speech2mail, $monfile, $this -> current_language);
+						if (stripos($inst_listdestination[4],"@a3billing") === false)
+							$this -> send_talk($this -> speech2mail, $monfile, $this -> current_language);
 						$monfile = false;
 					}
-
 					monitor_recognize($this);
 					break;
 
 				// ELSEIF NOT VOIP CALL
 				} else {
-
 					$this->agiconfig['use_dnid']=1;
 					$this->agiconfig['say_timetocall']=0;
 					$this->CID_handover = $this->CallerID;
@@ -2033,12 +2041,20 @@ $this -> debug( ERROR, $agi, __FILE__, __LINE__, "[ \033[1;34m".$agi->get_variab
             // IF VOIP CALL
             if ($inst_listdestination[5]==1) {
                 // RUN MIXMONITOR TO RECORD CALL
+		$monfile = false;
 		if ($this->monitor == 1 || $this->agiconfig['record_call'] == 1) {
-					$this->dl_short = MONITOR_PATH . "/" . $this->username . "/" . date('Y') . "/" . date('n') . "/" . date('j') . "/";
-					$command_mixmonitor = "MixMonitor ". $this->dl_short ."{$this->uniqueid}.{$this->agiconfig['monitor_formatfile']}|b";
-					$command_mixmonitor = $this -> format_parameters ($command_mixmonitor);
-					$myres = $agi->exec($command_mixmonitor);
-					$this -> debug( INFO, $agi, __FILE__, __LINE__, $command_mixmonitor);
+			$this->dl_short = MONITOR_PATH . "/" . $this->username . "/" . date('Y') . "/" . date('n') . "/" . date('j') . "/";
+			$monfile = $dl_short = $this->dl_short . $this->uniqueid . ".";
+			if ($this -> speech2mail) {
+			    $format_file = 'wav';
+			    $monfile .= $format_file;
+			} else {
+			    $format_file = $A2B->agiconfig['monitor_formatfile'];
+			    $monfile .= $format_file == 'wav49' ? 'WAV' : $format_file;
+			}
+			$command_mixmonitor = $this -> format_parameters ("MixMonitor {$dl_short}{$format_file}|b");
+			$myres = $agi->exec($command_mixmonitor);
+			$this -> debug( INFO, $agi, __FILE__, __LINE__, $command_mixmonitor);
 		}
 				
 		$max_long = 36000000; //Maximum 10 hours
@@ -2103,13 +2119,13 @@ $this -> debug( ERROR, $agi, __FILE__, __LINE__, "[ \033[1;34m".$agi->get_variab
 		if ($this->monitor == 1 || $this -> agiconfig['record_call'] == 1) {
 			$myres = $agi->exec($this -> format_parameters ("StopMixMonitor"));
 			$this -> debug( INFO, $agi, __FILE__, __LINE__, "EXEC StopMixMonitor (".$this->uniqueid.")");
-			$monfile = $this->dl_short ."{$this->uniqueid}.";
-			$monfile.= $this->agiconfig['monitor_formatfile'] == 'wav49' ? 'WAV' : $this->agiconfig['monitor_formatfile'];
+//			$monfile = $this->dl_short ."{$this->uniqueid}.";
+//			$monfile.= $this->agiconfig['monitor_formatfile'] == 'wav49' ? 'WAV' : $this->agiconfig['monitor_formatfile'];
 			if (filesize($monfile) < 100) {
 				unlink($monfile);
 				$monfile = false;
 			}
-                } else $monfile = false;
+                }
 
                 $this -> debug( INFO, $agi, __FILE__, __LINE__, "[".$inst_listdestination[4]." Friend][followme=$callcount]:[ANSWEREDTIME=".$answeredtime."-DIALSTATUS=".$dialstatus."]");
 
@@ -2216,14 +2232,11 @@ $this -> debug( ERROR, $agi, __FILE__, __LINE__, "[ \033[1;34m".$agi->get_variab
 
                     	    $result = $this -> instance_table -> SQLExec ($this->DBHandle, $QUERY, 0);
                     	    $this -> debug( INFO, $agi, __FILE__, __LINE__, "[DID CALL - LOG CC_CALL: SQL: $QUERY]:[result:$result]");
-
-			    $this -> send_talk($this -> speech2mail, $monfile, $this -> current_language);
-			    $monfile = false;
 			}
+			$this -> send_talk($this -> speech2mail, $monfile, $this -> current_language);
+			$monfile = false;
 		    }
-
 		    monitor_recognize($this);
-
             // ELSEIF NOT VOIP CALL
             } else {
 
@@ -2309,6 +2322,8 @@ $this -> debug( ERROR, $agi, __FILE__, __LINE__, "[ \033[1;34m".$agi->get_variab
 	function send_talk($mailaddr,$audioFile,$languageCode='not_set')
 	{
 //		$calleridname = $agi->get_variable('CALLERID(name)', true);
+		if ($languageCode=='not_set')
+			$languageCode = $this -> current_language;
 		switch($languageCode) {
 		    case 'de': $languageCode = 'de-DE'; break;
 		    case 'en': $languageCode = 'en-US'; break;
@@ -2317,8 +2332,8 @@ $this -> debug( ERROR, $agi, __FILE__, __LINE__, "[ \033[1;34m".$agi->get_variab
 		    case 'ua': $languageCode = 'uk-UA'; $alternateLangCode = array('ru-RU'); break;
 		}
 		if (strlen($languageCode)<5 || $languageCode=='not_set') {
-		    $languageCode = 'ru-RU';
-		    $alternateLangCode = array('en-US','uk-UA');
+		    $languageCode = 'en-US';
+		    $alternateLangCode = array('ru-RU','uk-UA');
 		}
 		$path_parts = pathinfo($audioFile);
 		$objectName = $path_parts['basename'];
@@ -2385,6 +2400,8 @@ $this -> debug( ERROR, $agi, __FILE__, __LINE__, "[ \033[1;34m".$agi->get_variab
 			$operation->pollUntilComplete();
 			
 			$transcript = $languageCode;
+			if (isset($alternateLangCode))
+				$transcript .= ", " . implode(", ", $alternateLangCode);
 			if ($operation->operationSucceeded()) {
 			    // Detects speech in the audio file
 			    $response = $operation->getResult();
@@ -3666,11 +3683,7 @@ $this -> debug( ERROR, $agi, __FILE__, __LINE__, "FAXRESOLUTION: ".$faxresolutio
 
 				if (strlen($language)==2 && !($this->languageselected>=1)) {
 
-					if ($this->agiconfig['asterisk_version'] == "1_2") {
-						$lg_var_set = 'LANGUAGE()';
-					} else {
-						$lg_var_set = 'CHANNEL(language)';
-					}
+					$lg_var_set = 'CHANNEL(language)';
 					$agi -> set_variable($lg_var_set, $language);
 					$this -> debug( DEBUG, $agi, __FILE__, __LINE__, "[SET $lg_var_set $language]");
 				}

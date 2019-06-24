@@ -91,7 +91,7 @@ include (LIBDIR."common.defines.php");
 define("DEMO_MODE", false);
 
 define ("GOOGLE_TTS_KEY", isset($A2B->config['global']['google_tts_key'])?$A2B->config['global']['google_tts_key']:null);
-define ("GOOGLE_SPEECH_KEY", isset($A2B->config['global']['google_speech_key'])?$A2B->config['global']['google_speech_key']:null);
+define ("GOOGLE_CLOUD_CREDENTIAL", isset($A2B->config['global']['google_cloud_credential'])?$A2B->config['global']['google_cloud_credential']:null);
 define ("LEN_ALIASNUMBER", isset($A2B->config['global']['len_aliasnumber'])?$A2B->config['global']['len_aliasnumber']:null);
 define ("LEN_VOUCHER", isset($A2B->config['global']['len_voucher'])?$A2B->config['global']['len_voucher']:null);
 define ("BASE_CURRENCY", isset($A2B->config['global']['base_currency'])?$A2B->config['global']['base_currency']:null);
