@@ -432,7 +432,7 @@ if ($mode == 'sms') {
 		    $result = $A2B -> instance_table -> SQLExec ($A2B->DBHandle, $QUERY);
 		    foreach ($callbackprefixallow as $value) {
 			$A2B -> prefixallow = false; // Пропускаем без защитного IVR если колбек (SOUND BEFORE CALLBACK -> NOT ACTIVE) запрещен в принципе, но защитное IVR разрешено
-			if (strpos($A2B->CallerID,$value)===0) {
+			if ($value == "" || strpos($A2B->CallerID,$value)===0) {
 			    $A2B -> prefixallow = true; // Если префикс калерайди (Before All-Callback -> ALLOW PREFIXES) соответствует заданному, разрешаем колбек
 			    break;
 			}
@@ -1059,7 +1059,7 @@ if ($mode == 'standard') {
 						" aleg_carrier_connect_charge_offp, aleg_carrier_cost_min_offp, aleg_retail_connect_charge_offp, aleg_retail_cost_min_offp,".
 						" aleg_carrier_initblock_offp, aleg_carrier_increment_offp, aleg_retail_initblock_offp, aleg_retail_increment_offp,".
 						" cc_card.id, playsound, timeout, margin, id_diller, voicebox, removeaddprefix, addprefixinternational, answer, chanlang,".
-						" aftercallbacksound, digitaftercallbacksound, spamfilter, secondtimedays, calleridname, speech2mail".
+						" aftercallbacksound, digitaftercallbacksound, spamfilter, secondtimedays, calleridname, speech2mail, send_text, send_sound".
 						" FROM cc_did, cc_card, cc_country, cc_did_destination".
 						" LEFT JOIN cc_sheduler_ratecard ON id_did_destination=cc_did_destination.id".
 						" WHERE id_cc_did=cc_did.id AND cc_card.status=1 AND cc_card.id=id_cc_card AND cc_did_destination.activated=1 AND cc_did.activated=1 AND did LIKE '$A2B->destination'".
@@ -1126,7 +1126,7 @@ if ($mode == 'standard') {
                     " aleg_timeinterval, ".
                     " aleg_carrier_connect_charge_offp, aleg_carrier_cost_min_offp, aleg_retail_connect_charge_offp, aleg_retail_cost_min_offp, ".
                     " aleg_carrier_initblock_offp, aleg_carrier_increment_offp, aleg_retail_initblock_offp, aleg_retail_increment_offp,".
-                    " answer, playsound, timeout, margin, id_diller, voicebox, removeaddprefix, addprefixinternational, chanlang, buyrate, billblock, spamfilter, secondtimedays, calleridname, speech2mail".
+                    " answer, playsound, timeout, margin, id_diller, voicebox, removeaddprefix, addprefixinternational, chanlang, buyrate, billblock, spamfilter, secondtimedays, calleridname, speech2mail, send_text, send_sound".
 			        " FROM cc_did, cc_card, cc_country, cc_did_destination".
 			        " LEFT JOIN cc_sheduler_ratecard ON id_did_destination=cc_did_destination.id".
 			        " WHERE id_cc_did=cc_did.id AND cc_card.status=1 AND cc_card.id=id_cc_card AND cc_did_destination.activated=1 AND cc_did.activated=1 AND did LIKE '$mydnid' ".
@@ -1752,7 +1752,7 @@ $A2B -> debug( ERROR, $agi, __FILE__, __LINE__, "\033[1;32m============INSERT===
 					" aleg_carrier_connect_charge_offp, aleg_carrier_cost_min_offp, aleg_retail_connect_charge_offp, aleg_retail_cost_min_offp, ".
 					" aleg_carrier_initblock_offp, aleg_carrier_increment_offp, aleg_retail_initblock_offp, aleg_retail_increment_offp, ".
 					" cc_card.id, playsound, timeout, margin, id_diller, voicebox, removeaddprefix, addprefixinternational, answer, chanlang, ".
-					" aftercallbacksound, digitaftercallbacksound, spamfilter, secondtimedays, calleridname, speech2mail".
+					" aftercallbacksound, digitaftercallbacksound, spamfilter, secondtimedays, calleridname, speech2mail, send_text, send_sound".
 					" FROM cc_did, cc_card, cc_country, cc_did_destination".
 					" LEFT JOIN cc_sheduler_ratecard ON id_did_destination=cc_did_destination.id".
 					" WHERE id_cc_did=cc_did.id AND cc_card.status=1 AND cc_card.id=id_cc_card and cc_did_destination.activated=1 AND cc_did.activated=1 AND did LIKE '$A2B->destination'".

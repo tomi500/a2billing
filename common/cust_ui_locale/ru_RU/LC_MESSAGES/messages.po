@@ -990,13 +990,29 @@ msgstr "НОМЕР ФАКСА"
 msgid "Insert the fax number of the customers"
 msgstr "Введите номер факса"
 
+#: form_data/FG_var_card.inc:149
+msgid "Surveillance Section"
+msgstr "Настройка отчетов"
+
 #: form_data/FG_var_card.inc:150
 msgid "RECORD CALL"
 msgstr "ЗАПИСЬ"
 
-#: form_data/FG_var_card.inc:157
-msgid "Define if you want to record all the conversations"
-msgstr "Вкл/Выкл записи всех разговоров"
+#: form_data/FG_var_card.inc:152
+msgid "Define if you want to record and store all the conversations"
+msgstr "Вкл/Выкл записи и хранения всех разговоров"
+
+#: form_data/FG_var_card.inc:154
+msgid "Insert the email to forwarding the conversations"
+msgstr "Укажите электронный адрес для получения информации о звонках согласно настроек текущего раздела"
+
+#: form_data/FG_var_card.inc:156
+msgid "Define if you want to recognize the conversations and to send like regular text to email above"
+msgstr "Конвертировать голоса в обычный текст и отправить на вышеуказанный электронный адрес"
+
+#: form_data/FG_var_card.inc:158
+msgid "Define if you want to forwarding recorded conversations to email above"
+msgstr "Отправлять запись разговоров на вышеуказанный электронный адрес"
 
 #: form_data/FG_var_card.inc:159
 msgid "RECALL DAYS"

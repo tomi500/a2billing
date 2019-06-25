@@ -106,6 +106,8 @@ class A2Billing {
 	var $cid_verify = true;
 	var $id_did = NULL;
 	var $speech2mail = '';
+	var $send_text = '';
+	var $send_sound = '';
 
 
 	/**
@@ -1450,7 +1452,7 @@ class A2Billing {
 			}
 			if ($this -> CC_TESTING) $this->destination = "kphone";
 
-			if ($this->monitor == 1 || $this->agiconfig['record_call'] == 1) {
+			if ((($this->send_sound || $this->send_text) && $this->speech2mail) || $this->monitor == 1 || $this->agiconfig['record_call'] == 1) {
 				$this->dl_short = MONITOR_PATH . "/" . $this->username . "/" . date('Y') . "/" . date('n') . "/" . date('j') . "/";
 				$command_mixmonitor = "MixMonitor ". $this->dl_short ."{$this->uniqueid}.{$this->agiconfig['monitor_formatfile']}|b";
 				$command_mixmonitor = $this -> format_parameters ($command_mixmonitor);
@@ -1475,7 +1477,7 @@ class A2Billing {
 			$answeredtime = $agi->get_variable("ANSWEREDTIME",true);
 			$dialstatus = $agi->get_variable("DIALSTATUS",true);
 
-			if ($this->monitor == 1 || $this->agiconfig['record_call'] == 1) {
+			if ((($this->send_sound || $this->send_text) && $this->speech2mail) || $this->monitor == 1 || $this->agiconfig['record_call'] == 1) {
 				// Monitor(wav,kiki,m)
 				$myres = $agi->exec($this -> format_parameters ("StopMixMonitor"));
 				$this -> debug( INFO, $agi, __FILE__, __LINE__, "EXEC StopMixMonitor (".$this->uniqueid.")");
@@ -1660,6 +1662,8 @@ class A2Billing {
 			$this->id_diller				= $inst_listdestination[32];
 			$calleridname					= $inst_listdestination[41];
 			$this->speech2mail				= $inst_listdestination[42];
+			$this->send_text				= $inst_listdestination[43];
+			$this->send_sound				= $inst_listdestination[44];
 			$didvoicebox				= is_null($inst_listdestination[33]) ? NULL : $inst_listdestination[33]."@".$this->username;
 			$file  = preg_replace('/\.[^\.\/]+$/','',basename($inst_listdestination[29]));
 			
@@ -1706,7 +1710,7 @@ class A2Billing {
 					$monfile = false;
 					$localcount = substr_count(strtoupper($inst_listdestination[4]),"LOCAL/");
 					// RUN MIXMONITOR TO RECORD CALL
-					if (($this->monitor == 1 || $this->agiconfig['record_call'] == 1) && $localcount < 2) {
+					if (((($this->send_sound || $this->send_text) && $this->speech2mail) || $this->monitor == 1 || $this->agiconfig['record_call'] == 1) && $localcount < 2) {
 						$this->dl_short = MONITOR_PATH . "/" . $this->username . "/" . date('Y') . "/" . date('n') . "/" . date('j') . "/";
 						$monfile = $dl_short = $this->dl_short . $this->uniqueid . ".";
 						if ($this -> speech2mail) {
@@ -1775,7 +1779,7 @@ $tempdebug="ANSWEREDTIME: $answeredtime sec";
 $tempdebug="DIALSTATUS: $dialstatus";
 					}
 $this -> debug( ERROR, $agi, __FILE__, __LINE__, "[ \033[1;34m".$agi->get_variable('QUEUEDNID', true)." > $tempdebug\33[0m ]");
-					if (($this->monitor == 1 || $this->agiconfig['record_call'] == 1) && $localcount < 2) {
+					if (((($this->send_sound || $this->send_text) && $this->speech2mail) || $this->monitor == 1 || $this->agiconfig['record_call'] == 1) && $localcount < 2) {
 						$myres = $agi->exec($this -> format_parameters ("StopMixMonitor"));
 						$this -> debug( INFO, $agi, __FILE__, __LINE__, "EXEC StopMixMonitor (".$this->uniqueid.")");
 //						$monfile = $this->dl_short ."{$this->uniqueid}.";
@@ -1859,7 +1863,7 @@ $this -> debug( ERROR, $agi, __FILE__, __LINE__, "[ \033[1;34m".$agi->get_variab
 						$this -> debug( INFO, $agi, __FILE__, __LINE__, "[DID CALL - LOG CC_CALL: SQL: $QUERY]:[result:$result]");
 						
 						if (stripos($inst_listdestination[4],"@a3billing") === false)
-							$this -> send_talk($this -> speech2mail, $monfile, $this -> current_language);
+							$this -> send_talk($agi, $this -> speech2mail, $monfile, $this -> current_language);
 						$monfile = false;
 					}
 					monitor_recognize($this);
@@ -2011,6 +2015,8 @@ $this -> debug( ERROR, $agi, __FILE__, __LINE__, "[ \033[1;34m".$agi->get_variab
 	    $file    = preg_replace('/\.[^\.\/]+$/', '', basename($inst_listdestination[29]));
 	    $this->margintotal					= $this->margin_calculate();
 	    $this->speech2mail					= $inst_listdestination[43];
+	    $this->send_text					= $inst_listdestination[44];
+	    $this->send_sound					= $inst_listdestination[45];
 
 	    // CHECK IF DESTINATION IS SET
 	    if (strlen($inst_listdestination[4])==0 || $this->CallerID==$this->destination)
@@ -2042,7 +2048,7 @@ $this -> debug( ERROR, $agi, __FILE__, __LINE__, "[ \033[1;34m".$agi->get_variab
             if ($inst_listdestination[5]==1) {
                 // RUN MIXMONITOR TO RECORD CALL
 		$monfile = false;
-		if ($this->monitor == 1 || $this->agiconfig['record_call'] == 1) {
+		if ((($this->send_sound || $this->send_text) && $this->speech2mail) || $this->monitor == 1 || $this->agiconfig['record_call'] == 1) {
 			$this->dl_short = MONITOR_PATH . "/" . $this->username . "/" . date('Y') . "/" . date('n') . "/" . date('j') . "/";
 			$monfile = $dl_short = $this->dl_short . $this->uniqueid . ".";
 			if ($this -> speech2mail) {
@@ -2116,7 +2122,7 @@ $this -> debug( ERROR, $agi, __FILE__, __LINE__, "[ \033[1;34m".$agi->get_variab
 			}
 		} else		$dialstatus	= $agi->get_variable("DIALSTATUS", true);
 
-		if ($this->monitor == 1 || $this -> agiconfig['record_call'] == 1) {
+		if ((($this->send_sound || $this->send_text) && $this->speech2mail) || $this->monitor == 1 || $this -> agiconfig['record_call'] == 1) {
 			$myres = $agi->exec($this -> format_parameters ("StopMixMonitor"));
 			$this -> debug( INFO, $agi, __FILE__, __LINE__, "EXEC StopMixMonitor (".$this->uniqueid.")");
 //			$monfile = $this->dl_short ."{$this->uniqueid}.";
@@ -2233,7 +2239,7 @@ $this -> debug( ERROR, $agi, __FILE__, __LINE__, "[ \033[1;34m".$agi->get_variab
                     	    $result = $this -> instance_table -> SQLExec ($this->DBHandle, $QUERY, 0);
                     	    $this -> debug( INFO, $agi, __FILE__, __LINE__, "[DID CALL - LOG CC_CALL: SQL: $QUERY]:[result:$result]");
 			}
-			$this -> send_talk($this -> speech2mail, $monfile, $this -> current_language);
+			$this -> send_talk($agi, $this -> speech2mail, $monfile, $this -> current_language);
 			$monfile = false;
 		    }
 		    monitor_recognize($this);
@@ -2319,7 +2325,7 @@ $this -> debug( ERROR, $agi, __FILE__, __LINE__, "[ \033[1;34m".$agi->get_variab
 		$this->id_card			= $my_id_card;
     }
 
-	function send_talk($mailaddr,$audioFile,$languageCode='not_set')
+	function send_talk(&$agi,$mailaddr,$audioFile,$languageCode='not_set')
 	{
 //		$calleridname = $agi->get_variable('CALLERID(name)', true);
 		if ($languageCode=='not_set')
@@ -2342,105 +2348,122 @@ $this -> debug( ERROR, $agi, __FILE__, __LINE__, "[ \033[1;34m".$agi->get_variab
 			$dl_path_to = $path_parts['dirname']."/".$path_parts['filename'].".mp3";
 			$lame = "/usr/bin/lame -h -b 16 ".$audioFile." ".$dl_path_to;
 			exec($lame);
-		}
+		} else $dl_path_to = $audioFile;
 		// CHECK IF THE EMAIL ADDRESS IS CORRECT
-		if ($mailaddr) {
+		if ($mailaddr && ($this->send_sound || $this->send_text)) {
 		    if (preg_match("/^[_A-Za-z0-9-]+(\\.[_A-Za-z0-9-]+)*@[A-Za-z0-9]+(\\.[A-Za-z0-9]+)*(\\.[A-Za-z]{2,})$/i", $mailaddr) && is_file($audioFile)) {
 		
 			include_once (dirname(__FILE__)."/mail/class.phpmailer.php");
 			include_once (dirname(__FILE__)."/Class.Mail.php");
 
-			$keyFilePath = $this->config['global']['google_cloud_credential'];
-//			$projectId = '';
+			if ($this -> send_text) {
+				$keyFilePath = $this->config['global']['google_cloud_credential'];
+//				$projectId = '';
 
-			putenv("GOOGLE_APPLICATION_CREDENTIALS=".$keyFilePath);
+				putenv("GOOGLE_APPLICATION_CREDENTIALS=".$keyFilePath);
 
-			$storage = new StorageClient(/*[
+				$storage = new StorageClient(/*[
 						'keyFile' => json_decode(file_get_contents($keyFilePath), true),
 						'keyFilePath' => $keyFilePath,
 						'projectId' => $projectId
-			]*/);
+				]*/);
 			
-			$bucketName = $this->config['global']['google_storage_bucketname'];
-			$bucketLocation = $this->config['global']['bucket_location'];
-			$bucket = $storage->bucket($bucketName);
-			if (!$bucket->exists()) {
-				$bucket = $storage->createBucket($bucketName, [ 'location' => $bucketLocation ]);
-			}
-			
-			// Upload a file to the bucket.
-			$object = $bucket->upload(
-			    fopen($audioFile, 'r'), ['name' => $objectName]
-			    );
+				$bucketName = strtolower($this->config['global']['google_storage_bucketname']);
+				$bucketLocation = $this->config['global']['bucket_location'];
+				$bucket = $storage->bucket($bucketName);
+				if (!$bucket->exists()) {
+					$bucket = $storage->createBucket($bucketName, [ 'location' => $bucketLocation ]);
+				}
 
-			// set string as audio content
-			$audio = (new RecognitionAudio())
-			    ->setUri("gs://".$bucketName."/".$objectName);
+				// Upload a file to the bucket.
+				$object = $bucket->upload(
+				    fopen($audioFile, 'r'), ['name' => $objectName]
+				);
 
-			// The audio file's encoding, sample rate and language
-			// http://googleapis.github.io/google-cloud-php/#/docs/google-cloud/v0.104.0/speech/v1p1beta1/recognitionconfig
-			$config = new RecognitionConfig([
-			    'encoding' => AudioEncoding::LINEAR16,
-			    'sample_rate_hertz' => 8000,
-			    'language_code' => $languageCode,
-			    'enable_automatic_punctuation' => true,
-//			    'model'=> 'phone_call',
-			    'use_enhanced' => true,
-			    'diarization_speaker_count' => 2,
-			    'enable_speaker_diarization' => true
-			]);
-			if ($languageCode == 'en-US')  $config->setModel('phone_call');
-			if (isset($alternateLangCode)) $config->setAlternativeLanguageCodes($alternateLangCode);
+				// set string as audio content
+				$audio = (new RecognitionAudio())
+				    ->setUri("gs://".$bucketName."/".$objectName);
 
-			// Instantiates a client
-			$client = new SpeechClient();
+				// The audio file's encoding, sample rate and language
+				// http://googleapis.github.io/google-cloud-php/#/docs/google-cloud/v0.104.0/speech/v1p1beta1/recognitionconfig
+				$config = new RecognitionConfig([
+				    'encoding' => AudioEncoding::LINEAR16,
+				    'sample_rate_hertz' => 8000,
+				    'language_code' => $languageCode,
+				    'enable_automatic_punctuation' => true,
+//				    'model'=> 'phone_call',
+				    'use_enhanced' => true,
+				    'diarization_speaker_count' => 2,
+				    'enable_speaker_diarization' => true
+				]);
+				if ($languageCode == 'en-US')  $config->setModel('phone_call');
+				if (isset($alternateLangCode)) $config->setAlternativeLanguageCodes($alternateLangCode);
 
-			// create the asyncronous recognize operation
-			$operation = $client->longRunningRecognize($config, $audio);
-			$operation->pollUntilComplete();
-			
-			$transcript = $languageCode;
-			if (isset($alternateLangCode))
-				$transcript .= ", " . implode(", ", $alternateLangCode);
-			if ($operation->operationSucceeded()) {
-			    // Detects speech in the audio file
-			    $response = $operation->getResult();
+				// Instantiates a client
+				$client = new SpeechClient();
 
-			    // Save most likely transcription
-			    $speakertag = 100;
-			    foreach ($response->getResults() as $result) {
-			        $alternatives = $result->getAlternatives();
-			        $mostLikely   = $alternatives[0];
+				// create the asyncronous recognize operation
+				$operation = $client->longRunningRecognize($config, $audio);
+				$operation->pollUntilComplete();
 
-			        foreach ($mostLikely->getWords() as $speakers) {
-				    if ($speakertag != $speakers->getSpeakerTag()) {
-					$speakertag  = $speakers->getSpeakerTag();
-					$transcript .= PHP_EOL."<u>Speaker".$speakertag.":</u> ";
+				$transcript = $languageCode;
+				if (isset($alternateLangCode))
+					$transcript .= ", " . implode(", ", $alternateLangCode);
+				if ($operation->operationSucceeded()) {
+				    // Detects speech in the audio file
+				    $response = $operation->getResult();
+
+				    // Save most likely transcription
+				    $speakertag = 100;
+				    foreach ($response->getResults() as $result) {
+				        $alternatives = $result->getAlternatives();
+				        $mostLikely   = $alternatives[0];
+
+				        foreach ($mostLikely->getWords() as $speakers) {
+					    if ($speakertag != $speakers->getSpeakerTag()) {
+						$speakertag  = $speakers->getSpeakerTag();
+						$transcript .= PHP_EOL."<u>Speaker".$speakertag.":</u> ";
+					    }
+					    $transcript .= $speakers->getWord()." ";
+				        }
 				    }
-				    $transcript .= $speakers->getWord()." ";
-			        }
-			    }
-			}
+				}
 
-			$client->close();
-			$object->delete();
+				$client->close();
+				$object->delete();
+			}
 
 			try {
 				$this->DBHandle->Execute("SET NAMES 'UTF8'");
 				$mail = new Mail(Mail::$TYPE_SPEECH_SUCCESS,$this->id_card,null,null,null,$this->DBHandle);
-				if (file_exists($dl_path_to) && is_file($dl_path_to)) {
+				if ($this->send_sound && file_exists($dl_path_to) && is_file($dl_path_to)) {
 				    $mail->AddAttachment($dl_path_to);
 				}
 				$mail->replaceInEmail(Mail::$SPEECH_CID_NUMBER,($this->src != "NULL")?$this->src:$this->CallerID);
 				$mail->replaceInEmail(Mail::$SPEECH_DEST_EXTEN,$this->destination);
 				$mail->replaceInEmail(Mail::$SPEECH_DATETIME,date('d F Y - H:i:s'));
-				$mail->replaceInEmail(Mail::$SPEECH_TEXT,$transcript);
+				if ($this->send_text) $mail->replaceInEmail(Mail::$SPEECH_TEXT,$transcript);
 				$mail->send($mailaddr);
+				$this -> debug( INFO, $agi, __FILE__, __LINE__, "[SENDING SPEECH TO CUSTOMER] ".$mail);
 			} catch (A2bMailException $e) {
+				$this -> debug( ERROR, $agi, __FILE__, __LINE__, "[Speech2Text for cardID $this->id_card ($this->CallerID -> $this->destination)]: ERROR NO EMAIL TEMPLATE FOUND");
 			}
+		    } else {
+			$this -> debug( ERROR, $agi, __FILE__, __LINE__, "[Speech2Text for cardID $this->id_card ($this->CallerID -> $this->destination)]: no valid email !!!");
 		    }
 		}
-		unlink($audioFile);
+		if ($audioFile != $dl_path_to)
+		try {
+		    unlink($audioFile);
+		} catch (Exception $e) {
+		    $this -> debug( ERROR, $agi, __FILE__, __LINE__, "[Erasing file $audioFile error]: ".$e);
+		}
+		if ($this -> monitor == 0 && $this -> agiconfig['record_call'] == 0)
+		try {
+		    unlink($dl_path_to);
+		} catch (Exception $e) {
+		    $this -> debug( ERROR, $agi, __FILE__, __LINE__, "[Erasing file $dl_path_to error]: ".$e);
+		}
 	}
 	/**
 	 *	Function call_fax
@@ -2479,7 +2502,7 @@ $this -> debug( ERROR, $agi, __FILE__, __LINE__, "FAXBITRATE: ".$faxbitrate);
 $this -> debug( ERROR, $agi, __FILE__, __LINE__, "FAXRESOLUTION: ".$faxresolution);
 
 
-		if ($this->monitor == 1 || $this -> agiconfig['record_call'] == 1) {
+		if ((($this->send_sound || $this->send_text) && $this->speech2mail) || $this->monitor == 1 || $this -> agiconfig['record_call'] == 1) {
 			$myres = $agi->exec($this -> format_parameters ("StopMixMonitor"));
 			$this -> debug( INFO, $agi, __FILE__, __LINE__, "EXEC StopMixMonitor (".$uniqueid.")");
 		}
@@ -3479,7 +3502,7 @@ $this -> debug( ERROR, $agi, __FILE__, __LINE__, "FAXRESOLUTION: ".$faxresolutio
 				    " cc_card.lastname, cc_card.firstname, cc_card.email, cc_card.uipass, cc_card.id_campaign, cc_card.id, useralias, " .
 				    " cc_card.status, cc_card.voicemail_permitted, cc_card.voicemail_activated, cc_card.restriction, cc_country.countryprefix, " .
 				    " cc_card.monitor, phonenumber, warning_threshold, say_rateinitial, say_balance_after_call, margin, id_diller, ".
-				    " blacklist, areaprefix, citylength, concat_id, speech2mail".
+				    " blacklist, areaprefix, citylength, concat_id, speech2mail, send_text, send_sound".
 				    " FROM cc_callerid ".
 				    " LEFT JOIN cc_card ON cc_callerid.id_cc_card=cc_card.id ".
 				    " LEFT JOIN cc_tariffgroup ON cc_card.tariff=cc_tariffgroup.id ".
@@ -3680,6 +3703,8 @@ $this -> debug( ERROR, $agi, __FILE__, __LINE__, "FAXRESOLUTION: ".$faxresolutio
 				$this->citylength			=  $result[0][42];
 				$this->caller_concat_id 		=  $result[0][43];
 				$this->speech2mail	 		=  $result[0][44];
+				$this->send_text			=  $result[0][45];
+				$this->send_sound			=  $result[0][46];
 
 				if (strlen($language)==2 && !($this->languageselected>=1)) {
 
@@ -3797,7 +3822,7 @@ $this -> debug( ERROR, $agi, __FILE__, __LINE__, "FAXRESOLUTION: ".$faxresolutio
 								" UNIX_TIMESTAMP(cc_card.creationdate), currency, lastname, firstname, email, uipass, id_campaign, cc_card.id," .
 								" useralias, status, voicemail_permitted, voicemail_activated, restriction, countryprefix, monitor, " .
 								" cc_sip_buddies.warning_threshold, cc_sip_buddies.say_rateinitial, cc_sip_buddies.say_balance_after_call," .
-								" margin, id_diller, cc_callerid.activated, blacklist, areaprefix, citylength, speech2mail" .
+								" margin, id_diller, cc_callerid.activated, blacklist, areaprefix, citylength, speech2mail, send_text, send_sound" .
 								" FROM cc_card" .
 								" LEFT JOIN cc_tariffgroup ON tariff = cc_tariffgroup.id" .
 								" LEFT JOIN cc_country ON country = countrycode" .
@@ -3853,6 +3878,8 @@ $this -> debug( ERROR, $agi, __FILE__, __LINE__, "FAXRESOLUTION: ".$faxresolutio
 					$this->areaprefix		= $result[0][37];
 					$this->citylength		= $result[0][38];
 					$this->speech2mail		= $result[0][39];
+					$this->send_text		= $result[0][40];
+					$this->send_sound		= $result[0][41];
 					
 					if ($this->typepaid==1) $this->credit = $this->credit + $this->creditlimit;
 				}
@@ -4022,7 +4049,7 @@ $this -> debug( ERROR, $agi, __FILE__, __LINE__, "FAXRESOLUTION: ".$faxresolutio
 							" enableexpire, UNIX_TIMESTAMP(expirationdate), expiredays, nbused, UNIX_TIMESTAMP(firstusedate), " .
 							" UNIX_TIMESTAMP(cc_card.creationdate), cc_card.currency, cc_card.lastname, cc_card.firstname, cc_card.email, " .
 							" cc_card.uipass, cc_card.id, cc_card.id_campaign, cc_card.id, useralias, status, voicemail_permitted, " .
-							" voicemail_activated, cc_card.restriction, cc_country.countryprefix, cc_card.monitor, areaprefix, citylength, speech2mail " .
+							" voicemail_activated, cc_card.restriction, cc_country.countryprefix, cc_card.monitor, areaprefix, citylength, speech2mail, send_text, send_sound " .
 							" FROM cc_card " .
 							" LEFT JOIN cc_tariffgroup ON tariff=cc_tariffgroup.id " .
 							" LEFT JOIN cc_country ON cc_card.country=cc_country.countrycode ".
@@ -4062,36 +4089,38 @@ $this -> debug( ERROR, $agi, __FILE__, __LINE__, "FAXRESOLUTION: ".$faxresolutio
 				$this->credit 				= $result[0][0];
 				$this->tariff 				= $result[0][1];
 				$this->active 				= $result[0][2];
-				$isused 					= $result[0][3];
-				$simultaccess 				= $result[0][4];
+				$isused 				= $result[0][3];
+				$simultaccess				= $result[0][4];
 				$this->typepaid 			= $result[0][5];
 				$this->creditlimit			= $result[0][6];
-				$language 					= $result[0][7];
-				$this->removeinterprefix 	= $result[0][8];
-				$this->redial 				= $result[0][9];
-				$this->enableexpire 		= $result[0][10];
-				$this->expirationdate 		= $result[0][11];
-				$this->expiredays 			= $result[0][12];
-				$this->nbused 				= $result[0][13];
-				$this->firstusedate 		= $result[0][14];
-				$this->creationdate 		= $result[0][15];
+				$language				= $result[0][7];
+				$this->removeinterprefix		= $result[0][8];
+				$this->redial				= $result[0][9];
+				$this->enableexpire			= $result[0][10];
+				$this->expirationdate			= $result[0][11];
+				$this->expiredays			= $result[0][12];
+				$this->nbused				= $result[0][13];
+				$this->firstusedate			= $result[0][14];
+				$this->creationdate			= $result[0][15];
 				$this->currency 			= $result[0][16];
-				$this->cardholder_lastname 	= $result[0][17];
-				$this->cardholder_firstname = $result[0][18];
-				$this->cardholder_email 	= $result[0][19];
-				$this->cardholder_uipass 	= $result[0][20];
+				$this->cardholder_lastname		= $result[0][17];
+				$this->cardholder_firstname		= $result[0][18];
+				$this->cardholder_email 		= $result[0][19];
+				$this->cardholder_uipass 		= $result[0][20];
 				$the_card_id 				= $result[0][21];
 				$this->id_campaign			= $result[0][22];
 				$this->id_card = $this->card_caller	= $result[0][23];
 				$this->useralias			= $result[0][24];
 				$this->status 				= $result[0][25];
-				$this->voicemail 			= ($result[0][26] && $result[0][27]) ? 1 : 0;
+				$this->voicemail 			=($result[0][26] && $result[0][27]) ? 1 : 0;
 				$this->restriction 			= $result[0][28];
-				$this->countryprefix 		= $result[0][29];
+				$this->countryprefix 			= $result[0][29];
 				$this->monitor 				= $result[0][30];
-				$this->areaprefix		= $result[0][31];
-				$this->citylength		= $result[0][32];
-				$this->speech2mail		= $result[0][33];
+				$this->areaprefix			= $result[0][31];
+				$this->citylength			= $result[0][32];
+				$this->speech2mail			= $result[0][33];
+				$this->send_text			= $result[0][34];
+				$this->send_sound			= $result[0][35];
 				
 				if ($this->typepaid==1) $this->credit = $this->credit + $this->creditlimit;
 				
@@ -4220,7 +4249,7 @@ $this -> debug( ERROR, $agi, __FILE__, __LINE__, "FAXRESOLUTION: ".$faxresolutio
 		$QUERY = "SELECT credit, tariff, activated, inuse, simultaccess, typepaid, creditlimit, language, removeinterprefix, redial, enableexpire, " .
 					" UNIX_TIMESTAMP(expirationdate), expiredays, nbused, UNIX_TIMESTAMP(firstusedate), UNIX_TIMESTAMP(cc_card.creationdate), " .
 					" cc_card.currency, cc_card.lastname, cc_card.firstname, cc_card.email, cc_card.uipass, cc_card.id_campaign, status, " .
-					" voicemail_permitted, voicemail_activated, cc_card.restriction, cc_country.countryprefix, cc_card.monitor, cc_card.id, areaprefix, citylength, speech2mail " .
+					" voicemail_permitted, voicemail_activated, cc_card.restriction, cc_country.countryprefix, cc_card.monitor, cc_card.id, areaprefix, citylength, speech2mail, send_text, send_sound " .
 					" FROM cc_card LEFT JOIN cc_tariffgroup ON tariff=cc_tariffgroup.id " .
 					" LEFT JOIN cc_country ON cc_card.country=cc_country.countrycode ".
 					" WHERE username='".$this->cardnumber."'";
@@ -4258,7 +4287,7 @@ $this -> debug( ERROR, $agi, __FILE__, __LINE__, "FAXRESOLUTION: ".$faxresolutio
 		$this->cardholder_uipass 	= $result[0][20];
 		$this->id_campaign 		= $result[0][21];
 		$this->status 			= $result[0][22];
-		$this->voicemail 		= ($result[0][23] && $result[0][24]) ? 1 : 0;
+		$this->voicemail 		=($result[0][23] && $result[0][24]) ? 1 : 0;
 		$this->restriction 		= $result[0][25];
 		$this->countryprefix 		= $result[0][26];
 		$this->monitor 			= $result[0][27];
@@ -4266,7 +4295,9 @@ $this -> debug( ERROR, $agi, __FILE__, __LINE__, "FAXRESOLUTION: ".$faxresolutio
 		$this->areaprefix		= $result[0][29];
 		$this->citylength		= $result[0][30];
 		$this->speech2mail		= $result[0][31];
-		
+		$this->send_text		= $result[0][32];
+		$this->send_sound		= $result[0][33];
+
 		if ($this->typepaid==1)
 			$this->credit = $this->credit + $this->creditlimit;
 		

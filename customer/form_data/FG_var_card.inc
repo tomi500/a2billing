@@ -180,26 +180,6 @@ $HD_Form -> AddEditElement (gettext("FAX NUMBER"),
 			   gettext("Insert the fax number of the customers"),
 			   "" , "", "",	"", "", "" , "NO", "");
 
-if ($ACXSEERECORDING){
-$HD_Form -> AddEditElement (gettext("RECORD CALL"),
-			   "monitor",
-			   '0',
-			   "RADIOBUTTON",
-			   "",
-			   "",
-			   gettext("Enable to monitor the call (to record all the conversations) value : YES - NO"),
-			   "" , "", "", gettext("Yes")." :1, - ".gettext("No").":0", "", "" , "", gettext("Define if you want to record all the conversations"));
-
-$HD_Form -> AddEditElement (gettext("FORWARD TO EMAIL"),
-                           "speech2mail",
-                           '$value',
-                           "INPUT",
-                           "size=70 maxlength=70",
-                           "1",
-                           gettext("Insert the email to forwarding recorded conversations"),
-                           "", "", "", "", "", "", "NO", gettext("Insert the email to forwarding recorded conversations"));
-}
-
 $HD_Form -> AddEditElement (gettext("RECALL DAYS"),
 			   "recalldays",
 			   '$value',
@@ -227,16 +207,52 @@ if (ACT_VOICEMAIL && $ACXVOICEMAIL) {
 				   "",
 				   gettext("Customer can choose to enable the voicemail for this card"),
 				   "" , "", "", "Yes :1, - No:0", "", "" , "", gettext("You can enable the voicemail"));
-}
 
-$add_fields_voicemail = '';
-if (ACT_VOICEMAIL && $ACXVOICEMAIL)
-	$add_fields_voicemail = ', voicemail_activated ';
-$add_fields_monitor = '';
-if ($ACXSEERECORDING)
-	$add_fields_monitor = ', monitor, speech2mail';
+	$add_fields_voicemail = ', voicemail_activated';
+} else	$add_fields_voicemail = '';
 
-$HD_Form -> FieldEditElement ('lastname, firstname, address, city, state, areaprefix, citylength, country, removeaddprefix, addprefixinternational, zipcode, id_timezone, phone, fax'.$add_fields_monitor.', recalldays, recalltime'.$add_fields_voicemail);
+if ($ACXSEERECORDING){
+$HD_Form -> AddEditElement (gettext("RECORD CALL"),
+			   "monitor",
+			   '0',
+			   "RADIOBUTTON",
+			   "",
+			   "",
+			   gettext("Enable to monitor the call (to record all the conversations) value : YES - NO"),
+			   "", "", "", gettext("Yes")." :1, - ".gettext("No").":0", "", "" , "", gettext("Define if you want to record and store all the conversations"),
+			   null, null, gettext("Surveillance Section"));
+
+$HD_Form -> AddEditElement (gettext("FORWARD TO EMAIL"),
+                           "speech2mail",
+                           '$value',
+                           "INPUT",
+                           "size=70 maxlength=70",
+                           "1",
+                           "",
+                           "", "", "", "", "", "", "NO", gettext("Insert the email to forwarding the conversations"));
+
+$HD_Form -> AddEditElement (gettext("SEND TEXT"),
+			   "send_text",
+			   '0',
+			   "RADIOBUTTON",
+			   "",
+			   "",
+			   "",
+			   "", "", "", gettext("Yes")." :1, - ".gettext("No").":0", "", "" , "", gettext("Define if you want to recognize the conversations and to send like regular text to email above"));
+
+$HD_Form -> AddEditElement (gettext("SEND SOUND"),
+			   "send_sound",
+			   '0',
+			   "RADIOBUTTON",
+			   "",
+			   "",
+			   "",
+			   "", "", "", gettext("Yes")." :1, - ".gettext("No").":0", "", "" , "", gettext("Define if you want to forwarding recorded conversations to email above"));
+
+	$add_fields_monitor = ', monitor, speech2mail, send_text, send_sound';
+} else	$add_fields_monitor = '';
+
+$HD_Form -> FieldEditElement ('lastname, firstname, address, city, state, areaprefix, citylength, country, removeaddprefix, addprefixinternational, zipcode, id_timezone, phone, fax'.', recalldays, recalltime'.$add_fields_voicemail.$add_fields_monitor);
 
 $HD_Form -> FG_INTRO_TEXT_ADD = gettext("you can add easily update your information clicking on the button.");
 

@@ -76,6 +76,8 @@ ALTER TABLE cc_card ADD dillertariffs varchar(60) COLLATE utf8_bin NOT NULL AFTE
 ALTER TABLE cc_card ADD dillergroups varchar(60) COLLATE utf8_bin NOT NULL AFTER `id_group`;
 ALTER TABLE cc_card ADD max_concurrent INT(11) NOT NULL DEFAULT '10';
 ALTER TABLE cc_card ADD speech2mail varchar(70) COLLATE utf8_bin NOT NULL AFTER `notify_email`;
+ALTER TABLE cc_card ADD send_text int(11) DEFAULT '0' AFTER `speech2mail`;
+ALTER TABLE cc_card ADD send_sound int(11) DEFAULT '0' AFTER `send_text`;
 
 ALTER TABLE cc_card CHANGE id_campaign id_campaign  INT( 11 ) NULL DEFAULT '-1';
 ALTER TABLE cc_card CHANGE id_timezone id_timezone CHAR( 40 ) NULL DEFAULT '0';

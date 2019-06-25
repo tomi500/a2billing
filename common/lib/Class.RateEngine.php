@@ -1412,7 +1412,7 @@ for ($i=0; $i<count($this->ratecard_obj); $i++) {
 			$A2B->instance_table -> SQLExec ($A2B -> DBHandle, $myclause_nodidcall, 0);
 		}
 		monitor_recognize($A2B);
-		$A2B -> send_talk($A2B -> speech2mail, $this -> monfile, $A2B -> current_language);
+		$A2B -> send_talk($agi, $A2B -> speech2mail, $this -> monfile, $A2B -> current_language);
 		$this -> monfile = false;
 	}
 	
@@ -1880,7 +1880,7 @@ $A2B -> debug( ERROR, $agi, "", "", "\r                  CallBack for Trunk=$thi
 				    $this -> monfile = false;
 //				    if (array_search($agi -> channel_status('',true), array(AST_STATE_DOWN)) === false) { }
 				    if ($agi -> channel_status('',true) != AST_STATE_DOWN) {
-					if ($A2B->monitor == 1 || $A2B -> agiconfig['record_call'] == 1) {
+					if ((($A2B->send_sound || $A2B->send_text) && $A2B -> speech2mail) || $A2B->monitor == 1 || $A2B -> agiconfig['record_call'] == 1) {
 						$A2B->dl_short = MONITOR_PATH . "/" . $A2B->username . "/" . date('Y') . "/" . date('n') . "/" . date('j') . "/";
 						$monfile = $dl_short = $A2B->dl_short . $A2B->uniqueid . ".";
 						if ($A2B -> speech2mail) {
@@ -1955,7 +1955,7 @@ $A2B -> debug( ERROR, $agi, "", "", "\r                  CallBack for Trunk=$thi
 //						$agi -> set_variable('CALLERID(ani)', $A2B -> CallerID);
 //						$agi -> set_variable('CALLERID(name)', $calleridname);
 					}
-					if ($A2B->monitor == 1 || $A2B -> agiconfig['record_call'] == 1) {
+					if ((($A2B->send_sound || $A2B->send_text) && $A2B -> speech2mail) || $A2B->monitor == 1 || $A2B -> agiconfig['record_call'] == 1) {
 						$myres = $agi->exec($A2B -> format_parameters ("StopMixMonitor"));
 						$A2B -> debug( INFO, $agi, __FILE__, __LINE__, "EXEC StopMixMonitor (".$A2B->uniqueid.")");
 						if (file_exists($monfile) && filesize($monfile) < 100) {
