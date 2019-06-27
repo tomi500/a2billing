@@ -1863,7 +1863,7 @@ $this -> debug( ERROR, $agi, __FILE__, __LINE__, "[ \033[1;34m".$agi->get_variab
 						$this -> debug( INFO, $agi, __FILE__, __LINE__, "[DID CALL - LOG CC_CALL: SQL: $QUERY]:[result:$result]");
 						
 						if (stripos($inst_listdestination[4],"@a3billing") === false)
-							$this -> send_talk($agi, $this -> speech2mail, $monfile, $this -> current_language);
+							$this -> send_talk($agi, $this -> speech2mail, $monfile, $answeredtime, $this -> current_language);
 						$monfile = false;
 					}
 					monitor_recognize($this);
@@ -2239,7 +2239,7 @@ $this -> debug( ERROR, $agi, __FILE__, __LINE__, "[ \033[1;34m".$agi->get_variab
                     	    $result = $this -> instance_table -> SQLExec ($this->DBHandle, $QUERY, 0);
                     	    $this -> debug( INFO, $agi, __FILE__, __LINE__, "[DID CALL - LOG CC_CALL: SQL: $QUERY]:[result:$result]");
 			}
-			$this -> send_talk($agi, $this -> speech2mail, $monfile, $this -> current_language);
+			$this -> send_talk($agi, $this -> speech2mail, $monfile, $answeredtime, $this -> current_language);
 			$monfile = false;
 		    }
 		    monitor_recognize($this);
@@ -2325,7 +2325,7 @@ $this -> debug( ERROR, $agi, __FILE__, __LINE__, "[ \033[1;34m".$agi->get_variab
 		$this->id_card			= $my_id_card;
     }
 
-	function send_talk(&$agi,$mailaddr,$audioFile,$languageCode='not_set')
+	function send_talk(&$agi,$mailaddr,$audioFile,$answeredtime,$languageCode='not_set')
 	{
 //		$calleridname = $agi->get_variable('CALLERID(name)', true);
 		if ($languageCode=='not_set')
@@ -2341,33 +2341,70 @@ $this -> debug( ERROR, $agi, __FILE__, __LINE__, "[ \033[1;34m".$agi->get_variab
 		    $languageCode = 'en-US';
 		    $alternateLangCode = array('ru-RU','uk-UA');
 		}
-		$path_parts = pathinfo($audioFile);
-		$objectName = $path_parts['basename'];
-		$extension  = $path_parts['extension'];
-		if (is_file($audioFile) && $extension=='wav') {
+		$dl_path_to = $audioFile;
+		if (is_file($audioFile)) {
+		    $path_parts = pathinfo($audioFile);
+		    $objectName = $path_parts['basename'];
+		    $extension  = $path_parts['extension'];
+		    if ($extension=='wav') {
 			$dl_path_to = $path_parts['dirname']."/".$path_parts['filename'].".mp3";
 			$lame = "/usr/bin/lame -h -b 16 ".$audioFile." ".$dl_path_to;
-			exec($lame);
-		} else $dl_path_to = $audioFile;
-		// CHECK IF THE EMAIL ADDRESS IS CORRECT
-		if ($mailaddr && ($this->send_sound || $this->send_text)) {
-		    if (preg_match("/^[_A-Za-z0-9-]+(\\.[_A-Za-z0-9-]+)*@[A-Za-z0-9]+(\\.[A-Za-z0-9]+)*(\\.[A-Za-z]{2,})$/i", $mailaddr) && is_file($audioFile)) {
+			exec($lame." >/dev/null 2>&1");
+		    }
 		
-			include_once (dirname(__FILE__)."/mail/class.phpmailer.php");
-			include_once (dirname(__FILE__)."/Class.Mail.php");
+		// CHECK IF THE EMAIL ADDRESS IS CORRECT
+		    if ($this->send_sound || $this->send_text)
+		    if ($mailaddr && preg_match("/^[_A-Za-z0-9-]+(\\.[_A-Za-z0-9-]+)*@[A-Za-z0-9]+(\\.[A-Za-z0-9]+)*(\\.[A-Za-z]{2,})$/i", $mailaddr)) {
 
 			if ($this -> send_text) {
-				$keyFilePath = $this->config['global']['google_cloud_credential'];
-//				$projectId = '';
+			    $keyFilePath = $this->config['global']['google_cloud_credential'];
+//			    $projectId = '';
 
-				putenv("GOOGLE_APPLICATION_CREDENTIALS=".$keyFilePath);
+			    putenv("GOOGLE_APPLICATION_CREDENTIALS=".$keyFilePath);
 
+			    // The audio file's encoding, sample rate and language
+			    // http://googleapis.github.io/google-cloud-php/#/docs/google-cloud/v0.104.0/speech/v1p1beta1/recognitionconfig
+			    $config = new RecognitionConfig([
+				'encoding' => AudioEncoding::LINEAR16,
+				'sample_rate_hertz' => 8000,
+				'language_code' => $languageCode,
+				'enable_automatic_punctuation' => true,
+//				'model'=> 'phone_call',
+				'use_enhanced' => true,
+				'diarization_speaker_count' => 2,
+				'enable_speaker_diarization' => true
+			    ]);
+			    if ($languageCode == 'en-US')  $config->setModel('phone_call');
+			    if (isset($alternateLangCode)) $config->setAlternativeLanguageCodes($alternateLangCode);
+
+			    $transcript = $languageCode;
+			    if (isset($alternateLangCode))
+				$transcript .= ", " . implode(", ", $alternateLangCode);
+
+			    // Instantiates a client
+			    $client = new SpeechClient();
+
+			    if ($answeredtime < 60) {
+				$content = file_get_contents($audioFile);
+				$audio = (new RecognitionAudio())
+				    ->setContent($content);
+				try {
+				    $response = $client->recognize($config, $audio);
+				    foreach ($response->getResults() as $result) {
+					$alternatives = $result->getAlternatives();
+					$mostLikely = $alternatives[0];
+					$transcript .= PHP_EOL.$mostLikely->getTranscript();
+				    }
+				} catch (Exception $e) {
+				    $this -> debug( ERROR, $agi, __FILE__, __LINE__, "[Recognize Speech-to-text error]: ".$e->getMessage());
+				}
+			    } else {
 				$storage = new StorageClient(/*[
 						'keyFile' => json_decode(file_get_contents($keyFilePath), true),
 						'keyFilePath' => $keyFilePath,
 						'projectId' => $projectId
 				]*/);
-			
+
 				$bucketName = strtolower($this->config['global']['google_storage_bucketname']);
 				$bucketLocation = $this->config['global']['bucket_location'];
 				$bucket = $storage->bucket($bucketName);
@@ -2384,31 +2421,10 @@ $this -> debug( ERROR, $agi, __FILE__, __LINE__, "[ \033[1;34m".$agi->get_variab
 				$audio = (new RecognitionAudio())
 				    ->setUri("gs://".$bucketName."/".$objectName);
 
-				// The audio file's encoding, sample rate and language
-				// http://googleapis.github.io/google-cloud-php/#/docs/google-cloud/v0.104.0/speech/v1p1beta1/recognitionconfig
-				$config = new RecognitionConfig([
-				    'encoding' => AudioEncoding::LINEAR16,
-				    'sample_rate_hertz' => 8000,
-				    'language_code' => $languageCode,
-				    'enable_automatic_punctuation' => true,
-//				    'model'=> 'phone_call',
-				    'use_enhanced' => true,
-				    'diarization_speaker_count' => 2,
-				    'enable_speaker_diarization' => true
-				]);
-				if ($languageCode == 'en-US')  $config->setModel('phone_call');
-				if (isset($alternateLangCode)) $config->setAlternativeLanguageCodes($alternateLangCode);
-
-				// Instantiates a client
-				$client = new SpeechClient();
-
 				// create the asyncronous recognize operation
 				$operation = $client->longRunningRecognize($config, $audio);
 				$operation->pollUntilComplete();
 
-				$transcript = $languageCode;
-				if (isset($alternateLangCode))
-					$transcript .= ", " . implode(", ", $alternateLangCode);
 				if ($operation->operationSucceeded()) {
 				    // Detects speech in the audio file
 				    $response = $operation->getResult();
@@ -2416,10 +2432,9 @@ $this -> debug( ERROR, $agi, __FILE__, __LINE__, "[ \033[1;34m".$agi->get_variab
 				    // Save most likely transcription
 				    $speakertag = 100;
 				    foreach ($response->getResults() as $result) {
-				        $alternatives = $result->getAlternatives();
-				        $mostLikely   = $alternatives[0];
-
-				        foreach ($mostLikely->getWords() as $speakers) {
+					$alternatives = $result->getAlternatives();
+					$mostLikely   = $alternatives[0];
+					foreach ($mostLikely->getWords() as $speakers) {
 					    if ($speakertag != $speakers->getSpeakerTag()) {
 						$speakertag  = $speakers->getSpeakerTag();
 						$transcript .= PHP_EOL."<u>Speaker".$speakertag.":</u> ";
@@ -2427,11 +2442,17 @@ $this -> debug( ERROR, $agi, __FILE__, __LINE__, "[ \033[1;34m".$agi->get_variab
 					    $transcript .= $speakers->getWord()." ";
 				        }
 				    }
+				} else {
+				    $this -> debug( ERROR, $agi, __FILE__, __LINE__, "[Recognize Speech-to-text error]: ".$operation->getError());
 				}
-
-				$client->close();
 				$object->delete();
+			    }
+
+			    $client->close();
 			}
+
+			include_once (dirname(__FILE__)."/mail/class.phpmailer.php");
+			include_once (dirname(__FILE__)."/Class.Mail.php");
 
 			try {
 				$this->DBHandle->Execute("SET NAMES 'UTF8'");
@@ -2444,9 +2465,9 @@ $this -> debug( ERROR, $agi, __FILE__, __LINE__, "[ \033[1;34m".$agi->get_variab
 				$mail->replaceInEmail(Mail::$SPEECH_DATETIME,date('d F Y - H:i:s'));
 				if ($this->send_text) $mail->replaceInEmail(Mail::$SPEECH_TEXT,$transcript);
 				$mail->send($mailaddr);
-				$this -> debug( INFO, $agi, __FILE__, __LINE__, "[SENDING SPEECH TO CUSTOMER] ".$mail);
+				$this -> debug( INFO, $agi, __FILE__, __LINE__, "[SENDING SPEECH EMAIL TO CUSTOMER]");
 			} catch (A2bMailException $e) {
-				$this -> debug( ERROR, $agi, __FILE__, __LINE__, "[Speech2Text for cardID $this->id_card ($this->CallerID -> $this->destination)]: ERROR NO EMAIL TEMPLATE FOUND");
+				$this -> debug( ERROR, $agi, __FILE__, __LINE__, "[Speech2Text for cardID $this->id_card ($this->CallerID -> $this->destination)]: ERROR NO EMAIL TEMPLATE FOUND -> ".$e->getMessage());
 			}
 		    } else {
 			$this -> debug( ERROR, $agi, __FILE__, __LINE__, "[Speech2Text for cardID $this->id_card ($this->CallerID -> $this->destination)]: no valid email !!!");
@@ -2456,13 +2477,13 @@ $this -> debug( ERROR, $agi, __FILE__, __LINE__, "[ \033[1;34m".$agi->get_variab
 		try {
 		    unlink($audioFile);
 		} catch (Exception $e) {
-		    $this -> debug( ERROR, $agi, __FILE__, __LINE__, "[Erasing file $audioFile error]: ".$e);
+		    $this -> debug( ERROR, $agi, __FILE__, __LINE__, "[Erasing file $audioFile error]: ".$e->getMessage());
 		}
-		if ($this -> monitor == 0 && $this -> agiconfig['record_call'] == 0)
+		if ($this -> monitor == 0 && $this -> agiconfig['record_call'] == 0 && is_file($dl_path_to))
 		try {
 		    unlink($dl_path_to);
 		} catch (Exception $e) {
-		    $this -> debug( ERROR, $agi, __FILE__, __LINE__, "[Erasing file $dl_path_to error]: ".$e);
+		    $this -> debug( ERROR, $agi, __FILE__, __LINE__, "[Erasing file $dl_path_to error]: ".$e->getMessage());
 		}
 	}
 	/**
