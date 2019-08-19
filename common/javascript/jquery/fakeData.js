@@ -1,14 +1,14 @@
 var PopUpDayTimeJson = {
-	"sheduleArray": [
-        {
-            "weekdays[]": "",
-            "timefrom[]": "0",
-            "timetill[]": "0",
-              "inputa[]": "10",
-              "inputb[]": "1",
-              "inputc[]": "60"
-        }
-	]
+    "sheduleArray": [
+	{
+	    "weekdays[]": "",
+	    "timefrom[]": "0",
+	    "timetill[]": "0",
+	    "inputa[]": "10",
+	    "inputb[]": "1",
+	    "inputc[]": "60"
+	}
+    ]
 };
 
 $(document).ready(function(){

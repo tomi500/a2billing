@@ -108,6 +108,7 @@ class A2Billing {
 	var $speech2mail = '';
 	var $send_text = '';
 	var $send_sound = '';
+	var $calleesound = NULL;
 
 
 	/**
@@ -1012,7 +1013,8 @@ class A2Billing {
 			$this->src_peername = $this->transferername[0];
 		}
 	    }
-	    if ($call2did != -1) {
+	}
+	if ($try_num==0 /*&& $call2did !== -1*/) {
 		$QUERY = "SELECT regexten, concat_id, id_cc_card FROM cc_sip_buddies
 			LEFT JOIN cc_card_concat ON id_cc_card = concat_card_id
 			WHERE name = '{$this->src_peername}' AND regexten IS NOT NULL LIMIT 1";
@@ -1030,7 +1032,6 @@ class A2Billing {
 			$this -> caller_concat_id = $result[0][0];
 		    }
 		}
-	    }
 	}
 	$this->extext = true;
 	if ($this->destination) {
@@ -1862,8 +1863,9 @@ $this -> debug( ERROR, $agi, __FILE__, __LINE__, "[ \033[1;34m".$agi->get_variab
 						$result = $this -> instance_table -> SQLExec ($this->DBHandle, $QUERY, 0);
 						$this -> debug( INFO, $agi, __FILE__, __LINE__, "[DID CALL - LOG CC_CALL: SQL: $QUERY]:[result:$result]");
 						
-						if (stripos($inst_listdestination[4],"@a3billing") === false)
+						if (stripos($inst_listdestination[4],"@a3billing") === false) {
 							$this -> send_talk($agi, $this -> speech2mail, $monfile, $answeredtime, $this -> current_language);
+						}
 						$monfile = false;
 					}
 					monitor_recognize($this);
@@ -2333,9 +2335,10 @@ $this -> debug( ERROR, $agi, __FILE__, __LINE__, "[ \033[1;34m".$agi->get_variab
 		switch($languageCode) {
 		    case 'de': $languageCode = 'de-DE'; break;
 		    case 'en': $languageCode = 'en-US'; break;
-		    case 'ru': $languageCode = 'ru-RU'; /*$alternateLangCode = array('uk-UA');*/ break;
+		    case 'ru': $languageCode = 'ru-RU'; $alternateLangCode = array('uk-UA'); break;
 		    case 'uk': $languageCode = 'uk-UA'; $alternateLangCode = array('ru-RU'); break;
 		    case 'ua': $languageCode = 'uk-UA'; $alternateLangCode = array('ru-RU'); break;
+		    case 'ja': $languageCode = 'ja-JP'; break;
 		}
 		if (strlen($languageCode)<5 || $languageCode=='not_set') {
 		    $languageCode = 'en-US';
@@ -2384,7 +2387,7 @@ $this -> debug( ERROR, $agi, __FILE__, __LINE__, "[ \033[1;34m".$agi->get_variab
 			    // Instantiates a client
 			    $client = new SpeechClient();
 
-			    if ($answeredtime < 60) {
+			    if ($answeredtime <= 60) {
 				$content = file_get_contents($audioFile);
 				$audio = (new RecognitionAudio())
 				    ->setContent($content);
@@ -2396,7 +2399,7 @@ $this -> debug( ERROR, $agi, __FILE__, __LINE__, "[ \033[1;34m".$agi->get_variab
 					$transcript .= PHP_EOL.$mostLikely->getTranscript();
 				    }
 				} catch (Exception $e) {
-				    $this -> debug( ERROR, $agi, __FILE__, __LINE__, "[Recognize Speech-to-text error]: ".$e->getMessage());
+				    $this -> debug( ERROR, $agi, __FILE__, __LINE__, "[Recognize Speech-to-text error]: ".var_export($e->getMessage(),true));
 				}
 			    } else {
 				$storage = new StorageClient(/*[
@@ -2434,13 +2437,19 @@ $this -> debug( ERROR, $agi, __FILE__, __LINE__, "[ \033[1;34m".$agi->get_variab
 				    foreach ($response->getResults() as $result) {
 					$alternatives = $result->getAlternatives();
 					$mostLikely   = $alternatives[0];
+//					$transcript .= PHP_EOL.$mostLikely->getTranscript();
 					foreach ($mostLikely->getWords() as $speakers) {
 					    if ($speakertag != $speakers->getSpeakerTag()) {
 						$speakertag  = $speakers->getSpeakerTag();
-						$transcript .= PHP_EOL."<u>Speaker".$speakertag.":</u> ";
+						if ($speakertag>0) $transcript .= PHP_EOL."<u>Speaker".$speakertag.":</u> ";
 					    }
-					    $transcript .= $speakers->getWord()." ";
+					    if ($speakertag>0) $transcript .= $speakers->getWord()." ";
 				        }
+				    }
+				    if (strpos($transcript,"Speaker") === false) foreach ($response->getResults() as $result) {
+					$alternatives = $result->getAlternatives();
+					$mostLikely   = $alternatives[0];
+					$transcript .= PHP_EOL.$mostLikely->getTranscript();
 				    }
 				} else {
 				    $this -> debug( ERROR, $agi, __FILE__, __LINE__, "[Recognize Speech-to-text error]: ".$operation->getError());
@@ -2473,7 +2482,7 @@ $this -> debug( ERROR, $agi, __FILE__, __LINE__, "[ \033[1;34m".$agi->get_variab
 			$this -> debug( ERROR, $agi, __FILE__, __LINE__, "[Speech2Text for cardID $this->id_card ($this->CallerID -> $this->destination)]: no valid email !!!");
 		    }
 		}
-		if ($audioFile != $dl_path_to)
+		if ($audioFile != $dl_path_to && is_file($audioFile))
 		try {
 		    unlink($audioFile);
 		} catch (Exception $e) {

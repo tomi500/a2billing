@@ -275,11 +275,42 @@ ALTER TABLE `cc_sheduler_ratecard`
   ADD `inputc` SMALLINT(6) NOT NULL DEFAULT '0' AFTER `inputb`,
   ADD PRIMARY KEY(`ids`),
   ADD INDEX `id` ( `id_ratecard` , `id_tariffplan` , `id_ringup`, `id_callback` );
-ALTER TABLE `cc_sheduler_ratecard` ADD `id_did_destination` BIGINT(20) NOT NULL DEFAULT '0' AFTER `id_callback`;
+ALTER TABLE `cc_sheduler_ratecard` ADD `id_did_destination` BIGINT(20) NOT NULL DEFAULT '0' AFTER `id_ringup`;
+ALTER TABLE `cc_sheduler_ratecard` ADD `id_ivr` BIGINT(20) NOT NULL DEFAULT '0' AFTER `id_did_destination`;
 
 #ALTER TABLE `cc_ratecard`
 #  DROP `starttime`,
 #  DROP `endtime`;
+
+CREATE TABLE IF NOT EXISTS `cc_ivr` (
+  `id` BIGINT(20) NOT NULL AUTO_INCREMENT,
+  `id_cc_card` INT(11) NOT NULL DEFAULT '0',
+  `ivrname` VARCHAR(40) CHARACTER SET utf8 COLLATE utf8_bin NOT NULL,
+  `repeats` SMALLINT(1) NOT NULL DEFAULT '1',
+  `waitsecsfordigits` SMALLINT(2) NOT NULL DEFAULT '6',
+  PRIMARY KEY (`id`),
+  INDEX (`id_cc_card`)
+) ENGINE=MyISAM DEFAULT CHARSET=utf8 COLLATE=utf8_bin;
+
+CREATE TABLE IF NOT EXISTS `cc_ivr_destinations` (
+  `id` BIGINT(20) NOT NULL AUTO_INCREMENT,
+  `id_cc_ivr` INT(11) NOT NULL DEFAULT '0',
+  `waitdigits` VARCHAR(6) NULL DEFAULT NULL,
+  `destinationnum` VARCHAR(100) CHARACTER SET utf8 COLLATE utf8_bin NULL DEFAULT NULL,
+  `playsoundcallee` VARCHAR(100) CHARACTER SET utf8 COLLATE utf8_bin NOT NULL,
+  PRIMARY KEY (`id`),
+  INDEX (`id_cc_ivr`)
+) ENGINE=MyISAM DEFAULT CHARSET=utf8 COLLATE=utf8_bin;
+
+CREATE TABLE IF NOT EXISTS `cc_ivr_sounds` (
+  `id` BIGINT(20) NOT NULL AUTO_INCREMENT,
+  `id_cc_ivr_start` INT(11) NOT NULL DEFAULT '0',
+  `id_cc_ivr_dest` INT(11) NOT NULL DEFAULT '0',
+  `timeout` VARCHAR(3) NOT NULL,
+  `playsound` VARCHAR(100) CHARACTER SET utf8 COLLATE utf8_bin NOT NULL,
+  PRIMARY KEY (`id`),
+  INDEX `id_ivrs` ( `id_cc_ivr_start`,`id_cc_ivr_dest` )
+) ENGINE=MyISAM DEFAULT CHARSET=utf8 COLLATE=utf8_bin;
 
 CREATE TABLE IF NOT EXISTS cc_voicemail_users (
 	uniqueid BIGINT(20) NOT NULL AUTO_INCREMENT PRIMARY KEY,
