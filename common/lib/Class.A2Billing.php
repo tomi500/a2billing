@@ -1483,8 +1483,8 @@ class A2Billing {
 				$myres = $agi->exec($this -> format_parameters ("StopMixMonitor"));
 				$this -> debug( INFO, $agi, __FILE__, __LINE__, "EXEC StopMixMonitor (".$this->uniqueid.")");
 				$monfile = $this->dl_short ."{$this->uniqueid}.";
-				$monfile.= $this->agiconfig['monitor_formatfile'] == 'wav49' ? 'WAV' : $this->agiconfig['monitor_formatfile'];
-				if (filesize($monfile) < 100) {
+				$monfile.= ($this->agiconfig['monitor_formatfile'] == 'wav49') ? 'WAV' : $this->agiconfig['monitor_formatfile'];
+				if (file_exists($monfile) && filesize($monfile) < 100) {
 					unlink($monfile);
 				}
 			}
@@ -1719,7 +1719,7 @@ class A2Billing {
 						    $monfile .= $format_file;
 						} else {
 						    $format_file = $A2B->agiconfig['monitor_formatfile'];
-						    $monfile .= $format_file == 'wav49' ? 'WAV' : $format_file;
+						    $monfile .= ($format_file == 'wav49') ? 'WAV' : $format_file;
 						}
 						$command_mixmonitor = $this -> format_parameters ("MixMonitor {$dl_short}{$format_file}|b");
 						$myres = $agi->exec($command_mixmonitor);
@@ -1785,7 +1785,7 @@ $this -> debug( ERROR, $agi, __FILE__, __LINE__, "[ \033[1;34m".$agi->get_variab
 						$this -> debug( INFO, $agi, __FILE__, __LINE__, "EXEC StopMixMonitor (".$this->uniqueid.")");
 //						$monfile = $this->dl_short ."{$this->uniqueid}.";
 //						$monfile.= $this->agiconfig['monitor_formatfile'] == 'wav49' ? 'WAV' : $this->agiconfig['monitor_formatfile'];
-						if (filesize($monfile) < 100) {
+						if (file_exists($monfile) && filesize($monfile) < 100) {
 							unlink($monfile);
 							$monfile = false;
 						}
@@ -2058,7 +2058,7 @@ $this -> debug( ERROR, $agi, __FILE__, __LINE__, "[ \033[1;34m".$agi->get_variab
 			    $monfile .= $format_file;
 			} else {
 			    $format_file = $A2B->agiconfig['monitor_formatfile'];
-			    $monfile .= $format_file == 'wav49' ? 'WAV' : $format_file;
+			    $monfile .= ($format_file == 'wav49') ? 'WAV' : $format_file;
 			}
 			$command_mixmonitor = $this -> format_parameters ("MixMonitor {$dl_short}{$format_file}|b");
 			$myres = $agi->exec($command_mixmonitor);
@@ -2129,7 +2129,7 @@ $this -> debug( ERROR, $agi, __FILE__, __LINE__, "[ \033[1;34m".$agi->get_variab
 			$this -> debug( INFO, $agi, __FILE__, __LINE__, "EXEC StopMixMonitor (".$this->uniqueid.")");
 //			$monfile = $this->dl_short ."{$this->uniqueid}.";
 //			$monfile.= $this->agiconfig['monitor_formatfile'] == 'wav49' ? 'WAV' : $this->agiconfig['monitor_formatfile'];
-			if (filesize($monfile) < 100) {
+			if (file_exists($monfile) && filesize($monfile) < 100) {
 				unlink($monfile);
 				$monfile = false;
 			}

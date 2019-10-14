@@ -119,7 +119,7 @@ class RateEngine
 		if (strlen($A2B->CallerID)>=1) $mycallerid = $A2B->CallerID;
 		if ($this->webui) $A2B -> debug( DEBUG, $agi, __FILE__, __LINE__, "[CC_asterisk_rate-engine - CALLERID : ".$A2B->CallerID."]",0);
 
-		$OUTOF_INTPREF_FORSURE = strlen($A2B->myprefix)>0 ? " AND out_of_intern_prefix_for_sure = 0" : "" ;
+		$OUTOF_INTPREF_FORSURE = (strlen($A2B->myprefix)>0) ? " AND out_of_intern_prefix_for_sure = 0" : "" ;
 		$DNID_SUB_QUERY = "AND 0 = (SELECT COUNT(dnidprefix) FROM cc_tariffgroup_plan RIGHT JOIN cc_tariffplan ON cc_tariffgroup_plan.idtariffplan=cc_tariffplan.id WHERE dnidprefix=SUBSTRING('$mydnid',1,length(dnidprefix)) AND idtariffgroup=$tariffgroupid ) ";
 		$CID_SUB_QUERY = "AND 0 = (SELECT count(calleridprefix) FROM cc_tariffgroup_plan RIGHT JOIN cc_tariffplan ON cc_tariffgroup_plan.idtariffplan=cc_tariffplan.id WHERE ('$mycallerid' LIKE CONCAT(calleridprefix,'%') OR calleridprefix LIKE '$mycallerid,%' OR calleridprefix LIKE '%,$mycallerid,%' OR calleridprefix LIKE '%,$mycallerid') AND idtariffgroup=$tariffgroupid )";
 //		$TARIFFNAME_SUB_QUERY = ($A2B->myprefix=="00" || $A2B->myprefix=="011") ? "" : " OR cc_tariffplan.tariffname LIKE '$A2B->cardnumber%'";
@@ -1071,7 +1071,7 @@ for ($i=0; $i<count($this->ratecard_obj); $i++) {
 		if ($K>=0 && count($this -> ratecard_obj)>0) {
 			$id_cc_package_offer   = $this -> ratecard_obj[$K][38];
 			$additional_grace_time = $this -> ratecard_obj[$K][47];
-			$idseller = is_null($this -> ratecard_obj[$K][73]) ? 0 : $this -> ratecard_obj[$K][73];
+			$idseller = (is_null($this -> ratecard_obj[$K][73])) ? 0 : $this -> ratecard_obj[$K][73];
 		} else {
 			$id_cc_package_offer = 'NONE';
 			$additional_grace_time = $idseller = 0;
@@ -1241,7 +1241,7 @@ for ($i=0; $i<count($this->ratecard_obj); $i++) {
 //			$src_exten	= (isset($A2B->src) && is_numeric($A2B->src)) ? $A2B->src : 'NULL';
 			$QUERY = "SELECT regexten FROM cc_sip_buddies WHERE name = '{$src_peername}' AND id_cc_card = $card_caller AND regexten IS NOT NULL LIMIT 1";
 			$result = $A2B -> instance_table -> SQLExec ($A2B->DBHandle, $QUERY);
-			$src_exten	= is_array($result) ? "'".$result[0][0]."'" : 'NULL';
+			$src_exten	= (is_array($result)) ? "'".$result[0][0]."'" : 'NULL';
 		} else	$src_exten	= 'NULL';
 //$A2B -> debug(ERROR, $agi, __FILE__, __LINE__, "[A2B->CallerIDext: {$A2B->CallerIDext}] [A2B->src: {$A2B->src}]");
 
@@ -1251,11 +1251,11 @@ for ($i=0; $i<count($this->ratecard_obj); $i++) {
 				WHERE (id_cc_card = $card_id OR v.concat_id IS NOT NULL) AND name = '$calledstation' LIMIT 1";
 **/		$result = $A2B -> instance_table -> SQLExec ($A2B->DBHandle, $QUERY);
 		if (is_array($result)) {
-			$calledexten = $result[0][0] != "" ? "'".$result[0][0]."'" : 'NULL';
+			$calledexten = ($result[0][0] != "") ? "'".$result[0][0]."'" : 'NULL';
 			$card_called = "'".$result[0][1]."'";
 		} else {
 			$calledexten = 'NULL';
-			$card_called = $calltype == 2 || $calltype == 3 || $calltype == 5 ? $card_id : "'0'";
+			$card_called = ($calltype == 2 || $calltype == 3 || $calltype == 5) ? $card_id : "'0'";
 		}
 
 		if ($callback_mode == 0 || $cost != 0 || !is_numeric($callback_mode) || $A2B->CallerID != $A2B -> config["callback"]['callerid']) {
@@ -1480,7 +1480,7 @@ for ($i=0; $i<count($this->ratecard_obj); $i++) {
 				    $ipaddress		= $this -> ratecard_obj[$k][32];
 				    $removeprefix	= explode(",",$this -> ratecard_obj[$k][33]);
 //				    if ($typecall==1)
-				    $timeout		= $typecall==1 ? $A2B -> config["callback"]['predictivedialer_maxtime_tocall'] : $this -> ratecard_obj[$k]['timeout'];
+				    $timeout		= ($typecall==1) ? $A2B -> config["callback"]['predictivedialer_maxtime_tocall'] : $this -> ratecard_obj[$k]['timeout'];
 //				    else $timeout	= $this -> ratecard_obj[$k]['timeout'];
 				    if (isset($this -> timeout) && $this -> timeout)
 					$timeout	= $this -> timeout;
@@ -1889,7 +1889,7 @@ $A2B -> debug( ERROR, $agi, "", "", "\r                  CallBack for Trunk=$thi
 						    $this -> monfile = $monfile;
 						} else {
 						    $format_file = $A2B->agiconfig['monitor_formatfile'];
-						    $monfile .= $format_file == 'wav49' ? 'WAV' : $format_file;
+						    $monfile .= ($format_file == 'wav49') ? 'WAV' : $format_file;
 						}
 						$j = 100;
 						while (file_exists($monfile)) {
@@ -1917,7 +1917,7 @@ $A2B -> debug( ERROR, $agi, "", "", "\r                  CallBack for Trunk=$thi
 							    $this -> monfile = $monfile;
 							} else {
 							    $format_file = $A2B->agiconfig['monitor_formatfile'];
-							    $monfile .= $format_file == 'wav49' ? 'WAV' : $format_file;
+							    $monfile .= ($format_file == 'wav49') ? 'WAV' : $format_file;
 							    $this -> monfile = false;
 							}
 						}
