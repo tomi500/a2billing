@@ -1718,7 +1718,7 @@ class A2Billing {
 						    $format_file = 'wav';
 						    $monfile .= $format_file;
 						} else {
-						    $format_file = $A2B->agiconfig['monitor_formatfile'];
+						    $format_file = $this->agiconfig['monitor_formatfile'];
 						    $monfile .= ($format_file == 'wav49') ? 'WAV' : $format_file;
 						}
 						$command_mixmonitor = $this -> format_parameters ("MixMonitor {$dl_short}{$format_file}|b");
@@ -2057,7 +2057,7 @@ $this -> debug( ERROR, $agi, __FILE__, __LINE__, "[ \033[1;34m".$agi->get_variab
 			    $format_file = 'wav';
 			    $monfile .= $format_file;
 			} else {
-			    $format_file = $A2B->agiconfig['monitor_formatfile'];
+			    $format_file = $this->agiconfig['monitor_formatfile'];
 			    $monfile .= ($format_file == 'wav49') ? 'WAV' : $format_file;
 			}
 			$command_mixmonitor = $this -> format_parameters ("MixMonitor {$dl_short}{$format_file}|b");
