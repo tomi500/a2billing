@@ -345,7 +345,7 @@ if ($mode == 'sms') {
 		$didyes = true;
 		$did_id = $result[0][3];
 		$diddest = $result[0][4];
-		$callbacksound = $result[0][5];
+		$callbacksound = ($result[0][5]=="-1")?"":$result[0][5];
 		$callbackanswer = $result[0][6];
 		$callbackprefixallow = explode(",",$result[0][7]);
 		$secondtimedays = $result[0][8];
@@ -1772,9 +1772,9 @@ $A2B -> debug( ERROR, $agi, __FILE__, __LINE__, "\033[1;32m============INSERT===
 					if ($chanlang != 'not_set') {
 						$lg_var_set = 'CHANNEL(language)';
 						$agi -> set_variable($lg_var_set, $chanlang);
-//						$A2B -> debug( DEBUG, $agi, __FILE__, __LINE__, "[SET $lg_var_set $chanlang]");
 					}
-					if ($result[0][38]) {
+					$A2B -> current_language = $agi -> get_variable('CHANNEL(language)', true);
+					if ($result[0][38] && $result[0][38]!="-1") {
 						sleep(1); 
 						$res_dtmf = $agi->get_data($result[0][38], 10000, 1);
 						$dtmf = (string)$res_dtmf["result"];

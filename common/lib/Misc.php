@@ -1816,11 +1816,11 @@ function Display_Login_Button ($DBHandle, $id) {
 		$link = $link . '/userinfo.php';
 	}
 	$content = '<div align="right" style="padding-right:20px;">
-		<form action="'.$link.'" method="POST" target="_blank">
+		<form action="'.$link.'" method="POST" target="_blank" name="formcust">
 			<input type="hidden" name="done" value="submit_log"/>
 			<input type="hidden" name="pr_login" value="'.$username.'"/>
 			<input type="hidden" name="pr_password" value="'.$password.'"/>
-			<a href="javascript:;" onclick="javascript:$(\'form\').submit();" > '.gettext("GO TO CUSTOMER ACCOUNT").'</a>
+			<a href="javascript:;" onclick="javascript:document.formcust.submit();" > '.gettext("GO TO CUSTOMER ACCOUNT").'</a>
 		</form>
 	</div>';
 	return $content;
