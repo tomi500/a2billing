@@ -83,7 +83,6 @@ $HD_Form -> CV_TEXT_TITLE_ABOVE_TABLE = '';
 $HD_Form -> CV_DISPLAY_FILTER_ABOVE_TABLE = false;
 
 $HD_Form -> FG_FILTER_APPLY = true;
-$HD_Form -> FG_FILTERFIELD = 'dialprefix';
 $HD_Form -> FG_FILTERFIELDNAME = gettext('PREFIX');
 $HD_Form -> FG_FILTER_FORM_ACTION = 'list';
 

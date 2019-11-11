@@ -206,7 +206,7 @@ function moveSourceDown(search_sources)
 // -->
 </script>
 <?php
-	$multform = true;
+	    $multform = true;
 	}
 }
 ?>
@@ -518,7 +518,9 @@ function updatecontent(id_el, record, field_inst, instance)
 					 ?>
 					<INPUT type="text" list="list_<?php echo $myname;?>" name="<?php echo $myname;?>" class="form_input_text" <?php echo $this->FG_TABLE_EDITION[$i][4];?> value="<?php if($this->VALID_SQL_REG_EXP){ echo stripslashes($list[0][$i]); }else{ echo $processed[$this->FG_TABLE_ADITION[$i][1]];  }?>">
 					<datalist id="list_<?php echo $myname;?>" autocomplete="off">
-						<?php echo ($this->FG_TABLE_EDITION[$i][15]);
+						<?php if ($this->FG_TABLE_EDITION[$i][15]) echo ($this->FG_TABLE_EDITION[$i][15]);
+						elseif (array_search($list[0][$i],array_column($select_list,0))===false)
+							array_unshift($select_list,array($list[0][$i],$list[0][$i]));
 						if (count($select_list)>0) {
 							$select_number=0;
 							foreach ($select_list as $select_recordset){

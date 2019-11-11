@@ -1861,10 +1861,9 @@ msgstr "Фильтровать по"
 msgid "FILTER ON"
 msgstr "FILTER ON PREFIX"
 
-#: lib/Form/Class.ViewHandler.inc.php:166
-#, fuzzy
+#: lib/Form/Class.ViewHandler.inc.php:175
 msgid "APPLY FILTER "
-msgstr "APPLY FILTER"
+msgstr "ПРИМЕНИТЬ ФИЛЬТР"
 
 #: lib/Form/Class.ViewHandler.inc.php:796
 msgid "DISPLAY"
@@ -4251,6 +4250,14 @@ msgstr "ЛИНИИ"
 msgid "EXTERNAL LINES"
 msgstr "ВНЕШНИЕ ЛИНИИ"
 
+#: form_data/FG_var_logrefill.inc
+msgid "THERE IS NO REFILL FOUNDED"
+msgstr "НИ ОДНОГО ДВИЖЕНИЯ ПО СЧЁТУ НЕ НАЙДЕНО"
+
+#: form_data/FG_var_moneysituation.inc
+msgid "THERE IS NO CARD FOUNDED!"
+msgstr "НИ ОДНОГО КЛИЕНТА НЕ НАЙДЕНО!"
+
 #: form_data/FG_var_moneysituation.inc
 msgid "CUSTOMER"
 msgstr "КЛИЕНТ"
@@ -4272,8 +4279,8 @@ msgid "Outbound call plan"
 msgstr "Исходящие звонки"
 
 #: templates/default/main.tpl:27
-msgid "Incoming call plan and IVR"
-msgstr "Входящие звонки и IVR"
+msgid "INCOMING CALLS"
+msgstr "ВХОДЯЩИЕ ЗВОНКИ"
 
 #: templates/default/main.tpl:28
 msgid "VOICEMAIL"
@@ -4320,7 +4327,7 @@ msgid "SIMULATOR"
 msgstr "СТОИМОСТЬ ЗВОНКА"
 
 #: templates/default/main.tpl:90
-msgid "ADD CALLER ID"
+msgid "MY CALLER IDs"
 msgstr "AOH (CallerID)"
 
 #: templates/default/main.tpl:94

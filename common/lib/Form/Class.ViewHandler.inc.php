@@ -108,8 +108,13 @@ if ((count($list)>0) && is_array($list)){
 		    <td align="right">
 		    <span class="viewhandler_span2">
 			<?php
-			$c_url = $_SERVER['PHP_SELF'].'?stitle='.$stitle.'&atmenu='.$atmenu.'&current_page=%s'."&filterprefix=".$processed['filterprefix']."&order=".$processed['order']."&sens=".$processed['sens']."&mydisplaylimit=".$processed['mydisplaylimit']."&popup_select=".$processed["popup_select"]."&letter=".$processed["letter"].$this-> CV_FOLLOWPARAMETERS;
-			if (!is_null($letter) && ($letter!=""))   $c_url .= "&letter=".$processed['letter'];
+			$c_url = $_SERVER['PHP_SELF'].'?current_page=%s';
+			foreach ($processed as $key => $val) {
+				if (!in_array($key,array('current_page','id')) && $val!='') {
+					$c_url .= '&'.$key.'='.$val;
+				}
+			}
+			$c_url .= $this-> CV_FOLLOWPARAMETERS;
 			$this -> printPages($this -> CV_CURRENT_PAGE+1, $this -> FG_NB_RECORD_MAX, $c_url) ;
 			?>
 		    </span>
@@ -124,13 +129,9 @@ if ((count($list)>0) && is_array($list)){
 		if ($this -> FG_FILTER_APPLY || $this -> FG_FILTER_APPLY2){
 		?>
 		<tr><FORM NAME="theFormFilter" action="<?php echo $_SERVER['PHP_SELF']?>">
-			<input type="hidden" name="atmenu" value="<?php echo $processed['atmenu']?>">
-			<input type="hidden" name="popup_select" value="<?php echo $processed['popup_select']?>">
-			<input type="hidden" name="popup_formname" value="<?php echo $processed['popup_formname']?>">
-			<input type="hidden" name="popup_fieldname" value="<?php echo $processed['popup_fieldname']?>">
-            <?php 
+            <?php
             	foreach ($processed as $key => $val) {
-            		if ($key!='current_page' && $key!='id') {
+            		if (!in_array($key,array('current_page','id','form_action','filterfield','filterfield2','filterprefix','filterprefix2')) && $val!='') {
             	?>
                    <input type="hidden" name="<?php echo $key?>" value="<?php echo $val?>">
              	<?php  
@@ -144,9 +145,10 @@ if ((count($list)>0) && is_array($list)){
 
 				<font class="viewhandler_filter_on"><?php echo gettext("FILTER ON ");?> <?php mb_internal_encoding('UTF-8');?><?php echo mb_strtoupper($this->FG_FILTERFIELDNAME)?> :</font>
 				<INPUT type="text" name="filterprefix" value="<?php if(!empty($processed['filterprefix'])) echo $processed['filterprefix']; ?>" class="form_input_text">
-
+				<?php if ($this->FG_FILTERFIELD!='') {?>
 				<INPUT type="hidden" name="filterfield"	value="<?php echo $this->FG_FILTERFIELD?>">
 				<?php
+				}
 				if ($this -> FG_FILTERTYPE == 'INPUT'){
 					// IT S OK
 				}elseif ($this -> FG_FILTERTYPE == 'POPUPVALUE'){
@@ -159,10 +161,12 @@ if ((count($list)>0) && is_array($list)){
 
 			if ($this -> FG_FILTER_APPLY2){ ?>
 				&nbsp;&nbsp;&nbsp;&nbsp; - &nbsp;&nbsp;&nbsp;&nbsp;
-				<font class="viewhandler_filter_on"><?php echo gettext("FILTER ON");?><?php echo strtoupper($this->FG_FILTERFIELDNAME2)?> :</font>
-				<INPUT type="text" name="filterprefix2" value="<?php if(!empty($processed['filterprefix2'])) echo $processed['filterprefix2']; ?>" class="form_input_text">
+				<font class="viewhandler_filter_on"><?php echo gettext("FILTER ON ");?> <?php echo $this->FG_FILTERFIELDNAME2?> :</font>
+				<INPUT type="text" name="filterprefix2" value="<?php if(!empty($processed['filterprefix2'])) echo $processed['filterprefix2']; ?>" class="form_input_text">&nbsp;
+				<?php if ($this->FG_FILTERFIELD2!='') {?>
 				<INPUT type="hidden" name="filterfield2"	value="<?php echo $this->FG_FILTERFIELD2?>">
 				<?php
+				}
 				if ($this -> FG_FILTERTYPE2 == 'INPUT') {
 					// IT S OK
 				} elseif ($this -> FG_FILTERTYPE2 == 'POPUPVALUE') {
@@ -879,8 +883,6 @@ if ((count($list)>0) && is_array($list)){
                 <TR>
                   <TD align="right" valign="bottom"><span class="viewhandler_span2">
 					<?php
-					$c_url = $_SERVER['PHP_SELF'].'?stitle='.$stitle.'&atmenu='.$atmenu.'&current_page=%s'."&filterprefix=".$processed['filterprefix']."&order=".$processed['order']."&sens=".$processed['sens']."&mydisplaylimit=".$processed['mydisplaylimit']."&popup_select=".$processed["popup_select"]."&letter=".$processed["letter"].$this-> CV_FOLLOWPARAMETERS;
-					if (!is_null($letter) && ($letter!=""))   $c_url .= "&letter=".$processed['letter'];
 					$this -> printPages($this -> CV_CURRENT_PAGE+1, $this -> FG_NB_RECORD_MAX, $c_url) ;
 					?>
 					</span>
@@ -893,23 +895,12 @@ if ((count($list)>0) && is_array($list)){
 		<tr><td>
 		<?php if ($this->CV_DISPLAY_RECORD_LIMIT){ ?>
 			<?php echo gettext("DISPLAY");?>
-			<input type="hidden" name="stitle" value="<?php echo $stitle?>">
-			<input type="hidden" name="atmenu" value="<?php echo $atmenu?>">
-			<input type="hidden" name="order" value="<?php echo $processed['order']?>">
-			<input type="hidden" name="sens" value="<?php echo $processed['sens']?>">
-			<input type="hidden" name="current_page" value="0">
-			<input type="hidden" name="filterprefix" value="<?php echo $processed['filterprefix']?>">
-			<input type="hidden" name="popup_select" value="<?php echo $processed['popup_select']?>">
-			<input type="hidden" name="popup_formname" value="<?php echo $processed['popup_formname']?>">
-			<input type="hidden" name="popup_fieldname" value="<?php echo $processed['popup_fieldname']?>">
-			<input type="hidden" name="type" value="<?php echo $processed['type']?>">
-			<input type="hidden" name="id" value="<?php echo $processed['id']?>">
             <?php 
             	foreach ($processed as $key => $val) {
-            		if ($key!='current_page' && $key!='id') {
+            		if (!in_array($key,array('current_page','mydisplaylimit')) && $val!='') {
             	?>
                    <input type="hidden" name="<?php echo $key?>" value="<?php echo $val?>">
-             	<?php  
+             	<?php
              		}
             	}
              ?>
@@ -942,9 +933,69 @@ if ((count($list)>0) && is_array($list)){
 <?php
 	}else{
 ?>
-    
-    
-	<br><br>
+<tr><td>
+<br>
+</td></tr>
+<?php
+		// Add filter  FG_FILTER_APPLY , FG_FILTERFIELD and FG_FILTER_FORM_ACTION
+		if ($this -> FG_FILTER_APPLY || $this -> FG_FILTER_APPLY2){
+		?>
+		<tr><FORM NAME="theFormFilter" action="<?php echo $_SERVER['PHP_SELF']?>">
+            <?php
+            	foreach ($processed as $key => $val) {
+            		if (!in_array($key,array('current_page','id','form_action','filterfield','filterfield2','filterprefix','filterprefix2')) && $val!='') {
+            	?>
+                   <input type="hidden" name="<?php echo $key?>" value="<?php echo $val?>">
+             	<?php
+             		}
+            	}
+             ?>
+			<INPUT type="hidden" name="form_action"	value="<?php echo $this->FG_FILTER_FORM_ACTION ?>">
+			<td class="viewhandler_filter_td1">
+			<span >
+			<?php if ($this -> FG_FILTER_APPLY){ ?>
+
+				<font class="viewhandler_filter_on"><?php echo gettext("FILTER ON ");?> <?php mb_internal_encoding('UTF-8');?><?php echo mb_strtoupper($this->FG_FILTERFIELDNAME)?> :</font>
+				<INPUT type="text" name="filterprefix" value="<?php if(!empty($processed['filterprefix'])) echo $processed['filterprefix']; ?>" class="form_input_text">
+				<?php if ($this->FG_FILTERFIELD!='') {?>
+				<INPUT type="hidden" name="filterfield"	value="<?php echo $this->FG_FILTERFIELD?>">
+				<?php
+				}
+				if ($this -> FG_FILTERTYPE == 'INPUT'){
+					// IT S OK
+				}elseif ($this -> FG_FILTERTYPE == 'POPUPVALUE'){
+				?>
+					<a href="#" onclick="window.open('<?php echo $this->FG_FILTERPOPUP[0]?>popup_formname=theFormFilter&popup_fieldname=filterprefix' <?php echo $this->FG_FILTERPOPUP[1]?>);"><img src="<?php echo Images_Path_Main;?>/icon_arrow_orange.gif"/></a>
+				<?php
+				}
+
+			}
+
+			if ($this -> FG_FILTER_APPLY2){ ?>
+				&nbsp;&nbsp;&nbsp;&nbsp; - &nbsp;&nbsp;&nbsp;&nbsp;
+				<font class="viewhandler_filter_on"><?php echo gettext("FILTER ON");?><?php echo strtoupper($this->FG_FILTERFIELDNAME2)?> :</font>
+				<INPUT type="text" name="filterprefix2" value="<?php if(!empty($processed['filterprefix2'])) echo $processed['filterprefix2']; ?>" class="form_input_text">
+				<?php if ($this->FG_FILTERFIELD2!='') {?>
+				<INPUT type="hidden" name="filterfield2"	value="<?php echo $this->FG_FILTERFIELD2?>">
+				<?php
+				}
+				if ($this -> FG_FILTERTYPE2 == 'INPUT') {
+					// IT S OK
+				} elseif ($this -> FG_FILTERTYPE2 == 'POPUPVALUE') {
+				?>
+					<a href="#" onclick="window.open('<?php echo $this->FG_FILTERPOPUP2[0]?>popup_formname=theFormFilter&popup_fieldname=filterprefix2' <?php echo $this->FG_FILTERPOPUP2[1]?>);"><img src="<?php echo Images_Path_Main;?>/icon_arrow_orange.gif"/></a>
+				<?php
+				}
+			}
+			?>
+				<input type="SUBMIT" value="<?php echo gettext("APPLY FILTER ");?>" class="form_input_button"/>
+			</span>
+			</td></FORM>
+		<?php } ?>
+		</tr>
+      </table>
+   </div>
+	<br>
 	<div align="center">
 	<table width="80%" border="0" align="center">
 		

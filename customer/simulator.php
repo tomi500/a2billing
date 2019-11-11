@@ -68,7 +68,6 @@ $tariffplan = $customer_info[16];
 $balance = $customer_info[1];
 
 $FG_DEBUG = 0;
-$DBHandle = DbConnect();
 
 if ($called && $id_cc_card) {
 
@@ -90,7 +89,6 @@ if ($called && $id_cc_card) {
 		$A2B->cardnumber = $result[0][0];
 		$A2B->credit = $balance;
 		$A2B->margintotal = $A2B->margin_calculate($customer_info[15]);
-//		$A2B->margintotal = $result[0][2];
 		if ($FG_DEBUG == 1)
 			echo "cardnumber = " . $result[0][0] . " - balance=$balance<br>";
 
@@ -131,7 +129,6 @@ if ($called && $id_cc_card) {
 $instance_table_tariffname = new Table("cc_tariffplan", "id, tariffname");
 $FG_TABLE_CLAUSE = "";
 $list_tariffname = $instance_table_tariffname->Get_list($DBHandle, $FG_TABLE_CLAUSE, "tariffname", "ASC", null, null, null, null);
-$nb_tariffname = count($list_tariffname);
 $currency = $customer_info[17];
 $currencies_list = get_currencies();
 if (!isset($currencies_list[strtoupper($currency)][2]) || !is_numeric($currencies_list[strtoupper($currency)][2])) {

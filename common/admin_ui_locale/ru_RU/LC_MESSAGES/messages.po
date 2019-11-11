@@ -784,7 +784,7 @@ msgstr "записей"
 
 #: lib/Form/Class.ViewHandler.inc.php:136
 msgid "FILTER ON "
-msgstr "ФИЛЬТР ВКЛ."
+msgstr "ФИЛЬТРОВАТЬ ПО "
 
 #: lib/Form/Class.ViewHandler.inc.php:153
 msgid "FILTER ON"
@@ -3276,7 +3276,7 @@ msgstr "ДА"
 #: Public/form_data/FG_var_def_ratecard.inc:163
 #: Public/form_data/FG_var_voucher.inc:110 Public/call-count-reporting.php:286
 msgid "NO"
-msgstr "НЕТ"
+msgstr "НИ ОДНОГО"
 
 #: Public/A2B_entity_invoice_conf.php:262
 msgid "Choose if you want display the account number on the invoices"
@@ -4477,7 +4477,7 @@ msgstr "ДАТА ЗВОНКА"
 
 #: Public/form_data/FG_var_did_destination.inc:89
 msgid "NO DID DESTINATIONS HAVE BEEN CREATED!"
-msgstr ""
+msgstr "НИ ОДНОГО DID DESTINATIONS НЕ БЫЛО СОЗДАНО!"
 
 #: Public/form_data/FG_var_did_destination.inc:126
 msgid "Enter the phone number you wish to call, or the VoIP client to reach, or QUEUE to go. (ie: 347894999 or SIP/jeremy@182.212.1.45 or QUEUE myqueue,hknRt,,,300). If the call is VoIP or QUEUE, the 'VoIP_Call' must be set to yes."
@@ -6583,7 +6583,7 @@ msgstr ""
 
 #: Public/form_data/FG_var_user.inc:110
 msgid "HAVE BEEN CREATED!"
-msgstr ""
+msgstr "БЫЛО СОЗДАНО!"
 
 #: Public/form_data/FG_var_user.inc:133
 msgid "Insert the userid"
@@ -6998,8 +6998,8 @@ msgstr ""
 
 #: Public/form_data/FG_var_def_ratecard.inc:163
 #: Public/form_data/FG_var_voucher.inc:110
-msgid "HAVE BEEN CREATED."
-msgstr "БЫЛ СОЗДАН"
+msgid "HAVE BEEN FOUNDED"
+msgstr "НЕ БЫЛО НАЙДЕНО"
 
 #: Public/form_data/FG_var_def_ratecard.inc:170
 msgid "Define the criteria to search"
@@ -7859,7 +7859,7 @@ msgstr ""
 
 #: Public/form_data/FG_var_campaign.inc:79
 msgid "No campaigns have been created."
-msgstr ""
+msgstr "Компании не были созданы."
 
 #: Public/form_data/FG_var_campaign.inc:88
 msgid "CAMPAIGN NAME"
@@ -7999,7 +7999,7 @@ msgstr ""
 
 #: Public/form_data/FG_var_speeddial.inc:69
 msgid "NO SPEED DIALS HAVE BEEN CREATED!"
-msgstr ""
+msgstr "НИ ОДНОГО БЫСТРОГО НАБОРА НЕ НАЙДЕНО!"
 
 #: Public/form_data/FG_var_speeddial.inc:96
 msgid "Enter the name or label that will identify this speed dial"

@@ -171,7 +171,7 @@ if ($popup_select) {
 	$HD_Form -> FG_LIMITE_DISPLAY = 15;
 }
 
-$HD_Form -> CV_NO_FIELDS  = gettext("NO")." ".strtoupper($HD_Form->FG_INSTANCE_NAME)." ".gettext("HAVE BEEN CREATED."); 
+$HD_Form -> CV_NO_FIELDS  = gettext("NO")." ".strtoupper($HD_Form->FG_INSTANCE_NAME)." ".gettext("HAVE BEEN FOUNDED"); 
 $HD_Form -> CV_DISPLAY_LINE_TITLE_ABOVE_TABLE = false;
 $HD_Form -> CV_TEXT_TITLE_ABOVE_TABLE = '';
 $HD_Form -> CV_DISPLAY_FILTER_ABOVE_TABLE = false;
@@ -688,7 +688,7 @@ $HD_Form -> FG_BUTTON_EDITION_SRC = $HD_Form -> FG_BUTTON_ADITION_SRC  = Images_
 $HD_Form -> FG_BUTTON_EDITION_BOTTOM_TEXT = $HD_Form -> FG_BUTTON_ADITION_BOTTOM_TEXT = gettext("Click 'Confirm Data' to continue.");
 
 $HD_Form -> FG_FILTER_APPLY = true;
-$HD_Form -> FG_FILTERFIELD = 'dialprefix';
+//$HD_Form -> FG_FILTERFIELD = 'dialprefix';
 $HD_Form -> FG_FILTERFIELDNAME = 'dialprefix';
 $HD_Form -> FG_FILTER_FORM_ACTION = 'list';
 
@@ -699,8 +699,8 @@ if (isset($filterprefix)  &&  (strlen($filterprefix)>0)) {
 }
 
 $HD_Form -> FG_FILTER_APPLY2 = true;
-$HD_Form -> FG_FILTERFIELD2 = 'cc_ratecard.id';
-$HD_Form -> FG_FILTERFIELDNAME2 = ' id';
+//$HD_Form -> FG_FILTERFIELD2 = 'cc_ratecard.id';
+$HD_Form -> FG_FILTERFIELDNAME2 = 'ID';
 $HD_Form -> FG_FILTER_FORM_ACTION2 = 'list';
 
 if (isset($filterprefix2)  &&  is_numeric($filterprefix2)) {

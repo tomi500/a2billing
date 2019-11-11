@@ -69,7 +69,7 @@ $HD_Form->create_toppage($form_action);
 
 $HD_Form->create_form($form_action, $list, $id = null);
 
-if (!isset($filterprefix) || (strlen($filterprefix)==0)) {
+if ((!isset($filterprefix) || strlen($filterprefix)==0) && (!isset($filterprefix2) || !is_numeric($filterprefix2))) {
 
     $table = new Table();
     $result_nb_card = $table->SQLExec($HD_Form->DBHandle, "SELECT COUNT(*) from cc_card WHERE id_diller = " . $_SESSION['card_id']);

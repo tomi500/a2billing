@@ -32,9 +32,13 @@
  * 
 **/
 
+getpost_ifset(array('filterprefix', 'filterprefix2'));
 
-
-$HD_Form = new FormHandler("cc_card","Card");
+if (isset($filterprefix2)  &&  is_numeric($filterprefix2)) {
+    $HD_Form = new FormHandler("cc_card LEFT JOIN cc_callerid ON id_cc_card=cc_card.id","Card");
+} else {
+    $HD_Form = new FormHandler("cc_card","Card");
+}
 $HD_Form -> FG_TABLE_CLAUSE = "id_diller=".$_SESSION["card_id"];
 $HD_Form -> FG_TABLE_ID="cc_card.id";
 $HD_Form -> FG_DEBUG = 0;
@@ -63,10 +67,10 @@ $HD_Form -> AddViewElement(gettext("AMOUNT "), "payment", "5%", "center", "", ""
 $HD_Form -> AddViewElement(gettext("TO PAY"), "to_pay", "10%", "center", "", "", "eval", "number_format((%4-%5+abs(%5-%4))/2, 2, '.', ' ')");
 
 //$HD_Form -> FieldViewElement ("CONCAT_WS(' ',lastname,firstname,IF(company_name='','',CONCAT('(',company_name,')'))) AS customer, credit, commission, CONCAT_WS(' ',margin,'%') margin, cc_card.id, cc_card.id, cc_card.id");
-$HD_Form -> FieldViewElement ("cc_card.id, credit, commission, CONCAT_WS(' ',margin,'%'), cc_card.id, cc_card.id, cc_card.id");
+$HD_Form -> FieldViewElement ("DISTINCT cc_card.id, credit, commission, CONCAT_WS(' ',margin,'%'), cc_card.id, cc_card.id, cc_card.id");
 
 $HD_Form -> FG_ACTION_SIZE_COLUMN = '10%';
-$HD_Form -> CV_NO_FIELDS  = gettext("THERE IS NO").strtoupper($HD_Form->FG_INSTANCE_NAME)." ".gettext("CREATED!"); 
+$HD_Form -> CV_NO_FIELDS  = gettext("THERE IS NO CARD FOUNDED!"); 
 $HD_Form -> CV_DISPLAY_LINE_TITLE_ABOVE_TABLE = false;
 $HD_Form -> CV_TEXT_TITLE_ABOVE_TABLE = '';
 $HD_Form -> CV_DISPLAY_FILTER_ABOVE_TABLE = false;
@@ -113,34 +117,38 @@ if (has_rights (ACX_DISTRIBUTION) && !($popup_select>=1)) {
 
 }
 
-
-
-
 $HD_Form -> FG_INTRO_TEXT_EDITION= gettext("You can modify, through the following form, the different properties of your")." ".$HD_Form->FG_INSTANCE_NAME;
 $HD_Form -> FG_INTRO_TEXT_ASK_DELETION = gettext("If you really want remove this")." ".$HD_Form->FG_INSTANCE_NAME.", ".gettext("click on the delete button.");
 $HD_Form -> FG_INTRO_TEXT_ADD = gettext("you can add easily a new")." ".$HD_Form->FG_INSTANCE_NAME.".<br>".gettext("Fill the following fields and confirm by clicking on the button add.");
 
 
+$HD_Form -> FG_FILTER_FORM_ACTION = 'list';
+
 $HD_Form -> FG_FILTER_APPLY = true;
 //$HD_Form -> FG_FILTERFIELD = 'name';
 $HD_Form -> FG_FILTERFIELDNAME = gettext("CUSTOMER");
-$HD_Form -> FG_FILTER_FORM_ACTION = 'list';
 
 if (isset($filterprefix)  &&  (strlen($filterprefix)>0)){
-	if (strlen($HD_Form -> FG_TABLE_CLAUSE)>0) $HD_Form -> FG_TABLE_CLAUSE.=" AND";
+	if (strlen($HD_Form -> FG_TABLE_CLAUSE)>0)
+		$HD_Form -> FG_TABLE_CLAUSE.=" AND";
 	$HD_Form -> FG_TABLE_CLAUSE.=" (upper(lastname) like upper('$filterprefix%') OR upper(company_name) like upper('$filterprefix%'))";
 }
 
+$HD_Form -> FG_FILTER_APPLY2 = true;
+//$HD_Form -> FG_FILTERFIELD2 = 'cc_ratecard.id';
+$HD_Form -> FG_FILTERFIELDNAME2 = 'CallerID';
 
+if (isset($filterprefix2)  &&  is_numeric($filterprefix2)) {
+	if (strlen($HD_Form -> FG_TABLE_CLAUSE)>0)
+		$HD_Form -> FG_TABLE_CLAUSE.=" AND ";
+	$HD_Form -> FG_TABLE_CLAUSE .= "cid LIKE '".$filterprefix2."%'";
+}
 
 $HD_Form -> FG_INTRO_TEXT_ADITION = gettext("Add a ".$HD_Form->FG_INSTANCE_NAME." now.");
 $HD_Form -> FG_TEXT_ADITION_CONFIRMATION = gettext("Your new ".$HD_Form->FG_INSTANCE_NAME." has been inserted. <br>");
 
-
 $HD_Form -> FG_BUTTON_EDITION_SRC = $HD_Form -> FG_BUTTON_ADITION_SRC  = Images_Path . "/cormfirmboton.gif";
 $HD_Form -> FG_BUTTON_EDITION_BOTTOM_TEXT = $HD_Form -> FG_BUTTON_ADITION_BOTTOM_TEXT = gettext("Once you have completed the form above, click on the CONTINUE button.");
-
-
 
 $HD_Form -> FG_GO_LINK_AFTER_ACTION_ADD = $_SERVER['PHP_SELF']."?atmenu=document&stitle=Document&wh=AC&id=";
 $HD_Form -> FG_GO_LINK_AFTER_ACTION_EDIT = $_SERVER['PHP_SELF']."?atmenu=document&stitle=Document&wh=AC&id=";

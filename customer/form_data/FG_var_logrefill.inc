@@ -1,6 +1,6 @@
 <?php
 
-getpost_ifset(array('id', 'card_id', 'date', 'credit', 'description', 'added_invoice', 'refill_type', 'idcust', 'message'));
+getpost_ifset(array('id', 'card_id', 'date', 'credit', 'description', 'added_invoice', 'refill_type', 'idcust', 'message', 'filterprefix', 'filterprefix2'));
 
 $list_refill_type = Constants::getRefillType_List();
 $list_refill_type[] = array( gettext("Connection charge for DID setup"), "4");
@@ -12,19 +12,27 @@ $QUERY_ADD = $QUERY_CLAUSE = "";
 if (!isset($form_action) || $form_action=="list") {
 	if (has_rights(ACX_DISTRIBUTION))
 		$QUERY_CLAUSE = " OR diller_id = ".$_SESSION["card_id"];
-	$QUERY = "((SELECT cc_charge.id, cc_charge.creationdate `date`, -amount credit, lastname, firstname, company_name, id_cc_card card_id, chargetype+3 refill_type, IFNULL(description,0) description FROM cc_charge
-LEFT JOIN cc_card ON cc_card.id=id_cc_card WHERE id_cc_card = ".$_SESSION["card_id"]." AND charged_status = 1)
-UNION (
+	$QUERY = "((SELECT cc_charge.id, cc_charge.creationdate `date`, -amount credit, lastname, firstname, company_name, cc_charge.id_cc_card card_id, chargetype+3 refill_type, IFNULL(description,0) description FROM cc_charge
+LEFT JOIN cc_card ON cc_card.id=cc_charge.id_cc_card  ";
+	if (has_rights(ACX_DISTRIBUTION) && isset($filterprefix2) && is_numeric($filterprefix2)) {
+		$QUERY .= "LEFT JOIN cc_callerid ci ON ci.id_cc_card=cc_card.id
+		WHERE cc_charge.id_cc_card = ".$_SESSION["card_id"]." AND charged_status = 1 AND cid LIKE '".$filterprefix2."%' AND cid IS NOT NULL) ";
+	} else {
+		$QUERY .= "WHERE cc_charge.id_cc_card = ".$_SESSION["card_id"]." AND charged_status = 1) ";
+	}
+$QUERY .= "UNION (
 SELECT cc_logrefill.id, `date`, cc_logrefill.credit, lastname, firstname, company_name, IF(card_id=".$_SESSION['card_id']." AND diller_id IS NOT NULL, -diller_id, card_id) card_id, refill_type, description FROM cc_logrefill
-LEFT JOIN cc_card ON cc_card.id=card_id WHERE cc_card.id = ".$_SESSION["card_id"].$QUERY_CLAUSE.")
-UNION (
+LEFT JOIN cc_card ON cc_card.id=card_id ";
+	if (has_rights(ACX_DISTRIBUTION) && isset($filterprefix2) && is_numeric($filterprefix2)) {
+		$QUERY .= "LEFT JOIN cc_callerid ci ON ci.id_cc_card=cc_card.id
+		WHERE (cc_card.id = ".$_SESSION["card_id"].$QUERY_CLAUSE.") AND cid LIKE '".$filterprefix2."%' AND cid IS NOT NULL) ";
+	} else {
+		$QUERY .= "WHERE cc_card.id = ".$_SESSION["card_id"].$QUERY_CLAUSE.") ";
+	}
+$QUERY .= "UNION (
 SELECT cc_voucher.id, `usedate` AS `date`, cc_voucher.credit, lastname, firstname, company_name, cc_card.id card_id, 0, 'Voucher' FROM cc_voucher
 LEFT JOIN cc_card ON username=usedcardnumber WHERE cc_card.id = ".$_SESSION["card_id"].")) aa";
 	$HD_Form = new FormHandler($QUERY,gettext("Refill"));
-//	if (strlen($HD_Form -> FG_TABLE_CLAUSE)>0)
-//		$HD_Form -> FG_TABLE_CLAUSE.=" AND ";
-//	$HD_Form -> FG_TABLE_CLAUSE.="(";
-//	$HD_Form -> FG_TABLE_CLAUSE.="cc_card.id = ".$_SESSION["card_id"].") AND id_cc_card = ".$_SESSION["card_id"];
 	$HD_Form -> FG_TABLE_ID = 'aa.id';
 	$HD_Form -> FG_TABLE_DEFAULT_ORDER = 'date';
 } else {
@@ -35,76 +43,47 @@ LEFT JOIN cc_card ON username=usedcardnumber WHERE cc_card.id = ".$_SESSION["car
 
 $HD_Form -> FG_DEBUG = 0;
 $HD_Form -> FG_TABLE_DEFAULT_SENS = "DESC";
-/**
-$HD_Form ->FG_LIST_ADDING_BUTTON1 = true;
-$HD_Form ->FG_LIST_ADDING_BUTTON_LINK1 = "A2B_entity_logrefill.php?form_action=ask-add&section=".$_SESSION["menu_section"];
-$HD_Form ->FG_LIST_ADDING_BUTTON_ALT1 = $HD_Form ->FG_LIST_ADDING_BUTTON_MSG1 = gettext("Add Refill");
-$HD_Form ->FG_LIST_ADDING_BUTTON_IMG1 = Images_Path . "/money.png";
-**/
 
-//$HD_Form -> AddViewElement(gettext("ID"), "cc_logrefill.id", "4%", "center", "sort");
 $HD_Form -> AddViewElement(gettext("REFILL DATE"), "date", "17%", "center", "sort", "30", "", "", "", "", "", "display_dateformat");
 if (has_rights(ACX_DISTRIBUTION)) {
-	$HD_Form -> AddViewElement(gettext("PARTNER"), "lastname", "22%", "center", "sort", "", "link2cust", "cc_card", "IF(id = ".$_SESSION['card_id'].",'',IF(company_name='',CONCAT_WS(' ',lastname,firstname),IF(%id<0,company_name,CONCAT_WS(' ',lastname,firstname,CONCAT('(',company_name,')'))))), id, tariff", "id=ABS(%id)", "%1", "", "javascript:;\" onClick=\"MM_openBrWindow('A2B_entity_moneysituation_details.php?type=card&form_action=ask-edit&atmenu=card&displayheader=0&popup_select=1&idcust=%2&tariff=%3','','scrollbars=yes,resizable=yes,width=660,height=810,left=600,top=50,screenX=430,screenY=50')\"", gettext("USER DELETED"));
-//	$HD_Form -> AddViewElement(gettext("PARTNER"), "lastname", "22%", "center", "sort", "", "link2cust", "cc_card", "IF(id = ".$_SESSION['card_id'].",'',CONCAT_WS(' ',lastname,firstname,IF(company_name='','',CONCAT('(',company_name,')')))), id", "id='%id'", "%1", "", "javascript:;\" onClick=\"MM_openBrWindow('A2B_entity_moneysituation_details.php?type=card&form_action=ask-edit&atmenu=card&displayheader=0&popup_select=1&idcust=%2','','scrollbars=yes,resizable=yes,width=660,height=810,left=600,top=50,screenX=430,screenY=50')\"", gettext("USER DELETED"));
+	$HD_Form -> AddViewElement(gettext("PARTNER"), "lastname", "22%", "center", "sort", "", "link2cust", "cc_card", "IF(id = ".$_SESSION['card_id'].",'',IF(company_name='',CONCAT_WS(' ',IF(status=0,'<del>',''),lastname,firstname,IF(status=0,'</del>','')),IF(%id<0,CONCAT_WS(' ',IF(status=0,'<del>',''),company_name,IF(status=0,'</del>','')),CONCAT_WS(' ',IF(status=0,'<del>',''),lastname,firstname,CONCAT('(',company_name,')'),IF(status=0,'</del>',''))))), id, tariff", "id=ABS(%id)", "%1", "", "javascript:;\" onClick=\"MM_openBrWindow('A2B_entity_moneysituation_details.php?type=card&form_action=ask-edit&atmenu=card&displayheader=0&popup_select=1&idcust=%2&tariff=%3','','scrollbars=yes,resizable=yes,width=660,height=810,left=600,top=50,screenX=430,screenY=50')\"", gettext("USER DELETED"));
 	$QUERY_ADD = "card_id, ";
 }
 $HD_Form -> AddViewElement(gettext("REFILL AMOUNT"), "credit", "15%", "center", "sort","", "", "", "", "", "", "display_refill_money");
 $HD_Form -> AddViewElement(gettext("REFILL TYPE"),"refill_type", "13%", "center", "sort", "", "list", $list_refill_type);
 $HD_Form -> AddViewElement(gettext("DESCRIPTION"), "description", "25%", "center", "sort");
 
-$HD_Form -> FieldViewElement ("date, ".$QUERY_ADD."IF(card_id = ".$_SESSION['card_id']." OR card_id < 0, credit, -credit) AS credit, refill_type, IFNULL(description,IF(credit > 0,IF(card_id = ".$_SESSION['card_id']." OR card_id < 0,'".gettext('REFILL FROM YOUR DILLER')."','".gettext('REFILL TO YOUR CUSTOMER')."'),IF(card_id = ".$_SESSION['card_id']." OR card_id < 0,'".gettext('REFUND TO YOUR DILLER')."','".gettext('REFUND FROM YOUR CUSTOMER')."')))");
+$HD_Form -> FieldViewElement ("DISTINCT date, ".$QUERY_ADD."IF(card_id = ".$_SESSION['card_id']." OR card_id < 0, credit, -credit) AS credit, refill_type, IFNULL(description,IF(credit > 0,IF(card_id = ".$_SESSION['card_id']." OR card_id < 0,'".gettext('REFILL FROM YOUR DILLER')."','".gettext('REFILL TO YOUR CUSTOMER')."'),IF(card_id = ".$_SESSION['card_id']." OR card_id < 0,'".gettext('REFUND TO YOUR DILLER')."','".gettext('REFUND FROM YOUR CUSTOMER')."')))");
 
-/**
-if (!($popup_select>=1))	 $HD_Form -> FG_FILTER_SEARCH_FORM = true;
-$HD_Form -> FG_FILTER_SEARCH_SESSION_NAME = 'refill_cust_selection';
-$HD_Form -> FG_FILTER_SEARCH_TOP_TEXT = gettext('Define specific criteria to search for refills created.');
-$HD_Form -> FG_FILTER_SEARCH_1_TIME = true;
-$HD_Form -> FG_FILTER_SEARCH_1_TIME_TEXT = gettext('DATE');
-$HD_Form -> FG_FILTER_SEARCH_1_TIME_FIELD = 'date';
-
-
-$HD_Form -> AddSearchElement_C1(gettext("ACCOUNT NUMBER"), 'username','usernametype');
-$HD_Form -> AddSearchElement_C1(gettext("LASTNAME"),'lastname','lastnametype');
-$HD_Form -> AddSearchElement_C1(gettext("FIRSTNAME"),'firstname','firstnametype');
-$HD_Form -> FG_FILTER_SEARCH_DELETE_ALL = false;
-**/
-$HD_Form -> CV_NO_FIELDS  = gettext("THERE IS NO ".strtoupper($HD_Form->FG_INSTANCE_NAME)." CREATED!"); 
+$HD_Form -> CV_NO_FIELDS  = gettext("THERE IS NO REFILL FOUNDED");
 $HD_Form -> CV_DISPLAY_LINE_TITLE_ABOVE_TABLE = false;
 $HD_Form -> CV_TEXT_TITLE_ABOVE_TABLE = '';
 $HD_Form -> CV_DISPLAY_FILTER_ABOVE_TABLE = false;
-if (has_rights(ACX_DISTRIBUTION))	$HD_Form -> FG_FILTER_APPLY = true;
-$HD_Form -> FG_FILTERFIELD = 'lastname';
-$HD_Form -> FG_FILTERFIELDNAME = gettext('LASTNAME').gettext(' OR ').gettext('COMPANY');
-$HD_Form -> FG_FILTER_FORM_ACTION = 'list';
 $HD_Form -> FG_LIMITE_DISPLAY = 13;
-
 if (strlen($HD_Form -> FG_TABLE_CLAUSE)>0) $HD_Form -> FG_TABLE_CLAUSE.=" AND";
 $HD_Form -> FG_TABLE_CLAUSE.=" (refill_type != 2 OR credit >= 0 OR card_id >= 0)"; // не показывать отрицательные бонусы клиентам
 
-if (isset($filterprefix)  &&  (strlen($filterprefix)>0)) {
-	if (strlen($HD_Form -> FG_TABLE_CLAUSE)>0) $HD_Form -> FG_TABLE_CLAUSE.=" AND";
-	$HD_Form -> FG_TABLE_CLAUSE.=" (upper(lastname) like upper('$filterprefix%') OR upper(company_name) like upper('$filterprefix%'))";
+if (has_rights(ACX_DISTRIBUTION)) {
+	$HD_Form -> FG_FILTER_APPLY = true;
+	$HD_Form -> FG_FILTERFIELD = 'lastname';
+	$HD_Form -> FG_FILTERFIELDNAME = gettext('LASTNAME').gettext(' OR ').gettext('COMPANY');
+	$HD_Form -> FG_FILTER_FORM_ACTION = 'list';
+
+	if (isset($filterprefix)  &&  (strlen($filterprefix)>0)) {
+		if (strlen($HD_Form -> FG_TABLE_CLAUSE)>0)
+			$HD_Form -> FG_TABLE_CLAUSE.=" AND";
+		$HD_Form -> FG_TABLE_CLAUSE.=" (upper(lastname) like upper('$filterprefix%') OR upper(company_name) like upper('$filterprefix%'))";
+	}
+
+	$HD_Form -> FG_FILTER_APPLY2 = true;
+	$HD_Form -> FG_FILTERFIELDNAME2 = 'CallerID';
 }
 
 $HD_Form -> FG_ADDITION = true;
 if ($form_action=="ask-add") {
-//	$begin_date  = date("Y");
-//	$end_date    = date("-m-d H:i:s");
-//	$comp_date   = $begin_date.$end_date;
-//	$comp_date   = "value='$comp_date'";
 	$refill_type = 3;
 }
-/**
-$HD_Form -> AddEditElement (gettext("REFILL DATE"),
-			   "date",
-			   '$value',
-			   "INPUT",
-			   "size=52 maxlength=40 $comp_date",
-			   "10",
-			   gettext("Insert the current date"),
-			   "", "", "", "", "", "", "", "" );
-**/
+
 $QUERYpop = "SELECT credit FROM cc_card WHERE username = '" . $_SESSION["pr_login"] . "' AND uipass = '" . $_SESSION["pr_password"] . "'";
 $resmax = $DBHandle->Execute($QUERYpop);
 if ($resmax) {
