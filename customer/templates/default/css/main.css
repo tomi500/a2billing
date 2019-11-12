@@ -771,6 +771,15 @@ SPAN.errorText {
 	height: 20px;
 	background-color: #52BEDE;
 }
+.blink
+{
+	color: Red;
+	animation: blink 1.5s infinite; /* Параметры анимации */
+}
+@keyframes blink {
+	from { opacity: 1;   /* Непрозрачный текст */ }
+	to   { opacity: 0.2; /* Прозрачный   текст */ }
+}
 .viewhandler_table2_td3
 {
 	padding-right: 3px;	
