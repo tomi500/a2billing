@@ -626,12 +626,12 @@ $HD_Form -> AddEditElement (gettext("SETVAR"),
 
 $HD_Form -> AddEditElement (gettext("ENCRYPTION"),
 						   "encryption",
-						   '',
-						   "INPUT",
-						   "size=20 maxlength=20",
+						   $encryption,
+						   "SELECT",
 						   "",
 						   "",
-						   "", "", "", "", "", "", "NO-NULL" );
+						   "",
+						    "list", "", "", "", $values_list['encryption'], "%1", "NO-NULL" );
 
 if ($atmenu=='sip') {
 

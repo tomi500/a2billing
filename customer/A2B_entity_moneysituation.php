@@ -68,6 +68,10 @@ echo $CC_help_money_situation;
 $HD_Form->create_toppage($form_action);
 
 $HD_Form->create_form($form_action, $list, $id = null);
+?><script type="text/javascript">
+document.getElementById('filterprefix').focus();
+</script>
+<?php
 
 if ((!isset($filterprefix) || strlen($filterprefix)==0) && (!isset($filterprefix2) || !is_numeric($filterprefix2))) {
 

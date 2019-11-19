@@ -104,7 +104,7 @@ INSERT IGNORE INTO cc_invoice_conf (key_val) VALUES ('comments');
 ALTER TABLE cc_sip_buddies ADD `external` INT( 11 ) NOT NULL DEFAULT '0' AFTER `id_cc_card`;
 ALTER TABLE cc_sip_buddies ADD `callbackextension` varchar( 40 ) DEFAULT NULL;
 ALTER TABLE cc_sip_buddies ADD `directmedia` enum('yes', 'no', 'nonat', 'update', 'outgoing') NULL DEFAULT 'yes' AFTER `nat`;
-ALTER TABLE cc_sip_buddies ADD `encryption` varchar( 20 ) COLLATE utf8_bin DEFAULT NULL;
+ALTER TABLE cc_sip_buddies ADD `encryption` enum( 'yes', 'no' ) DEFAULT NULL;
 ALTER TABLE cc_sip_buddies ADD `encryption_taglen` enum('32','80') DEFAULT NULL AFTER `encryption`;
 ALTER TABLE cc_sip_buddies ADD `ignorecryptolifetime` enum( 'yes', 'no' ) DEFAULT NULL;
 ALTER TABLE cc_sip_buddies ADD `transport` enum('tls','udp','tcp','udp,tcp','tcp,udp','tls,tcp,udp') DEFAULT NULL;
@@ -163,7 +163,7 @@ ALTER TABLE cc_sip_buddies
   CHANGE `rtpkeepalive` `rtpkeepalive` int( 11 ) NULL DEFAULT NULL ,
   CHANGE `outboundproxy` `outboundproxy` varchar( 40 ) NULL DEFAULT NULL ,
   CHANGE `callbackextension` `callbackextension` varchar( 40 ) NULL DEFAULT NULL ,
-  CHANGE `encryption` `encryption` varchar( 20 ) COLLATE utf8_bin NULL DEFAULT NULL ,
+  CHANGE `encryption` `encryption` enum( 'yes', 'no' ) NULL DEFAULT NULL ,
   CHANGE `transport` `transport` enum( 'tls', 'udp', 'tcp', 'udp,tcp', 'tcp,udp' ) NULL DEFAULT NULL ,
   CHANGE `callgroup` `callgroup` varchar( 40 ) NULL DEFAULT NULL ,
   CHANGE `pickupgroup` `pickupgroup` varchar( 40 ) NULL DEFAULT NULL ,
@@ -230,6 +230,7 @@ ALTER TABLE cc_callerid ADD cli_localreplace SMALLINT( 6 ) NOT NULL DEFAULT '0';
 ALTER TABLE cc_callerid ADD cli_otherreplace SMALLINT( 6 ) NOT NULL DEFAULT '0';
 ALTER TABLE cc_callerid ADD cli_prefixreplace CHAR( 30 ) CHARACTER SET utf8 COLLATE utf8_bin NOT NULL DEFAULT '';
 ALTER TABLE cc_callerid ADD blacklist SMALLINT( 6 ) NOT NULL DEFAULT '0';
+ALTER TABLE cc_callerid ADD INDEX `id_cc_card` (`id_cc_card`);
 
 ALTER TABLE cc_did_destination ADD answer INT( 11 ) NOT NULL DEFAULT '0';
 ALTER TABLE cc_did_destination ADD playsound VARCHAR( 100 ) CHARACTER SET utf8 COLLATE utf8_bin NOT NULL;

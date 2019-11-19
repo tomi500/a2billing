@@ -66,6 +66,7 @@ if (DELETE_FK_CARD) {
 //$HD_Form -> FG__DELETION_LINK = $_SERVER['PHP_SELF']."?form_action=ask-delete&atmenu=$atmenu&regexten=|$FN_COLUMN_REGEXTEN|&id=";
 
 $values_list['nat'] = array(array(gettext('yes'),'force_rport,comedia'),array(gettext('no'),'no'),array(null,null));
+$values_list['encryption'] = array(array(gettext('yes'),'yes'),array(gettext('no'),'no'),array(null,null));
 $yesno = Constants::getYesNoList();
 // Possible value to notify the user
 $instance_config_table = new Table("cc_config", "id, config_value");
@@ -182,6 +183,15 @@ $HD_Form -> AddEditElement (gettext("NAT"),
 					"",
 					"list", "", "", "", $values_list['nat'], "%1", "NO-NULL", gettext("Is this extension behind the nat?"));
 
+$HD_Form -> AddEditElement (gettext("ENCRYPTION"),
+					"encryption",
+					"",
+					"SELECT",
+					"",
+					"",
+					"",
+					"list", "", "", "", $values_list['encryption'], "%1", "NO-NULL", gettext("Whether to offer SRTP encrypted media on calls to you?"));
+
 $HD_Form -> AddEditElement (gettext("SAY BALANCE AFTER AUTH"),
                                         "warning_threshold",
                                         '',
@@ -227,7 +237,7 @@ $HD_Form -> AddEditElement (gettext("SAY BALANCE AFTER CALL"),
                                         "",
                                         "list", "", "", "", $yesno, "%1");
 
-$field_list_edit = 'regexten, name, secret, callerid, nat, warning_threshold, say_dialednumber, say_rateinitial, say_timetotalk, say_balance_after_call';
+$field_list_edit = 'regexten, name, secret, callerid, nat, encryption, warning_threshold, say_dialednumber, say_rateinitial, say_timetotalk, say_balance_after_call';
 
 $HD_Form -> FieldEditElement ($field_list_edit);
 

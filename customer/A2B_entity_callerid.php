@@ -157,7 +157,7 @@ if ($form_action == "list") {
 
 		<td align="center" valign="top">
 				<?php //echo gettext("CALLER ID :");?>
-				+<input class="form_input_text" name="add_callerid" size="15" maxlength="60">
+				+<input class="form_input_text" id="add_callerid" name="add_callerid" size="15" maxlength="60">
 			</td>
 			<td align="center" valign="middle">
 						<input class="form_input_button"  value="<?php echo gettext("ADD NEW CALLERID"); ?>"  type="submit">
@@ -190,6 +190,10 @@ if ($form_action == "list") {
 $HD_Form -> create_toppage ($form_action);
 
 $HD_Form -> create_form ($form_action, $list, $id=null) ;
+?><script type="text/javascript">
+document.getElementById('add_callerid').focus();
+</script>
+<?php
 
 // #### FOOTER SECTION
 $smarty->display( 'footer.tpl');

@@ -144,7 +144,7 @@ if ((count($list)>0) && is_array($list)){
 			<?php if ($this -> FG_FILTER_APPLY){ ?>
 
 				<font class="viewhandler_filter_on"><?php echo gettext("FILTER ON ");?> <?php mb_internal_encoding('UTF-8');?><?php echo mb_strtoupper($this->FG_FILTERFIELDNAME)?> :</font>
-				<INPUT type="text" name="filterprefix" value="<?php if(!empty($processed['filterprefix'])) echo $processed['filterprefix']; ?>" class="form_input_text">
+				<INPUT type="text" id="filterprefix" name="filterprefix" value="<?php if(!empty($processed['filterprefix'])) echo $processed['filterprefix']; ?>" class="form_input_text">
 				<?php if ($this->FG_FILTERFIELD!='') {?>
 				<INPUT type="hidden" name="filterfield"	value="<?php echo $this->FG_FILTERFIELD?>">
 				<?php
@@ -268,13 +268,18 @@ if ((count($list)>0) && is_array($list)){
 						if (is_array($select_list)) {
 							$record_clear = $this->FG_TABLE_COL[$i][10];
 							$link_display = $this->FG_TABLE_COL[$i][12];
+							if (count($select_list[0])>=5 && strlen($select_list[0][3])>0) {
+							    $select_list[0][4] = str_replace($select_list[0][3], "<b>".$select_list[0][3]."</b>", $select_list[0][4]);
+							}
 							for ($l=count($select_list[0]);$l>=1;$l--){
+								if ($l==1 && $list[$ligne_number][$i-$k] >= 0)
+								    $record_clear = str_replace("%1", "%1</a>", $record_clear);
 								$record_clear = str_replace("%$l", $select_list[0][$l-1], $record_clear);
 								$link_display = str_replace("%$l", $select_list[0][$l-1], $link_display);
 							}
 							if ($list[$ligne_number][$i-$k] >= 0)
-								$record_display = "<a href=\"".$link_display."\">".$record_clear."</a>";
-							else	$record_display = "<b>".$record_clear."</b>";
+								$record_display = "<a href=\"".$link_display."\">".$record_clear;
+							else	$record_display = str_replace($select_list[0][0], "<b>".$select_list[0][0]."</b>", $record_clear);
 						} elseif ($list[$ligne_number][$i-$k] != 0) {
 							$record_display = $this->FG_TABLE_COL[$i][13];
 						} else {

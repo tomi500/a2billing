@@ -34,16 +34,32 @@
 
 getpost_ifset(array('filterprefix', 'filterprefix2'));
 
-if (isset($filterprefix2)  &&  is_numeric($filterprefix2)) {
-    $HD_Form = new FormHandler("cc_card LEFT JOIN cc_callerid ON id_cc_card=cc_card.id","Card");
+if (isset($filterprefix2)) {
+    $filterprefix2 = preg_replace("/[^\d]/", '', $filterprefix2);
 } else {
-    $HD_Form = new FormHandler("cc_card","Card");
+    $filterprefix2 = '';
 }
+if (strlen($filterprefix2)>3)
+    $addsearch = "%".$filterprefix2."%";
+else
+    $addsearch = $filterprefix2."%";
+
+$req  = "cc_card";
+$req2 = "cc_card.id='%id'";
+if (is_numeric($filterprefix2)) {
+    $req  .= " LEFT JOIN cc_callerid ON id_cc_card=cc_card.id";
+    $req2 .= " AND (id_cc_card IS NULL OR (id_cc_card='%id' AND cid LIKE '".$addsearch."') OR phone+0 LIKE '".$addsearch."') ORDER BY fn+0 LIKE '".$addsearch."' LIMIT 1";
+}
+$req1 = "cc_card LEFT JOIN cc_callerid ON id_cc_card=cc_card.id";
+
+$HD_Form = new FormHandler($req,"Card");
+
 $HD_Form -> FG_TABLE_CLAUSE = "id_diller=".$_SESSION["card_id"];
 $HD_Form -> FG_TABLE_ID="cc_card.id";
 $HD_Form -> FG_DEBUG = 0;
-$HD_Form -> FG_LIMITE_DISPLAY = 10;
+$HD_Form -> FG_LIMITE_DISPLAY = 20;
 $HD_Form -> FG_TABLE_DEFAULT_SENS = "DESC";
+$HD_Form -> SQL_GROUP = 'GROUP BY cc_card.id';
 
 if (has_rights (ACX_DISTRIBUTION) && !($popup_select>=1)) {
 	$HD_Form -> FG_ADDITION = true;
@@ -57,7 +73,9 @@ if (has_rights (ACX_DISTRIBUTION) && !($popup_select>=1)) {
 //$HD_Form -> AddViewElement(gettext("ID"), "cc_card.id", "7%", "center", "sort", "");
 //$HD_Form -> AddViewElement(gettext("CardNumber"), "username", "7%", "center", "sort", "", "30", "", "", "", "", "linktocustomer");
 //$HD_Form -> AddViewElement(gettext("CUSTOMER"), "customer", "18%", "center", "sort");
-$HD_Form -> AddViewElement(gettext("CUSTOMER"), "lastname", "25%", "center", "sort", "", "link2cust", "cc_card", "CONCAT_WS(' ',IF(status=0,'<del>',''),lastname,firstname,IF(company_name='','',CONCAT('(',company_name,')')),IF(status=0,'</del>','')), id, tariff", "id='%id'", "%1", "", "javascript:;\" onClick=\"MM_openBrWindow('A2B_entity_moneysituation_details.php?form_action=ask-edit&displayheader=0&popup_select=1&idcust=%2&tariff=%3','','status=no,toolbar=no,menubar=no,location=no,directories=no,scrollbars=yes,resizable=yes,width=675,height=680,left=500,top=40,screenX=500,screenY=40')");
+$HD_Form -> AddViewElement(gettext("CUSTOMER"), "lastname", "25%", "center", "sort", "", "link2cust", $req1, "CONCAT_WS(' ',IF(status=0,'<del>',''),lastname,firstname,CONCAT(IF(company_name='','',CONCAT('(',company_name,')')),IF(status=0,'</del> ',''))), cc_card.id, tariff, '$filterprefix2' AS fp, IF('$filterprefix2'='' OR cc_card.id = ".$_SESSION['card_id'].",'',CONCAT('(',IF(phone+0 LIKE '".$addsearch."',phone,cid),')')) AS fn", 
+$req2, "%1 %5", "", "javascript:;\" onClick=\"MM_openBrWindow('A2B_entity_moneysituation_details.php?form_action=ask-edit&displayheader=0&popup_select=1&idcust=%2&tariff=%3','','status=no,toolbar=no,menubar=no,location=no,directories=no,scrollbars=yes,resizable=yes,width=675,height=680,left=500,top=40,screenX=500,screenY=40')");
+
 $HD_Form -> AddViewElement(gettext("BALANCE"), "credit", "11%", "center", "sort", "", "", "", "", "", "", "display_refill_money");
 $HD_Form -> AddViewElement(gettext("COMMISSION ACCRUED"), "commission", "17%", "center", "sort", "", "", "", "", "", "", "display_refill_money");
 $HD_Form -> AddViewElement(gettext("MARGIN"), "margin", "7%", "center", "sort");
@@ -107,7 +125,6 @@ if (has_rights (ACX_DISTRIBUTION) && !($popup_select>=1)) {
 	$HD_Form -> FG_OTHER_BUTTON4_ALT = '<font color="red">'.gettext('LOG').'</font>';
 	$HD_Form -> FG_OTHER_BUTTON5_ALT = gettext('Add Refill to this Card');
 	$HD_Form -> FG_OTHER_BUTTON5_CONDITION = 'strpos("|col0|", "<del>") === false';
-//	$HD_Form -> FG_OTHER_BUTTON4_ALT = '<font color="red">'.gettext('REFILL').'</font>';
 
 	$HD_Form -> FG_OTHER_BUTTON1_IMG = '';
 	$HD_Form -> FG_OTHER_BUTTON2_IMG = '';
@@ -125,7 +142,6 @@ $HD_Form -> FG_INTRO_TEXT_ADD = gettext("you can add easily a new")." ".$HD_Form
 $HD_Form -> FG_FILTER_FORM_ACTION = 'list';
 
 $HD_Form -> FG_FILTER_APPLY = true;
-//$HD_Form -> FG_FILTERFIELD = 'name';
 $HD_Form -> FG_FILTERFIELDNAME = gettext("CUSTOMER");
 
 if (isset($filterprefix)  &&  (strlen($filterprefix)>0)){
@@ -138,10 +154,10 @@ $HD_Form -> FG_FILTER_APPLY2 = true;
 //$HD_Form -> FG_FILTERFIELD2 = 'cc_ratecard.id';
 $HD_Form -> FG_FILTERFIELDNAME2 = 'CallerID';
 
-if (isset($filterprefix2)  &&  is_numeric($filterprefix2)) {
+if (is_numeric($filterprefix2)) {
 	if (strlen($HD_Form -> FG_TABLE_CLAUSE)>0)
 		$HD_Form -> FG_TABLE_CLAUSE.=" AND ";
-	$HD_Form -> FG_TABLE_CLAUSE .= "cid LIKE '".$filterprefix2."%'";
+	$HD_Form -> FG_TABLE_CLAUSE .= "(cid LIKE '".$addsearch."' OR phone+0 LIKE '".$addsearch."')";
 }
 
 $HD_Form -> FG_INTRO_TEXT_ADITION = gettext("Add a ".$HD_Form->FG_INSTANCE_NAME." now.");
