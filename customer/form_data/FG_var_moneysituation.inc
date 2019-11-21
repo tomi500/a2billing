@@ -73,7 +73,7 @@ if (has_rights (ACX_DISTRIBUTION) && !($popup_select>=1)) {
 //$HD_Form -> AddViewElement(gettext("ID"), "cc_card.id", "7%", "center", "sort", "");
 //$HD_Form -> AddViewElement(gettext("CardNumber"), "username", "7%", "center", "sort", "", "30", "", "", "", "", "linktocustomer");
 //$HD_Form -> AddViewElement(gettext("CUSTOMER"), "customer", "18%", "center", "sort");
-$HD_Form -> AddViewElement(gettext("CUSTOMER"), "lastname", "25%", "center", "sort", "", "link2cust", $req1, "CONCAT_WS(' ',IF(status=0,'<del>',''),lastname,firstname,CONCAT(IF(company_name='','',CONCAT('(',company_name,')')),IF(status=0,'</del> ',''))), cc_card.id, tariff, '$filterprefix2' AS fp, IF('$filterprefix2'='' OR cc_card.id = ".$_SESSION['card_id'].",'',CONCAT('(',IF(phone+0 LIKE '".$addsearch."',phone,cid),')')) AS fn", 
+$HD_Form -> AddViewElement(gettext("CUSTOMER"), "lastname", "25%", "center", "sort", "", "link2cust", $req1, "CONCAT(IF(status=0,'<del>',''),lastname,' ',firstname,IF(company_name='','',CONCAT(' (',company_name,')')),IF(status=0,'</del>','')), cc_card.id, tariff, '$filterprefix2' AS fp, IF('$filterprefix2'='' OR cc_card.id = ".$_SESSION['card_id'].",'',CONCAT('(',IF(phone+0 LIKE '".$addsearch."',phone,cid),')')) AS fn", 
 $req2, "%1 %5", "", "javascript:;\" onClick=\"MM_openBrWindow('A2B_entity_moneysituation_details.php?form_action=ask-edit&displayheader=0&popup_select=1&idcust=%2&tariff=%3','','status=no,toolbar=no,menubar=no,location=no,directories=no,scrollbars=yes,resizable=yes,width=675,height=680,left=500,top=40,screenX=500,screenY=40')");
 
 $HD_Form -> AddViewElement(gettext("BALANCE"), "credit", "11%", "center", "sort", "", "", "", "", "", "", "display_refill_money");
