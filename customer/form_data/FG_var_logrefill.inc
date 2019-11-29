@@ -23,7 +23,7 @@ $req2 = "cc_card.id=ABS(%id)";
 $QUERY_ADD = $QUERY_CLAUSE = "";
 if (!isset($form_action) || $form_action=="list") {
 	if (has_rights(ACX_DISTRIBUTION)) {
-		$QUERY_CLAUSE = " OR diller_id = ".$_SESSION["card_id"];
+		$QUERY_CLAUSE = " OR (diller_id = ".$_SESSION["card_id"]." AND diller_id!=cc_card.id)";
 		if (strlen($filterprefix2)>0) {
 		    $req2 .= " AND (cid LIKE '".$addsearch.$filterprefix2."%' OR phone+0 LIKE '".$addsearch.$filterprefix2."%') ORDER BY fn+0 LIKE '".$addsearch.$filterprefix2."%' LIMIT 1";
 		}
@@ -57,7 +57,7 @@ $HD_Form -> FG_TABLE_DEFAULT_SENS = "DESC";
 
 $HD_Form -> AddViewElement(gettext("REFILL DATE"), "date", "17%", "center", "sort", "30", "", "", "", "", "", "display_dateformat");
 if (has_rights(ACX_DISTRIBUTION)) {
-	$HD_Form -> AddViewElement(gettext("PARTNER"), "lastname", "22%", "center", "sort", "", "link2cust", "cc_card LEFT JOIN cc_callerid ON id_cc_card=cc_card.id", "IF(cc_card.id = ".$_SESSION['card_id'].",'',IF(company_name='',CONCAT_WS(' ',IF(status=0,'<del>',''),lastname,CONCAT(firstname,IF(status=0,'</del>',''))),IF(%id<0,CONCAT(IF(status=0,'<del>',''),company_name,IF(status=0,'</del>','')),CONCAT_WS(' ',IF(status=0,'<del>',''),lastname,firstname,CONCAT('(',company_name,')',IF(status=0,'</del>','')))))), cc_card.id, tariff, '$filterprefix2' AS fp, IF('$filterprefix2'='' OR cc_card.id = ".$_SESSION['card_id'].",'',CONCAT('(',IF(phone+0 LIKE '".$addsearch.$filterprefix2."%',phone,cid),')')) AS fn", 
+	$HD_Form -> AddViewElement(gettext("PARTNER"), "lastname", "22%", "center", "sort", "", "link2cust", "cc_card LEFT JOIN cc_callerid ON id_cc_card=cc_card.id", "IF(cc_card.id = ".$_SESSION['card_id'].",'',IF(company_name='',CONCAT_WS(' ',IF(status=0,'<del>',''),lastname,CONCAT(firstname,IF(status=0,'</del>',''))),IF(%id<0,CONCAT(IF(status=0,'<del>',''),company_name,IF(status=0,'</del>','')),CONCAT_WS(' ',IF(status=0,'<del>',''),lastname,firstname,CONCAT('(',company_name,')',IF(status=0,'</del>','')))))), cc_card.id, tariff, '$filterprefix2' AS fp, IF('$filterprefix2'='' OR cc_card.id = ".$_SESSION['card_id'].",'',CONCAT('(',IF(phone+0 LIKE '".$addsearch.$filterprefix2."%',phone,cid),')')) AS fn",
 	$req2, "%1 %5", "", "javascript:;\" onClick=\"MM_openBrWindow('A2B_entity_moneysituation_details.php?type=card&form_action=ask-edit&atmenu=card&displayheader=0&popup_select=1&idcust=%2&tariff=%3','','scrollbars=yes,resizable=yes,width=660,height=810,left=600,top=50,screenX=430,screenY=50')\"", gettext("USER DELETED"));
 	$QUERY_ADD = "card_id, ";
 }
@@ -65,7 +65,7 @@ $HD_Form -> AddViewElement(gettext("REFILL AMOUNT"), "credit", "15%", "center", 
 $HD_Form -> AddViewElement(gettext("REFILL TYPE"),"refill_type", "13%", "center", "sort", "", "list", $list_refill_type);
 $HD_Form -> AddViewElement(gettext("DESCRIPTION"), "description", "25%", "center", "sort");
 
-$HD_Form -> FieldViewElement ("date, ".$QUERY_ADD."IF(card_id = ".$_SESSION['card_id']." OR card_id < 0, credit, -credit) AS credit, refill_type, IFNULL(description,IF(credit > 0,IF(card_id = ".$_SESSION['card_id']." OR card_id < 0,'".gettext('REFILL FROM YOUR DILLER')."','".gettext('REFILL TO YOUR CUSTOMER')."'),IF(card_id = ".$_SESSION['card_id']." OR card_id < 0,'".gettext('REFUND TO YOUR DILLER')."','".gettext('REFUND FROM YOUR CUSTOMER')."')))");
+$HD_Form -> FieldViewElement ("date, ".$QUERY_ADD."IF(card_id = ".$_SESSION['card_id']." OR card_id < 0, credit, -credit) AS credit, refill_type, IFNULL(description,IF(credit > 0,IF(card_id = ".$_SESSION['card_id']." OR card_id < 0,'".gettext('REFILL FROM YOUR DILLER')."','".gettext('REFILL TO YOUR CUSTOMER')."'),IF(card_id = ".$_SESSION['card_id']." OR card_id < 0,'".gettext('REFUND TO YOUR DILLER')."','".gettext('REFUND FROM YOUR CUSTOMER')."'))) AS description");
 
 $HD_Form -> CV_NO_FIELDS  = gettext("THERE IS NO REFILL FOUNDED");
 $HD_Form -> CV_DISPLAY_LINE_TITLE_ABOVE_TABLE = false;
