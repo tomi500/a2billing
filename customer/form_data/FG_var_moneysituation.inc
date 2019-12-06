@@ -65,7 +65,6 @@ if (has_rights (ACX_DISTRIBUTION) && !($popup_select>=1)) {
 	$HD_Form -> FG_ADDITION = true;
 	$HD_Form -> FG_LIST_ADDING_BUTTON1 = true;
 	$HD_Form -> FG_LIST_ADDING_BUTTON_LINK1 = "javascript:;\" onClick=\"MM_openBrWindow('signup.php?form_action=ask-add&id_diller=".$_SESSION["pr_login"]."&margin=".$_SESSION["margin_diller"]."&popup_select=1&popup_formname=myForm&displayheader=0','','resizable=yes,width=800,height=810,left=600,top=50,screenX=600,screenY=50')";
-//	$HD_Form -> FG_LIST_ADDING_BUTTON_LINK1 = "signup.php?form_action=ask-add&id_diller=".$_SESSION["pr_login"]."&margin=5&section=14";
 	$HD_Form -> FG_LIST_ADDING_BUTTON_ALT1 = $HD_Form ->FG_LIST_ADDING_BUTTON_MSG1 = gettext("Add Customer");
 	$HD_Form -> FG_LIST_ADDING_BUTTON_IMG1 = Images_Path ."/user_add.png" ;
 }
@@ -79,13 +78,11 @@ $req2, "%1 %5", "", "javascript:;\" onClick=\"MM_openBrWindow('A2B_entity_moneys
 $HD_Form -> AddViewElement(gettext("BALANCE"), "credit", "11%", "center", "sort", "", "", "", "", "", "", "display_refill_money");
 $HD_Form -> AddViewElement(gettext("COMMISSION ACCRUED"), "commission", "17%", "center", "sort", "", "", "", "", "", "", "display_refill_money");
 $HD_Form -> AddViewElement(gettext("MARGIN"), "margin", "7%", "center", "sort");
-//$HD_Form -> AddViewElement(gettext("INVOICE "), "invoice", "5%", "center", "sort", "15", "lie", "cc_invoice LEFT JOIN cc_invoice_item ON cc_invoice_item.id_invoice=cc_invoice.id", "ROUND(SUM(CEIL(cc_invoice_item.price*(1+(cc_invoice_item.vat/100))*100)/100),2)", "cc_invoice.id_card='%id' GROUP BY cc_invoice.id_card", "%1");
 $HD_Form -> AddViewElement(gettext("INVOICE "), "invoice", "5%", "center", "", "", "link2cust", "cc_invoice LEFT JOIN cc_invoice_item ON cc_invoice_item.id_invoice=cc_invoice.id", "SUM(ROUND(cc_invoice_item.price*(1+(cc_invoice_item.vat/100)),2)), cc_invoice.id_card", "cc_invoice.id_card='%id' GROUP BY cc_invoice.id_card", "%1", "", "javascript:;\" onClick=\"MM_openBrWindow('A2B_entity_moneysituation_details.php?type=invoice&form_action=list&atmenu=card&displayheader=0&popup_select=1&idcust=%2','','scrollbars=yes,resizable=yes,width=500,height=415,left=600,top=200,screenX=600,screenY=200')");
 $HD_Form -> AddViewElement(gettext("AMOUNT "), "payment", "5%", "center", "", "", "link2cust", "cc_logpayment as t2", "SUM(ROUND(t2.payment-t2.fee,2)),t2.card_id", "t2.card_id='%id' GROUP BY t2.card_id", "%1", "", "javascript:;\" onClick=\"MM_openBrWindow('A2B_entity_moneysituation_details.php?type=payment&form_action=list&atmenu=card&displayheader=0&popup_select=1&idcust=%2','','scrollbars=yes,resizable=yes,width=550,height=415,left=600,top=200,screenX=600,screenY=200')");
 $HD_Form -> AddViewElement(gettext("TO PAY"), "to_pay", "10%", "center", "", "", "eval", "number_format((%4-%5+abs(%5-%4))/2, 2, '.', ' ')");
 
-//$HD_Form -> FieldViewElement ("CONCAT_WS(' ',lastname,firstname,IF(company_name='','',CONCAT('(',company_name,')'))) AS customer, credit, commission, CONCAT_WS(' ',margin,'%') margin, cc_card.id, cc_card.id, cc_card.id");
-$HD_Form -> FieldViewElement ("DISTINCT cc_card.id, credit, commission, CONCAT_WS(' ',margin,'%'), cc_card.id, cc_card.id, cc_card.id");
+$HD_Form -> FieldViewElement ("DISTINCT cc_card.id, CONCAT(credit,IFNULL((SELECT IF(card_id=cc_card.id,' 1','') FROM cc_logrefill WHERE diller_id=".$_SESSION["card_id"]." AND TIMEDIFF(NOW(),cc_logrefill.date)<'00:05:00' ORDER BY id DESC LIMIT 1),'')) credit, commission, CONCAT_WS(' ',margin,'%'), cc_card.id, cc_card.id, cc_card.id");
 
 $HD_Form -> FG_ACTION_SIZE_COLUMN = '10%';
 $HD_Form -> CV_NO_FIELDS  = gettext("THERE IS NO CARD FOUNDED!"); 

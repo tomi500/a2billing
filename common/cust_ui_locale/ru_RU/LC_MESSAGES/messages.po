@@ -1563,7 +1563,7 @@ msgstr "Список CallerID"
 
 #: form_data/FG_var_callerid.inc:55
 msgid "There are no Caller IDs created"
-msgstr "Ни одного  CallerID не создано"
+msgstr "Ни одного CallerID не задано"
 
 #: form_data/FG_var_callerid.inc:87
 msgid "Insert the CallerID"
@@ -3743,8 +3743,8 @@ msgid "Invoice Payment Ref: "
 msgstr ""
 
 #: A2B_entity_callerid.php
-msgid "... for incoming calls from this number"
-msgstr "Использовать для аутентификации при входящем звонке"
+msgid "Direct Inward System Access... for incoming calls from this number"
+msgstr "Прямой внутрисистемный доступ... используется для аутентификации при входящем звонке"
 
 #: A2B_entity_callerid.php:98
 #, fuzzy

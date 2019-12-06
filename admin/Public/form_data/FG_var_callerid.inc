@@ -92,16 +92,6 @@ foreach ($values as $val) {
 	$limits_notify [$idx] = array($val_display,$val);
 }
 
-$HD_Form -> AddEditElement (gettext("ACTIVATED"),
-			"activated",
-			't',
-			"RADIOBUTTON",
-			"",
-			"",
-			gettext("Choose if you want to activate this CallerID"),
-			"", "", "", gettext("Yes").":t, - ".gettext("No").":f", "", "", "",
-			gettext("... for incoming calls from this number"));
-
 $HD_Form -> AddEditElement (gettext("CALLERID"),
 			"cid",
 			'$value',
@@ -110,6 +100,16 @@ $HD_Form -> AddEditElement (gettext("CALLERID"),
 			"",
 			gettext("Insert the CallerID"),
 			"", "", "", "", "", "", "", "");
+
+$HD_Form -> AddEditElement (gettext("D I S A"),
+			"activated",
+			't',
+			"RADIOBUTTON",
+			"",
+			"",
+			gettext("Choose if you want to activate this CallerID"),
+			"", "", "", gettext("Yes").":t, - ".gettext("No").":f", "", "", "",
+			gettext("Direct Inward System Access... for incoming calls from this number"));
 
 $HD_Form -> AddEditElement (gettext("BLACKLIST"),
 			"blacklist",
@@ -248,7 +248,7 @@ $HD_Form -> AddEditElement (gettext("REPLACE BY PREFIX"),
 			"",
 			"", "", "", "", "", "", "NO", gettext("Present this CallerID, when calls are made to countries from listed prefixes. Insert the replaceable prefixes separated by comma, e.g. for UK,IT,RU,UA are '44,39,7,380'."));
 
-$HD_Form -> FieldEditElement ('activated, cid, blacklist, verify, id_cc_card, callback, phonenumber, warning_threshold, say_dialednumber, say_rateinitial, say_timetotalk, say_balance_after_call, cli_replace, cli_localreplace, cli_otherreplace, cli_prefixreplace');
+$HD_Form -> FieldEditElement ('cid, activated, blacklist, verify, id_cc_card, callback, phonenumber, warning_threshold, say_dialednumber, say_rateinitial, say_timetotalk, say_balance_after_call, cli_replace, cli_localreplace, cli_otherreplace, cli_prefixreplace');
 
 // Set the filter variables
 $HD_Form -> FG_FILTER_APPLY = true;

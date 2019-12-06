@@ -780,6 +780,16 @@ SPAN.errorText {
 	from { opacity: 1;   /* Непрозрачный текст */ }
 	to   { opacity: 0.2; /* Прозрачный   текст */ }
 }
+.blinkmoney
+{
+	color: Black;
+	font-weight: bold;
+	animation: blink 1s infinite; /* Параметры анимации */
+}
+@keyframes blink {
+	from { opacity: 1;   /* Непрозрачный текст */ }
+	to   { opacity: 0.4; /* Прозрачный   текст */ }
+}
 .viewhandler_table2_td3
 {
 	padding-right: 3px;	

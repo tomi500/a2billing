@@ -47,116 +47,116 @@ class Mail {
 	private $attachfile = '';
 	
 	//mail type
-	static public $TYPE_PAYMENT = 'payment';
-	static public $TYPE_REMINDER = 'reminder';
-	static public $TYPE_SIGNUP = 'signup';
-	static public $TYPE_FORGETPASSWORD = 'forgetpassword';
-	static public $TYPE_SIGNUPCONFIRM = 'signupconfirmed';
-	static public $TYPE_EPAYMENTVERIFY = 'epaymentverify';
-	static public $TYPE_REMINDERCALL = 'reminder';
-	static public $TYPE_SUBSCRIPTION_PAID = 'subscription_paid';
-	static public $TYPE_SUBSCRIPTION_UNPAID = 'subscription_unpaid';
-	static public $TYPE_SUBSCRIPTION_DISABLE_CARD = 'subscription_disable_card';
+	public static $TYPE_PAYMENT = 'payment';
+	public static $TYPE_REMINDER = 'reminder';
+	public static $TYPE_SIGNUP = 'signup';
+	public static $TYPE_FORGETPASSWORD = 'forgetpassword';
+	public static $TYPE_SIGNUPCONFIRM = 'signupconfirmed';
+	public static $TYPE_EPAYMENTVERIFY = 'epaymentverify';
+	public static $TYPE_REMINDERCALL = 'reminder';
+	public static $TYPE_SUBSCRIPTION_PAID = 'subscription_paid';
+	public static $TYPE_SUBSCRIPTION_UNPAID = 'subscription_unpaid';
+	public static $TYPE_SUBSCRIPTION_DISABLE_CARD = 'subscription_disable_card';
 
-	static public $TYPE_DID_PAID = 'did_paid';
-	static public $TYPE_DID_UNPAID = 'did_unpaid';
-	static public $TYPE_DID_RELEASED = 'did_released';
-	static public $TYPE_TICKET_NEW = 'new_ticket';
-	static public $TYPE_TICKET_MODIFY = 'modify_ticket';
-	static public $TYPE_INVOICE_TO_PAY = 'invoice_to_pay';
+	public static $TYPE_DID_PAID = 'did_paid';
+	public static $TYPE_DID_UNPAID = 'did_unpaid';
+	public static $TYPE_DID_RELEASED = 'did_released';
+	public static $TYPE_TICKET_NEW = 'new_ticket';
+	public static $TYPE_TICKET_MODIFY = 'modify_ticket';
+	public static $TYPE_INVOICE_TO_PAY = 'invoice_to_pay';
 
-	static public $TYPE_FAX_SUCCESS = 'fax_success';
-	static public $TYPE_FAX_FAILED = 'fax_failed';
+	public static $TYPE_FAX_SUCCESS = 'fax_success';
+	public static $TYPE_FAX_FAILED = 'fax_failed';
 
-	static public $TYPE_SPEECH_SUCCESS = 'call_success';
+	public static $TYPE_SPEECH_SUCCESS = 'call_success';
 
 	//Used by mail type = fax_success AND fax_failed
-	static public $FAX_CID_NUMBER = '$cid_number$';
-	static public $FAX_CID_NAME = '$cid_name$';
-	static public $FAX_COUNT = '$count$';
-	static public $FAX_DEST_EXTEN = '$dest_exten$';
-	static public $FAX_DATETIME = '$datetime$';
-	static public $FAX_RESULT = '$fax_result$';
-	static public $FAX_FORMAT = '$format$';
+	public static $FAX_CID_NUMBER = '$cid_number$';
+	public static $FAX_CID_NAME = '$cid_name$';
+	public static $FAX_COUNT = '$count$';
+	public static $FAX_DEST_EXTEN = '$dest_exten$';
+	public static $FAX_DATETIME = '$datetime$';
+	public static $FAX_RESULT = '$fax_result$';
+	public static $FAX_FORMAT = '$format$';
 
 	//Used by mail type = speech2mail
-	static public $SPEECH_CID_NUMBER = '$cid_number$';
-	static public $SPEECH_CID_NAME = '$cid_name$';
-	static public $SPEECH_DEST_EXTEN = '$dest_exten$';
-	static public $SPEECH_DATETIME = '$datetime$';
-	static public $SPEECH_TEXT = '$text$';
+	public static $SPEECH_CID_NUMBER = '$cid_number$';
+	public static $SPEECH_CID_NAME = '$cid_name$';
+	public static $SPEECH_DEST_EXTEN = '$dest_exten$';
+	public static $SPEECH_DATETIME = '$datetime$';
+	public static $SPEECH_TEXT = '$text$';
 
 	//Used by mail type = invoice_to_pay
-	static public $INVOICE_TITLE_KEY = '$invoice_title$';
-	static public $INVOICE_REFERENCE_KEY = '$invoice_reference$';
-	static public $INVOICE_DESCRIPTION_KEY = '$invoice_description$';
-	static public $INVOICE_TOTAL_KEY = '$invoice_total$';
-	static public $INVOICE_TOTAL_VAT_KEY = '$invoice_total_vat$';
+	public static $INVOICE_TITLE_KEY = '$invoice_title$';
+	public static $INVOICE_REFERENCE_KEY = '$invoice_reference$';
+	public static $INVOICE_DESCRIPTION_KEY = '$invoice_description$';
+	public static $INVOICE_TOTAL_KEY = '$invoice_total$';
+	public static $INVOICE_TOTAL_VAT_KEY = '$invoice_total_vat$';
 
 	//Used by mail type = new_ticket AND modify_ticket
-	static public $TICKET_NUMBER_KEY = '$ticket_id$';
-	static public $TICKET_OWNER_KEY = '$ticket_owner$';
-	static public $TICKET_PRIORITY_KEY = '$ticket_priority$';
-	static public $TICKET_STATUS_KEY = '$ticket_status$';
-	static public $TICKET_TITLE_KEY = '$ticket_title$';
-	static public $TICKET_DESCRIPTION_KEY = '$ticket_description$';
+	public static $TICKET_NUMBER_KEY = '$ticket_id$';
+	public static $TICKET_OWNER_KEY = '$ticket_owner$';
+	public static $TICKET_PRIORITY_KEY = '$ticket_priority$';
+	public static $TICKET_STATUS_KEY = '$ticket_status$';
+	public static $TICKET_TITLE_KEY = '$ticket_title$';
+	public static $TICKET_DESCRIPTION_KEY = '$ticket_description$';
 
 	//Used by mail type = modify_ticket
-	static public $TICKET_COMMENT_CREATOR_KEY = '$comment_creator$';
-	static public $TICKET_COMMENT_DESCRIPTION_KEY = '$comment_description$';
+	public static $TICKET_COMMENT_CREATOR_KEY = '$comment_creator$';
+	public static $TICKET_COMMENT_DESCRIPTION_KEY = '$comment_description$';
 	
 	//Used by mail type = did_paid
-	static public $BALANCE_REMAINING_KEY = '$balance_remaining$';
+	public static $BALANCE_REMAINING_KEY = '$balance_remaining$';
 
 	//Used by mail type = subscription_paid OR subscription_unpaid
-	static public $SUBSCRIPTION_LABEL = '$subscription_label$';
-	static public $SUBSCRIPTION_ID = '$subscription_id$';
-	static public $SUBSCRIPTION_FEE = '$subscription_fee$';
+	public static $SUBSCRIPTION_LABEL = '$subscription_label$';
+	public static $SUBSCRIPTION_ID = '$subscription_id$';
+	public static $SUBSCRIPTION_FEE = '$subscription_fee$';
 
 	//Used by mail type = did_paid OR did_unpaid OR did_released
-	static public $DID_NUMBER_KEY = '$did$';
-	static public $DID_COST_KEY = '$did_cost$';
+	public static $DID_NUMBER_KEY = '$did$';
+	public static $DID_COST_KEY = '$did_cost$';
 
 	//Used by mail type = did_unpaid  & subscription_unpaid
-	static public $DAY_REMAINING_KEY = '$days_remaining$';
-	static public $INVOICE_REF_KEY = '$invoice_ref$';
+	public static $DAY_REMAINING_KEY = '$days_remaining$';
+	public static $INVOICE_REF_KEY = '$invoice_ref$';
 
 	//Used by mail type = epaymentverify
-	static public $TIME_KEY = '$time$';
-	static public $PAYMENTGATEWAY_KEY = '$paymentgateway$';
+	public static $TIME_KEY = '$time$';
+	public static $PAYMENTGATEWAY_KEY = '$paymentgateway$';
 
 	//Used by mail type = payment
-	static public $ITEM_NAME_KEY = '$itemName$';
-	static public $ITEM_ID_KEY = '$itemID$';
-	static public $PAYMENT_METHOD_KEY = '$paymentMethod$';
-	static public $PAYMENT_STATUS_KEY = '$paymentStatus$';
-	static public $PAYMENT_FEE_KEY = '$paymentFee$';
-	static public $PAYMENT_VAT_KEY = '$paymentVAT$';
-	static public $PAYMENT_VATAMOUNT_KEY = '$paymentVATamount$';
-	static public $PAYMENT_AMOUNT_KEY = '$paymentAmount$';
-	static public $PAYMENT_CURCURRENCY_KEY = '$paymentCurCurrency$';
+	public static $ITEM_NAME_KEY = '$itemName$';
+	public static $ITEM_ID_KEY = '$itemID$';
+	public static $PAYMENT_METHOD_KEY = '$paymentMethod$';
+	public static $PAYMENT_STATUS_KEY = '$paymentStatus$';
+	public static $PAYMENT_FEE_KEY = '$paymentFee$';
+	public static $PAYMENT_VAT_KEY = '$paymentVAT$';
+	public static $PAYMENT_VATAMOUNT_KEY = '$paymentVATamount$';
+	public static $PAYMENT_AMOUNT_KEY = '$paymentAmount$';
+	public static $PAYMENT_CURCURRENCY_KEY = '$paymentCurCurrency$';
 
 	//used by type = payment and type = epaymentverify
-	static public $ITEM_AMOUNT_KEY = '$itemAmount$';
+	public static $ITEM_AMOUNT_KEY = '$itemAmount$';
 
 	//used in all mail
-	static public $CUSTOMER_EMAIL_KEY = '$email$';
-	static public $CUSTOMER_FIRSTNAME_KEY = '$firstname$';
-	static public $CUSTOMER_LASTNAME_KEY = '$lastname$';
-	static public $CUSTOMER_CREDIT_BASE_CURRENCY_KEY = '$credit$';
-	static public $CUSTOMER_CREDIT_IN_OWN_CURRENCY_KEY = '$creditcurrency$';
-	static public $CUSTOMER_BALANCE_IN_OWN_CURRENCY_KEY = '$balancecurrency$';
-	static public $CUSTOMER_CURRENCY = '$currency$';
-	static public $CUSTOMER_CARDNUMBER_KEY = '$cardnumber$';
-	static public $CUSTOMER_PASSWORD_KEY = '$password$';
-	static public $CUSTOMER_LOGIN = '$login$';
-	static public $CUSTOMER_LOGINKEY = '$loginkey$';
-	static public $CUSTOMER_CREDIT_NOTIFICATION = '$credit_notification$';
+	public static $CUSTOMER_EMAIL_KEY = '$email$';
+	public static $CUSTOMER_FIRSTNAME_KEY = '$firstname$';
+	public static $CUSTOMER_LASTNAME_KEY = '$lastname$';
+	public static $CUSTOMER_CREDIT_BASE_CURRENCY_KEY = '$credit$';
+	public static $CUSTOMER_CREDIT_IN_OWN_CURRENCY_KEY = '$creditcurrency$';
+	public static $CUSTOMER_BALANCE_IN_OWN_CURRENCY_KEY = '$balancecurrency$';
+	public static $CUSTOMER_CURRENCY = '$currency$';
+	public static $CUSTOMER_CARDNUMBER_KEY = '$cardnumber$';
+	public static $CUSTOMER_PASSWORD_KEY = '$password$';
+	public static $CUSTOMER_LOGIN = '$login$';
+	public static $CUSTOMER_LOGINKEY = '$loginkey$';
+	public static $CUSTOMER_CREDIT_NOTIFICATION = '$credit_notification$';
 
 	//used in all mail
-	static public $SYSTEM_CURRENCY = '$base_currency$';
+	public static $SYSTEM_CURRENCY = '$base_currency$';
 
-	function __construct($type, $id_card = null, $lg = null, $msg = null, $title = null, &$DBHandle = null)
+	public function __construct($type, $id_card = null, $lg = null, $msg = null, $title = null, &$DBHandle = null)
 	{		
 		if ($DBHandle === null) $DBHandle = Connection::GetDBHandler();
 		
@@ -245,78 +245,78 @@ class Mail {
 		}
 	}
 
-	function replaceInEmail($key, $val)
+	public function replaceInEmail($key, $val)
 	{
 		$this->message = str_replace($key, $val, $this->message);
 		$this->title = str_replace($key, $val, $this->title);
 	}
 
-	function getIdCard()
+	public function getIdCard()
 	{
 		return $this->id_card;
 	}
 
-	function getFromEmail()
+	public function getFromEmail()
 	{
 		return $this->from_email;
 	}
 	
-	function getToEmail()
+	public function getToEmail()
 	{
 		return $this->to_email;
 	}
 	
-	function getMessage()
+	public function getMessage()
 	{
 		return $this->message;
 	}
 	
-	function AddToMessage($msg)
+	public function AddToMessage($msg)
 	{
 		$this->message = $this->message . $msg;
 	}
 	
-	function getTitle()
+	public function getTitle()
 	{
 		return $this->title;
 	}
 
-	function getFromName()
+	public function getFromName()
 	{
 		return $this->from_name;
 	}
 	
-	function setFromEmail($from_email)
+	public function setFromEmail($from_email)
 	{
 		$this->from_email = $from_email;
 	}
 
-	function setTitle($title)
+	public function setTitle($title)
 	{
 		$this->title = $title;
 	}
 	
-	function setMessage($message)
+	public function setMessage($message)
 	{
 		$this->message = $message;
 	}
 	
-	function setToEmail($to_email)
+	public function setToEmail($to_email)
 	{
 		$this->to_email = $to_email;
 	}
 	
-	function setFromName($from_name)
+	public function setFromName($from_name)
 	{
 		$this->from_name = $from_name;
 	}
 	
-	function AddAttachment($attachfile)
+	public function AddAttachment($attachfile)
 	{
 		$this->attachfile = $attachfile;
 	}
 
-	function send($to_email = null)
+	public function send($to_email = null)
 	{
 		if (!empty ($to_email)){
 			$this->to_email = $to_email;

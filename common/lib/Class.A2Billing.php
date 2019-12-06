@@ -1334,6 +1334,7 @@ class A2Billing {
 		if ($resfindrate==0) {
 				$this -> debug( ERROR, $agi, __FILE__, __LINE__, $this->destination." ::> RateEngine didnt succeed to match the dialed number over the ratecard (Please check : id the ratecard is well create ; if the removeInter_Prefix is set according to your prefix in the ratecard ; if you hooked the ratecard to the Call Plan)");
 				$this -> let_stream_listening($agi);
+				sleep(1);
 				$agi-> stream_file('the-number-u-dialed', '#');
 				$agi-> stream_file('pbx-invalid-number', '#');
 			} else {

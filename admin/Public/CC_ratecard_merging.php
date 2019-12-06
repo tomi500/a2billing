@@ -96,7 +96,7 @@ if($posted == 1) {
 			$update_des .= ",aa.".$val."=bb.".$val;
 			if ($val == "rateinitial") {
 //				$condition .= " AND aa.buyrate < bb.rateinitial";
-				$condition .= " AND aa.buyrate < bb.rateinitial AND aa.rateinitial < bb.rateinitial"; //обновлять только где в источнике цена продажи выше
+				$condition .= " AND aa.buyrate < bb.rateinitial AND aa.rateinitial < bb.rateinitial"; //обновлять только если в источнике цена продажи выше
 			}
 		}
 		$instance_table = new Table("cc_ratecard aa, (SELECT dialprefix$update_src FROM cc_ratecard WHERE idtariffplan = $ratecard_src_val) bb");

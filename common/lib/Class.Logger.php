@@ -36,7 +36,7 @@ class Logger
 	var $do_debug = 0;
 	
 	//constructor
-	function Logger()
+	public function __construct()
 	{
 	
 	}

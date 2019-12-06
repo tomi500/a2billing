@@ -9602,6 +9602,10 @@ msgid "Agent LOGIN"
 msgstr "ЛОГИН для агента"
 
 #: Public/form_data/FG_var_callerid.inc
+msgid "Direct Inward System Access... for incoming calls from this number"
+msgstr "Прямой внутрисистемный доступ... использовать этот номер для аутентификации при входящем звонке"
+
+#: Public/form_data/FG_var_callerid.inc
 msgid "Settings for general Caller Line Identity (CLI)"
 msgstr "Правила, которые будут автоматически использованы в общих принципах передачи номера звонящего [Caller Line Identity (CLI)]"
 

@@ -263,6 +263,7 @@ function sendtoupload(form){
 
 		<center>
 		<?php echo gettext("The first line of your import is previewed below, please check to ensure that every is correct.")?>
+
 		</center>
 
 		<table align=center border="0" cellpadding="2" cellspacing="2" width="300">

@@ -109,12 +109,16 @@ $smarty->display('main.tpl');
 <?php
 if (has_rights(ACX_DISTRIBUTION) && ($popup_select>=1)) {
 	$instance_table_card = new Table('cc_card');
-	$QUERY = "SELECT lastname, firstname FROM cc_card WHERE id = $idcust AND id_diller = " . $_SESSION["card_id"];
+	$QUERY = "SELECT lastname, firstname, phone FROM cc_card WHERE id = $idcust AND id_diller = " . $_SESSION["card_id"];
 	$resmax = $instance_table_card -> SQLExec ($HD_Form -> DBHandle, $QUERY, 1);
 	if ($resmax) {
 		echo "<u>".$resmax[0][0]." ".$resmax[0][1]."</u><br>";
+		$phonenumber = $filterprefix2 = preg_replace("/[^\d]/", '', $resmax[0][2]);
+		$QUERY = "SELECT cid FROM cc_callerid WHERE id_cc_card = $idcust AND cid LIKE '$phonenumber'";
+		$resmax = $instance_table_card -> SQLExec ($HD_Form -> DBHandle, $QUERY, 1);
+		if ($resmax) $phonenumber = "";
 	} else exit();
-}
+} else $phonenumber = "";
 
 if ($form_action == "list") {
 ?>
@@ -157,7 +161,7 @@ if ($form_action == "list") {
 
 		<td align="center" valign="top">
 				<?php //echo gettext("CALLER ID :");?>
-				+<input class="form_input_text" id="add_callerid" name="add_callerid" size="15" maxlength="60">
+				+<input class="form_input_text" id="add_callerid" name="add_callerid" size="15" maxlength="60" value="<?php echo $phonenumber;?>">
 			</td>
 			<td align="center" valign="middle">
 						<input class="form_input_button"  value="<?php echo gettext("ADD NEW CALLERID"); ?>"  type="submit">

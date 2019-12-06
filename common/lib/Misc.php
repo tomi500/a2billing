@@ -370,13 +370,18 @@ function display_money($value, $currency = BASE_CURRENCY) {
 
 function display_refill_money($value, $currency = BASE_CURRENCY, $echoreturn = true) {
 	$body = explode(" ", $value);
-	if (isset($body[1]))
+	if (isset($body[1]) && $body[1]!="1")
 		$currency = $body[1];
 	$tempval = 100*abs($value-floor($value));
 	$value = number_format($value, 5, '.', '');
 	$value = (round($tempval-floor($tempval),5) == 0) ? number_format($value, 2, '.', ' ') : rtrim(number_format($value, 5, '.', ' '), '0');
 	if ($echoreturn)
-	    echo $value . ' ' . mb_strtoupper($currency);
+	    if (isset($body[1]) && $body[1]=="1") {
+		echo "<font class=\"blinkmoney\" title=\"" . gettext('Just refilled') . "\">" . $value . " " . mb_strtoupper($currency) . "</font>";
+	    }
+	    else {
+		echo $value . ' ' . mb_strtoupper($currency);
+	    }
 	else
 	    return $value . ' ' . mb_strtoupper($currency);
 }

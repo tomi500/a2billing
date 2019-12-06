@@ -160,7 +160,7 @@ $HD_Form -> AddEditElement (gettext("CALLERID"),
 
 if ($form_action != 'ask-delete') {
 
-	$HD_Form -> AddEditElement (gettext("ACTIVATED"),
+	$HD_Form -> AddEditElement (gettext("D I S A"),
 			   "activated",
 			   't',
 			   "RADIOBUTTON",
@@ -168,7 +168,7 @@ if ($form_action != 'ask-delete') {
 			   "",
 			   "",
 			   "", "", "", gettext("Yes").":t, - ".gettext("No").":f", "", "", "",
-			   gettext("... for incoming calls from this number"));
+			   gettext("Direct Inward System Access... for incoming calls from this number"));
 
 	$HD_Form -> AddEditElement (gettext("BLACKLIST"),
 			    "blacklist",

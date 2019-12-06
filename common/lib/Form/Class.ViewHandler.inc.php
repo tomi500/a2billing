@@ -140,7 +140,6 @@ if ((count($list)>0) && is_array($list)){
              ?>
 			<INPUT type="hidden" name="form_action"	value="<?php echo $this->FG_FILTER_FORM_ACTION ?>">
             <td class="viewhandler_filter_td1">
-			<span >
 			<?php if ($this -> FG_FILTER_APPLY){ ?>
 
 				<font class="viewhandler_filter_on"><?php echo gettext("FILTER ON ");?> <?php mb_internal_encoding('UTF-8');?><?php echo mb_strtoupper($this->FG_FILTERFIELDNAME)?> :</font>
@@ -177,7 +176,6 @@ if ((count($list)>0) && is_array($list)){
 			}
 			?>
 				<input type="SUBMIT" value="<?php echo gettext("APPLY FILTER ");?>" class="form_input_button"/>
-			</span>
 			</td></FORM>
         </tr>
 		<?php } ?>
@@ -978,7 +976,7 @@ if ((count($list)>0) && is_array($list)){
 
 			if ($this -> FG_FILTER_APPLY2){ ?>
 				&nbsp;&nbsp;&nbsp;&nbsp; - &nbsp;&nbsp;&nbsp;&nbsp;
-				<font class="viewhandler_filter_on"><?php echo gettext("FILTER ON");?><?php echo strtoupper($this->FG_FILTERFIELDNAME2)?> :</font>
+				<font class="viewhandler_filter_on"><?php echo gettext("FILTER ON ");?> <?php echo strtoupper($this->FG_FILTERFIELDNAME2)?> :</font>
 				<INPUT type="text" name="filterprefix2" value="<?php if(!empty($processed['filterprefix2'])) echo $processed['filterprefix2']; ?>" class="form_input_text">
 				<?php if ($this->FG_FILTERFIELD2!='') {?>
 				<INPUT type="hidden" name="filterfield2"	value="<?php echo $this->FG_FILTERFIELD2?>">

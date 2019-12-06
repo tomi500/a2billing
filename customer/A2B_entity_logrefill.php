@@ -78,7 +78,7 @@ $HD_Form->create_toppage($form_action);
 if ($message != "success") {
 	$HD_Form->create_form($form_action, $list, $id = null);
 ?>	<script type="text/javascript">
-	document.getElementById('filterprefix').focus();
+	document.getElementById('<?php if ($form_action=='ask-add') echo 'credit'; else echo 'filterprefix';?>').focus();
 	</script>
 <?php
 }

@@ -1,6 +1,7 @@
 <?php
 $mosConfig_live_site = 'https://customer.sipde.net/';
 // Global
+$lang='';
 $moduleclass_sfx = '';
 $pretext = 'Donate Author';
 $btntxt = 'Donate';
@@ -10,22 +11,23 @@ $wmz = 'Z419639909455';
 $wme = 'E241616677453';
 $wmr = 'R367908670622';
 $wmu = 'U188972105659';
-$wm_summ = '50';
+$wmcur_type = 'WMZ'; //валюта по-умолчанию
+$wm_summ = ''; //тут вставить сумму для оплаты контрагентом
 $wm_successurl = $wm_errorurl = $mosConfig_live_site."donate_en.php";
 $wm_descpay = 'Donate Author';
 // Yandex
 $use_yandex = 0;
 $yandex = '01234567891011';
-$yandex_summ = '50';
+$yandex_summ = ''; //тут вставить сумму для оплаты контрагентом
 $yandex_successurl = $mosConfig_live_site."donate_en.php";
 // PayPal
 $use_paypal = 1;
 //$donate_email = '4935XK7M8RJQY';
 $donate_email = 'VBP4BCSYDMWD6';
 $paypalcur_on = 0;
-$paypalcur_val = 'USD';
+$paypalcur_val = 'USD'; //валюта по-умолчанию
 $paypalval_on = 0;
-$paypalval_val = 70;
+$paypalval_val = '200'; //тут вставить сумму для оплаты контрагентом
 $paypalvalleast_val = 5;
 $donate_org = 'Donate Author';
 $donate_len = 1;
@@ -48,12 +50,12 @@ if ($wmu != '') {
     $wmtype4 = 'WMU';
     $wmnum4 = $wmu;
 	 }
-$logowm = $mosConfig_live_site.'/templates/default/images/kicons/logowm.gif';
-$logoyandex = $mosConfig_live_site.'/templates/default/images/kicons/logoyandex.gif';
-$logopaypal = $mosConfig_live_site.'/templates/default/images/kicons/logopaypal.gif';
-$logowm_sm = $mosConfig_live_site.'/templates/default/images/kicons/logowm_small.gif';
-$logoyandex_sm = $mosConfig_live_site.'/templates/default/images/kicons/logoyandex_small.gif';
-$logopaypal_sm = $mosConfig_live_site.'/templates/default/images/kicons/logopaypal_small.gif';
+$logowm        = $mosConfig_live_site.'templates/default/images/kicons/logowm.gif';
+$logoyandex    = $mosConfig_live_site.'templates/default/images/kicons/logoyandex.gif';
+$logopaypal    = $mosConfig_live_site.'templates/default/images/kicons/logopaypal.gif';
+$logowm_sm     = $mosConfig_live_site.'templates/default/images/kicons/logowm_small.gif';
+$logoyandex_sm = $mosConfig_live_site.'templates/default/images/kicons/logoyandex_small.gif';
+$logopaypal_sm = $mosConfig_live_site.'templates/default/images/kicons/logopaypal_small.gif';
 ?>
 <html xmlns="http://www.w3.org/1999/xhtml">
 <head>
@@ -139,41 +141,30 @@ $logopaypal_sm = $mosConfig_live_site.'/templates/default/images/kicons/logopayp
 <div id="moduletable_donate">
 <!--------------------------- Panel --------------------------->
 <div id="rulez" align="center">
-	<?php
-	if ($pretext != '')
+<?php	if ($pretext != '')
 	{?>
 		<span style="font-weight:bold; cursor:pointer; border-bottom:1px solid #CCC; padding:3px;" onclick="hide_all()" title="Hide all">
 			<?php echo $pretext;?>
+
 		</span><br/><br/>
-	<?php
+<?php
 	}?>
-	<?php
+<?php	if ($use_paypal)
+	{?>
+		<a href="javascript:void(0);" onclick="show_paypal()" title="PayPal"><img src="<?php echo $logopaypal_sm;?>" alt="PayPal" border="0" /></a>
+<?php	}
 	if ($use_wm)
 	{?>
-		<a href="javascript:void(0);" onclick="show_wm()" title="Webmoney">
-			<img src="<?php echo $logowm_sm;?>" alt="Webmoney" border="0" />
-		</a>
-	<?php
-	}?>
-	<?php
+		<a href="javascript:void(0);" onclick="show_wm()" title="Webmoney"><img src="<?php echo $logowm_sm;?>" alt="Webmoney" border="0" /></a>
+<?php	}
 	if ($use_yandex)
 	{?>
-		<a href="javascript:void(0);" onclick="show_yandex()" title="Yandex">
-			<img src="<?php echo $logoyandex_sm;?>" alt="Yandex" border="0" />
-		</a>
-	<?php
-	}?>
-	<?php
-	if ($use_paypal)
-	{?>
-		<a href="javascript:void(0);" onclick="show_paypal()" title="PayPal">
-			<img src="<?php echo $logopaypal_sm;?>" alt="PayPal" border="0" />
-		</a>
-	<?php
-	}?>
+	<a href="javascript:void(0);" onclick="show_yandex()" title="Yandex" style="text-decoration: none"><img src="<?php echo $logoyandex_sm;?>" alt="Yandex" border="0" /></a>
+<?php	}?>
 </div>
 <!--------------------------- Webmoney --------------------------->
-<div id="wm" align="center" style="display:none;">
+<?php $style = ($wm_summ)?"":" style=\"display:none;\"";?>
+<div id="wm" align="center"<?php echo $style;?>>
 	<form id="pay" name="pay" method="POST" action="https://merchant.wmtransfer.com/lmi/payment.asp">
 		<table width="100%" align="center" cellpadding="0" cellspacing="0" border="0">
 			<tr>
@@ -183,7 +174,7 @@ $logopaypal_sm = $mosConfig_live_site.'/templates/default/images/kicons/logopayp
 			</tr>
 			<tr>
 				<td width="100%" align="center">
-					Amount / Currency
+					Amount&nbsp;&nbsp;Currency
 				</td>
 			</tr>
 			<tr>
@@ -196,10 +187,10 @@ $logopaypal_sm = $mosConfig_live_site.'/templates/default/images/kicons/logopayp
 					<input type="hidden" name="LMI_FAIL_URL" value="<?php echo $wm_errorurl;?>">
 					<input type="hidden" name="LMI_FAIL_METHOD" value="2">
 					<select name="LMI_PAYEE_PURSE" style="min-width:30px;">
-						<option value="<?php echo $wmnum1;?>"><?php echo $wmtype1;?></option>
-						<option value="<?php echo $wmnum2;?>"><?php echo $wmtype2;?></option>
-						<option value="<?php echo $wmnum3;?>"><?php echo $wmtype3;?></option>
-						<option value="<?php echo $wmnum4;?>"><?php echo $wmtype4;?></option>
+						<option <?php if ($wmtype1==$wmcur_type) echo "selected=\"selected\" ";?>value="<?php echo $wmnum1;?>"><?php echo $wmtype1;?></option>
+						<option <?php if ($wmtype2==$wmcur_type) echo "selected=\"selected\" ";?>value="<?php echo $wmnum2;?>"><?php echo $wmtype2;?></option>
+						<option <?php if ($wmtype3==$wmcur_type) echo "selected=\"selected\" ";?>value="<?php echo $wmnum3;?>"><?php echo $wmtype3;?></option>
+						<option <?php if ($wmtype4==$wmcur_type) echo "selected=\"selected\" ";?>value="<?php echo $wmnum4;?>"><?php echo $wmtype4;?></option>
 					</select>
 					<input type="hidden" name="sess_id" value="1">
 					<input type="hidden" name="transactionID" value="1">
@@ -246,9 +237,9 @@ $logopaypal_sm = $mosConfig_live_site.'/templates/default/images/kicons/logopayp
 		</table>
 	</form>
 </div>
-<!--------------------------- PayPal -------------------------
-<div id="paypal" align="center" style="display:none;">        -->
-<div id="paypal" align="center">
+<!--------------------------- PayPal --------------------------->
+<?php $style = ($paypalval_val)?"":" style=\"display:none;\"";?>
+<div id="paypal" align="center"<?php echo $style;?>>
 <?php
 /**
 $length = isset( $_POST[ 'paypallength' ] ) ? (int) $_POST[ 'paypallength' ] : "";
@@ -264,35 +255,35 @@ if( $amount < $paypalvalleast_val )
 }
 $currency_code = isset( $_POST[ 'paypalcurrency_code' ] ) ? trim( $_POST[ 'paypalcurrency_code' ] ) : 0;
 if ($length == 4) {
-  header("Location: https://www.paypal.com/cgi-bin/webscr?cmd=_xclick&business=".$donate_email."&item_name=".$donate_org."&amount=".$amount."&no_shipping=0&no_note=1&tax=0&currency_code=".$currency_code."&bn=PP%2dDonationsBF&charset=UTF%2d8&return=".$link_return."&cancel=".$link_cancel);
+  header("Location: https://www.paypal.com/cgi-bin/webscr?cmd=_xclick&business=".$donate_email."&item_name=".$donate_org."&amount=".$amount."&lc=".$lang."&no_shipping=0&no_note=1&tax=0&currency_code=".$currency_code."&bn=PP%2dDonationsBF&charset=UTF%2d8&return=".$link_return."&cancel=".$link_cancel);
 }
 else if ($length == 1) {
-  header("Location: https://www.paypal.com/cgi-bin/webscr?cmd=_xclick-subscriptions&business=".$donate_email."&item_name=".$donate_org."&no_shipping=1&no_note=1&currency_code=".$currency_code."&bn=PP%2dSubscriptionsBF&charset=UTF%2d8&a3=".$amount."%2e00&p3=1&t3=W&src=1&sra=1&return=".$link_return."&cancel=".$link_cancel);
+  header("Location: https://www.paypal.com/cgi-bin/webscr?cmd=_xclick-subscriptions&business=".$donate_email."&item_name=".$donate_org."&lc=".$lang."&no_shipping=1&no_note=1&currency_code=".$currency_code."&bn=PP%2dSubscriptionsBF&charset=UTF%2d8&a3=".$amount."%2e00&p3=1&t3=W&src=1&sra=1&return=".$link_return."&cancel=".$link_cancel);
 }
 elseif ($length == 2) {
-  header("Location: https://www.paypal.com/cgi-bin/webscr?cmd=_xclick-subscriptions&business=".$donate_email."&item_name=".$donate_org."&no_shipping=1&no_note=1&currency_code=".$currency_code."&bn=PP%2dSubscriptionsBF&charset=UTF%2d8&a3=".$amount."%2e00&p3=1&t3=M&src=1&sra=1&return=".$link_return."&cancel=".$link_cancel);
+  header("Location: https://www.paypal.com/cgi-bin/webscr?cmd=_xclick-subscriptions&business=".$donate_email."&item_name=".$donate_org."&lc=".$lang."&no_shipping=1&no_note=1&currency_code=".$currency_code."&bn=PP%2dSubscriptionsBF&charset=UTF%2d8&a3=".$amount."%2e00&p3=1&t3=M&src=1&sra=1&return=".$link_return."&cancel=".$link_cancel);
 }
 elseif ($length == 3) {
-  header("Location: https://www.paypal.com/cgi-bin/webscr?cmd=_xclick-subscriptions&business=".$donate_email."&item_name=".$donate_org."&no_shipping=1&no_note=1&currency_code=".$currency_code."&bn=PP%2dSubscriptionsBF&charset=UTF%2d8&a3=".$amount."%2e00&p3=1&t3=Y&src=1&sra=1&return=".$link_return."&cancel=".$link_cancel);
+  header("Location: https://www.paypal.com/cgi-bin/webscr?cmd=_xclick-subscriptions&business=".$donate_email."&item_name=".$donate_org."&lc=".$lang."&no_shipping=1&no_note=1&currency_code=".$currency_code."&bn=PP%2dSubscriptionsBF&charset=UTF%2d8&a3=".$amount."%2e00&p3=1&t3=Y&src=1&sra=1&return=".$link_return."&cancel=".$link_cancel);
 }
 */
 //$currencies = array( 'USD' => '$ ', 'EUR' => '&euro; ' );
-$currencies = array( 'USD' => '$ ', 'GBP' => '&pound; ', 'EUR' => '&euro; ' );
+$currencies = array( 'USD' => '$ ', 'GBP' => '&pound; ', 'EUR' => '&euro; ' );//, 'THB' => '&#x0E3F ' );
 ?>
 <div id="paypal_logo">
-<img src="<?php echo $logopaypal?>" alt="PayPal" />
+<img src="<?php echo $logopaypal;?>" alt="PayPal" />
 </div>
 <form name="_xclick" action="https://www.paypal.com/cgi-bin/webscr" method="post">
     <input type="hidden" name="cmd" value="_donations">
-    <input type="hidden" name="business" value="<?php echo $donate_email?>">
+    <input type="hidden" name="business" value="<?php echo $donate_email;?>">
     <input type="hidden" name="charset" value="UTF-8">
-    <input type="hidden" name="lc" value="EN">
+    <input type="hidden" name="lc" value="<?php echo $lang;?>">
     <input type="hidden" name="no_shipping" value="1">
     <input type="hidden" name="no_note" value="1">
-    <input type="hidden" name="notify_url" value="<?php echo $link?>">
-    <input type="hidden" name="return" value="<?php echo $link_return?>">
-    <input type="hidden" name="cancel_return" value="<?php echo $link_cancel?>">
-    <input type="hidden" name="item_name" value="<?php echo $donate_org?>">
+    <input type="hidden" name="notify_url" value="">
+    <input type="hidden" name="return" value="<?php echo $link_return;?>">
+    <input type="hidden" name="cancel_return" value="<?php echo $link_cancel;?>">
+    <input type="hidden" name="item_name" value="<?php echo $donate_org;?>">
 <?php
 if ($paypalval_on == 0) {
   $javaScript = <<<'JAVASCRIPT'
@@ -304,18 +295,17 @@ if ($paypalval_on == 0) {
     var currencyObj = document.getElementById( 'donate_symbol_currency' );
     if( currencyObj )
     {
-      var currencySymbols = { 'USD': '$ ', 'GBP': '&pound; ', 'EUR': '&euro; ' };
+      var currencySymbols = { 'USD': '$ ', 'GBP': '&pound; ', 'EUR': '&euro; ', 'THB': '&#x0E3F ' };
       var currencySymbol = currencySymbols[ selection ];
       currencyObj.innerHTML = currencySymbol;
     }
   }
 </script>
 JAVASCRIPT;
-  $symbol = $currencies[ $paypalcur_val ];
-  echo "$javaScript Enter Amount:<br><span id=\"donate_symbol_currency\">".$symbol."</span><input type=\"text\" name=\"amount\" size=\"3\"  value=\"".$paypalval_val."\" class=\"inputbox\">";
-}
-elseif ($paypalval_on == 1) {
-  echo "<input type=\"hidden\" value=\"".$paypalval_val."\" name=\"amount\">";
+    $symbol = $currencies[ $paypalcur_val ];
+    echo "$javaScript Enter Amount:<br><span id=\"donate_symbol_currency\">".$symbol."</span><input type=\"text\" name=\"amount\" size=\"3\"  value=\"".$paypalval_val."\" class=\"inputbox\"> ";
+} elseif ($paypalval_on == 1) {
+    echo "<input type=\"hidden\" value=\"".$amount."\" name=\"amount\">";
 }
 if ($paypalcur_on == 0) {
   print( "<select name=\"currency_code\" id=\"donate_currency_code\" class=\"inputbox\" onchange=\"donateChangeCurrency();\">" );
@@ -337,12 +327,12 @@ if ($donate_len == 0) {
     <option value="2">Monthly</option>
     <option value="3">Annual</option>
   </select>
-  <?
+  <?php
 }
 elseif ($donate_len == 1) {
   ?>
-  <input type="hidden" name="paypallength" value="<? echo $paypallen_val; ?>" />
-  <?
+  <input type="hidden" name="paypallength" value="<?php echo $paypallen_val; ?>" />
+  <?php
 }
 ?>
 <br>

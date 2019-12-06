@@ -110,7 +110,7 @@ $HD_Form -> AddViewElement(gettext("SECRET"), "secret", "8%", "center", "sort");
 $HD_Form -> FieldViewElement ("IF(regexten='',name,regexten) AS regexten, callerid, IF(id_cc_card = ".$_SESSION["card_id"].",language,NULL) AS language, IF(id_cc_card = ".$_SESSION["card_id"]." OR v.foreignvoipconf, IF(port>0 AND UNIX_TIMESTAMP()<regseconds,concat('<font color=green>',ipaddr,':',port,'</font> ',IF(lastms=-1,'UNREACHABLE',IF(lastms>0,concat('(',lastms,' ms)'),'')),'<br>',useragent),host),IF(port>0 AND UNIX_TIMESTAMP()<regseconds,'<font color=green>ONLINE</font>','offline')) AS host, IF(id_cc_card = ".$_SESSION["card_id"].",'".SIP_IAX_INFO_HOST."',NULL) AS server, name, IF(id_cc_card = ".$_SESSION["card_id"].",secret,NULL) AS secret ");
 //$HD_Form -> FieldViewElement ("IF(regexten='',name,regexten) AS regexten, callerid, IF(id_cc_card = ".$_SESSION["card_id"].",language,NULL) AS language, IF(port>0 AND UNIX_TIMESTAMP()<regseconds,concat('<font color=green>',ipaddr,':',port,'</font>'),host) AS host, IF(id_cc_card = ".$_SESSION["card_id"].",'".SIP_IAX_INFO_HOST."',NULL) AS server, IF(id_cc_card = ".$_SESSION["card_id"].",name,NULL) AS name, IF(id_cc_card = ".$_SESSION["card_id"].",secret,NULL) AS secret ");
 
-$HD_Form -> CV_NO_FIELDS  = gettext("THERE IS NO ".strtoupper($HD_Form->FG_INSTANCE_NAME)." CREATED!");
+$HD_Form -> CV_NO_FIELDS  = gettext("THERE IS NO ".$atmenu." CONFIG FOUNDED!");
 $HD_Form -> CV_DISPLAY_LINE_TITLE_ABOVE_TABLE = false;
 $HD_Form -> CV_TEXT_TITLE_ABOVE_TABLE = '';
 $HD_Form -> CV_DISPLAY_FILTER_ABOVE_TABLE = false;
