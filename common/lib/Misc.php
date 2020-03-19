@@ -31,6 +31,10 @@
  * 
 **/
 
+use PHPMailer\PHPMailer\PHPMailer;
+use PHPMailer\PHPMailer\SMTP;
+use PHPMailer\PHPMailer\Exception;
+
 function monitor_recognize(&$ipointer) {
 	if (!isset($ipointer->dl_short)) $ipointer->dl_short="";
 	if ($ipointer->monitor == 1 || $ipointer->agiconfig['record_call'] == 1) {

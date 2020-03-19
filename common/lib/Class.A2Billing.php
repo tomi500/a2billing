@@ -57,7 +57,6 @@ use Google\Cloud\Speech\V1p1beta1\RecognitionConfig\AudioEncoding;
 
 class A2Billing {
 
-
 	/**
     * Config variables
     *
@@ -2460,8 +2459,6 @@ $this -> debug( ERROR, $agi, __FILE__, __LINE__, "[ \033[1;34m".$agi->get_variab
 
 			    $client->close();
 			}
-
-			include_once (dirname(__FILE__)."/mail/class.phpmailer.php");
 			include_once (dirname(__FILE__)."/Class.Mail.php");
 
 			try {
@@ -2569,8 +2566,7 @@ $this -> debug( ERROR, $agi, __FILE__, __LINE__, "FAXRESOLUTION: ".$faxresolutio
 		// CHECK IF THE EMAIL ADDRESS IS CORRECT
 		if ($this->fax2mail) {
 		    if (preg_match("/^[_A-Za-z0-9-]+(\\.[_A-Za-z0-9-]+)*@[A-Za-z0-9]+(\\.[A-Za-z0-9]+)*(\\.[A-Za-z]{2,})$/i", $this->faxemail)) {
-		
-			include_once (dirname(__FILE__)."/mail/class.phpmailer.php");
+
 			include_once (dirname(__FILE__)."/Class.Mail.php");
 			try {
 				$this->DBHandle->Execute("SET NAMES 'UTF8'");

@@ -42,18 +42,14 @@ $profiler = new PhpQuickProfiler($objProf->getMicroTime());
 
 define ("WRITELOG_QUERY",false);
 define ("FSROOT", substr(dirname(__FILE__),0,-3));
-define ("LIBDIR", FSROOT."lib/");	
+define ("LIBDIR", FSROOT."lib/");
 
 
 include_once (FSROOT."lib/interface/constants.php");
 include_once (dirname(__FILE__)."/Class.A2Billing.php");
-//require_once('adodb/adodb.inc.php'); // AdoDB
 include_once (dirname(__FILE__)."/Class.Table.php");
 include_once (dirname(__FILE__)."/Class.Connection.php");
 include_once (dirname(__FILE__)."/Class.Realtime.php");
-
-// USE PHPMAILER
-include_once (FSROOT."lib/mail/class.phpmailer.php");
 
 // INCLUDE MISC
 include (FSROOT."lib/Misc.php");

@@ -305,12 +305,12 @@ CREATE TABLE IF NOT EXISTS `cc_ivr_destinations` (
 
 CREATE TABLE IF NOT EXISTS `cc_ivr_sounds` (
   `id` BIGINT(20) NOT NULL AUTO_INCREMENT,
-  `id_cc_ivr_start` INT(11) NOT NULL DEFAULT '0',
+  `id_cc_ivr` INT(11) NOT NULL DEFAULT '0',
   `id_cc_ivr_dest` INT(11) NOT NULL DEFAULT '0',
   `timeout` VARCHAR(3) NOT NULL,
   `playsound` VARCHAR(100) CHARACTER SET utf8 COLLATE utf8_bin NOT NULL,
   PRIMARY KEY (`id`),
-  INDEX `id_ivrs` ( `id_cc_ivr_start`,`id_cc_ivr_dest` )
+  INDEX `id_ivrs` ( `id_cc_ivr`,`id_cc_ivr_dest` )
 ) ENGINE=MyISAM DEFAULT CHARSET=utf8 COLLATE=utf8_bin;
 
 CREATE TABLE IF NOT EXISTS cc_voicemail_users (
@@ -895,7 +895,7 @@ CREATE TABLE IF NOT EXISTS `cc_greeting_records` (
   `voice_name` varchar(30) COLLATE utf8_bin NOT NULL,
   `gender` varchar(20) COLLATE utf8_bin NOT NULL,
   `speed` varchar(4) COLLATE utf8_bin NOT NULL,
-  `greet_text` varchar(140) COLLATE utf8_bin NOT NULL,
+  `greet_text` varchar(200) COLLATE utf8_bin NOT NULL,
   `greet_filename` varchar(100) COLLATE utf8_bin NOT NULL,
   `download_payed` smallint(6) NOT NULL DEFAULT '0',
   `updatetime` TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
