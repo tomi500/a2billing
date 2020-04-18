@@ -104,10 +104,20 @@ INSERT IGNORE INTO cc_invoice_conf (key_val) VALUES ('comments');
 ALTER TABLE cc_sip_buddies ADD `external` INT( 11 ) NOT NULL DEFAULT '0' AFTER `id_cc_card`;
 ALTER TABLE cc_sip_buddies ADD `callbackextension` varchar( 40 ) DEFAULT NULL;
 ALTER TABLE cc_sip_buddies ADD `directmedia` enum('yes', 'no', 'nonat', 'update', 'outgoing') NULL DEFAULT 'yes' AFTER `nat`;
+ALTER TABLE cc_sip_buddies ADD `avpf` enum( 'yes', 'no' ) DEFAULT NULL;
+ALTER TABLE cc_sip_buddies ADD `force_avp` enum( 'yes', 'no' ) DEFAULT NULL;
+ALTER TABLE cc_sip_buddies ADD `icesupport` enum( 'yes', 'no' ) DEFAULT NULL;
+ALTER TABLE cc_sip_buddies ADD `dtlsenable` enum( 'yes', 'no' ) DEFAULT NULL;
+ALTER TABLE cc_sip_buddies ADD `dtlsverify` enum( 'yes', 'no' ) DEFAULT NULL;
+ALTER TABLE cc_sip_buddies ADD `dtlscertfile` VARCHAR( 80 ) NULL DEFAULT NULL;
+ALTER TABLE cc_sip_buddies ADD `dtlsprivatekey` VARCHAR( 80 ) NULL DEFAULT NULL;
+ALTER TABLE cc_sip_buddies ADD `dtlscafile` VARCHAR( 80 ) NULL DEFAULT NULL;
+ALTER TABLE cc_sip_buddies ADD `dtlssetup` enum( 'actpass', 'active', 'passive' ) DEFAULT NULL;
+
 ALTER TABLE cc_sip_buddies ADD `encryption` enum( 'yes', 'no' ) DEFAULT NULL;
 ALTER TABLE cc_sip_buddies ADD `encryption_taglen` enum('32','80') DEFAULT NULL AFTER `encryption`;
 ALTER TABLE cc_sip_buddies ADD `ignorecryptolifetime` enum( 'yes', 'no' ) DEFAULT NULL;
-ALTER TABLE cc_sip_buddies ADD `transport` enum('tls','udp','tcp','udp,tcp','tcp,udp','tls,tcp,udp') DEFAULT NULL;
+ALTER TABLE cc_sip_buddies ADD `transport` enum('tls','udp','tcp','udp,tcp','tcp,udp','tls,tcp,udp','udp,tls,ws,wss','tls,wss') DEFAULT NULL;
 ALTER TABLE cc_sip_buddies ADD `remotesecret` VARCHAR( 40 ) NULL DEFAULT NULL AFTER `secret`;
 ALTER TABLE cc_sip_buddies ADD `trustrpid` enum('yes','no') DEFAULT NULL AFTER `insecure`;
 ALTER TABLE cc_sip_buddies ADD `progressinband` enum('yes','no','never') DEFAULT NULL AFTER `trustrpid`;
@@ -153,6 +163,8 @@ ALTER TABLE cc_sip_buddies ADD say_timetotalk SMALLINT( 6 ) NOT NULL DEFAULT '0'
 ALTER TABLE cc_sip_buddies ADD say_balance_after_call SMALLINT( 6 ) NOT NULL DEFAULT '0';
 ALTER TABLE cc_sip_buddies ADD translit SMALLINT( 6 ) NOT NULL DEFAULT '0' AFTER `external`;
 
+ALTER TABLE cc_sip_buddies CHANGE `transport` `transport` enum( 'tls', 'udp', 'tcp', 'udp,tcp', 'tcp,udp', 'tls,tcp,udp', 'udp,tls,ws,wss', 'tls,wss' ) NULL DEFAULT NULL;
+
 ALTER TABLE cc_sip_buddies
   CHANGE `canreinvite` `canreinvite` varchar( 20 ) CHARACTER SET utf8 COLLATE utf8_bin NULL DEFAULT NULL ,
   CHANGE `nat` `nat` enum( 'force_rport,comedia','no','force_rport','comedia','auto_force_rport','auto_comedia','auto_force_rport,auto_comedia' ) NULL DEFAULT 'comedia' ,
@@ -164,7 +176,6 @@ ALTER TABLE cc_sip_buddies
   CHANGE `outboundproxy` `outboundproxy` varchar( 40 ) NULL DEFAULT NULL ,
   CHANGE `callbackextension` `callbackextension` varchar( 40 ) NULL DEFAULT NULL ,
   CHANGE `encryption` `encryption` enum( 'yes', 'no' ) NULL DEFAULT NULL ,
-  CHANGE `transport` `transport` enum( 'tls', 'udp', 'tcp', 'udp,tcp', 'tcp,udp' ) NULL DEFAULT NULL ,
   CHANGE `callgroup` `callgroup` varchar( 40 ) NULL DEFAULT NULL ,
   CHANGE `pickupgroup` `pickupgroup` varchar( 40 ) NULL DEFAULT NULL ,
   CHANGE `ignorecryptolifetime` `ignorecryptolifetime` enum( 'yes', 'no' ) NULL DEFAULT NULL ,

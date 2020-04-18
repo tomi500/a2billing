@@ -624,6 +624,88 @@ $HD_Form -> AddEditElement (gettext("SETVAR"),
 						   gettext("Insert the setvar"),
 						   "", "", "", "", "", "", "NO-NULL" );
 
+$HD_Form -> AddEditElement (gettext("AVPF"),
+						   "avpf",
+						   $avpf,
+						   "SELECT",
+						   "",
+						   "",
+						   "",
+						    "list", "", "", "", $values_list['avpf'], "%1", "NO-NULL" );
+
+$HD_Form -> AddEditElement (gettext("FORCE_AVP"),
+						   "force_avp",
+						   $force_avp,
+						   "SELECT",
+						   "",
+						   "",
+						   "",
+						    "list", "", "", "", $values_list['force_avp'], "%1", "NO-NULL" );
+
+$HD_Form -> AddEditElement (gettext("ICESUPPORT"),
+						   "icesupport",
+						   $icesupport,
+						   "SELECT",
+						   "",
+						   "",
+						   "",
+						    "list", "", "", "", $values_list['icesupport'], "%1", "NO-NULL" );
+
+$HD_Form -> AddEditElement (gettext("dtlsenable"),
+						   "dtlsenable",
+						   $dtlsenable,
+						   "SELECT",
+						   "",
+						   "",
+						   "",
+						    "list", "", "", "", $values_list['dtlsenable'], "%1", "NO-NULL", gettext("Tell Asterisk to enable DTLS for this peer"));
+
+$HD_Form -> AddEditElement (gettext("dtlsverify"),
+						   "dtlsverify",
+						   $dtlsverify,
+						   "SELECT",
+						   "",
+						   "",
+						   "",
+						    "list", "", "", "", $values_list['dtlsverify'], "%1", "NO-NULL", gettext("Tell Asterisk to not verify your DTLS certs"));
+
+$HD_Form -> AddEditElement (gettext("dtlscertfile"),
+						"dtlscertfile",
+						'',
+						"INPUT",
+						"size=81 maxlength=80",
+						"",
+						"",
+						"" , "", "", "", "", "", "NO-NULL", gettext("Tell Asterisk where your DTLS cert file is"));
+
+$HD_Form -> AddEditElement (gettext("dtlsprivatekey"),
+						"dtlsprivatekey",
+						'',
+						"INPUT",
+						"size=81 maxlength=80",
+						"",
+						"",
+						"" , "", "", "", "", "", "NO-NULL", gettext("Tell Asterisk where your DTLS private key is"));
+
+$HD_Form -> AddEditElement (gettext("dtlscafile"),
+						"dtlscafile",
+						'',
+						"INPUT",
+						"size=81 maxlength=80",
+						"",
+						"",
+						"" , "", "", "", "", "", "NO-NULL", gettext(""));
+
+$HD_Form -> AddEditElement (gettext("dtlssetup"),
+						   "dtlssetup",
+						   $dtlssetup,
+						   "SELECT",
+						   "",
+						   "",
+						   "",
+						    "list", "", "", "", $values_list['dtlssetup'], "%1", "NO-NULL", gettext("Tell Asterisk to use actpass SDP parameter when setting up DTLS"));
+
+
 $HD_Form -> AddEditElement (gettext("ENCRYPTION"),
 						   "encryption",
 						   $encryption,
@@ -1133,14 +1215,16 @@ if ($atmenu=='sip') {
 
 
 if ($atmenu=='sip') {
-	$field_list_edit = 'id_cc_card, external, warning_threshold, say_dialednumber, say_rateinitial, say_timetotalk, say_balance_after_call, name, accountcode, regexten, callerid, cid_number, amaflags, type, defaultuser, secret, qualify, ' .
-			'defaultip, deny, permit, dtmfmode, disallow, allow, videosupport, host, port, context, language, subscribecontext, mailbox, fromuser, fromdomain, insecure, auth, callgroup, pickupgroup, ' .
-			'namedcallgroup, namedpickupgroup, mohsuggest, setvar, encryption, ignorecryptolifetime, transport, t38pt_udptl, username, md5secret, directmedia, nat, canreinvite, mask, restrictcid, ' .
-			'rtpkeepalive, rtptimeout, rtpholdtimeout, musiconhold, allowtransfer, subscribemwi, vmexten, callingpres, usereqphone, callcounter, `call-limit`, musicclass, autoframing, maxcallbitrate, ' .
-			'outboundproxy, callbackextension';
+	$field_list_edit = 'id_cc_card, external, warning_threshold, say_dialednumber, say_rateinitial, say_timetotalk, say_balance_after_call, name, accountcode, regexten, callerid, cid_number, amaflags, ' .
+			'type, defaultuser, secret, qualify, defaultip, deny, permit, dtmfmode, disallow, allow, videosupport, host, port, context, language, subscribecontext, mailbox, fromuser, fromdomain, ' .
+			'insecure, auth, callgroup, pickupgroup, namedcallgroup, namedpickupgroup, mohsuggest, setvar, ' .
+			'avpf, force_avp, icesupport, dtlsenable, dtlsverify, dtlscertfile, dtlsprivatekey, dtlscafile, dtlssetup, encryption, ignorecryptolifetime, transport, t38pt_udptl, ' .
+			'username, md5secret, directmedia, nat, canreinvite, mask, restrictcid, rtpkeepalive, rtptimeout, rtpholdtimeout, musiconhold, allowtransfer, subscribemwi, vmexten, callingpres, ' .
+			'usereqphone, callcounter, `call-limit`, musicclass, autoframing, maxcallbitrate, outboundproxy, callbackextension';
 } else {
 	$field_list_edit = 'id_cc_card, external, name, accountcode, regexten, callerid, cid_number, amaflags, type, secret, qualify, defaultip, deny, permit, disallow, allow, host, port, context, language, ' .
-			'auth, mohsuggest, setvar, encryption, username, forceencryption, trunk, dbsecret, regcontext, sourceaddress, mohinterpret, inkeys, outkey,  sendani, fullname,  maxauthreq, transfer, ' .
+			'auth, mohsuggest, setvar, avpf, force_avp, icesupport, dtlsenable, dtlsverify, dtlscertfile, dtlsprivatekey, dtlscafile, dtlssetup, encryption, username, forceencryption, trunk, ' .
+			'dbsecret, regcontext, sourceaddress, mohinterpret, inkeys, outkey,  sendani, fullname,  maxauthreq, transfer, ' .
 			'jitterbuffer, forcejitterbuffer, codecpriority, qualifysmoothing, qualifyfreqok, qualifyfreqnotok, timezone, adsi, requirecalltoken, maxcallnumbers, maxcallnumbers_nonvalidated';
 }
 
