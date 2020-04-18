@@ -291,8 +291,7 @@ body {
 
 }
 
-.tableDivider 
-{
+.tableDivider {
 	background-color: #e1e1e1;
 	HEIGHT: 1px
 }
@@ -477,20 +476,113 @@ SPAN.errorText {
 	height:64px;
 	background-repeat: no-repeat;
 }
+.bgcolor_006{
+	background-color: #EEEEEE;
+}
 .bgcolor_007{
 	background-color: #DDDDDD;
 	width: 400px;
 }
-.bgcolor_006{
-	background-color: #EEEEEE;
-}
 .bgcolor_008{
 	background-color: #F0F0F0;
 }
-.bgcolor_008{
+.bgcolor_027{
 	background-color: #fff1d1;
 }
-
+.blocka {
+    display: flex;
+    align-items: flex-start;
+    font-family: verdana, sans-serif;
+    font-size: small;
+}
+.itema {
+    width: 15%;
+}
+.lefta {
+    padding-right: 3px;
+    text-align: right;
+}
+.centera {
+	width: 70%;
+	display: flex;
+	flex-flow: row wrap;
+	align-items: stretch;
+	border-style: none;
+	border-collapse: collapse;
+}
+.tohide :last-child {
+	flex-grow: 1;
+}
+.bgivr{
+	display: flex;
+	flex-flow: row nowrap;
+}
+.bgivrth {
+	text-align: left;
+	padding-left: 10px;
+	padding-top: 5px;
+	padding-bottom: 5px;
+	background-color: #C2C2C2;
+}
+.bgivrth:first-child {
+	font-weight: bold;
+}
+.bgivrth:last-child {
+	min-width: 50%;
+	padding-right: 8px;
+}
+.bgivrtr {
+	text-align: right;
+}
+.ivrbee {
+	display: table;
+	width: 100%;
+	table-layout: fixed;
+}
+.ivrbeetr {
+	display: table-row;
+}
+.ivrbeetd {
+	display: table-cell;
+	text-align: left;
+	padding-left: 10px;
+	padding-top: 1px;
+	padding-bottom: 5px;
+	vertical-align: top;
+	white-space: nowrap;
+}
+.ivrbeetd:first-child {
+	width: 17%;
+}
+.ivrbeetd:nth-child(2) {
+	width: 39%;
+	vertical-align: bottom;
+}
+.ivrbeetd:nth-child(3) {
+	width: 25%;
+}
+.ivrbeetd:nth-child(4) {
+	width: 19%;
+	padding-right: 2px;
+}
+.ivrbeetd:last-child {
+/*	text-align: justify;
+	line-height: 0;
+	text-justify: newspaper;
+	zoom: 1;
+	text-align-last: justify;
+	width: 100%;
+	height: 0px;*/
+	visibility: hidden;
+	overflow: hidden;
+	content: '';
+	display: inline-block;
+}
+.soundFlex {
+	display: flex;
+	flex-flow: row nowrap;
+//border: 1px solid green;
+}
 .error_message{
 	font-family: Arial, Helvetica, sans-serif;
 	font-size: 10px;
@@ -849,6 +941,7 @@ SPAN.errorText {
 	font-family: Arial, Helvetica, sans-serif;
 	font-size: 11px;
 	font-weight: bold;
+	padding-right: 4px;
 	color: #BC2222;
 }
 

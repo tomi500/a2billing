@@ -46,7 +46,7 @@ $(document).ready(function(){
 				newimage = $(this).attr('src');
 				$(this).attr('src', newimage.substr(0,newimage.length-7) + '.png');
 			});
-			div_toggle = $(this).parent().find("div.tohide");
+			div_toggle = $(this).parent().parent().find("div.tohide");
 			//alert(div_toggle.html());
 			div_toggle.animate({ height: 'hide', opacity: 'hide' }, 'slow');
 		
@@ -55,7 +55,7 @@ $(document).ready(function(){
 				newimage = $(this).attr('src');
 				$(this).attr('src', newimage.substr(0,newimage.length-4) + '_on.png');
 			});
-			div_toggle = $(this).parent().find("div.tohide");
+			div_toggle = $(this).parent().parent().find("div.tohide");
 			//alert(div_toggle.html());
 			div_toggle.animate({ height: 'show', opacity: 'show' }, 'slow');
 		});

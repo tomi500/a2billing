@@ -14,7 +14,8 @@ Usage :
     https://localhost/customer/balance.php?u=XXXXXXXXXXX&p=XXXXXXXXXXX&html=xml
     https://localhost/customer/balance.php?u=XXXXXXXXXXX           <<== Will have returned balance in xml with authenticate by request ip instead password
     In Acrobits apps:
-    https://localhost/customer/balance.php?u=%account[username]%   <<== Will have returned balance in xml with authenticate by request ip instead password
+    https://localhost/customer/balance.php?u=%account[username]%&p=%account[password]%   <<== Will have returned balance in xml with authenticate by login+password
+    https://localhost/customer/balance.php?u=%account[username]%                         <<== Will have returned balance in xml with authenticate by request ip instead password
 */
 
 include ("lib/customer.defines.php");

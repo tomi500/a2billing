@@ -1537,6 +1537,7 @@ $A2B -> debug( ERROR, $agi, __FILE__, __LINE__, "Out of length range destination
 					break;
 				    }
 				}
+				if ($A2B->calleesound) $addparameter .= "A({$A2B->calleesound})";
 				if ($cidgroupid == -1) $cidgroupid = $cidgroupidrate;
 				$sellerprefix = $this -> ratecard_obj[$k][74];
 				if (is_array($removeprefix) && count($removeprefix)>0) {

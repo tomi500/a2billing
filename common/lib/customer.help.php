@@ -169,6 +169,8 @@ if (SHOW_HELP) {
 
 	$CC_help_log_viewer_info = create_help(gettext("The system log helps you track all events on your application. Log levels are the Importance Levels for the events - 1 is lowest level and 3 is highest level. 1 is used for Login, Logout and Page Visit. 2 is used for Add, Import, Export. 3 is for Update and Delete."),$credit_cur,$limit_cur);
 
+	$CC_help_ivr = create_help(gettext("Create your own voice menus and use them when setting up INCOMING CALLS.<br>Before that, create voice phrases or upload your own in the VOICE GREETINGS section."),$credit_cur,$limit_cur);
+
 } //ENDIF SHOW_HELP
 
 if (!isset ($disable_load_conf) || !($disable_load_conf)) {

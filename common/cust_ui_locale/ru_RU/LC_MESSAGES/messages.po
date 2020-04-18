@@ -561,7 +561,7 @@ msgstr "Выберите 'Да' если нужно поднимать труб�
 #: form_data/FG_var_speeddial.inc:118 form_data/FG_var_phonebook.inc:109
 #: form_data/FG_var_ticket.inc:80 form_data/FG_var_phonenumber.inc:144
 #: form_data/FG_var_callerid.inc:116 lib/Form/Class.FormHandler.inc.php:554
-msgid "If you really want remove this"
+msgid "If you really want to remove this"
 msgstr "Если действительно хотите удалить"
 
 #: form_data/FG_var_did.inc:169 form_data/FG_var_campaign.inc:295
@@ -687,7 +687,7 @@ msgid "Insert your email"
 msgstr "Введите Ваш email"
 
 #: form_data/FG_var_signup.inc:199 form_data/FG_var_card.inc:72 userinfo.php:112
-msgid "ADRESS"
+msgid "ADDRESS"
 msgstr "АДРЕС"
 
 #: form_data/FG_var_signup.inc:204
@@ -798,7 +798,7 @@ msgid "You can modify, through the following form, the different properties of y
 msgstr "Вы можете редактировать используя следующую форму различные параметры "
 
 #: form_data/FG_var_signup.inc:426
-msgid "If you really want remove this "
+msgid "If you really want to remove this "
 msgstr "Если вы действительно хотите удалить это "
 
 #: form_data/FG_var_signup.inc:427
@@ -812,6 +812,14 @@ msgstr "Спасибо за регистрацию у нас.<br>Письмо с
 #: form_data/FG_var_signup.inc:430
 msgid "Your card number is "
 msgstr "Ваш номер "
+
+#: A2B_entity_greeting.php:262
+msgid "Enter the filename without extension"
+msgstr "Введите имя без! расширения"
+
+#: form_data/FG_var_greeting.inc:116
+msgid "GREETING"
+msgstr "ПРИВЕТСТВИЕ"
 
 #: signup_confirmation.php:100
 msgid "Your new customer was registered successfully"
@@ -2261,8 +2269,8 @@ msgid "You cannot choose more than one !"
 msgstr "Нельзя выбрать более одного !"
 
 #: lib/Form/Class.FormHandler.inc.php:563
-msgid "Are you sure to delete all records connected to this instance."
-msgstr "Вы уверены,что хотите удалить все записи, закрепленные за этим документом"
+msgid "Are you sure to delete all records connected to this instance?"
+msgstr "Вы уверены,что хотите удалить все записи, связанные с этим документом?"
 
 #: lib/Form/Class.FormHandler.inc.php:565
 #: lib/Form/Class.FormHandler.inc.php:567
@@ -3149,6 +3157,10 @@ msgstr "Назначте 1 цифру на ваши самые использу�
 msgid "Callback : Enter your phone number and the phone number you wish to call."
 msgstr "Вы можете назначить обратный звонок, чтобы не платить за исходящую связь!"
 
+#: lib/customer.help.php:172
+msgid "Create your own voice menus and use them when setting up INCOMING CALLS.<br>Before that, create voice phrases or upload your own in the VOICE GREETINGS section."
+msgstr "Создавайте свои собственные голосовые меню и используйте их при настройке ВХОДЯЩИХ ЗВОНКОВ.<br>Перед этим создайте голосовые фразы или загрузите свои в разделе VOICE GREETINGS."
+
 #: A2B_ticket_view.php:58
 msgid "Ticket updated successfully"
 msgstr "Тикет обновлен успешно"
@@ -3900,6 +3912,10 @@ msgstr "Удаление"
 #: call-history.php:58
 msgid "ERROR: Cannot download file "
 msgstr ""
+
+#: A2B_entity_ivr.php
+msgid "IVR Name"
+msgstr "Название"
 
 #: call-history.php
 msgid "RegName"

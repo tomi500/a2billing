@@ -267,7 +267,7 @@ $HD_Form->AddEditElement(gettext("EMAIL")." *",
 		gettext("Insert your email"), "", "", "", "", "", "", "", "");
 
 if (ADDRESS_ENABLE)  {
-$HD_Form->AddEditElement(gettext("ADRESS")." *",
+$HD_Form->AddEditElement(gettext("ADDRESS")." *",
 		"address",
 		'$value',
 		"INPUT",
@@ -573,7 +573,7 @@ $HD_Form->FG_FILTERFIELDNAME = 'cardnumber';
 $HD_Form->FG_FILTER_FORM_ACTION = 'list';
 
 $HD_Form->FG_INTRO_TEXT_EDITION = gettext("You can modify, through the following form, the different properties of your " . $HD_Form->FG_INSTANCE_NAME);
-$HD_Form->FG_INTRO_TEXT_ASK_DELETION = gettext("If you really want remove this " . $HD_Form->FG_INSTANCE_NAME . ", click on the delete button.");
+$HD_Form->FG_INTRO_TEXT_ASK_DELETION = gettext("If you really want to remove this " . $HD_Form->FG_INSTANCE_NAME . ", click on the delete button.");
 $HD_Form->FG_INTRO_TEXT_ADD = gettext("you can add easily a new " . $HD_Form->FG_INSTANCE_NAME . ".<br>Fill the following fields and confirm by clicking on the button add.");
 
 $HD_Form->FG_INTRO_TEXT_ADITION = '';

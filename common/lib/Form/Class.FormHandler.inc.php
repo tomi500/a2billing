@@ -425,7 +425,7 @@ class FormHandler
 
 	var $FG_INTRO_TEXT_EDITION="You can modify, through the following form, the different properties of your #FG_INSTANCE_NAME#<br>";
 
-	var $FG_INTRO_TEXT_ASK_DELETION = "If you really want remove this #FG_INSTANCE_NAME#, click on the delete button.";
+	var $FG_INTRO_TEXT_ASK_DELETION = "If you really want to remove this #FG_INSTANCE_NAME#, click on the delete button.";
 	
 	var $FG_INTRO_TEXT_DELETION = "A #FG_INSTANCE_NAME# has been deleted!";
 
@@ -558,7 +558,7 @@ class FormHandler
 	    $this -> FG_EDIT_ALT = gettext("Edit this record");
         $this -> FG_ADITION_GO_EDITION_MESSAGE = gettext("The document has been created correctly. Now, you can define the different tariff that you want to associate.");
         $this -> FG_INTRO_TEXT_EDITION = gettext("You can modify, through the following form, the different properties of your")." #FG_INSTANCE_NAME#".'<br>';
-        $this -> FG_INTRO_TEXT_ASK_DELETION = gettext("If you really want remove this")." #FG_INSTANCE_NAME#, ".gettext("Click on the delete button.");
+        $this -> FG_INTRO_TEXT_ASK_DELETION = gettext("If you really want to remove this")." #FG_INSTANCE_NAME#, ".gettext("click on the delete button.");
         $this -> FG_INTRO_TEXT_DELETION = gettext("One")." #FG_INSTANCE_NAME# ".gettext("has been deleted!");
 		
         $this -> FG_INTRO_TEXT_ADD = gettext("you can add easily a new")." #FG_INSTANCE_NAME#.<br>".gettext("Fill the following fields and confirm by clicking on the button add.");
@@ -567,7 +567,7 @@ class FormHandler
         $this -> FG_TEXT_ADITION_ERROR = '<font color="Red">'.gettext("Your new")." #FG_INSTANCE_NAME# ".gettext("hasn't been inserted.").'<br>'."</font>";
         $this -> FG_TEXT_ERROR_DUPLICATION = gettext("You cannot choose more than one !");
 
-        $this -> FG_FK_DELETE_MESSAGE = gettext("Are you sure to delete all records connected to this instance.");
+        $this -> FG_FK_DELETE_MESSAGE = gettext("Are you sure to delete all records connected to this instance?");
 		
 		$this -> FG_EDIT_PAGE_CONFIRM_BUTTON	= gettext("CONFIRM DATA");
 		$this -> FG_DELETE_PAGE_CONFIRM_BUTTON	= gettext('DELETE');

@@ -66,11 +66,11 @@ $actived_list = Constants::getActivationTrueFalseList();
 $yesno = Constants::getYesNoList();
 
 
-$HD_Form -> AddViewElement(gettext("CALLERID"), "cid", "25%", "center", "sort");
-$HD_Form -> AddViewElement(gettext("ACTIVATED"), "activated", "13%", "center", "sort", "26", "list", $actived_list);
-$HD_Form -> AddViewElement(gettext("CALLBACK"), "callback", "13%", "center", "SORT", "", "list", $yesno);
+$HD_Form -> AddViewElement(gettext("CALLERID"), "cid", "20%", "center", "sort");
+$HD_Form -> AddViewElement(gettext("D I S A"), "activated", "14%", "center\" nowrap \"", "sort", "26", "list", $actived_list);
+$HD_Form -> AddViewElement(gettext("CALLBACK"), "callback", "17%", "center", "SORT", "", "list", $yesno);
 $HD_Form -> AddViewElement(gettext("PHONE FORWARD"), "phonenumber", "25%", "center", "sort", "26");
-$HD_Form -> AddViewElement(gettext("VERIFY"), "verify", "13%", "center", "SORT");
+$HD_Form -> AddViewElement(gettext("VERIFY"), "verify", "20%", "center", "SORT");
 
 
 $HD_Form -> FieldViewElement ("cid, cc_callerid.activated, callback, phonenumber, IF(verify=0,'<font color=red>".gettext('No')."</font>','<font color=green>".gettext('Yes')."</font>')");
@@ -81,7 +81,7 @@ $HD_Form -> CV_DISPLAY_LINE_TITLE_ABOVE_TABLE = false;
 $HD_Form -> CV_TEXT_TITLE_ABOVE_TABLE = '';
 $HD_Form -> CV_DISPLAY_FILTER_ABOVE_TABLE = false;
 $HD_Form -> FG_LIMITE_DISPLAY = 10;
-$HD_Form -> FG_VIEW_TABLE_WITDH = '70%';
+$HD_Form -> FG_VIEW_TABLE_WITDH = '90%';
 
 //$HD_Form -> FG_DELETION_CONDITION = '"|col4|" == "<font color=red>'.gettext('No').'</font>"';
 

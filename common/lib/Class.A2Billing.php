@@ -1653,7 +1653,7 @@ class A2Billing {
 
 			$this->agiconfig['cid_enable']	= 0;
 			$this->tariff 					= $inst_listdestination[3];
-			$this->destination 				= $inst_listdestination[4];
+			$this->destination = $initialdestination	= $inst_listdestination[4];
 			$this->accountcode = $this->username		= $inst_listdestination[6];
 			$this->useralias 				= $inst_listdestination[7];
 			$this->time_out 				= $inst_listdestination[30];
@@ -1702,12 +1702,294 @@ class A2Billing {
 				if ($file) {
 					$diraudio = $this->config['webui']['dir_store_audio']."/".$this->accountcode."/".$file;
 					if ($this -> resolve($diraudio)!==false) $file = $this->accountcode."/".$file;
-					sleep(1);
+					sleep(2);
 					$agi -> evaluate("STREAM FILE $file \"#\" 0");
 				}
-				// IF VOIP CALL
-				if ($inst_listdestination[5]==1) {
+// waitdigits =
+// '-1' - ничего не нажато, идем на повтор
+// '-2' - нажато не верно,  идем на повтор
+// '-3' - ничего не нажато, выход на destinationnum
+// '-4' - нажато не верно,  выход на destinationnum
+// '-5' - выбран extension
+	    while (true) {
+		$inst_listdestination[4] = $initialdestination;
+		$QUERY = "SELECT DISTINCT cc_ivr_destinations.id, repeats, waitsecsfordigits, waitdigits, destinationnum, playsoundcallee, cc_ivr.id
+			    FROM cc_ivr, cc_ivr_destinations WHERE id_cc_card = '{$this->id_card}' AND ivrname LIKE '{$initialdestination}' AND id_cc_ivr=cc_ivr.id";
+		$result = $this -> instance_table -> SQLExec ($this->DBHandle, $QUERY);
 
+		while (is_array($result)) {
+			$initialdestination = $inst_listdestination[4];
+			$this -> calleesound = '';
+			$maxlen = 0;
+			$waitdigits = array();
+			foreach ($result as $value) {
+			    if ($value[3]>=0 && strlen($value[3])>$maxlen)
+				$maxlen = strlen($value[3]);
+			    if ($value[3]=='-5') { // Dial Extensions
+				$QUERY = "SELECT regexten AS field FROM cc_sip_buddies
+						LEFT JOIN cc_card_concat bb ON bb.concat_card_id = id_cc_card
+						LEFT JOIN ( SELECT aa.concat_id FROM cc_card_concat aa WHERE aa.concat_card_id = '{$this->id_card}' ) AS v ON bb.concat_id = v.concat_id
+						WHERE (id_cc_card = '{$this->id_card}' OR v.concat_id IS NOT NULL) AND external = 0
+					UNION ALL
+					    SELECT ext_num AS field FROM cc_fax
+						LEFT JOIN cc_card_concat bb ON bb.concat_card_id = cc_fax.id_cc_card
+						LEFT JOIN ( SELECT aa.concat_id FROM cc_card_concat aa WHERE aa.concat_card_id = '{$this->id_card}' ) AS v ON bb.concat_id = v.concat_id
+						WHERE id_cc_card = '{$this->id_card}' OR v.concat_id IS NOT NULL
+					ORDER BY field";
+				$resmax = $this -> instance_table -> SQLExec ($this->DBHandle, $QUERY);
+				if (is_array($resmax)) {
+					foreach ($resmax as $val) {
+					    if (strlen($val[0])>$maxlen)
+						$maxlen = strlen($val[0]);
+					    $value[3] = $value[4] = $val[0];
+//					    $dests[] = $val[0];
+					    $result[] = $value;
+					}
+				}
+			    }
+			}
+			foreach ($result as $value) {
+			    $waitdigits[] = $value[3];
+			}
+			$QUERY = "SELECT id_cc_ivr,id_cc_ivr_dest,timeout,playsound FROM cc_ivr_sounds ".
+				    "WHERE {$result[0][6]}=id_cc_ivr OR id_cc_ivr_dest IN (SELECT id FROM cc_ivr_destinations WHERE id_cc_ivr={$result[0][6]}) ORDER BY cc_ivr_sounds.id";
+			$resultsound = $this -> instance_table -> SQLExec ($this->DBHandle, $QUERY);
+			$ed = '0123456789';
+			for ($r=$result[0][1];$r>=0;$r--) {
+			    $this -> calleesound = '';
+			    $res = array();
+			    $res['result'] = 0;
+			    foreach ($resultsound as $val) {
+				if ($val[0]>0) {
+					$wait = $val[2];
+					if (isset($first_dtmf)) $wait++;
+					if ($wait>0) {
+					    if ($agi -> channel_status('',true) == AST_STATE_DOWN) {
+						$this -> destination_start_inuse($agi, $inst_listdestination[1], false);
+						break 5;
+					    }
+					    $res = $agi -> wait_for_digit($wait*1000);
+					    if ($res['result'] > 0) break;
+					}
+					$file = $val[3];
+					if ($file) {
+					    if ($agi -> channel_status('',true) == AST_STATE_DOWN) {
+						$this -> destination_start_inuse($agi, $inst_listdestination[1], false);
+						break 5;
+					    }
+					    $diraudio = $this->config['webui']['dir_store_audio']."/".$this->accountcode."/".$file;
+					    if ($this -> resolve($diraudio)!==false) $file = $this->accountcode."/".$file;
+					    $res = $agi -> stream_file($file, $ed);
+					    if ($res['result'] > 0) break;
+					}
+				}
+			    }
+			    if ($agi -> channel_status('',true) == AST_STATE_DOWN) {
+				$this -> destination_start_inuse($agi, $inst_listdestination[1], false);
+				break 4;
+			    }
+			    if ($res['result'] > 0) {
+				$first_dtmf = chr($res['result']);
+			    } else $first_dtmf = '';
+			    while (array_search($first_dtmf, $waitdigits) === false && strlen($first_dtmf)<$maxlen) {
+				$res = $agi -> wait_for_digit($result[0][2]*1000);
+				if ($res['result'] > 0) $first_dtmf .= chr($res['result']);
+					else break;
+			    }
+			    $key = array_search($first_dtmf, $waitdigits);
+			    if ($key===false) { // ничего не нажали или нажали неверно
+				if ($r>0) { // если повтор...
+				    if ($first_dtmf=='') { // и ничего не нажали
+					foreach ($result as $value) {
+					    if ($value[3]=='-1') {
+						foreach ($resultsound as $val) { // перебираем что проиграть перед повтором
+						    if ($val[1]==$value[0]) {
+							$wait = $val[2];
+							$file = $val[3];
+							if ($wait>0) {
+							    if ($agi -> channel_status('',true) == AST_STATE_DOWN) {
+								$this -> destination_start_inuse($agi, $inst_listdestination[1], false);
+								break 6;
+							    }
+							    sleep((int)$wait);
+							}
+							if ($file) { // проиграем перед повтором
+							    if ($agi -> channel_status('',true) == AST_STATE_DOWN) {
+								$this -> destination_start_inuse($agi, $inst_listdestination[1], false);
+								break 6;
+							    }
+							    $diraudio = $this->config['webui']['dir_store_audio']."/".$this->accountcode."/".$file;
+							    if ($this -> resolve($diraudio)!==false) $file = $this->accountcode."/".$file;
+							    $agi -> evaluate("STREAM FILE $file \"#\" 0");
+							}
+						    }
+						}
+						break;
+					    }
+					}
+				    } else { // и нажали неверно
+					foreach ($result as $value) {
+					    if ($value[3]=='-2') {
+						foreach ($resultsound as $val) { // перебираем что проиграть перед повтором
+						    if ($val[1]==$value[0]) {
+							$wait = $val[2];
+							$file = $val[3];
+							if ($wait>0) {
+							    if ($agi -> channel_status('',true) == AST_STATE_DOWN) {
+								$this -> destination_start_inuse($agi, $inst_listdestination[1], false);
+								break 6;
+							    }
+							    sleep((int)$wait);
+							}
+							if ($file) { // проиграем перед повтором
+							    if ($agi -> channel_status('',true) == AST_STATE_DOWN) {
+								$this -> destination_start_inuse($agi, $inst_listdestination[1], false);
+								break 6;
+							    }
+							    $diraudio = $this->config['webui']['dir_store_audio']."/".$this->accountcode."/".$file;
+							    if ($this -> resolve($diraudio)!==false) $file = $this->accountcode."/".$file;
+							    $agi -> evaluate("STREAM FILE $file \"#\" 0");
+							}
+						    }
+						}
+						break;
+					    }
+					}
+				    }
+				    continue; // повтор IVR
+				}
+				
+//				continue 4; // уходим на следующий PRIOR
+			    } else {
+				$inst_listdestination[4] = $result[$key][4];
+				$inst_listdestination[5] = (stripos($inst_listdestination[4],"QUEUE ") !== 0)?0:1;
+				foreach ($resultsound as $val) { // перебираем что проиграть перед вызовом
+				    if ($val[1]==$result[$key][0]) {
+					$wait = $val[2];
+					$file = $val[3];
+					if ($wait>0) {
+					    if ($agi -> channel_status('',true) == AST_STATE_DOWN) {
+						$this -> destination_start_inuse($agi, $inst_listdestination[1], false);
+						break 5;
+					    }
+					    sleep((int)$wait);
+					}
+					if ($file) { // проиграем перед повтором
+					    if ($agi -> channel_status('',true) == AST_STATE_DOWN) {
+						$this -> destination_start_inuse($agi, $inst_listdestination[1], false);
+						break 5;
+					    }
+					    $diraudio = $this->config['webui']['dir_store_audio']."/".$this->accountcode."/".$file;
+					    if ($this -> resolve($diraudio)!==false) $file = $this->accountcode."/".$file;
+					    $agi -> evaluate("STREAM FILE $file \"#\" 0");
+					}
+				    }
+				}
+				$file = $result[$key][5];
+				if ($file) {
+				    if ($agi -> channel_status('',true) == AST_STATE_DOWN) {
+					$this -> destination_start_inuse($agi, $inst_listdestination[1], false);
+					break 4;
+				    }
+				    $diraudio = $this->config['webui']['dir_store_audio']."/".$this->accountcode."/".$file;
+				    if ($this -> resolve($diraudio)!==false) $file = $this->accountcode."/".$file;
+				    $this -> calleesound = $file;
+				}
+				$QUERY = "SELECT DISTINCT cc_ivr_destinations.id, repeats, waitsecsfordigits, waitdigits, destinationnum, playsoundcallee, cc_ivr.id
+					FROM cc_ivr, cc_ivr_destinations WHERE id_cc_card = '{$this->id_card}' AND ivrname LIKE '{$inst_listdestination[4]}' AND id_cc_ivr=cc_ivr.id";
+				$result = $this -> instance_table -> SQLExec ($this->DBHandle, $QUERY);
+				continue 2;
+			    }
+			}
+
+			if ($first_dtmf=='') { // и ничего не нажали
+				foreach ($result as $value) {
+				    if ($value[3]=='-3') {
+					$inst_listdestination[4] = $value[4];
+					$inst_listdestination[5] = (stripos($inst_listdestination[4],"QUEUE ") !== 0)?0:1;
+					foreach ($resultsound as $val) { // перебираем что проиграть перед повтором
+					    if ($val[1]==$value[0]) {
+						$wait = $val[2];
+						$file = $val[3];
+						if ($wait>0) {
+						    if ($agi -> channel_status('',true) == AST_STATE_DOWN) {
+							$this -> destination_start_inuse($agi, $inst_listdestination[1], false);
+							break 5;
+						    }
+						    sleep((int)$wait);
+						}
+						if ($file) { // проиграем перед повтором
+						    if ($agi -> channel_status('',true) == AST_STATE_DOWN) {
+							$this -> destination_start_inuse($agi, $inst_listdestination[1], false);
+							break 5;
+						    }
+						    $diraudio = $this->config['webui']['dir_store_audio']."/".$this->accountcode."/".$file;
+						    if ($this -> resolve($diraudio)!==false) $file = $this->accountcode."/".$file;
+						    $agi -> evaluate("STREAM FILE $file \"#\" 0");
+						}
+					    }
+					}
+					$file = $value[5];
+					if ($file) {
+					    if ($agi -> channel_status('',true) == AST_STATE_DOWN) {
+						$this -> destination_start_inuse($agi, $inst_listdestination[1], false);
+						break 4;
+					    }
+					    $diraudio = $this->config['webui']['dir_store_audio']."/".$this->accountcode."/".$file;
+					    if ($this -> resolve($diraudio)!==false) $file = $this->accountcode."/".$file;
+					    $this -> calleesound = $file;
+					}
+					break;
+				    }
+				}
+			} else { // и нажали неверно
+				foreach ($result as $value) {
+				    if ($value[3]=='-4') {
+					$inst_listdestination[4] = $value[4];
+					$inst_listdestination[5] = (stripos($inst_listdestination[4],"QUEUE ") !== 0)?0:1;
+					foreach ($resultsound as $val) { // перебираем что проиграть перед повтором
+					    if ($val[1]==$value[0]) {
+						$wait = $val[2];
+						$file = $val[3];
+						if ($wait>0) {
+						    if ($agi -> channel_status('',true) == AST_STATE_DOWN) {
+							$this -> destination_start_inuse($agi, $inst_listdestination[1], false);
+							break 5;
+						    }
+						    sleep((int)$wait);
+						}
+						if ($file) { // проиграем перед повтором
+						    if ($agi -> channel_status('',true) == AST_STATE_DOWN) {
+							$this -> destination_start_inuse($agi, $inst_listdestination[1], false);
+							break 5;
+						    }
+						    $diraudio = $this->config['webui']['dir_store_audio']."/".$this->accountcode."/".$file;
+						    if ($this -> resolve($diraudio)!==false) $file = $this->accountcode."/".$file;
+						    $agi -> evaluate("STREAM FILE $file \"#\" 0");
+						}
+					    }
+					}
+					$file = $value[5];
+					if ($file) {
+					    if ($agi -> channel_status('',true) == AST_STATE_DOWN) {
+						$this -> destination_start_inuse($agi, $inst_listdestination[1], false);
+						break 4;
+					    }
+					    $diraudio = $this->config['webui']['dir_store_audio']."/".$this->accountcode."/".$file;
+					    if ($this -> resolve($diraudio)!==false) $file = $this->accountcode."/".$file;
+					    $this -> calleesound = $file;
+					}
+					break;
+				    }
+				}
+			}
+			$QUERY = "SELECT DISTINCT cc_ivr_destinations.id, repeats, waitsecsfordigits, waitdigits, destinationnum, playsoundcallee, cc_ivr.id
+				FROM cc_ivr, cc_ivr_destinations WHERE id_cc_card = '{$this->id_card}' AND ivrname LIKE '{$inst_listdestination[4]}' AND id_cc_ivr=cc_ivr.id";
+			$result = $this -> instance_table -> SQLExec ($this->DBHandle, $QUERY);
+		}
+
+// IF VOIP CALL
+				if ($inst_listdestination[5]==1) {
 					$monfile = false;
 					$localcount = substr_count(strtoupper($inst_listdestination[4]),"LOCAL/");
 					// RUN MIXMONITOR TO RECORD CALL
@@ -1747,7 +2029,7 @@ class A2Billing {
 
 					if ($agi -> channel_status('',true) == AST_STATE_DOWN) {
 						$this -> destination_start_inuse($agi, $inst_listdestination[1], false);
-						break;
+						break 2;
 					}
 					$CID_handover = $this -> apply_cid_rules ($this->CallerID, $inst_listdestination[34], $inst_listdestination[35]);
 					if ($CID_handover != $this->CallerID)
@@ -1783,8 +2065,6 @@ $this -> debug( ERROR, $agi, __FILE__, __LINE__, "[ \033[1;34m".$agi->get_variab
 					if (((($this->send_sound || $this->send_text) && $this->speech2mail) || $this->monitor == 1 || $this->agiconfig['record_call'] == 1) && $localcount < 2) {
 						$myres = $agi->exec($this -> format_parameters ("StopMixMonitor"));
 						$this -> debug( INFO, $agi, __FILE__, __LINE__, "EXEC StopMixMonitor (".$this->uniqueid.")");
-//						$monfile = $this->dl_short ."{$this->uniqueid}.";
-//						$monfile.= $this->agiconfig['monitor_formatfile'] == 'wav49' ? 'WAV' : $this->agiconfig['monitor_formatfile'];
 						if (file_exists($monfile) && filesize($monfile) < 100) {
 							unlink($monfile);
 							$monfile = false;
@@ -1797,32 +2077,30 @@ $this -> debug( ERROR, $agi, __FILE__, __LINE__, "[ \033[1;34m".$agi->get_variab
 					if ($dialstatus == "BUSY") {
 						$answeredtime = 0;
 						if ($keytotal > $callcount)
-							continue;
+							continue 2;
 						$this -> let_stream_listening($agi);
 						if ($this->agiconfig['busy_timeout'] > 0) {
 							$agi->exec("Playtones busy");
 							sleep($this->agiconfig['busy_timeout']);
 						} else	$agi-> stream_file('prepaid-isbusy', '#');
-//						$res_busy = $agi->exec("Busy");
 					} elseif ($dialstatus == "NOANSWER") {
 						$answeredtime = 0;
 						if ($keytotal > $callcount) {
-							continue;
+							continue 2;
 						} else $agi-> stream_file('prepaid-noanswer', '#');
 					} elseif ($dialstatus == "CANCEL") {
 						// Call cancelled, no need to follow-me
-//						return 1;
 						$answeredtime = 0;
 					} elseif ($dialstatus == "ANSWER") {
 						$this -> debug( DEBUG, $agi, __FILE__, __LINE__,"[A2Billing] DID call friend: dialstatus : $dialstatus, answered time is ".$answeredtime." \n");
 					} elseif (($dialstatus  == "CHANUNAVAIL") || ($dialstatus  == "CONGESTION")) {
 						$answeredtime = 0;
 						if ($keytotal > $callcount) {
-							continue;
+							continue 2;
 						}
 					} else {
 						if ($keytotal > $callcount) {
-							continue;
+							continue 2;
 						} else $agi-> stream_file('prepaid-callfollowme', '#');
 					}
 
@@ -1842,7 +2120,7 @@ $this -> debug( ERROR, $agi, __FILE__, __LINE__, "[ \033[1;34m".$agi->get_variab
 								$result = $this -> instance_table -> SQLExec ($this->DBHandle, $QUERY);
 								if (is_array($result) && $result[0][0] != "")	$uppeer = $bridgepeer[0];
 								else	$uppeer = $agi->get_variable('QUEUEDNID', true);
-								if ($uppeer) $inst_listdestination[4] = $uppeer;
+								if ($uppeer) $inst_listdestination[4] = $this -> destination = $uppeer;
 							}
 							$this -> debug( INFO, $agi, __FILE__, __LINE__, "Destination: " . $inst_listdestination[4]);
 						}
@@ -1869,9 +2147,9 @@ $this -> debug( ERROR, $agi, __FILE__, __LINE__, "[ \033[1;34m".$agi->get_variab
 						$monfile = false;
 					}
 					monitor_recognize($this);
-					break;
+					break 2;
 
-				// ELSEIF NOT VOIP CALL
+// ELSEIF NOT VOIP CALL
 				} else {
 					$this->agiconfig['use_dnid']=1;
 					$this->agiconfig['say_timetocall']=0;
@@ -1886,17 +2164,18 @@ $this -> debug( ERROR, $agi, __FILE__, __LINE__, "[ \033[1;34m".$agi->get_variab
 						if ($agi -> channel_status('',true) != AST_STATE_DOWN) {
 						    $this->agiconfig['dialcommand_param'] = $this->agiconfig['dialcommand_param_call_2did'];
 						    $result_callperf = $RateEngine->rate_engine_performcall ($agi, $this -> destination, $this, 44+$keytotal-$callcount); // 44 = For not to play announce seconds and call cost
-						    $this -> destination_start_inuse($agi, $inst_listdestination[1], false);
 						    if (!$result_callperf) {
 							if ($keytotal == $callcount) {
 							    if (is_null($didvoicebox) && is_null($this->voicebox)) {
 								$prompt="prepaid-callfollowme";
 								$agi-> stream_file($prompt, '#');
 							    }
-							} else continue;
+							} else {
+							    $this -> destination_start_inuse($agi, $inst_listdestination[1], false);
+							    continue 2;
+							}
 						    }
 						} else	{
-						    $this -> destination_start_inuse($agi, $inst_listdestination[1], false);
 						    $RateEngine->dialstatus = 'CANCEL';
 						}
 						$dialstatus = $RateEngine->dialstatus;
@@ -1905,24 +2184,59 @@ $this -> debug( ERROR, $agi, __FILE__, __LINE__, "[ \033[1;34m".$agi->get_variab
 							($dialstatus == "CHANUNAVAIL") ||
 							($dialstatus == "CONGESTION")) &&
 							$keytotal > $callcount) {
-								continue;
+						    if ($key !== false /*&& is_null($this->voicebox) && is_null($didvoicebox)*/) {
+						        if ($dialstatus  == "BUSY") {
+						    	$this -> let_stream_listening($agi);
+						    	$agi-> stream_file('prepaid-isbusy', '#');
+						        } elseif ($dialstatus == "NOANSWER") {
+						    	$this -> let_stream_listening($agi);
+						    	$agi-> stream_file('prepaid-noanswer', '#');
+						        } elseif ($dialstatus == "CHANUNAVAIL" || $dialstatus == "CONGESTION") {
+						    	$this -> let_stream_listening($agi);
+						    	$agi-> stream_file('prepaid-dest-unreachable', '#');
+						        }
+						        continue;
+						    }
+						    $this -> destination_start_inuse($agi, $inst_listdestination[1], false);
+						    continue 2;
 						}
-						if ($dialstatus != "ANSWER") $this -> destination = $this -> realdestination;
+						if ($dialstatus != "ANSWER")
+						    $this -> destination = $this -> realdestination;
 						$this->src = $this->src_peername = $this->calledexten = "NULL";
 
 						// INSERT CDR  & UPDATE SYSTEM
 						$RateEngine->rate_engine_updatesystem($this, $agi, $this->destination, $doibill, 2);
+						if ($dialstatus == "CANCEL") {
+						    $this -> destination_start_inuse($agi, $inst_listdestination[1], false);
+						    break 2;
+						}
 						$answeredtime = $RateEngine->answeredtime;
+						if ($key !== false && $dialstatus != "ANSWER" /*&& is_null($this->voicebox) && is_null($didvoicebox)*/) {
+						    if ($dialstatus  == "BUSY") {
+							$this -> let_stream_listening($agi);
+							$agi-> stream_file('prepaid-isbusy', '#');
+						    } elseif ($dialstatus == "NOANSWER") {
+							$this -> let_stream_listening($agi);
+							$agi-> stream_file('prepaid-noanswer', '#');
+						    } elseif ($dialstatus == "CHANUNAVAIL" || $dialstatus == "CONGESTION") {
+							$this -> let_stream_listening($agi);
+							$agi-> stream_file('prepaid-dest-unreachable', '#');
+						    }
+						    continue;
+						}
 					    } elseif ($ast=='2FAX') {
 						$answeredtime = $this -> call_fax($agi, 2);
-						$this -> destination_start_inuse($agi, $inst_listdestination[1], false);
 						if ($this->set_inuse_username)
 							$this -> callingcard_acct_start_inuse($agi,0);
 					    }
-					    break;
+					    // THEN STATUS IS ANSWER
+					    $this -> destination_start_inuse($agi, $inst_listdestination[1], false);
+					    break 2;
 					}
 					$this -> destination_start_inuse($agi, $inst_listdestination[1], false);
 				}
+		break;
+		}// END WHILE(true)
 			} // END IF AUTHENTICATE
 		if ($dialstatus == "ANSWER" || $dialstatus == "CANCEL" || $agi -> channel_status('',true) == AST_STATE_DOWN) break;
 		}// END FOR
@@ -2000,10 +2314,11 @@ $this -> debug( ERROR, $agi, __FILE__, __LINE__, "[ \033[1;34m".$agi->get_variab
 	$keytotal = count($listdestination);
 
 	foreach ($listdestination as $inst_listdestination) {
-
+	    $key = false;
 	    $callcount++;
 	    $this -> debug( INFO, $agi, __FILE__, __LINE__, "[A2Billing] DID call friend: FOLLOWME=$callcount (cardnumber:".$inst_listdestination[6]."|destination:".$inst_listdestination[4]."|tariff:".$inst_listdestination[3].")\n");
 	    $this->agiconfig['cid_enable']			= 0;
+	    $initialdestination 				= $inst_listdestination[4];
 	    $this->accountcode = $this->username=$new_username	= $inst_listdestination[6];
 	    $this->tariff 					= $inst_listdestination[3];
 	    $this->destination					= $inst_listdestination[10];
@@ -2038,14 +2353,288 @@ $this -> debug( ERROR, $agi, __FILE__, __LINE__, "[ \033[1;34m".$agi->get_variab
 		sleep(1);
 		$agi -> evaluate("STREAM FILE $file \"#\" 0");
 	    }
+// waitdigits =
+// 'цифра или номер' - выполнить пункт меню по нажатию одной или нескольких цифр
+// '-1' - ничего не нажато, идем на повтор
+// '-2' - нажато не верно,  идем на повтор
+// '-3' - ничего не нажато, выход на destinationnum
+// '-4' - нажато не верно,  выход на destinationnum
+// '-5' - разрешен ввод extension
+	    while (true) {
+		$inst_listdestination[4] = $initialdestination;
+		$QUERY = "SELECT DISTINCT cc_ivr_destinations.id, repeats, waitsecsfordigits, waitdigits, destinationnum, playsoundcallee, cc_ivr.id
+			    FROM cc_ivr, cc_ivr_destinations WHERE id_cc_card = '{$this->id_card}' AND ivrname LIKE '{$initialdestination}' AND id_cc_ivr=cc_ivr.id";
+		$result = $this -> instance_table -> SQLExec ($this->DBHandle, $QUERY);
+		while (is_array($result)) {
+			$initialdestination = $inst_listdestination[4];
+			$this -> calleesound = '';
+			$maxlen = 0;
+			$waitdigits = array();
+			foreach ($result as $value) {
+			    if ($value[3]>=0 && strlen($value[3])>$maxlen)
+				$maxlen = strlen($value[3]);
+			    if ($value[3]=='-5') { // Dial Extensions
+				$QUERY = "SELECT regexten AS field FROM cc_sip_buddies
+						LEFT JOIN cc_card_concat bb ON bb.concat_card_id = id_cc_card
+						LEFT JOIN ( SELECT aa.concat_id FROM cc_card_concat aa WHERE aa.concat_card_id = '{$this->id_card}' ) AS v ON bb.concat_id = v.concat_id
+						WHERE (id_cc_card = '{$this->id_card}' OR v.concat_id IS NOT NULL) AND external = 0
+					UNION ALL
+					    SELECT ext_num AS field FROM cc_fax
+						LEFT JOIN cc_card_concat bb ON bb.concat_card_id = cc_fax.id_cc_card
+						LEFT JOIN ( SELECT aa.concat_id FROM cc_card_concat aa WHERE aa.concat_card_id = '{$this->id_card}' ) AS v ON bb.concat_id = v.concat_id
+						WHERE id_cc_card = '{$this->id_card}' OR v.concat_id IS NOT NULL
+					ORDER BY field";
+				$resmax = $this -> instance_table -> SQLExec ($this->DBHandle, $QUERY);
+				if (is_array($resmax)) {
+					foreach ($resmax as $val) {
+					    if (strlen($val[0])>$maxlen)
+						$maxlen = strlen($val[0]);
+					    $value[3] = $value[4] = $val[0];
+					    $result[] = $value;
+					}
+				}
+			    }
+			}
+			foreach ($result as $value) {
+			    $waitdigits[] = $value[3];
+			}
+			$QUERY = "SELECT id_cc_ivr,id_cc_ivr_dest,timeout,playsound FROM cc_ivr_sounds ".
+				    "WHERE {$result[0][6]}=id_cc_ivr OR id_cc_ivr_dest IN (SELECT id FROM cc_ivr_destinations WHERE id_cc_ivr={$result[0][6]}) ORDER BY cc_ivr_sounds.id";
+			$resultsound = $this -> instance_table -> SQLExec ($this->DBHandle, $QUERY);
+			$ed = '0123456789';
+			for ($r=$result[0][1];$r>=0;$r--) {
+			    $this -> calleesound = '';
+			    $res = array();
+			    $res['result'] = 0;
+			    foreach ($resultsound as $val) {
+				if ($val[0]>0) {
+					$wait = $val[2];
+					if (isset($first_dtmf)) $wait++;
+					$file = $val[3];
+					if ($wait>0) {
+					    if ($agi -> channel_status('',true) == AST_STATE_DOWN) {
+						$this -> destination_start_inuse($agi, $inst_listdestination[1], false);
+						break 5;
+					    }
+					    $res = $agi -> wait_for_digit($wait*1000);
+					    if ($res['result'] > 0) break;
+					}
+					if ($file) {
+					    if ($agi -> channel_status('',true) == AST_STATE_DOWN) {
+						$this -> destination_start_inuse($agi, $inst_listdestination[1], false);
+						break 5;
+					    }
+					    $diraudio = $this->config['webui']['dir_store_audio']."/".$this->accountcode."/".$file;
+					    if ($this -> resolve($diraudio)!==false) $file = $this->accountcode."/".$file;
+					    $res = $agi -> stream_file($file, $ed);
+					    if ($res['result'] > 0) break;
+					}
+				}
+			    }
+			    if ($agi -> channel_status('',true) == AST_STATE_DOWN) {
+				$this -> destination_start_inuse($agi, $inst_listdestination[1], false);
+				break 4;
+			    }
+			    if ($res['result'] > 0) {
+				$first_dtmf = chr($res['result']);
+			    } else $first_dtmf = '';
+			    while (array_search($first_dtmf, $waitdigits) === false && strlen($first_dtmf)<$maxlen) {
+				$res = $agi -> wait_for_digit($result[0][2]*1000);
+				if ($res['result'] > 0) $first_dtmf .= chr($res['result']);
+					else break;
+			    }
+			    $key = array_search($first_dtmf, $waitdigits);
+			    if ($key===false) { // ничего не нажали или нажали неверно
+				if ($r>0) { // если повтор...
+				    if ($first_dtmf=='') { // и ничего не нажали
+					foreach ($result as $value) {
+					    if ($value[3]=='-1') {
+						foreach ($resultsound as $val) { // перебираем что проиграть перед повтором
+						    if ($val[1]==$value[0]) {
+							$wait = $val[2];
+							$file = $val[3];
+							if ($wait>0) {
+							    if ($agi -> channel_status('',true) == AST_STATE_DOWN) {
+								$this -> destination_start_inuse($agi, $inst_listdestination[1], false);
+								break 6;
+							    }
+							    sleep((int)$wait);
+							}
+							if ($file) { // проиграем перед повтором
+							    if ($agi -> channel_status('',true) == AST_STATE_DOWN) {
+								$this -> destination_start_inuse($agi, $inst_listdestination[1], false);
+								break 6;
+							    }
+							    $diraudio = $this->config['webui']['dir_store_audio']."/".$this->accountcode."/".$file;
+							    if ($this -> resolve($diraudio)!==false) $file = $this->accountcode."/".$file;
+							    $agi -> evaluate("STREAM FILE $file \"#\" 0");
+							}
+						    }
+						}
+						break;
+					    }
+					}
+				    } else { // и нажали неверно
+					foreach ($result as $value) {
+					    if ($value[3]=='-2') {
+						foreach ($resultsound as $val) { // перебираем что проиграть перед повтором
+						    if ($val[1]==$value[0]) {
+							$wait = $val[2];
+							$file = $val[3];
+							if ($wait>0) {
+							    if ($agi -> channel_status('',true) == AST_STATE_DOWN) {
+								$this -> destination_start_inuse($agi, $inst_listdestination[1], false);
+								break 6;
+							    }
+							    sleep((int)$wait);
+							}
+							if ($file) { // проиграем перед повтором
+							    if ($agi -> channel_status('',true) == AST_STATE_DOWN) {
+								$this -> destination_start_inuse($agi, $inst_listdestination[1], false);
+								break 6;
+							    }
+							    $diraudio = $this->config['webui']['dir_store_audio']."/".$this->accountcode."/".$file;
+							    if ($this -> resolve($diraudio)!==false) $file = $this->accountcode."/".$file;
+							    $agi -> evaluate("STREAM FILE $file \"#\" 0");
+							}
+						    }
+						}
+						break;
+					    }
+					}
+				    }
+				    continue; // повтор IVR
+				}
+//				continue 4; // уходим на следующий PRIOR
+			    } else {
+				$inst_listdestination[4] = $result[$key][4];
+				$inst_listdestination[5] = (stripos($inst_listdestination[4],"QUEUE ") !== 0)?0:1;
+				foreach ($resultsound as $val) { // перебираем что проиграть перед вызовом
+				    if ($val[1]==$result[$key][0]) {
+					$wait = $val[2];
+					$file = $val[3];
+					if ($wait>0) {
+					    if ($agi -> channel_status('',true) == AST_STATE_DOWN) {
+						$this -> destination_start_inuse($agi, $inst_listdestination[1], false);
+						break 5;
+					    }
+					    sleep((int)$wait);
+					}
+					if ($file) { // проиграем перед повтором
+					    if ($agi -> channel_status('',true) == AST_STATE_DOWN) {
+						$this -> destination_start_inuse($agi, $inst_listdestination[1], false);
+						break 5;
+					    }
+					    $diraudio = $this->config['webui']['dir_store_audio']."/".$this->accountcode."/".$file;
+					    if ($this -> resolve($diraudio)!==false) $file = $this->accountcode."/".$file;
+					    $agi -> evaluate("STREAM FILE $file \"#\" 0");
+					}
+				    }
+				}
+				$file = $result[$key][5];
+				if ($file) {
+				    if ($agi -> channel_status('',true) == AST_STATE_DOWN) {
+					$this -> destination_start_inuse($agi, $inst_listdestination[1], false);
+					break 4;
+				    }
+				    $diraudio = $this->config['webui']['dir_store_audio']."/".$this->accountcode."/".$file;
+				    if ($this -> resolve($diraudio)!==false) $file = $this->accountcode."/".$file;
+				    $this -> calleesound = $file;
+				}
+				$QUERY = "SELECT DISTINCT cc_ivr_destinations.id, repeats, waitsecsfordigits, waitdigits, destinationnum, playsoundcallee, cc_ivr.id
+					FROM cc_ivr, cc_ivr_destinations WHERE id_cc_card = '{$this->id_card}' AND ivrname LIKE '{$inst_listdestination[4]}' AND id_cc_ivr=cc_ivr.id";
+				$result = $this -> instance_table -> SQLExec ($this->DBHandle, $QUERY);
+				continue 2;
+			    }
+			}
 
-		if (!$onetry && $this->dnid=="555555") {
-			sleep(1);
-			$agi -> exec('SendDTMF',(string)mt_rand(0,9));
+			if ($first_dtmf=='') { // и ничего не нажали
+				foreach ($result as $value) {
+				    if ($value[3]=='-3') {
+					$inst_listdestination[4] = $value[4];
+					$inst_listdestination[5] = (stripos($inst_listdestination[4],"QUEUE ") !== 0)?0:1;
+					foreach ($resultsound as $val) { // перебираем что проиграть перед повтором
+					    if ($val[1]==$value[0]) {
+						$wait = $val[2];
+						$file = $val[3];
+						if ($wait>0) {
+						    if ($agi -> channel_status('',true) == AST_STATE_DOWN) {
+							$this -> destination_start_inuse($agi, $inst_listdestination[1], false);
+							break 5;
+						    }
+						    sleep((int)$wait);
+						}
+						if ($file) { // проиграем перед повтором
+						    if ($agi -> channel_status('',true) == AST_STATE_DOWN) {
+							$this -> destination_start_inuse($agi, $inst_listdestination[1], false);
+							break 5;
+						    }
+						    $diraudio = $this->config['webui']['dir_store_audio']."/".$this->accountcode."/".$file;
+						    if ($this -> resolve($diraudio)!==false) $file = $this->accountcode."/".$file;
+						    $agi -> evaluate("STREAM FILE $file \"#\" 0");
+						}
+					    }
+					}
+					$file = $value[5];
+					if ($file) {
+					    if ($agi -> channel_status('',true) == AST_STATE_DOWN) {
+						$this -> destination_start_inuse($agi, $inst_listdestination[1], false);
+						break 4;
+					    }
+					    $diraudio = $this->config['webui']['dir_store_audio']."/".$this->accountcode."/".$file;
+					    if ($this -> resolve($diraudio)!==false) $file = $this->accountcode."/".$file;
+					    $this -> calleesound = $file;
+					}
+					break;
+				    }
+				}
+			} else { // и нажали неверно
+				foreach ($result as $value) {
+				    if ($value[3]=='-4') {
+					$inst_listdestination[4] = $value[4];
+					$inst_listdestination[5] = (stripos($inst_listdestination[4],"QUEUE ") !== 0)?0:1;
+					foreach ($resultsound as $val) { // перебираем что проиграть перед повтором
+					    if ($val[1]==$value[0]) {
+						$wait = $val[2];
+						$file = $val[3];
+						if ($wait>0) {
+						    if ($agi -> channel_status('',true) == AST_STATE_DOWN) {
+							$this -> destination_start_inuse($agi, $inst_listdestination[1], false);
+							break 5;
+						    }
+						    sleep((int)$wait);
+						}
+						if ($file) { // проиграем перед повтором
+						    if ($agi -> channel_status('',true) == AST_STATE_DOWN) {
+							$this -> destination_start_inuse($agi, $inst_listdestination[1], false);
+							break 5;
+						    }
+						    $diraudio = $this->config['webui']['dir_store_audio']."/".$this->accountcode."/".$file;
+						    if ($this -> resolve($diraudio)!==false) $file = $this->accountcode."/".$file;
+						    $agi -> evaluate("STREAM FILE $file \"#\" 0");
+						}
+					    }
+					}
+					$file = $value[5];
+					if ($file) {
+					    if ($agi -> channel_status('',true) == AST_STATE_DOWN) {
+						$this -> destination_start_inuse($agi, $inst_listdestination[1], false);
+						break 4;
+					    }
+					    $diraudio = $this->config['webui']['dir_store_audio']."/".$this->accountcode."/".$file;
+					    if ($this -> resolve($diraudio)!==false) $file = $this->accountcode."/".$file;
+					    $this -> calleesound = $file;
+					}
+					break;
+				    }
+				}
+			}
+			$QUERY = "SELECT DISTINCT cc_ivr_destinations.id, repeats, waitsecsfordigits, waitdigits, destinationnum, playsoundcallee, cc_ivr.id
+				FROM cc_ivr, cc_ivr_destinations WHERE id_cc_card = '{$this->id_card}' AND ivrname LIKE '{$inst_listdestination[4]}' AND id_cc_ivr=cc_ivr.id";
+			$result = $this -> instance_table -> SQLExec ($this->DBHandle, $QUERY);
 		}
-
             // IF call on did is not free calculate time to call
-            
+
             // IF VOIP CALL
             if ($inst_listdestination[5]==1) {
                 // RUN MIXMONITOR TO RECORD CALL
@@ -2093,7 +2682,7 @@ $this -> debug( ERROR, $agi, __FILE__, __LINE__, "[ \033[1;34m".$agi->get_variab
 
 		if ($agi -> channel_status('',true) == AST_STATE_DOWN) {
 			$this -> destination_start_inuse($agi, $inst_listdestination[1], false);
-			break;
+			break 2;
 		}
 		if (isset($this->src_exten)) {
 			$QUERY = "SELECT 1 FROM cc_card_concat WHERE concat_id = '$this->caller_concat_id' AND concat_card_id = {$this->id_card} LIMIT 1";
@@ -2127,8 +2716,6 @@ $this -> debug( ERROR, $agi, __FILE__, __LINE__, "[ \033[1;34m".$agi->get_variab
 		if ((($this->send_sound || $this->send_text) && $this->speech2mail) || $this->monitor == 1 || $this -> agiconfig['record_call'] == 1) {
 			$myres = $agi->exec($this -> format_parameters ("StopMixMonitor"));
 			$this -> debug( INFO, $agi, __FILE__, __LINE__, "EXEC StopMixMonitor (".$this->uniqueid.")");
-//			$monfile = $this->dl_short ."{$this->uniqueid}.";
-//			$monfile.= $this->agiconfig['monitor_formatfile'] == 'wav49' ? 'WAV' : $this->agiconfig['monitor_formatfile'];
 			if (file_exists($monfile) && filesize($monfile) < 100) {
 				unlink($monfile);
 				$monfile = false;
@@ -2141,7 +2728,7 @@ $this -> debug( ERROR, $agi, __FILE__, __LINE__, "[ \033[1;34m".$agi->get_variab
                 if ($dialstatus == "BUSY") {
 					$answeredtime = 0;
 					if ($keytotal > $callcount) {
-						continue;
+						continue 2;
 					} else {
 						$this -> let_stream_listening($agi);
 						if ($this->agiconfig['busy_timeout'] > 0) {
@@ -2152,7 +2739,7 @@ $this -> debug( ERROR, $agi, __FILE__, __LINE__, "[ \033[1;34m".$agi->get_variab
                 } elseif ($dialstatus == "NOANSWER") {
 					$answeredtime = 0;
 					if ($keytotal > $callcount) {
-						continue;
+						continue 2;
 					} else {
 						$this -> let_stream_listening($agi);
 						$agi-> stream_file('prepaid-noanswer', '#');
@@ -2164,11 +2751,11 @@ $this -> debug( ERROR, $agi, __FILE__, __LINE__, "[ \033[1;34m".$agi->get_variab
 					$this -> debug( DEBUG, $agi, __FILE__, __LINE__,"[A2Billing] DID call friend: dialstatus : $dialstatus, answered time is ".$answeredtime." \n");
                 } elseif (($dialstatus == "CHANUNAVAIL") || ($dialstatus == "CONGESTION")) {
 					$answeredtime = 0;
-					if ($keytotal > $callcount) continue;
+					if ($keytotal > $callcount) continue 2;
                 } else {
 		    $this -> let_stream_listening($agi);
                     $agi-> stream_file('prepaid-callfollowme', '#');
-                    if ($keytotal > $callcount) continue;
+                    if ($keytotal > $callcount) continue 2;
                 }
 
                     $this -> debug( INFO, $agi, __FILE__, __LINE__, "[DID CALL - LOG CC_CALL: FOLLOWME=$callcount - (answeredtime=$answeredtime :: dialstatus=$dialstatus :: call_did_free=$call_did_free)]");
@@ -2193,7 +2780,6 @@ $this -> debug( ERROR, $agi, __FILE__, __LINE__, "[ \033[1;34m".$agi->get_variab
 			if ($uppeer) {
 				$inst_listdestination[10] = $uppeer;
 			}
-		
 			$this -> debug( INFO, $agi, __FILE__, __LINE__, "Destination: " . $inst_listdestination[10]);
 		    }
 		    if (!isset($this->card_caller)) {
@@ -2254,7 +2840,6 @@ $this -> debug( ERROR, $agi, __FILE__, __LINE__, "[ \033[1;34m".$agi->get_variab
                 $this->myprefix = '';
                 $this->dnid = $this->destination;
                 $this->extension = $this->destination = $inst_listdestination[4];
-                if ($this->CC_TESTING) $this->extension = $this->dnid = $this->destination = "011324885";
                 $ast = $this -> callingcard_ivr_authorize($agi, $RateEngine, 0, -2);
                 if ($ast==1 ||  $ast=='2FAX') {
                   if ($ast==1) {
@@ -2272,17 +2857,56 @@ $this -> debug( ERROR, $agi, __FILE__, __LINE__, "[ \033[1;34m".$agi->get_variab
                     $answeredtime = $RateEngine->answeredtime;
                     if ((($dialstatus == "NOANSWER") || ($dialstatus == "BUSY") ||
                             ($dialstatus == "CHANUNAVAIL") || ($dialstatus == "CONGESTION")) && $keytotal > $callcount) {
+				if ($key !== false /*&& is_null($this->voicebox) && is_null($didvoicebox)*/) {
+				    if ($dialstatus  == "BUSY") {
+					$this -> let_stream_listening($agi);
+					$agi-> stream_file('prepaid-isbusy', '#');
+				    } elseif ($dialstatus == "NOANSWER") {
+					$this -> let_stream_listening($agi);
+					$agi-> stream_file('prepaid-noanswer', '#');
+				    } elseif ($dialstatus == "CHANUNAVAIL" || $dialstatus == "CONGESTION") {
+					$this -> let_stream_listening($agi);
+					$agi-> stream_file('prepaid-dest-unreachable', '#');
+				    }
+				    continue;
+				}
 				$this -> destination_start_inuse($agi, $inst_listdestination[1], false);
-				continue;
+				continue 2;
                             }
 		    if ($dialstatus != "ANSWER") $this -> destination = $this -> realdestination;
 					
                     // INSERT CDR  & UPDATE SYSTEM
                     $RateEngine->rate_engine_updatesystem($this, $agi, $this-> destination, $doibill, 2);
                     if (!$result_callperf && $keytotal > $callcount) {
+			if ($key !== false && $dialstatus != "ANSWER" /*&& is_null($this->voicebox) && is_null($didvoicebox)*/) {
+			    if ($dialstatus  == "BUSY") {
+				$this -> let_stream_listening($agi);
+				$agi-> stream_file('prepaid-isbusy', '#');
+			    } elseif ($dialstatus == "NOANSWER") {
+				$this -> let_stream_listening($agi);
+				$agi-> stream_file('prepaid-noanswer', '#');
+			    } elseif ($dialstatus == "CHANUNAVAIL" || $dialstatus == "CONGESTION") {
+				$this -> let_stream_listening($agi);
+				$agi-> stream_file('prepaid-dest-unreachable', '#');
+			    }
+			    continue;
+			}
 			$this -> destination_start_inuse($agi, $inst_listdestination[1], false);
-			continue;
+			continue 2;
                     }
+			if ($key !== false && $dialstatus != "ANSWER" /*&& is_null($this->voicebox) && is_null($didvoicebox)*/) {
+			    if ($dialstatus  == "BUSY") {
+				$this -> let_stream_listening($agi);
+				$agi-> stream_file('prepaid-isbusy', '#');
+			    } elseif ($dialstatus == "NOANSWER") {
+				$this -> let_stream_listening($agi);
+				$agi-> stream_file('prepaid-noanswer', '#');
+			    } elseif ($dialstatus == "CHANUNAVAIL" || $dialstatus == "CONGESTION") {
+				$this -> let_stream_listening($agi);
+				$agi-> stream_file('prepaid-dest-unreachable', '#');
+			    }
+			    continue;
+			}
 		  } elseif ($ast=='2FAX') {
 			$answeredtime = $this -> call_fax($agi, 2);
 			if ($this->set_inuse_username) {
@@ -2292,6 +2916,8 @@ $this -> debug( ERROR, $agi, __FILE__, __LINE__, "[ \033[1;34m".$agi->get_variab
 		}
 		$this -> destination_start_inuse($agi, $inst_listdestination[1], false);
 	    }
+	    break;
+	    }// END WHILE(true)
 	    if ($dialstatus == "ANSWER" || $dialstatus == "CANCEL" || $agi -> channel_status('',true) == AST_STATE_DOWN) break;
 	}// END FOR
 

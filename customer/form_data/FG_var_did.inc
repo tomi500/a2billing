@@ -72,6 +72,25 @@ if ($return!==false) {
             }
         }
 }
+$destlist = array();
+$QUERYpop = "SELECT ivrname FROM cc_ivr WHERE id_cc_card=".$_SESSION["card_id"]." ORDER BY ivrname";
+$resmax = $DBHandle->Execute($QUERYpop);
+if ($resmax) {
+	foreach ($resmax as $val)
+	    $destlist[] = array($val[0],$val[0]);
+}
+$QUERYpop = "SELECT regexten FROM cc_sip_buddies WHERE id_cc_card=".$_SESSION["card_id"]." AND external=0 AND regexten>0 ORDER BY regexten";
+$resmax = $DBHandle->Execute($QUERYpop);
+if ($resmax) {
+	foreach ($resmax as $val)
+	    $destlist[] = array($val[0],$val[0]);
+}
+$QUERYpop = "SELECT cid FROM cc_callerid WHERE id_cc_card=".$_SESSION["card_id"]." AND blacklist=0 ORDER BY cid";
+$resmax = $DBHandle->Execute($QUERYpop);
+if ($resmax) {
+	foreach ($resmax as $val)
+	    $destlist[] = array($val[0],$val[0]);
+}
 
 $HD_Form -> AddViewElement(gettext("DID"), "id_cc_did", "15%", "center", "sort", "30", "lie", "cc_did", "did", "id='%id'", "%1");
 $HD_Form -> AddViewElement(gettext("DESTINATION"), "destination", "10%", "center\" nowrap \"", "sort");
@@ -184,32 +203,23 @@ $HD_Form -> AddEditElement (gettext("ANSWER"),
 	gettext("Choose 'Yes' if you want to answer on the call"),
 	"" , "", "", gettext("Yes").":1, - ".gettext("No").":0", "", "", "", gettext("Choose if you want to answer on the call before playing PLAY_SOUND"));
 
-if (isset($form_action) && $form_action=="ask-edit") {
-	$instance_table = new Table("cc_did_destination", "playsound");
-	$list = $instance_table -> Get_list($DBHandle_max, "id = $id", 0);;
-	if (is_array($list) && count($list)>0) {
-		$playsound = preg_replace('/\.[^\.\/]+$/', '', basename($list[0][0]));
-		$selectedgreeting = ($playsound && array_search($playsound,array_column($soundlist,0))===false) ? "<OPTION value=\"$playsound\">".$playsound."</OPTION>" : NULL;
-	} else	$selectedgreeting = NULL;
-} else		$selectedgreeting = NULL;
-
 $HD_Form -> AddEditElement (gettext("PLAY_SOUND"),
 	"playsound",
 	'$value',
 	($form_action=='ask-delete')?"INPUT":"DATALIST",
-	"size=50 maxlength=50",
+	"size=50 maxlength=50 style=\"width: 250px;\"",
 	"",
 	gettext("Insert the path and name of sound file"),
-	"list", "", "", "", $soundlist, "%1", "", gettext("Play sound before calling DESTINATION."), NULL, $selectedgreeting);
+	"list", "", "", "", $soundlist, "%1", "", gettext("Play sound before calling DESTINATION."));
 
 $HD_Form -> AddEditElement (gettext("DESTINATION"),
 	    "destination",
 	    '$value',
-	    "INPUT",
-	    "size=120 maxlength=120 readonly",
+	    ($form_action=='ask-delete')?"INPUT":"DATALIST",
+	    "size=50 maxlength=100 style=\"width: 250px;\"",
 	    "0",
 	    "Insert the Destination",
-	    "" , "", "", "", "" , "", "");//, gettext("Enter here the phonenumber you wish to call or the SIP/IAX/H323 peer to reach (ie: 347894999 or SIP/jeremy@182.212.1.45). To call SIP/IAX/H323 peer, you need to enable the voip_call below (voip_call = Yes) "));
+	    "list" , "", "", "", $destlist , "%1", "", gettext("Enter here the phonenumber or IVR name you wish to send call, or select destination from the drop-down list"));
 //}
 
 $HD_Form -> AddEditElement (gettext("TIMEOUT"),

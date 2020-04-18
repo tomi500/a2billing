@@ -212,7 +212,7 @@ $HD_Form -> AddEditElement (gettext("VOICEBOX"),
 	"",
 	gettext("Insert the regexten"),
 	"", "", "", "", "", "", "NO-NULL",
-	gettext("Insert extension number that receive voicemail when nobody answered on incoming call"));
+	gettext("Insert extension number (not name) you want to receive voicemail when nobody answered on incoming call"));
 
 $HD_Form -> AddEditElement (gettext("ALLOW PREFIXes"),
 	"callbackprefixallow",

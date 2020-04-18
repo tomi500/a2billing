@@ -61,7 +61,7 @@ $HD_Form -> AddViewElement(gettext("Voice"), "voice_name", "15%", "left\" nowrap
 $HD_Form -> AddViewElement(gettext("Greeting text"), "greet_text", "55%", "center", "sort");
 $HD_Form -> AddViewElement(gettext("FileName"), "greet_filename", "15%", "left\" nowrap \"", "sort");
 
-$HD_Form -> FieldViewElement ("CONCAT_WS(IF(LENGTH(gender),'/',''),voice_name,gender) voice_name, greet_text, greet_filename, id, no_browther_cache");
+$HD_Form -> FieldViewElement ("CONCAT_WS(IF(LENGTH(gender),'/',''),voice_name,gender) voice_name, greet_text, greet_filename, id, no_browther_cache, lang_locale");
 
 $HD_Form -> CV_TITLE_TEXT = gettext("Greetings list");
 $HD_Form -> CV_NO_FIELDS  = gettext("There are no greetings created");
@@ -91,7 +91,7 @@ $HD_Form -> FG_FK_EDITION_CLAUSE = array("INSTR(playsound, (SELECT SUBSTRING_IND
 $HD_Form -> FG_FK_DELETE_MESSAGE = gettext("There are some inbound DID destinations where this greeting message included.<br>Please edit the dependent destinations first.");
 
 $HD_Form -> FG_OTHER_BUTTON1 = true;
-$HD_Form -> FG_OTHER_BUTTON1_CONDITION = '"|col1|" != ""';
+$HD_Form -> FG_OTHER_BUTTON1_CONDITION = '"|col5|" != ""';
 $HD_Form -> FG_OTHER_BUTTON2 = true;
 $HD_Form -> FG_OTHER_BUTTON1_LINK= $_SERVER['PHP_SELF']."?form_action=list&id=|param|";
 $HD_Form -> FG_OTHER_BUTTON2_LINK= "javascript:;";
@@ -113,7 +113,7 @@ $HD_Form -> AddEditElement (gettext("FILENAME"),
 $HD_Form -> FieldEditElement ('greet_filename');
 
 $HD_Form -> FG_INTRO_TEXT_EDITION= gettext("You can modify, through the following form, the different properties of your")." ".$HD_Form->FG_INSTANCE_NAME;
-$HD_Form -> FG_INTRO_TEXT_ASK_DELETION = gettext("If you really want remove this")." ".$HD_Form->FG_INSTANCE_NAME.", ".gettext("click on the delete button.");
+$HD_Form -> FG_INTRO_TEXT_ASK_DELETION = gettext("If you really want to remove this ").gettext($HD_Form->FG_INSTANCE_NAME).", ".gettext("click on the delete button.");
 $HD_Form -> FG_INTRO_TEXT_ADD = gettext("you can add easily a new")." ".$HD_Form->FG_INSTANCE_NAME.".<br>".gettext("Fill the following fields and confirm by clicking on the button add.");
 
 $HD_Form -> FG_INTRO_TEXT_ADITION = gettext("You can upload, generate and edit greeting messages");

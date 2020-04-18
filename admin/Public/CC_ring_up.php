@@ -206,7 +206,6 @@ $weekdays = substr($weekdays,0,-1);
 <link href="./javascript/jquery/jqDynaForm.css" media="screen" type="text/css" rel="stylesheet">
 <script language="JavaScript" src="./javascript/jquery/jqDynaForm.js"></script>
 <script language="JavaScript" src="./javascript/jquery/fakeData.js"></script>
-<div id="popup"></div>
 <div style="display:none">
     <div data-name="shedule">
 	<input name="weekdays[]" />
@@ -216,10 +215,7 @@ $weekdays = substr($weekdays,0,-1);
 	<?php echo gettext("To")?>: <b><input name="timetill[]" value="0" /></b>
     </div>
 </div>
-
-
-
-
+<div id="popup"></div>
 
 <script language="JavaScript" type="text/javascript">
 <!--

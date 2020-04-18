@@ -1,5 +1,30 @@
+var ivrJson = {
+    "ivrname": "",
+    "repeats": "2",
+    "waitsecsfordigits": "6",
+    "soundArray": [
+	{
+	    "timeout": "1",
+	    "playsound": ""
+	}
+    ],
+    "destArray": [
+	{
+	    "waitdigits": "",
+	    "destinationnum": "",
+	    "soundArray": [
+		{
+		    "timeout": "1",
+		    "playsound": ""
+		}
+	    ],
+	    "playsoundcallee": ""
+	}
+    ]
+};
+
 var PopUpDayTimeJson = {
-    "sheduleArray": [
+    "shedule": [
 	{
 	    "weekdays[]": "",
 	    "timefrom[]": "0",

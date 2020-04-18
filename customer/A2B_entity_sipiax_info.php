@@ -179,7 +179,7 @@ if ($form_action == "list") {
 if (isset($extcreated)) echo 'You have just created '.count($extcreated).' extensions';
 if ($atmenu == "SIP" && $form_action == "list") {
 ?>
-<script language="JavaScript" src="./javascript/sipiax.js"></script>
+<script src="./javascript/sipiax.js"></script>
 <br/>
 <div class="toggle_hide2show">
 <center>
@@ -192,7 +192,7 @@ if ($atmenu == "SIP" && $form_action == "list") {
 		    <td align="left" valign="bottom" nowrap="nowrap">
 			<font style="font-weight:bold;"><?php echo gettext("Create extensions from");?>:</font><br/><sup>[<?php echo gettext("from");?> <?php echo $extmin;?> <?php echo gettext("to");?> <?php echo $extmax;?>]</sup>
 		    </td><td nowrap="nowrap">
-			&nbsp;<input class="form_input_text" id="num1" name="startnumber" onfocus="clear_textbox();" onkeypress="return keytoDownNumber(event,id);" size="10" maxlength="<?php echo $extlen;?>" value="<?php echo $extstart;?>">
+			&nbsp;<input class="form_input_text" id="num1" name="startnumber" onfocus="clear_textbox(this);" onkeypress="return keytoDownNumber(event,this);" size="10" maxlength="<?php echo $extlen;?>" value="<?php echo $extstart;?>">
 		    </td>
 		    <td align="justify" style="padding: 0 15px" rowspan="100%">
 			<center><h3><?php echo gettext("Information");?></h3></center>
@@ -202,7 +202,7 @@ if ($atmenu == "SIP" && $form_action == "list") {
 		<tr><td align="left" valign="top">
 			<font style="font-weight:bold;"><?php echo gettext("Quantity");?>:</font>
 		    </td><td valign="top" nowrap="nowrap">
-			&nbsp<input class="form_input_text" id="num2" name="quantity" onfocus="clear_textbox2();" onkeypress="return keytoDownNumber(event,id);" size="10" maxlength="3" value="1"><br/>
+			&nbsp<input class="form_input_text" id="num2" name="quantity" onfocus="clear_textbox(this);" onkeypress="return keytoDownNumber(event,this);" size="10" maxlength="3" value="1"><br/>
 			&nbsp;<sup><em><?php echo gettext("Extensions left");?>:&nbsp;<?php echo $extquantity;?></em></sup>
 		    </td>
 		</tr>

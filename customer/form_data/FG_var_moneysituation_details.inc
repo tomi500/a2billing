@@ -400,7 +400,7 @@ $HD_Form -> FG_GO_LINK_AFTER_ACTION_EDIT = $_SERVER['PHP_SELF']."?idcust=$idcust
 	$HD_Form -> AddViewElement(gettext("SECRET"), "secret", "4%", "center", "sort");
 
 	$HD_Form -> FieldViewElement ("IF(regexten='',t2.name,regexten), callerid, t2.language, IF(port>0 AND UNIX_TIMESTAMP()<regseconds,concat('<font color=green>',ipaddr,':',port,'</font> ',IF(lastms=-1,'UNREACHABLE',IF(lastms>0,concat('(',lastms,' ms)'),'')),'<br>',useragent),host), t2.name, t2.secret");
-	$HD_Form -> CV_NO_FIELDS = gettext("THERE IS NO") . " " . strtoupper($HD_Form->FG_INSTANCE_NAME) . " " . gettext("CREATED!");
+	$HD_Form -> CV_NO_FIELDS = gettext("THERE IS NO ".$atmenu." CONFIG FOUNDED!");
 
     }
     $HD_Form->FG_EDITION = false;

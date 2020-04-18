@@ -71,7 +71,6 @@
             var item = getSourceItem(itemName);
             var newItem = $("<div class='item'></div>").append( item.clone() );
             setValues(newItem, values);
-
             // Delete button
             $("<div class='delete' title='"+settings.messages.deleteItem+"'></div>")
                 .prependTo(newItem)
@@ -81,6 +80,8 @@
 //                    if(confirm(settings.messages.deleleItemConfirmation)) {
                         item.slideUp(function(){
                             item.remove();
+			    $(".ivrbeetr:even").css("background-color", "#DDDDDD");
+			    $(".ivrbeetr:odd").css("background-color", "#C2C2C2");
                         });
 //                    }
 //                    else {
@@ -95,13 +96,15 @@
                 newItem.hide();
                 list.append( newItem );
                 newItem.slideDown();                  
+		$(".ivrbeetr:even").css("background-color", "#DDDDDD");
+		$(".ivrbeetr:odd").css("background-color", "#C2C2C2");
             }
             
             // Init nested holders
             var holders = $("[data-holder-for]", newItem);              
             holders.each(function(){
                 var nestedName = $(this).attr('data-holder-for');
-                initHolder($(this), values[nestedName+'Array']);
+                initHolder($(this), values[nestedName]);
             });            
         }        
         
@@ -113,7 +116,6 @@
             var list   = $("<div class='list'></div>")  .appendTo(holder);
             var footer = $("<div class='footer'></div>").appendTo(holder);
             
-  
             
             var addButton = $("<div class='add' title='"+settings.messages.addItem+" &quot;" + item.attr('data-label') + "&quot;'></div>").appendTo(footer);
             addButton.click(function(){
@@ -136,6 +138,8 @@
                     },
                     stop: function(event, ui) { 
                         ui.item.removeClass('moving');
+			$(".ivrbeetr:even").css("background-color", "#DDDDDD");
+			$(".ivrbeetr:odd").css("background-color", "#C2C2C2");
                     }                
                 });
             }
@@ -156,7 +160,7 @@
             var holders = $("[data-holder-for]", doc);            
             holders.empty();
             holders.each(function(){
-                var name = $(this).attr('data-holder-for')+'Array';                                
+                var name = $(this).attr('data-holder-for');                                
                 initHolder($(this), json[name]);                
             });
             
@@ -186,7 +190,7 @@
                 this.each(function(){
                     setup(this);
                 });
-            },
+                },
             
             //
             // Get
@@ -249,6 +253,8 @@
             // 
             set: function(json) {
                 setup(this, json);
+		$(".ivrbeetr:even").css("background-color", "#DDDDDD");
+		$(".ivrbeetr:odd").css("background-color", "#C2C2C2");
             }
         };
         

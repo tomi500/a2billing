@@ -376,9 +376,9 @@ function updatecontent(id_el, record, field_inst, instance)
 				} elseif (stripos($this->FG_TABLE_EDITION[$i][3],"POPUPDAYTIME")===0) {
 					$k = substr($this->FG_TABLE_EDITION[$i][3], -1);
 					$instance_sub_table = new Table($this->FG_TABLE_EDITION[$i][8], $this->FG_TABLE_EDITION[$i][9]);
-					$select_list = $instance_sub_table -> Get_list ($this->DBHandle, str_replace("%id", "$id", $this->FG_TABLE_EDITION[$i][10]), null, null, null, null, null, null);
+					$select_list = $instance_sub_table -> Get_list ($this->DBHandle, str_replace("%id", "$id", $this->FG_TABLE_EDITION[$i][10]), "ids", "DESC", null, null, null, null);
 					if ($this->FG_DEBUG >= 2) { echo "<br>"; print_r($select_list);}
-					//echo $select_list."<br>";
+					//print_r($select_list); echo "<br>";
 					if($this->VALID_SQL_REG_EXP) {
 						if ($select_list !== 0) {
 							$select_list = array_reverse($select_list);
@@ -394,14 +394,14 @@ function updatecontent(id_el, record, field_inst, instance)
 							}
 							$json_str = json_encode($json_list);
 							?>
-							<script language="JavaScript"> PopUpDayTimeJson={"<?php echo $this->FG_TABLE_EDITION[$i][1];?>Array":<?php echo $json_str;?>}; </script>
+							<script language="JavaScript"> PopUpDayTimeJson={"<?php echo $this->FG_TABLE_EDITION[$i][1];?>":<?php echo $json_str;?>}; </script>
 							<?php
 						} else {
 						
 						}
 					} else {
 						$json_str = json_encode($processed[$this->FG_TABLE_ADITION[$i][1]]);?>
-						<script language="JavaScript"> PopUpDayTimeJson={"<?php echo $this->FG_TABLE_EDITION[$i][1]?>Array":<?php echo $json_str;?>}; </script><?php
+						<script language="JavaScript"> PopUpDayTimeJson={"<?php echo $this->FG_TABLE_EDITION[$i][1]?>":<?php echo $json_str;?>}; </script><?php
 						}?>
 				    <div class="blockDyna">
 				    <div data-holder-for="<?php echo $this->FG_TABLE_EDITION[$i][1];?>"></div>

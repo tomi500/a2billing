@@ -43,9 +43,14 @@
 				<li><a href="A2B_entity_sipiax_info.php?section=15"><strong>{php} echo gettext("EXTENSIONS ");{/php}</strong></a></li>
 <!--				<li><a href="A2B_entity_sipiax_info.php?section=15"><strong>{php} echo gettext("Outbound call plan");{/php}</strong></a></li>
 -->			{/if}
+			{if $ACXCALLER_ID >0 }
+			<div class="toggle_menu"><li><a href="A2B_entity_callerid.php?atmenu=callerid&stitle=CallerID"><strong>{php} echo gettext("MY CALLER IDs");{/php}</strong></a></li></div>
+			{/if}
+
 			{if $ACXDID >0 }
 <!--				<li><a href="A2B_entity_did_info.php?section=15"><strong>{php} echo gettext("EXTERNAL LINES");{/php}</strong></a></li>
--->				<li><a href="A2B_entity_did.php?section=15&form_action=list"><strong>{php} echo gettext("Incoming call plan and IVR");{/php}</strong></a></li>
+-->				<li><a href="A2B_entity_did.php?section=15&form_action=list"><strong>{php} echo gettext("INCOMING CALLS");{/php}</strong></a></li>
+				<li><a href="A2B_entity_ivr.php?section=15"><strong>{php} echo gettext("IVR");{/php}</strong></a></li>
 			{/if}
 			<li><a href="A2B_entity_fax.php?section=15&form_action=list"><strong>{php} echo gettext("VIRTUAL FAX");{/php}</strong></a></li>
 			<li><a href="A2B_entity_greeting.php?section=15&form_action=list"><strong>{php} echo gettext("VOICE GREETINGS");{/php}</strong></a></li>
@@ -71,7 +76,7 @@
 	<ul>
 		<li><ul>
 			<li><a href="A2B_entity_moneysituation.php?section=14"><strong>{php} echo gettext("LIST CUSTOMERS");{/php}</strong></a></li>
-			<li><a href="A2B_entity_moneysituation.php?section=14"><strong>{php} echo gettext("COMMISSION ACCRUED");{/php}</strong></a></li>
+			<li><a href="A2B_entity_rewards.php?section=14"><strong>{php} echo gettext("COMMISSION ACCRUED");{/php}</strong></a></li>
 		</ul></li>
 	</ul>
 	</div>
@@ -96,10 +101,6 @@
 
 	{if $ACXCALL_BACK >0 }
 	<div class="toggle_menu"><li><a href="callback.php"><strong>{php} echo gettext("CALLBACK");{/php}</strong></a></li></div>
-	{/if}
-
-	{if $ACXCALLER_ID >0 }
-	<div class="toggle_menu"><li><a href="A2B_entity_callerid.php?atmenu=callerid&stitle=CallerID"><strong>{php} echo gettext("ADD CALLER ID");{/php}</strong></a></li></div>
 	{/if}
 
 	{if $ACXPASSWORD>0 }

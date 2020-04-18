@@ -109,14 +109,16 @@ $smarty->display('main.tpl');
 <?php
 if (has_rights(ACX_DISTRIBUTION) && ($popup_select>=1)) {
 	$instance_table_card = new Table('cc_card');
-	$QUERY = "SELECT lastname, firstname, phone FROM cc_card WHERE id = $idcust AND id_diller = " . $_SESSION["card_id"];
+	$QUERY = "SELECT lastname, firstname, phone, countryprefix FROM cc_card, cc_country WHERE cc_card.id = $idcust AND id_diller = " . $_SESSION["card_id"] . " AND countrycode LIKE country";
 	$resmax = $instance_table_card -> SQLExec ($HD_Form -> DBHandle, $QUERY, 1);
 	if ($resmax) {
 		echo "<u>".$resmax[0][0]." ".$resmax[0][1]."</u><br>";
 		$phonenumber = $filterprefix2 = preg_replace("/[^\d]/", '', $resmax[0][2]);
+		$countryprefix = $resmax[0][3];
+		if (strpos($phonenumber,$countryprefix)!==0) $phonenumber = $countryprefix . $phonenumber;
 		$QUERY = "SELECT cid FROM cc_callerid WHERE id_cc_card = $idcust AND cid LIKE '$phonenumber'";
 		$resmax = $instance_table_card -> SQLExec ($HD_Form -> DBHandle, $QUERY, 1);
-		if ($resmax) $phonenumber = "";
+		if ($resmax) $phonenumber = $countryprefix;
 	} else exit();
 } else $phonenumber = "";
 
@@ -195,7 +197,23 @@ $HD_Form -> create_toppage ($form_action);
 
 $HD_Form -> create_form ($form_action, $list, $id=null) ;
 ?><script type="text/javascript">
-document.getElementById('add_callerid').focus();
+$.fn.setCursorPosition = function(pos) {
+    this.focus();
+    this.each(function(index, elem) {
+    if (elem.setSelectionRange) {
+        elem.setSelectionRange(pos, pos);
+    } else if (elem.createTextRange) {
+        var range = elem.createTextRange();
+        range.collapse(true);
+        range.moveEnd('character', pos);
+        range.moveStart('character', pos);
+        range.select();
+    }
+    });
+    return this;
+};
+var inputcid = $("#add_callerid");
+inputcid.setCursorPosition(inputcid.val().length);
 </script>
 <?php
 

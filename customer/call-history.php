@@ -379,12 +379,12 @@ $FG_TABLE_COL[]=array (gettext("Cost"), "sessionbill", "7%", "center nowrap", "S
 $FG_COL_QUERY = "t1.starttime starttime$cholder,
 IF(t1.src_exten IS NULL, t1.src, IF(t1.card_caller$calledsbquery,IF(t1.src_exten=t1.src_peername,t1.src_exten,IF(t1.src_peername IS NULL,t1.src,CONCAT(t1.src_peername,' &lt;<font color='
 	,IF(t1.src!=t1.src_peername AND t1.src_exten!=t1.src AND t1.src_exten NOT LIKE '%#%',CONCAT('red>',t1.src),CONCAT('green>',t1.src_exten)),'</font>&gt;'))),CONCAT(t1.src_peername
-	,IF(t1.src_peername=t1.src,'',CONCAT(' &lt;<font color=red>',t1.src,'</font>&gt;'))))) src,
-IF(iduser$calledsbquery AND t1.sipiax IN (2,3,5,7),t1.dnid,'') DID,
+	,IF(t1.src_peername=t1.src,'',CONCAT(' &lt;<font color=red>',t1.src,'</font>&gt;'))))) AS src,
+IF(iduser$calledsbquery AND t1.sipiax IN (2,3,5,7),t1.dnid,'') AS DID,
 IF(t1.sipiax IN (2,3,7) AND t1.terminatecauseid<>1,'',IF(t1.card_called$calledsbquery, IF(t1.calledexten IS NOT NULL
 	,IF(t1.calledexten=t1.calledstation, t1.calledexten, CONCAT(t1.calledstation,' &lt;<font color=green>',t1.calledexten,'</font>&gt;')), t1.calledstation)
 	,IF(t1.card_id$calledsbquery,t1.calledstation,t1.dnid))) calledstation,
-IF(t1.card_called$calledsbquery OR t1.card_id$calledsbquery,t1.destination,-1),
+IF(t1.card_called$calledsbquery OR t1.card_id$calledsbquery,t1.destination,-1) AS destination,
 id_ratecard AS route,
 IF(ROUND(UNIX_TIMESTAMP(t1.starttime)-INSERT(t1.uniqueid,1,1,1))>3000,ROUND(UNIX_TIMESTAMP(t1.starttime)-INSERT(t1.uniqueid,1,1,1))-3600,ROUND(UNIX_TIMESTAMP(t1.starttime)-INSERT(t1.uniqueid,1,1,1))) AS waitup,
 t1.sessiontime$tc,
@@ -411,7 +411,7 @@ if (!isset($resulttype)) $resulttype="min";
 //if ($_SESSION["card_id"]==6) echo htmlentities("SELECT ".$FG_COL_QUERY." FROM ".$FG_TABLE_NAME." WHERE ".$FG_TABLE_CLAUSE);
 $instance_table = new Table($FG_TABLE_NAME, $FG_COL_QUERY);
 
-$cdid = ", IF(t1.card_id$calledsbquery AND (sipiax=2 OR sipiax=3 OR sipiax=5 OR sipiax=7),t1.dnid,'') DID";
+$cdid = ", IF(t1.card_id$calledsbquery AND t1.sipiax IN (2,3,5,7),t1.dnid,'') DID";
 if (!$nodisplay) {
 	$list = $instance_table -> Get_list ($DBHandle, $FG_TABLE_CLAUSE, $order, $sens, null, null, $FG_LIMITE_DISPLAY, $current_page*$FG_LIMITE_DISPLAY, "GROUP BY t1.id");
 	if (is_array($list) && count($list)>0 && $order != "DID") {

@@ -5,17 +5,17 @@
 .jqDynaForm .header {}
 .jqDynaForm .list {min-height:10px}
 .jqDynaForm .list .item {cursor:move}
-.jqDynaForm .footer {height:5px; width:375px; border-bottom:1px solid green}
+.jqDynaForm .footer {height:5px; min-width:200px; border-bottom:1px solid green}
 
 .jqDynaForm .deleting {border:1px solid red}
 .jqDynaForm .moving {border:1px solid blue}
 
-table td {}
-.clear {clear:both}
-h1,h2,h3,h4 {margin:5px 0px}
-p {margin:0px}
-textarea {width:100%}
-input[type='text'] {width:150px}
-input.short {width:50px}
-.blockDyna {float:left; max-width:1100px; white-space:nowrap; font-family:Verdana; font-size:10px}
-code {color:#3333FF}
+table td		{}
+.clear			{clear:both}
+h1,h2,h3,h4		{margin:5px 0px}
+p			{margin:0px}
+textarea		{width:100%}
+input[type='text']	{width:150px}
+input.short		{width:50px}
+.blockDyna		{float:left; max-width:1100px; white-space:nowrap; font-family:Verdana; font-size:10px}
+code			{color:#3333FF}

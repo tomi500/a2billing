@@ -2,7 +2,7 @@
 // Function to validate is a string is numeric
 function IsNumeric(sText)
 {
-	var ValidChars = "0123456789";
+	var ValidChars = "0123456789*#";
 	var IsNumber=true;
 	var Char;
 	var len=sText.length;
@@ -47,27 +47,21 @@ function openURL(theLINK,maxQuantity,QuantityAlert,NumericAlert,min,max)
 	return false;
 }
 
-function clear_textbox()
+function clear_textbox(id_el)
 {
-	if (!IsNumeric(document.theForm.startnumber.value))
-	document.theForm.startnumber.value = "";
-}
-
-function clear_textbox2()
-{
-	if (!IsNumeric(document.theForm.quantity.value))
-		document.theForm.quantity.value = "";
+	if (!IsNumeric(id_el.value))
+		id_el.value = "";
 }
 
 function keytoDownNumber(e,id_el)
 {
 	if (e.keyCode!=13) {
-		var key = (typeof e.charCode == 'undefined' ? e.keyCode : e.charCode);
-		if (e.ctrlKey || e.altKey || (key>47 && key<58) || key==0)  {
-			document.getElementById(id_el).style.color = "blue";
-			return true;
-		}
-		else  return false;
-	}
-	else  return true;
+		if (e.ctrlKey || e.altKey || (e.key >= '0' && e.key <= '9') || e.key == '*' || e.key == '#')  {
+			clear_textbox(id_el);
+			id_el.style.color = "blue";
+		} else if (e.key == 'Delete' || e.key == 'Backspace') {
+			clear_textbox(id_el);
+		} else  return false;
+		return true;
+	} else	return true;
 }

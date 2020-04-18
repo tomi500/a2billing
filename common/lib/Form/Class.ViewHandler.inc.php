@@ -14,8 +14,7 @@ getpost_ifset(array('stitle', 'letter', 'current_page', 'popup_select'));
 
 $processed = $this->getProcessed();
 ?>
-<script language="JavaScript" type="text/JavaScript">
-<!--
+<script type="text/JavaScript">
 function openURLFilter(theLINK)
 {
 	selInd = document.theFormFilter.choose_list.selectedIndex;
@@ -23,7 +22,6 @@ function openURLFilter(theLINK)
 	goURL = document.theFormFilter.choose_list.options[selInd].value;
 	this.location.href = theLINK + goURL;
 }
-//-->
 </script>
 
 <div style="" align="center">
