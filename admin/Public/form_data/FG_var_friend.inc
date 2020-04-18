@@ -631,7 +631,7 @@ $HD_Form -> AddEditElement (gettext("AVPF"),
 						   "",
 						   "",
 						   "",
-						    "list", "", "", "", $values_list['avpf'], "%1", "NO-NULL" );
+						    "list", "", "", "", $values_list['avpf'], "%1", "NO-NULL", gettext("Inter-operability with media streams using the AVPF RTP profile"));
 
 $HD_Form -> AddEditElement (gettext("FORCE_AVP"),
 						   "force_avp",
@@ -640,7 +640,7 @@ $HD_Form -> AddEditElement (gettext("FORCE_AVP"),
 						   "",
 						   "",
 						   "",
-						    "list", "", "", "", $values_list['force_avp'], "%1", "NO-NULL" );
+						    "list", "", "", "", $values_list['force_avp'], "%1", "NO-NULL", gettext("Force 'RTP/AVP', 'RTP/AVPF', 'RTP/SAVP', and 'RTP/SAVPF' to be used for media streams when appropriate, even if a DTLS stream is present"));
 
 $HD_Form -> AddEditElement (gettext("ICESUPPORT"),
 						   "icesupport",
@@ -649,7 +649,7 @@ $HD_Form -> AddEditElement (gettext("ICESUPPORT"),
 						   "",
 						   "",
 						   "",
-						    "list", "", "", "", $values_list['icesupport'], "%1", "NO-NULL" );
+						    "list", "", "", "", $values_list['icesupport'], "%1", "NO-NULL", gettext("ICE/STUN/TURN usage"));
 
 $HD_Form -> AddEditElement (gettext("dtlsenable"),
 						   "dtlsenable",
@@ -694,7 +694,7 @@ $HD_Form -> AddEditElement (gettext("dtlscafile"),
 						"size=81 maxlength=80",
 						"",
 						"",
-						"" , "", "", "", "", "", "NO-NULL", gettext(""));
+						"" , "", "", "", "", "", "NO-NULL", gettext("Path to certificate authority certificate"));
 
 $HD_Form -> AddEditElement (gettext("dtlssetup"),
 						   "dtlssetup",
