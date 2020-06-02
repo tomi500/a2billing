@@ -4,7 +4,8 @@
 <HEAD>
 	<link rel="shortcut icon" href="{$FAVICONPATH}">
 	<title>{$CCMAINTITLE}</title>
-	<meta http-equiv="Content-Type" content="text/html; charset=utf-8">
+	<meta charset="UTF-8" name="viewport" content="width=device-width, initial-scale=1.0">
+	<meta http-equiv="Content-Type" content="text/html; charset=UTF-8"/>
 
 	<link href="templates/{$SKIN_NAME}/css/main.css" rel="stylesheet" type="text/css">
 	<!--[if lt IE 7]>

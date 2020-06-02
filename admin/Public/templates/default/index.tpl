@@ -1,8 +1,9 @@
+<!DOCTYPE html>
 <HTML>
 <HEAD>
 	<link rel="shortcut icon" href="{$FAVICONPATH}">
 	<title>{$CCMAINTITLE}</title>
-	<meta http-equiv="Content-Type" content="text/html; charset=utf-8">
+	<meta charset="UTF-8" name="viewport" content="width=device-width, initial-scale=1.0">
 		{if ($CSS_NAME!="" && $CSS_NAME!="default")}
 			   <link href="templates/default/css/{$CSS_NAME}.css" rel="stylesheet" type="text/css">
 		{else}

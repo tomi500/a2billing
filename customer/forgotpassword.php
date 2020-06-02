@@ -141,11 +141,11 @@ $smarty->display('header.tpl');
 <div id="login-wrapper" class="login-border-up">
 	<div class="login-border-down">
 	<div class="login-border-center">
-	<form name="form" method="POST" action="forgotpassword.php?action=email" onsubmit="return test()">
+	<form name="form" method="POST" action="forgotpassword?action=email" onsubmit="return test()">
 	<input type="hidden" name="done" value="submit_log">
 
     <?php if($show_message == false){ ?>
-	<table width="100%" cellspacing="6">
+	<table width="320px" cellspacing="6">
         <tr>
 		<td class="login-title">
 			 <?php echo gettext("FORGOT YOUR PASSWORD?")?>
@@ -170,7 +170,7 @@ $smarty->display('header.tpl');
    <?php
    } else {
    ?>			
-			<table width="92%">
+			<table width="320px">
 			<tr><td>
 			<table align="right" width="90%">
 			<tr><td colspan="2" ></td></tr>

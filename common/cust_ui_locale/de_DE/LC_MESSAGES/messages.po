@@ -15,6 +15,106 @@ msgstr ""
 "Content-Type: text/plain; charset=utf-8\n"
 "Content-Transfer-Encoding: 8bit\n"
 
+#: templates/default/index.tpl:57
+msgid "User"
+msgstr "Benutzer"
+
+#: templates/default/index.tpl:95 templates/default/index.tpl:98
+msgid "Click here"
+msgstr "Klicke hier"
+
+#: templates/default/index.tpl
+msgid "Please wait 1 minute before making any other request for the forgot password!"
+msgstr "Bitte warten Sie 1 Minute, bevor sie nochmals auf Passwort vergessen drücken!"
+
+#: templates/default/index.tpl
+msgid "Mail sender error.<br>Try again please."
+msgstr "Fehler: Kein E-Mail-Template gefunden"
+
+#: templates/default/index.tpl
+msgid "Your login information email<br>has been sent to you."
+msgstr "Ihre Login-Daten E-Mail wurde an Sie gesendet werden."
+
+#: templates/default/index.tpl
+msgid "Forgot your password?"
+msgstr "Passwort vergessen?"
+
+#: lib/customer.module.access.php
+msgid "AUTHENTICATION REFUSED :<br>please check your login/password!"
+msgstr "AUTHENTIFIZIERUNG ABGELEHNT<br>Bitte überprüfen Sie Ihre Benutzer / Passwort!"
+
+#: lib/customer.module.access.php
+msgid "INACTIVE ACCOUNT :<br>Your account need to be activated!"
+msgstr "INACTIVE KONTO<br>Ihr Konto muss aktiviert werden!"
+
+#: lib/customer.module.access.php
+msgid "BLOCKED ACCOUNT :<br>Please contact the administrator!"
+msgstr "GESPERRTE KONTO<br>Bitte wenden Sie sich an den Administrator!"
+
+#: lib/customer.module.access.php
+msgid "NEW ACCOUNT :<br>Your account has not been validate yet!"
+msgstr "NEUES KONTO<br>Ihr Konto ist noch in Validierung!"
+
+#: lib/customer.module.access.php
+msgid "Too frequent requests"
+msgstr "Zu viele Aufträge"
+
+#: templates/default/index.tpl
+msgid "Sign in"
+msgstr "Anmelden"
+
+#: templates/default/index.tpl
+msgid "Sign up"
+msgstr "Registrieren"
+
+#: templates/default/index.tpl
+msgid "Login / E-mail"
+msgstr "Login / E-mail"
+
+#: templates/default/index.tpl
+msgid "Password"
+msgstr "Passwort"
+
+#: templates/default/index.tpl
+msgid "Keep me signed in"
+msgstr "Angemeldet bleiben"
+
+#: templates/default/index.tpl
+msgid "Login"
+msgstr "Jetzt Einloggen"
+
+#: templates/default/index.tpl
+msgid "Full name"
+msgstr "Vollständiger Name"
+
+#: templates/default/index.tpl
+msgid "Create Account"
+msgstr "Benutzerkonto Erstellen"
+
+#: templates/default/index.tpl
+msgid "Get password"
+msgstr "Senden"
+
+#: templates/default/index.tpl
+msgid "You must enter an email address!"
+msgstr "Sie müssen eine E-Mail-Adresse eingeben!"
+
+#: templates/default/index.tpl
+msgid "No such login exists"
+msgstr "So eine Login existiert nicht."
+
+#: templates/default/index.tpl
+msgid "Invalid Action"
+msgstr "Ungültige Aktion"
+
+#: templates/default/index.tpl
+msgid "Service temporally not available.<br>Try again later."
+msgstr "Service steht temporär leider nicht zur Verfügung.<br>Überprüfen Sie Ihre Internetverbindung und versuchen Sie es erneut."
+
+#: templates/default/index.tpl
+msgid "Please provide your valid email address<br>to get your login information"
+msgstr "Bitte geben Sie Ihre E-Mail-Adresse,<br>um Ihre Login-Daten."
+
 #: A2B_notification.php:76
 msgid "Your notification settings has successfully been updated."
 msgstr "Ihre Anmeldung Einstellungen wurden erfolgreich aktualisiert."
@@ -2670,35 +2770,6 @@ msgstr "Deletetion"
 msgid "Inserted"
 msgstr "Eingefügt"
 
-#: forgotpassword.php:56
-msgid "Please wait 1 minutes before making any other request for the forgot password!"
-msgstr "Bitte warten Sie 1 Minute, bevor sie nochmals auf Passwort vergessen drücken!"
-
-#: forgotpassword.php:85
-#, fuzzy
-msgid "Error : Mail sender"
-msgstr "Fehler: Kein E-Mail-Template gefunden"
-
-#: forgotpassword.php:104
-msgid "Your login information email has been sent to you."
-msgstr "Ihre Login-Daten E-Mail wurde an Sie gesendet werden."
-
-#: forgotpassword.php:107
-msgid "No such login exists."
-msgstr "So eine Login existiert nicht."
-
-#: forgotpassword.php:110
-msgid "Invalid Action."
-msgstr "Ungültige Aktion."
-
-#: forgotpassword.php:113
-msgid "Please provide your email address to get your login information."
-msgstr "Bitte geben Sie Ihre E-Mail-Adresse, um Ihre Login-Daten."
-
-#: forgotpassword.php:127
-msgid "You must enter an email address!"
-msgstr "Sie müssen eine E-Mail-Adresse eingeben!"
-
 #: A2B_invoice_view.php:145
 #, fuzzy
 msgid "Print"
@@ -3015,10 +3086,6 @@ msgstr "SIP"
 #: A2B_entity_sipiax_info.php:117
 msgid "Username"
 msgstr "Benutzername"
-
-#: A2B_entity_sipiax_info.php:118 templates/default/index.tpl:61
-msgid "Password"
-msgstr "Passwort"
 
 #: A2B_entity_sipiax_info.php:120
 msgid "To configure your Asterisk server, copy and paste this into your "
@@ -3562,42 +3629,6 @@ msgstr "Import Telefon Liste"
 #: templates/default/main.tpl:126
 msgid "LOGOUT"
 msgstr "AUSLOGEN"
-
-#: templates/default/index.tpl:49
-msgid "AUTHENTICATION"
-msgstr "AUTHENTIFIZIERUNG"
-
-#: templates/default/index.tpl:57
-msgid "User"
-msgstr "Benutzer"
-
-#: templates/default/index.tpl:95
-msgid "Forgot your password ?"
-msgstr "Haben Sie Ihr Passwort vergessen?"
-
-#: templates/default/index.tpl:95 templates/default/index.tpl:98
-msgid "Click here"
-msgstr "Klicke hier"
-
-#: templates/default/index.tpl:98
-msgid "To sign up"
-msgstr "zum Anmelden"
-
-#: templates/default/index.tpl:107
-msgid "AUTHENTICATION REFUSED :<br>please check your user/password!"
-msgstr "AUTHENTIFIZIERUNG ABGELEHNT<br>Bitte überprüfen Sie Ihre Benutzer / Passwort!"
-
-#: templates/default/index.tpl:109
-msgid "INACTIVE ACCOUNT :<br>Your account need to be activated!"
-msgstr "INACTIVE KONTO<br>Ihr Konto muss aktiviert werden!"
-
-#: templates/default/index.tpl:111
-msgid "BLOCKED ACCOUNT :<br>Please contact the administrator!"
-msgstr "GESPERRTE KONTO<br>Bitte wenden Sie sich an den Administrator!"
-
-#: templates/default/index.tpl:113
-msgid "NEW ACCOUNT :<br>Your account has not been validate yet!"
-msgstr "NEUES KONTO<br>Ihr Konto ist noch in Validierung!"
 
 #: signup_confirmation.php:46
 msgid "Sorry the confirmation email has been sent already, multi-signup are not authorized! Please wait 2 minutes before making any other signup!"

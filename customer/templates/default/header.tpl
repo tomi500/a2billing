@@ -4,7 +4,8 @@
 <HEAD>
 	<link rel="shortcut icon" href="{$FAVICONPATH}">
 	<title>{$CCMAINTITLE}</title>
-	<meta http-equiv="Content-Type" content="text/html; charset=utf-8">
+	<meta charset="UTF-8" name="viewport" content="width=device-width, initial-scale=1.0">
+	<meta http-equiv="Content-Type" content="text/html; charset=UTF-8"/>
 
     <link href="templates/{$SKIN_NAME}/css/main.css" rel="stylesheet" type="text/css">
     <link href="templates/{$SKIN_NAME}/css/menu.css" rel="stylesheet" type="text/css">
@@ -22,14 +23,14 @@
 	{if ($popupwindow != 0)}
 		<link href="templates/{$SKIN_NAME}/css/popup.css" rel="stylesheet" type="text/css">
  	{/if}
-	<script type="text/javascript">	
-		var IMAGE_PATH = "templates/{$SKIN_NAME}/images/";
+	<script type="text/javascript">
+	    var IMAGE_PATH = "templates/{$SKIN_NAME}/images/";
 	</script>
-	<script type="text/javascript" src="./javascript/jquery/jquery-1.7.2.min.js"></script>
-	<script type="text/javascript" src="./javascript/jquery/jquery.debug.js"></script>
-	<script type="text/javascript" src="./javascript/jquery/ilogger.js"></script>
-	<script type="text/javascript" src="./javascript/jquery/handler_jquery.js"></script>
-	<script language="javascript" type="text/javascript" src="./javascript/misc.js"></script>
+	<script src="./javascript/jquery/jquery-1.7.2.min.js"></script>
+	<script src="./javascript/jquery/jquery.debug.js"></script>
+	<script src="./javascript/jquery/ilogger.js"></script>
+	<script src="./javascript/jquery/handler_jquery.js"></script>
+	<script src="./javascript/misc.js"></script>
 </HEAD>
 
 <BODY leftmargin="0" topmargin="0" marginwidth="0" marginheight="0">

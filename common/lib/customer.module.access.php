@@ -60,16 +60,12 @@ define ("ACX_SEERECORDING",					 262144);
 define ("ACX_DISTRIBUTION",					 524288);
 define ("ACX_SURVEILLANCE",					1048576);
 
-header("Expires: Sat, Jan 01 2000 01:01:01 GMT");
-
+//header("Expires: Sat, Jan 01 2000 01:01:01 GMT");
 
 if(strlen(RETURN_URL_DISTANT_LOGIN)>1) {
-	if (strpos(RETURN_URL_DISTANT_LOGIN, '?') === false)
-		$C_RETURN_URL_DISTANT_LOGIN = RETURN_URL_DISTANT_LOGIN . '?';
-	else
-		$C_RETURN_URL_DISTANT_LOGIN = RETURN_URL_DISTANT_LOGIN . '&';
+    $C_RETURN_URL_DISTANT_LOGIN = RETURN_URL_DISTANT_LOGIN;
 } else {
-	$C_RETURN_URL_DISTANT_LOGIN = 'index.php?';
+    $C_RETURN_URL_DISTANT_LOGIN = 'index';
 }
 
 if (isset($_GET["logout"]) && $_GET["logout"]=="true") {
@@ -81,19 +77,29 @@ if (isset($_GET["logout"]) && $_GET["logout"]=="true") {
 	session_destroy();
 	$cus_rights=0;
 	Header ("HTTP/1.0 401 Unauthorized");
-	Header ("Location: $C_RETURN_URL_DISTANT_LOGIN");
+	Header ("Location: /");
 	die();
 }
 
-getpost_ifset (array('pr_login', 'pr_password'));
+getpost_ifset (array('pr_login', 'pr_password', 'done'));
 
+function sendSignin($error,$signinString) {
+    header("Content-type: text/xml");
+    echo "<response><error>$error</error><signinString><![CDATA[$signinString]]></signinString></response>";
+    die();
+}
 
-if ((!isset($_SESSION['pr_login']) || !isset($_SESSION['pr_password']) || !isset($_SESSION['cus_rights']) || (isset($_POST["done"]) && $_POST["done"]=="submit_log") )){
+if (!isset($_SESSION['pr_login']) || !isset($_SESSION['pr_password']) || !isset($_SESSION['cus_rights']) || (isset($_POST["done"]) && ($done=="submit_log" || $done=="submit_sig"))){
 
 	if ($FG_DEBUG == 1) echo "<br>0. HERE WE ARE";
 
-	if ($_POST["done"]=="submit_log") {
-		
+	if ($done=="submit_log" || $done=="submit_sig") {
+		 if (!isset ($_SESSION["date_forgot"]) || (time() - $_SESSION["date_forgot"]) > 5) {
+                        $_SESSION["date_forgot"] = time();
+                } else {
+                        sendSignin(9,gettext("Too frequent requests"));
+                }
+
 		$DBHandle  = DbConnect();
 		if ($FG_DEBUG == 1) echo "<br>1. ".$pr_login." - ".$pr_password;
 		
@@ -102,19 +108,18 @@ if ((!isset($_SESSION['pr_login']) || !isset($_SESSION['pr_password']) || !isset
 		if ($FG_DEBUG == 1) echo "==>".$return[1];
 		
 		if (!is_array($return)) {
-			sleep(2);
+        		if (is_int($return)) {
+            		    if ($return == -1) {
+			        sendSignin(3,gettext("BLOCKED ACCOUNT :<br>Please contact the administrator!"));
+            		    } elseif ($return == -2) {
+			        sendSignin(4,gettext("NEW ACCOUNT :<br>Your account has not been validate yet!"));
+            		    } else {
+			        sendSignin(2,gettext("INACTIVE ACCOUNT :<br>Your account need to be activated!"));
+            		    }
+        		} else {
+			        sendSignin(1,gettext("AUTHENTICATION REFUSED :<br>please check your login/password!"));
+        		}
 			header ("HTTP/1.0 401 Unauthorized");
-            if (is_int($return)) {
-                if ($return == -1) {
-			        Header ("Location: $C_RETURN_URL_DISTANT_LOGIN"."error=3");
-                } elseif ($return == -2) {
-			        Header ("Location: $C_RETURN_URL_DISTANT_LOGIN"."error=4");
-                } else {
-                    Header ("Location: $C_RETURN_URL_DISTANT_LOGIN"."error=2");
-                }
-            } else {
-                Header ("Location: $C_RETURN_URL_DISTANT_LOGIN"."error=1");
-            }
 			die();
 		}
 		
@@ -160,6 +165,10 @@ if ((!isset($_SESSION['pr_login']) || !isset($_SESSION['pr_password']) || !isset
 			$log = new Logger();
 			$log -> insertLog($return[3], 1, "<b>LOGGED IN</b>", "User Logged in to website", '', $_SERVER['REMOTE_ADDR'], '', '', 2);
 			$log = null;
+
+			if ($_POST["done"]=="submit_sig") {
+			    sendSignin(0,gettext("SUCCESS"));
+			}
 		}
 	} else {
 		$_SESSION["cus_rights"]=0;
@@ -193,8 +202,10 @@ function login ($user, $pass)
 	}
 	
 	$row [] =$res -> fetchRow();
-	
-	if( $row [0][2] != "t" && $row [0][2] != "1"  && $row [0][2] != "8" ) {
+
+	if(!isset($row [0][2])) return (false);
+
+	if($row [0][2] != "t" && $row [0][2] != "1"  && $row [0][2] != "8") {
 		if ($row [0][2] == "2")
 			return -2;
 		else

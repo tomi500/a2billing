@@ -54,7 +54,7 @@ $error["accessdenied"] = gettext("Sorry, you don't have access to this page !");
 <div id="login-wrapper" class="login-border-up">
 	<div class="login-border-down">
 	<div class="login-border-center">
-	<table>
+	<table width="320px">
 		<tr>
 			<td class="login-title" colspan="2">
 				<font size="3"> <?php echo gettext("ERROR PAGE");?> </font>
@@ -68,9 +68,9 @@ $error["accessdenied"] = gettext("Sorry, you don't have access to this page !");
 				<b><font size="é"><?php echo $error[$c]?></font></b>
 			</td>
 		</tr>
-    </table>
+	</table>
       	<div style="text-align:right;padding-right:10px;" >
-	      	<a href="index.php" ><?php echo gettext("GO TO LOGIN PAGE"); ?>&nbsp;<img src="<?php echo Images_Path; ?>/key_go.png"> </a>
+	      	<a href="#" onclick="location.href=location.origin"><?php echo gettext("GO TO LOGIN PAGE"); ?>&nbsp;<img src="<?php echo Images_Path; ?>/key_go.png"> </a>
       	</div>
 	</div>
 	

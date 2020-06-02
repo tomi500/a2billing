@@ -203,7 +203,7 @@ $HD_Form->AddEditElement(gettext("LASTNAME")." *",
 		"lastname",
 		'$value',
 		"INPUT",
-		"size=30 maxlength=50", "11",
+		"style=\"width:260px\" maxlength=50", "11",
 		gettext("Insert your lastname"), "", "", "", "", "", "", "", "");
 $lastname_editFG = "lastname,";
 }
@@ -212,7 +212,7 @@ $HD_Form->AddEditElement(gettext("FIRSTNAME")." *",
 		"firstname",
 		'$value',
 		"INPUT",
-		"size=30 maxlength=50", "11",
+		"style=\"width:260px\" maxlength=50", "11",
 		gettext("Insert your firstname"), "", "", "", "", "", "", "", "");
 $firstname_editFG = "firstname,";
 }
@@ -222,7 +222,7 @@ $HD_Form->AddEditElement(gettext("COMPANY NAME"),
 		"company_name",
 		'$value',
 		"INPUT",
-		"size=40 maxlength=50", "",
+		"style=\"width:260px\" maxlength=50", "",
 		gettext("Insert Company name of this customer"), "", "", "", "", "", "", "NO", "");
 $company_name_editFG = "company_name,";
 }
@@ -252,7 +252,7 @@ if (has_rights (ACX_DISTRIBUTION) || (isset($id_diller) && $id_diller > 0))  {
 								"margin",
 								'$value',
 								"INPUT",
-								"size=10 maxlength=3",
+								"style=\"width:260px\" maxlength=3",
 								"27", "(0..100)%",
 								"", "", "", "", "", "", "NO", "");
 $group_editFG .= "margin,";
@@ -263,7 +263,7 @@ $HD_Form->AddEditElement(gettext("EMAIL")." *",
 		"email",
 		'$value',
 		"INPUT",
-		"size=30 maxlength=70", "1",
+		"style=\"width:260px\" maxlength=70", "1",
 		gettext("Insert your email"), "", "", "", "", "", "", "", "");
 
 if (ADDRESS_ENABLE)  {
@@ -271,7 +271,7 @@ $HD_Form->AddEditElement(gettext("ADDRESS")." *",
 		"address",
 		'$value',
 		"INPUT",
-		"size=30 maxlength=100", "0",
+		"style=\"width:260px\" maxlength=100", "0",
 		gettext("Insert your address"), "", "", "", "", "", "", "", "");
 $address_editFG = ",address";
 }
@@ -281,7 +281,7 @@ if (CITY_ENABLE)  {
 								"city",
 								'$value',
 								"INPUT",
-								"size=30 maxlength=40", "0",
+								"style=\"width:260px\" maxlength=40", "0",
 								gettext("Insert your city"), "", "", "", "", "", "", "", "");
 	$city_editFG = ",city";
 }
@@ -291,7 +291,7 @@ if (STATE_ENABLE)  {
 								"state",
 								'$value',
 								"INPUT",
-								"size=30 maxlength=40", "11",
+								"style=\"width:260px\" maxlength=40", "11",
 								gettext("Insert your state"), "", "", "", "", "", "", "NO", "");
 	$state_editFG = ",state";
 }
@@ -306,7 +306,7 @@ if (COUNTRY_ENABLE)  {
 	$HD_Form->AddEditElement(gettext("COUNTRY")." *",
 								"country",
 								"$country",
-								"SELECT", "", "", "",
+								"SELECT", "style=\"max-width: 262px\"", "", "",
 								"sql",
 								"cc_country", "countryname, countrycode", 
 								"", "", "%1", "", "", "", '');
@@ -318,7 +318,7 @@ if (ZIPCODE_ENABLE)  {
 								"zipcode",
 								'$value',
 								"INPUT",
-								"size=30 maxlength=20 $maxi4","0",
+								"style=\"width:260px\" maxlength=20 $maxi4","0",
 								gettext("Insert your zipcode"), "", "", "", "", "", "", "", "");
 	$zipcode_editFG = ",zipcode";
 }
@@ -377,7 +377,7 @@ if (TIMEZONE_ENABLE)  {
 								"id_timezone",
 								"$id_timezone",
 								"SELECT",
-								"", "", "",
+								"style=\"max-width:262px\"", "", "",
 								"list", "", "", "",
 								$timezone_list,
 								"%1", "", "");
@@ -388,7 +388,7 @@ if (PHONE_ENABLE)  {
 	$HD_Form->AddEditElement(gettext("PHONE NUMBER")." *",
 								"phone",
 								'$value',
-								"INPUT", "size=30 maxlength=20",
+								"INPUT", "style=\"width:260px\" maxlength=20",
 								"7", "", "", "", "", "", "", "", "", "");
 	$phone_editFG = ",phone";
 }
@@ -397,7 +397,7 @@ if (FAX_ENABLE)  {
 	$HD_Form->AddEditElement(gettext("FAXNUMBER"), 
 								"fax", 
 								'$value', 
-								"INPUT", "size=30 maxlength=20", 
+								"INPUT", "style=\"width:260px\" maxlength=20", 
 								"7", gettext("Insert your fax number"), "", "", "", "", "", "", "NO");
 	$fax_editFG = ",fax";
 }
@@ -406,7 +406,7 @@ if (COMP_WEB_ENABLE)  {
 	$HD_Form->AddEditElement(gettext("COMPANY WEBSITE"), 
 								"company_website",
 								'$value',
-								"INPUT", "size=40 maxlength=60",
+								"INPUT", "style=\"width:260px\" maxlength=60",
 								"8", gettext("Insert the company website of this customer"), "", "", "", "", "", "", "NO", "");
 	$company_website_editFG = ",company_website";
 }
@@ -415,7 +415,7 @@ if (VAT_RN_ENABLE)  {
 	$HD_Form->AddEditElement(gettext("VAT REGISTRATION NUMBER "), 
 								"vat_rn", 
 								'$value', 
-								"INPUT", "size=40 maxlength=40",
+								"INPUT", "style=\"width:260px\" maxlength=40",
 								"", gettext("Insert the VAT registration number of this customer"), "", "", "", "", "", "", "NO", "");
 	$VAT_RN_editFG = ",vat_rn";
 
@@ -423,7 +423,7 @@ if (VAT_RN_ENABLE)  {
 								"vat",
 								'$value',
 								"INPUT",
-								"size=10 maxlength=6",
+								"style=\"width:260px\" maxlength=6",
 								"12", "%%",
 								"", "", "", "", "", "", "NO", "");
 	$VAT_editFG = ",vat";
@@ -433,7 +433,7 @@ if (TRAFFIC_ENABLE)  {
 	$HD_Form->AddEditElement(gettext("TRAFFIC PER MONTH"), 
 								"traffic", 
 								'$value', 
-								"INPUT", "size=30 maxlength=20", 
+								"INPUT", "style=\"width:260px\" maxlength=20", 
 								"4", gettext("Insert the traffic per month for this customer"), "", "", "", "", "", "", "NO", "");
 	$traffic_editFG = ",traffic";
 }
@@ -442,7 +442,7 @@ if (TRAFFIC_TARGET_ENABLE)  {
 	$HD_Form->AddEditElement(gettext("TARGET TRAFFIC"),
 								"traffic_target",
 								'',
-								"TEXTAREA", "cols=50 rows=4",
+								"TEXTAREA", "cols=45 rows=4",
 								"", gettext("Insert the target traffic description"), "", "", "", "", "", "", "", "");
 	$traffic_target_editFG = ",traffic_target";
 }
@@ -452,7 +452,7 @@ if (has_rights (ACX_DISTRIBUTION) || (isset($id_diller) && $id_diller > 0))  {
 								"id_diller",
 								'$value',
 								"INPUT",
-								'size=30 maxlength=20 readonly style="color: gray;"',
+								'style=\"width:260px\" maxlength=20 readonly style="color: gray;"',
 								"6",
 								"", "", "", "", "", "", "", "", "");
 	$subscriber_editFG = ",id_diller";

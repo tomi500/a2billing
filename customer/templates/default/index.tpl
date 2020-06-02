@@ -1,70 +1,46 @@
+<!DOCTYPE html>
 {php} header('X-Frame-Options: SAMEORIGIN'); {/php}
-<HTML>
-<HEAD>
-	<link rel="shortcut icon" href="{$FAVICONPATH}">
-	<title>{$CCMAINTITLE}</title>
-	<meta http-equiv="Content-Type" content="text/html; charset=utf-8">
-		{if ($CSS_NAME!="" && $CSS_NAME!="default")}
-			   <link href="templates/default/css/{$CSS_NAME}.css" rel="stylesheet" type="text/css">
-		{else}
-			   <link href="templates/default/css/main.css" rel="stylesheet" type="text/css">
-			   <link href="templates/default/css/menu.css" rel="stylesheet" type="text/css">
-			   <link href="templates/default/css/style-def.css" rel="stylesheet" type="text/css">
-		{/if}
-         <script type="text/javascript" src="./javascript/jquery/jquery-1.7.2.min.js"></script>
-</HEAD>
-
-<BODY leftmargin="0" topmargin="0" marginwidth="0" marginheight="0">
-
-	<form name="form" method="POST" action="userinfo.php" onsubmit="return test()">
-	<input type="hidden" name="done" value="submit_log">
-
-    <div id="login-wrapper" class="login-border-up">
-	<div class="login-border-down">
-	<div class="login-border-center">
-	<center>
-	<table border="0" cellpadding="3" cellspacing="12">
-	<tr>
-		<td class="login-title" colspan="2">
-    {if ($error == 1)}
-		{php} echo gettext("AUTHENTICATION REFUSED :<br>please check your user/password!");{/php}
-    {elseif ($error==2)}
-		{php} echo gettext("INACTIVE ACCOUNT :<br>Your account need to be activated!");{/php}
-    {elseif ($error==3)}
-		{php} echo gettext("BLOCKED ACCOUNT :<br>Please contact the administrator!");{/php}
-    {elseif ($error==4)}
-		{php} echo gettext("NEW ACCOUNT :<br>Your account has not been validate yet!");{/php}
-    {else}
-		{php} echo gettext("AUTHENTICATION");{/php}
-    {/if}
-		</td>
-	</tr>
-	<tr>
-		<td ><img src="templates/{$SKIN_NAME}/images/kicons/lock_bg.png"></td>
-		<td align="center" style="padding-right: 10px">
-			<table width="90%">
-			<tr align="center">
-				<td align="left"><font size="2" face="Arial, Helvetica, Sans-Serif"><b>{php} echo gettext("User");{/php}:</b></font></td>
-				<td><input class="form_input_text" type="text" name="pr_login" size="15" value="{$username}"></td>
-			</tr>
-			<tr align="center">
-				<td align="left"><font face="Arial, Helvetica, Sans-Serif" size="2"><b>{php} echo gettext("Password");{/php}:</b></font></td>
-				<td><input class="form_input_text" type="password" name="pr_password" size="15" value="{$password}"></td>
-			</tr>
-			</tr><tr >
-                <td colspan="2"> &nbsp;</td>
-            </tr>
-			<tr align="right" >
-                <td>
-                    <select name="ui_language"  id="ui_language" class="icon-menu form_input_select">
-                        <option style="background-image:url(templates/{$SKIN_NAME}/images/flags/gb.gif);" value="english" {php} if(LANGUAGE=="english") echo "selected";{/php} >English</option>
-<!--
-                        <option style="background-image:url(templates/{$SKIN_NAME}/images/flags/ua.gif);" value="ukrainian" {php} if(LANGUAGE=="ukrainian") echo "selected";{/php} >Ukrainian</option>
+<html>
+<head>
+    <link rel="shortcut icon" href="{$FAVICONPATH}"/>
+    <meta charset="UTF-8" name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
+    <title>{$CCMAINTITLE}</title>
+    <link rel="stylesheet" href="templates/default/css/index.css" type="text/css">
+    <link rel="canonical" href="https://customer.sipde.net" />
+<!--    <ript data-ad-client="ca-pub-3831618686142206" async src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js"></script>
 -->
-                        <option style="background-image:url(templates/{$SKIN_NAME}/images/flags/ru.gif);" value="russian" {php} if(LANGUAGE=="russian") echo "selected";{/php} >Russian</option>
+</head>
+<body>
+<script language="JavaScript">
+if(false && !CSS.supports("display:flex")) {
+    location.replace("https://customer.sipde.net/index1");
+}
+var emptyemail = "{php} echo gettext("You must enter an email address!"){/php}";
+var emptylogin = "{php} echo gettext("AUTHENTICATION REFUSED :<br>please check your user/password!");{/php}";
+var noservice = "{php} echo gettext("Service temporally not available.<br>Try again later.");{/php}";
+</script>
+  <link href='https://fonts.googleapis.com/css?family=Open+Sans:400,300,700' rel='stylesheet' type='text/css'>
+
+<div class="container">
+  <div class="frameback">
+  </div>
+  <div class="frame">
+    <div class="nav">
+      <ul class="links">
+        <li class="signin-active"><a class="btn_in">{php} echo gettext("Sign in");{/php}</a></li>
+{php}if(SIGNUPENABLE){{/php}
+        <li class="signup-inactive"><a class="btn_up" style="color: rgba(255,255,255,.3)">{php} echo gettext("Sign up");{/php}</a></li>
+{php}}{/php}
+      </ul>
+      <select name="ui_language" id="ui_language">
+                        <option value="english" {php} if(LANGUAGE=="english") echo "selected";{/php} >English</option>
+                        <option value="ukrainian" {php} if(LANGUAGE=="ukrainian") echo "selected";{/php} >Українська</option>
+                        <option value="russian" {php} if(LANGUAGE=="russian") echo "selected";{/php} >Русский</option>
+                        <option value="german" {php} if(LANGUAGE=="german") echo "selected";{/php} >Deutsch</option>
+<!--
                         <option style="background-image:url(templates/{$SKIN_NAME}/images/flags/es.gif);" value="spanish" {php} if(LANGUAGE=="spanish") echo "selected";{/php} >Spanish</option>Român
                         <option style="background-image:url(templates/{$SKIN_NAME}/images/flags/fr.gif);" value="french" {php} if(LANGUAGE=="french") echo "selected";{/php} >French</option>
-                        <option style="background-image:url(templates/{$SKIN_NAME}/images/flags/de.gif);" value="german" {php} if(LANGUAGE=="german") echo "selected";{/php} >German</option>
                         <option style="background-image:url(templates/{$SKIN_NAME}/images/flags/fi.gif);" value="finnish" {php} if(LANGUAGE=="finnish") echo "selected";{/php} >Finnish</option>
                         <option style="background-image:url(templates/{$SKIN_NAME}/images/flags/pt.gif);" value="portuguese" {php} if(LANGUAGE=="portuguese") echo "selected";{/php} >Portuguese</option>
                         <option style="background-image:url(templates/{$SKIN_NAME}/images/flags/br.gif);" value="brazilian" {php} if(LANGUAGE=="brazilian") echo "selected";{/php}>Brazilian</option>
@@ -76,28 +52,118 @@
                         <option style="background-image:url(templates/{$SKIN_NAME}/images/flags/pk.gif);" value="urdu" {php} if(LANGUAGE=="urdu") echo "selected";{/php} >Urdu</option>
                         <option style="background-image:url(templates/{$SKIN_NAME}/images/flags/gr.gif);" value="greek" {php} if(LANGUAGE=="greek") echo "selected";{/php} >Greek</option>
                         <option style="background-image:url(templates/{$SKIN_NAME}/images/flags/id.gif);" value="indonesian" {php} if(LANGUAGE=="indonesian") echo "selected";{/php} >Indonesian</option>
-                    </select>
-                </td>
-				<td><input type="submit" name="submit" value="{php} echo gettext("LOGIN");{/php}" class="form_input_button"></td>
-			</tr>
-			
-			</table>
-		</td>
-	</tr>
-	<tr align="center">
-		<td colspan="2"><font class="fontstyle_007">{php} echo gettext("Forgot your password ?");{/php} <a href="forgotpassword.php">{php} echo gettext("Click here");{/php}</a></font>.</td>
-    </tr>
-    {php}if(SIGNUPENABLE){{/php}
-    <tr align="center">
-        <td colspan="2"><font class="fontstyle_007">{php} echo gettext("To sign up");{/php} <a href="signup.php">{php} echo gettext("Click here");{/php}</a></font>.</td>
-    </tr>{php}}{/php}
-  	</table>
-  	</center>
-  	</div>
-  	</div>
-  	
+-->
+      </select>
     </div>
-    <div id="footer">
+    <div ontouchstart="turn_start(event);" ontouchmove="turn_page(event);">
+
+      <div class="forms">
+	<form class="form-forgot" method="post" name="formforgot">
+          <div class="login-title" id="warningforgot">
+          </div>
+          <label for="pr_email">{php} echo gettext("E-Mail");{/php}</label>
+          <input class="form-styling" type="email" name="pr_email" id="pr_email"/>
+          <a class="btn-submit btn-forgot">{php} echo gettext("Get password");{/php}</a>
+	</form>
+	<form class="form-signin" action="userinfo" method="post" name="formsignin">
+          <div class="login-title" id="warningsignin">
+          </div>
+          <label for="pr_login">{php} echo gettext("Login / E-mail");{/php}</label>
+          <input class="form-styling" type="text" name="pr_login" id="pr_login"/>
+          <label for="pr_password">{php} echo gettext("Password");{/php}</label>
+          <input class="form-styling" type="password" name="pr_password" id="pr_password"/>
+          <input type="checkbox" id="checkbox"/>
+          <label for="checkbox"><span class="ui"></span>{php} echo gettext("Keep me signed in");{/php}</label>
+          <a class="btn-submit btn-signin">{php} echo gettext("Login");{/php}</a>
+          <div class="forgot">
+            <a>{php} echo gettext("Forgot your password?");{/php}</a>
+          </div>
+	</form>
+{php}if(SIGNUPENABLE){{/php}
+	<form class="form-signup" action="" method="post" name="formsignup">
+          <input type="hidden" name="country" id="country">
+          <input type="hidden" name="id_timezone" id="id_timezone">
+          <div class="login-title" id="warningsignin">
+          </div>
+          <label for="fullname">{php} echo gettext("Full name");{/php}</label>
+          <input class="form-styling" type="text" name="fullname"/>
+          <label for="email">{php} echo gettext("E-Mail");{/php}</label>
+          <input class="form-styling" type="text" name="email"/>
+          <label for="pr_country">{php} echo gettext("COUNTRY");{/php}</label>
+          <div class="select-styling">
+{php}
+		global $countrycode;
+		$country = $countrycode;
+		$DBHandle_max = DbConnect();
+		$instance_table = new Table("cc_country");
+		$QUERY = "SELECT countrycode, countryname, countryprefix FROM cc_country";
+		$countrylist = $instance_table -> SQLExec ($DBHandle_max, $QUERY);
+		if ($countrylist) {
+		    foreach ($countrylist AS $value) {
+			if ($value[0]==$countrycode) {
+			    $country = $value[1].($value[2]!="0"?' +'.$value[2]:"");
+			    break;
+			}
+		    }
+		}
+{/php}
+	    <input class="form-styling" type="text" value="{php} echo $country;{/php}" dataval = "{php} echo $countrycode;{/php}" name="pr_country" id="pr_country" onfocus="this.blur()" onclick="this.blur()"/>
+	    <ul id="countrylist">
+{php}
+		if ($countrylist) {
+		    foreach ($countrylist AS $value) {
+			echo '<li><a href="#" class="countryselect" dataval="'.$value[0].'">'.$value[1].($value[2]!="0"?' +'.$value[2]:"").'</a></li>'.PHP_EOL;
+		    }
+		}
+{/php}
+	    </ul>
+          </div>
+          <label for="timezone">{php} echo gettext("TIMEZONE");{/php}</label>
+          <div class="select-styling">
+	    <input class="form-styling" type="text" value="{$curzonename}" dataval = "{$curzonecode}" name="timezone" id="timezone" onfocus="this.blur()" onclick="this.blur()"/>
+	    <ul id="zonelist">
+{php}
+		global $timezone_list;
+		if ($timezone_list) {
+		    foreach ($timezone_list AS $value) {
+			echo '<li><a href="#" class="zoneselect" dataval="'.$value[1].'">'.$value[0].'</a></li>'.PHP_EOL;
+		    }
+		}
+{/php}
+	    </ul>
+          </div>
+          <a class="btn-submit btn-signup">{php} echo gettext("Create Account");{/php}</a>
+	</form>
+{php}}{/php}
+      </div>
+<!--
+      <div class="success">
+              <svg width="270" height="270" xmlns="https://www.w3.org/2000/svg" xmlns:xlink="https://www.w3.org/1999/xlink" x="0px" y="0px" viewBox="0 0 60 60" id="check" ng-class="checked ? 'checked' : ''">
+                 <path fill="#ffffff" d="M40.61,23.03L26.67,36.97L13.495,23.788c-1.146-1.147-1.359-2.936-0.504-4.314
+                  c3.894-6.28,11.169-10.243,19.283-9.348c9.258,1.021,16.694,8.542,17.622,17.81c1.232,12.295-8.683,22.607-20.849,22.042
+                  c-9.9-0.46-18.128-8.344-18.972-18.218c-0.292-3.416,0.276-6.673,1.51-9.578" />
+                <div class="successtext">
+                   <p> Thanks for signing up! Check your email for confirmation.</p>
+                </div>
+      </div>
+-->
+    </div>
+  </div>
+  <div>
+  <a id="refresh" value="Refresh" onClick="history.go()">
+    <svg class="refreshicon"   version="1.1" id="Capa_1"  xmlns="https://www.w3.org/2000/svg" xmlns:xlink="https://www.w3.org/1999/xlink" x="0px" y="0px"
+         width="25px" height="25px" viewBox="0 0 322.447 322.447" style="enable-background:new 0 0 322.447 322.447;"
+         xml:space="preserve">
+         <path  d="M321.832,230.327c-2.133-6.565-9.184-10.154-15.75-8.025l-16.254,5.281C299.785,206.991,305,184.347,305,161.224
+                c0-84.089-68.41-152.5-152.5-152.5C68.411,8.724,0,77.135,0,161.224s68.411,152.5,152.5,152.5c6.903,0,12.5-5.597,12.5-12.5
+                c0-6.902-5.597-12.5-12.5-12.5c-70.304,0-127.5-57.195-127.5-127.5c0-70.304,57.196-127.5,127.5-127.5
+                c70.305,0,127.5,57.196,127.5,127.5c0,19.372-4.371,38.337-12.723,55.568l-5.553-17.096c-2.133-6.564-9.186-10.156-15.75-8.025
+                c-6.566,2.134-10.16,9.186-8.027,15.751l14.74,45.368c1.715,5.283,6.615,8.642,11.885,8.642c1.279,0,2.582-0.198,3.865-0.614
+                l45.369-14.738C320.371,243.946,323.965,236.895,321.832,230.327z"/>
+    </svg>
+  </a>
+  </div>
+  <div class="footer">
 <!--    <div style="color: #BD2A15; font-size: 11px; text-align:center;">{$COPYRIGHT}</div>
 -->
 {php}
@@ -122,30 +188,19 @@
 
     $show_logo .= ' <a href="http://www.gnu.org/licenses/agpl.html" target="_blank"><img src="' . KICON_PATH . '/agplv3-155x51.png" alt="AGPLv3"/></a> &nbsp; ';
 {/php}
-
     <table style="width:100%;margin:0 auto;" align="center">
     <tr><td valign="top" align="center" class="tableBodyRight">{php} echo $show_logo;{/php}
-<!--LiveInternet counter-->
-<script type="text/javascript">
-document.write("<a href='http://www.liveinternet.ru/click' "+
-"target=_blank><img src='//counter.yadro.ru/hit?t39.2;r"+
-escape(document.referrer)+((typeof(screen)=="undefined")?"":
-";s"+screen.width+"*"+screen.height+"*"+(screen.colorDepth?
-screen.colorDepth:screen.pixelDepth))+";u"+escape(document.URL)+
-";"+Math.random()+
-"' alt='' title='LiveInternet' "+
-"border='0' width='31' height='31'><\/a>")
-</script>
-<!--/LiveInternet-->
     </td></tr></table>
-
-    </div>
-	</form>
-{literal}
-<script LANGUAGE="JavaScript">
-	//document.form.pr_login.focus();
-        $("#ui_language").change(function () {
-          self.location.href= "index.php?ui_language="+$("#ui_language option:selected").val();
-        });
+  </div>
+</div>
+<script src="./javascript/jquery/jquery-1.7.2.min.js"></script>
+<script src="./javascript/index.js"></script>
+{if ($error >= 5)}
+<script language="JavaScript">
+$(document).ready(function() {
+$(".forgot a").click();
+});
 </script>
-{/literal}
+{/if}
+</body>
+</html>

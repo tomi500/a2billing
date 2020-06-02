@@ -34,14 +34,14 @@
 
 include ("lib/customer.defines.php");
 include ("lib/customer.module.access.php");
-include ("lib/customer.smarty.php");
+include_once ("lib/customer.smarty.php");
 include ("lib/epayment/includes/configure.php");
 include ("lib/epayment/includes/html_output.php");
 include ("./lib/epayment/includes/general.php");
 
 if (!has_rights(ACX_ACCESS)) {
 	Header("HTTP/1.0 401 Unauthorized");
-	Header("Location: PP_error.php?c=accessdenied");
+	Header("Location: PP_error?c=accessdenied");
 	die();
 }
 
@@ -65,7 +65,7 @@ if (!$customer_res || !is_array($customer_res)) {
 $customer_info = $customer_res[0];
 if ($customer_info[14] != "1" && $customer_info[14] != "8") {
 	Header("HTTP/1.0 401 Unauthorized");
-	Header("Location: PP_error.php?c=accessdenied");
+	Header("Location: PP_error?c=accessdenied");
 	die();
 }
 

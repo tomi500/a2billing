@@ -1,4 +1,4 @@
-# A2Billing Customer Panel - PO File. 
+# A2Billing Customer Panel - PO File.
 # Copyright (C) 2004-2009 A2BILLING
 # This file is distributed under the same license as the PACKAGE package.
 # ARESKI <areski@gmail.com>.
@@ -50,6 +50,14 @@ msgstr "Сб"
 #: lib/Form/Class.FormHandler.EditForm.inc.php
 msgid "Su"
 msgstr "Вс"
+
+#: A2B_entity_greeting.php
+msgid " dependent records.<br>"
+msgstr " зависимых записи.<br>"
+
+#: A2B_entity_greeting.php
+msgid " dependent record.<br>"
+msgstr " зависимая запись.<br>"
 
 #: form_data/FG_var_sipiax_info.inc:136
 msgid "Enter right number from range below exclude afore existing numbers"
@@ -790,8 +798,8 @@ msgid "Insert code from above picture"
 msgstr "Введите код с картинки"
 
 #: form_data/FG_var_signup.inc:333
-msgid "Enter code from above picture here."
-msgstr "Введите 6 символов с картинки."
+msgid "Enter code from picture here"
+msgstr "Введите код с картинки"
 
 #: form_data/FG_var_signup.inc:425
 msgid "You can modify, through the following form, the different properties of your "
@@ -1563,7 +1571,7 @@ msgstr "Номер звонящего"
 
 #: form_data/FG_var_callerid.inc:48 form_data/FG_var_callerid.inc:81
 msgid "CALLERID"
-msgstr "НОМЕР ЗВОНЯЩЕГО &lt;CallerID&gt;"
+msgstr "НОМЕР ЗВОНЯЩЕГО<br>&lt;CallerID&gt;"
 
 #: form_data/FG_var_callerid.inc:54
 msgid "CallerID list"
@@ -2189,7 +2197,7 @@ msgstr "Сообщение"
 
 #: lib/Form/Class.FormHandler.DelForm.inc.php:53
 msgid "You have "
-msgstr "Имеется"
+msgstr "Имеется "
 
 #: lib/Form/Class.FormHandler.DelForm.inc.php:208
 msgid "Remove this "
@@ -3293,38 +3301,6 @@ msgstr "Удаление"
 msgid "Inserted"
 msgstr "Довавить новое"
 
-#: forgotpassword.php:56
-msgid "Please wait 1 minutes before making any other request for the forgot password!"
-msgstr "Пожалуйста подождите одну минуту перед тем как делать запрос пароля снова!"
-
-#: forgotpassword.php:85
-msgid "Error : Mail sender"
-msgstr ""
-
-#: forgotpassword.php:104
-msgid "Your login information email has been sent to you."
-msgstr "На Ваш адрес электронной почты отправлено сообщение c информацией о существующем пароле.<br><br>Не получили электронное сообщение? Проверьте, нет ли письма в папке, предназначенной для спама и рекламных сообщений (Spam/Junk)."
-
-#: forgotpassword.php:107
-msgid "No such login exists."
-msgstr ""
-
-#: forgotpassword.php:110
-msgid "Invalid Action."
-msgstr ""
-
-#: forgotpassword.php:113
-msgid "Please provide your email address to get your login information."
-msgstr ""
-
-#: forgotpassword.php:127
-msgid "You must enter an email address!"
-msgstr ""
-
-#: forgotpassword.php:147
-msgid "FORGOT YOUR PASSWORD?"
-msgstr "ЗАБЫЛИ СВОЙ ПАРОЛЬ?"
-
 #: A2B_invoice_view.php:145
 msgid "Print"
 msgstr "Печать"
@@ -3698,9 +3674,97 @@ msgstr "номера от"
 msgid "to"
 msgstr "до"
 
-#: templates/default/index.tpl:61
+#: forgotpassword.php:56
+msgid "Please wait 1 minute before making any other request for the forgot password!"
+msgstr "Пожалуйста, подождите одну минуту<br>перед тем как делать запрос пароля снова!"
+
+#: forgotpassword.php:85
+msgid "Mail sender error.<br>Try again please."
+msgstr "Email не был отправлен по неизвестной причине.<br>Попробуйте еще раз."
+
+#: forgotpassword.php:104
+msgid "Your login information email<br>has been sent to you."
+msgstr "На Ваш адрес электронной почты<br>отправлено сообщение c информацией<br>о существующем пароле.<br><br>Не получили электронное сообщение?<br>Проверьте, нет ли письма в папке,<br>предназначенной для спама и<br>рекламных сообщений (Spam/Junk)."
+
+#: templates/default/index.tpl:107
+msgid "AUTHENTICATION REFUSED :<br>please check your login/password!"
+msgstr "АВТОРИЗАЦИЯ ОТКЛОНЕНА<br>Пожалуйста, проверьте Ваши логин/пароль!"
+
+#: templates/default/index.tpl:109
+msgid "INACTIVE ACCOUNT :<br>Your account need to be activated!"
+msgstr "АККАУНТ НЕ АКТИВИРОВАН<br>Ваш аккаунт нуждается в активации!"
+
+#: templates/default/index.tpl:111
+msgid "BLOCKED ACCOUNT :<br>Please contact the administrator!"
+msgstr "АККАУНТ ЗАБЛОКИРОВАН<br>Пожалуйста свяжитесь с администратором!"
+
+#: templates/default/index.tpl:113
+msgid "NEW ACCOUNT :<br>Your account has not been validate yet!"
+msgstr "НОВЫЙ АККАУНТ:<br>Ваш аккаунт ещё не проверен!"
+
+#: templates/default/index.tpl
+msgid "Sign in"
+msgstr "Вход"
+
+#: templates/default/index.tpl
+msgid "Sign up"
+msgstr "Регистрация"
+
+#: templates/default/index.tpl
+msgid "Login / E-mail"
+msgstr "Логин / E-mail пользователя"
+
+#: common/lib/customer.module.access.php
+msgid "Too frequent requests"
+msgstr "Слишком частые запросы"
+
+#: templates/default/index.tpl
 msgid "Password"
 msgstr "Пароль"
+
+#: templates/default/index.tpl
+msgid "Keep me signed in"
+msgstr "Помнить меня"
+
+#: templates/default/index.tpl
+msgid "Login"
+msgstr "Войти"
+
+#: templates/default/index.tpl
+msgid "Full name"
+msgstr "Имя и фамилия"
+
+#: templates/default/index.tpl
+msgid "Create Account"
+msgstr "Создать аккаунт"
+
+#: templates/default/index.tpl
+msgid "Forgot your password?"
+msgstr "Забыли свой пароль?"
+
+#: templates/default/index.tpl
+msgid "Get password"
+msgstr "Запросить пароль"
+
+#: templates/default/index.tpl
+msgid "You must enter an email address!"
+msgstr "Введите ваш действительный email адрес!"
+
+#: templates/default/index.tpl
+msgid "No such login exists"
+msgstr "Пользователь с таким email не найден"
+
+#: templates/default/index.tpl
+msgid "Invalid Action"
+msgstr "Недопустимая операция"
+
+#: templates/default/index.tpl
+msgid "Service temporally not available.<br>Try again later."
+msgstr "Сервис временно недоступен.<br>Проверьте подключение к Интернету<br>и повторите запрос."
+
+#: templates/default/index.tpl
+msgid "Please provide your valid email address<br>to get your login information"
+msgstr "Пожалуйста, укажите правильный адрес,<br>чтобы получить информацию для входа."
 
 #: A2B_entity_sipiax_info.php:118
 msgid "Between 8-20 characters, include Latin letters and numbers"
@@ -4389,42 +4453,6 @@ msgstr "СО СТАТУСОМ 'ОПЛАЧЕНО'"
 #: Public/A2B_entity_moneysituation.php:177
 msgid "NB INVOICE WITH UNPAID STATUS"
 msgstr "К ОПЛАТЕ"
-
-#: templates/default/index.tpl:49
-msgid "AUTHENTICATION"
-msgstr "АВТОРИЗАЦИЯ"
-
-#: templates/default/index.tpl:57
-msgid "User"
-msgstr "Пользователь"
-
-#: templates/default/index.tpl:95
-msgid "Forgot your password ?"
-msgstr "Забыли пароль ?"
-
-#: templates/default/index.tpl:95 templates/default/index.tpl:98
-msgid "Click here"
-msgstr "Нажмите тут"
-
-#: templates/default/index.tpl:98
-msgid "To sign up"
-msgstr "Для регистрации"
-
-#: templates/default/index.tpl:107
-msgid "AUTHENTICATION REFUSED :<br>please check your user/password!"
-msgstr "АВТОРИЗАЦИЯ ОТКЛОНЕНА<br>Пожалуйста проверьте Ваши логин/пароль!"
-
-#: templates/default/index.tpl:109
-msgid "INACTIVE ACCOUNT :<br>Your account need to be activated!"
-msgstr "АККАУНТ НЕ АКТИВИРОВАН<br>Ваш аккаунт нуждается в активации!"
-
-#: templates/default/index.tpl:111
-msgid "BLOCKED ACCOUNT :<br>Please contact the administrator!"
-msgstr "АККАУНТ ЗАБЛОКИРОВАН<br>Пожалуйста свяжитесь с администратором!"
-
-#: templates/default/index.tpl:113
-msgid "NEW ACCOUNT :<br>Your account has not been validate yet!"
-msgstr ""
 
 #: signup_confirmation.php:46
 msgid "Sorry the confirmation email has been sent already, multi-signup are not authorized! Please wait 2 minutes before making any other signup!"

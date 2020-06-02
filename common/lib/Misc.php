@@ -1819,10 +1819,10 @@ function Display_Login_Button ($DBHandle, $id) {
 	$password = $list_card_info[0][1];
 	$link = CUSTOMER_UI_URL;
 
-	if (strpos($link, 'index.php') !== false) {
-		$link = substr($link, 0, strlen($link)-9) . 'userinfo.php';
+	if (strpos($link, 'index') !== false) {
+		$link = substr($link, 0, strlen($link)-9) . 'userinfo';
 	} else {
-		$link = $link . '/userinfo.php';
+		$link = $link . '/userinfo';
 	}
 	$content = '<div align="right" style="padding-right:20px;">
 		<form action="'.$link.'" method="POST" target="_blank" name="formcust">

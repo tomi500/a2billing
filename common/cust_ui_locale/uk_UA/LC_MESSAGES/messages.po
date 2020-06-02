@@ -19,6 +19,94 @@ msgstr ""
 "X-Poedit-Language: Ukrainian\n"
 "X-Poedit-Country: UKRAINE\n"
 
+#: templates/default/index.tpl
+msgid "Mail sender error.<br>Try again please."
+msgstr "Email не був надісланий з невідомої причини.<br>Спробуйте ще раз."
+
+#: templates/default/index.tpl
+msgid "Your login information email<br>has been sent to you."
+msgstr "На Вашу адресу електронної пошти<br>надіслано повідомлення з інформацією<br>про поточний пароль.<br><br>Не отримали електронне повідомлення?<br>Перевірте, чи немає листа в папці,<br>призначеної для спаму і<br>рекламних повідомлень (Spam/Junk)."
+
+#: templates/default/index.tpl
+msgid "Forgot your password?"
+msgstr "Забули свій пароль?"
+
+#: lib/customer.module.access.php
+msgid "AUTHENTICATION REFUSED :<br>please check your login/password!"
+msgstr "АВТОРИЗАЦІЮ ВІДХИЛЕНО<br>Будь ласка, перевірте Ваші логін/пароль!"
+
+#: lib/customer.module.access.php
+msgid "INACTIVE ACCOUNT :<br>Your account need to be activated!"
+msgstr "АКАУНТ НЕ АКТИВОВАНО<br>Ваш акаунт потребує активації!"
+
+#: lib/customer.module.access.php
+msgid "BLOCKED ACCOUNT :<br>Please contact the administrator!"
+msgstr "АКАУНТ ЗАБЛОКОВАНО<br>Будь ласка зв'яжіться з адміністратором!"
+
+#: lib/customer.module.access.php
+msgid "NEW ACCOUNT :<br>Your account has not been validate yet!"
+msgstr "НОВИЙ АКАУНТ:<br>Ваш акаунт ще не перевірено!"
+
+#: lib/customer.module.access.php
+msgid "Too frequent requests"
+msgstr "Дуже часті запити"
+
+#: templates/default/index.tpl
+msgid "Sign in"
+msgstr "Вхід"
+
+#: templates/default/index.tpl
+msgid "Sign up"
+msgstr "Реєстрація"
+
+#: templates/default/index.tpl
+msgid "Login / E-mail"
+msgstr "Логін / E-mail користувача"
+
+#: templates/default/index.tpl
+msgid "Password"
+msgstr "Пароль"
+
+#: templates/default/index.tpl
+msgid "Keep me signed in"
+msgstr "Запам'ятати мене"
+
+#: templates/default/index.tpl
+msgid "Login"
+msgstr "Ввійти"
+
+#: templates/default/index.tpl
+msgid "Full name"
+msgstr "Ім'я та прізвище"
+
+#: templates/default/index.tpl
+msgid "Create Account"
+msgstr "Створити акаунт"
+
+#: templates/default/index.tpl
+msgid "Get password"
+msgstr "Отримати пароль"
+
+#: templates/default/index.tpl
+msgid "You must enter an email address!"
+msgstr "Введіть Вашу email адресу!"
+
+#: templates/default/index.tpl
+msgid "No such login exists"
+msgstr "Користувача з такою email адресою не знайдено"
+
+#: templates/default/index.tpl
+msgid "Invalid Action"
+msgstr "Неприпустима операція"
+
+#: templates/default/index.tpl
+msgid "Service temporally not available.<br>Try again later."
+msgstr "Сервіс тимчасово недоступний.<br>Перевірте підключення до Інтернету<br>та повторіть запит."
+
+#: templates/default/index.tpl
+msgid "Please provide your valid email address<br>to get your login information"
+msgstr "Будь ласка, вкажіть правильну email адресу,<br>щоб отримати інформацію для входу."
+
 #: A2B_notification.php:76
 #, fuzzy
 msgid "Your notification settings has successfully been updated."
@@ -2773,35 +2861,6 @@ msgstr "Видалення"
 msgid "Inserted"
 msgstr "Додано"
 
-#: forgotpassword.php:56
-msgid "Please wait 1 minutes before making any other request for the forgot password!"
-msgstr "Будь-ласка, зачекайте 1 хвилину перед наступною спробою відновлення пароля!"
-
-#: forgotpassword.php:85
-msgid "Error : Mail sender"
-msgstr ""
-
-#: forgotpassword.php:104
-msgid "Your login information email has been sent to you."
-msgstr "Вашу ідентифікаційну інформацію надіслано Вам на e-mail."
-
-#: forgotpassword.php:107
-msgid "No such login exists."
-msgstr "Такого логіну не існує."
-
-#: forgotpassword.php:110
-msgid "Invalid Action."
-msgstr "Невірна дія."
-
-#: forgotpassword.php:113
-#, fuzzy
-msgid "Please provide your email address to get your login information."
-msgstr "Будь-ласка, введіть Вашу e-mail адресу для отримання ідентифікаційної інформації."
-
-#: forgotpassword.php:127
-msgid "You must enter an email address!"
-msgstr "Ви повинні ввести e-mail адресу!"
-
 #: A2B_invoice_view.php:145
 msgid "Print"
 msgstr ""
@@ -3134,11 +3193,6 @@ msgstr "SIP"
 #, fuzzy
 msgid "Username"
 msgstr "Ім'я"
-
-#: A2B_entity_sipiax_info.php:118 templates/default/index.tpl:61
-#, fuzzy
-msgid "Password"
-msgstr "Новий Пароль"
 
 #: A2B_entity_sipiax_info.php:120
 #, fuzzy
@@ -3615,44 +3669,6 @@ msgstr ""
 #: templates/default/main.tpl:126
 msgid "LOGOUT"
 msgstr "Вихід"
-
-#: templates/default/index.tpl:49
-#, fuzzy
-msgid "AUTHENTICATION"
-msgstr "НАПРЯМОК"
-
-#: templates/default/index.tpl:57
-msgid "User"
-msgstr ""
-
-#: templates/default/index.tpl:95
-#, fuzzy
-msgid "Forgot your password ?"
-msgstr "Забули пароль?"
-
-#: templates/default/index.tpl:95 templates/default/index.tpl:98
-msgid "Click here"
-msgstr ""
-
-#: templates/default/index.tpl:98
-msgid "To sign up"
-msgstr ""
-
-#: templates/default/index.tpl:107
-msgid "AUTHENTICATION REFUSED : please check your user/password!"
-msgstr ""
-
-#: templates/default/index.tpl:109
-msgid "INACTIVE ACCOUNT : Your account need to be activated!"
-msgstr ""
-
-#: templates/default/index.tpl:111
-msgid "BLOCKED ACCOUNT : Please contact the administrator!"
-msgstr ""
-
-#: templates/default/index.tpl:113
-msgid "NEW ACCOUNT : Your account has not been validate yet!"
-msgstr ""
 
 #: signup_confirmation.php:46
 msgid "Sorry the confirmation email has been sent already, multi-signup are not authorized! Please wait 2 minutes before making any other signup!"
