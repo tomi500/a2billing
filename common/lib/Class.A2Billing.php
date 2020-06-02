@@ -2205,9 +2205,11 @@ $this -> debug( ERROR, $agi, __FILE__, __LINE__, "[ \033[1;34m".$agi->get_variab
 						$this->src = $this->src_peername = $this->calledexten = "NULL";
 
 						// INSERT CDR  & UPDATE SYSTEM
+						if ($key === false || $dialstatus == "ANSWER" || $dialstatus == "CANCEL")
+							$this -> destination_start_inuse($agi, $inst_listdestination[1], false);
 						$RateEngine->rate_engine_updatesystem($this, $agi, $this->destination, $doibill, 2);
 						if ($dialstatus == "CANCEL") {
-						    $this -> destination_start_inuse($agi, $inst_listdestination[1], false);
+//						    $this -> destination_start_inuse($agi, $inst_listdestination[1], false);
 						    break 2;
 						}
 						$answeredtime = $RateEngine->answeredtime;
@@ -2228,9 +2230,10 @@ $this -> debug( ERROR, $agi, __FILE__, __LINE__, "[ \033[1;34m".$agi->get_variab
 						$answeredtime = $this -> call_fax($agi, 2);
 						if ($this->set_inuse_username)
 							$this -> callingcard_acct_start_inuse($agi,0);
+						$this -> destination_start_inuse($agi, $inst_listdestination[1], false);
 					    }
 					    // THEN STATUS IS ANSWER
-					    $this -> destination_start_inuse($agi, $inst_listdestination[1], false);
+//					    $this -> destination_start_inuse($agi, $inst_listdestination[1], false);
 					    break 2;
 					}
 					$this -> destination_start_inuse($agi, $inst_listdestination[1], false);
@@ -2841,8 +2844,8 @@ $this -> debug( ERROR, $agi, __FILE__, __LINE__, "[ \033[1;34m".$agi->get_variab
                 $this->dnid = $this->destination;
                 $this->extension = $this->destination = $inst_listdestination[4];
                 $ast = $this -> callingcard_ivr_authorize($agi, $RateEngine, 0, -2);
-                if ($ast==1 ||  $ast=='2FAX') {
-                  if ($ast==1) {
+//                if ($ast==1 || $ast=='2FAX') {
+                if ($ast==1) {
                     // PERFORM THE CALL
 		    if ($agi -> channel_status('',true) != AST_STATE_DOWN) {
 			$this->agiconfig['dialcommand_param'] = $this->agiconfig['dialcommand_param_call_2did'];
@@ -2855,8 +2858,8 @@ $this -> debug( ERROR, $agi, __FILE__, __LINE__, "[ \033[1;34m".$agi->get_variab
 
                     $dialstatus = $RateEngine->dialstatus;
                     $answeredtime = $RateEngine->answeredtime;
-                    if ((($dialstatus == "NOANSWER") || ($dialstatus == "BUSY") ||
-                            ($dialstatus == "CHANUNAVAIL") || ($dialstatus == "CONGESTION")) && $keytotal > $callcount) {
+                    if ((($dialstatus == "NOANSWER")    || ($dialstatus == "BUSY") ||
+                         ($dialstatus == "CHANUNAVAIL") || ($dialstatus == "CONGESTION")) && $keytotal > $callcount) {
 				if ($key !== false /*&& is_null($this->voicebox) && is_null($didvoicebox)*/) {
 				    if ($dialstatus  == "BUSY") {
 					$this -> let_stream_listening($agi);
@@ -2872,8 +2875,10 @@ $this -> debug( ERROR, $agi, __FILE__, __LINE__, "[ \033[1;34m".$agi->get_variab
 				}
 				$this -> destination_start_inuse($agi, $inst_listdestination[1], false);
 				continue 2;
-                            }
+		    }
 		    if ($dialstatus != "ANSWER") $this -> destination = $this -> realdestination;
+		    if ($key === false || $dialstatus == "ANSWER" || $dialstatus == "CANCEL")
+			$this -> destination_start_inuse($agi, $inst_listdestination[1], false);
 					
                     // INSERT CDR  & UPDATE SYSTEM
                     $RateEngine->rate_engine_updatesystem($this, $agi, $this-> destination, $doibill, 2);
@@ -2891,10 +2896,11 @@ $this -> debug( ERROR, $agi, __FILE__, __LINE__, "[ \033[1;34m".$agi->get_variab
 			    }
 			    continue;
 			}
-			$this -> destination_start_inuse($agi, $inst_listdestination[1], false);
+			if ($dialstatus != "CANCEL")
+			    $this -> destination_start_inuse($agi, $inst_listdestination[1], false);
 			continue 2;
                     }
-			if ($key !== false && $dialstatus != "ANSWER" /*&& is_null($this->voicebox) && is_null($didvoicebox)*/) {
+		    if ($key !== false && $dialstatus != "ANSWER" /*&& is_null($this->voicebox) && is_null($didvoicebox)*/) {
 			    if ($dialstatus  == "BUSY") {
 				$this -> let_stream_listening($agi);
 				$agi-> stream_file('prepaid-isbusy', '#');
@@ -2906,15 +2912,17 @@ $this -> debug( ERROR, $agi, __FILE__, __LINE__, "[ \033[1;34m".$agi->get_variab
 				$agi-> stream_file('prepaid-dest-unreachable', '#');
 			    }
 			    continue;
-			}
-		  } elseif ($ast=='2FAX') {
+		    }
+		} elseif ($ast=='2FAX') {
 			$answeredtime = $this -> call_fax($agi, 2);
 			if ($this->set_inuse_username) {
 				$this -> callingcard_acct_start_inuse($agi,0);
 			}
-		  }
+			$this -> destination_start_inuse($agi, $inst_listdestination[1], false);
+//		  }
+		} else {
+		    $this -> destination_start_inuse($agi, $inst_listdestination[1], false);
 		}
-		$this -> destination_start_inuse($agi, $inst_listdestination[1], false);
 	    }
 	    break;
 	    }// END WHILE(true)
@@ -2997,93 +3005,96 @@ $this -> debug( ERROR, $agi, __FILE__, __LINE__, "[ \033[1;34m".$agi->get_variab
 				'encoding' => AudioEncoding::LINEAR16,
 				'sample_rate_hertz' => 8000,
 				'language_code' => $languageCode,
-				'enable_automatic_punctuation' => true,
+				'diarization_speaker_count' => 2,
+				'enable_speaker_diarization' => true,
 //				'model'=> 'phone_call',
 				'use_enhanced' => true,
-				'diarization_speaker_count' => 2,
-				'enable_speaker_diarization' => true
+				'enable_automatic_punctuation' => true
 			    ]);
-			    if ($languageCode == 'en-US')  $config->setModel('phone_call');
-			    if (isset($alternateLangCode)) $config->setAlternativeLanguageCodes($alternateLangCode);
+//			    if ($languageCode == 'en-US')  $config->setModel('phone_call');
+//			    if (isset($alternateLangCode)) $config->setAlternativeLanguageCodes($alternateLangCode);
 
 			    $transcript = $languageCode;
 			    if (isset($alternateLangCode))
 				$transcript .= ", " . implode(", ", $alternateLangCode);
+			    $transcript .= PHP_EOL . gettext("Duration: ") . sprintf ( "%02d", intval ( $answeredtime / 60 ) ) . ":" . sprintf ( "%02d", intval ( $answeredtime % 60 ) );
 
-			    // Instantiates a client
-			    $client = new SpeechClient();
-
-			    if ($answeredtime <= 60) {
-				$content = file_get_contents($audioFile);
-				$audio = (new RecognitionAudio())
-				    ->setContent($content);
-				try {
-				    $response = $client->recognize($config, $audio);
-				    foreach ($response->getResults() as $result) {
-					$alternatives = $result->getAlternatives();
-					$mostLikely = $alternatives[0];
-					$transcript .= PHP_EOL.$mostLikely->getTranscript();
-				    }
-				} catch (Exception $e) {
-				    $this -> debug( ERROR, $agi, __FILE__, __LINE__, "[Recognize Speech-to-text error]: ".var_export($e->getMessage(),true));
-				}
-			    } else {
-				$storage = new StorageClient(/*[
+			    if ($answeredtime > 1) {
+//				    $QUERY = " INSERT INTO cc_callback_spool (uniqueid, status, server_ip, num_attempt, channel, exten, context, priority," ;
+//				    $agi -> evaluate("ASYNCAGI BREAK");
+				    // Instantiates a client
+				    $client = new SpeechClient();
+				    if ($answeredtime <= 60) {
+					$content = file_get_contents($audioFile);
+					$audio = (new RecognitionAudio())
+					    ->setContent($content);
+					try {
+					    $response = $client->recognize($config, $audio);
+					    foreach ($response->getResults() as $result) {
+						$alternatives = $result->getAlternatives();
+						$mostLikely = $alternatives[0];
+						$transcript .= PHP_EOL.$mostLikely->getTranscript();
+					    }
+					} catch (Exception $e) {
+					    $this -> debug( ERROR, $agi, __FILE__, __LINE__, "[Recognize Speech-to-text error]: ".var_export($e->getMessage(),true));
+					}
+				    } else {
+					$storage = new StorageClient(/*[
 						'keyFile' => json_decode(file_get_contents($keyFilePath), true),
 						'keyFilePath' => $keyFilePath,
 						'projectId' => $projectId
-				]*/);
+					]*/);
 
-				$bucketName = strtolower($this->config['global']['google_storage_bucketname']);
-				$bucketLocation = $this->config['global']['bucket_location'];
-				$bucket = $storage->bucket($bucketName);
-				if (!$bucket->exists()) {
-					$bucket = $storage->createBucket($bucketName, [ 'location' => $bucketLocation ]);
-				}
+					$bucketName = strtolower($this->config['global']['google_storage_bucketname']);
+					$bucketLocation = $this->config['global']['bucket_location'];
+					$bucket = $storage->bucket($bucketName);
+					if (!$bucket->exists()) {
+					    $bucket = $storage->createBucket($bucketName, [ 'location' => $bucketLocation ]);
+					}
 
-				// Upload a file to the bucket.
-				$object = $bucket->upload(
-				    fopen($audioFile, 'r'), ['name' => $objectName]
-				);
+					// Upload a file to the bucket.
+					$object = $bucket->upload(
+					    fopen($audioFile, 'r'), ['name' => $objectName]
+					);
 
-				// set string as audio content
-				$audio = (new RecognitionAudio())
-				    ->setUri("gs://".$bucketName."/".$objectName);
+					// set string as audio content
+					$audio = (new RecognitionAudio())
+					    ->setUri("gs://".$bucketName."/".$objectName);
 
-				// create the asyncronous recognize operation
-				$operation = $client->longRunningRecognize($config, $audio);
-				$operation->pollUntilComplete();
+					// create the asyncronous recognize operation
+					$operation = $client->longRunningRecognize($config, $audio);
+					$operation->pollUntilComplete();
 
-				if ($operation->operationSucceeded()) {
-				    // Detects speech in the audio file
-				    $response = $operation->getResult();
+					if ($operation->operationSucceeded()) {
+					    // Detects speech in the audio file
+					    $response = $operation->getResult();
 
-				    // Save most likely transcription
-				    $speakertag = 100;
-				    foreach ($response->getResults() as $result) {
-					$alternatives = $result->getAlternatives();
-					$mostLikely   = $alternatives[0];
-//					$transcript .= PHP_EOL.$mostLikely->getTranscript();
-					foreach ($mostLikely->getWords() as $speakers) {
-					    if ($speakertag != $speakers->getSpeakerTag()) {
-						$speakertag  = $speakers->getSpeakerTag();
-						if ($speakertag>0) $transcript .= PHP_EOL."<u>Speaker".$speakertag.":</u> ";
+					    // Save most likely transcription
+					    $speakertag = 100;
+					    foreach ($response->getResults() as $result) {
+						$alternatives = $result->getAlternatives();
+						$mostLikely   = $alternatives[0];
+//						$transcript .= PHP_EOL.$mostLikely->getTranscript();
+						foreach ($mostLikely->getWords() as $speakers) {
+						    if ($speakertag != $speakers->getSpeakerTag()) {
+							$speakertag  = $speakers->getSpeakerTag();
+							if ($speakertag>0) $transcript .= PHP_EOL."<u>Speaker".$speakertag.":</u> ";
+						    }
+						    if ($speakertag>0) $transcript .= $speakers->getWord()." ";
+						}
 					    }
-					    if ($speakertag>0) $transcript .= $speakers->getWord()." ";
-				        }
+					    if (strpos($transcript,"Speaker") === false) foreach ($response->getResults() as $result) {
+						$alternatives = $result->getAlternatives();
+						$mostLikely   = $alternatives[0];
+						$transcript .= PHP_EOL.$mostLikely->getTranscript();
+					    }
+					} else {
+					    $this -> debug( ERROR, $agi, __FILE__, __LINE__, "[Recognize Speech-to-text error]: ".$operation->getError());
+					}
+					$object->delete();
 				    }
-				    if (strpos($transcript,"Speaker") === false) foreach ($response->getResults() as $result) {
-					$alternatives = $result->getAlternatives();
-					$mostLikely   = $alternatives[0];
-					$transcript .= PHP_EOL.$mostLikely->getTranscript();
-				    }
-				} else {
-				    $this -> debug( ERROR, $agi, __FILE__, __LINE__, "[Recognize Speech-to-text error]: ".$operation->getError());
-				}
-				$object->delete();
+				    $client->close();
 			    }
-
-			    $client->close();
 			}
 			include_once (dirname(__FILE__)."/Class.Mail.php");
 

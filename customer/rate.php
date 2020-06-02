@@ -29,6 +29,7 @@ $rate = Service_Get_RateInitial($u, $p, $t);
 
 $A2B -> DbDisconnect();
 
+header ( "Content-type: text/xml" );
 echo "<response>\n";
 echo "<error>0</error>\n";
 echo "<callRateString>";

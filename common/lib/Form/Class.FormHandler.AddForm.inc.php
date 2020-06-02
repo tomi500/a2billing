@@ -35,7 +35,7 @@ $processed = $this->getProcessed();
 			$pos = strpos($this->FG_TABLE_ADITION[$i][14], ":");
 			
 			if (strlen($this->FG_TABLE_ADITION[$i][16])>1 && strtoupper ($this->FG_TABLE_ADITION[$i][3])!=("HAS_MANY")) {
-				echo '<TR><TD width="%25" valign="top" bgcolor="#FEFEEE" colspan="2" class="tableBodyRight" ><i>';				
+				echo '<TR><TD valign="top" bgcolor="#FEFEEE" colspan="2" class="tableBodyRight" ><i>';				
 				echo $this->FG_TABLE_EDITION[$i][16];
 				echo '</i></TD></TR>';
 			}
@@ -44,11 +44,11 @@ $processed = $this->getProcessed();
 	?>
                <TR>
 			   <?php if (!$this-> FG_fit_expression[$i]  &&  isset($this-> FG_fit_expression[$i]) ){ ?>
-			<TD width="%25" valign="middle" class="form_head_red"> 		<?php echo $this->FG_TABLE_ADITION[$i][0]?> 		</TD>  
-		  	<TD width="%75" valign="top" class="tableBodyRight" background="<?php echo Images_Path;?>/background_cells_red.gif" class="text">
+			<TD valign="middle" class="form_head_red"> 		<?php echo $this->FG_TABLE_ADITION[$i][0]?> 		</TD>  
+		  	<TD valign="top" class="tableBodyRight" background="<?php echo Images_Path;?>/background_cells_red.gif" class="text">
         <?php }else{ ?>
-			<TD width="%25" valign="middle" class="form_head"> 		<?php echo $this->FG_TABLE_ADITION[$i][0]?> 		</TD>  
-			<TD width="%75" valign="top" class="tableBodyRight" background="<?php echo Images_Path;?>/background_cells.gif" class="text">
+			<TD valign="middle" class="form_head"> 		<?php echo $this->FG_TABLE_ADITION[$i][0]?> 		</TD>  
+			<TD valign="top" class="tableBodyRight" background="<?php echo Images_Path;?>/background_cells.gif" class="text">
 		<?php } ?>
 		
 	<?php 
@@ -79,7 +79,7 @@ $processed = $this->getProcessed();
 				<td> <img src="./captcha/captcha.php" ></td>
 			</tr>			
 			<tr>
-			<td><INPUT class="form_input_text" name=<?php echo $this->FG_TABLE_ADITION[$i][1]?>  <?php echo $this->FG_TABLE_ADITION[$i][4]?> value="<?php echo $processed[$this->FG_TABLE_ADITION[$i][1]];?>"> <?php echo gettext("Enter code from above picture here.")?>
+			<td><INPUT class="form_input_text" name=<?php echo $this->FG_TABLE_ADITION[$i][1]?>  <?php echo $this->FG_TABLE_ADITION[$i][4]?> value="<?php echo $processed[$this->FG_TABLE_ADITION[$i][1]];?>"> <?php echo gettext("Enter code from picture here")?>
 			</td>
 			</tr>
 			</table>
@@ -246,7 +246,7 @@ $processed = $this->getProcessed();
 		?>
 	
         </TBODY>
-      </TABLE>
+	<TR><TD colspan="2" nowrap>
 	  <TABLE cellspacing="0" class="editform_table8">
 		<tr>
 			<td width="50%" class="text_azul"><span class="tableBodyRight"><?php echo $this->FG_BUTTON_ADITION_BOTTOM_TEXT?></span></td>
@@ -259,4 +259,7 @@ $processed = $this->getProcessed();
 			</td>
 		</tr>
 	  </TABLE>
+       </TD>
+	</TR>
+      </TABLE>
 	</FORM>

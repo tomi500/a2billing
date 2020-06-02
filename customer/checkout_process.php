@@ -310,6 +310,7 @@ else
 	$VAT = $transaction_data[0][3];
 
 write_log(LOGFILE_EPAYMENT, basename(__FILE__).' line:'.__LINE__." - curr amount $currAmount $currCurrency BASE_CURRENCY=".BASE_CURRENCY);
+$currAmountBC = convert_currency($currencies_list, $currAmount, $currCurrency, BASE_CURRENCY);
 $fee = convert_currency($currencies_list, $mc_fee, $currCurrency, BASE_CURRENCY);
 $amount_without_vat = convert_currency($currencies_list, ($currAmount-$mc_fee) / (1+$VAT/100), $currCurrency, BASE_CURRENCY);
 $amount_paid = convert_currency($currencies_list, ($currAmount-$mc_fee), $currCurrency, BASE_CURRENCY);
@@ -422,7 +423,7 @@ if ($id > 0 && is_null($is_transaction[0][0])) {
 		
 		if ($currCurrency == BASE_CURRENCY)	$addfield = '';
 		$field_insert = "date, payment, card_id, id_logrefill, description, agent_id, fee";
-		$value_insert = "'$nowDate', '".$amount_paid."', '$id', '$id_logrefill', '".$pmodule.$addfield."', $id_agent_insert, '$fee'";
+		$value_insert = "'$nowDate', '".$currAmountBC/*$amount_paid*/."', '$id', '$id_logrefill', '".$pmodule.$addfield."', $id_agent_insert, '$fee'";
 		$instance_sub_table = new Table("cc_logpayment", $field_insert);
 		$id_payment = $instance_sub_table -> Add_table ($DBHandle, $value_insert, null, null,"id");
 		write_log(LOGFILE_EPAYMENT, basename(__FILE__).' line:'.__LINE__." - transactionID=$transactionID"." Add_table cc_logpayment : $field_insert - VALUES $value_insert");

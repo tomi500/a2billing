@@ -705,6 +705,14 @@ $HD_Form -> AddEditElement (gettext("dtlssetup"),
 						   "",
 						    "list", "", "", "", $values_list['dtlssetup'], "%1", "NO-NULL", gettext("Tell Asterisk to use actpass SDP parameter when setting up DTLS"));
 
+$HD_Form -> AddEditElement (gettext("RTCP_MUX"),
+						   "rtcp_mux",
+						   $rtcp_mux,
+						   "SELECT",
+						   "",
+						   "",
+						   "",
+						    "list", "", "", "", $values_list['rtcp_mux'], "%1", "NO-NULL", gettext("Tell Asterisk to do RTCP mux"));
 
 $HD_Form -> AddEditElement (gettext("ENCRYPTION"),
 						   "encryption",
@@ -1218,12 +1226,12 @@ if ($atmenu=='sip') {
 	$field_list_edit = 'id_cc_card, external, warning_threshold, say_dialednumber, say_rateinitial, say_timetotalk, say_balance_after_call, name, accountcode, regexten, callerid, cid_number, amaflags, ' .
 			'type, defaultuser, secret, qualify, defaultip, deny, permit, dtmfmode, disallow, allow, videosupport, host, port, context, language, subscribecontext, mailbox, fromuser, fromdomain, ' .
 			'insecure, auth, callgroup, pickupgroup, namedcallgroup, namedpickupgroup, mohsuggest, setvar, ' .
-			'avpf, force_avp, icesupport, dtlsenable, dtlsverify, dtlscertfile, dtlsprivatekey, dtlscafile, dtlssetup, encryption, ignorecryptolifetime, transport, t38pt_udptl, ' .
+			'avpf, force_avp, icesupport, dtlsenable, dtlsverify, dtlscertfile, dtlsprivatekey, dtlscafile, dtlssetup, rtcp_mux, encryption, ignorecryptolifetime, transport, t38pt_udptl, ' .
 			'username, md5secret, directmedia, nat, canreinvite, mask, restrictcid, rtpkeepalive, rtptimeout, rtpholdtimeout, musiconhold, allowtransfer, subscribemwi, vmexten, callingpres, ' .
 			'usereqphone, callcounter, `call-limit`, musicclass, autoframing, maxcallbitrate, outboundproxy, callbackextension';
 } else {
 	$field_list_edit = 'id_cc_card, external, name, accountcode, regexten, callerid, cid_number, amaflags, type, secret, qualify, defaultip, deny, permit, disallow, allow, host, port, context, language, ' .
-			'auth, mohsuggest, setvar, avpf, force_avp, icesupport, dtlsenable, dtlsverify, dtlscertfile, dtlsprivatekey, dtlscafile, dtlssetup, encryption, username, forceencryption, trunk, ' .
+			'auth, mohsuggest, setvar, avpf, force_avp, icesupport, dtlsenable, dtlsverify, dtlscertfile, dtlsprivatekey, dtlscafile, dtlssetup, rtcp_mux, encryption, username, forceencryption, trunk, ' .
 			'dbsecret, regcontext, sourceaddress, mohinterpret, inkeys, outkey,  sendani, fullname,  maxauthreq, transfer, ' .
 			'jitterbuffer, forcejitterbuffer, codecpriority, qualifysmoothing, qualifyfreqok, qualifyfreqnotok, timezone, adsi, requirecalltoken, maxcallnumbers, maxcallnumbers_nonvalidated';
 }

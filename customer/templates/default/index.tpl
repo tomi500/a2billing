@@ -7,9 +7,6 @@
     <meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
     <title>{$CCMAINTITLE}</title>
     <link rel="stylesheet" href="templates/default/css/index.css" type="text/css">
-    <link rel="canonical" href="https://customer.sipde.net" />
-<!--    <ript data-ad-client="ca-pub-3831618686142206" async src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js"></script>
--->
 </head>
 <body>
 <script language="JavaScript">

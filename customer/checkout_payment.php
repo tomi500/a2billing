@@ -46,7 +46,7 @@ include ("./lib/customer.smarty.php");
 
 if (! has_rights (ACX_ACCESS)) {
 	Header ("HTTP/1.0 401 Unauthorized");
-	Header ("Location: PP_error.php?c=accessdenied");
+	Header ("Location: PP_error?c=accessdenied");
 	die();
 }
 
@@ -109,7 +109,7 @@ if (!$customer_info || !is_array($customer_info)) {
 
 if ($customer_info[0][1] != "1" && $customer_info[0][1] != "8") {
     Header("HTTP/1.0 401 Unauthorized");
-    Header("Location: PP_error.php?c=accessdenied");
+    Header("Location: PP_error?c=accessdenied");
     die();
 }
 

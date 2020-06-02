@@ -39,7 +39,7 @@ include ("lib/customer.smarty.php");
 
 if (! has_rights (ACX_CALL_HISTORY)) {
 	Header ("HTTP/1.0 401 Unauthorized");
-	Header ("Location: PP_error.php?c=accessdenied");
+	Header ("Location: PP_error?c=accessdenied");
 	die();
 }
 
@@ -121,7 +121,7 @@ if ($numrow == 0) exit();
 
 if ($customer_info[14] != "1" && $customer_info[14] != "8") {
 	Header("HTTP/1.0 401 Unauthorized");
-	Header("Location: PP_error.php?c=accessdenied");
+	Header("Location: PP_error?c=accessdenied");
 	die();
 }
 
@@ -313,7 +313,7 @@ switch ($choose_callowner) {
 
 if ($accdie)	{
 	Header("HTTP/1.0 401 Unauthorized");
-	Header("Location: PP_error.php?c=accessdenied");
+	Header("Location: PP_error?c=accessdenied");
 	die();
 }
 

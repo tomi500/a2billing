@@ -38,7 +38,7 @@ include ("lib/customer.smarty.php");
 
 if (! has_rights (ACX_ACCESS)) {
 	Header ("HTTP/1.0 401 Unauthorized");
-	Header ("Location: PP_error.php?c=accessdenied");	   
+	Header ("Location: PP_error?c=accessdenied");	   
 	die();
 }
 

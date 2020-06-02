@@ -35,14 +35,15 @@
 include ("./lib/customer.defines.php");
 include ("./lib/customer.module.access.php");
 include ("./lib/Form/Class.FormHandler.inc.php");
-include ("./form_data/FG_var_notify.inc");
-include ("./lib/customer.smarty.php");
 
 if (!has_rights(ACX_NOTIFICATION)) {
 	Header("HTTP/1.0 401 Unauthorized");
-	Header("Location: PP_error.php?c=accessdenied");
+	Header("Location: PP_error?c=accessdenied");
 	die();
 }
+
+include ("./form_data/FG_var_notify.inc");
+include ("./lib/customer.smarty.php");
 
 $HD_Form->setDBHandler(DbConnect());
 

@@ -13,7 +13,6 @@ foreach ($this->FG_TABLE_EDITION as $sts) {
 		if (!$dynaform) {
 ?>
 <script language="JavaScript" type="text/JavaScript">
-<!--
 	var WEEKDAYS = {"dows": [<?php echo $weekdays;?>]};
 	var TIMEINTERVALLIST = {"format": "%HH%:%MM%",
                                 "empt": "00:00",
@@ -27,7 +26,6 @@ foreach ($this->FG_TABLE_EDITION as $sts) {
                                 "CancelTxt": "<?php echo gettext("Cancel")?>",
                                 "OkTxt": " <?php echo gettext("Ok")?> ",
                                 "hidedays": true};
-// -->
 </script>
 <!-- Init jQuery, jQuery UI and jQuery PI -->
 <link href="./javascript/jquery/jquery.pi_ctl.min.css" type="text/css" rel="stylesheet">
@@ -55,8 +53,8 @@ foreach ($this->FG_TABLE_EDITION as $sts) {
 		<?php if (substr($sts[3], -1) == "3") { ?>&nbsp;
 		<?php echo gettext("Action every")?> <b><input class="form_input_text" name="inputa[]" value="10" size="4" maxlength="3" /></b>&nbsp;<font style="color:#BC2222"><?php echo gettext("sec")?></font>&nbsp;&nbsp;
 		<?php echo gettext("Num calls per action")?>: <b><input class="form_input_text" name="inputb[]" value="1" size="4" maxlength="1" /></b>&nbsp;&nbsp;
-		<?php echo gettext("Max duration, sec")?>: <b><input class="form_input_text" name="inputc[]" value="60" size="4" maxlength="3" /></b>
-		<?php } ?>
+		<?php echo gettext("Max duration, sec")?>: <b><input class="form_input_text" name="inputc[]" value="60" size="4" maxlength="3" /></b><?php
+		      } ?> 
     </div>
 </div>
 <?php
@@ -288,21 +286,20 @@ function updatecontent(id_el, record, field_inst, instance)
 		}
 	}
 ?>
-
 <table class="editform_table1" cellspacing="2">
 <?php
 	for($i=0;$i<$this->FG_NB_TABLE_EDITION;$i++) { 
 		$pos = strpos($this->FG_TABLE_EDITION[$i][14], ':'); // SQL CUSTOM QUERY		
 		if (strlen($this->FG_TABLE_EDITION[$i][16])>1) {
-			echo '<TR><TD width="%25" valign="top" bgcolor="#FEFEEE" colspan="2" class="tableBodyRight" ><i>';				
+			echo '<TR><TD valign="top" bgcolor="#FEFEEE" colspan="2" class="tableBodyRight" ><i>';				
 			echo $this->FG_TABLE_EDITION[$i][16];
 			echo '</i></TD></TR>';
 		}
 		if (!$pos) {
 ?>		<TR>
 <?php		if (!$this-> FG_fit_expression[$i]  &&  isset($this-> FG_fit_expression[$i]) ){
-?>			<TD width="%25" valign="middle" class="form_head_red">		<?php echo $this->FG_TABLE_EDITION[$i][0]?>		</TD>
-			<TD width="%75" valign="top" class="tableBodyRight" background="<?php echo Images_Path;?>/background_cells_red.gif" >
+?>			<TD valign="middle" class="form_head_red">		<?php echo $this->FG_TABLE_EDITION[$i][0]?>		</TD>
+			<TD valign="top" class="tableBodyRight" background="<?php echo Images_Path;?>/background_cells_red.gif" >
 <?php		} else { ?>
 			<TD valign="middle" class="form_head">		<?php echo $this->FG_TABLE_EDITION[$i][0]?>		</TD>
 			<TD valign="top" class="tableBodyRight" background="<?php echo Images_Path;?>/background_cells.gif" >
@@ -1237,7 +1234,7 @@ echo $this->FG_TABLE_COMMENT[$i]?>&nbsp;<?php
 							}// end if pos
 			}//END_FOR ?>
 				               
-              </TABLE>
+	<TR><TD colspan="2" nowrap>
 	  <TABLE cellspacing="0" class="editform_table8">
 		<tr>
 			<td width="50%"><span class="tableBodyRight"><?php echo $this->FG_BUTTON_EDITION_BOTTOM_TEXT?></span></td>
@@ -1246,4 +1243,6 @@ echo $this->FG_TABLE_COMMENT[$i]?>&nbsp;<?php
 			</td>
 		</tr>
 	  </TABLE>
+	 </TD></TR>
+              </TABLE>
 </FORM>

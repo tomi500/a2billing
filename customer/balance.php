@@ -29,6 +29,7 @@ $balance = Service_Get_Balance($u, $p);
 
 $A2B -> DbDisconnect();
 
+header ( "Content-type: text/xml" );
 if (isset($html) && $html=="1") {
     echo "<pre>";
     echo $balance[0];

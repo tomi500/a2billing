@@ -86,6 +86,7 @@ $HD_Form -> CV_NO_FIELDS  = gettext("THERE IS NO CARD FOUNDED!");
 $HD_Form -> CV_DISPLAY_LINE_TITLE_ABOVE_TABLE = false;
 $HD_Form -> CV_TEXT_TITLE_ABOVE_TABLE = '';
 $HD_Form -> CV_DISPLAY_FILTER_ABOVE_TABLE = false;
+$HD_Form -> FG_VIEW_TABLE_WITDH = '80%';
 
 
 $HD_Form -> FG_EDITION = false;
@@ -108,7 +109,7 @@ if (has_rights (ACX_DISTRIBUTION) && !($popup_select>=1)) {
 	$HD_Form -> FG_OTHER_BUTTON4 = true;
 	$HD_Form -> FG_OTHER_BUTTON5 = true;
 	$HD_Form -> FG_OTHER_BUTTON1_LINK= "javascript:;\" onClick=\"MM_openBrWindow('A2B_entity_moneysituation_details?type=sipiax&form_action=list&atmenu=SIP&displayheader=0&popup_select=1&idcust=|param|','','scrollbars=yes,resizable=yes,width=650,height=415,left=550,top=200,screenX=550,screenY=200')";
-	$HD_Form -> FG_OTHER_BUTTON2_LINK= "javascript:;\" onClick=\"MM_openBrWindow('A2B_entity_callerid?form_action=list&displayheader=0&popup_select=1&idcust=|param|','','scrollbars=yes,resizable=yes,width=600,height=450,left=600,top=200,screenX=600,screenY=200')";
+	$HD_Form -> FG_OTHER_BUTTON2_LINK= "javascript:;\" onClick=\"MM_openBrWindow('A2B_entity_callerid?form_action=list&displayheader=0&popup_select=1&idcust=|param|','','scrollbars=yes,resizable=yes,width=650,height=450,left=650,top=200,screenX=650,screenY=200')";
 	$HD_Form -> FG_OTHER_BUTTON3_LINK= "javascript:;\" onClick=\"MM_openBrWindow('didivr?popup_select=1&choose_callowner=4&id=|param|','','scrollbars=yes,resizable=yes,width=950,height=500,left=160,top=180,screenX=160,screenY=180')";
 	$HD_Form -> FG_OTHER_BUTTON4_LINK= "javascript:;\" onClick=\"MM_openBrWindow('call-history?popup_select=1&choose_callowner=4&id=|param|','','scrollbars=yes,resizable=yes,width=950,height=500,left=160,top=180,screenX=160,screenY=180')";
 //	$HD_Form -> FG_OTHER_BUTTON4_LINK= "javascript:;\" onClick=\"MM_openBrWindow('A2B_entity_moneysituation_details?type=payment&form_action=list&atmenu=card&displayheader=0&popup_select=1&idcust=|param|','','scrollbars=yes,resizable=yes,width=550,height=415,left=600,top=200,screenX=600,screenY=200')";

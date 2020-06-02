@@ -88,8 +88,8 @@ class paypalcreditcard {
 					 tep_draw_hidden_field('PAYMENTREQUEST_0_CURRENCYCODE', $my_currency) .
 					 tep_draw_hidden_field('PAYMENTREQUEST_0_ITEMAMT', number_format($order->info['total'], $currencyObject->get_decimal_places($my_currency))) .
 					 tep_draw_hidden_field('PAYMENTREQUEST_0_AMT', number_format($order->info['total'], $currencyObject->get_decimal_places($my_currency))) .
-					 tep_draw_hidden_field('RETURNURL', tep_href_link("userinfo.php", '', 'SSL')) .
-					 tep_draw_hidden_field('CANCELURL', tep_href_link("checkout_payment.php", '', 'SSL')) .
+					 tep_draw_hidden_field('RETURNURL', tep_href_link("userinfo", '', 'SSL')) .
+					 tep_draw_hidden_field('CANCELURL', tep_href_link("checkout_payment", '', 'SSL')) .
 					 tep_draw_hidden_field('SOLUTIONTYPE', 'Sole') .
 					 tep_draw_hidden_field('LANDINGPAGE', 'Billing') .
 					 tep_draw_hidden_field('NO_SHIPPING', '1') .
@@ -111,9 +111,9 @@ class paypalcreditcard {
 //					 tep_draw_hidden_field('shipping', number_format($order->info['shipping_cost'] * $currencyObject->get_value($my_currency), $currencyObject->get_decimal_places($my_currency))) .
 					 tep_draw_hidden_field('currency_code', $my_currency) .
 					 tep_draw_hidden_field('notify_url', tep_href_link("checkout_process.php?transactionID=".$transactionID."&sess_id=".session_id()."&key=".$key, '', 'SSL')) .
-					 tep_draw_hidden_field('return', tep_href_link("userinfo.php", '', 'SSL')) .
+					 tep_draw_hidden_field('return', tep_href_link("userinfo", '', 'SSL')) .
 					 tep_draw_hidden_field('cbt', gettext('Return to ').STORE_NAME) .
-					 tep_draw_hidden_field('cancel_return', tep_href_link("userinfo.php", '', 'SSL'));
+					 tep_draw_hidden_field('cancel_return', tep_href_link("userinfo", '', 'SSL'));
 **/
 
 		return $process_button_string;

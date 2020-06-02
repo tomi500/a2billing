@@ -14,9 +14,6 @@
 			   <link href="templates/default/css/style-def.css" rel="stylesheet" type="text/css">
 		{/if}
 	<script type="text/javascript" src="./javascript/jquery/jquery-1.7.2.min.js"></script>
-
-	<link rel="canonical" href="https://customer.sipde.net" />
-	<script data-ad-client="ca-pub-3831618686142206" async src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js"></script>
 </HEAD>
 
 <BODY leftmargin="0" topmargin="0" marginwidth="0" marginheight="0">
