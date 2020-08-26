@@ -269,12 +269,16 @@ if ($form_action == "list") {
 		<tr>
 	</form>
 	</table>
+</center>
+<?php
+    } else {?>
+	<audio id="sound2" preload="none" controlsList="nodownload"></audio>
+<?php
+    } ?>
 	<audio id="sound1" preload="none" controlsList="nodownload"></audio>
 	<script language="JavaScript"> var langfirst = '<?php echo $langlocale?>', voicefirst = '<?php echo $voicename?>', soundpath2 = '<?php echo $_SERVER['PHP_SELF']; ?>?langlocale='; document.theForm.range_weight_disp.value=<?php echo $speakingRate?>;</script>
 	<script language="JavaScript" src="./javascript/player.js"></script>
-</center>
 <?php
-    }
 }
 
 // #### TOP SECTION PAGE
