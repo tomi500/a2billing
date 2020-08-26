@@ -1502,3 +1502,67 @@ SPAN.errorText {
 	font-size: 10px;
 	color: #666666;
 }
+/* Cookie notification */
+#cookiescript_container {
+  background-color: rgba(0,0,0,.8);
+  z-index: 999999;
+  position: fixed;
+  width: 100%;
+  padding: 15px 0 5px 0;
+  left: 0px;
+  font-size: 13px;
+  font-weight: normal;
+  text-align: left;
+  letter-spacing: normal;
+  color: #fff;
+  box-shadow: 0px 0px 8px #000;
+  top: 0px;
+}
+#cookiescript_wrapper {
+  max-width: 900px;
+  margin: 0 auto;
+  font-size: 13px;
+  font-weight: normal;
+  color: #fff;
+  line-height: 18px;
+  letter-spacing: normal;
+  text-align: justify;
+}
+#cookiescript_wrapper A {
+  color: #7777F7;
+}
+
+#cookiescript_wrapper A:visited {
+  color: #77F777;
+}
+#cookiescript_header {
+  z-index: 999999;
+  padding: 0px 0px 7px;
+  text-align: center;
+  color: #fff;
+  display: block;
+  font-size: 15px;
+  font-weight: bold;
+  margin: 0px;
+}
+#cookiescript_buttons {
+  width: 186px;
+  margin: 0px auto;
+  font-size: 13px;
+  font-weight: normal;
+  text-align: center;
+}
+#cookiescript_accept {
+  border-radius: 5px;
+  border: 0px none;
+  padding: 6px 10px;
+  font-weight: bold;
+  font-size: 13px;
+  cursor: pointer;
+  margin: 5px 0px;
+  transition: all 0.25s ease 0s;
+  text-shadow: 0px 0px 2px #000;
+  background-color: #88bd46;
+  color: #fff;
+}
+/* Cookie notification END */

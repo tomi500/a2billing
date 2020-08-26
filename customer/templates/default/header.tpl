@@ -3,13 +3,12 @@
 <html xmlns="http://www.w3.org/1999/xhtml" xml:lang="en" lang="en">
 <HEAD>
 	<link rel="shortcut icon" href="{$FAVICONPATH}">
-	<title>{$CCMAINTITLE}</title>
+	<title>{php}echo basename($_SESSION["last_page"],".php"){/php} | {$CCMAINTITLE}</title>
 	<meta charset="UTF-8" name="viewport" content="width=device-width, initial-scale=1.0">
 	<meta http-equiv="Content-Type" content="text/html; charset=UTF-8"/>
 
     <link href="templates/{$SKIN_NAME}/css/main.css" rel="stylesheet" type="text/css">
     <link href="templates/{$SKIN_NAME}/css/menu.css" rel="stylesheet" type="text/css">
-    
     {if LANGUAGE == "farsi" }
         <link href="templates/{$SKIN_NAME}/css/right2left.css" rel="stylesheet" type="text/css">
     {/if}

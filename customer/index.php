@@ -92,7 +92,7 @@ if (has_rights(ACX_ACCESS)) {
 
 $zippostcode = '';
 //      -= Need to install GeoIP http://ua2.php.net/manual/en/geoip.setup.php =-
-if (geoip_db_avail(GEOIP_REGION_EDITION_REV0) || geoip_db_avail(GEOIP_REGION_EDITION_REV1)) {
+if (function_exists('geoip_db_avail') && (geoip_db_avail(GEOIP_REGION_EDITION_REV0) || geoip_db_avail(GEOIP_REGION_EDITION_REV1))) {
         $countryregion = geoip_record_by_name($_SERVER['REMOTE_ADDR']);
         $zippostcode = "value='".$countryregion['postal_code']."'"; // ZIP/POSTAL CODE
 } else {
@@ -143,6 +143,7 @@ $timezone_list = get_timezones();
                         $UserDateTime           = new DateTime('2017-12-14', $UserDateTimeZone);
                         $servergmt              = $UserDateTime->getOffset();
                 } else $servergmt = SERVER_GMT;
+
                 foreach ($timezone_list as $key => $cur_value) {
                         $timezone_list[$key] = array (
                                 $cur_value[2],

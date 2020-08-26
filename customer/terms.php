@@ -32,8 +32,14 @@
 **/
 
 
+$disable_load_conf = true;
+
 include ("lib/customer.defines.php");
 include ("lib/customer.module.access.php");
+include ("lib/customer.smarty.php");
 
- Header ("Location: .");
-?>
+$smarty -> assign("CUSTOMER_INTERFACE_URL", CUSTOMER_INTERFACE_URL);
+$smarty -> assign("MAILTO", "support@sipde.net");
+$smarty -> assign("ADDRESS", "support@sipde.net");
+
+$smarty -> display('terms.tpl');

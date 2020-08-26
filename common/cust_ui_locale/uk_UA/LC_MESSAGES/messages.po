@@ -52,6 +52,18 @@ msgid "Too frequent requests"
 msgstr "Дуже часті запити"
 
 #: templates/default/index.tpl
+msgid "By creating this account, you agree to our <a href=\"terms\">Terms</a> and <a href=\"policy\">Privacy Policy</a>."
+msgstr "Створюючи акаунт ви погоджуєтеся з <a href=\"terms\">Умовами Користування</a> та <a href=\"policy\">Політикою Конфіденційності</a>"
+
+#: templates/default/index.tpl
+msgid "This website uses cookies"
+msgstr "Цей веб-сайт використовує cookie-файли"
+
+#: templates/default/index.tpl
+msgid "Got it!"
+msgstr "Погоджуюсь!"
+
+#: templates/default/index.tpl
 msgid "Sign in"
 msgstr "Вхід"
 
@@ -80,8 +92,8 @@ msgid "Full name"
 msgstr "Ім'я та прізвище"
 
 #: templates/default/index.tpl
-msgid "Create Account"
-msgstr "Створити акаунт"
+msgid "Agree and Create Account"
+msgstr "Погоджуюсь, Створити акаунт"
 
 #: templates/default/index.tpl
 msgid "Get password"
@@ -3101,17 +3113,16 @@ msgid "There is an error on this page!"
 msgstr "Помилка на цій сторінці!"
 
 #: PP_error.php:48
-#, fuzzy
-msgid "Sorry, you don't have access to this page !"
+msgid "Sorry, you don't have access to this page!"
 msgstr "Вибачте, у Вас немає доступу до цієї сторінки!"
 
 #: PP_error.php:60
 msgid "ERROR PAGE"
-msgstr ""
+msgstr "ПОМИЛКА"
 
 #: PP_error.php:73
 msgid "GO TO LOGIN PAGE"
-msgstr ""
+msgstr "ПОВЕРНУТИСЯ НА СТОРІНКУ ВХОДУ"
 
 #: A2B_billing_preview.php:83
 msgid "Cost of calls between the "

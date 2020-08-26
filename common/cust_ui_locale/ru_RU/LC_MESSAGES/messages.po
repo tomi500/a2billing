@@ -15,6 +15,110 @@ msgstr ""
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
 
+#: forgotpassword.php:56
+msgid "Please wait 1 minute before making any other request for the forgot password!"
+msgstr "Пожалуйста, подождите одну минуту<br>перед тем как делать запрос пароля снова!"
+
+#: forgotpassword.php:85
+msgid "Mail sender error.<br>Try again please."
+msgstr "Email не был отправлен по неизвестной причине.<br>Попробуйте еще раз."
+
+#: forgotpassword.php:104
+msgid "Your login information email<br>has been sent to you."
+msgstr "На Ваш адрес электронной почты<br>отправлено сообщение c информацией<br>о существующем пароле.<br><br>Не получили электронное сообщение?<br>Проверьте, нет ли письма в папке,<br>предназначенной для спама и<br>рекламных сообщений (Spam/Junk)."
+
+#: templates/default/index.tpl:107
+msgid "AUTHENTICATION REFUSED :<br>please check your login/password!"
+msgstr "АВТОРИЗАЦИЯ ОТКЛОНЕНА<br>Пожалуйста, проверьте Ваши логин/пароль!"
+
+#: templates/default/index.tpl:109
+msgid "INACTIVE ACCOUNT :<br>Your account need to be activated!"
+msgstr "АККАУНТ НЕ АКТИВИРОВАН<br>Ваш аккаунт нуждается в активации!"
+
+#: templates/default/index.tpl:111
+msgid "BLOCKED ACCOUNT :<br>Please contact the administrator!"
+msgstr "АККАУНТ ЗАБЛОКИРОВАН<br>Пожалуйста свяжитесь с администратором!"
+
+#: templates/default/index.tpl:113
+msgid "NEW ACCOUNT :<br>Your account has not been validate yet!"
+msgstr "НОВЫЙ АККАУНТ:<br>Ваш аккаунт ещё не проверен!"
+
+#: templates/default/index.tpl
+msgid "Sign in"
+msgstr "Вход"
+
+#: templates/default/index.tpl
+msgid "Sign up"
+msgstr "Регистрация"
+
+#: templates/default/index.tpl
+msgid "Login / E-mail"
+msgstr "Логин / E-mail пользователя"
+
+#: common/lib/customer.module.access.php
+msgid "Too frequent requests"
+msgstr "Слишком частые запросы"
+
+#: templates/default/index.tpl
+msgid "Password"
+msgstr "Пароль"
+
+#: templates/default/index.tpl
+msgid "Keep me signed in"
+msgstr "Помнить меня"
+
+#: templates/default/index.tpl
+msgid "By creating this account, you agree to our <a href=\"terms\">Terms</a> and <a href=\"policy\">Privacy Policy</a>."
+msgstr "Создавая аккаунт вы соглашаетесь с <a href=\"terms\">Условиями Использования</a> и <a href=\"policy\">Политикой Конфиденциальности</a>"
+
+#: templates/default/index.tpl
+msgid "This website uses cookies"
+msgstr "Этот веб-сайт использует cookie-файлы"
+
+#: templates/default/index.tpl
+msgid "Got it!"
+msgstr "Принять и продолжить"
+
+#: templates/default/index.tpl
+msgid "Login"
+msgstr "Войти"
+
+#: templates/default/index.tpl
+msgid "Full name"
+msgstr "Имя и фамилия"
+
+#: templates/default/index.tpl
+msgid "Agree and Create Account"
+msgstr "Соглашаюсь, Создать аккаунт"
+
+#: templates/default/index.tpl
+msgid "Forgot your password?"
+msgstr "Забыли свой пароль?"
+
+#: templates/default/index.tpl
+msgid "Get password"
+msgstr "Запросить пароль"
+
+#: templates/default/index.tpl
+msgid "You must enter an email address!"
+msgstr "Введите ваш действительный email адрес!"
+
+#: templates/default/index.tpl
+msgid "No such login exists"
+msgstr "Пользователь с таким email не найден"
+
+#: templates/default/index.tpl
+msgid "Invalid Action"
+msgstr "Недопустимая операция"
+
+#: templates/default/index.tpl
+msgid "Service temporally not available.<br>Try again later."
+msgstr "Сервис временно недоступен.<br>Проверьте подключение к Интернету<br>и повторите запрос."
+
+#: templates/default/index.tpl
+msgid "Please provide your valid email address<br>to get your login information"
+msgstr "Пожалуйста, укажите правильный адрес,<br>чтобы получить информацию для входа."
+
 #: lib/Form/Class.FormHandler.EditForm.inc.php
 msgid "Hours"
 msgstr "Часов"
@@ -145,7 +249,7 @@ msgstr "АВТОМАТИЧЕСКИ СОЗДАННАЯ КОМИССИЯ!"
 
 #: lib/customer.help.php:159
 msgid "This screen shows refills and payments made against each account, along with the current credit on each card. The initial amount of credit applied to the card is not included. The amount owing is calculated by subtracting payments from refills."
-msgstr "Просматривайте баллансы, счета и платежи своих клиентов. В правой колонке можно выбрать информацию о других параметрах, а так же пополнить баланс клиента или вернуть средства.<br/><u>ВНИМАНИЕ</u>! Отмена проведенного перевода средств невозможна!"
+msgstr "Просматривайте балансы, счета и платежи своих клиентов. В правой колонке можно выбрать информацию о других параметрах, а так же пополнить баланс клиента или вернуть средства.<br/><u>ВНИМАНИЕ</u>! Отмена проведенного перевода средств невозможна!"
 
 #: paypal.php:72
 msgid "Payment for "
@@ -3548,8 +3652,7 @@ msgid "There is an error on this page!"
 msgstr "Ошибка на странице!"
 
 #: PP_error.php:48
-#, fuzzy
-msgid "Sorry, you don't have access to this page !"
+msgid "Sorry, you don't have access to this page!"
 msgstr "У Вас нет доступа на эту страницу!"
 
 #: PP_error.php:60
@@ -3558,7 +3661,7 @@ msgstr "ОШИБКА"
 
 #: PP_error.php:73
 msgid "GO TO LOGIN PAGE"
-msgstr "ПЕРЕЙТИ НА СТРАНИЦУ  ЛОГИНА"
+msgstr "ПЕРЕЙТИ НА СТРАНИЦУ ВХОДА"
 
 #: A2B_billing_preview.php:83
 msgid "Cost of calls between the "
@@ -3673,98 +3776,6 @@ msgstr "номера от"
 #: A2B_entity_sipiax_info.php:138
 msgid "to"
 msgstr "до"
-
-#: forgotpassword.php:56
-msgid "Please wait 1 minute before making any other request for the forgot password!"
-msgstr "Пожалуйста, подождите одну минуту<br>перед тем как делать запрос пароля снова!"
-
-#: forgotpassword.php:85
-msgid "Mail sender error.<br>Try again please."
-msgstr "Email не был отправлен по неизвестной причине.<br>Попробуйте еще раз."
-
-#: forgotpassword.php:104
-msgid "Your login information email<br>has been sent to you."
-msgstr "На Ваш адрес электронной почты<br>отправлено сообщение c информацией<br>о существующем пароле.<br><br>Не получили электронное сообщение?<br>Проверьте, нет ли письма в папке,<br>предназначенной для спама и<br>рекламных сообщений (Spam/Junk)."
-
-#: templates/default/index.tpl:107
-msgid "AUTHENTICATION REFUSED :<br>please check your login/password!"
-msgstr "АВТОРИЗАЦИЯ ОТКЛОНЕНА<br>Пожалуйста, проверьте Ваши логин/пароль!"
-
-#: templates/default/index.tpl:109
-msgid "INACTIVE ACCOUNT :<br>Your account need to be activated!"
-msgstr "АККАУНТ НЕ АКТИВИРОВАН<br>Ваш аккаунт нуждается в активации!"
-
-#: templates/default/index.tpl:111
-msgid "BLOCKED ACCOUNT :<br>Please contact the administrator!"
-msgstr "АККАУНТ ЗАБЛОКИРОВАН<br>Пожалуйста свяжитесь с администратором!"
-
-#: templates/default/index.tpl:113
-msgid "NEW ACCOUNT :<br>Your account has not been validate yet!"
-msgstr "НОВЫЙ АККАУНТ:<br>Ваш аккаунт ещё не проверен!"
-
-#: templates/default/index.tpl
-msgid "Sign in"
-msgstr "Вход"
-
-#: templates/default/index.tpl
-msgid "Sign up"
-msgstr "Регистрация"
-
-#: templates/default/index.tpl
-msgid "Login / E-mail"
-msgstr "Логин / E-mail пользователя"
-
-#: common/lib/customer.module.access.php
-msgid "Too frequent requests"
-msgstr "Слишком частые запросы"
-
-#: templates/default/index.tpl
-msgid "Password"
-msgstr "Пароль"
-
-#: templates/default/index.tpl
-msgid "Keep me signed in"
-msgstr "Помнить меня"
-
-#: templates/default/index.tpl
-msgid "Login"
-msgstr "Войти"
-
-#: templates/default/index.tpl
-msgid "Full name"
-msgstr "Имя и фамилия"
-
-#: templates/default/index.tpl
-msgid "Create Account"
-msgstr "Создать аккаунт"
-
-#: templates/default/index.tpl
-msgid "Forgot your password?"
-msgstr "Забыли свой пароль?"
-
-#: templates/default/index.tpl
-msgid "Get password"
-msgstr "Запросить пароль"
-
-#: templates/default/index.tpl
-msgid "You must enter an email address!"
-msgstr "Введите ваш действительный email адрес!"
-
-#: templates/default/index.tpl
-msgid "No such login exists"
-msgstr "Пользователь с таким email не найден"
-
-#: templates/default/index.tpl
-msgid "Invalid Action"
-msgstr "Недопустимая операция"
-
-#: templates/default/index.tpl
-msgid "Service temporally not available.<br>Try again later."
-msgstr "Сервис временно недоступен.<br>Проверьте подключение к Интернету<br>и повторите запрос."
-
-#: templates/default/index.tpl
-msgid "Please provide your valid email address<br>to get your login information"
-msgstr "Пожалуйста, укажите правильный адрес,<br>чтобы получить информацию для входа."
 
 #: A2B_entity_sipiax_info.php:118
 msgid "Between 8-20 characters, include Latin letters and numbers"

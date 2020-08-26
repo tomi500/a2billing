@@ -65,15 +65,35 @@ $HD_Form -> FG_DEBUG = 0;
 $actived_list = Constants::getActivationTrueFalseList();
 $yesno = Constants::getYesNoList();
 
+$destlist = array();
+$QUERYpop = "SELECT ivrname FROM cc_ivr WHERE id_cc_card=".$_SESSION["card_id"]." ORDER BY ivrname";
+$resmax = $DBHandle->Execute($QUERYpop);
+if ($resmax) {
+	foreach ($resmax as $val)
+	    $destlist[] = array($val[0],$val[0]);
+}
+$QUERYpop = "SELECT regexten FROM cc_sip_buddies WHERE id_cc_card=".$_SESSION["card_id"]." AND external=0 AND regexten>0 ORDER BY regexten";
+$resmax = $DBHandle->Execute($QUERYpop);
+if ($resmax) {
+	foreach ($resmax as $val)
+	    $destlist[] = array($val[0],$val[0]);
+}
+$QUERYpop = "SELECT cid FROM cc_callerid WHERE id_cc_card=".$_SESSION["card_id"]." AND blacklist=0 ORDER BY cid";
+$resmax = $DBHandle->Execute($QUERYpop);
+if ($resmax) {
+	foreach ($resmax as $val)
+	    $destlist[] = array($val[0],$val[0]);
+}
 
 $HD_Form -> AddViewElement(gettext("CALLERID"), "cid", "20%", "center", "sort");
 $HD_Form -> AddViewElement(gettext("D I S A"), "activated", "14%", "center\" nowrap \"", "sort", "26", "list", $actived_list);
+$HD_Form -> AddViewElement(gettext("BLACKLIST"), "verify", "14%", "center", "SORT");
 $HD_Form -> AddViewElement(gettext("CALLBACK"), "callback", "17%", "center", "SORT", "", "list", $yesno);
 $HD_Form -> AddViewElement(gettext("PHONE FORWARD"), "phonenumber", "25%", "center", "sort", "26");
 $HD_Form -> AddViewElement(gettext("VERIFY"), "verify", "20%", "center", "SORT");
 
 
-$HD_Form -> FieldViewElement ("cid, cc_callerid.activated, callback, phonenumber, IF(verify=0,'<font color=red>".gettext('No')."</font>','<font color=green>".gettext('Yes')."</font>')");
+$HD_Form -> FieldViewElement ("cid, cc_callerid.activated, IF(blacklist=0,'".gettext('No')."','<font color=red>".gettext('Yes')."</font>'), callback, phonenumber, IF(verify=0,'<font color=red>".gettext('No')."</font>','<font color=green>".gettext('Yes')."</font>')");
 
 $HD_Form -> CV_TITLE_TEXT = gettext("CallerID list");
 $HD_Form -> CV_NO_FIELDS  = gettext("There are no Caller IDs created");
@@ -183,11 +203,12 @@ if ($form_action != 'ask-delete') {
 	$HD_Form -> AddEditElement (gettext("PHONE FORWARD"),
 			    "phonenumber",
 			    '$value',
-			    "INPUT",
-			    "size=50 maxlength=50",
-			    "22",
+			    ($form_action=='ask-delete')?"INPUT":"DATALIST",
+			    "size=50 maxlength=50 style=\"width: 250px;\"",
+			    "0",//"22",
 			    gettext("Enter the phone"),
-			    "", "", "", "", "", "", "NO", gettext("Enter the phone number for immediatly dial instead prompt to dial"));
+			    "list" , "", "", "", $destlist , "%1", "NO", gettext("Enter here the phonenumber or IVR name you wish to send call, or select destination from the drop-down list"));
+//			    "", "", "", "", "", "", "NO", gettext("Enter the phone number for immediatly dial instead prompt to dial"));
 
 	$HD_Form -> AddEditElement (gettext("CALLBACK"),
 			   "callback",

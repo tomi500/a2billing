@@ -128,6 +128,7 @@ define ("COMP_WEB_ENABLE", isset($A2B->config["signup"]['field_company_website']
 define ("VAT_RN_ENABLE", isset($A2B->config["signup"]['field_VAT_RN'])?$A2B->config["signup"]['field_VAT_RN']:0);
 define ("TRAFFIC_ENABLE", isset($A2B->config["signup"]['field_traffic'])?$A2B->config["signup"]['field_traffic']:0);
 define ("TRAFFIC_TARGET_ENABLE", isset($A2B->config["signup"]['field_traffic_target'])?$A2B->config["signup"]['field_traffic_target']:0);
+define ("CUSTOMER_INTERFACE_URL", isset($A2B->config["signup"]['urlcustomerinterface'])?$A2B->config["signup"]['urlcustomerinterface']:"");
 
 // For ePayment Modules
 define('PULL_DOWN_DEFAULT', 'Please Select');

@@ -1,5 +1,5 @@
 {
-  "name": "a2billing",
+  "name": "sipde.net/a2billing",
   "description": "Phone billing system based on PHP",
   "autoload": {
     "psr-4": {
@@ -13,7 +13,8 @@
     "guzzlehttp/guzzle": "^6.3",
     "google/cloud-speech": "^0.24.0",
     "google/cloud-storage": "^1.12",
-    "phpmailer/phpmailer": "^6.1"
+    "phpmailer/phpmailer": "^6.1",
+    "league/iso3166": "^2.1"
   },
   "license": "AGPL",
   "authors": [

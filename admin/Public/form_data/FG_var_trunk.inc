@@ -143,24 +143,29 @@ if ($popup_select) {
 	$HD_Form -> FG_ADDITION = true;
 }
 
-$def_value_inuse = '';
-$def_value_maxuse = '';
-$def_maxsecperperiod = '';
-$def_timeleft = '';
-$def_billblocksec = '';
 if (isset($form_action) && $form_action=="ask-add"){
 	$def_value_inuse = "value='0'";
 	$def_value_maxuse = "value='-1'";
 	$def_maxsecperperiod = "value='-1'";
 	$def_timeleft = "value='60'";
 	$def_billblocksec = "value='1'";
+	$def_period = "value='31'";
 	$begin_date = date("Y");
 //	$begin_date_plus = date("Y")+15;
 	$begin_date_plus = "2036";
 	$end_date = date("-m-d H:i:s");
 	$comp_date = "value='".$begin_date.$end_date."'";
 	$comp_date_plus = "value='".$begin_date_plus.$end_date."'";
-	$tomorrow_date = "value='".date("Y-m-d 00:00:00",mktime(0, 0, 0, date("m"), date("d")+1, date("Y")))."'";
+//	$tomorrow_date = "value='".date("Y-m-d 00:00:00",mktime(0, 0, 0, date("m"), date("d")+1, date("Y")))."'";
+	$nextmonth_date = "value='".date("Y-m-d 00:00:00",mktime(0, 0, 0, date("m")==12?1:date("m")+1, 1, date("Y")+(int)(date("m")/12)))."'";
+} else {
+	$def_value_inuse = '';
+	$def_value_maxuse = '';
+	$def_maxsecperperiod = '';
+	$def_timeleft = '';
+	$def_billblocksec = '';
+	$def_period = '';
+	$nextmonth_date = '';
 }
 
 $HD_Form -> AddEditElement (gettext("VOIP-PROVIDER"),
@@ -394,7 +399,7 @@ $HD_Form -> AddEditElement(gettext("PERIOD")." A",
 	"perioda",
 	'$value',
 	"INPUT",
-	"size=30 $def_billblocksec maxlength=20",
+	"size=30 $def_period maxlength=20",
 	"4",
 	gettext("Insert the period")." A",
 	"", "", "", "", "", "", "", gettext("Define period in days. Set '0' if you want define EXPIRY PERIOD only. Set '31' for per month period."));
@@ -403,7 +408,7 @@ $HD_Form -> AddEditElement(gettext("EXPIRY PERIOD")." A",
 	"periodexpirya",
 	'$value',
 	"INPUT",
-	"size=40 maxlength=40 $tomorrow_date",
+	"size=40 maxlength=40 $nextmonth_date",
 	"10",
 	gettext("Correct the expiry period"),
 	"", "", "", "", "", "NO-NULL", "", gettext("You can correct current period expiry. Format YYYY-MM-DD HH:MM:SS. This will auto increment in future."),
@@ -514,7 +519,7 @@ $HD_Form -> AddEditElement(gettext("PERIOD")." B",
 	"periodb",
 	'$value',
 	"INPUT",
-	"size=30 $def_billblocksec maxlength=20",
+	"size=30 $def_period maxlength=20",
 	"4",
 	gettext("Insert the period")." B",
 	"" , "", "", "", "", "" , "NO", gettext("Define period in days. Set '0' if you want define EXPIRY PERIOD only. Set '31' for per month period."));
@@ -523,7 +528,7 @@ $HD_Form -> AddEditElement(gettext("EXPIRY PERIOD")." B",
 	"periodexpiryb",
 	'$value',
 	"INPUT",
-	"size=40 maxlength=40 $tomorrow_date",
+	"size=40 maxlength=40 $nextmonth_date",
 	"10",
 	gettext("Correct the expiry period"),
 	"", "", "", "", "", "NO-NULL", "", gettext("You can correct current period expiry. Format YYYY-MM-DD HH:MM:SS. This will auto increment in future."),

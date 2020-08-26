@@ -1262,7 +1262,7 @@ for ($i=0; $i<count($this->ratecard_obj); $i++) {
 
 		    $QUERY_COLUMN = "uniqueid, sessionid, card_id, card_caller, card_called, card_seller, nasipaddress, starttime, sessiontime, real_sessiontime, calledstation, ".
 			" terminatecauseid, stoptime, sessionbill, id_tariffgroup, id_tariffplan, id_ratecard, " .
-			" id_trunk, src, sipiax, buycost, id_card_package_offer, dnid, destination, id_did, src_peername, src_exten, calledexten, margindillers, margindiller";
+			" id_trunk, src, sipiax, buycost, id_card_package_offer, dnid, destination, id_did, src_peername, src_exten, calledexten, margindillers, margindiller, callbackid";
 		    $QUERY = "INSERT INTO cc_call ($QUERY_COLUMN) VALUES ('{$A2B->uniqueid}', '{$A2B->channel}', ".
 			"$card_id, $card_caller, $card_called, '$idseller', '{$A2B->hostname}', ";
 
@@ -1283,7 +1283,7 @@ for ($i=0; $i<count($this->ratecard_obj); $i++) {
 
 		    $QUERY .= " , '$signe_cc_call".a2b_round(abs($cost))."', ".
 					" $id_tariffgroup, $id_tariffplan, $id_ratecard, $trunk_id, '{$A2B->CallerID}', '$calltype', ".
-					" '$buycost', $id_card_package_offer, '{$A2B->dnid}', $calldestination, $id_did, $src_peername, $src_exten, $calledexten, ".a2b_round($this->margindillers).", ".a2b_round($this->commission).")";
+					" '$buycost', $id_card_package_offer, '{$A2B->dnid}', $calldestination, $id_did, $src_peername, $src_exten, $calledexten, ".a2b_round($this->margindillers).", ".a2b_round($this->commission).", '".$A2B->callback_id."')";
 
 		    if ($A2B->config["global"]['cache_enabled']) {
 			 //insert query in the cache system

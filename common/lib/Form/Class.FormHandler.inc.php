@@ -1644,7 +1644,7 @@ class FormHandler
 			$agent  = (isset($_SESSION["card_id"])) ? 2 : 0 ;
 			$idcust = ($agent) ? $_SESSION["card_id"]:$_SESSION["admin_id"];
 			if($this -> FG_ENABLE_LOG == 1) {
-				$this -> logger -> insertLog_Add($idcust, 2, "NEW ".strtoupper($this->FG_INSTANCE_NAME)." CREATED" , "Record is added in database", $this->FG_TABLE_NAME, $_SERVER['REMOTE_ADDR'], $_SERVER['REQUEST_URI'], $param_add_fields, $param_add_value, $agent);
+				$this -> logger -> insertLog_Add($idcust, 2, "NEW ".strtoupper($this->FG_INSTANCE_NAME)." CREATED" , "Record is added in database", $this->FG_TABLE_NAME, $_SERVER['REMOTE_ADDR'], basename($_SERVER['REQUEST_URI'],".php"), $param_add_fields, $param_add_value, $agent);
 			}
 			$pageName = explode('?', basename($_SERVER['REQUEST_URI']));
 			$_SESSION["last_page"] = array_shift($pageName);

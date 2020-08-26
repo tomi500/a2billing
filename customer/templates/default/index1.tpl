@@ -3,7 +3,7 @@
 <HTML>
 <HEAD>
 	<link rel="shortcut icon" href="{$FAVICONPATH}" />
-	<title>{$CCMAINTITLE}</title>
+	<title>Login | {$CCMAINTITLE}</title>
 	<meta charset="UTF-8" name="viewport" content="width=device-width, initial-scale=1.0">
 	<meta http-equiv="Content-Type" content="text/html; charset=UTF-8"/>
 		{if ($CSS_NAME!="" && $CSS_NAME!="default")}
@@ -127,23 +127,11 @@
 
     <table style="width:100%;margin:0 auto;" align="center">
     <tr><td valign="top" align="center" class="tableBodyRight">{php} echo $show_logo;{/php}
-<!--LiveInternet counter-->
-<script type="text/javascript">
-document.write("<a href='http://www.liveinternet.ru/click' "+
-"target=_blank><img src='//counter.yadro.ru/hit?t39.2;r"+
-escape(document.referrer)+((typeof(screen)=="undefined")?"":
-";s"+screen.width+"*"+screen.height+"*"+(screen.colorDepth?
-screen.colorDepth:screen.pixelDepth))+";u"+escape(document.URL)+
-";"+Math.random()+
-"' alt='' title='LiveInternet' "+
-"border='0' width='31' height='31'><\/a>")
-</script>
-<!--/LiveInternet end-->
     </td></tr></table>
 
     </div>
 {literal}
-<script LANGUAGE="JavaScript">
+<script>
 	document.form.pr_login.focus();
         $("#ui_language").change(function () {
           self.location.href= "index?ui_language="+$("#ui_language option:selected").val();

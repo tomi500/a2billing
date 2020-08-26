@@ -108,6 +108,7 @@ class A2Billing {
 	var $send_text = '';
 	var $send_sound = '';
 	var $calleesound = NULL;
+	var $callback_id = 0;
 
 
 	/**
@@ -1521,10 +1522,10 @@ class A2Billing {
 			if ($answeredtime > 0) {
 				$this -> debug( DEBUG, $agi, __FILE__, __LINE__, "[CC_RATE_ENGINE_UPDATESYSTEM: usedratecard K=$K - (answeredtime=$answeredtime :: dialstatus=$dialstatus :: cost=$cost)]");
 				$QUERY = "INSERT INTO cc_call (uniqueid, sessionid, card_id, nasipaddress, starttime, sessiontime, calledstation, ".
-					" terminatecauseid, stoptime, sessionbill, id_tariffplan, id_ratecard, id_trunk, src, sipiax) VALUES ".
+					" terminatecauseid, stoptime, sessionbill, id_tariffplan, id_ratecard, id_trunk, src, sipiax, callbackid) VALUES ".
 					"('".$this->uniqueid."', '".$this->channel."',  '".$this->id_card."', '".$this->hostname."',";
 				$QUERY .= " CURRENT_TIMESTAMP - INTERVAL $answeredtime SECOND ";
-				$QUERY .= ", '$answeredtime', '".$card_alias."', '$terminatecauseid', now(), '0', '0', '0', '0', '$this->CallerID', '1' )";
+				$QUERY .= ", '$answeredtime', '".$card_alias."', '$terminatecauseid', now(), '0', '0', '0', '0', '$this->CallerID', '1', '$this->callback_id')";
 				
 				$result = $this -> instance_table -> SQLExec ($this->DBHandle, $QUERY, 0);
 				monitor_recognize($this);
@@ -1790,11 +1791,13 @@ class A2Billing {
 			    }
 			    if ($res['result'] > 0) {
 				$first_dtmf = chr($res['result']);
+				if ($result[0][2]<6) $result[0][2] = 6;
 			    } else $first_dtmf = '';
 			    while (array_search($first_dtmf, $waitdigits) === false && strlen($first_dtmf)<$maxlen) {
 				$res = $agi -> wait_for_digit($result[0][2]*1000);
 				if ($res['result'] > 0) $first_dtmf .= chr($res['result']);
 					else break;
+				if ($result[0][2]<6) $result[0][2] = 6;
 			    }
 			    $key = array_search($first_dtmf, $waitdigits);
 			    if ($key===false) { // ничего не нажали или нажали неверно
@@ -2034,7 +2037,7 @@ class A2Billing {
 					$CID_handover = $this -> apply_cid_rules ($this->CallerID, $inst_listdestination[34], $inst_listdestination[35]);
 					if ($CID_handover != $this->CallerID)
 						$agi -> set_variable('CALLERID(num)', $CID_handover);
-					$agi -> set_variable('CDR(accountcode)', $this->accountcode);
+					$agi -> set_variable('CHANNEL(accountcode)', $this->accountcode);
 					if (!is_null($calleridname))
 						$agi -> set_variable('CALLERID(name)', $calleridname);
 					//# Channel: technology/number@ip_of_gw_to PSTN
@@ -2061,7 +2064,7 @@ $tempdebug="ANSWEREDTIME: $answeredtime sec";
 							$dialstatus	= $agi->get_variable("DIALSTATUS", true);
 $tempdebug="DIALSTATUS: $dialstatus";
 					}
-$this -> debug( ERROR, $agi, __FILE__, __LINE__, "[ \033[1;34m".$agi->get_variable('QUEUEDNID', true)." > $tempdebug\33[0m ]");
+					$bridgepeer = $agi->get_variable('QUEUEDNID', true);
 					if (((($this->send_sound || $this->send_text) && $this->speech2mail) || $this->monitor == 1 || $this->agiconfig['record_call'] == 1) && $localcount < 2) {
 						$myres = $agi->exec($this -> format_parameters ("StopMixMonitor"));
 						$this -> debug( INFO, $agi, __FILE__, __LINE__, "EXEC StopMixMonitor (".$this->uniqueid.")");
@@ -2114,14 +2117,7 @@ $this -> debug( ERROR, $agi, __FILE__, __LINE__, "[ \033[1;34m".$agi->get_variab
 						}
 						if ($answeredtime == 0) $inst_listdestination[4] = $this -> realdestination;
 						else {
-							$bridgepeer = $agi -> get_variable('BRIDGEPEER',true);
-							if (preg_match("/([^\/]+)(?=-[^-]*$)/",$bridgepeer,$bridgepeer)) {
-								$QUERY = "SELECT regexten FROM cc_sip_buddies WHERE name LIKE '{$bridgepeer[0]}' LIMIT 1";
-								$result = $this -> instance_table -> SQLExec ($this->DBHandle, $QUERY);
-								if (is_array($result) && $result[0][0] != "")	$uppeer = $bridgepeer[0];
-								else	$uppeer = $agi->get_variable('QUEUEDNID', true);
-								if ($uppeer) $inst_listdestination[4] = $this -> destination = $uppeer;
-							}
+							$inst_listdestination[4] = $this -> destination = $bridgepeer;
 							$this -> debug( INFO, $agi, __FILE__, __LINE__, "Destination: " . $inst_listdestination[4]);
 						}
 						$QUERY = "SELECT regexten, id_cc_card FROM cc_sip_buddies WHERE name LIKE '{$inst_listdestination[4]}' LIMIT 1";
@@ -2134,10 +2130,10 @@ $this -> debug( ERROR, $agi, __FILE__, __LINE__, "[ \033[1;34m".$agi->get_variab
 							$card_called = "'0'";
 						}
 						$QUERY = "INSERT INTO cc_call (uniqueid, sessionid, card_id, nasipaddress, starttime, sessiontime, calledstation, ".
-							" terminatecauseid, stoptime, sessionbill, id_tariffgroup, id_tariffplan, id_ratecard, id_trunk, src, sipiax, id_did, calledexten, card_called, dnid) VALUES ".
+							" terminatecauseid, stoptime, sessionbill, id_tariffgroup, id_tariffplan, id_ratecard, id_trunk, src, sipiax, id_did, calledexten, card_called, dnid, callbackid) VALUES ".
 							"('".$this->uniqueid."', '".$this->channel."',  '".$this->id_card."', '".$this->hostname."',";
 						$QUERY .= " CURRENT_TIMESTAMP - INTERVAL $answeredtime SECOND ";
-						$QUERY .= ", '$answeredtime', '".$inst_listdestination[4]."', '$terminatecauseid', now(), '0', '0', '0', '0', '0', '$this->CallerID', '3', '$this->id_did', $this->calledexten, $card_called, '$this->dnid' )";
+						$QUERY .= ", '$answeredtime', '".$inst_listdestination[4]."', '$terminatecauseid', now(), '0', '0', '0', '0', '0', '$this->CallerID', '3', '$this->id_did', $this->calledexten, $card_called, '$this->dnid', '$this->callback_id')";
 						$result = $this -> instance_table -> SQLExec ($this->DBHandle, $QUERY, 0);
 						$this -> debug( INFO, $agi, __FILE__, __LINE__, "[DID CALL - LOG CC_CALL: SQL: $QUERY]:[result:$result]");
 						
@@ -2440,11 +2436,13 @@ $this -> debug( ERROR, $agi, __FILE__, __LINE__, "[ \033[1;34m".$agi->get_variab
 			    }
 			    if ($res['result'] > 0) {
 				$first_dtmf = chr($res['result']);
+				if ($result[0][2]<6) $result[0][2] = 6;
 			    } else $first_dtmf = '';
 			    while (array_search($first_dtmf, $waitdigits) === false && strlen($first_dtmf)<$maxlen) {
 				$res = $agi -> wait_for_digit($result[0][2]*1000);
 				if ($res['result'] > 0) $first_dtmf .= chr($res['result']);
 					else break;
+				if ($result[0][2]<6) $result[0][2] = 6;
 			    }
 			    $key = array_search($first_dtmf, $waitdigits);
 			    if ($key===false) { // ничего не нажали или нажали неверно
@@ -2771,7 +2769,7 @@ $this -> debug( ERROR, $agi, __FILE__, __LINE__, "[ \033[1;34m".$agi->get_variab
 		    if ($answeredtime == 0) {
 			$inst_listdestination[10] = $this -> realdestination;
 		    } else {
-			$bridgepeer = $agi -> get_variable('BRIDGEPEER',true);
+			$bridgepeer = $agi -> get_variable('CDR(dstchannel)',true);
 			preg_match("/([^\/]+)(?=-[^-]*$)/",$bridgepeer,$bridgepeer);
 			$QUERY = "SELECT regexten FROM cc_sip_buddies WHERE name = '{$bridgepeer[0]}' LIMIT 1";
 			$result = $this -> instance_table -> SQLExec ($this->DBHandle, $QUERY);
@@ -2809,10 +2807,10 @@ $this -> debug( ERROR, $agi, __FILE__, __LINE__, "[ \033[1;34m".$agi->get_variab
                     	    //CALL2DID CDR is free
 	                    /* CDR A-LEG OF DID CALL */
 	                    $QUERY = "INSERT INTO cc_call (uniqueid, sessionid, card_id, card_caller, card_called, nasipaddress, starttime, sessiontime, calledstation, ".
-	                            " terminatecauseid, stoptime, sessionbill, id_tariffgroup, id_tariffplan, id_ratecard, id_trunk, src, sipiax, id_did, src_peername, src_exten, calledexten, dnid) VALUES ".
+	                            " terminatecauseid, stoptime, sessionbill, id_tariffgroup, id_tariffplan, id_ratecard, id_trunk, src, sipiax, id_did, src_peername, src_exten, calledexten, dnid, callbackid) VALUES ".
 	                            "('".$this->uniqueid."', '".$this->channel."',  '".$this->id_card."',  '".$this->card_caller."', $card_called, '".$this->hostname."',";
 	                    $QUERY .= " CURRENT_TIMESTAMP - INTERVAL $answeredtime SECOND ";
-	                    $QUERY .= ", '$answeredtime', '".$inst_listdestination[10]."', '$terminatecauseid', now(), '0', '0', '0', '0', '0', '$this->CallerID', '3', '$this->id_did', $this->src_peername, $src_exten, $this->calledexten, '$this->destination')";
+	                    $QUERY .= ", '$answeredtime', '".$inst_listdestination[10]."', '$terminatecauseid', now(), '0', '0', '0', '0', '0', '$this->CallerID', '3', '$this->id_did', $this->src_peername, $src_exten, $this->calledexten, '$this->destination', '$this->callback_id')";
 
 	                    $result = $this -> instance_table -> SQLExec ($this->DBHandle, $QUERY, 0);
 	                    $this -> debug( INFO, $agi, __FILE__, __LINE__, "[DID CALL - LOG CC_CALL: SQL: $QUERY]:[result:$result]");
@@ -2822,10 +2820,10 @@ $this -> debug( ERROR, $agi, __FILE__, __LINE__, "[ \033[1;34m".$agi->get_variab
 
                     	    /* CDR A-LEG OF DID CALL */
                     	    $QUERY = "INSERT INTO cc_call (uniqueid, sessionid, card_id, card_caller, card_called, nasipaddress, starttime, sessiontime, calledstation, ".
-                    	            " terminatecauseid, stoptime, sessionbill, id_tariffgroup, id_tariffplan, id_ratecard, id_trunk, src, sipiax, id_did, src_peername, src_exten, calledexten, dnid) VALUES ".
+                    	            " terminatecauseid, stoptime, sessionbill, id_tariffgroup, id_tariffplan, id_ratecard, id_trunk, src, sipiax, id_did, src_peername, src_exten, calledexten, dnid, callbackid) VALUES ".
                     	            "('".$this->uniqueid."', '".$this->channel."',  '".$my_id_card."', '".$this->card_caller."', $card_called, '".$this->hostname."',";
                     	    $QUERY .= " CURRENT_TIMESTAMP - INTERVAL $answeredtime SECOND ";
-                    	    $QUERY .= ", '$answeredtime', '". $listdestination[0][10]."', '$terminatecauseid', now(), '$cost', '0', '0', '0', '0', '$this->CallerID', '3', '$this->id_did', $this->src_peername, $src_exten, $this->calledexten, '$this->destination')";
+                    	    $QUERY .= ", '$answeredtime', '". $listdestination[0][10]."', '$terminatecauseid', now(), '$cost', '0', '0', '0', '0', '$this->CallerID', '3', '$this->id_did', $this->src_peername, $src_exten, $this->calledexten, '$this->destination', '$this->callback_id')";
 
                     	    $result = $this -> instance_table -> SQLExec ($this->DBHandle, $QUERY, 0);
                     	    $this -> debug( INFO, $agi, __FILE__, __LINE__, "[DID CALL - LOG CC_CALL: SQL: $QUERY]:[result:$result]");
@@ -2993,6 +2991,8 @@ $this -> debug( ERROR, $agi, __FILE__, __LINE__, "[ \033[1;34m".$agi->get_variab
 		    if ($this->send_sound || $this->send_text)
 		    if ($mailaddr && preg_match("/^[_A-Za-z0-9-]+(\\.[_A-Za-z0-9-]+)*@[A-Za-z0-9]+(\\.[A-Za-z0-9]+)*(\\.[A-Za-z]{2,})$/i", $mailaddr)) {
 
+			$transcript = gettext("Duration: ") . sprintf ( "%02d", intval ( $answeredtime / 60 ) ) . ":" . sprintf ( "%02d", intval ( $answeredtime % 60 ) );
+
 			if ($this -> send_text) {
 			    $keyFilePath = $this->config['global']['google_cloud_credential'];
 //			    $projectId = '';
@@ -3014,10 +3014,9 @@ $this -> debug( ERROR, $agi, __FILE__, __LINE__, "[ \033[1;34m".$agi->get_variab
 //			    if ($languageCode == 'en-US')  $config->setModel('phone_call');
 //			    if (isset($alternateLangCode)) $config->setAlternativeLanguageCodes($alternateLangCode);
 
-			    $transcript = $languageCode;
 			    if (isset($alternateLangCode))
-				$transcript .= ", " . implode(", ", $alternateLangCode);
-			    $transcript .= PHP_EOL . gettext("Duration: ") . sprintf ( "%02d", intval ( $answeredtime / 60 ) ) . ":" . sprintf ( "%02d", intval ( $answeredtime % 60 ) );
+				$languageCode .= ", " . implode(", ", $alternateLangCode);
+			    $transcript = $languageCode . PHP_EOL . $transcript;
 
 			    if ($answeredtime > 1) {
 //				    $QUERY = " INSERT INTO cc_callback_spool (uniqueid, status, server_ip, num_attempt, channel, exten, context, priority," ;
@@ -3107,7 +3106,7 @@ $this -> debug( ERROR, $agi, __FILE__, __LINE__, "[ \033[1;34m".$agi->get_variab
 				$mail->replaceInEmail(Mail::$SPEECH_CID_NUMBER,($this->src != "NULL")?$this->src:$this->CallerID);
 				$mail->replaceInEmail(Mail::$SPEECH_DEST_EXTEN,$this->destination);
 				$mail->replaceInEmail(Mail::$SPEECH_DATETIME,date('d F Y - H:i:s'));
-				if ($this->send_text) $mail->replaceInEmail(Mail::$SPEECH_TEXT,$transcript);
+				$mail->replaceInEmail(Mail::$SPEECH_TEXT,$transcript);
 				$mail->send($mailaddr);
 				$this -> debug( INFO, $agi, __FILE__, __LINE__, "[SENDING SPEECH EMAIL TO CUSTOMER]");
 			} catch (A2bMailException $e) {
@@ -3180,11 +3179,11 @@ $this -> debug( ERROR, $agi, __FILE__, __LINE__, "FAXRESOLUTION: ".$faxresolutio
 			$this->src_peername = 'NULL';
 
 		$QUERY  = "INSERT INTO cc_call (uniqueid, sessionid, card_id, card_caller, card_called, nasipaddress, starttime, sessiontime, calledstation, destination, terminatecauseid, stoptime, sessionbill, ".
-				"id_tariffgroup, id_tariffplan, id_ratecard, id_trunk, src, sipiax, src_peername, src_exten, calledexten, dnid, faxstatus, remotefaxid, faxpages, faxbitrate, faxresolution) VALUES ";
+				"id_tariffgroup, id_tariffplan, id_ratecard, id_trunk, src, sipiax, src_peername, src_exten, calledexten, dnid, faxstatus, remotefaxid, faxpages, faxbitrate, faxresolution, callbackid) VALUES ";
 		$QUERY .= "('$uniqueid', '$this->channel', '$this->id_card', '$this->id_card', '$this->faxidcard', '$this->hostname', ";
 		$QUERY .= "CURRENT_TIMESTAMP - INTERVAL $answeredtime SECOND, ";
 		$QUERY .= "'$answeredtime', '$this->destination', '-2', '1', now(), '0', '0', '0', '0', '0', '$this->CallerID', $didcall, $this->src_peername, $this->CallerIDext, '$this->destination', '$this->dnid', ";
-		$QUERY .= "'$faxstatus', '$remotefaxid', '$faxpages', '$faxbitrate', '$faxresolution')";
+		$QUERY .= "'$faxstatus', '$remotefaxid', '$faxpages', '$faxbitrate', '$faxresolution', '$this->callback_id')";
 
 		$result = $this -> instance_table -> SQLExec ($this->DBHandle, $QUERY, 0);
 
@@ -4129,9 +4128,9 @@ $this -> debug( ERROR, $agi, __FILE__, __LINE__, "FAXRESOLUTION: ".$faxresolutio
 		$this -> DbReConnect($agi);
 		$duration = time() - $now;
 		///create campaign cdr
-		$QUERY_CALL = "INSERT INTO cc_call (uniqueid, sessionid, card_id,calledstation, sipiax,  sessionbill , sessiontime , stoptime ,starttime) VALUES ('".$this->uniqueid."', '".$this->channel."', '".
-				$userid."','".$called."',6, ".$cost.", ".$duration." , CURRENT_TIMESTAMP , ";
-		$QUERY_CALL .= "DATE_SUB(CURRENT_TIMESTAMP, INTERVAL $duration SECOND )";
+		$QUERY_CALL = "INSERT INTO cc_call (uniqueid, sessionid, card_id, calledstation, sipiax, sessionbill, sessiontime, stoptime, starttime, callbackid) ".
+					"VALUES ('".$this->uniqueid."', '".$this->channel."', '".$userid."', '".$called."', 6, ".$cost.", ".$duration.", CURRENT_TIMESTAMP, ".
+						"DATE_SUB(CURRENT_TIMESTAMP, INTERVAL $duration SECOND), '$this->callback_id')";
 
 		$this -> debug( DEBUG, $agi, __FILE__, __LINE__, "[INSERT CAMPAIGN CALL : ".$QUERY_CALL);
 		$this->instance_table -> SQLExec ($this -> DBHandle, $QUERY_CALL);

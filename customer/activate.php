@@ -109,10 +109,10 @@ if ($list[0][8] != "1" && isset ($result) && $result != null) {
 			  <?php echo gettext("To login to your account :"); ?><br/>
 			  <?php echo gettext("Your card alias (login) is "); ?> <b><font color="#00AA00"><?php echo $list[0][6]; ?></font></b><br/>
 			  <?php echo gettext("Your password is "); ?> <b><font color="#00AA00"><?php echo $list[0][4]; ?></font></b><br/>
-			</h3>	  
+			</h3>
 			
 			<br/><br/>
-	<?php echo gettext("Follow the link to access your account : ").'<a href="'.$A2B->config["signup"]['urlcustomerinterface'].'">'.$A2B->config["signup"]['urlcustomerinterface']."</a><br/>"; ?>
+	<?php echo gettext("Follow the link to access your account : ").'<a href="'.CUSTOMER_INTERFACE_URL.'">'.CUSTOMER_INTERFACE_URL."</a><br/>"; ?>
 		
 </div>
 </blockquote>

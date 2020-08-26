@@ -184,7 +184,8 @@ $HD_Form -> AddEditElement (gettext("DID"),
 	"did, id",
 	"id=(SELECT id_cc_did FROM cc_did_destination WHERE id='%id')", "", "%1", "" , "");
 
-if (isset($form_action) && $form_action=="ask-edit")
+//if (isset($form_action) && $form_action=="ask-edit")
+if (isset($form_action) && $form_action<>"ask-add")
 $HD_Form -> AddEditElement(gettext("SCHEDULE"),
         "shedule",
         '$value',
@@ -249,7 +250,7 @@ $HD_Form -> AddEditElement (gettext("PRIORITY"),
 	"",
 	"list" , "", "",  "", $priority_list, "%1" , "" , "");
 
-if (isset($form_action) && ($form_action=="ask-edit" || $form_action=="edit")) {
+if (isset($form_action) && $form_action<>"ask-add" /**($form_action=="ask-edit" || $form_action=="edit")**/) {
     $HD_Form -> FieldEditElement ('activated, id_cc_did, id_cc_card, answer, playsound, destination, timeout, voip_call, priority');
 } else {
     $HD_Form -> FieldEditElement ('activated, id_cc_did, answer, playsound, destination, timeout, voip_call, priority');

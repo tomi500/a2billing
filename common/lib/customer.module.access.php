@@ -77,7 +77,7 @@ if (isset($_GET["logout"]) && $_GET["logout"]=="true") {
 	session_destroy();
 	$cus_rights=0;
 	Header ("HTTP/1.0 401 Unauthorized");
-	Header ("Location: /");
+	Header ("Location: .");
 	die();
 }
 

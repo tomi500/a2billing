@@ -3,10 +3,9 @@
 <html xmlns="http://www.w3.org/1999/xhtml" xml:lang="en" lang="en">
 <HEAD>
 	<link rel="shortcut icon" href="{$FAVICONPATH}">
-	<title>{$CCMAINTITLE}</title>
+	<title>SignUp | {$CCMAINTITLE}</title>
 	<meta charset="UTF-8" name="viewport" content="width=device-width, initial-scale=1.0">
 	<meta http-equiv="Content-Type" content="text/html; charset=UTF-8"/>
-
 	<link href="templates/{$SKIN_NAME}/css/main.css" rel="stylesheet" type="text/css">
 	<!--[if lt IE 7]>
 		<link rel="stylesheet" type="text/css" href="templates/{$SKIN_NAME}/css/style-ie.css" />

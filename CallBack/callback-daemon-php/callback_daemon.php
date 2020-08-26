@@ -218,22 +218,22 @@ while(true)
 	if ($duration > 0) {
 		$acc_to_unav=$acc_to_busy=$acc_to_noansw=$cc_num_attempts_unavailable=$cc_num_attempts_busy=$cc_num_attempts_noanswer=0;
 	}
-	if ($flagringup != 1 && $acc_timeout_res < 0)
+	if ($flagringup == 0 && $acc_timeout_res < 0)
 	{
 	    $query="UPDATE `cc_callback_spool` SET `status`='ERROR_TIMEOUT',`id_server`='$manager_id' WHERE `id`=$cc_id";
 	    if (!$A2B->DBHandle->Execute($query)) die("Can't execute query '$query'\n");
 	}
-	elseif($flagringup != 1 && $acc_max_unav<=$cc_num_attempts_unavailable)
+	elseif($flagringup == 0 && $acc_max_unav<=$cc_num_attempts_unavailable)
 	{
 	    $query="UPDATE `cc_callback_spool` SET `status`='ERROR_UNAVAILABLE',`id_server`='$manager_id' WHERE `id`=$cc_id";
 	    if (!$A2B->DBHandle->Execute($query)) die("Can't execute query '$query'\n");
 	}
-	elseif($flagringup != 1 && $acc_max_busy<=$cc_num_attempts_busy)
+	elseif($flagringup == 0 && $acc_max_busy<=$cc_num_attempts_busy)
 	{
 	    $query="UPDATE `cc_callback_spool` SET `status`='ERROR_BUSY',`id_server`='$manager_id' WHERE `id`=$cc_id";
 	    if (!$A2B->DBHandle->Execute($query)) die("Can't execute query '$query'\n");
 	}
-	elseif($flagringup != 1 && $acc_max_noansw<=$cc_num_attempts_noanswer)
+	elseif($flagringup == 0 && $acc_max_noansw<=$cc_num_attempts_noanswer)
 	{
 	    $query="UPDATE `cc_callback_spool` SET `status`='ERROR_NO-ANSWER',`id_server`='$manager_id' WHERE `id`=$cc_id";
 	    if (!$A2B->DBHandle->Execute($query)) die("Can't execute query '$query'\n");
@@ -258,7 +258,8 @@ while(true)
 
 		$A2B -> DbConnect($agi);
 		$A2B -> set_instance_table ($instance_table);
-		if ($flagringup) {
+		if ($flagringup==2) {
+		} elseif ($flagringup==1) {
 			$query="UPDATE `cc_callback_spool` SET `status`='PENDING',`num_attempt`=`num_attempt`+1,`last_attempt_time`=now(),`next_attempt_time`=ADDTIME(now(),SEC_TO_TIME($secperaction)),`id_server`='$manager_id' WHERE `id`=$cc_id";
 		} else {
 			$query="UPDATE `cc_callback_spool` SET `status`='PROCESSING',`num_attempt`=`num_attempt`+1,`last_attempt_time`=now(),`id_server`='$manager_id' WHERE `id`=$cc_id";
@@ -274,6 +275,7 @@ while(true)
 			        $cc_callerid .= mt_rand(0,9);
 			}
 		}
+		$cc_variable = "CALLBACKID=".$cc_id.",".$cc_variable;
 		$return=callback_engine($A2B, $manager_host.":5038", $manager_username, $manager_secret, array($cc_exten,$cc_priority,$cc_callerid,$cc_variable,$cc_account,$cc_id."-".$intid,$cc_context,$maxduration), $cc_exten_leg_a, $acc_tariff);
 		$timeout=-1;
 		$fatal=0;

@@ -1136,7 +1136,7 @@ function getAcceptLanguage($languages)
 		$result = 'russian';
 		break;
 	case 'uk':
-		$result = 'russian';
+		$result = 'ukrainian';
 		break;
 	case 'de':
 		$result = 'german';

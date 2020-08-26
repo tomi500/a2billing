@@ -4,11 +4,16 @@ $("#ui_language").change(function () {
     self.location.href= "?ui_language="+$("#ui_language option:selected").val();
 });
 
+function opback() {
+	$(".frameback").toggleClass("lgrad");
+	$(".frame").toggleClass("opback");
+	$("body").toggleClass("bodygradient");
+}
+
 $(function() {
     $(".btn_in").click(function() {
 	$(".forms").removeClass("forms-right");
 	$(".forms").removeClass("forms-left");
-//	$(".frame").removeClass("frame-long");
 	$(".signin-active").removeClass("signin-inactive");
 	$(".signup-inactive").removeClass("signup-active");
 	$(".signup-inactive a").css('color','rgba(255,255,255,.3)');
@@ -20,7 +25,6 @@ $(function() {
     $(".btn_up").click(function() {
 	$(".forms").removeClass("forms-right");
 	$(".forms").addClass("forms-left");
-//	$(".frame").addClass("frame-long");
 	$(".signup-inactive a").removeAttr('style');
 	$(".signup-inactive").addClass("signup-active");
 	$(".signin-active").addClass("signin-inactive");
@@ -73,9 +77,6 @@ $(function() {
 	$(".nav").toggleClass("nav-up");
 	$('#country').val($('#pr_country').attr('dataval'));
 	$('#id_timezone').val($('#timezone').attr('dataval'));
-//	$(".form-signup-left").toggleClass("form-signup-down");
-//	$(".success").toggleClass("success-left"); 
-//	$(".frame").toggleClass("frame-short");
     });
 });
 
@@ -96,17 +97,6 @@ $('body').on('click', '.btn-forgot', function () {
 	var warning = $("#warningforgot");
 	if(pr_email.value=="" || !validateEmail(pr_email.value))
 	{
-/*	    var shrinktimer = setInterval(function(){
-		if (warning.html() === '')
-		    warning.html(emptyemail);
-		else
-		    warning.html('');
-	    },100);
-	    setTimeout(function(){
-		clearInterval(shrinktimer);
-		warning.html(emptyemail);
-	    },2000);
-*/
 	    warning.html(emptyemail);
 	    lasttimeout = setTimeout(function(){
 		warning.html('');
@@ -115,9 +105,6 @@ $('body').on('click', '.btn-forgot', function () {
 	}
 	warning.html('');
 	$(".nav").addClass("nav-up");
-//	$(".btn-animate").toggleClass("btn-animate-grow");
-//	$(".form-forgot").submit();
-
 	var url = location.origin+location.pathname;
 	url = url.replace(".php","");
 	url = url.replace("/index","");

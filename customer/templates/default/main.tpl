@@ -176,7 +176,7 @@
 	<div class="toggle_menu"><li><a href="A2B_entity_log_viewer"><strong>{php} echo gettext("ACTIVITY");{/php}</strong></a></li></div>
 
 	{if $ACXSUPPORT >0 }
-	<div class="toggle_menu"><li><a href="A2B_support"><strong>{php} echo gettext("SUPPORT");{/php}</strong></a></li></div>
+	<div class="toggle_menu"><li><a href="support"><strong>{php} echo gettext("SUPPORT");{/php}</strong></a></li></div>
 	{/if}
 
 </ul>

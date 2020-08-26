@@ -200,6 +200,7 @@ ALTER TABLE cc_iax_buddies ADD `forceencryption` varchar(20) COLLATE utf8_bin NO
 ALTER TABLE cc_iax_buddies ADD `external` INT( 11 ) NOT NULL DEFAULT '0';
 ALTER TABLE cc_iax_buddies CHANGE `DEFAULTip` `defaultip` CHAR( 50 ) CHARACTER SET utf8 COLLATE utf8_bin NULL DEFAULT NULL;
 
+ALTER TABLE cc_call ADD callbackid BIGINT(20) NOT NULL DEFAULT 0;
 ALTER TABLE cc_call ADD card_caller BIGINT(20) NOT NULL AFTER `card_id`;
 ALTER TABLE cc_call ADD card_called BIGINT(20) NOT NULL AFTER `card_caller`;
 ALTER TABLE cc_call ADD card_seller BIGINT(20) NOT NULL AFTER `card_called`;
@@ -315,6 +316,7 @@ CREATE TABLE IF NOT EXISTS `cc_ivr_destinations` (
   INDEX (`id_cc_ivr`)
 ) ENGINE=MyISAM DEFAULT CHARSET=utf8 COLLATE=utf8_bin;
 
+ALTER TABLE `cc_ivr_sounds` CHANGE `id_cc_ivr_start` `id_cc_ivr` INT(11) NOT NULL DEFAULT '0';
 CREATE TABLE IF NOT EXISTS `cc_ivr_sounds` (
   `id` BIGINT(20) NOT NULL AUTO_INCREMENT,
   `id_cc_ivr` INT(11) NOT NULL DEFAULT '0',
@@ -963,3 +965,85 @@ join `cc_tariffplan` on `cc_tariffplan`.`id` = `cc_tariffgroup_plan`.`idtariffpl
 left join `cc_ratecard` on `cc_ratecard`.`idtariffplan` = `cc_tariffplan`.`id`
 left join `cc_prefix` on `cc_prefix`.`prefix` = `cc_ratecard`.`destination`
 where (`cc_ratecard`.`id` is not null);
+
+CREATE TABLE cc_queues (
+    `name` VARCHAR(128) NOT NULL,
+    musiconhold VARCHAR(128),
+    announce VARCHAR(128),
+    `context` VARCHAR(128),
+    timeout INTEGER,
+    ringinuse ENUM('yes','no'),
+    setinterfacevar ENUM('yes','no'),
+    setqueuevar ENUM('yes','no'),
+    setqueueentryvar ENUM('yes','no'),
+    monitor_format VARCHAR(8),
+    membermacro VARCHAR(512),
+    membergosub VARCHAR(512),
+    queue_youarenext VARCHAR(128),
+    queue_thereare VARCHAR(128),
+    queue_callswaiting VARCHAR(128),
+    queue_quantity1 VARCHAR(128),
+    queue_quantity2 VARCHAR(128),
+    queue_holdtime VARCHAR(128),
+    queue_minutes VARCHAR(128),
+    queue_minute VARCHAR(128),
+    queue_seconds VARCHAR(128),
+    queue_thankyou VARCHAR(128),
+    queue_callerannounce VARCHAR(128),
+    queue_reporthold VARCHAR(128),
+    announce_frequency INTEGER,
+    announce_to_first_user ENUM('yes','no'),
+    min_announce_frequency INTEGER,
+    announce_round_seconds INTEGER,
+    announce_holdtime VARCHAR(128),
+    announce_position VARCHAR(128),
+    announce_position_limit INTEGER,
+    periodic_announce VARCHAR(50),
+    periodic_announce_frequency INTEGER,
+    relative_periodic_announce ENUM('yes','no'),
+    random_periodic_announce ENUM('yes','no'),
+    retry INTEGER,
+    wrapuptime INTEGER,
+    penaltymemberslimit INTEGER,
+    autofill ENUM('yes','no'),
+    monitor_type VARCHAR(128),
+    autopause ENUM('yes','no','all'),
+    autopausedelay INTEGER,
+    autopausebusy ENUM('yes','no'),
+    autopauseunavail ENUM('yes','no'),
+    maxlen INTEGER,
+    servicelevel INTEGER,
+    strategy ENUM('ringall','leastrecent','fewestcalls','random','rrmemory','linear','wrandom','rrordered'),
+    joinempty VARCHAR(128),
+    leavewhenempty VARCHAR(128),
+    reportholdtime ENUM('yes','no'),
+    memberdelay INTEGER,
+    weight INTEGER,
+    timeoutrestart ENUM('yes','no'),
+    defaultrule VARCHAR(128),
+    timeoutpriority VARCHAR(128),
+    PRIMARY KEY (`name`)
+);
+
+CREATE TABLE cc_queue_members (
+    uniqueid INTEGER NOT NULL AUTO_INCREMENT UNIQUE,
+    queue_name VARCHAR(80) NOT NULL,
+    interface VARCHAR(80) NOT NULL,
+    membername VARCHAR(80),
+    state_interface VARCHAR(80),
+    penalty INTEGER,
+    paused INTEGER,
+    ringinuse ENUM('yes','no'),
+    wrapuptime INTEGER,
+    PRIMARY KEY (queue_name, interface)
+);
+
+CREATE TABLE cc_queue_rules (
+    ruleid INTEGER NOT NULL AUTO_INCREMENT UNIQUE,
+    rule_name VARCHAR(80) NOT NULL,
+    `time` VARCHAR(32) NOT NULL,
+    min_penalty VARCHAR(32) NOT NULL,
+    max_penalty VARCHAR(32) NOT NULL,
+    raise_penalty VARCHAR(32) NOT NULL,
+    PRIMARY KEY (rule_name, `time`)
+);

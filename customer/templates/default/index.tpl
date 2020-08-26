@@ -5,22 +5,19 @@
     <link rel="shortcut icon" href="{$FAVICONPATH}"/>
     <meta charset="UTF-8" name="viewport" content="width=device-width, initial-scale=1.0">
     <meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
-    <title>{$CCMAINTITLE}</title>
+    <title>Sign in or Register | {$CCMAINTITLE}</title>
     <link rel="stylesheet" href="templates/default/css/index.css" type="text/css">
 </head>
-<body>
-<script language="JavaScript">
-if(false && !CSS.supports("display:flex")) {
-    location.replace("https://customer.sipde.net/index1");
-}
+<body class="bodygradient">
+<script>
 var emptyemail = "{php} echo gettext("You must enter an email address!"){/php}";
-var emptylogin = "{php} echo gettext("AUTHENTICATION REFUSED :<br>please check your user/password!");{/php}";
+var emptylogin = "{php} echo gettext("AUTHENTICATION REFUSED :<br>please check your login/password!");{/php}";
 var noservice = "{php} echo gettext("Service temporally not available.<br>Try again later.");{/php}";
 </script>
   <link href='https://fonts.googleapis.com/css?family=Open+Sans:400,300,700' rel='stylesheet' type='text/css'>
 
 <div class="container">
-  <div class="frameback">
+  <div class="frameback lgrad">
   </div>
   <div class="frame">
     <div class="nav">
@@ -35,7 +32,7 @@ var noservice = "{php} echo gettext("Service temporally not available.<br>Try ag
                         <option value="ukrainian" {php} if(LANGUAGE=="ukrainian") echo "selected";{/php} >Українська</option>
                         <option value="russian" {php} if(LANGUAGE=="russian") echo "selected";{/php} >Русский</option>
                         <option value="german" {php} if(LANGUAGE=="german") echo "selected";{/php} >Deutsch</option>
-<!--
+{if (false)}
                         <option style="background-image:url(templates/{$SKIN_NAME}/images/flags/es.gif);" value="spanish" {php} if(LANGUAGE=="spanish") echo "selected";{/php} >Spanish</option>Român
                         <option style="background-image:url(templates/{$SKIN_NAME}/images/flags/fr.gif);" value="french" {php} if(LANGUAGE=="french") echo "selected";{/php} >French</option>
                         <option style="background-image:url(templates/{$SKIN_NAME}/images/flags/fi.gif);" value="finnish" {php} if(LANGUAGE=="finnish") echo "selected";{/php} >Finnish</option>
@@ -49,7 +46,7 @@ var noservice = "{php} echo gettext("Service temporally not available.<br>Try ag
                         <option style="background-image:url(templates/{$SKIN_NAME}/images/flags/pk.gif);" value="urdu" {php} if(LANGUAGE=="urdu") echo "selected";{/php} >Urdu</option>
                         <option style="background-image:url(templates/{$SKIN_NAME}/images/flags/gr.gif);" value="greek" {php} if(LANGUAGE=="greek") echo "selected";{/php} >Greek</option>
                         <option style="background-image:url(templates/{$SKIN_NAME}/images/flags/id.gif);" value="indonesian" {php} if(LANGUAGE=="indonesian") echo "selected";{/php} >Indonesian</option>
--->
+{/if}
       </select>
     </div>
     <div ontouchstart="turn_start(event);" ontouchmove="turn_page(event);">
@@ -69,7 +66,7 @@ var noservice = "{php} echo gettext("Service temporally not available.<br>Try ag
           <input class="form-styling" type="text" name="pr_login" id="pr_login"/>
           <label for="pr_password">{php} echo gettext("Password");{/php}</label>
           <input class="form-styling" type="password" name="pr_password" id="pr_password"/>
-          <input type="checkbox" id="checkbox"/>
+          <input type="checkbox" id="checkbox" class="checkbox"/>
           <label for="checkbox"><span class="ui"></span>{php} echo gettext("Keep me signed in");{/php}</label>
           <a class="btn-submit btn-signin">{php} echo gettext("Login");{/php}</a>
           <div class="forgot">
@@ -129,11 +126,12 @@ var noservice = "{php} echo gettext("Service temporally not available.<br>Try ag
 {/php}
 	    </ul>
           </div>
-          <a class="btn-submit btn-signup">{php} echo gettext("Create Account");{/php}</a>
+	  <label style="text-transform:none;padding-bottom:0">{php}echo gettext('By creating this account, you agree to our <a href="terms">Terms</a> and <a href="policy">Privacy Policy</a>.'){/php}</label>
+	  <a class="btn-submit btn-signup">{php} echo gettext("Agree and Create Account");{/php}</a>
 	</form>
 {php}}{/php}
       </div>
-<!--
+{if (false)}
       <div class="success">
               <svg width="270" height="270" xmlns="https://www.w3.org/2000/svg" xmlns:xlink="https://www.w3.org/1999/xlink" x="0px" y="0px" viewBox="0 0 60 60" id="check" ng-class="checked ? 'checked' : ''">
                  <path fill="#ffffff" d="M40.61,23.03L26.67,36.97L13.495,23.788c-1.146-1.147-1.359-2.936-0.504-4.314
@@ -143,11 +141,11 @@ var noservice = "{php} echo gettext("Service temporally not available.<br>Try ag
                    <p> Thanks for signing up! Check your email for confirmation.</p>
                 </div>
       </div>
--->
+{/if}
     </div>
   </div>
   <div>
-  <a id="refresh" value="Refresh" onClick="history.go()">
+  <a id="refresh" value="Refresh" onClick="opback()"> <!-- "history.go()"> -->
     <svg class="refreshicon"   version="1.1" id="Capa_1"  xmlns="https://www.w3.org/2000/svg" xmlns:xlink="https://www.w3.org/1999/xlink" x="0px" y="0px"
          width="25px" height="25px" viewBox="0 0 322.447 322.447" style="enable-background:new 0 0 322.447 322.447;"
          xml:space="preserve">
@@ -161,8 +159,7 @@ var noservice = "{php} echo gettext("Service temporally not available.<br>Try ag
   </a>
   </div>
   <div class="footer">
-<!--    <div style="color: #BD2A15; font-size: 11px; text-align:center;">{$COPYRIGHT}</div>
--->
+{if (false)}<div style="color: #BD2A15; font-size: 11px; text-align:center;">{$COPYRIGHT}</div>{/if}
 {php}
     $DBHandle = DbConnect();
     $instance_table = new Table();
@@ -183,13 +180,39 @@ var noservice = "{php} echo gettext("Service temporally not available.<br>Try ag
 	}
     }
 
-    $show_logo .= ' <a href="http://www.gnu.org/licenses/agpl.html" target="_blank"><img src="' . KICON_PATH . '/agplv3-155x51.png" alt="AGPLv3"/></a> &nbsp; ';
+//    $show_logo .= ' <a href="http://www.gnu.org/licenses/agpl.html" target="_blank"><img src="' . KICON_PATH . '/agplv3-155x51.png" alt="AGPLv3"/></a> &nbsp; ';
 {/php}
+
     <table style="width:100%;margin:0 auto;" align="center">
     <tr><td valign="top" align="center" class="tableBodyRight">{php} echo $show_logo;{/php}
     </td></tr></table>
   </div>
 </div>
+{php}if(!isset($_COOKIE["cookiescript"])) {{/php}
+<div id="cookiescript_container">
+    <div id="cookiescript_wrapper">
+	<span id="cookiescript_header">{php} echo gettext("This website uses cookies"){/php}</span>
+{php}if(LANGUAGE=="russian"){{/php}
+	&nbsp;&nbsp;&nbsp;Информируем, что на этом сайте используются cookie-файлы. Cookie-файлы используются для выполнения идентификации пользователя и накапливания данных о посещении сайта. Продолжая пользоваться этим веб-сайтом, Вы соглашаетесь на сбор и использование данных cookie-файлов на Вашем устройстве. Свое согласие Вы в любой момент можете отозвать, удалив сохраненные cookie-файлы.
+{php}}elseif(LANGUAGE=="ukrainian"){{/php}
+	&nbsp;&nbsp;&nbsp;Інформуємо, що на цьому сайті використовуються cookie-файли. Cookie-файли використовуються для виконання ідентифікації користувача і накопичення даних про відвідування сайту. Продовжуючи користуватися цим веб-сайтом, Ви погоджуєтесь на збір і використання даних cookie-файлів на Вашому пристрої. Свою згоду Ви в будь-який момент можете відкликати, видаливши збережені cookie-файли.
+{php}}else{{/php}
+	&nbsp;&nbsp;&nbsp;We use cookies to ensure you have the best browsing experience on our website. By using our site, you acknowledge that you have read and understood our <a href="policy">Privacy Policy</a>.
+{php}}{/php}<br>
+	<div id="cookiescript_buttons">
+	    <div id="cookiescript_accept" onClick="closeCookieScript();">{php} echo gettext("Got it!"){/php}</div>
+	</div>
+    </div>
+</div>
+<script>
+function closeCookieScript() {
+    $("#cookiescript_container").remove();
+    var expiryDate = new Date();
+    expiryDate.setMonth(expiryDate.getMonth() + 3);
+    document.cookie = "cookiescript=set;expires="+expiryDate.toGMTString()+";path=/;";
+}
+</script>
+{php}}{/php}
 <script src="./javascript/jquery/jquery-1.7.2.min.js"></script>
 <script src="./javascript/index.js"></script>
 {if ($error >= 5)}

@@ -438,7 +438,7 @@ if ($mode == 'sms') {
 			}
 		    }
 		    if ($callbacksound && strlen($A2B->CallerID)>1 && is_numeric($A2B->CallerID) && !(is_array($result) && count($result) > 0) && $A2B -> prefixallow) {
-			$accountcode = $agi -> get_variable("CDR(accountcode)", true);
+			$accountcode = $agi -> get_variable("CHANNEL(accountcode)", true);
 
 			$QUERY = "SELECT IF(status='SENT',0,id) FROM cc_callback_spool WHERE (status='PENDING' OR status='PROCESSING' OR status='SENT') AND account='$accountcode' AND callerid='".$A2B->config['callback']['callerid']."' AND exten_leg_a='{$A2B->CallerID}' AND timediff(now(),entry_time)<".$A2B->config['callback']['sec_avoid_repeate'];
 			$result = $A2B -> instance_table -> SQLExec($A2B -> DBHandle, $QUERY);
@@ -1064,13 +1064,14 @@ if ($mode == 'standard') {
 						" LEFT JOIN cc_sheduler_ratecard ON id_did_destination=cc_did_destination.id".
 						" WHERE id_cc_did=cc_did.id AND cc_card.status=1 AND cc_card.id=id_cc_card AND cc_did_destination.activated=1 AND cc_did.activated=1 AND did LIKE '$A2B->destination'".
 						" AND cc_country.id=id_cc_country AND cc_did.startingdate <= CURRENT_TIMESTAMP".
-						" AND (cc_did.expirationdate > CURRENT_TIMESTAMP OR cc_did.expirationdate IS NULL AND cc_did_destination.validated = 1".
-						" AND (`cc_sheduler_ratecard`.`id_did_destination` IS NULL OR (`weekdays` LIKE CONCAT('%',WEEKDAY(NOW()),'%') AND (CURTIME() BETWEEN `timefrom` AND `timetill`
-						    OR (`timetill`<=`timefrom` AND (CURTIME()<`timetill` OR CURTIME()>=`timefrom`)))))";
-					if ($A2B->config["database"]['dbtype'] == "mysql") {
-						$QUERY .= " OR cc_did.expirationdate = '0000-00-00 00:00:00'";
-					}
-					$QUERY .= ") ORDER BY priority ASC";
+						" AND (cc_did.expirationdate > CURRENT_TIMESTAMP OR cc_did.expirationdate IS NULL OR cc_did.expirationdate = '0000-00-00 00:00:00')".
+						" AND cc_did_destination.validated = 1".
+						" AND (`cc_sheduler_ratecard`.`id_did_destination` IS NULL OR".
+						    " (`weekdays` LIKE CONCAT('%',WEEKDAY(CONVERT_TZ(NOW(),@@global.time_zone,IF(CONCAT(id_timezone+0) = id_timezone, @@global.time_zone, SUBSTRING_INDEX(id_timezone, ';', -1)) )),'%')".
+							" AND (TIME(CONVERT_TZ(NOW(),@@global.time_zone,IF(CONCAT(id_timezone+0) = id_timezone, @@global.time_zone, SUBSTRING_INDEX(id_timezone, ';', -1)))) BETWEEN `timefrom` AND `timetill`".
+							    " OR (`timetill`<=`timefrom` AND (TIME(CONVERT_TZ(NOW(),@@global.time_zone,IF(CONCAT(id_timezone+0) = id_timezone, @@global.time_zone, SUBSTRING_INDEX(id_timezone, ';', -1))))<`timetill`".
+								" OR TIME(CONVERT_TZ(NOW(),@@global.time_zone,IF(CONCAT(id_timezone+0) = id_timezone, @@global.time_zone, SUBSTRING_INDEX(id_timezone, ';', -1))))>=`timefrom`)))))".
+						" ORDER BY priority ASC";
 
 					$A2B -> debug( DEBUG, $agi, __FILE__, __LINE__, $QUERY);
 					$result = $A2B -> instance_table -> SQLExec ($A2B->DBHandle, $QUERY);
@@ -1129,16 +1130,16 @@ if ($mode == 'standard') {
                     " answer, playsound, timeout, margin, id_diller, voicebox, removeaddprefix, addprefixinternational, chanlang, buyrate, billblock, spamfilter, secondtimedays, calleridname, speech2mail, send_text, send_sound".
 			        " FROM cc_did, cc_card, cc_country, cc_did_destination".
 			        " LEFT JOIN cc_sheduler_ratecard ON id_did_destination=cc_did_destination.id".
-			        " WHERE id_cc_did=cc_did.id AND cc_card.status=1 AND cc_card.id=id_cc_card AND cc_did_destination.activated=1 AND cc_did.activated=1 AND did LIKE '$mydnid' ".
-			        " AND cc_country.id=id_cc_country AND cc_did.startingdate<= CURRENT_TIMESTAMP AND (cc_did.expirationdate > CURRENT_TIMESTAMP OR cc_did.expirationdate IS NULL ".
+			        " WHERE id_cc_did=cc_did.id AND cc_card.status=1 AND cc_card.id=id_cc_card AND cc_did_destination.activated=1 AND cc_did.activated=1 AND did LIKE '$mydnid'".
+			        " AND cc_country.id=id_cc_country AND cc_did.startingdate<= CURRENT_TIMESTAMP".
+				" AND (cc_did.expirationdate > CURRENT_TIMESTAMP OR cc_did.expirationdate IS NULL OR cc_did.expirationdate = '0000-00-00 00:00:00')".
 			        " AND cc_did_destination.validated=1 ".
-			        " AND (`cc_sheduler_ratecard`.`id_did_destination` IS NULL OR (`weekdays` LIKE CONCAT('%',WEEKDAY(NOW()),'%') AND (CURTIME() BETWEEN `timefrom` AND `timetill`
-					OR (`timetill`<=`timefrom` AND (CURTIME()<`timetill` OR CURTIME()>=`timefrom`)))))";
-		if ($A2B->config["database"]['dbtype'] != "postgres") {
-			// MYSQL
-			$QUERY .= " OR cc_did.expirationdate = '0000-00-00 00:00:00'";
-		}
-		$QUERY .= ") ORDER BY priority ASC";
+				" AND (`cc_sheduler_ratecard`.`id_did_destination` IS NULL OR".
+				    " (`weekdays` LIKE CONCAT('%',WEEKDAY(CONVERT_TZ(NOW(),@@global.time_zone,IF(CONCAT(id_timezone+0) = id_timezone, @@global.time_zone, SUBSTRING_INDEX(id_timezone, ';', -1)) )),'%')".
+					" AND (TIME(CONVERT_TZ(NOW(),@@global.time_zone,IF(CONCAT(id_timezone+0) = id_timezone, @@global.time_zone, SUBSTRING_INDEX(id_timezone, ';', -1)))) BETWEEN `timefrom` AND `timetill`".
+					    " OR (`timetill`<=`timefrom` AND (TIME(CONVERT_TZ(NOW(),@@global.time_zone,IF(CONCAT(id_timezone+0) = id_timezone, @@global.time_zone, SUBSTRING_INDEX(id_timezone, ';', -1))))<`timetill`".
+						" OR TIME(CONVERT_TZ(NOW(),@@global.time_zone,IF(CONCAT(id_timezone+0) = id_timezone, @@global.time_zone, SUBSTRING_INDEX(id_timezone, ';', -1))))>=`timefrom`)))))".
+				" ORDER BY priority ASC";
 
 //		$A2B -> debug( DEBUG, $agi, __FILE__, __LINE__, $QUERY);
 //$A2B -> debug( ERROR, $agi, __FILE__, __LINE__, $QUERY);
@@ -1567,6 +1568,7 @@ $A2B -> debug( ERROR, $agi, __FILE__, __LINE__, "\033[1;32m============INSERT===
 	$callback_mode			= $agi -> get_variable("MODE", true);
 	$callback_tariff		= $agi -> get_variable("TARIFF", true);
 	$callback_uniqueid		= $agi -> get_variable("CBID", true);
+	$A2B->callback_id		= $agi -> get_variable("CALLBACKID", true);
 	$callback_leg			= $agi -> get_variable("LEG", true);
 	$usedratecard			= $agi -> get_variable("RATECARD", true);
 
@@ -1756,14 +1758,15 @@ $A2B -> debug( ERROR, $agi, __FILE__, __LINE__, "\033[1;32m============INSERT===
 					" FROM cc_did, cc_card, cc_country, cc_did_destination".
 					" LEFT JOIN cc_sheduler_ratecard ON id_did_destination=cc_did_destination.id".
 					" WHERE id_cc_did=cc_did.id AND cc_card.status=1 AND cc_card.id=id_cc_card and cc_did_destination.activated=1 AND cc_did.activated=1 AND did LIKE '$A2B->destination'".
-					" AND cc_country.id=id_cc_country AND cc_did.startingdate <= CURRENT_TIMESTAMP AND (cc_did.expirationdate > CURRENT_TIMESTAMP OR cc_did.expirationdate IS NULL ".
+					" AND cc_country.id=id_cc_country AND cc_did.startingdate <= CURRENT_TIMESTAMP".
+					" AND (cc_did.expirationdate > CURRENT_TIMESTAMP OR cc_did.expirationdate IS NULL OR cc_did.expirationdate = '0000-00-00 00:00:00')".
 					" AND cc_did_destination.validated = 1 ".
-					" AND (`cc_sheduler_ratecard`.`id_did_destination` IS NULL OR (`weekdays` LIKE CONCAT('%',WEEKDAY(NOW()),'%') AND (CURTIME() BETWEEN `timefrom` AND `timetill`
-						OR (`timetill`<=`timefrom` AND (CURTIME()<`timetill` OR CURTIME()>=`timefrom`)))))";
-				if ($A2B->config["database"]['dbtype'] == "mysql") {
-					$QUERY .= " OR cc_did.expirationdate = '0000-00-00 00:00:00'";
-				}
-				$QUERY .= ") ORDER BY priority ASC";
+					" AND (`cc_sheduler_ratecard`.`id_did_destination` IS NULL OR".
+					    " (`weekdays` LIKE CONCAT('%',WEEKDAY(CONVERT_TZ(NOW(),@@global.time_zone,IF(CONCAT(id_timezone+0) = id_timezone, @@global.time_zone, SUBSTRING_INDEX(id_timezone, ';', -1)) )),'%')".
+						" AND (TIME(CONVERT_TZ(NOW(),@@global.time_zone,IF(CONCAT(id_timezone+0) = id_timezone, @@global.time_zone, SUBSTRING_INDEX(id_timezone, ';', -1)))) BETWEEN `timefrom` AND `timetill`".
+						    " OR (`timetill`<=`timefrom` AND (TIME(CONVERT_TZ(NOW(),@@global.time_zone,IF(CONCAT(id_timezone+0) = id_timezone, @@global.time_zone, SUBSTRING_INDEX(id_timezone, ';', -1))))<`timetill`".
+							" OR TIME(CONVERT_TZ(NOW(),@@global.time_zone,IF(CONCAT(id_timezone+0) = id_timezone, @@global.time_zone, SUBSTRING_INDEX(id_timezone, ';', -1))))>=`timefrom`)))))".
+					" ORDER BY priority ASC";
 
 				$A2B -> debug( DEBUG, $agi, __FILE__, __LINE__, $QUERY);
 				$result = $A2B -> instance_table -> SQLExec ($A2B->DBHandle, $QUERY);
@@ -1826,6 +1829,7 @@ $A2B -> debug( ERROR, $agi, __FILE__, __LINE__, "\033[1;32m============INSERT===
 	$callback_mode = $agi -> get_variable("MODE", true);
 	$callback_tariff = $agi -> get_variable("TARIFF", true);
 	$callback_uniqueid = $agi -> get_variable("CBID", true);
+	$A2B->callback_id = $agi -> get_variable("CALLBACKID", true);
 	$callback_leg = $agi -> get_variable("LEG", true);
 	$usedratecard = $agi -> get_variable("RATECARD", true);
     $accountcode = $agi -> get_variable("ACCOUNTCODE", true);
@@ -2043,6 +2047,7 @@ $A2B -> debug( ERROR, $agi, __FILE__, __LINE__, "\033[1;32m============INSERT===
 	$callback_mode = $agi -> get_variable("MODE", true);
 	$callback_tariff = $agi -> get_variable("TARIFF", true);
 	$callback_uniqueid = $agi -> get_variable("CBID", true);
+	$A2B->callback_id = $agi -> get_variable("CALLBACKID", true);
 	$callback_leg = $agi -> get_variable("LEG", true);
 	$usedratecard = $agi -> get_variable("RATECARD", true);
     $accountcode = $agi -> get_variable("ACCOUNTCODE", true);

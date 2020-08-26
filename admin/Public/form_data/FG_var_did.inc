@@ -221,7 +221,7 @@ $HD_Form -> AddEditElement (gettext("ALLOW PREFIXes"),
 	"size=30 maxlength=30 ",
 	"28",
 	"",
-	"", "", "", "", "", "", "NO", gettext("Allow Callback and/or Spam Filter only for the listed prefixes. Insert the prefixes separated by comma, e.g. for UK,IT,RU,UA are '44,39,7,380'."), null, null, gettext("Before All-Callback"));
+	"", "", "", "", "", "", "NO", gettext("Allow Callback and/or Spam Filter for the listed prefixes only. Insert the prefixes separated by comma, e.g. for UK,IT,RU,UA are '44,39,7,380'."), null, null, gettext("Before All-Callback"));
 
 $HD_Form -> AddEditElement (gettext("SOUND BEFORE CALLBACK"),
         "callbacksound",
@@ -250,7 +250,7 @@ $HD_Form -> AddEditElement(gettext("DTMF DIGIT GUARD"),
 	"size=30 maxlength=12",
 	"32",
 	"",
-	"", "", "", "", "", "", "NO-NULL", gettext("Set DTMF digit which caller must pressed any of them, i.e. 0123456789*#"));
+	"", "", "", "", "", "", "NO-NULL", gettext("Set DTMF digit what caller must pressed any of them, e.g. 0123456789*#"));
 
 $HD_Form -> AddEditElement (gettext("SPAM FILTER"),
 	"spamfilter",
