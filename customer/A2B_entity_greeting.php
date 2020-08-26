@@ -162,20 +162,23 @@ if (isset($soundlist) && count($soundlist)>0) {
 	}
 }
 
+$istts = true;
 try {
     $response = $client->request('GET', 'https://texttospeech.googleapis.com/v1/voices?key=' . GOOGLE_TTS_KEY);
 } catch (Exception $e) {
-    die('Something went wrong, e.g. make sure that GOOGLE_TTS_KEY is setted.');//: ' . $e->getMessage());
+    $istts = false;
+//    die('Something went wrong, e.g. make sure that GOOGLE_TTS_KEY is setted.');//: ' . $e->getMessage());
 }
-$fileData = json_decode($response->getBody()->getContents(), true);
+if ($istts) {
+    $fileData = json_decode($response->getBody()->getContents(), true);
 
-foreach ($fileData['voices'] as $eachvoice) {
+    foreach ($fileData['voices'] as $eachvoice) {
 	$langlist[]=$eachvoice['languageCodes'][0];
-}
-$langlist = array_unique($langlist);
-sort($langlist);
+    }
+    $langlist = array_unique($langlist);
+    sort($langlist);
 
-foreach ($langlist as $eachvoice) {
+    foreach ($langlist as $eachvoice) {
 	foreach ($fileData['voices'] as $eachname) {
 		if ($eachname['languageCodes'][0]==$eachvoice) {
 			$voicenamelist[$eachvoice][] = array(0 => $eachname['name'], 1 => $eachname['ssmlGender'], 2 => $eachname['naturalSampleRateHertz']);
@@ -184,8 +187,8 @@ foreach ($langlist as $eachvoice) {
 	}
 	array_multisort($wavesort,$voicenamelist[$eachvoice]);
 	unset($wavesort);
+    }
 }
-
 if ($id!="" || !is_null($id)) {
 	$HD_Form -> FG_EDITION_CLAUSE = str_replace("%id", "$id", $HD_Form -> FG_EDITION_CLAUSE);
 }
@@ -225,6 +228,7 @@ $smarty->display( 'main.tpl');
 
 if ($form_action == "list") {
     $HD_Form -> create_toppage ("ask-add");
+    if ($istts) {
 ?>
 <center>
 <?php
@@ -268,11 +272,10 @@ if ($form_action == "list") {
 	<audio id="sound1" preload="none" controlsList="nodownload"></audio>
 	<script language="JavaScript"> var langfirst = '<?php echo $langlocale?>', voicefirst = '<?php echo $voicename?>', soundpath2 = '<?php echo $_SERVER['PHP_SELF']; ?>?langlocale='; document.theForm.range_weight_disp.value=<?php echo $speakingRate?>;</script>
 	<script language="JavaScript" src="./javascript/player.js"></script>
-	<?php
-}
-?>
 </center>
 <?php
+    }
+}
 
 // #### TOP SECTION PAGE
 $HD_Form -> create_toppage ($form_action);
