@@ -84,6 +84,12 @@ if ($resmax) {
 	foreach ($resmax as $val)
 	    $destlist[] = array($val[0],$val[0]);
 }
+$instance_table = new Table("cc_callerid", "phonenumber");
+$list = $instance_table -> Get_list($DBHandle, "id = $id", 0);
+if (is_array($list) && count($list)>0) {
+    $destination = $list[0][0];
+    $selecteddest = ($destination && array_search($destination,array_column($destlist,0))===false) ? "<OPTION value=\"$destination\">".$destination."</OPTION>" : NULL;
+} else $selecteddest = NULL;
 
 $HD_Form -> AddViewElement(gettext("CALLERID"), "cid", "20%", "center", "sort");
 $HD_Form -> AddViewElement(gettext("D I S A"), "activated", "14%", "center\" nowrap \"", "sort", "26", "list", $actived_list);
@@ -204,10 +210,8 @@ if ($form_action != 'ask-delete') {
 			    '$value',
 			    ($form_action=='ask-delete')?"INPUT":"DATALIST",
 			    "size=50 maxlength=100 style=\"width: 250px;\"",
-			    "0",//"22",
-			    gettext("Enter the phone"),
-			    "list" , "", "", "", $destlist , "%1", "NO", gettext("Enter here the phonenumber or IVR name you wish to send call, or select destination from the drop-down list"));
-//			    "", "", "", "", "", "", "NO", gettext("Enter the phone number for immediatly dial instead prompt to dial"));
+			    "", gettext("Enter the phone"),
+			    "list" , "", "", "", $destlist , "%1", "NO", gettext("Enter the destination for immediatly dial instead prompt to dial. There are the phonenumber or IVR name you wish to send call. Or select destination from the drop-down list"), NULL, $selecteddest);
 
 	$HD_Form -> AddEditElement (gettext("CALLBACK"),
 			   "callback",

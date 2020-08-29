@@ -1616,9 +1616,7 @@ class A2Billing {
 
 	function is_voip ($setur)
 	{
-	    if (stripos($setur,"QUEUE ") === 0 ||
-		stripos($setur,"/") > 2
-		)
+	    if (stripos($setur,"QUEUE ") === 0 || strpos($setur,"/") > 2)
 		return true;
 	    return false;
 	}

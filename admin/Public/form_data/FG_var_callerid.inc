@@ -165,7 +165,7 @@ if (isset($form_action) && $form_action=="ask-edit") {
         $resmax = $DBHandle->Execute($QUERYpop);
         if ($resmax) {
 	    foreach ($resmax as $val)
-	    $destlist[] = array($val[0],$val[0]);
+		$destlist[] = array($val[0],$val[0]);
         }
         $QUERYpop = "SELECT cid FROM cc_callerid WHERE id_cc_card=(SELECT id_cc_card FROM cc_callerid WHERE id=$id) AND blacklist=0 ORDER BY cid";
         $resmax = $DBHandle->Execute($QUERYpop);

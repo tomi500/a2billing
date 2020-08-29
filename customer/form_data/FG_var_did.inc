@@ -36,7 +36,7 @@ $json_data = $_POST["json_data"];
 if (isset($json_data))
     extract(json_decode($json_data,true,512));
 else
-    getpost_ifset(array('id', 'billingtype', 'did', 'startingdate', 'expirationdate', 'id_cc_didgroup', 'id_cc_country', 'activated', 'fixrate', 'id_trunk', 'choose_country', 'choose_did', 'assign', 'countrycode', 'arecode', 'phonenumber', 'voip_call', 'destination', 'choose_did_rate', 'new_did_page', 'confirm_buy_did', 'action_release'));
+    getpost_ifset(array('id', 'billingtype', 'did', 'startingdate', 'expirationdate', 'id_cc_didgroup', 'id_cc_country', 'activated', 'fixrate', 'id_trunk', 'choose_country', 'choose_did', 'assign', 'countrycode', 'arecode', 'phonenumber', 'destination', 'choose_did_rate', 'new_did_page', 'confirm_buy_did', 'action_release'));
 
 $HD_Form = new FormHandler("cc_did_destination",gettext("Destination"));
 
@@ -100,8 +100,8 @@ if ($resmax) {
 $instance_table = new Table("cc_did_destination", "destination");
 $list = $instance_table -> Get_list($DBHandle, "id = $id", 0);
 if (is_array($list) && count($list)>0) {
-    $destination = $list[0][0];
-    $selecteddest = ($destination && array_search($destination,array_column($destlist,0))===false) ? "<OPTION value=\"$destination\">".$destination."</OPTION>" : NULL;
+    $dest = $list[0][0];
+    $selecteddest = ($dest && array_search($dest,array_column($destlist,0))===false) ? "<OPTION value=\"$dest\">".$dest."</OPTION>" : NULL;
 } else $selecteddest = NULL;
 
 $HD_Form -> AddViewElement(gettext("DID"), "id_cc_did", "15%", "center", "sort", "30", "lie", "cc_did", "did", "id='%id'", "%1");
@@ -118,35 +118,21 @@ if (isset($form_action) && ($form_action=='ask-edit' || $form_action=='edit')) {
 	$HD_Form -> FG_TABLE_NAME = "cc_did_destination AS t1";
 	$country_field = '';
 	$validated = 1;
-	$DBHandle_max = DbConnect();
-	$resmax = $DBHandle_max -> Execute("SELECT destination, validated, voip_call FROM cc_did_destination WHERE id='$id'");
-	$row = $resmax->fetchRow();
-	
-	if ($voip_call == 1) {
+
+	if (strpos($destination,"/") > 2) {
 	    // It's a Voip Call
-	    if (!(strpos(substr($destination, strpos($destination, '/')),'.') && (stripos($destination,'SIP/') === 0 || stripos($destination,'IAX2/') === 0 || stripos($destination,'H323/') === 0) && stripos($row[0],'Local/') === false)) {
-		$destination = $row[0];
-		$validated = $row[1];
-		$voip_call = $row[2];
-	    } else {
-		$numrow = 0;
-		$resmax = $DBHandle_max -> Execute("SELECT * FROM cc_did_destination WHERE id='$id' AND destination='$destination' AND validated=1");
-	
-		if ( $resmax )
-		    $numrow = $resmax -> RecordCount( );
-		$validated = ($numrow == 1) ? 1 : 0;
-	
-		if ($validated)
-		    NotificationsDAO::AddNotification("did_destination_edited_cust", Notification::$LOW, Notification::$CUST, $_SESSION['card_id'], Notification::$LINK_DID_DESTINATION, $id);
-	
-		//$HD_Form->_processed['destination'] = intval($destination);
-	    }
+	    $resmax = $DBHandle -> Execute("SELECT * FROM cc_did_destination WHERE id='$id' AND destination='$destination' AND validated=1");
+
+	    $numrow = ($resmax) ? $resmax -> RecordCount( ) : 0;
+	    $validated = ($numrow) ? 1 : 0;
+
+	    if ($validated==0)
+		NotificationsDAO::AddNotification("did_destination_edited_cust", Notification::$LOW, Notification::$CUST, $_SESSION['card_id'], Notification::$LINK_DID_DESTINATION, $id);
 	} else {
 	    // It's not a Voip call, check if we don't try to inject
 	    $destination = (intval($destination) > 0) ? preg_replace("|\D|", "", $destination) : 'no valid';
-	    //echo "Validity check ($destination)";
 	}
-	
+
 } else {
 	$HD_Form -> FG_TABLE_NAME = "cc_did_destination AS t1, cc_did AS t2";
 	$HD_Form -> FG_TABLE_CLAUSE = " id_cc_card='".$_SESSION["card_id"]."' AND t1.id_cc_did=t2.id";
@@ -196,7 +182,6 @@ $HD_Form -> AddEditElement (gettext("DID"),
 	"did, id",
 	"id=(SELECT id_cc_did FROM cc_did_destination WHERE id='%id')", "", "%1", "" , "");
 
-//if (isset($form_action) && $form_action=="ask-edit")
 if (isset($form_action) && $form_action<>"ask-add")
 $HD_Form -> AddEditElement(gettext("SCHEDULE"),
         "shedule",
@@ -233,7 +218,6 @@ $HD_Form -> AddEditElement (gettext("DESTINATION"),
 	    "",
 	    "Insert the Destination",
 	    "list" , "", "", "", $destlist , "%1", "", gettext("Enter here the phonenumber or IVR name you wish to send call, or select destination from the drop-down list"), NULL, $selecteddest);
-//}
 
 $HD_Form -> AddEditElement (gettext("TIMEOUT"),
 	"timeout",
@@ -243,16 +227,7 @@ $HD_Form -> AddEditElement (gettext("TIMEOUT"),
 	"22",
 	gettext("Insert max 3 digits"),
 	"", "", "", "", "", "", "", gettext("Maximum time, in seconds, that the Dial command is to wait for a channel to answer"));
-/**
-$HD_Form -> AddEditElement (gettext("VOIP_CALL"),
-	"voip_call",
-	'1',
-	"RADIOBUTTON",
-	"",
-	"",
-	gettext("Choose if you want to not use the trunk and let the asterisk call directly the destination (ie, Destination : SIP/jeremy@182.212.1.45)"),
-	"" , "",  "", gettext("Yes").":1, - ".gettext("No").":0",  "", "" , "" , "");
-**/
+
 $HD_Form -> AddEditElement (gettext("PRIORITY"),
 	"priority",
 	"",
@@ -266,11 +241,11 @@ if (isset($form_action) && $form_action<>"ask-add" /**($form_action=="ask-edit" 
     $HD_Form -> FieldEditElement ('activated, id_cc_did, id_cc_card, answer, playsound, destination, timeout, priority');
 } else {
     $HD_Form -> FieldEditElement ('activated, id_cc_did, answer, playsound, destination, timeout, priority');
-    $HD_Form -> FG_QUERY_EDITION_HIDDEN_FIELDS = "validated";
-    $HD_Form -> FG_QUERY_EDITION_HIDDEN_VALUE = "$validated";
 //    $HD_Form -> FG_QUERY_EDITION_HIDDEN_FIELDS = "destination, validated, voip_call";
 //    $HD_Form -> FG_QUERY_EDITION_HIDDEN_VALUE = "$destination, $validated, $voip_call";
 }
+$HD_Form -> FG_QUERY_EDITION_HIDDEN_FIELDS = "validated";
+$HD_Form -> FG_QUERY_EDITION_HIDDEN_VALUE = "$validated";
 
 $HD_Form -> FG_INTRO_TEXT_EDITION= gettext("You can modify, through the following form, the different properties of your DID number <b>".$number."</b>");
 $HD_Form -> FG_INTRO_TEXT_ASK_DELETION = gettext("If you really want remove this")." ".$HD_Form->FG_INSTANCE_NAME.", ".gettext("click on the delete button.");
