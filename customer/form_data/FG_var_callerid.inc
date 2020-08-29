@@ -116,7 +116,6 @@ if ($form_action=="ask-add") {
 if (isset($form_action) && ($form_action=='ask-edit' || $form_action=='edit')) {
 
 	$QUERY = "SELECT status, currency FROM cc_card  WHERE id = $idcard";
-	$DBHandle  = DbConnect();
 	$numrow = 0;
 	$resmax = $DBHandle -> Execute($QUERY);
 	if ($resmax)
@@ -204,7 +203,7 @@ if ($form_action != 'ask-delete') {
 			    "phonenumber",
 			    '$value',
 			    ($form_action=='ask-delete')?"INPUT":"DATALIST",
-			    "size=50 maxlength=50 style=\"width: 250px;\"",
+			    "size=50 maxlength=100 style=\"width: 250px;\"",
 			    "0",//"22",
 			    gettext("Enter the phone"),
 			    "list" , "", "", "", $destlist , "%1", "NO", gettext("Enter here the phonenumber or IVR name you wish to send call, or select destination from the drop-down list"));

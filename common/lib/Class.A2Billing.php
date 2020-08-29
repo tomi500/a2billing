@@ -1614,6 +1614,14 @@ class A2Billing {
                 return false; // Destination is available
         }
 
+	function is_voip ($setur)
+	{
+	    if (stripos($setur,"QUEUE ") === 0 ||
+		stripos($setur,"/") > 2
+		)
+		return true;
+	    return false;
+	}
 
 	/**
 	 *	Function call_did
@@ -1655,6 +1663,7 @@ class A2Billing {
 			$this->agiconfig['cid_enable']	= 0;
 			$this->tariff 					= $inst_listdestination[3];
 			$this->destination = $initialdestination	= $inst_listdestination[4];
+			$isvoip 				= is_voip($inst_listdestination[4]);
 			$this->accountcode = $this->username		= $inst_listdestination[6];
 			$this->useralias 				= $inst_listdestination[7];
 			$this->time_out 				= $inst_listdestination[30];
@@ -1865,7 +1874,7 @@ class A2Billing {
 //				continue 4; // уходим на следующий PRIOR
 			    } else {
 				$inst_listdestination[4] = $result[$key][4];
-				$inst_listdestination[5] = (stripos($inst_listdestination[4],"QUEUE ") !== 0)?0:1;
+				$isvoip = is_voip($inst_listdestination[4]);
 				foreach ($resultsound as $val) { // перебираем что проиграть перед вызовом
 				    if ($val[1]==$result[$key][0]) {
 					$wait = $val[2];
@@ -1909,7 +1918,7 @@ class A2Billing {
 				foreach ($result as $value) {
 				    if ($value[3]=='-3') {
 					$inst_listdestination[4] = $value[4];
-					$inst_listdestination[5] = (stripos($inst_listdestination[4],"QUEUE ") !== 0)?0:1;
+					$isvoip = is_voip($inst_listdestination[4]);
 					foreach ($resultsound as $val) { // перебираем что проиграть перед повтором
 					    if ($val[1]==$value[0]) {
 						$wait = $val[2];
@@ -1949,7 +1958,7 @@ class A2Billing {
 				foreach ($result as $value) {
 				    if ($value[3]=='-4') {
 					$inst_listdestination[4] = $value[4];
-					$inst_listdestination[5] = (stripos($inst_listdestination[4],"QUEUE ") !== 0)?0:1;
+					$isvoip = is_voip($inst_listdestination[4]);
 					foreach ($resultsound as $val) { // перебираем что проиграть перед повтором
 					    if ($val[1]==$value[0]) {
 						$wait = $val[2];
@@ -1986,13 +1995,14 @@ class A2Billing {
 				    }
 				}
 			}
+$this -> debug( ERROR, $agi, __FILE__, __LINE__, "Dialstatus=".$inst_listdestination[4]);
 			$QUERY = "SELECT DISTINCT cc_ivr_destinations.id, repeats, waitsecsfordigits, waitdigits, destinationnum, playsoundcallee, cc_ivr.id
 				FROM cc_ivr, cc_ivr_destinations WHERE id_cc_card = '{$this->id_card}' AND ivrname LIKE '{$inst_listdestination[4]}' AND id_cc_ivr=cc_ivr.id";
 			$result = $this -> instance_table -> SQLExec ($this->DBHandle, $QUERY);
 		}
 
 // IF VOIP CALL
-				if ($inst_listdestination[5]==1) {
+				if ($isvoip) {
 					$monfile = false;
 					$localcount = substr_count(strtoupper($inst_listdestination[4]),"LOCAL/");
 					// RUN MIXMONITOR TO RECORD CALL
@@ -2318,6 +2328,7 @@ $tempdebug="DIALSTATUS: $dialstatus";
 	    $this -> debug( INFO, $agi, __FILE__, __LINE__, "[A2Billing] DID call friend: FOLLOWME=$callcount (cardnumber:".$inst_listdestination[6]."|destination:".$inst_listdestination[4]."|tariff:".$inst_listdestination[3].")\n");
 	    $this->agiconfig['cid_enable']			= 0;
 	    $initialdestination 				= $inst_listdestination[4];
+	    $isvoip					= is_voip($inst_listdestination[4]);
 	    $this->accountcode = $this->username=$new_username	= $inst_listdestination[6];
 	    $this->tariff 					= $inst_listdestination[3];
 	    $this->destination					= $inst_listdestination[10];
@@ -2509,7 +2520,7 @@ $tempdebug="DIALSTATUS: $dialstatus";
 //				continue 4; // уходим на следующий PRIOR
 			    } else {
 				$inst_listdestination[4] = $result[$key][4];
-				$inst_listdestination[5] = (stripos($inst_listdestination[4],"QUEUE ") !== 0)?0:1;
+				$isvoip = is_voip($inst_listdestination[4]);
 				foreach ($resultsound as $val) { // перебираем что проиграть перед вызовом
 				    if ($val[1]==$result[$key][0]) {
 					$wait = $val[2];
@@ -2553,7 +2564,7 @@ $tempdebug="DIALSTATUS: $dialstatus";
 				foreach ($result as $value) {
 				    if ($value[3]=='-3') {
 					$inst_listdestination[4] = $value[4];
-					$inst_listdestination[5] = (stripos($inst_listdestination[4],"QUEUE ") !== 0)?0:1;
+					$isvoip = is_voip($inst_listdestination[4]);
 					foreach ($resultsound as $val) { // перебираем что проиграть перед повтором
 					    if ($val[1]==$value[0]) {
 						$wait = $val[2];
@@ -2593,7 +2604,7 @@ $tempdebug="DIALSTATUS: $dialstatus";
 				foreach ($result as $value) {
 				    if ($value[3]=='-4') {
 					$inst_listdestination[4] = $value[4];
-					$inst_listdestination[5] = (stripos($inst_listdestination[4],"QUEUE ") !== 0)?0:1;
+					$isvoip = is_voip($inst_listdestination[4]);
 					foreach ($resultsound as $val) { // перебираем что проиграть перед повтором
 					    if ($val[1]==$value[0]) {
 						$wait = $val[2];
@@ -2637,7 +2648,7 @@ $tempdebug="DIALSTATUS: $dialstatus";
             // IF call on did is not free calculate time to call
 
             // IF VOIP CALL
-            if ($inst_listdestination[5]==1) {
+            if ($isvoip) {
                 // RUN MIXMONITOR TO RECORD CALL
 		$monfile = false;
 		if ((($this->send_sound || $this->send_text) && $this->speech2mail) || $this->monitor == 1 || $this->agiconfig['record_call'] == 1) {

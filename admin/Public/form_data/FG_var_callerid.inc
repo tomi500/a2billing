@@ -153,14 +153,41 @@ $HD_Form -> AddEditElement (gettext("CALLBACK"),
 			"list", "", "", "", $yesno, "%1", "",
 			gettext("Choose 'Yes' if you want to callback to this CallerID"));
 
+$destlist = array();
+if (isset($form_action) && $form_action=="ask-edit") {
+	$QUERYpop = "SELECT ivrname FROM cc_ivr WHERE id_cc_card=(SELECT id_cc_card FROM cc_callerid WHERE id=$id) ORDER BY ivrname";
+        $resmax = $DBHandle->Execute($QUERYpop);
+        if ($resmax) {
+	    foreach ($resmax as $val)
+		$destlist[] = array($val[0],$val[0]);
+        }
+        $QUERYpop = "SELECT regexten FROM cc_sip_buddies WHERE id_cc_card=(SELECT id_cc_card FROM cc_callerid WHERE id=$id) AND external=0 AND regexten>0 ORDER BY regexten";
+        $resmax = $DBHandle->Execute($QUERYpop);
+        if ($resmax) {
+	    foreach ($resmax as $val)
+	    $destlist[] = array($val[0],$val[0]);
+        }
+        $QUERYpop = "SELECT cid FROM cc_callerid WHERE id_cc_card=(SELECT id_cc_card FROM cc_callerid WHERE id=$id) AND blacklist=0 ORDER BY cid";
+        $resmax = $DBHandle->Execute($QUERYpop);
+        if ($resmax) {
+	    foreach ($resmax as $val)
+		$destlist[] = array($val[0],$val[0]);
+        }
+        $instance_table = new Table("cc_callerid", "phonenumber");
+        $list = $instance_table -> Get_list($DBHandle, "id = $id", 0);
+        if (is_array($list) && count($list)>0) {
+            $destination = $list[0][0];
+            $selecteddest = ($destination && array_search($destination,array_column($destlist,0))===false) ? "<OPTION value=\"$destination\">".$destination."</OPTION>" : NULL;
+        } else $selecteddest = NULL;
+} else $selecteddest = NULL;
 $HD_Form -> AddEditElement (gettext("PHONE NUMBER"),
 			"phonenumber",
 			'$value',
-			"INPUT",
-			"size=50 maxlength=50",
+			($form_action=='ask-delete')?"INPUT":"DATALIST",
+			"size=50 maxlength=100 style=\"width: 250px;\"",
 			"",
 			gettext("Insert the phone"),
-			"" , "", "", "", "", "", "", gettext("Enter the phone number for immediatly dial instead prompt to dial") );
+			"list", "", "", "", $destlist, "%1", "", gettext("Enter the phone number for immediatly dial instead prompt to dial"), NULL, $selecteddest);
 
 $HD_Form -> AddEditElement (gettext("SAY BALANCE AFTER AUTH"),
 			"warning_threshold",

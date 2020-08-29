@@ -72,6 +72,12 @@ if ($return!==false) {
             }
         }
 }
+$instance_table = new Table("cc_did_destination", "playsound");
+$list = $instance_table -> Get_list($DBHandle, "id = $id", 0);
+if (is_array($list) && count($list)>0) {
+    $playsound = preg_replace('/\.[^\.\/]+$/', '', basename($list[0][0]));
+    $selectedgreeting = ($playsound && array_search($playsound,array_column($soundlist,0))===false) ? "<OPTION value=\"$playsound\">".$playsound."</OPTION>" : NULL;
+} else $selectedgreeting = NULL;
 $destlist = array();
 $QUERYpop = "SELECT ivrname FROM cc_ivr WHERE id_cc_card=".$_SESSION["card_id"]." ORDER BY ivrname";
 $resmax = $DBHandle->Execute($QUERYpop);
@@ -91,6 +97,12 @@ if ($resmax) {
 	foreach ($resmax as $val)
 	    $destlist[] = array($val[0],$val[0]);
 }
+$instance_table = new Table("cc_did_destination", "destination");
+$list = $instance_table -> Get_list($DBHandle, "id = $id", 0);
+if (is_array($list) && count($list)>0) {
+    $destination = $list[0][0];
+    $selecteddest = ($destination && array_search($destination,array_column($destlist,0))===false) ? "<OPTION value=\"$destination\">".$destination."</OPTION>" : NULL;
+} else $selecteddest = NULL;
 
 $HD_Form -> AddViewElement(gettext("DID"), "id_cc_did", "15%", "center", "sort", "30", "lie", "cc_did", "did", "id='%id'", "%1");
 $HD_Form -> AddViewElement(gettext("DESTINATION"), "destination", "10%", "center\" nowrap \"", "sort");
@@ -211,16 +223,16 @@ $HD_Form -> AddEditElement (gettext("PLAY_SOUND"),
 	"size=50 maxlength=50 style=\"width: 250px;\"",
 	"",
 	gettext("Insert the path and name of sound file"),
-	"list", "", "", "", $soundlist, "%1", "", gettext("Play sound before calling DESTINATION."));
+	"list", "", "", "", $soundlist, "%1", "", gettext("Play sound before calling DESTINATION."), NULL, $selectedgreeting);
 
 $HD_Form -> AddEditElement (gettext("DESTINATION"),
 	    "destination",
 	    '$value',
 	    ($form_action=='ask-delete')?"INPUT":"DATALIST",
 	    "size=50 maxlength=100 style=\"width: 250px;\"",
-	    "0",
+	    "",
 	    "Insert the Destination",
-	    "list" , "", "", "", $destlist , "%1", "", gettext("Enter here the phonenumber or IVR name you wish to send call, or select destination from the drop-down list"));
+	    "list" , "", "", "", $destlist , "%1", "", gettext("Enter here the phonenumber or IVR name you wish to send call, or select destination from the drop-down list"), NULL, $selecteddest);
 //}
 
 $HD_Form -> AddEditElement (gettext("TIMEOUT"),
@@ -231,7 +243,7 @@ $HD_Form -> AddEditElement (gettext("TIMEOUT"),
 	"22",
 	gettext("Insert max 3 digits"),
 	"", "", "", "", "", "", "", gettext("Maximum time, in seconds, that the Dial command is to wait for a channel to answer"));
-
+/**
 $HD_Form -> AddEditElement (gettext("VOIP_CALL"),
 	"voip_call",
 	'1',
@@ -240,7 +252,7 @@ $HD_Form -> AddEditElement (gettext("VOIP_CALL"),
 	"",
 	gettext("Choose if you want to not use the trunk and let the asterisk call directly the destination (ie, Destination : SIP/jeremy@182.212.1.45)"),
 	"" , "",  "", gettext("Yes").":1, - ".gettext("No").":0",  "", "" , "" , "");
-
+**/
 $HD_Form -> AddEditElement (gettext("PRIORITY"),
 	"priority",
 	"",
@@ -251,9 +263,9 @@ $HD_Form -> AddEditElement (gettext("PRIORITY"),
 	"list" , "", "",  "", $priority_list, "%1" , "" , "");
 
 if (isset($form_action) && $form_action<>"ask-add" /**($form_action=="ask-edit" || $form_action=="edit")**/) {
-    $HD_Form -> FieldEditElement ('activated, id_cc_did, id_cc_card, answer, playsound, destination, timeout, voip_call, priority');
+    $HD_Form -> FieldEditElement ('activated, id_cc_did, id_cc_card, answer, playsound, destination, timeout, priority');
 } else {
-    $HD_Form -> FieldEditElement ('activated, id_cc_did, answer, playsound, destination, timeout, voip_call, priority');
+    $HD_Form -> FieldEditElement ('activated, id_cc_did, answer, playsound, destination, timeout, priority');
     $HD_Form -> FG_QUERY_EDITION_HIDDEN_FIELDS = "validated";
     $HD_Form -> FG_QUERY_EDITION_HIDDEN_VALUE = "$validated";
 //    $HD_Form -> FG_QUERY_EDITION_HIDDEN_FIELDS = "destination, validated, voip_call";

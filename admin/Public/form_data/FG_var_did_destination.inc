@@ -84,7 +84,7 @@ $HD_Form -> AddViewElement(gettext("DID"), "did", "12%", "center", "sort", "26")
 $HD_Form -> AddViewElement(gettext("ACTIVE"), "activated", "5%", "center", "sort", "", "list", $actived_list);
 $HD_Form -> AddViewElement(gettext("PRIOR"), "priority", "5%", "center", "sort", "", "list", $priority_list);
 $HD_Form -> AddViewElement(gettext("DESTINATION"), "destination", "15%", "center", "sort");
-$HD_Form -> AddViewElement(gettext("VOIP"), "voip_call", "5%", "center", "sort", "", "list", $actived_list);
+//$HD_Form -> AddViewElement(gettext("VOIP"), "voip_call", "5%", "center", "sort", "", "list", $actived_list);
 $HD_Form -> AddViewElement(gettext("CREATION DATE"), "creationdate", "15%", "center", "sort", "16", "", "", "", "", "", "display_dateformat");
 $HD_Form -> AddViewElement(gettext("ACCOUNT NUMBER"), "id_cc_card", "15%", "center", "sort", "", "lie_link", "cc_card", "username,id", "id='%id'", "%1", "", "A2B_entity_card.php");
 $HD_Form -> AddViewElement(gettext("INUSE"), "destinuse" , "2%", "center", "sort");
@@ -93,7 +93,7 @@ $HD_Form -> AddViewElement(gettext("MINUTES USED"), "secondusedreal", "10%", "ce
 $HD_Form -> AddViewElement(gettext("VALIDATED"), "validated", "10%", "center", "sort", "", "list", $validated_list);
 
 // added a parameter to append  FG_TABLE_ID  ( by default ) or disable 0.
-$HD_Form -> FieldViewElement ('cc_did.did, cc_did_destination.activated, priority, destination, voip_call, cc_did_destination.creationdate, id_cc_card, destinuse, destmaxuse, cc_did_destination.secondusedreal, validated');
+$HD_Form -> FieldViewElement ('cc_did.did, cc_did_destination.activated, priority, destination, cc_did_destination.creationdate, id_cc_card, destinuse, destmaxuse, cc_did_destination.secondusedreal, validated');
 
 $HD_Form -> FG_ACTION_SIZE_COLUMN = '15%';
 
@@ -167,10 +167,10 @@ $HD_Form -> AddEditElement (gettext("ANSWER"),
 	"" , "", "", gettext("Yes").":1, - ".gettext("No").":0", "", "", "", gettext("Choose if you want to answer on the call before playing PLAY_SOUND"));
 
 $soundlist = array();
+$destlist = array();
 if (isset($form_action) && $form_action=="ask-edit") {
-	$DBHandle_max = DbConnect();
 	$instance_table = new Table("cc_card","username");
-	$result_card = $instance_table -> Get_list($DBHandle_max, "id=(SELECT id_cc_card FROM cc_did_destination WHERE id=$id)", 0);
+	$result_card = $instance_table -> Get_list($DBHandle, "id=(SELECT id_cc_card FROM cc_did_destination WHERE id=$id)", 0);
 	$diraudio = DIR_STORE_AUDIO."/".$result_card[0][0]."/";
 	$return = scandir($diraudio);
 	if ($return!==false) {
@@ -181,19 +181,44 @@ if (isset($form_action) && $form_action=="ask-edit") {
 	    }
 	}
         $instance_table = new Table("cc_did_destination", "playsound");
-        $list = $instance_table -> Get_list($DBHandle_max, "id = $id", 0);
+        $list = $instance_table -> Get_list($DBHandle, "id = $id", 0);
         if (is_array($list) && count($list)>0) {
             $playsound = preg_replace('/\.[^\.\/]+$/', '', basename($list[0][0]));
             $selectedgreeting = ($playsound && array_search($playsound,array_column($soundlist,0))===false) ? "<OPTION value=\"$playsound\">".$playsound."</OPTION>" : NULL;
         } else $selectedgreeting = NULL;
+
+        $QUERYpop = "SELECT ivrname FROM cc_ivr WHERE id_cc_card=(SELECT id_cc_card FROM cc_did_destination WHERE id=$id) ORDER BY ivrname";
+        $resmax = $DBHandle->Execute($QUERYpop);
+        if ($resmax) {
+	    foreach ($resmax as $val)
+		$destlist[] = array($val[0],$val[0]);
+        }
+        $QUERYpop = "SELECT regexten FROM cc_sip_buddies WHERE id_cc_card=(SELECT id_cc_card FROM cc_did_destination WHERE id=$id) AND external=0 AND regexten>0 ORDER BY regexten";
+        $resmax = $DBHandle->Execute($QUERYpop);
+        if ($resmax) {
+	    foreach ($resmax as $val)
+	    $destlist[] = array($val[0],$val[0]);
+        }
+        $QUERYpop = "SELECT cid FROM cc_callerid WHERE id_cc_card=(SELECT id_cc_card FROM cc_did_destination WHERE id=$id) AND blacklist=0 ORDER BY cid";
+        $resmax = $DBHandle->Execute($QUERYpop);
+        if ($resmax) {
+	    foreach ($resmax as $val)
+		$destlist[] = array($val[0],$val[0]);
+        }
+        $instance_table = new Table("cc_did_destination", "destination");
+        $list = $instance_table -> Get_list($DBHandle, "id = $id", 0);
+        if (is_array($list) && count($list)>0) {
+            $destination = $list[0][0];
+            $selecteddest = ($destination && array_search($destination,array_column($destlist,0))===false) ? "<OPTION value=\"$destination\">".$destination."</OPTION>" : NULL;
+        } else $selecteddest = NULL;
 } else {
-	$selectedgreeting = NULL;
+	$selectedgreeting = $selecteddest = NULL;
 }
 $HD_Form -> AddEditElement (gettext("PLAY_SOUND"),
 	"playsound",
 	'$value',
 	($form_action=='ask-delete')?"INPUT":"DATALIST",
-	"size=50 maxlength=50",
+	"size=50 maxlength=50 style=\"width: 250px;\"",
 	"",
 	gettext("Insert the path and name of sound file"),
 	"list", "", "", "", $soundlist, "%1", "", gettext("Play sound before calling DESTINATION. ie 'ivr/wait-please'"), NULL, $selectedgreeting);
@@ -201,11 +226,11 @@ $HD_Form -> AddEditElement (gettext("PLAY_SOUND"),
 $HD_Form -> AddEditElement (gettext("DESTINATION"),
 	"destination",
 	'$value',
-	"INPUT",
-	"size=50 maxlength=120",
-	"0",
+	($form_action=='ask-delete')?"INPUT":"DATALIST",
+	"size=50 maxlength=100 style=\"width: 250px;\"",
+	"",
 	gettext("Insert the DID"),
-	"", "", "", "", "", "", "", gettext("Enter the phone number you wish to call, or the VoIP client to reach, or QUEUE to go. (ie: 347894999 or SIP/jeremy@182.212.1.45 or QUEUE myqueue,hknRt,,,300). If the call is VoIP or QUEUE, the 'VoIP_Call' must be set to yes."));
+	"list", "", "", "", $destlist, "%1", "", gettext("Enter the phone number you wish to call, or the VoIP client to reach, or QUEUE to go. (ie: 347894999 or SIP/jeremy@182.212.1.45 or QUEUE myqueue,hknRt,,,300)"), NULL, $selecteddest);
 
 $HD_Form -> AddEditElement (gettext("CALLERIDNAME"),
 	"calleridname",
@@ -224,7 +249,7 @@ $HD_Form -> AddEditElement (gettext("TIMEOUT"),
 	"22",
 	gettext("Insert max 3 digits"),
 	"", "", "", "", "", "", "", gettext("Maximum time, in seconds, that the Dial command is to wait for a channel to answer.</br><font color=red>Affect for QUEUE!</font>"));
-
+/**
 $HD_Form -> AddEditElement (gettext("VOIP_CALL"),
 	"voip_call",
 	'0',
@@ -233,7 +258,7 @@ $HD_Form -> AddEditElement (gettext("VOIP_CALL"),
 	"",
 	gettext("Choose if you want to not use the trunk and let the asterisk go to QUEUE or call directly the destination (ie, Destination : SIP/jeremy@182.212.1.45)"),
 	"", "",  "", gettext("Yes").":1, - ".gettext("No").":0", "", "", "", gettext("If the call is VoIP or QUEUE, that must be set to 'Yes'"));
-
+**/
 $HD_Form -> AddEditElement (gettext("CURRENT CONNECTIONS"),
         "destinuse",
         "",
@@ -291,7 +316,7 @@ $HD_Form -> AddEditElement (gettext("CID_PRESENT"),
 	gettext("Choose 'Yes' if you want to present real CID though CID_GROUP applied"),
 	"" , "", "", gettext("Yes").":1, - ".gettext("No").":0", "", "", "", gettext("Choose 'Yes' if you want to present real CID though CID_GROUP applied"));
 **/
-	$HD_Form -> FieldEditElement ('activated, id_cc_did, id_cc_did, answer, playsound, destination, calleridname, timeout, voip_call, destinuse, destmaxuse, id_cc_card, validated, priority');
+	$HD_Form -> FieldEditElement ('activated, id_cc_did, id_cc_did, answer, playsound, destination, calleridname, timeout, destinuse, destmaxuse, id_cc_card, validated, priority');
 
 $HD_Form->FG_ADITION_HIDDEN_PARAM		= $HD_Form->FG_EDITION_HIDDEN_PARAM		= 'filterprefix,current_page';
 $HD_Form->FG_ADITION_HIDDEN_PARAM_VALUE 	= $HD_Form->FG_EDITION_HIDDEN_PARAM_VALUE	= $filterprefix.",".$current_page;
