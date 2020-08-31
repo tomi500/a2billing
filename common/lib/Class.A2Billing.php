@@ -1661,7 +1661,7 @@ class A2Billing {
 			$this->agiconfig['cid_enable']	= 0;
 			$this->tariff 					= $inst_listdestination[3];
 			$this->destination = $initialdestination	= $inst_listdestination[4];
-			$isvoip 				= is_voip($inst_listdestination[4]);
+			$isvoip 			 = $this->is_voip($inst_listdestination[4]);
 			$this->accountcode = $this->username		= $inst_listdestination[6];
 			$this->useralias 				= $inst_listdestination[7];
 			$this->time_out 				= $inst_listdestination[30];
@@ -1872,7 +1872,7 @@ class A2Billing {
 //				continue 4; // уходим на следующий PRIOR
 			    } else {
 				$inst_listdestination[4] = $result[$key][4];
-				$isvoip = is_voip($inst_listdestination[4]);
+				$isvoip = $this->is_voip($inst_listdestination[4]);
 				foreach ($resultsound as $val) { // перебираем что проиграть перед вызовом
 				    if ($val[1]==$result[$key][0]) {
 					$wait = $val[2];
@@ -1916,7 +1916,7 @@ class A2Billing {
 				foreach ($result as $value) {
 				    if ($value[3]=='-3') {
 					$inst_listdestination[4] = $value[4];
-					$isvoip = is_voip($inst_listdestination[4]);
+					$isvoip = $this->is_voip($inst_listdestination[4]);
 					foreach ($resultsound as $val) { // перебираем что проиграть перед повтором
 					    if ($val[1]==$value[0]) {
 						$wait = $val[2];
@@ -1956,7 +1956,7 @@ class A2Billing {
 				foreach ($result as $value) {
 				    if ($value[3]=='-4') {
 					$inst_listdestination[4] = $value[4];
-					$isvoip = is_voip($inst_listdestination[4]);
+					$isvoip = $this->is_voip($inst_listdestination[4]);
 					foreach ($resultsound as $val) { // перебираем что проиграть перед повтором
 					    if ($val[1]==$value[0]) {
 						$wait = $val[2];
@@ -2326,7 +2326,7 @@ $tempdebug="DIALSTATUS: $dialstatus";
 	    $this -> debug( INFO, $agi, __FILE__, __LINE__, "[A2Billing] DID call friend: FOLLOWME=$callcount (cardnumber:".$inst_listdestination[6]."|destination:".$inst_listdestination[4]."|tariff:".$inst_listdestination[3].")\n");
 	    $this->agiconfig['cid_enable']			= 0;
 	    $initialdestination 				= $inst_listdestination[4];
-	    $isvoip					= is_voip($inst_listdestination[4]);
+	    $isvoip				 = $this->is_voip($inst_listdestination[4]);
 	    $this->accountcode = $this->username=$new_username	= $inst_listdestination[6];
 	    $this->tariff 					= $inst_listdestination[3];
 	    $this->destination					= $inst_listdestination[10];
@@ -2518,7 +2518,7 @@ $tempdebug="DIALSTATUS: $dialstatus";
 //				continue 4; // уходим на следующий PRIOR
 			    } else {
 				$inst_listdestination[4] = $result[$key][4];
-				$isvoip = is_voip($inst_listdestination[4]);
+				$isvoip = $this->is_voip($inst_listdestination[4]);
 				foreach ($resultsound as $val) { // перебираем что проиграть перед вызовом
 				    if ($val[1]==$result[$key][0]) {
 					$wait = $val[2];
@@ -2562,7 +2562,7 @@ $tempdebug="DIALSTATUS: $dialstatus";
 				foreach ($result as $value) {
 				    if ($value[3]=='-3') {
 					$inst_listdestination[4] = $value[4];
-					$isvoip = is_voip($inst_listdestination[4]);
+					$isvoip = $this->is_voip($inst_listdestination[4]);
 					foreach ($resultsound as $val) { // перебираем что проиграть перед повтором
 					    if ($val[1]==$value[0]) {
 						$wait = $val[2];
@@ -2602,7 +2602,7 @@ $tempdebug="DIALSTATUS: $dialstatus";
 				foreach ($result as $value) {
 				    if ($value[3]=='-4') {
 					$inst_listdestination[4] = $value[4];
-					$isvoip = is_voip($inst_listdestination[4]);
+					$isvoip = $this->is_voip($inst_listdestination[4]);
 					foreach ($resultsound as $val) { // перебираем что проиграть перед повтором
 					    if ($val[1]==$value[0]) {
 						$wait = $val[2];
