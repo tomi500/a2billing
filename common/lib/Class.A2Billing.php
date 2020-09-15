@@ -1807,7 +1807,7 @@ class A2Billing {
 				if ($result[0][2]<6) $result[0][2] = 6;
 			    }
 			    $key = array_search($first_dtmf, $waitdigits);
-			    if ($key===false) { // ничего не нажали или нажали неверно
+			    if ($first_dtmf=='' || $key===false) { // ничего не нажали или нажали неверно
 				if ($r>0) { // если повтор...
 				    if ($first_dtmf=='') { // и ничего не нажали
 					foreach ($result as $value) {
@@ -2454,7 +2454,7 @@ $tempdebug="DIALSTATUS: $dialstatus";
 				if ($result[0][2]<6) $result[0][2] = 6;
 			    }
 			    $key = array_search($first_dtmf, $waitdigits);
-			    if ($key===false) { // ничего не нажали или нажали неверно
+			    if ($first_dtmf=='' || $key===false) { // ничего не нажали или нажали неверно
 				if ($r>0) { // если повтор...
 				    if ($first_dtmf=='') { // и ничего не нажали
 					foreach ($result as $value) {
