@@ -47,6 +47,11 @@ ALTER TABLE cc_trunk
   CHANGE `dialprefixb`    `dialprefixb`    CHAR(40) CHARACTER SET utf8 COLLATE utf8_bin NOT NULL DEFAULT '',
   CHANGE `lastdial`       `lastdial`       VARCHAR(50) CHARACTER SET utf8 COLLATE utf8_bin NOT NULL DEFAULT '';
 
+ALTER TABLE `cc_trunk` ADD UNIQUE `trunkcode` (`trunkcode`);
+INSERT IGNORE INTO cc_trunk (trunkcode,providertech,providerip,failover_trunk,addparameter,id_provider) VALUES ('*DEFAULT','SIP','%dialingnumber%','-1','htk','-1');
+INSERT IGNORE INTO cc_trunk (trunkcode,providertech,providerip,failover_trunk,id_provider) VALUES ('-INFOLINE-','Local','%dialingnumber%@loopvirtual/n','-1','-1');
+INSERT IGNORE INTO cc_trunk (trunkcode,providertech,providerip,removeprefix,failover_trunk,id_provider,cid_handover) VALUES ('-VOICEMAIL-','Local','%dialingnumber%%cardnumber%@tovoicemailu','9','-1','-1','1');
+
 ALTER TABLE cc_voucher ADD callplan INT(11) NOT NULL;
 
 ALTER TABLE cc_card ADD monitor int(11) DEFAULT '0';
@@ -918,10 +923,11 @@ CREATE TABLE IF NOT EXISTS `cc_greeting_records` (
 ) ENGINE=MyISAM DEFAULT CHARSET=utf8 COLLATE=utf8_bin;
 
 ALTER TABLE `cc_prefix` CHANGE `prefix` `prefix` BIGINT( 20 ) NOT NULL;
-INSERT IGNORE INTO cc_prefix (`prefix`, `destination`) VALUES ('0', 'Internal Call');
+INSERT IGNORE INTO cc_prefix (`prefix`, `destination`) VALUES ('0', 'Internal');
 INSERT IGNORE INTO cc_prefix (`prefix`, `destination`) VALUES ('-1', '');
 INSERT IGNORE INTO cc_prefix (`prefix`, `destination`) VALUES ('-2', '<b>FAX</b>');
 INSERT IGNORE INTO cc_prefix (`prefix`, `destination`) VALUES ('-3', '<b>Incoming</b>');
+INSERT IGNORE INTO cc_prefix (`prefix`, `destination`) VALUES ('-4', '<b>VoiceMail</b>');
 
 INSERT IGNORE INTO cc_templatemail (`id_language`, `mailtype`, `fromemail`, `fromname`, `subject`, `messagetext`, `messagehtml`) VALUES
 ('en', 'fax_success', 'fax_robot@my.domain', 'Fax Robot', 'FAX received from $cid_number$', 'You have just received a $count$ page fax from $cid_number$ $cid_name$, at phone number $dest_exten$, on $datetime$.\r\nThe original fax document is attached in $format$ format.\r\n\r\nYou may also download copy of fax from your personal web page <a href="https://customer.my.domain/fax-history.php">https://customer.my.domain/fax-history.php</a>\r\n\r\nKind regards,\r\nTeam <a href="http://www.my.domain/">TEAM.LTD</a>', NULL),
