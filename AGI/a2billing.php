@@ -915,9 +915,17 @@ if ($mode == 'standard') {
 				$cia_res = $A2B-> call_sip_iax_buddy($agi, $RateEngine, $i);
 
 			} else {
-				$ans = $A2B -> callingcard_ivr_authorize($agi, $RateEngine, $i, true);
+				$isvoip = false;
+				$initialdestination = $A2B->extension;
+				if ($A2B -> ivr($agi,$A2B->extension,$initialdestination,$isvoip)) {
+					$A2B->destination = $A2B->extension;
+				}
+				if (stripos($A2B->extension,'QUEUE ') === 0) {
+						$ans = "QUEUE";
+				} else {
+					$ans = $A2B -> callingcard_ivr_authorize($agi, $RateEngine, $i, true);
+				}
 				if (!$A2B -> enough_credit_to_call($agi, $RateEngine)) {
-//$A2B -> debug( ERROR, $agi, __FILE__, __LINE__, "[NO ENOUGH CREDIT TO CALL THIS NUMBER - ERROR]");
 					// SAY TO THE CALLER THAT IT DEOSNT HAVE ENOUGH CREDIT TO MAKE A CALL
 					$A2B -> let_stream_listening($agi);
 					$prompt = "prepaid-no-enough-credit-stop";
@@ -925,7 +933,6 @@ if ($mode == 'standard') {
 					$A2B -> debug( DEBUG, $agi, __FILE__, __LINE__, "[STOP STREAM FILE $prompt]");
 				
 					if (($A2B -> agiconfig['notenoughcredit_cardnumber']==1) && (($i+1)< $A2B -> agiconfig['number_try'])) {
-//$A2B -> debug( ERROR, $agi, __FILE__, __LINE__, "[NO ENOUGH CREDIT TO CALL THIS NUMBER - ERROR]");
 
 						if ($A2B->set_inuse_username)
 							$A2B->callingcard_acct_start_inuse($agi,0);
@@ -959,7 +966,53 @@ if ($mode == 'standard') {
 				$A2B -> uniqueid = implode('.',$newuniqueid);
 //$A2B -> debug( FATAL, $agi, __FILE__, __LINE__, $A2B -> uniqueid);
 
-				if ($ans=="2FAX") {
+				if ($ans=="QUEUE") {
+					$dialstr = $A2B->destination;
+					$que = explode(",",$dialstr);
+					if (stripos($que[1],"r") === false) {
+						$A2B -> let_stream_listening($agi);
+					} else {
+						$A2B -> let_stream_listening($agi,false,true);
+					}
+					$myres = $A2B -> run_dial($agi, $dialstr);
+					$A2B -> DbReConnect($agi);
+					$answeredtime = $agi->get_variable("ANSWEREDTIME", true);
+					if ($answeredtime == "")
+						$answeredtime	= $agi->get_variable("CDR(billsec)",true);
+					if ($answeredtime>1356000000) {
+						$answeredtime	= time() - $answeredtime;
+						$dialstatus	= 'ANSWER';
+					} else {
+						$answeredtime	= 0;
+						$dialstatus	= $A2B -> get_dialstatus_from_queuestatus($agi);
+					}
+					$bridgepeer = $agi->get_variable('QUEUEDNID', true);
+					if (strlen($A2B -> dialstatus_rev_list[$dialstatus])>0) {
+						$terminatecauseid = $A2B -> dialstatus_rev_list[$dialstatus];
+					} else {
+						$terminatecauseid = 0;
+					}
+					if ($answeredtime == 0) $inst_listdestination4 = $A2B -> realdestination;
+					else {
+						$inst_listdestination4 = $A2B -> destination = $bridgepeer;
+					}
+					$QUERY = "SELECT regexten, id_cc_card FROM cc_sip_buddies WHERE name LIKE '{$inst_listdestination4}' LIMIT 1";
+					$result = $A2B -> instance_table -> SQLExec ($A2B->DBHandle, $QUERY);
+					if (is_array($result)) {
+						$A2B->calledexten = ($result[0][0] != "") ? "'".$result[0][0]."'" : 'NULL';
+						$card_called = "'".$result[0][1]."'";
+					} else {
+						$A2B->calledexten = 'NULL';
+						$card_called = "'0'";
+					}
+					$QUERY = "INSERT INTO cc_call (uniqueid, sessionid, card_id, nasipaddress, starttime, sessiontime, calledstation, ".
+						" terminatecauseid, stoptime, sessionbill, id_tariffgroup, id_tariffplan, id_ratecard, id_trunk, src, sipiax, id_did, calledexten, card_called, dnid, callbackid) VALUES ".
+						"('".$A2B->uniqueid."', '".$A2B->channel."',  '".$A2B->id_card."', '".$A2B->hostname."',";
+					$QUERY .= " CURRENT_TIMESTAMP - INTERVAL $answeredtime SECOND ";
+					$QUERY .= ", '$answeredtime', '".$inst_listdestination4."', '$terminatecauseid', now(), '0', '0', '0', '0', '0', '$A2B->CallerID', '3', '$A2B->id_did', $A2B->calledexten, $card_called, '$A2B->dnid', '$A2B->callback_id')";
+					$result = $A2B -> instance_table -> SQLExec ($A2B->DBHandle, $QUERY, 0);
+					if ($A2B->set_inuse_username)	$A2B -> callingcard_acct_start_inuse($agi,0);
+				} else if ($ans=="2FAX") {
 //					$transferername = $agi->get_variable("TRANSFERERNAME", true);
 //					if ($transferername == "") $transferername = $agi->get_variable("BLINDTRANSFER", true);
 

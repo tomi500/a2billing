@@ -825,7 +825,8 @@ CREATE TABLE IF NOT EXISTS `cc_card_concat` (
   INDEX `union` ( `concat_id` )
 ) ENGINE=MyISAM DEFAULT CHARSET=utf8 COLLATE=utf8_bin;
 
-ALTER TABLE `cc_card_concat` DROP PRIMARY KEY ,
+ALTER TABLE `cc_card_concat`
+DROP PRIMARY KEY ,
 ADD PRIMARY KEY ( `concat_card_id` ),
 ADD INDEX `union` ( `concat_id` );
 
@@ -1030,6 +1031,12 @@ CREATE TABLE cc_queues (
     timeoutpriority VARCHAR(128),
     PRIMARY KEY (`name`)
 );
+ALTER TABLE `cc_queues`
+ADD `argument_timeout` INTEGER NOT NULL DEFAULT '600' AFTER `name`,
+ADD `argument_options` VARCHAR(128) COLLATE utf8_bin DEFAULT 'cikt' AFTER `argument_timeout`,
+ADD `argument_gosub` VARCHAR(128) COLLATE utf8_bin DEFAULT 'getdnid' AFTER `argument_options`,
+ADD `id_cc_card` INTEGER NOT NULL DEFAULT '0' AFTER `argument_gosub`,
+ADD INDEX `id_cc_card` ( `id_cc_card` );
 
 CREATE TABLE cc_queue_members (
     uniqueid INTEGER NOT NULL AUTO_INCREMENT UNIQUE,
@@ -1053,3 +1060,6 @@ CREATE TABLE cc_queue_rules (
     raise_penalty VARCHAR(32) NOT NULL,
     PRIMARY KEY (rule_name, `time`)
 );
+ALTER TABLE `cc_queue_rules`
+ADD `id_cc_card` INTEGER NOT NULL DEFAULT '0' AFTER `rule_name`,
+ADD INDEX `id_cc_card` ( `id_cc_card` );

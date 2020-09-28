@@ -41,7 +41,7 @@ LEFT JOIN cc_logrefill ON card_id=cc_card.id OR diller_id=cc_card.id ";
 		$QUERY .= "WHERE card_id = ".$_SESSION["card_id"].$QUERY_CLAUSE." GROUP BY cc_logrefill.id) ";
 	}
 $QUERY .= "UNION (
-SELECT cc_voucher.id, `usedate` AS `date`, cc_voucher.credit, lastname, firstname, company_name, cc_card.id card_id, 0, 'Voucher' FROM cc_voucher
+SELECT cc_voucher.id, `usedate` AS `date`, cc_voucher.credit, lastname, firstname, company_name, cc_card.id card_id, 0, 'Voucher' description FROM cc_voucher
 LEFT JOIN cc_card ON username=usedcardnumber WHERE cc_card.id = ".$_SESSION["card_id"].")) aa";
 	$HD_Form = new FormHandler($QUERY,gettext("Refill"));
 	$HD_Form -> FG_TABLE_ID = 'aa.id';

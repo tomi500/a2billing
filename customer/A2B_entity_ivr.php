@@ -80,6 +80,12 @@ if ($resmax) {
         foreach ($resmax as $val)
             $destlist[] = array($val[0],$val[0]);
 }
+$QUERYpop = "SELECT `name` FROM cc_queues WHERE id_cc_card=".$_SESSION["card_id"]." ORDER BY `name`";
+$resmax = $instance_table -> SQLExec ($DBHandle,$QUERYpop);
+if ($resmax) {
+	foreach ($resmax as $val)
+	    $destlist[] = array("QUEUE ".$val[0],"QUEUE ".$val[0]);
+}
 if (count($destlist)==0) $nextivrname = "IVR_1";
 $QUERYpop = "SELECT regexten FROM cc_sip_buddies WHERE id_cc_card=".$_SESSION["card_id"]." AND external=0 AND regexten>0 ORDER BY regexten";
 $resmax = $instance_table -> SQLExec ($DBHandle,$QUERYpop);
@@ -265,7 +271,7 @@ if ($form_action=='list') {
 		<?php echo gettext("IVR Name")?>: <INPUT class="form_input_text" name="ivrname" size="11" maxlength="10"/>
 	    </div>
 	    <div class="bgivrth">
-		Repeats: <SELECT name="repeats" class="form_input_select">
+		<?php echo gettext("Repeats")?>: <SELECT name="repeats" class="form_input_select">
 				<option>0</option>
 				<option>1</option>
 				<option>2</option>
@@ -279,7 +285,7 @@ if ($form_action=='list') {
 			 </SELECT>
 	    </div>
 	    <div class="bgivrth">
-		Wait for input, sec: <SELECT name="waitsecsfordigits" class="form_input_select">
+		<?php echo gettext("Wait for input, sec")?>: <SELECT name="waitsecsfordigits" class="form_input_select">
 					<option>0</option>
 					<option>1</option>
 					<option>2</option>
@@ -326,11 +332,11 @@ if ($form_action=='list') {
 <div style="display:none;">
 <div class="ivrbeetr" data-name="destArray" data-label="Dest">
 	<div class="ivrbeetd">
-	    <?php echo gettext("Input")?>:<br><INPUT name="waitdigits" type="text" list="eventlist" autocomplete="off" class="form_input_text" onkeydown="return keytoDownNumber(event,this)" style="width:100%"/>
+	    <?php echo gettext("Input Action")?>:<br><INPUT name="waitdigits" type="text" list="eventlist" autocomplete="off" class="form_input_text" onkeydown="return keytoDownNumber(event,this)" style="width:100%"/>
 	</div>
 	<div class="ivrbeetd" data-holder-for="soundArray"></div>
 	<div class="ivrbeetd">
-	    <?php echo gettext("Destination")?>:<br><INPUT type="text" name="destinationnum" list="destlist" class="form_input_text" maxlength="100" style="width:100%"/>
+	    <?php echo gettext("Exit Action")?>:<br><INPUT type="text" name="destinationnum" list="destlist" class="form_input_text" maxlength="100" style="width:100%"/>
 	</div>
 	<div class="ivrbeetd">
 	    <?php echo gettext("Callee sound")?>:<br><INPUT type="text" name="playsoundcallee" list="soundlist" class="form_input_text" style="width:100%"/>
@@ -340,7 +346,7 @@ if ($form_action=='list') {
 </div>
 <div data-name="soundArray" data-label="Sound" class="soundFlex">
 	<div style="white-space:nowrap">
-	Pause,sec: <SELECT name="timeout" class="form_input_select">
+	<?php echo gettext("Pause,sec")?>: <SELECT name="timeout" class="form_input_select">
 	    <option>0</option>
 	    <option>1</option>
 	    <option>2</option>
@@ -351,7 +357,7 @@ if ($form_action=='list') {
 	    <option>7</option>
 	    <option>8</option>
 	    <option>9</option>
-	</SELECT>&nbsp;&nbsp;Sound:&nbsp;</div>
+	</SELECT>&nbsp;&nbsp;<?php echo gettext("Sound")?>:&nbsp;</div>
 	<div><INPUT type="text" name="playsound" list="soundlist" class="form_input_text" maxlength="100" style="width:99%"/></div>
 </div>
 </div>

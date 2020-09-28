@@ -1631,11 +1631,11 @@ msgstr "Локальная"
 
 #: form_data/FG_var_callerid.inc
 msgid "If your CallerID number was verified you can use the remaining options..."
-msgstr "Если номер CallerID подтверждён, то можно использовать ниже приведенные опции, которые отрабатываются вне зависимости от настройки 'АКТИВИРОВАН'."
+msgstr "Если номер CallerID подтверждён, то можно использовать ниже приведенные опции, которые отрабатываются вне зависимости от настройки 'D I S A'."
 
 #: form_data/FG_var_callerid.inc
 msgid "Choose 'Yes' if you want hide CLI and replace its in a general manner for calls from this CallerID. Choose 'No' if you want set a veto for replacement CLI for calls from this CallerID. Choose 'Local' to replace this CallerID when calling to countries for which there exist a local number(s) for replacement."
-msgstr "Настройка распространяется только на звонки с этого CallerID... Выберите 'Да', если хотите скрыть номер - будет передаваться номер звонящего согласно общих настроек. Выберите 'Нет' чтобы звонки отображались как есть. Выберите 'Локальная' чтобы скрыть номер при звонках в страны, для которых у Вас заданы локальные CallerID для отображения."
+msgstr "Настройка распространяется только на звонки с этого CallerID... Выберите 'Да', если хотите скрыть номер - будет передаваться другой номер звонящего согласно общих настроек. Выберите 'Нет' чтобы звонки отображались как есть. Выберите 'Локальная' чтобы скрыть номер при звонках в страны, для которых у Вас заданы локальные CallerID для отображения."
 
 #: form_data/FG_var_callerid.inc
 msgid "Present this CallerID, when calls are made to a country relevant to this CallerID."
@@ -3831,7 +3831,11 @@ msgstr ""
 
 #: A2B_entity_callerid.php
 msgid "Direct Inward System Access... for incoming calls from this number"
-msgstr "Прямой внутрисистемный доступ... используется для аутентификации при входящем звонке"
+msgstr "Прямой внутрисистемный доступ (разрешение донабора произвольного номера как-будто с внутреннего телефона)"
+
+#: A2B_entity_callerid.php
+msgid "Enter the destination for immediatly dial instead prompt to dial. There are the phonenumber, Queue or IVR name you wish to send call. Or select destination from the drop-down list.<br>Requires \"D I S A\" on and \"BLACKLIST\" off for activation. After one attempt to redirect the call, the call will be dropped."
+msgstr "Задайте куда будет мгновенно направлен звонок после поступления. Это может быть произвольный номер телефона, Queue(очередь) или IVR-меню из выпадающего списка.<br>Для срабатывания требуется включенная \"D I S A\" и выключенная настройка \"BLACKLIST\". После однократной попытки перенаправления звонок будет сброшен."
 
 #: A2B_entity_callerid.php:98
 #, fuzzy
@@ -3987,6 +3991,38 @@ msgstr "Удаление"
 #: call-history.php:58
 msgid "ERROR: Cannot download file "
 msgstr ""
+
+#: A2B_entity_ivr.php
+msgid "HIDE"
+msgstr "СКРЫТЬ"
+
+#: A2B_entity_ivr.php
+msgid "Repeats"
+msgstr "Повторов"
+
+#: A2B_entity_ivr.php
+msgid "Wait for input, sec"
+msgstr "Ожидание нажатия, сек"
+
+#: A2B_entity_ivr.php
+msgid "Input Action"
+msgstr "Сработка на"
+
+#: A2B_entity_ivr.php
+msgid "Exit Action"
+msgstr "Направление"
+
+#: A2B_entity_ivr.php
+msgid "Pause,sec"
+msgstr "Пауза,сек"
+
+#: A2B_entity_ivr.php
+msgid "Sound"
+msgstr "Звук"
+
+#: A2B_entity_ivr.php
+msgid "Callee sound"
+msgstr "Звук вызываемому"
 
 #: A2B_entity_ivr.php
 msgid "IVR Name"

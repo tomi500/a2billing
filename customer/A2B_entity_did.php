@@ -150,15 +150,15 @@ if (!isset ($action_release) || $action_release == "confirm_release" || $action_
 			$confirm_buy_did = 0;
 	}
 
-	if (is_numeric($voip_call) && ($confirm_buy_did >= 2) && ($voip_call==0 || ($voip_call==1 && strpos(substr($destination, strpos( $destination, '@')),'.')))) {
-		 
+	$voip_call = (strpos($destination,"/") > 2) ? 1 : 0 ;
+	if ($confirm_buy_did >= 2 /*&& ($voip_call==0 || ($voip_call==1 && strpos(substr($destination, strpos( $destination, '@')),'.')===false))*/) {
 		$instance_table_did_use = new Table();
 		$validated = ($voip_call==1) ? 0 : 1;
 		
 		if ($voip_call==0)
 		    $destination = (intval($destination) > 0) ? $destination : 'no valid';
 		
-		$QUERY = "INSERT INTO cc_did_destination (activated, id_cc_card, id_cc_did, destination, priority, voip_call, validated) VALUES ('1', '" . $_SESSION["card_id"] . "', '" . $choose_did . "', '" . $destination . "', '1', '" . $voip_call . "', '$validated')";
+		$QUERY = "INSERT INTO cc_did_destination (activated, id_cc_card, id_cc_did, destination, priority, validated) VALUES ('1', '" . $_SESSION["card_id"] . "', '$choose_did', '$destination', '1', '$validated')";
 		
 		$result = $instance_table_did_use->SQLExec($HD_Form->DBHandle, $QUERY, 0);
 		if ($confirm_buy_did == 2) {
@@ -358,7 +358,7 @@ function CheckCountry(Source){
 //-->
 </script>
 	  <center><?php echo $error_msg;?>
-	  <a href="A2B_entity_did.php?assign=1"><input type="radio" value="1" <?php if ($assign==1) echo 'checked'; ?>/><?php echo gettext("Buy New DID");?> </a> - <a href="A2B_entity_did.php?assign=2"><input type="radio" value="2" <?php if ($assign==2) echo 'checked'; ?>/><?php echo gettext("Add Phone Number to your DID");?></a> - <a href="A2B_entity_did.php?assign=3"><input type="radio" value="3" <?php if ($assign==3) echo 'checked'; ?>/><?php echo gettext("Release DID");?></a>
+	  <a href="A2B_entity_did.php?assign=1"><input type="radio" value="1" <?php if ($assign==1) echo 'checked'; ?>/><?php echo gettext("Buy New DID");?> </a> - <a href="A2B_entity_did.php?assign=2"><input type="radio" value="2" <?php if ($assign==2) echo 'checked'; ?>/><?php echo gettext("Add Destination Number to your DID");?></a> - <a href="A2B_entity_did.php?assign=3"><input type="radio" value="3" <?php if ($assign==3) echo 'checked'; ?>/><?php echo gettext("Release DID");?></a>
 	
 	   <form name="theForm" action="A2B_entity_did.php">
 	    <INPUT type="hidden" name="assign" value="<?php echo $assign ?>">
@@ -414,13 +414,9 @@ function CheckCountry(Source){
 		<?php if ($assign<=2){ ?> <td align="left" valign="bottom"> <?php } ?>
 
 		<?php if ($assign<=2) {
-
-			echo gettext("VOIP CALL : ");?> <?php echo gettext("Yes");?> <input class="form_enter" name="voip_call" value="1" type="radio" <?php if ((isset($voip_call)) && ($voip_call == 1)) echo "checked" ?>> - <?php echo gettext("NO");?> <input class="form_enter" name="voip_call" value="0" type="radio" <?php if (!isset($voip_call)) { echo "checked";} else  {if ($voip_call == 0) echo "checked"; }?>>
-				<br>
-				<?php echo gettext("Destination");?> :
-
+				echo gettext("Destination");?> :
 				<input class="form_input_text" name="destination" size="40" maxlength="120<?php if (isset($destination) && ($confirm_buy_did!=4)) { ?>" value="<?php echo $destination; }?>">
-				<br/><center><font color="red"><?php echo gettext("Enter the phone number you wish to call, or the SIP/IAX client to reach  (ie: 347894999 or SIP/jeremy@182.212.1.45). In order to call a VoIP number, you will need to enable voip_call");?> </font></center>
+				<br/><center><font color="red"><?php echo gettext("Enter the phone number you wish to call, or the SIP/IAX client to reach  (ie: 347894999 or SIP/jeremy@182.212.1.45)");?> </font></center>
 			</td>
 		<?php } else { ?>
 			<td align="left" valign="middle">
@@ -433,7 +429,7 @@ function CheckCountry(Source){
 				switch ($assign) {
 					case 1:echo gettext("Next").'" type="button" onclick="CheckCountry(\'NextButton1\')">';
 					break; 
-					case 2:echo gettext("Add phone number").'" Type="button" onclick="CheckCountry(\'Add\')">';
+					case 2:echo gettext("Add DID Destination").'" Type="button" onclick="CheckCountry(\'Add\')">';
 					break;
 					case 3: echo gettext("Ok").'" Type="button" onclick="CheckCountry(\'did_release\')">';
 					break;
@@ -446,7 +442,6 @@ function CheckCountry(Source){
 		?>
 		<INPUT type="hidden" name="choose_did_rate" value="<?php echo $choose_did_rate ?>">
 		<INPUT type="hidden" name="destination" value="<?php echo $destination ?>">
-		<INPUT type="hidden" name="voip_call" value="<?php echo $voip_call ?>">
 		<INPUT type="hidden" name="choose_country" value="<?php echo $choose_country ?>">
 		<INPUT type="hidden" name="confirm_buy_did" value="1">
 		<tr class="bgcolor_007" valign="middle">
@@ -483,7 +478,6 @@ function CheckCountry(Source){
 		</tr>
 		<INPUT type="hidden" name="choose_did_rate" value="">
 		<INPUT type="hidden" name="destination" value=" ">
-		<INPUT type="hidden" name="voip_call" value="">
 		<INPUT type="hidden" name="choose_country" value="">
 		<tr class="bgcolor_007">
 			<td align="center" valign="middle">

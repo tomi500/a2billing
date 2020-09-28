@@ -72,6 +72,12 @@ if ($resmax) {
 	foreach ($resmax as $val)
 	    $destlist[] = array($val[0],$val[0]);
 }
+$QUERYpop = "SELECT `name` FROM cc_queues WHERE id_cc_card=".$_SESSION["card_id"]." ORDER BY `name`";
+$resmax = $DBHandle->Execute($QUERYpop);
+if ($resmax) {
+	foreach ($resmax as $val)
+	    $destlist[] = array("QUEUE ".$val[0],"QUEUE ".$val[0]);
+}
 $QUERYpop = "SELECT regexten FROM cc_sip_buddies WHERE id_cc_card=".$_SESSION["card_id"]." AND external=0 AND regexten>0 ORDER BY regexten";
 $resmax = $DBHandle->Execute($QUERYpop);
 if ($resmax) {
@@ -174,13 +180,12 @@ if (isset($form_action) && ($form_action=='ask-edit' || $form_action=='edit')) {
 	}
 }
 
-
 $HD_Form -> AddEditElement (gettext("CALLERID"),
 			   "cid",
 			   '$value',
 			   "INPUT",
-			   "size=20 maxlength=30".$cidRO,
-			   "18",
+			   "size=30 maxlength=30".$cidRO,
+			   "",
 			   gettext("Insert the CallerID"), "", "", "", "", "", "");
 
 if ($form_action != 'ask-delete') {
@@ -211,7 +216,7 @@ if ($form_action != 'ask-delete') {
 			    ($form_action=='ask-delete')?"INPUT":"DATALIST",
 			    "size=50 maxlength=100 style=\"width: 250px;\"",
 			    "", gettext("Enter the phone"),
-			    "list" , "", "", "", $destlist , "%1", "NO", gettext("Enter the destination for immediatly dial instead prompt to dial. There are the phonenumber or IVR name you wish to send call. Or select destination from the drop-down list"), NULL, $selecteddest);
+			    "list" , "", "", "", $destlist , "%1", "NO", gettext("Enter the destination for immediatly dial instead prompt to dial. There are the phonenumber, Queue or IVR name you wish to send call. Or select destination from the drop-down list.<br>Requires \"D I S A\" on and \"BLACKLIST\" off for activation. After one attempt to redirect the call, the call will be dropped."), NULL, $selecteddest);
 
 	$HD_Form -> AddEditElement (gettext("CALLBACK"),
 			   "callback",

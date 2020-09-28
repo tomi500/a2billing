@@ -85,6 +85,12 @@ if ($resmax) {
 	foreach ($resmax as $val)
 	    $destlist[] = array($val[0],$val[0]);
 }
+$QUERYpop = "SELECT `name` FROM cc_queues WHERE id_cc_card=".$_SESSION["card_id"]." ORDER BY `name`";
+$resmax = $DBHandle->Execute($QUERYpop);
+if ($resmax) {
+	foreach ($resmax as $val)
+	    $destlist[] = array("QUEUE ".$val[0],"QUEUE ".$val[0]);
+}
 $QUERYpop = "SELECT regexten FROM cc_sip_buddies WHERE id_cc_card=".$_SESSION["card_id"]." AND external=0 AND regexten>0 ORDER BY regexten";
 $resmax = $DBHandle->Execute($QUERYpop);
 if ($resmax) {
