@@ -766,7 +766,7 @@ INSERT IGNORE INTO `cc_configuration` (`configuration_title`, `configuration_key
 	('Enable WebMoney Module', 'MODULE_PAYMENT_WM_STATUS', 'False', 'Do you want to accept webmoney payments?', 0, NULL, 'tep_cfg_select_option(array(''True'', ''False''),'),
 	('Provider WMID', 'MODULE_PAYMENT_WM_WMID', '111111111111', '', 0, NULL, NULL),
 	('WME Purse', 'MODULE_PAYMENT_WM_PURSE_WME', 'E222222222222', 'Euro (EUR)', 0, NULL, NULL),
-	('WMR purse', 'MODULE_PAYMENT_WM_PURSE_WMR', 'R333333333333', 'Russian Rouble (RUB)', 0, NULL, NULL),
+	('WMP purse', 'MODULE_PAYMENT_WM_PURSE_WMR', 'P333333333333', 'Russian Rouble (RUB)', 0, NULL, NULL),
 	('WMZ purse', 'MODULE_PAYMENT_WM_PURSE_WMZ', 'Z444444444444', 'U.S. Dollar (USD)', 0, NULL, NULL),
 	('WMU Purse', 'MODULE_PAYMENT_WM_PURSE_WMU', 'U555555555555', 'Ukraine Hryvnia (UAH)', 0, NULL, NULL),
 	('WebMoney', 'MODULE_PAYMENT_WM_CACERT', './WebMoneyTransferRootCA.crt', 'root certificate path, in PEM-format', 0, NULL, NULL),
@@ -777,7 +777,7 @@ INSERT IGNORE INTO `cc_configuration` (`configuration_title`, `configuration_key
 	('Enable WebMoney Credit Card payments Module', 'MODULE_PAYMENT_WM_STATUS_10', 'False', 'Do you want to accept separate method for jump directly to interface for paying by Credit Card?', 0, NULL, 'tep_cfg_select_option(array(''True'', ''False''),'),
 	('Provider WMID', 'MODULE_PAYMENT_WM_WMID_10', '111111111111', '', 0, NULL, NULL),
 	('WMU Purse', 'MODULE_PAYMENT_WM_PURSE_WMU_10', 'U555555555555', 'Ukraine Hryvnia (UAH)', 0, NULL, NULL),
-	('WMR purse', 'MODULE_PAYMENT_WM_PURSE_WMR_10', 'R333333333333', 'Russian Rouble (RUB)', 0, NULL, NULL),
+	('WMP purse', 'MODULE_PAYMENT_WM_PURSE_WMR_10', 'P333333333333', 'Russian Rouble (RUB)', 0, NULL, NULL),
 	('WebMoney', 'MODULE_PAYMENT_WM_CACERT_10', './WebMoneyTransferRootCA.crt', 'root certificate path, in PEM-format', 0, NULL, NULL),
 	('Secret Key', 'MODULE_PAYMENT_WM_LMI_SECRET_KEY_10', 'Secret Key', 'Known to seller and WM Merchant Interface service on', 0, NULL, NULL),
 	('Extra field for testmode', 'MODULE_PAYMENT_WM_LMI_SIM_MODE_10', '0', '0 - simulate success; 1 - simulate fail; 2 - simulate 80% success, 20% fail', 0, NULL, NULL),
@@ -839,6 +839,23 @@ ADD `mylogs` TINYINT NOT NULL DEFAULT '0',
 ADD `foreignrecords` TINYINT NOT NULL DEFAULT '0',
 ADD `myrecords` TINYINT NOT NULL DEFAULT '0';
 
+CREATE TABLE IF NOT EXISTS `cc_recognize_spool` (
+  `id` bigint(20) NOT NULL AUTO_INCREMENT,
+  `status` smallint(6) NOT NULL DEFAULT '0',
+  `id_cc_card` bigint(20) NOT NULL,
+  `mailaddr` varchar(80) COLLATE utf8_bin NOT NULL,
+  `audiofile` varchar(80) COLLATE utf8_bin NOT NULL,
+  `answeredtime` smallint(6) NOT NULL,
+  `languagecode` varchar(30) COLLATE utf8_bin NOT NULL,
+  `send_sound` smallint(6) NOT NULL,
+  `send_text` smallint(6) NOT NULL,
+  `save_sound` smallint(6) NOT NULL,
+  `src` varchar(40) COLLATE utf8_bin NOT NULL,
+  `destination` varchar(40) COLLATE utf8_bin NOT NULL,
+  PRIMARY KEY (`id`),
+  INDEX (`status`)
+) ENGINE=MyISAM DEFAULT CHARSET=utf8 COLLATE=utf8_bin;
+
 CREATE TABLE IF NOT EXISTS `cc_ringup` (
   `id` bigint(20) NOT NULL AUTO_INCREMENT,
   `tag` varchar(60) COLLATE utf8_bin NOT NULL UNIQUE,
@@ -874,7 +891,7 @@ CREATE TABLE IF NOT EXISTS `cc_sms` (
   `id` bigint(20) NOT NULL AUTO_INCREMENT,
   `id_cc_card` int(11) NOT NULL DEFAULT '0',
   `num` varchar(40) COLLATE utf8_bin NOT NULL,
-  `email` varchar(70) COLLATE utf8_bin NOT NULL,
+  `email` varchar(80) COLLATE utf8_bin NOT NULL,
   `notify_email` smallint(6) NOT NULL DEFAULT '1',
   `go_on` smallint(6) NOT NULL DEFAULT '0',
   PRIMARY KEY (`id`,`id_cc_card`)
@@ -973,7 +990,7 @@ left join `cc_ratecard` on `cc_ratecard`.`idtariffplan` = `cc_tariffplan`.`id`
 left join `cc_prefix` on `cc_prefix`.`prefix` = `cc_ratecard`.`destination`
 where (`cc_ratecard`.`id` is not null);
 
-CREATE TABLE cc_queues (
+CREATE TABLE IF NOT EXISTS `cc_queues` (
     `name` VARCHAR(128) NOT NULL,
     musiconhold VARCHAR(128),
     announce VARCHAR(128),
@@ -1030,7 +1047,8 @@ CREATE TABLE cc_queues (
     defaultrule VARCHAR(128),
     timeoutpriority VARCHAR(128),
     PRIMARY KEY (`name`)
-);
+) ENGINE=MyISAM DEFAULT CHARSET=utf8 COLLATE=utf8_bin;
+
 ALTER TABLE `cc_queues`
 ADD `argument_timeout` INTEGER NOT NULL DEFAULT '600' AFTER `name`,
 ADD `argument_options` VARCHAR(128) COLLATE utf8_bin DEFAULT 'cikt' AFTER `argument_timeout`,
@@ -1038,7 +1056,7 @@ ADD `argument_gosub` VARCHAR(128) COLLATE utf8_bin DEFAULT 'getdnid' AFTER `argu
 ADD `id_cc_card` INTEGER NOT NULL DEFAULT '0' AFTER `argument_gosub`,
 ADD INDEX `id_cc_card` ( `id_cc_card` );
 
-CREATE TABLE cc_queue_members (
+CREATE TABLE IF NOT EXISTS cc_queue_members (
     uniqueid INTEGER NOT NULL AUTO_INCREMENT UNIQUE,
     queue_name VARCHAR(80) NOT NULL,
     interface VARCHAR(80) NOT NULL,
@@ -1049,9 +1067,9 @@ CREATE TABLE cc_queue_members (
     ringinuse ENUM('yes','no'),
     wrapuptime INTEGER,
     PRIMARY KEY (queue_name, interface)
-);
+) ENGINE=MyISAM DEFAULT CHARSET=utf8 COLLATE=utf8_bin;
 
-CREATE TABLE cc_queue_rules (
+CREATE TABLE IF NOT EXISTS cc_queue_rules (
     ruleid INTEGER NOT NULL AUTO_INCREMENT UNIQUE,
     rule_name VARCHAR(80) NOT NULL,
     `time` VARCHAR(32) NOT NULL,
@@ -1059,7 +1077,7 @@ CREATE TABLE cc_queue_rules (
     max_penalty VARCHAR(32) NOT NULL,
     raise_penalty VARCHAR(32) NOT NULL,
     PRIMARY KEY (rule_name, `time`)
-);
-ALTER TABLE `cc_queue_rules`
+) ENGINE=MyISAM DEFAULT CHARSET=utf8 COLLATE=utf8_bin;
+ALTER TABLE IF NOT EXISTS `cc_queue_rules`
 ADD `id_cc_card` INTEGER NOT NULL DEFAULT '0' AFTER `rule_name`,
 ADD INDEX `id_cc_card` ( `id_cc_card` );

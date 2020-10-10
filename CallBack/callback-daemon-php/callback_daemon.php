@@ -258,8 +258,8 @@ while(true)
 
 		$A2B -> DbConnect($agi);
 		$A2B -> set_instance_table ($instance_table);
-		if ($flagringup==2) {
-		} elseif ($flagringup==1) {
+		/*if ($flagringup==2) {
+		} else*/ if ($flagringup==1) {
 			$query="UPDATE `cc_callback_spool` SET `status`='PENDING',`num_attempt`=`num_attempt`+1,`last_attempt_time`=now(),`next_attempt_time`=ADDTIME(now(),SEC_TO_TIME($secperaction)),`id_server`='$manager_id' WHERE `id`=$cc_id";
 		} else {
 			$query="UPDATE `cc_callback_spool` SET `status`='PROCESSING',`num_attempt`=`num_attempt`+1,`last_attempt_time`=now(),`id_server`='$manager_id' WHERE `id`=$cc_id";
@@ -369,6 +369,39 @@ while(true)
 		    }
 		}
 	    }
+	}
+    }
+    $query="SELECT `id`,`id_cc_card`,`mailaddr`,`audiofile`,`answeredtime`,`languagecode`,`send_sound`,`send_text`,`save_sound`,`src`,`destination` FROM `cc_recognize_spool` WHERE `status`=0";
+    $result=$instance_table->SQLExec($A2B->DBHandle, $query);
+    foreach ($result as $value) {
+	list($cc_id,$cc_cardid,$cc_mailaddr,$cc_audiofile,$cc_answeredtime,$cc_languagecode,$cc_sendsound,$cc_sendtext,$cc_savesound,$cc_src,$cc_dest)=$value;
+	$query="UPDATE `cc_recognize_spool` SET `status`=1 WHERE `id`=$cc_id";
+	if (!$A2B->DBHandle->Execute($query)) {
+	    write_log(LOGFILE_API_CALLBACK, basename(__FILE__) . ' line:' . __LINE__ . " Can't execute query: " . $query);
+	    die("Can't execute query '$query'\n");
+	}
+	$A2B->DbDisconnect();
+	$pid=pcntl_fork();
+	if($pid==-1) {
+	    print("Can't fork!\n");
+	    exit(2);
+	} elseif($pid) {
+	    pcntl_wait($status, WNOHANG);
+	    $A2B -> DbConnect($agi);
+	    $A2B -> set_instance_table ($instance_table);
+	} else {
+	    ob_start();
+	    register_shutdown_function(create_function('$pars', 'ob_end_clean();posix_kill(getmypid(), SIGKILL);'), array());
+	    $A2B -> DbConnect($agi);
+	    $A2B -> set_instance_table ($instance_table);
+	    $status = $A2B->google_recognize($cc_cardid,$cc_sendsound,$cc_sendtext,$cc_savesound,$cc_src,$cc_dest,$cc_mailaddr,$cc_audiofile,$cc_answeredtime,$cc_languagecode);
+	    $query="UPDATE `cc_recognize_spool` SET `status`='$status' WHERE `id`=$cc_id";
+	    if (!$A2B->DBHandle->Execute($query)) {
+		write_log(LOGFILE_API_CALLBACK, basename(__FILE__) . ' line:' . __LINE__ . " Can't execute query: " . $query);
+		die("Can't execute query '$query'\n");
+	    }
+	    $A2B->DbDisconnect();
+	    exit(0);
 	}
     }
 // break;

@@ -1455,7 +1455,7 @@ class A2Billing {
 			if ($this -> CC_TESTING) $this->destination = "kphone";
 
 			if ((($this->send_sound || $this->send_text) && $this->speech2mail) || $this->monitor == 1 || $this->agiconfig['record_call'] == 1) {
-				$this->dl_short = MONITOR_PATH . "/" . $this->username . "/" . date('Y') . "/" . date('n') . "/" . date('j') . "/";
+			    $this->dl_short = MONITOR_PATH . "/" . $this->username . "/" . date('Y') . "/" . date('n') . "/" . date('j') . "/";
 				$command_mixmonitor = "MixMonitor ". $this->dl_short ."{$this->uniqueid}.{$this->agiconfig['monitor_formatfile']}|b";
 				$command_mixmonitor = $this -> format_parameters ($command_mixmonitor);
 				$myres = $agi->exec($command_mixmonitor);
@@ -2004,14 +2004,20 @@ class A2Billing {
 					if (((($this->send_sound || $this->send_text) && $this->speech2mail) || $this->monitor == 1 || $this->agiconfig['record_call'] == 1) && $localcount < 2) {
 						$this->dl_short = MONITOR_PATH . "/" . $this->username . "/" . date('Y') . "/" . date('n') . "/" . date('j') . "/";
 						$monfile = $dl_short = $this->dl_short . $this->uniqueid . ".";
-						if ($this -> speech2mail) {
+						if ($this -> send_sound || $this -> send_text) {
 						    $format_file = 'wav';
 						    $monfile .= $format_file;
 						} else {
 						    $format_file = $this->agiconfig['monitor_formatfile'];
 						    $monfile .= ($format_file == 'wav49') ? 'WAV' : $format_file;
 						}
-						$command_mixmonitor = $this -> format_parameters ("MixMonitor {$dl_short}{$format_file}|b");
+						if ($format_file == 'wav' && $this -> send_text) {
+						    $command_mixmonitor = "Monitor wav,{$dl_short}wav,b";
+						    $stopmon = "StopMonitor";
+						} else {
+						    $command_mixmonitor = $this -> format_parameters ("MixMonitor {$dl_short}{$format_file}|b");
+						    $stopmon = "StopMixMonitor";
+						}
 						$myres = $agi->exec($command_mixmonitor);
 						$this -> debug( INFO, $agi, __FILE__, __LINE__, "Exec ". $command_mixmonitor);
 					}
@@ -2070,11 +2076,20 @@ $tempdebug="ANSWEREDTIME: $answeredtime sec";
 $tempdebug="DIALSTATUS: $dialstatus";
 					}
 					$bridgepeer = $agi->get_variable('QUEUEDNID', true);
-					if (((($this->send_sound || $this->send_text) && $this->speech2mail) || $this->monitor == 1 || $this->agiconfig['record_call'] == 1) && $localcount < 2) {
-						$myres = $agi->exec($this -> format_parameters ("StopMixMonitor"));
-						$this -> debug( INFO, $agi, __FILE__, __LINE__, "EXEC StopMixMonitor (".$this->uniqueid.")");
-						if (file_exists($monfile) && filesize($monfile) < 100) {
+$this -> debug( ERROR, $agi, __FILE__, __LINE__, "[ \033[1;34m".$bridgepeer." ".$dialstatus." > $tempdebug\33[0m ]");
+					if (isset($stopmon)) {
+						$myres = $agi->exec($stopmon);
+						$this -> debug( INFO, $agi, __FILE__, __LINE__, "EXEC $stopmon (".$this->uniqueid.")");
+						if (file_exists($monfile) && (filesize($monfile) < 100 || $answeredtime<2)) {
 							unlink($monfile);
+							$monfile = false;
+						}
+						if (file_exists($monfile."-in.wav") && (filesize($monfile."-in.wav") < 100 || $answeredtime<2)) {
+							unlink($monfile."-in.wav");
+							$monfile = false;
+						}
+						if (file_exists($monfile."-out.wav") && (filesize($monfile."-out.wav") < 100 || $answeredtime<2)) {
+							unlink($monfile."-out.wav");
 							$monfile = false;
 						}
 					} else $monfile = false;
@@ -2366,20 +2381,32 @@ $tempdebug="DIALSTATUS: $dialstatus";
             // IF call on did is not free calculate time to call
 
             // IF VOIP CALL
+/*
+if ($isvoip)
+    $this -> debug( ERROR, $agi, __FILE__, __LINE__, "VOIP=".$inst_listdestination[4]);
+else
+    $this -> debug( ERROR, $agi, __FILE__, __LINE__, "NOT VOIP=".$inst_listdestination[4]);
+*/
             if ($isvoip) {
                 // RUN MIXMONITOR TO RECORD CALL
 		$monfile = false;
 		if ((($this->send_sound || $this->send_text) && $this->speech2mail) || $this->monitor == 1 || $this->agiconfig['record_call'] == 1) {
 			$this->dl_short = MONITOR_PATH . "/" . $this->username . "/" . date('Y') . "/" . date('n') . "/" . date('j') . "/";
 			$monfile = $dl_short = $this->dl_short . $this->uniqueid . ".";
-			if ($this -> speech2mail) {
+			if ($this->send_sound || $this -> send_text) {
 			    $format_file = 'wav';
 			    $monfile .= $format_file;
 			} else {
 			    $format_file = $this->agiconfig['monitor_formatfile'];
 			    $monfile .= ($format_file == 'wav49') ? 'WAV' : $format_file;
 			}
-			$command_mixmonitor = $this -> format_parameters ("MixMonitor {$dl_short}{$format_file}|b");
+			if ($format_file == 'wav' && $this -> send_text) {
+			    $command_mixmonitor = "Monitor wav,{$dl_short}wav,b";
+			    $stopmon = "StopMonitor";
+			} else {
+			    $command_mixmonitor = $this -> format_parameters ("MixMonitor {$dl_short}{$format_file}|b");
+			    $stopmon = "StopMixMonitor";
+			}
 			$myres = $agi->exec($command_mixmonitor);
 			$this -> debug( INFO, $agi, __FILE__, __LINE__, $command_mixmonitor);
 		}
@@ -2443,11 +2470,19 @@ $tempdebug="DIALSTATUS: $dialstatus";
 			}
 		} else		$dialstatus	= $agi->get_variable("DIALSTATUS", true);
 
-		if ((($this->send_sound || $this->send_text) && $this->speech2mail) || $this->monitor == 1 || $this -> agiconfig['record_call'] == 1) {
-			$myres = $agi->exec($this -> format_parameters ("StopMixMonitor"));
-			$this -> debug( INFO, $agi, __FILE__, __LINE__, "EXEC StopMixMonitor (".$this->uniqueid.")");
-			if (file_exists($monfile) && filesize($monfile) < 100) {
+		if (isset($stopmon)) {
+			$myres = $agi->exec($stopmon);
+			$this -> debug( INFO, $agi, __FILE__, __LINE__, "EXEC $stopmon (".$this->uniqueid.")");
+			if (file_exists($monfile) && (filesize($monfile) < 100 || $answeredtime<2)) {
 				unlink($monfile);
+				$monfile = false;
+			}
+			if (file_exists($monfile."-in.wav") && (filesize($monfile."-in.wav") < 100 || $answeredtime<2)) {
+				unlink($monfile."-in.wav");
+				$monfile = false;
+			}
+			if (file_exists($monfile."-out.wav") && (filesize($monfile."-out.wav") < 100 || $answeredtime<2)) {
+				unlink($monfile."-out.wav");
 				$monfile = false;
 			}
                 }
@@ -2690,7 +2725,7 @@ $tempdebug="DIALSTATUS: $dialstatus";
 
 	function send_talk(&$agi,$mailaddr,$audioFile,$answeredtime,$languageCode='not_set')
 	{
-//		$calleridname = $agi->get_variable('CALLERID(name)', true);
+		if ($answeredtime<2 || $audioFile=="" || $mailaddr=="") return false;
 		if ($languageCode=='not_set')
 			$languageCode = $this -> current_language;
 		switch($languageCode) {
@@ -2701,46 +2736,77 @@ $tempdebug="DIALSTATUS: $dialstatus";
 		    case 'ua': $languageCode = 'uk-UA'; $alternateLangCode = array('ru-RU'); break;
 		    case 'ja': $languageCode = 'ja-JP'; break;
 		}
+		$src = ($this->src != "NULL")?$this->src:$this->CallerID;
+		$save_audio = ($this -> monitor == 0 && $this -> agiconfig['record_call'] == 0) ? 0 : 1 ;
+
+		$QUERY = "INSERT INTO `cc_recognize_spool` (`id_cc_card`,`mailaddr`,`audiofile`,`answeredtime`,`languagecode`,`send_sound`,`send_text`,`save_sound`,`src`,`destination`) VALUES ".
+                	"('".$this->id_card."','".$mailaddr."','".$audioFile."','".$answeredtime."','".$languageCode."','".$this->send_sound."','".$this->send_text."','".$save_audio."','".$src."','".$this->destination."')";
+		$result = $this -> instance_table -> SQLExec ($this->DBHandle, $QUERY, 0);
+//		$this -> debug( INFO, $agi, __FILE__, __LINE__, "[Recognize spool inserted]");
+	}
+
+	function google_recognize($idcard,$send_sound,$send_text,$save_sound,$src,$dst,$mailaddr,$audioFile,$answeredtime,$languageCode)
+	{
+		$retcode = 1;
 		if (strlen($languageCode)<5 || $languageCode=='not_set') {
 		    $languageCode = 'en-US';
 		    $alternateLangCode = array('ru-RU','uk-UA');
 		}
 		$dl_path_to = $audioFile;
-		if (is_file($audioFile)) {
-		    $path_parts = pathinfo($audioFile);
+		$audioFileIn  = $audioFile."-in.wav";
+		$audioFileOut = $audioFile."-out.wav";
+		$audioFileMix = $audioFile."-mix.wav";
+		if (is_file($audioFile) || is_file($audioFileOut) || is_file($audioFileIn)) {
+		    if (is_file($audioFileOut) || is_file($audioFileIn)) {
+			$sox = "/usr/bin/sox -M ".$audioFileIn." ".$audioFileOut." ".$audioFileMix;
+			exec($sox);
+			try {
+			    unlink($audioFileIn);
+			} catch (Exception $e) {
+			    write_log(LOGFILE_API_CALLBACK, basename(__FILE__) . ' line:' . __LINE__ . " [Erasing file $audioFileIn error]: ".$e->getMessage());
+			}
+			try {
+			    unlink($audioFileOut);
+			} catch (Exception $e) {
+			    write_log(LOGFILE_API_CALLBACK, basename(__FILE__) . ' line:' . __LINE__ . " [Erasing file $audioFileOut error]: ".$e->getMessage());
+			}
+		    } else $audioFileMix = $audioFile;
+		    $path_parts = pathinfo($audioFileMix);
 		    $objectName = $path_parts['basename'];
-		    $extension  = $path_parts['extension'];
-		    if ($extension=='wav') {
+		    $path_parts = pathinfo($audioFile);
+		    if (is_file($audioFileMix) && $path_parts['extension']=='wav') {
 			$dl_path_to = $path_parts['dirname']."/".$path_parts['filename'].".mp3";
-			$lame = "/usr/bin/lame -h -b 16 ".$audioFile." ".$dl_path_to;
+			$lame = "/usr/bin/lame -m m -h -b 16 ".$audioFileMix." ".$dl_path_to;
 			exec($lame." >/dev/null 2>&1");
 		    }
 		
 		// CHECK IF THE EMAIL ADDRESS IS CORRECT
-		    if ($this->send_sound || $this->send_text)
+		    if ($send_sound || $send_text)
 		    if ($mailaddr && preg_match("/^[_A-Za-z0-9-]+(\\.[_A-Za-z0-9-]+)*@[A-Za-z0-9]+(\\.[A-Za-z0-9]+)*(\\.[A-Za-z]{2,})$/i", $mailaddr)) {
 
 			$transcript = gettext("Duration: ") . sprintf ( "%02d", intval ( $answeredtime / 60 ) ) . ":" . sprintf ( "%02d", intval ( $answeredtime % 60 ) );
 
-			if ($this -> send_text) {
+			if ($send_text) {
 			    $keyFilePath = $this->config['global']['google_cloud_credential'];
 //			    $projectId = '';
 
 			    putenv("GOOGLE_APPLICATION_CREDENTIALS=".$keyFilePath);
 
 			    // The audio file's encoding, sample rate and language
-			    // http://googleapis.github.io/google-cloud-php/#/docs/google-cloud/v0.104.0/speech/v1p1beta1/recognitionconfig
+			    // http://googleapis.github.io/google-cloud-php/#/docs/google-cloud/v0.141.0/speech/v1p1beta1/recognitionconfig
 			    $config = new RecognitionConfig([
 				'encoding' => AudioEncoding::LINEAR16,
 				'sample_rate_hertz' => 8000,
 				'language_code' => $languageCode,
-				'diarization_speaker_count' => 2,
-				'enable_speaker_diarization' => true,
-//				'model'=> 'phone_call',
+				'audio_channel_count' => 2,
+				'enable_separate_recognition_per_channel' => true,
+//				'diarization_speaker_count' => 2,
+//				'enable_speaker_diarization' => true,
 				'use_enhanced' => true,
+//				'model'=> 'phone_call',
 				'enable_automatic_punctuation' => true
 			    ]);
-//			    if ($languageCode == 'en-US')  $config->setModel('phone_call');
+			    if (array_search($languageCode, array('en-GB','en-US','ru-RU','es-US')) !== false)	$config->setModel('phone_call');
 //			    if (isset($alternateLangCode)) $config->setAlternativeLanguageCodes($alternateLangCode);
 
 			    if (isset($alternateLangCode))
@@ -2748,23 +2814,32 @@ $tempdebug="DIALSTATUS: $dialstatus";
 			    $transcript = $languageCode . PHP_EOL . $transcript;
 
 			    if ($answeredtime > 1) {
-//				    $QUERY = " INSERT INTO cc_callback_spool (uniqueid, status, server_ip, num_attempt, channel, exten, context, priority," ;
-//				    $agi -> evaluate("ASYNCAGI BREAK");
 				    // Instantiates a client
 				    $client = new SpeechClient();
 				    if ($answeredtime <= 60) {
-					$content = file_get_contents($audioFile);
+					$content = file_get_contents($audioFileMix);
 					$audio = (new RecognitionAudio())
 					    ->setContent($content);
 					try {
 					    $response = $client->recognize($config, $audio);
+					    $speakertag = 100;
 					    foreach ($response->getResults() as $result) {
 						$alternatives = $result->getAlternatives();
-						$mostLikely = $alternatives[0];
+						$mostLikely   = $alternatives[0];
+						if ($speakertag != $result->getChannelTag()) {
+						    $speakertag  = $result->getChannelTag();
+						    if ($speakertag>0) $transcript .= PHP_EOL."<u>Speaker".$speakertag.":</u> ";
+						}
+						if ($speakertag>0) $transcript .= $mostLikely->getTranscript();
+					    }
+					    if (strpos($transcript,"Speaker") === false) foreach ($response->getResults() as $result) {
+						$alternatives = $result->getAlternatives();
+						$mostLikely   = $alternatives[0];
 						$transcript .= PHP_EOL.$mostLikely->getTranscript();
 					    }
 					} catch (Exception $e) {
-					    $this -> debug( ERROR, $agi, __FILE__, __LINE__, "[Recognize Speech-to-text error]: ".var_export($e->getMessage(),true));
+					    write_log(LOGFILE_API_CALLBACK, basename(__FILE__) . ' line:' . __LINE__ . " [Recognize Speech-to-text error]: ".var_export($e->getMessage(),true));
+					    $retcode = 2;
 					}
 				    } else {
 					$storage = new StorageClient(/*[
@@ -2782,16 +2857,21 @@ $tempdebug="DIALSTATUS: $dialstatus";
 
 					// Upload a file to the bucket.
 					$object = $bucket->upload(
-					    fopen($audioFile, 'r'), ['name' => $objectName]
+					    fopen($audioFileMix, 'r'), ['name' => $objectName]
 					);
 
 					// set string as audio content
 					$audio = (new RecognitionAudio())
 					    ->setUri("gs://".$bucketName."/".$objectName);
 
-					// create the asyncronous recognize operation
-					$operation = $client->longRunningRecognize($config, $audio);
-					$operation->pollUntilComplete();
+					try {
+					    // create the asyncronous recognize operation
+					    $operation = $client->longRunningRecognize($config, $audio);
+					    $operation->pollUntilComplete();
+					} catch (Exception $e) {
+					    write_log(LOGFILE_API_CALLBACK, basename(__FILE__) . ' line:' . __LINE__ . " [LongRunningRecognize Speech-to-text error]: ".var_export($e->getMessage(),true));
+					    $retcode = 2;
+					}
 
 					if ($operation->operationSucceeded()) {
 					    // Detects speech in the audio file
@@ -2802,14 +2882,11 @@ $tempdebug="DIALSTATUS: $dialstatus";
 					    foreach ($response->getResults() as $result) {
 						$alternatives = $result->getAlternatives();
 						$mostLikely   = $alternatives[0];
-//						$transcript .= PHP_EOL.$mostLikely->getTranscript();
-						foreach ($mostLikely->getWords() as $speakers) {
-						    if ($speakertag != $speakers->getSpeakerTag()) {
-							$speakertag  = $speakers->getSpeakerTag();
-							if ($speakertag>0) $transcript .= PHP_EOL."<u>Speaker".$speakertag.":</u> ";
-						    }
-						    if ($speakertag>0) $transcript .= $speakers->getWord()." ";
+						if ($speakertag != $result->getChannelTag()) {
+						    $speakertag  = $result->getChannelTag();
+						    if ($speakertag>0) $transcript .= PHP_EOL."<u>Speaker".$speakertag.":</u> ";
 						}
+						if ($speakertag>0) $transcript .= $mostLikely->getTranscript();
 					    }
 					    if (strpos($transcript,"Speaker") === false) foreach ($response->getResults() as $result) {
 						$alternatives = $result->getAlternatives();
@@ -2817,7 +2894,8 @@ $tempdebug="DIALSTATUS: $dialstatus";
 						$transcript .= PHP_EOL.$mostLikely->getTranscript();
 					    }
 					} else {
-					    $this -> debug( ERROR, $agi, __FILE__, __LINE__, "[Recognize Speech-to-text error]: ".$operation->getError());
+					    write_log(LOGFILE_API_CALLBACK, basename(__FILE__) . ' line:' . __LINE__ . " [LongRunningRecognize Speech-to-text error]: ".$operation->getError());
+					    $retcode = 2;
 					}
 					$object->delete();
 				    }
@@ -2828,35 +2906,47 @@ $tempdebug="DIALSTATUS: $dialstatus";
 
 			try {
 				$this->DBHandle->Execute("SET NAMES 'UTF8'");
-				$mail = new Mail(Mail::$TYPE_SPEECH_SUCCESS,$this->id_card,null,null,null,$this->DBHandle);
-				if ($this->send_sound && file_exists($dl_path_to) && is_file($dl_path_to)) {
+				$mail = new Mail(Mail::$TYPE_SPEECH_SUCCESS,$idcard,null,null,null,$this->DBHandle);
+				if ($send_sound && file_exists($dl_path_to) && is_file($dl_path_to)) {
 				    $mail->AddAttachment($dl_path_to);
 				}
-				$mail->replaceInEmail(Mail::$SPEECH_CID_NUMBER,($this->src != "NULL")?$this->src:$this->CallerID);
-				$mail->replaceInEmail(Mail::$SPEECH_DEST_EXTEN,$this->destination);
+				$mail->replaceInEmail(Mail::$SPEECH_CID_NUMBER,$src);
+				$mail->replaceInEmail(Mail::$SPEECH_DEST_EXTEN,$dst);
 				$mail->replaceInEmail(Mail::$SPEECH_DATETIME,date('d F Y - H:i:s'));
 				$mail->replaceInEmail(Mail::$SPEECH_TEXT,$transcript);
 				$mail->send($mailaddr);
-				$this -> debug( INFO, $agi, __FILE__, __LINE__, "[SENDING SPEECH EMAIL TO CUSTOMER]");
 			} catch (A2bMailException $e) {
-				$this -> debug( ERROR, $agi, __FILE__, __LINE__, "[Speech2Text for cardID $this->id_card ($this->CallerID -> $this->destination)]: ERROR NO EMAIL TEMPLATE FOUND -> ".$e->getMessage());
+				write_log(LOGFILE_API_CALLBACK, basename(__FILE__) . ' line:' . __LINE__ . " [Speech2Text for cardID $idcard ($src -> $dst)]: ERROR NO EMAIL TEMPLATE FOUND -> ".$e->getMessage());
+				$retcode+=4;
 			}
 		    } else {
-			$this -> debug( ERROR, $agi, __FILE__, __LINE__, "[Speech2Text for cardID $this->id_card ($this->CallerID -> $this->destination)]: no valid email !!!");
+			write_log(LOGFILE_API_CALLBACK, basename(__FILE__) . ' line:' . __LINE__ . " [Speech2Text for cardID $idcard ($src -> $dst)]: no valid email !!!");
+			$retcode+=8;
 		    }
 		}
 		if ($audioFile != $dl_path_to && is_file($audioFile))
 		try {
 		    unlink($audioFile);
 		} catch (Exception $e) {
-		    $this -> debug( ERROR, $agi, __FILE__, __LINE__, "[Erasing file $audioFile error]: ".$e->getMessage());
+		    write_log(LOGFILE_API_CALLBACK, basename(__FILE__) . ' line:' . __LINE__ . " [Erasing file $audioFile error]: ".$e->getMessage());
+		    $retcode+=16;
 		}
-		if ($this -> monitor == 0 && $this -> agiconfig['record_call'] == 0 && is_file($dl_path_to))
+		if ($audioFileMix != $dl_path_to && is_file($audioFileMix))
+		try {
+		    unlink($audioFileMix);
+		} catch (Exception $e) {
+		    write_log(LOGFILE_API_CALLBACK, basename(__FILE__) . ' line:' . __LINE__ . " [Erasing file $audioFileMix error]: ".$e->getMessage());
+		    $retcode+=32;
+		}
+		if ($save_sound == 0 && is_file($dl_path_to))
 		try {
 		    unlink($dl_path_to);
 		} catch (Exception $e) {
-		    $this -> debug( ERROR, $agi, __FILE__, __LINE__, "[Erasing file $dl_path_to error]: ".$e->getMessage());
+		    write_log(LOGFILE_API_CALLBACK, basename(__FILE__) . ' line:' . __LINE__ . " [Erasing file $dl_path_to error]: ".$e->getMessage());
+		    $retcode+=64;
 		}
+
+		return $retcode;
 	}
 	/**
 	 *	Function call_fax
@@ -4873,6 +4963,7 @@ $this -> debug( ERROR, $agi, __FILE__, __LINE__, "FAXRESOLUTION: ".$faxresolutio
 			}
 			if ($this->config['database']['dbtype'] == "mysql") {
 				$this->DBHandle -> Execute('SET AUTOCOMMIT=1');
+				$this->DBHandle -> Execute("SET NAMES 'UTF8'");
 			}
 			
 			$this -> debug( DEBUG, $agi, __FILE__, __LINE__, "[NO DB CONNECTION] - RECONNECT OK]");

@@ -1884,13 +1884,14 @@ $A2B -> debug( ERROR, $agi, "", "", "\r                  CallBack for Trunk=$thi
 					if ((($A2B->send_sound || $A2B->send_text) && $A2B -> speech2mail) || $A2B->monitor == 1 || $A2B -> agiconfig['record_call'] == 1) {
 						$A2B->dl_short = MONITOR_PATH . "/" . $A2B->username . "/" . date('Y') . "/" . date('n') . "/" . date('j') . "/";
 						$monfile = $dl_short = $A2B->dl_short . $A2B->uniqueid . ".";
-						if ($A2B -> speech2mail) {
+						if ($A2B->send_sound || $A2B -> send_text) {
 						    $format_file = 'wav';
 						    $monfile .= $format_file;
 						    $this -> monfile = $monfile;
 						} else {
 						    $format_file = $A2B->agiconfig['monitor_formatfile'];
 						    $monfile .= ($format_file == 'wav49') ? 'WAV' : $format_file;
+//						    $this -> monfile = $monfile;
 						}
 						$j = 100;
 						while (file_exists($monfile)) {
@@ -1922,7 +1923,14 @@ $A2B -> debug( ERROR, $agi, "", "", "\r                  CallBack for Trunk=$thi
 							    $this -> monfile = false;
 							}
 						}
-						$command_mixmonitor = $A2B -> format_parameters ("MixMonitor {$dl_short}{$format_file}|b");
+						if ($format_file == 'wav' && $A2B -> send_text) {
+//							$command_mixmonitor = $A2B -> format_parameters ("MixMonitor {$dl_short}wav|br({$dl_short}wav-in.wav)t({$dl_short}wav-out.wav)S");
+							$command_mixmonitor = "Monitor wav,{$dl_short}wav,b";
+							$stopmon = "StopMonitor";
+						} else {
+							$command_mixmonitor = $A2B -> format_parameters ("MixMonitor {$dl_short}{$format_file}|b");
+							$stopmon = "StopMixMonitor";
+						}
 						$myres = $agi->exec($command_mixmonitor);
 						$A2B -> debug( INFO, $agi, __FILE__, __LINE__, "EXEC ". $command_mixmonitor);
 					}
@@ -1948,21 +1956,21 @@ $A2B -> debug( ERROR, $agi, "", "", "\r                  CallBack for Trunk=$thi
 					}
 					// Count this call on the trunk
 //$A2B -> debug( ERROR, $agi, __FILE__, __LINE__, "this -> usedtrunk = ".$this -> usedtrunk);
-					$myres = $A2B -> run_dial($agi, $dialstr);
+//$A2B -> debug( ERROR, $agi, "", "", "\r                  DIAL---> for Trunk=$this->usedtrunk to $dialstr");
+//					$myres = $agi->exec("ResetCDR()");
+//					$agi -> set_variable('CDR_PROP(party_a)', 'false');
 					$A2B -> debug( DEBUG, $agi, __FILE__, __LINE__, "DIAL FAILOVER $dialstr");
+					$myres = $A2B -> run_dial($agi, $dialstr);
+					if (isset($stopmon)) {
+						$myres = $agi->exec($stopmon);
+						$A2B -> debug( INFO, $agi, __FILE__, __LINE__, "EXEC $stopmon (".$A2B->uniqueid.")");
+					}
 					if ($outcid != 0) {
 						$outcid = 0;
+$A2B -> debug( ERROR, $agi, __FILE__, __LINE__, 'set_callerid "'.$calleridname.'"<'.$A2B -> CallerID.'>');
 						$agi -> set_callerid('"'.$calleridname.'"<'.$A2B -> CallerID.'>');
 //						$agi -> set_variable('CALLERID(ani)', $A2B -> CallerID);
 //						$agi -> set_variable('CALLERID(name)', $calleridname);
-					}
-					if ((($A2B->send_sound || $A2B->send_text) && $A2B -> speech2mail) || $A2B->monitor == 1 || $A2B -> agiconfig['record_call'] == 1) {
-						$myres = $agi->exec($A2B -> format_parameters ("StopMixMonitor"));
-						$A2B -> debug( INFO, $agi, __FILE__, __LINE__, "EXEC StopMixMonitor (".$A2B->uniqueid.")");
-						if (file_exists($monfile) && filesize($monfile) < 100) {
-							unlink($monfile);
-							$this->monfile = false;
-						}
 					}
 					$this -> dialstatus = $agi -> get_variable("DIALSTATUS",true);
 				    }
@@ -2009,10 +2017,14 @@ $A2B -> debug( ERROR, $agi, "", "", "\r                  CallBack for Trunk=$thi
 				if ($agi) {
 
 				    if ($this->dialstatus == "ANSWER") {
-					$answeredtime					= $agi->get_variable("ANSWEREDTIME",true);
-					if ($answeredtime == "")	$answeredtime	= $agi->get_variable("CDR(billsec)",true);
+//					$answeredtime					= $agi->get_variable("ANSWEREDTIME",true);
+//					if ($answeredtime == "")	$answeredtime	= $agi->get_variable("CDR(billsec)",true);
+					$answeredtime					= ceil(time()-$agi->get_variable("answer_timestamp",true));
+//					$answeredtime					= $agi->get_variable("CDR(billsec)",true);
+//					if ($answeredtime == "")	$answeredtime	= $agi->get_variable("ANSWEREDTIME",true);
 					if ($answeredtime == $this -> ratecard_obj[$k]['alltimeout'] + 1)	$answeredtime--;
-$tempdebug="ANSWEREDTIME: $answeredtime sec";
+//$tempdebug="ANSWEREDTIME: ".$agi->get_variable("ANSWEREDTIME",true)." sec. CDR(billsec): ".$agi->get_variable("CDR(billsec)",true)." anstime: ". ceil(time()-$agi->get_variable("answer_timestamp",true));
+$tempdebug="ANSWEREDTIME: ".$answeredtime." sec. CDR(billsec): ".$agi->get_variable("CDR(billsec)",true);
 				    } else {
 					$answeredtime					= 0;
 $tempdebug="DIALSTATUS: $this->dialstatus";
@@ -2021,6 +2033,20 @@ $tempdebug="DIALSTATUS: $this->dialstatus";
 
 $A2B -> debug( ERROR, $agi, __FILE__, __LINE__, "[ \033[1;34m> $A2B->destination  $tempdebug\33[0m ]");
 				    $A2B -> debug( INFO, $agi, __FILE__, __LINE__, "[FAILOVER K=$k]:[ANSWEREDTIME=".$this->answeredtime."]:[DIALSTATUS=".$this->dialstatus."]");
+				    if (isset($stopmon)) {
+					if (file_exists($monfile) && (filesize($monfile) < 100 || $answeredtime<2)) {
+						unlink($monfile);
+						$this->monfile = false;
+					}
+					if (file_exists($monfile."-in.wav") && (filesize($monfile."-in.wav") < 100 || $answeredtime<2)) {
+						unlink($monfile."-in.wav");
+						$this->monfile = false;
+					}
+					if (file_exists($monfile."-out.wav") && (filesize($monfile."-out.wav") < 100 || $answeredtime<2)) {
+						unlink($monfile."-out.wav");
+						$this->monfile = false;
+					}
+				    }
 				}
 				if (($this->dialstatus  == "CHANUNAVAIL" || $this->dialstatus  == "CONGESTION") && $intellect_count >= 0) {
 					$errmess = "Trunk $this->usedtrunk is $this->dialstatus. ";
