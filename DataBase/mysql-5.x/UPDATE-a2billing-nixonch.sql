@@ -1078,6 +1078,6 @@ CREATE TABLE IF NOT EXISTS cc_queue_rules (
     raise_penalty VARCHAR(32) NOT NULL,
     PRIMARY KEY (rule_name, `time`)
 ) ENGINE=MyISAM DEFAULT CHARSET=utf8 COLLATE=utf8_bin;
-ALTER TABLE IF NOT EXISTS `cc_queue_rules`
+ALTER TABLE `cc_queue_rules`
 ADD `id_cc_card` INTEGER NOT NULL DEFAULT '0' AFTER `rule_name`,
 ADD INDEX `id_cc_card` ( `id_cc_card` );
