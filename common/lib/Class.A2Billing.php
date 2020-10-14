@@ -197,6 +197,7 @@ class A2Billing {
 	var $expiredays;
 	var $firstusedate;
 	var $creationdate;
+	var $voicebox = NULL;
 	
 	var $creditlimit = 0;
 
@@ -1926,6 +1927,7 @@ class A2Billing {
 		$callcount=0;
 		$keytotal = count($listdestination);
 		foreach ($listdestination as $inst_listdestination) {
+			$key = false;
 			$callcount++;
 			
 			if (($listdestination[0][2]==0) || ($listdestination[0][2]==2)) {
@@ -2730,7 +2732,7 @@ else
 			$languageCode = $this -> current_language;
 		switch($languageCode) {
 		    case 'de': $languageCode = 'de-DE'; break;
-		    case 'en': $languageCode = 'en-US'; break;
+		    case 'en': $languageCode = (strpos($this->destination,'44')===0 && strlen($this->destination)>10)?'en-GB':'en-US'; break;
 		    case 'ru': $languageCode = 'ru-RU'; $alternateLangCode = array('uk-UA'); break;
 		    case 'uk': $languageCode = 'uk-UA'; $alternateLangCode = array('ru-RU'); break;
 		    case 'ua': $languageCode = 'uk-UA'; $alternateLangCode = array('ru-RU'); break;
@@ -2756,7 +2758,7 @@ else
 		$audioFileIn  = $audioFile."-in.wav";
 		$audioFileOut = $audioFile."-out.wav";
 		$audioFileMix = $audioFile."-mix.wav";
-		if (is_file($audioFile) || is_file($audioFileOut) || is_file($audioFileIn)) {
+		if (is_file($audioFile) || is_file($audioFileOut) || is_file($audioFileIn) || is_file($audioFileMix)) {
 		    if (is_file($audioFileOut) || is_file($audioFileIn)) {
 			$sox = "/usr/bin/sox -M ".$audioFileIn." ".$audioFileOut." ".$audioFileMix;
 			exec($sox);
@@ -2770,7 +2772,7 @@ else
 			} catch (Exception $e) {
 			    write_log(LOGFILE_API_CALLBACK, basename(__FILE__) . ' line:' . __LINE__ . " [Erasing file $audioFileOut error]: ".$e->getMessage());
 			}
-		    } else $audioFileMix = $audioFile;
+		    } else if (!is_file($audioFileMix)) $audioFileMix = $audioFile;
 		    $path_parts = pathinfo($audioFileMix);
 		    $objectName = $path_parts['basename'];
 		    $path_parts = pathinfo($audioFile);
