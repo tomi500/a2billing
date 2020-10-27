@@ -2725,18 +2725,30 @@ else
 		$this->id_card			= $my_id_card;
     }
 
-	function send_talk(&$agi,$mailaddr,$audioFile,$answeredtime,$languageCode='not_set')
+	function send_talk(&$agi,$mailaddr,$audioFile,$answeredtime,$languageCode='not_set',$calldestination=NULL)
 	{
 		if ($answeredtime<2 || $audioFile=="" || $mailaddr=="") return false;
+		if ($calldestination) {
+		    $QUERY = "SELECT destination FROM cc_prefix WHERE prefix LIKE '$calldestination'";
+		    $result = $this -> instance_table -> SQLExec ($this->DBHandle, $QUERY);
+		    $calldestination = is_array($result) ? $result[0][0] : NULL;
+		}
 		if ($languageCode=='not_set')
 			$languageCode = $this -> current_language;
 		switch($languageCode) {
-		    case 'de': $languageCode = 'de-DE'; break;
-		    case 'en': $languageCode = (strpos($this->destination,'44')===0 && strlen($this->destination)>10)?'en-GB':'en-US'; break;
-		    case 'ru': $languageCode = 'ru-RU'; $alternateLangCode = array('uk-UA'); break;
-		    case 'uk': $languageCode = 'uk-UA'; $alternateLangCode = array('ru-RU'); break;
-		    case 'ua': $languageCode = 'uk-UA'; $alternateLangCode = array('ru-RU'); break;
-		    case 'ja': $languageCode = 'ja-JP'; break;
+		    case 'de':	if (stripos($calldestination,'SWITZERLAND')===0)	$languageCode = 'de-CH';
+				else							$languageCode = 'de-DE'; break;
+		    case 'en':	if (stripos($calldestination,'UNITED KINGDOM')===0)	$languageCode = 'en-GB';
+				else if (stripos($calldestination,'CANADA')===0)	$languageCode = 'en-CA';
+				else if (stripos($calldestination,'AUSTRALIA')===0)	$languageCode = 'en-AU';
+				else if (stripos($calldestination,'INDIA')===0) 	$languageCode = 'en-IN';
+				else if (stripos($calldestination,'NEW ZELAND')===0)	$languageCode = 'en-NZ';
+				else							$languageCode = 'en-US'; break;
+		    case 'ru': $alternateLangCode = array('uk-UA');			$languageCode = 'ru-RU'; break;
+		    case 'uk': $alternateLangCode = array('ru-RU');			$languageCode = 'uk-UA'; break;
+		    case 'ua': $alternateLangCode = array('ru-RU');			$languageCode = 'uk-UA'; break;
+		    case 'ja':								$languageCode = 'ja-JP'; break;
+		    case 'iw':								$languageCode = 'iw-IL'; break;
 		}
 		$src = ($this->src != "NULL")?$this->src:$this->CallerID;
 		$save_audio = ($this -> monitor == 0 && $this -> agiconfig['record_call'] == 0) ? 0 : 1 ;
@@ -2760,7 +2772,7 @@ else
 		$audioFileMix = $audioFile."-mix.wav";
 		if (is_file($audioFile) || is_file($audioFileOut) || is_file($audioFileIn) || is_file($audioFileMix)) {
 		    if (is_file($audioFileOut) || is_file($audioFileIn)) {
-			$sox = "/usr/bin/sox -M ".$audioFileIn." ".$audioFileOut." ".$audioFileMix;
+			$sox = "/usr/bin/sox -M ".$audioFileOut." ".$audioFileIn." ".$audioFileMix;
 			exec($sox);
 			try {
 			    unlink($audioFileIn);
@@ -2824,24 +2836,24 @@ else
 					    ->setContent($content);
 					try {
 					    $response = $client->recognize($config, $audio);
-					    $speakertag = 100;
-					    foreach ($response->getResults() as $result) {
-						$alternatives = $result->getAlternatives();
-						$mostLikely   = $alternatives[0];
-						if ($speakertag != $result->getChannelTag()) {
-						    $speakertag  = $result->getChannelTag();
-						    if ($speakertag>0) $transcript .= PHP_EOL."<u>Speaker".$speakertag.":</u> ";
-						}
-						if ($speakertag>0) $transcript .= $mostLikely->getTranscript();
-					    }
-					    if (strpos($transcript,"Speaker") === false) foreach ($response->getResults() as $result) {
-						$alternatives = $result->getAlternatives();
-						$mostLikely   = $alternatives[0];
-						$transcript .= PHP_EOL.$mostLikely->getTranscript();
-					    }
 					} catch (Exception $e) {
 					    write_log(LOGFILE_API_CALLBACK, basename(__FILE__) . ' line:' . __LINE__ . " [Recognize Speech-to-text error]: ".var_export($e->getMessage(),true));
 					    $retcode = 2;
+					}
+					$speakertag = 100;
+					foreach ($response->getResults() as $result) {
+					    $alternatives = $result->getAlternatives();
+					    $mostLikely   = $alternatives[0];
+					    if ($speakertag != $result->getChannelTag()) {
+						$speakertag  = $result->getChannelTag();
+						if ($speakertag>0) $transcript .= PHP_EOL."<u>Speaker".$speakertag.":</u> ";
+					    }
+					    if ($speakertag>0) $transcript .= $mostLikely->getTranscript();
+					}
+					if (strpos($transcript,"Speaker") === false) foreach ($response->getResults() as $result) {
+					    $alternatives = $result->getAlternatives();
+					    $mostLikely   = $alternatives[0];
+					    $transcript .= PHP_EOL.$mostLikely->getTranscript();
 					}
 				    } else {
 					$storage = new StorageClient(/*[

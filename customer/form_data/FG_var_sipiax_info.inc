@@ -174,6 +174,15 @@ $HD_Form -> AddEditElement (gettext("CALLERID NAME"),
 					"",
 					"", "", "", "", "", "", "NO-NULL", gettext("Allows you to set the Name of the caller"));
 
+$HD_Form -> AddEditElement (gettext("WebRTC"),
+                                        "webrtctech",
+                                        $webrtctech,
+                                        "SELECT",
+                                        "",
+                                        "",
+                                        "",
+                                        "list", "", "", "", $yesno, "%1", "", gettext("Is this extension for WebRTC tech? (like webrtc_sip-phone for web browser)"));
+
 $HD_Form -> AddEditElement (gettext("NAT"),
 					"nat",
 					"",
@@ -237,7 +246,7 @@ $HD_Form -> AddEditElement (gettext("SAY BALANCE AFTER CALL"),
                                         "",
                                         "list", "", "", "", $yesno, "%1");
 
-$field_list_edit = 'regexten, name, secret, callerid, nat, encryption, warning_threshold, say_dialednumber, say_rateinitial, say_timetotalk, say_balance_after_call';
+$field_list_edit = 'regexten, name, secret, callerid, webrtctech, nat, encryption, warning_threshold, say_dialednumber, say_rateinitial, say_timetotalk, say_balance_after_call';
 
 $HD_Form -> FieldEditElement ($field_list_edit);
 

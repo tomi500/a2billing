@@ -1412,7 +1412,7 @@ for ($i=0; $i<count($this->ratecard_obj); $i++) {
 			$A2B->instance_table -> SQLExec ($A2B -> DBHandle, $myclause_nodidcall, 0);
 		}
 		monitor_recognize($A2B);
-		$A2B -> send_talk($agi, $A2B -> speech2mail, $this -> monfile, $sessiontime, $A2B -> current_language);
+		$A2B -> send_talk($agi, $A2B -> speech2mail, $this -> monfile, $sessiontime, $A2B -> current_language, $calldestination);
 		$this -> monfile = false;
 	}
 	

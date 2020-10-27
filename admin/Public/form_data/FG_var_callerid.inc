@@ -58,7 +58,7 @@ $HD_Form -> AddViewElement(gettext("PHONE NUMBER"), "phonenumber", "15%", "cente
 $HD_Form -> AddViewElement(gettext("CALLBACK"), "callback", "10%", "center", "SORT", "", "list", $yesno);
 $HD_Form -> AddViewElement(gettext("ACCOUNT NUMBER"), "id_cc_card", "12%", "center", "sort", "", "lie_link", "cc_card", "username, id", "id='%id'", "%1", "", "A2B_entity_card.php");
 $HD_Form -> AddViewElement(gettext("CUSTOMER NAME"), "id_cc_card", "20%", "center", "sort", "", "lie_link", "cc_card", "lastname, id, firstname", "id='%id'", "%1 %3", "", "A2B_entity_card.php");
-$HD_Form -> AddViewElement(gettext("ACTIVATED"), "activated", "10%", "center", "sort", "", "list", $actived_list);
+$HD_Form -> AddViewElement(gettext("D I S A"), "activated", "10%", "center", "sort", "", "list", $actived_list);
 
 $HD_Form -> FieldViewElement ("cid, IF(verify=0,'".gettext("No")."','<font color=green>".gettext("Yes")."</font>'), phonenumber, callback, id_cc_card, id_cc_card, cc_callerid.activated");
 
@@ -193,7 +193,7 @@ $HD_Form -> AddEditElement (gettext("PHONE NUMBER"),
 			"size=50 maxlength=100 style=\"width: 250px;\"",
 			"",
 			gettext("Insert the phone"),
-			"list", "", "", "", $destlist, "%1", "", gettext("Enter the phone number for immediatly dial instead prompt to dial"), NULL, $selecteddest);
+			"list", "", "", "", $destlist, "%1", "", gettext("Enter the destination for immediatly dial instead prompt to dial. There are the phonenumber, Queue or IVR name you wish to send call. Or select destination from the drop-down list.<br>Requires \"D I S A\" on and \"BLACKLIST\" off. After one attempt to redirect the call, the call will be dropped."), NULL, $selecteddest);
 
 $HD_Form -> AddEditElement (gettext("SAY BALANCE AFTER AUTH"),
 			"warning_threshold",

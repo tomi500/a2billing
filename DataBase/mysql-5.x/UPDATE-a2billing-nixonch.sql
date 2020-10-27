@@ -108,10 +108,11 @@ INSERT IGNORE INTO cc_invoice_conf (key_val) VALUES ('comments');
 
 ALTER TABLE cc_sip_buddies ADD `external` INT( 11 ) NOT NULL DEFAULT '0' AFTER `id_cc_card`;
 ALTER TABLE cc_sip_buddies ADD `callbackextension` varchar( 40 ) DEFAULT NULL;
-ALTER TABLE cc_sip_buddies ADD `directmedia` enum('yes', 'no', 'nonat', 'update', 'outgoing') NULL DEFAULT 'yes' AFTER `nat`;
+ALTER TABLE cc_sip_buddies ADD `directmedia` enum('yes', 'no', 'nonat', 'update', 'update,nonat', 'outgoing') NULL DEFAULT 'yes' AFTER `nat`;
+ALTER TABLE cc_sip_buddies ADD `webrtctech` enum('1','0') DEFAULT '0';
 ALTER TABLE cc_sip_buddies ADD `avpf` enum( 'yes', 'no' ) DEFAULT NULL;
 ALTER TABLE cc_sip_buddies ADD `force_avp` enum( 'yes', 'no' ) DEFAULT NULL;
-ALTER TABLE cc_sip_buddies ADD `rtcp_mux` enum( 'yes', 'no' ) DEFAULT NULL AFTER `force_avp`;
+ALTER TABLE cc_sip_buddies ADD `rtcp_mux` enum( 'yes', 'no' ) DEFAULT NULL;
 ALTER TABLE cc_sip_buddies ADD `icesupport` enum( 'yes', 'no' ) DEFAULT NULL;
 ALTER TABLE cc_sip_buddies ADD `dtlsenable` enum( 'yes', 'no' ) DEFAULT NULL;
 ALTER TABLE cc_sip_buddies ADD `dtlsverify` enum( 'yes', 'no', 'fingerprint', 'certificate' ) DEFAULT NULL;
@@ -709,6 +710,71 @@ call a2b_trf_check;
 
 drop procedure if exists a2b_trf_check;
 
+delimiter //
+
+create procedure a2b_trf_check()
+begin
+    declare a int;
+    select count(*) into a from cc_config where config_key='certfile';
+    if a=0 then
+	INSERT INTO cc_config (id, config_title, config_key, config_value, config_description, config_valuetype, config_listvalues, config_group_title)
+	VALUES (NULL, 'Cert file path', 'certfile', '/etc/letsencrypt/live/my.domain/fullchain.pem', 'Tell Asterisk where your cert file is', 0, NULL, 'global');
+    elseif a>1 then
+	select id into a from cc_config where config_key='certfile' order by id limit 0,1;
+	delete from cc_config where config_key='certfile' and id>a;
+    end if;
+end //
+
+delimiter ;
+
+call a2b_trf_check;
+
+drop procedure if exists a2b_trf_check;
+
+delimiter //
+
+create procedure a2b_trf_check()
+begin
+    declare a int;
+    select count(*) into a from cc_config where config_key='privatekey';
+    if a=0 then
+	INSERT INTO cc_config (id, config_title, config_key, config_value, config_description, config_valuetype, config_listvalues, config_group_title)
+	VALUES (NULL, 'Private key path', 'privatekey', '/etc/letsencrypt/live/my.domain/privkey.pem', 'Tell Asterisk where your private key is', 0, NULL, 'global');
+    elseif a>1 then
+	select id into a from cc_config where config_key='privatekey' order by id limit 0,1;
+	delete from cc_config where config_key='privatekey' and id>a;
+    end if;
+end //
+
+delimiter ;
+
+call a2b_trf_check;
+
+drop procedure if exists a2b_trf_check;
+
+delimiter //
+
+create procedure a2b_trf_check()
+begin
+    declare a int;
+    select count(*) into a from cc_config where config_key='cafile';
+    if a=0 then
+	INSERT INTO cc_config (id, config_title, config_key, config_value, config_description, config_valuetype, config_listvalues, config_group_title)
+	VALUES (NULL, 'Authority certificate path', 'cafile', '/etc/letsencrypt/live/my.domain/chain.pem', 'Path to certificate authority certificate', 0, NULL, 'global');
+    elseif a>1 then
+	select id into a from cc_config where config_key='cafile' order by id limit 0,1;
+	delete from cc_config where config_key='cafile' and id>a;
+    end if;
+end //
+
+delimiter ;
+
+call a2b_trf_check;
+
+drop procedure if exists a2b_trf_check;
+
+UPDATE `cc_config` SET `config_description` = 'Asterisk Version Information, 1_1, 1_2, 1_4, 1_6, 1_8, 1_12, 1_16', `config_listvalues` = '1_1,1_2,1_4,1_6,1_8,1_12,1_16' WHERE `config_key` LIKE 'asterisk_version';
+UPDATE `cc_config` SET `regexten` = NULL WHERE `regexten`='';
 UPDATE `cc_config` SET `config_group_title` = 'epayment_method' WHERE `config_group_title` = '5';
 
 ALTER TABLE cc_callback_spool ADD `next_attempt_time` timestamp NULL DEFAULT NULL;
@@ -958,8 +1024,10 @@ INSERT IGNORE INTO cc_templatemail (`id_language`, `mailtype`, `fromemail`, `fro
 ('ru', 'did_unpaid', 'info@my.domain', 'TEAM.LTD', 'DID уведомление - ($did$)', '\r\nОСТАТОК НА БАЛАНСЕ: $balance_remaining$ $base_currency$\r\n\r\nУ Вас не хватает средств чтобы оплатить Ваш DID номер ($did$), ежемесячный платёж составляет: $did_cost$ $base_currency$\r\n\r\nПроизведено резервирование номера на дополнительные $days_remaining$ дней чтобы Вы могли оплатить выставленный счёт (REF: $invoice_ref$). После истечения этого срока DID номер станет свободен для заказа в обычном порядке.\r\n\r\n--\r\n<a href="http://www.my.domain/">TEAM.LTD</a>', NULL),
 ('ru', 'did_released', 'info@my.domain', 'TEAM.LTD', 'DID уведомление - ($did$)', '\r\nУ Вас не хватило средств чтобы оплатить Ваш DID номер ($did$), ежемесячный платёж составлял: $did_cost$ $base_currency$\r\n\r\nDID номер $did$ был автоматически отключен и переведен в свободную продажу!\r\nВы можете заказать его вновь в обычном порядке.\r\n\r\n--\r\n<a href="http://www.my.domain/">TEAM.LTD</a>', NULL);
 INSERT IGNORE INTO cc_templatemail (`id_language`, `mailtype`, `fromemail`, `fromname`, `subject`, `messagetext`, `messagehtml`) VALUES
-('en', 'call_success', 'speech_robot@my.domain', 'Speech Robot', 'Conversation $cid_number$->$dest_exten$',
-'<font face="Verdana"><i>$text$</i></font>\r\n---------------------------------------------------------\r\nKind regards,\r\nTeam <a href="http://www.my.domain/">IP Ltd</a>', NULL);
+('en', 'call_success', 'speech_robot@my.domain', 'Speech Robot', 'Call $cid_number$->$dest_exten$', '<font face="Verdana"><i>$text$</i></font>\r\n---------------------------------------------------------\r\nKind regards,\r\nTeam <a href="http://www.my.domain/">IP Ltd</a>', NULL);
+INSERT IGNORE INTO cc_templatemail (`id_language`, `mailtype`, `fromemail`, `fromname`, `subject`, `messagetext`, `messagehtml`) VALUES
+('en', 'forgetpassword', 'info@my.domain', 'No Reply', 'Login Information', '<font face="Verdana"><u>Your login information is as below:</u> Your account is: $cardnumber$ <i>Login link</i>: <a href="$urlcustomerinterface$">$urlcustomerinterface$</a> <i>Your cardalias</i> is: $login$ <i>Your password</i> is: $password$ <form name="form1" method="post" action="$customerinterface$userinfo.php"><input type="hidden" name="done" value="submit_log"><input type="hidden" name="pr_login" value="$login$"><input type="hidden" name="pr_password" value="$password$"><input name="" type="submit" value="SIGN IN"/></form> Kind regards, <a href="http://www.my.domain/">TEAM.LTD</a></font>', NULL),
+('ru', 'forgetpassword', 'info@my.domain', 'No Reply', 'Информация для входа', '<font face="Verdana">Это напоминание о персональной информации было отправлено автоматически в ответ на Ваш запрос со страницы входа. Рекомендуем хранить данное письмо в надёжном месте. <u>Информация для доступа к управлению Вашей учётной записью</u>: <i>Номер учётной записи</i>: $cardnumber$ <i>Ссылка для входа</i>: <a href="$customerinterface$">$customerinterface$</a> <i>Логин</i>: $login$ <i>Пароль</i>: $password$ <form name="form1" method="post" action="$customerinterface$userinfo.php"><input type="hidden" name="done" value="submit_log"><input type="hidden" name="pr_login" value="$login$"><input type="hidden" name="pr_password" value="$password$"><input name="" type="submit" value="ВОЙТИ"/></form> - Спасибо за ваш интерес к сервису <a href="http://www.my.domain/">TEAM.LTD</a> ! </font>', NULL);
 
 CREATE TABLE IF NOT EXISTS `cc_trunk_credit` (
   `trunk_id` int(11) NOT NULL,

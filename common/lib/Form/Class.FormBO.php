@@ -535,6 +535,7 @@ class FormBO {
 
 	static public function processing_sipiax_generate()
 	{
+		global $A2B;
 		$FormHandler = FormHandler::GetInstance();
 		require_once (dirname(__FILE__)."/../phpagi/phpagi-asmanager.php");
 		$as = new AGI_AsteriskManager();
@@ -542,6 +543,7 @@ class FormBO {
 
 		$regexten = $processed['regexten'];
 		$sip_buddy_id = $processed['id'];
+		$webrtctech = $processed['webrtctech'];
 		$instance_table = new Table("cc_voicemail_users", "");
 		$QUERY = "UPDATE cc_voicemail_users SET mailbox='".$regexten."' WHERE sip_buddy_id='".$sip_buddy_id."'";
 		$instance_table->SQLExec($FormHandler->DBHandle, $QUERY, 0);
@@ -549,6 +551,33 @@ class FormBO {
 		$QUERY = "UPDATE ".$FormHandler->FG_TABLE_NAME." SET mailbox=CONCAT('".$regexten."@',SUBSTRING_INDEX(mailbox, '@', -1)) WHERE id='".$sip_buddy_id."'";
 		$instance_table->SQLExec($FormHandler->DBHandle, $QUERY, 0);
 
+		if ($webrtctech==='1') {
+			$QUERY = "UPDATE cc_sip_buddies SET  dtlscertfile='".	$A2B->config['global']['certfile']."',".
+							    "dtlsprivatekey='".	$A2B->config['global']['privatekey']."',".
+							    "dtlscafile='".	$A2B->config['global']['cafile']."',".
+							    "avpf='yes',".
+							    "force_avp='yes',".
+							    "icesupport='yes',".
+							    "dtlsenable='yes',".
+							    "dtlsverify='fingerprint',".
+							    "dtlssetup='actpass',".
+							    "rtcp_mux='yes'".
+					" WHERE id='$sip_buddy_id'";
+			$instance_table->SQLExec($FormHandler->DBHandle, $QUERY, 0);
+		} else if ($webrtctech==='0') {
+			$QUERY =  "UPDATE cc_sip_buddies SET dtlscertfile=NULL,".
+							    "dtlsprivatekey=NULL,".
+							    "dtlscafile=NULL,".
+							    "avpf=NULL,".
+							    "force_avp=NULL,".
+							    "icesupport=NULL,".
+							    "dtlsenable=NULL,".
+							    "dtlsverify=NULL,".
+							    "dtlssetup=NULL,".
+							    "rtcp_mux=NULL".
+					" WHERE id='".$sip_buddy_id."'";
+			$instance_table->SQLExec($FormHandler->DBHandle, $QUERY, 0);
+		}
 		if (USE_REALTIME) {
 			$res =@  $as->connect(MANAGER_HOST,MANAGER_USERNAME,MANAGER_SECRET);
 			if ($res) {

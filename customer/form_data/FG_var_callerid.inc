@@ -216,7 +216,7 @@ if ($form_action != 'ask-delete') {
 			    ($form_action=='ask-delete')?"INPUT":"DATALIST",
 			    "size=50 maxlength=100 style=\"width: 250px;\"",
 			    "", gettext("Enter the phone"),
-			    "list" , "", "", "", $destlist , "%1", "NO", gettext("Enter the destination for immediatly dial instead prompt to dial. There are the phonenumber, Queue or IVR name you wish to send call. Or select destination from the drop-down list.<br>Requires \"D I S A\" on and \"BLACKLIST\" off for activation. After one attempt to redirect the call, the call will be dropped."), NULL, $selecteddest);
+			    "list" , "", "", "", $destlist , "%1", "NO", gettext("Enter the destination for immediatly dial instead prompt to dial. There are the phonenumber, Queue or IVR name you wish to send call. Or select destination from the drop-down list.<br>Requires \"D I S A\" on and \"BLACKLIST\" off. After one attempt to redirect the call, the call will be dropped."), NULL, $selecteddest);
 
 	$HD_Form -> AddEditElement (gettext("CALLBACK"),
 			   "callback",
