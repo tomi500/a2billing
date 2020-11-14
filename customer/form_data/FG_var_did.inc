@@ -64,7 +64,7 @@ $validated_list["1"] = array( gettext("Validated"), "1");
 
 $diraudio = DIR_STORE_AUDIO."/" . $_SESSION["pr_login"] . "/";
 $soundlist = array();
-$return = scandir($diraudio);
+$return = @ scandir($diraudio);
 if ($return!==false) {
         foreach ($return as $val) {
             if (is_file($diraudio.$val) && $val != 'tempplay.wav') {

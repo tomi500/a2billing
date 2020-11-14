@@ -2841,16 +2841,17 @@ else
 					    $retcode = 2;
 					}
 					$speakertag = 100;
+					$speaker = gettext("Speaker");
 					foreach ($response->getResults() as $result) {
 					    $alternatives = $result->getAlternatives();
 					    $mostLikely   = $alternatives[0];
 					    if ($speakertag != $result->getChannelTag()) {
 						$speakertag  = $result->getChannelTag();
-						if ($speakertag>0) $transcript .= PHP_EOL."<u>Speaker".$speakertag.":</u> ";
+						if ($speakertag>0) $transcript .= PHP_EOL."<u>".$speaker.$speakertag.":</u> ";
 					    }
 					    if ($speakertag>0) $transcript .= $mostLikely->getTranscript();
 					}
-					if (strpos($transcript,"Speaker") === false) foreach ($response->getResults() as $result) {
+					if (strpos($transcript,$speaker) === false) foreach ($response->getResults() as $result) {
 					    $alternatives = $result->getAlternatives();
 					    $mostLikely   = $alternatives[0];
 					    $transcript .= PHP_EOL.$mostLikely->getTranscript();

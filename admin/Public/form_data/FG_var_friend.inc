@@ -534,7 +534,6 @@ $HD_Form -> AddEditElement (gettext("REGSECONDS"),
 						   gettext("Insert the regseconds"),
 						   "", "", "", "", "", "", "NO-NULL" );
 
-
 $HD_Form -> AddEditElement (gettext("IPADDR"),
 						   "ipaddr",		
 						   '',	
@@ -613,7 +612,6 @@ $HD_Form -> AddEditElement (gettext("MOHSUGGEST"),
 						   "",	
 						   gettext("Insert the mohsuggest"),
 						   "", "", "", "", "", "", "NO-NULL" );
-
 
 $HD_Form -> AddEditElement (gettext("SETVAR"),
 						   "setvar",		

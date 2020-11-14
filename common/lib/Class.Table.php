@@ -56,7 +56,7 @@ class Query_trace {
 	private static $m_pInstance;
 
 	/* CONSTRUCTOR */
-	function Query_trace ()
+	public function __construct()
 	{
 		
 	}
@@ -75,31 +75,30 @@ class Query_trace {
 
 class Table {
 
-	var $fields 				= '*';
-	var $table  				= '';
-	var $table_count			= '';
-	var $errstr 				= '';
-	var $debug_st 				= 0;
-	var $debug_st_stop 			= 0;
-	var $start_message_debug 	= "<table width=\"100%\" align=\"right\" style=\"float : left;\"><tr><td>QUERY: \n";
-	var $end_message_debug 		= "\n</td></tr></table><br><br><br>";
-	var $alert_query_time 		= 0.1;
-	var $alert_query_long_time 	= 2;
-	
-	var $writelog 				= null;
+	public $fields 			= '*';
+	public $table  			= '';
+	public $table_count		= '';
+	public $errstr 			= '';
+	public $debug_st 		= 0;
+	public $debug_st_stop 		= 0;
+	public $start_message_debug	= "<table width=\"100%\" align=\"right\" style=\"float : left;\"><tr><td>QUERY: \n";
+	public $end_message_debug	= "\n</td></tr></table><br><br><br>";
+	public $alert_query_time	= 0.1;
+	public $alert_query_long_time	= 2;
 
-    var $FK_TABLES				= null;
-    var $FK_EDITION_CLAUSE		= null;
-    // FALSE if you want to delete the dependent Records, TRUE if you want to update
-    // Dependent Records to -1
-    var $FK_DELETE 				= true;
-    var $FK_ID_VALUE 			= 0;
-	
-	var $query_handler			= null;
-	
+	public $writelog 		= null;
+
+	public $FK_TABLES		= null;
+	public $FK_EDITION_CLAUSE	= null;
+	// FALSE if you want to delete the dependent Records, TRUE if you want to update
+	// Dependent Records to -1
+	public $FK_DELETE 		= true;
+	public $FK_ID_VALUE 		= 0;
+
+	public $query_handler		= null;
 
 	/* CONSTRUCTOR */
-	function Table ($table = null, $liste_fields = null,  $fk_Tables = null, $fk_Fields = null, $id_Value = null, $fk_del_upd = true, $table_count = null)
+	public function __construct ($table = null, $liste_fields = null,  $fk_Tables = null, $fk_Fields = null, $id_Value = null, $fk_del_upd = true, $table_count = null)
 	{
         $this->writelog = defined('WRITELOG_QUERY') ? WRITELOG_QUERY : false;
 		$this -> table = $table;
@@ -107,7 +106,7 @@ class Table {
 		$this -> fields = $liste_fields;
 		$this -> mytopg = new MytoPg(0); // debug level 0 logs only >30ms CPU hogs
 		
-		if ((count($fk_Tables) == count($fk_Fields)) && (count($fk_Fields) > 0)) {
+		if ($fk_Fields && count($fk_Fields) > 0 && count($fk_Tables) == count($fk_Fields)) {
 			$this -> FK_TABLES = $fk_Tables;
 			$this -> FK_EDITION_CLAUSE = $fk_Fields;
 			$this -> FK_DELETE = $fk_del_upd;

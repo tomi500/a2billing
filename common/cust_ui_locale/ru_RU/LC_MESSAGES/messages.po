@@ -15,6 +15,10 @@ msgstr ""
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
 
+#: lib/Class.A2Billing.php
+msgid "Speaker"
+msgstr "Собеседник"
+
 #: forgotpassword.php:56
 msgid "Please wait 1 minute before making any other request for the forgot password!"
 msgstr "Пожалуйста, подождите одну минуту<br>перед тем как делать запрос пароля снова!"
@@ -4709,7 +4713,7 @@ msgid "STORE ON SERVER"
 msgstr "ХРАНЕНИЕ НА СЕРВЕРЕ"
 
 #:
-msgid "FORWARD TO EMAIL"
+msgid "THE EMAIL FOR FORWARDING"
 msgstr "АДРЕС ЭЛ. ПОЧТЫ"
 
 #:

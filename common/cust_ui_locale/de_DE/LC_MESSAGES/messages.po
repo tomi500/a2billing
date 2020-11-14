@@ -19,6 +19,10 @@ msgstr ""
 msgid "User"
 msgstr "Benutzer"
 
+#: lib/Class.A2Billing.php
+msgid "Speaker"
+msgstr "Sprecher"
+
 #: templates/default/index.tpl:95 templates/default/index.tpl:98
 msgid "Click here"
 msgstr "Klicke hier"

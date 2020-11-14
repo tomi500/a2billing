@@ -39,7 +39,7 @@ include ("lib/customer.module.access.php");
 include ("lib/customer.smarty.php");
 
 $smarty -> assign("CUSTOMER_INTERFACE_URL", CUSTOMER_INTERFACE_URL);
-$smarty -> assign("MAILTO", "support@sipde.net");
-$smarty -> assign("ADDRESS", "support@sipde.net");
+$smarty -> assign("MAILTO", SUPPORT_MAILTO);
+$smarty -> assign("ADDRESS", SUPPORT_ADDRESS);
 
 $smarty -> display('policy.tpl');

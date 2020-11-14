@@ -543,15 +543,15 @@ class FormBO {
 
 		$regexten = $processed['regexten'];
 		$sip_buddy_id = $processed['id'];
-		$webrtctech = $processed['webrtctech'];
+		$webrtctech = $processed['avpf'];
 		$instance_table = new Table("cc_voicemail_users", "");
 		$QUERY = "UPDATE cc_voicemail_users SET mailbox='".$regexten."' WHERE sip_buddy_id='".$sip_buddy_id."'";
 		$instance_table->SQLExec($FormHandler->DBHandle, $QUERY, 0);
 
-		$QUERY = "UPDATE ".$FormHandler->FG_TABLE_NAME." SET mailbox=CONCAT('".$regexten."@',SUBSTRING_INDEX(mailbox, '@', -1)) WHERE id='".$sip_buddy_id."'";
+		$QUERY = "UPDATE ".$FormHandler->FG_TABLE_NAME." SET mailbox=CONCAT('".$regexten."@',SUBSTRING_INDEX(mailbox, '@', -1)) WHERE id='$sip_buddy_id'";
 		$instance_table->SQLExec($FormHandler->DBHandle, $QUERY, 0);
 
-		if ($webrtctech==='1') {
+		if ($webrtctech=='yes') {
 			$QUERY = "UPDATE cc_sip_buddies SET  dtlscertfile='".	$A2B->config['global']['certfile']."',".
 							    "dtlsprivatekey='".	$A2B->config['global']['privatekey']."',".
 							    "dtlscafile='".	$A2B->config['global']['cafile']."',".
@@ -561,10 +561,9 @@ class FormBO {
 							    "dtlsenable='yes',".
 							    "dtlsverify='fingerprint',".
 							    "dtlssetup='actpass',".
-							    "rtcp_mux='yes'".
-					" WHERE id='$sip_buddy_id'";
+							    "rtcp_mux='yes',dtmfmode='info' WHERE id='$sip_buddy_id'";
 			$instance_table->SQLExec($FormHandler->DBHandle, $QUERY, 0);
-		} else if ($webrtctech==='0') {
+		} else {
 			$QUERY =  "UPDATE cc_sip_buddies SET dtlscertfile=NULL,".
 							    "dtlsprivatekey=NULL,".
 							    "dtlscafile=NULL,".
@@ -574,8 +573,7 @@ class FormBO {
 							    "dtlsenable=NULL,".
 							    "dtlsverify=NULL,".
 							    "dtlssetup=NULL,".
-							    "rtcp_mux=NULL".
-					" WHERE id='".$sip_buddy_id."'";
+							    "rtcp_mux=NULL,dtmfmode='rfc2833' WHERE id='$sip_buddy_id'";
 			$instance_table->SQLExec($FormHandler->DBHandle, $QUERY, 0);
 		}
 		if (USE_REALTIME) {

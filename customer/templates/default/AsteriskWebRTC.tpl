@@ -191,8 +191,9 @@ RTP ports: UDP 10000 - 20000<br />
 (Re)Start Asterisk.<br />
 At this moment you should be able to make calls between a WebRTC and a SIP client.</p>
 <h3>Configure WebRTC client:</h3>
-<p>You can use any WebRTC SIP client with Asterisk. Just set it&rsquo;s websocket and SIP address to point to your asterisk. With the <a href="https://customer.sipde.net/">WebRTC SIP Phone</a>, you will need the following configuration:</p>
-<p1>Server Address:&nbsp; ASTERISK_IP:5060<br />
+<p>You can use any WebRTC SIP client with Asterisk. Just set it&rsquo;s websocket SIP address to point to your asterisk. With the <a href="{$WEBPHONE}">WebRTC SIP Phone</a>, you will need the following configuration:</p>
+<p1>Authorization name:&nbsp; SIP_REGNAME<br>
+Password: YOUR_SIP_PASSWORD<br>
 WebRTC Server Address:&nbsp; wss://ASTERISK_IP:8089/ws</p1>
 <p style="text-align: center;"><img alt="WebRTC SIP Phone" src="templates/{$SKIN_NAME}/images/phonesetup.png" style="text-align:center"/></p>
 <h3>Extra configuration:</h3>

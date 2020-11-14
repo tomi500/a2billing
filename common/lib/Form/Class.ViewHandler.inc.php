@@ -289,7 +289,7 @@ if ((count($list)>0) && is_array($list)){
 							if ($list[$ligne_number][$l]=='') $list[$ligne_number][$l]=0;
 							$string_to_eval = str_replace("%$l", $list[$ligne_number][$l], $string_to_eval);
 						}
-						eval("\$eval_res = $string_to_eval;");
+						@eval("\$eval_res = $string_to_eval;");
 						$record_display = $eval_res;
 
 					} elseif ($this->FG_TABLE_COL[$i][6]=="list") {

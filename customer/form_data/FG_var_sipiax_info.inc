@@ -67,6 +67,7 @@ if (DELETE_FK_CARD) {
 
 $values_list['nat'] = array(array(gettext('yes'),'force_rport,comedia'),array(gettext('no'),'no'),array(null,null));
 $values_list['encryption'] = array(array(gettext('yes'),'yes'),array(gettext('no'),'no'),array(null,null));
+$values_list['avpf'] = array(array(gettext('no'),'no'),array(gettext('yes'),'yes'));
 $yesno = Constants::getYesNoList();
 // Possible value to notify the user
 $instance_config_table = new Table("cc_config", "id, config_value");
@@ -175,13 +176,13 @@ $HD_Form -> AddEditElement (gettext("CALLERID NAME"),
 					"", "", "", "", "", "", "NO-NULL", gettext("Allows you to set the Name of the caller"));
 
 $HD_Form -> AddEditElement (gettext("WebRTC"),
-                                        "webrtctech",
-                                        $webrtctech,
+                                        "avpf",
+                                        $avpf,
                                         "SELECT",
                                         "",
                                         "",
                                         "",
-                                        "list", "", "", "", $yesno, "%1", "", gettext("Is this extension for WebRTC tech? (like webrtc_sip-phone for web browser)"));
+                                        "list", "", "", "", $values_list['avpf'], "%1", "NO-NULL", gettext("Is this extension for WebRTC tech? (like webrtc_sip-phone for web browser)"));
 
 $HD_Form -> AddEditElement (gettext("NAT"),
 					"nat",
@@ -246,7 +247,7 @@ $HD_Form -> AddEditElement (gettext("SAY BALANCE AFTER CALL"),
                                         "",
                                         "list", "", "", "", $yesno, "%1");
 
-$field_list_edit = 'regexten, name, secret, callerid, webrtctech, nat, encryption, warning_threshold, say_dialednumber, say_rateinitial, say_timetotalk, say_balance_after_call';
+$field_list_edit = 'regexten, name, secret, callerid, avpf, nat, encryption, warning_threshold, say_dialednumber, say_rateinitial, say_timetotalk, say_balance_after_call';
 
 $HD_Form -> FieldEditElement ($field_list_edit);
 

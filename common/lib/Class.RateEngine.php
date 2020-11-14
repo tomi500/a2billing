@@ -2020,18 +2020,20 @@ $A2B -> debug( ERROR, $agi, __FILE__, __LINE__, 'set_callerid "'.$calleridname.'
 //					$answeredtime					= $agi->get_variable("ANSWEREDTIME",true);
 //					if ($answeredtime == "")	$answeredtime	= $agi->get_variable("CDR(billsec)",true);
 					$answeredtime					= ceil(time()-$agi->get_variable("answer_timestamp",true));
+$tempdebug="Calculated TIME: ".$answeredtime.";  CDR(billsec): ".$agi->get_variable("CDR(billsec)",true).";  ANSWEREDTIME: ".$agi->get_variable("ANSWEREDTIME",true);
 //					$answeredtime					= $agi->get_variable("CDR(billsec)",true);
 //					if ($answeredtime == "")	$answeredtime	= $agi->get_variable("ANSWEREDTIME",true);
+					if ($answeredtime > 100000)	$answeredtime	= $agi->get_variable("CDR(billsec)",true);
+					if ($answeredtime > 100000)	$answeredtime	= $agi->get_variable("ANSWEREDTIME",true);
+					if ($answeredtime > 100000)	$answeredtime	= 1;
 					if ($answeredtime == $this -> ratecard_obj[$k]['alltimeout'] + 1)	$answeredtime--;
-//$tempdebug="ANSWEREDTIME: ".$agi->get_variable("ANSWEREDTIME",true)." sec. CDR(billsec): ".$agi->get_variable("CDR(billsec)",true)." anstime: ". ceil(time()-$agi->get_variable("answer_timestamp",true));
-$tempdebug="ANSWEREDTIME: ".$answeredtime." sec. CDR(billsec): ".$agi->get_variable("CDR(billsec)",true);
 				    } else {
 					$answeredtime					= 0;
 $tempdebug="DIALSTATUS: $this->dialstatus";
 				    }
 				    $this -> real_answeredtime = $this -> answeredtime	= $answeredtime;
 
-$A2B -> debug( ERROR, $agi, __FILE__, __LINE__, "[ \033[1;34m> $A2B->destination  $tempdebug\33[0m ]");
+$A2B -> debug( ERROR, $agi, __FILE__, __LINE__, "[ \033[1;34m".$A2B->CallerID." > ".$A2B->destination.";  ".$tempdebug."\33[0m ]");
 				    $A2B -> debug( INFO, $agi, __FILE__, __LINE__, "[FAILOVER K=$k]:[ANSWEREDTIME=".$this->answeredtime."]:[DIALSTATUS=".$this->dialstatus."]");
 				    if (isset($stopmon)) {
 					if (file_exists($monfile) && (filesize($monfile) < 100 || $answeredtime<2)) {

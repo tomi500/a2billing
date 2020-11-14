@@ -114,15 +114,6 @@ $HD_Form -> AddEditElement (gettext("STORE ON SERVER"),
 			   gettext("Choose 'Yes' if you want keep copy on server"),
 			   "", "", "", gettext("Yes").":1, - ".gettext("No").":0", "", "", "", gettext("Choose 'Yes' if you want keep copy on server"));
 
-$HD_Form -> AddEditElement (gettext("FORWARD TO EMAIL"),
-			   "email",
-			   '$value',
-			   "INPUT",
-			   "size=30 maxlength=70",
-			   "1",
-			   gettext("Insert the email to forwarding of faxes"),
-			   "", "", "", "", "", "", "NO", "");
-
 $HD_Form -> AddEditElement (gettext("PERMITTED FORWARDING"),
 			   "notify_email",
 			   '0',
@@ -132,7 +123,16 @@ $HD_Form -> AddEditElement (gettext("PERMITTED FORWARDING"),
 			   gettext("Choose 'Yes' if you want to receive faxes to email"),
 			   "", "", "", gettext("Yes").":1, - ".gettext("No").":0", "", "", "", gettext("Choose 'Yes' if you want to receive faxes to email"));
 
-$HD_Form -> FieldEditElement ('ext_num, localstationid, store, email, notify_email');
+$HD_Form -> AddEditElement (gettext("THE EMAIL FOR FORWARDING"),
+			   "email",
+			   '$value',
+			   "INPUT",
+			   "size=30 maxlength=70",
+			   "1",
+			   gettext("Insert the email to forwarding of faxes"),
+			   "", "", "", "", "", "", "NO", "");
+
+$HD_Form -> FieldEditElement ('ext_num, localstationid, store, notify_email, email');
 
 $HD_Form -> FG_INTRO_TEXT_EDITION= gettext("You can modify, through the following form, the different properties of your")." ".$HD_Form->FG_INSTANCE_NAME;
 $HD_Form -> FG_INTRO_TEXT_ASK_DELETION = gettext("If you really want remove this")." ".$HD_Form->FG_INSTANCE_NAME.", ".gettext("click on the delete button.");

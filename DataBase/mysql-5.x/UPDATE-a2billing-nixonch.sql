@@ -109,7 +109,6 @@ INSERT IGNORE INTO cc_invoice_conf (key_val) VALUES ('comments');
 ALTER TABLE cc_sip_buddies ADD `external` INT( 11 ) NOT NULL DEFAULT '0' AFTER `id_cc_card`;
 ALTER TABLE cc_sip_buddies ADD `callbackextension` varchar( 40 ) DEFAULT NULL;
 ALTER TABLE cc_sip_buddies ADD `directmedia` enum('yes', 'no', 'nonat', 'update', 'update,nonat', 'outgoing') NULL DEFAULT 'yes' AFTER `nat`;
-ALTER TABLE cc_sip_buddies ADD `webrtctech` enum('1','0') DEFAULT '0';
 ALTER TABLE cc_sip_buddies ADD `avpf` enum( 'yes', 'no' ) DEFAULT NULL;
 ALTER TABLE cc_sip_buddies ADD `force_avp` enum( 'yes', 'no' ) DEFAULT NULL;
 ALTER TABLE cc_sip_buddies ADD `rtcp_mux` enum( 'yes', 'no' ) DEFAULT NULL;
@@ -773,8 +772,49 @@ call a2b_trf_check;
 
 drop procedure if exists a2b_trf_check;
 
+delimiter //
+
+create procedure a2b_trf_check()
+begin
+    declare a int;
+    select count(*) into a from cc_config where config_key='mailto';
+    if a=0 then
+	INSERT INTO cc_config (config_title, config_key, config_value, config_description, config_valuetype, config_listvalues, config_group_title)
+	VALUES ('E-mail to contact us', 'mailto', 'support@my.domain', 'Customers support email address', 0, NULL, 'webcustomerui');
+    elseif a>1 then
+	select id into a from cc_config where config_key='mailto' order by id limit 0,1;
+	delete from cc_config where config_key='mailto' and id>a;
+    end if;
+end //
+
+delimiter ;
+
+call a2b_trf_check;
+
+drop procedure if exists a2b_trf_check;
+
+delimiter //
+
+create procedure a2b_trf_check()
+begin
+    declare a int;
+    select count(*) into a from cc_config where config_key='address';
+    if a=0 then
+	INSERT INTO cc_config (config_title, config_key, config_value, config_description, config_valuetype, config_listvalues, config_group_title)
+	VALUES ('Address to contact us', 'address', 'ATTN: John Doe, CEO, Global Co, 90210 Broadway Blvd, Nashville, TN 37011-5678, USA', 'Customers support address', 0, NULL, 'webcustomerui');
+    elseif a>1 then
+	select id into a from cc_config where config_key='address' order by id limit 0,1;
+	delete from cc_config where config_key='address' and id>a;
+    end if;
+end //
+
+delimiter ;
+
+call a2b_trf_check;
+
+drop procedure if exists a2b_trf_check;
+
 UPDATE `cc_config` SET `config_description` = 'Asterisk Version Information, 1_1, 1_2, 1_4, 1_6, 1_8, 1_12, 1_16', `config_listvalues` = '1_1,1_2,1_4,1_6,1_8,1_12,1_16' WHERE `config_key` LIKE 'asterisk_version';
-UPDATE `cc_config` SET `regexten` = NULL WHERE `regexten`='';
 UPDATE `cc_config` SET `config_group_title` = 'epayment_method' WHERE `config_group_title` = '5';
 
 ALTER TABLE cc_callback_spool ADD `next_attempt_time` timestamp NULL DEFAULT NULL;
