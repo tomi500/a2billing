@@ -137,7 +137,7 @@ function ringup_engine(&$A2B, $server, $username, $secret, $AmiVars, $destinatio
 	$ast -> add_event_handler('OriginateResponse', 'newstateresponse');
 //	MAKE THE CALL
 	$res = $ast -> Originate($channel,NULL,NULL,NULL,NULL,NULL,$A2B->config['callback']['timeout']*1000,$AmiVars[2],$AmiVars[3],NULL,true,$ast->actionid);
-	$response = $ast -> wait_response(true);
+	$response = $ast -> wait_response(true,$ast->actionid);
 	if ($ast->channel)	$ast -> Hangup ($ast->channel);
 	$ast -> disconnect();
 	if (is_array($response)) {

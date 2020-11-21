@@ -87,7 +87,7 @@ $modes = array(
 	"iax" => "IAX Info",
 	"conferences" => "Conferences",
 	"subscriptions" => "Subscriptions",
-	"voicemail" => "Voicemail Users",
+//	"voicemail" => "Voicemail Users",
 	"codecs" => "Codecs",
 	"all" => "Full Report"
 );
@@ -106,9 +106,7 @@ $arr_all = array(
 	"IAX2 Peers" => "iax2 show peers",
 	"Codecs" => "core show translation",
 	"Subscribe/Notify" => "core show hints",
-	"Zaptel driver info" => "zap show channels",
-	"Conference Info" => "meetme list",
-	"Voicemail users" => "voicemail show users",
+	"Conference Info" => "ConfbridgeListRooms",
 );
 $arr_registries = array(
 	"Sip Registry" => "sip show registry",
@@ -135,28 +133,11 @@ $arr_iax = array(
 	"IAX2 Peers" => "iax2 show peers",
 );
 $arr_conferences = array(
-	"Conference Info" => "meetme list",
+	"Conference Info" => "ConfbridgeListRooms",
 );
 $arr_subscriptions = array(
 	"Subscribe/Notify" => "core show hints"
 );
-$arr_voicemail = array(
-	"Voicemail users" => "voicemail show users",
-);
-
-
-if (ASTERISK_VERSION == '1_4'|| ASTERISK_VERSION == '1_6') {
-	$arr_all["Uptime"]="core show uptime";
-	$arr_all["Active Channel(s)"]="core show channels";
-	$arr_all["Subscribe/Notify"]="core show hints";
-	$arr_all["Voicemail users"]="voicemail show users";
-	$arr_all["Codecs"]="core show translation";
-	$arr_codecs["Codecs"]="core show translation";
-	$arr_channels["Active Channel(s)"]="core show channels";
-	$arr_subscriptions["Subscribe/Notify"]="core show hints";
-	$arr_voicemail["Voicemail users"]="voicemail show users";
-}
-
 ?>
 
 <div class="rnav"><ul>
@@ -214,10 +195,15 @@ if (!$astman) {
 					<tr>
 						<td>
 							<pre>
-								<?php 
-								$response = $astman->send_request('Command',array('Command'=>$value));
-								$new_value = $response['data'];
-								echo ltrim($new_value,'Privilege: Command');
+<?php
+								if ($key=='Conference Info')
+								    $response = $astman->send_request($value);
+								else
+								    $response = $astman->send_request('Command',array('Command'=>$value));
+								$new_value = (!isset($response['data']))?$response['Output']:$response['data'];
+								if ($new_value=='')
+								    $new_value = $response['Message'];
+								echo htmlspecialchars($new_value, ENT_QUOTES);
 								?>
 							</pre>
 						</td>
@@ -226,8 +212,8 @@ if (!$astman) {
 				</td>
 			</tr>
 		<?php
-			}
-		} else {
+		}
+	} else {
 	?>
 			<tr class="boxheader">
 				<td colspan="2" align="center"><h5><?php echo _("Summary")?><hr></h5></td>
@@ -282,13 +268,13 @@ function getActiveChannel($channel_arr, $channelType = NULL){
 		if($channelType == NULL || $channelType == 'SIP'){
 			$sipChannel_arr = $channel_arr;
 			$sipChannel_arrCount = count($sipChannel_arr);
-			$sipChannel_string = $sipChannel_arr[$sipChannel_arrCount - 2];
+			$sipChannel_string = $sipChannel_arr[$sipChannel_arrCount - 1];
 			$sipChannel = explode(' ', $sipChannel_string);
 			return $sipChannel[0];
 		}elseif($channelType == 'IAX2'){
 			$iax2Channel_arr = $channel_arr;
 			$iax2Channel_arrCount = count($iax2Channel_arr);
-			$iax2Channel_string = $iax2Channel_arr[$iax2Channel_arrCount - 2];
+			$iax2Channel_string = $iax2Channel_arr[$iax2Channel_arrCount - 1];
 			$iax2Channel = explode(' ', $iax2Channel_string);
 			return $iax2Channel[0];
 		}
@@ -298,126 +284,118 @@ function getActiveChannel($channel_arr, $channelType = NULL){
 function getRegistration($registration, $channelType = 'SIP'){
 	if($channelType == NULL || $channelType == 'SIP'){
 		$sipRegistration_arr = $registration;
-		$sipRegistration_count = count($sipRegistration_arr);
-		return $sipRegistration_count-3;
+		$sipRegistration_arrCount = count($sipRegistration_arr);
+		$sipRegistration_string = $sipRegistration_arr[$sipRegistration_arrCount - 1];
+		$sipRegistration = explode(' ', $sipRegistration_string);
+		return $sipRegistration[0];
 		
 	}elseif($channelType == 'IAX2'){
 		$iax2Registration_arr = $registration;
-		$iax2Registration_count = count($iax2Registration_arr);
-		return $iax2Registration_count-3;
+		$iaxRegistration_arrCount = count($iaxRegistration_arr);
+		$iaxRegistration_string = $iaxRegistration_arr[$iaxRegistration_arrCount - 1];
+		$iaxRegistration = explode(' ', $iaxRegistration_string);
+		return $iaxRegistration[0];
 	}
 }
 
-function getPeer($peer, $channelType = NULL){
-	global $astver_major, $astver_minor;
-	global $astver;
-	if(count($peer) > 1){	
-		if($channelType == NULL || $channelType == 'SIP'){
-			$sipPeer = $peer;
-			$sipPeer_count = count($sipPeer);
-			$sipPeerInfo_arr['sipPeer_count'] = $sipPeer_count -3;
-			$sipPeerInfo_string = $sipPeer[$sipPeer_count -2];
-			$sipPeerInfo_arr2 = explode('[',$sipPeerInfo_string);
-			$sipPeerInfo_arr3 = explode(' ',$sipPeerInfo_arr2[1]);
-			if (version_compare($astver, '1.4', 'ge')) { 
-				$sipPeerInfo_arr['online'] = $sipPeerInfo_arr3[1] + $sipPeerInfo_arr3[6];
-				$sipPeerInfo_arr['offline'] = $sipPeerInfo_arr3[3] + $sipPeerInfo_arr3[8];
-			}else{
-				$sipPeerInfo_arr['online'] = $sipPeerInfo_arr3[0];
-				$sipPeerInfo_arr['offline'] = $sipPeerInfo_arr3[3];
-			}
-			return $sipPeerInfo_arr;
-			
-		}elseif($channelType == 'IAX2'){
-			$iax2Peer = $peer;
-			$iax2Peer_count = count($iax2Peer);
-			$iax2PeerInfo_arr['iax2Peer_count'] = $iax2Peer_count -3;
-			$iax2PeerInfo_string = $iax2Peer[$iax2Peer_count -2];
-			$iax2PeerInfo_arr2 = explode('[',$iax2PeerInfo_string);
-			$iax2PeerInfo_arr3 = explode(' ',$iax2PeerInfo_arr2[1]);
-			$iax2PeerInfo_arr['online'] = $iax2PeerInfo_arr3[0];
-			$iax2PeerInfo_arr['offline'] = $iax2PeerInfo_arr3[2];
-			$iax2PeerInfo_arr['unmonitored'] = $iax2PeerInfo_arr3[4];
-			return $iax2PeerInfo_arr;
-		}
+function getPeer($iax2Peer){
+	if(count($iax2Peer) > 1){
+		$iax2Peer_count = count($iax2Peer);
+		$iax2PeerInfo_string = $iax2Peer[$iax2Peer_count -1];
+		$iax2PeerInfo_arr2 = explode('[',$iax2PeerInfo_string);
+		$iax2PeerInfo_arr3 = explode(' ',$iax2PeerInfo_arr2[1]);
+		$iax2PeerInfo_arr['online'] = $iax2PeerInfo_arr3[0];
+		$iax2PeerInfo_arr['offline'] = $iax2PeerInfo_arr3[2];
+		$iax2PeerInfo_arr['unmonitored'] = $iax2PeerInfo_arr3[4];
+		return $iax2PeerInfo_arr;
 	}
+	return array('online'=>0,'offline'=>0,'unmonitored'=>0);
 }
 
 function buildAsteriskInfo(){
 	global $astman;
-	global $astver;
-	
+
 	$arr = array(
-		"Uptime" => "show uptime",
+		"Uptime" => "core show uptime",
 		"Active SIP Channel(s)" => "sip show channels",
 		"Active IAX2 Channel(s)" => "iax2 show channels",
 		"Sip Registry" => "sip show registry",
 		"IAX2 Registry" => "iax2 show registry",
-		"Sip Peers" => "sip show peers",	
+		"Sip Peers" => "sip show peers",
 		"IAX2 Peers" => "iax2 show peers",
 	);
-	
-	if (ASTERISK_VERSION == '1_4'|| ASTERISK_VERSION == '1_6') {
-		$arr['Uptime'] = 'core show uptime';
-	}
-	
+
 	$htmlOutput = '<div style="color:#000000;font-size:12px;margin:10px;">';
 	$htmlOutput .= '<table border="1" cellpadding="10">';
 
+	$DBHandle_max = DbConnect();
+	$instance_table = new Table();
+
 	foreach ($arr as $key => $value) {
-		$response = $astman->send_request('Command',array('Command'=>$value));
-		$astout = explode("\n",$response['data']);
+		if ($key!='Sip Peers') {
+		    $response = $astman->send_request('Command',array('Command'=>$value));
+		    $astout = explode("\n",$response['data']);
+		}
 		switch ($key) {
 			case 'Uptime':
 				$uptime = $astout;
-				$htmlOutput .= '<tr><td colspan="2">'.$uptime[1]."<br />".$uptime[2]."<br /></td>";
+				$htmlOutput .= '<tr><td colspan="2">'.$uptime[0]."<br />".$uptime[1]."<br /></td>";
 				$htmlOutput .= '</tr>';
 			break;
 			case 'Active SIP Channel(s)':
 				$activeSipChannel = $astout;
-				$activeSipChannel_count = getActiveChannel($activeSipChannel, $channelType = 'SIP');
+				$activeSipChannel_count = getActiveChannel($activeSipChannel, 'SIP');
 				$htmlOutput .= '<tr>';
 				$htmlOutput .= "<td>Active Sip Channels: ".$activeSipChannel_count."</td>";
 			break;
 			case 'Active IAX2 Channel(s)':
 				$activeIAX2Channel = $astout;
-				$activeIAX2Channel_count = getActiveChannel($activeIAX2Channel, $channelType = 'IAX2');
+				$activeIAX2Channel_count = getActiveChannel($activeIAX2Channel, 'IAX2');
 				$htmlOutput .= "<td>Active IAX2 Channels: ".$activeIAX2Channel_count."</td>";
 				$htmlOutput .= '</tr>';
 			break;
-			break;
 			case 'Sip Registry':
 				$sipRegistration = $astout;
-				$sipRegistration_count = getRegistration($sipRegistration, $channelType = 'SIP');
+				$sipRegistration_count = getRegistration($sipRegistration, 'SIP');
 				$htmlOutput .= '<tr>';
 				$htmlOutput .= "<td>SIP Registrations: ".$sipRegistration_count."</td>";
 			break;
 			case 'IAX2 Registry':
 				$iax2Registration = $astout;
-				$iax2Registration_count = getRegistration($iax2Registration, $channelType = 'IAX2');
+				$iax2Registration_count = getRegistration($iax2Registration, 'IAX2');
 				$htmlOutput .= "<td>IAX2 Registrations: ".$iax2Registration_count."</td>";
 				$htmlOutput .= '</tr>';
 			break;
 			case 'Sip Peers':
-				$sipPeer = $astout;
-				$sipPeer_arr = getPeer($sipPeer, $channelType = 'SIP');
-				if($sipPeer_arr['offline'] != 0){
-					$sipPeerColor = 'red';
-				}else{
-					$sipPeerColor = '#000000';
+				$Peer_arr = array('mononline'=>0,'monoffline'=>0,'unmononline'=>0,'unmonoffline'=>0);
+				$QUERY = "SELECT qualify, COUNT(*) FROM cc_sip_buddies WHERE port>0 AND UNIX_TIMESTAMP()<regseconds GROUP BY qualify";
+				$result = $instance_table -> SQLExec ($DBHandle_max, $QUERY);
+				if (is_array($result) && count($result)>0) {
+				    foreach ($result as $val) {
+					if ($val[0]=='no' || $val[0]==NULL) $Peer_arr['unmononline']+=$val[1];
+					else $Peer_arr['mononline']+=$val[1];
+				    }
+				}
+				$QUERY = "SELECT qualify, COUNT(*) FROM cc_sip_buddies WHERE port=0 OR port IS NULL OR UNIX_TIMESTAMP()>=regseconds GROUP BY qualify";
+				$result = $instance_table -> SQLExec ($DBHandle_max, $QUERY);
+				if (is_array($result) && count($result)>0) {
+				    foreach ($result as $val) {
+					if ($val[0]=='no' || $val[0]==NULL) $Peer_arr['unmonoffline']+=$val[1];
+					else $Peer_arr['monoffline']+=$val[1];
+				    }
 				}
 				$htmlOutput .= '<tr>';
-				$htmlOutput .= "<td>SIP Peers<br />&nbsp;&nbsp;&nbsp;&nbsp;Online: ".$sipPeer_arr['online']."<br />&nbsp;&nbsp;&nbsp;&nbsp;Offline: <span style=\"color:".$sipPeerColor.";font-weight:bold;\">".$sipPeer_arr['offline']."</span></td>";
+				$htmlOutput .= "<td>SIP Peers<br />&nbsp;&nbsp;&nbsp;&nbsp;Monitored Online: ".$Peer_arr['mononline']."<br />&nbsp;&nbsp;&nbsp;&nbsp;Monitored Offline: ".$Peer_arr['monoffline']."<br />&nbsp;&nbsp;&nbsp;&nbsp;Unmonitored Online: ".$Peer_arr['unmononline']."<br />&nbsp;&nbsp;&nbsp;&nbsp;Unmonitored Offline: ".$Peer_arr['unmonoffline']."</td>";
 			break;
 			case 'IAX2 Peers':
 				$iax2Peer = $astout;
-				$iax2Peer_arr = getPeer($iax2Peer, $channelType = 'IAX2');
+				$iax2Peer_arr = getPeer($iax2Peer, 'IAX2');
 				if($iax2Peer_arr['offline'] != 0){
 					$iax2PeerColor = 'red';
 				}else{
 					$iax2PeerColor = '#000000';
 				}
-				$htmlOutput .= "<td>IAX2 Peers<br />&nbsp;&nbsp;&nbsp;&nbsp;Online: ".$iax2Peer_arr['online']."<br />&nbsp;&nbsp;&nbsp;&nbsp;Offline: <span style=\"color:".$iax2PeerColor.";font-weight:bold;\">".$iax2Peer_arr['offline']."</span><br />&nbsp;&nbsp;&nbsp;&nbsp;Unmonitored: ".$iax2Peer_arr['unmonitored']."</td>";
+				$htmlOutput .= "<td>IAX2 Peers<br />&nbsp;&nbsp;&nbsp;&nbsp;Online: ".$iax2Peer_arr['online']."<br />&nbsp;&nbsp;&nbsp;&nbsp;Offline: ".$iax2Peer_arr['offline']."<br />&nbsp;&nbsp;&nbsp;&nbsp;Unmonitored: ".$iax2Peer_arr['unmonitored']."<br />&nbsp;</td>";
 				$htmlOutput .= '</tr>';
 			break;
 			default:
