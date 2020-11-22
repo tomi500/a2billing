@@ -38,40 +38,40 @@ include_once (FSROOT."lib/Misc.php");
 
 class RateEngine
 {
-	var $debug_st = 0;
+	public $debug_st = 0;
 
-	var $ratecard_obj = array();
+	public $ratecard_obj = array();
 
-	var $freetimetocall_left = array();
-	var $freecall = array();
-	var $package_to_apply = array();
+	public $freetimetocall_left = array();
+	public $freecall = array();
+	public $package_to_apply = array();
 
-	var $number_trunk		= 0;
-	var $lastcost			= 0;
-	var $lastbuycost		= 0;
-	var $answeredtime		= 0;
-	var $real_answeredtime		= 0;
-	var $dialstatus			= 0;
-	var $usedratecard		= 0;
-	var $webui			= 1;
-	var $usedtrunk			= 0;
-	var $freetimetocall_used	= 0;
-	var $margindillers		= 0;
-	var $commission			= 0;
-	var $pos_dialingnumber		= true;
-	var $monfile			= false;
+	public $number_trunk		= 0;
+	public $lastcost			= 0;
+	public $lastbuycost		= 0;
+	public $answeredtime		= 0;
+	public $real_answeredtime		= 0;
+	public $dialstatus			= 0;
+	public $usedratecard		= 0;
+	public $webui			= 1;
+	public $usedtrunk			= 0;
+	public $freetimetocall_used	= 0;
+	public $margindillers		= 0;
+	public $commission			= 0;
+	public $pos_dialingnumber		= true;
+	public $monfile			= false;
 
 	// List of dialstatus
-	var $dialstatus_rev_list;
+	public $dialstatus_rev_list;
 
 	/* CONSTRUCTOR */
-	function RateEngine ()
+	public function __construct()
 	{
 		$this -> dialstatus_rev_list = Constants::getDialStatus_Revert_List();
 	}
 
 	/* Reinit */
-	function Reinit ()
+	public function Reinit ()
 	{
 		$this -> number_trunk		= 0;
 		$this -> answeredtime		= 0;
@@ -88,7 +88,7 @@ class RateEngine
 		RATE ENGINE
 		CALCUL THE RATE ACCORDING TO THE RATEGROUP, LCR - RATECARD
 	*/
-	function rate_engine_findrates (&$A2B, $phonenumber, $tariffgroupid)
+	public function rate_engine_findrates (&$A2B, $phonenumber, $tariffgroupid)
 	{
 		global $agi;
 		// Check if we want to force the call plan
@@ -377,7 +377,7 @@ for ($i=0; $i<count($this->ratecard_obj); $i++) {
 		RATE ENGINE - CALCUL TIMEOUT
 		* CALCUL THE DURATION ALLOWED FOR THE CALLER TO THIS NUMBER
 	*/
-	function rate_engine_all_calcultimeout (&$A2B, $credit)
+	public function rate_engine_all_calcultimeout (&$A2B, $credit)
 	{
 		global $agi;
 		$addtimeout = 0;
@@ -400,7 +400,7 @@ for ($i=0; $i<count($this->ratecard_obj); $i++) {
 		RATE ENGINE - CALCUL TIMEOUT
 		* CALCUL THE DURATION ALLOWED FOR THE CALLER TO THIS NUMBER
 	*/
-	function rate_engine_calcultimeout (&$A2B, $credit, $K=0, &$addtimeout=0)
+	public function rate_engine_calcultimeout (&$A2B, $credit, $K=0, &$addtimeout=0)
 	{
 		global $agi;
 
@@ -794,7 +794,7 @@ for ($i=0; $i<count($this->ratecard_obj); $i++) {
 	 * RATE ENGINE - CALCUL COST OF THE CALL
 	 * - calcul the credit consumed by the call
 	 */
-	function rate_engine_calculcost (&$A2B, $callduration, $K=0)
+	public function rate_engine_calculcost (&$A2B, $callduration, $K=0)
 	{
 		global $agi;
 		$K = $this->usedratecard;
@@ -1035,7 +1035,7 @@ for ($i=0; $i<count($this->ratecard_obj); $i++) {
 		SORT_ASC : Tri en ordre ascendant
       	SORT_DESC : Tri en ordre descendant
 	*/
-	function array_csort()
+	public function array_csort()
 	{
 		$args = func_get_args();
 		$marray = array_shift($args);
@@ -1063,7 +1063,7 @@ for ($i=0; $i<count($this->ratecard_obj); $i++) {
 	 * RATE ENGINE - UPDATE SYSTEM (DURATIONCALL)
 	 * Calcul the duration allowed for the caller to this number
 	 */
-	function rate_engine_updatesystem (&$A2B, $agi, $calledstation, $doibill = 1, $didcall=0, $callback=0, $trunk_id=0, $td=NULL, $callback_mode=0, $starttime=0, $buycost=0)
+	public function rate_engine_updatesystem (&$A2B, $agi, $calledstation, $doibill = 1, $didcall=0, $callback=0, $trunk_id=0, $td=NULL, $callback_mode=0, $starttime=0, $buycost=0)
 	{
 		$K = $this->usedratecard;
 		
@@ -1419,7 +1419,7 @@ for ($i=0; $i<count($this->ratecard_obj); $i++) {
 	/*
 	 *	function would set when the trunk is used or when it release
 	 */
-	function trunk_start_inuse($agi, $A2B, $inuse, $wrapuptime=0) {
+	public function trunk_start_inuse($agi, $A2B, $inuse, $wrapuptime=0) {
 
 		if ($inuse) {
 			$QUERY = "UPDATE cc_trunk SET inuse=inuse+1, lastdial = '$A2B->destination' WHERE id_trunk='".$this -> usedtrunk."'";
@@ -1437,7 +1437,7 @@ for ($i=0; $i<count($this->ratecard_obj); $i++) {
 		RATE ENGINE - PERFORM CALLS
 		$typecall = 1 -> predictive dialer
 	*/
-	function rate_engine_performcall ($agi, $destination, &$A2B, $typecall=0, $amicmd=false, &$ast=false) {
+	public function rate_engine_performcall ($agi, $destination, &$A2B, $typecall=0, $amicmd=false, &$ast=false) {
 
 	global	$currencies_list;
 		$max_long = 36000000; //Maximum 10 hours
@@ -1988,7 +1988,7 @@ $A2B -> debug( ERROR, $agi, __FILE__, __LINE__, 'set_callerid "'.$calleridname.'
 				    if ($res['Response'] == "Success") {
 					write_log(LOGFILE_API_CALLBACK, " ActionID = {$amicmd[5]} [#### Starting AMI WAIT_RESPONSE ####] $channel ");
 					$ast->log("ActionID = {$amicmd[5]} [#### Starting AMI WAIT_RESPONSE ####] $channel / res= ".var_export($res, true));
-					$response = $ast -> wait_response(true);
+					$response = $ast -> wait_response(true, $ast -> actionid);
 					$this->dialstatus = $response[1];
 					if ($this->dialstatus == "ANSWER" && $amicmd[7] >= 0) {
 						$res = $ast -> AbsoluteTimeout($response[2], $amicmd[7]-0.2);

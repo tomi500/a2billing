@@ -3,7 +3,7 @@
   class order {
     var $info, $totals, $products, $customer, $delivery, $content_type;
 
-    function order($order_amount = '')
+    public function __construct($order_amount = '')
     { 
       $this->info = array();
       $this->totals = array();
@@ -17,7 +17,7 @@
       }
     }
 
-    function query($order_amount)
+    public function query($order_amount)
     {
         global $languages_id;
 	

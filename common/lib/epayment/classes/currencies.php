@@ -5,10 +5,10 @@
 // Class to handle currencies
 // TABLES: currencies
   class currencies {
-    var $currencies;
+    public $currencies;
 
 // class constructor
-    function currencies() {
+    public function __construct() {
       $this->currencies = array();
       $currenciesTable= new Table("cc_currencies"," * ");
       $DBHandle = DBConnect();
@@ -26,7 +26,7 @@
     }
 
 // class methods
-    function format($number, $calculate_currency_value = true, $currency_type = '', $currency_value = '') {
+    public function format($number, $calculate_currency_value = true, $currency_type = '', $currency_value = '') {
       global $currency;
 
       if (empty($currency_type)) $currency_type = $currency;
@@ -46,7 +46,7 @@
       return $format_string;
     }
 
-    function is_set($code) {
+    public function is_set($code) {
       if (isset($this->currencies[$code]) && tep_not_null($this->currencies[$code])) {
         return true;
       } else {
@@ -54,15 +54,15 @@
       }
     }
 
-    function get_value($code) {
+    public function get_value($code) {
       return $this->currencies[$code]['value'];
     }
 
-    function get_decimal_places($code) {
+    public function get_decimal_places($code) {
       return $this->currencies[$code]['decimal_places'];
     }
 
-    function display_price($products_price, $products_tax, $quantity = 1) {
+    public function display_price($products_price, $products_tax, $quantity = 1) {
       return $this->format(tep_add_tax($products_price, $products_tax) * $quantity);
     }
   }

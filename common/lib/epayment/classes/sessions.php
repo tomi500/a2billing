@@ -4,45 +4,45 @@
   $SID = '';
 
   class php3session {
-    var $name = PHP_SESSION_NAME;
-    var $auto_start = false;
-    var $referer_check = false;
+    public $name = PHP_SESSION_NAME;
+    public $auto_start = false;
+    public $referer_check = false;
 
-    var $save_path = PHP_SESSION_SAVE_PATH;
-    var $save_handler = 'php3session_files';
+    public $save_path = PHP_SESSION_SAVE_PATH;
+    public $save_handler = 'php3session_files';
 
-    var $lifetime = 0;
+    public $lifetime = 0;
 
-    var $cache_limiter = 'nocache';
-    var $cache_expire = 180;
+    public $cache_limiter = 'nocache';
+    public $cache_expire = 180;
 
-    var $use_cookies = true;
-    var $cookie_lifetime = 0;
-    var $cookie_path = PHP_SESSION_PATH;
-    var $cookie_domain = PHP_SESSION_DOMAIN;
+    public $use_cookies = true;
+    public $cookie_lifetime = 0;
+    public $cookie_path = PHP_SESSION_PATH;
+    public $cookie_domain = PHP_SESSION_DOMAIN;
 
-    var $gc_probability = 1;
-    var $gc_maxlifetime = 0;
+    public $gc_probability = 1;
+    public $gc_maxlifetime = 0;
 
-    var $serialize_handler = 'php';
-    var $ID;
+    public $serialize_handler = 'php';
+    public $ID;
 
-    var $nr_open_sessions = 0;
-    var $mod_name = '';
-    var $id;
-    var $delimiter = "\n";
-    var $delimiter_value = '[==]';
+    public $nr_open_sessions = 0;
+    public $mod_name = '';
+    public $id;
+    public $delimiter = "\n";
+    public $delimiter_value = '[==]';
 
-    var $vars;
+    public $vars;
 
-    function php3session() {
+    function __construct() {
       $this->mod_name = $this->save_handler;
       $this->vars = array();
     }
   }
 
   class php3session_user {
-    var $open_func, $close_func, $read_func, $write_func, $destroy_func, $gc_func;
+    public $open_func, $close_func, $read_func, $write_func, $destroy_func, $gc_func;
 
     function open($save_path, $sess_name) {
       $func = $this->open_func;

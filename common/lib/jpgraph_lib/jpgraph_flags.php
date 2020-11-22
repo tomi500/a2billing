@@ -20,7 +20,7 @@ DEFINE('FLAGSIZE4',4);
 
 class FlagImages {
 
-    var $iCountryNameMap = array(
+    public $iCountryNameMap = array(
     'Afghanistan' => 'afgh',
     'Republic of Angola' => 'agla',
     'Republic of Albania' => 'alba',
@@ -252,18 +252,18 @@ class FlagImages {
     'Republic of Zimbabwe' => 'zbwe' ) ;
 
 
-    var $iFlagCount = -1;
-    var $iFlagSetMap = array(
+    public $iFlagCount = -1;
+    public $iFlagSetMap = array(
 	FLAGSIZE1 => 'flags_thumb35x35',
 	FLAGSIZE2 => 'flags_thumb60x60',
 	FLAGSIZE3 => 'flags_thumb100x100',
 	FLAGSIZE4 => 'flags'
 	);
 
-    var $iFlagData ;
-    var $iOrdIdx=array();
+    public $iFlagData ;
+    public $iOrdIdx=array();
 
-    function FlagImages($aSize=FLAGSIZE1) {
+    function __construct($aSize=FLAGSIZE1) {
 	switch($aSize) {
 	    case FLAGSIZE1 :
 	    case FLAGSIZE2 :

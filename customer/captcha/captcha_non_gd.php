@@ -16,14 +16,14 @@
 */
 class captcha
 {
-	var $filtered_pngs;
-	var $width = 320;
-	var $height = 50;
+	public $filtered_pngs;
+	public $width = 320;
+	public $height = 50;
 
 	/**
 	* Define filtered pngs on init
 	*/
-	function captcha()
+	public function __construct()
 	{
 		// If we can we will generate a single filtered png, we avoid nastiness via emulation of some Zlib stuff
 		$this->define_filtered_pngs();
@@ -32,7 +32,7 @@ class captcha
 	/**
 	* Create the image containing $code with a seed of $seed
 	*/
-	function execute($code, $seed)
+	public function execute($code, $seed)
 	{
 		$img_height = $this->height - 10;
 		$img_width = 0;
@@ -107,7 +107,7 @@ class captcha
 	* certain limits so as to keep it readable. It also varies the image
 	* width a little
 	*/
-	function randomise($scanline, $width)
+	public function randomise($scanline, $width)
 	{
 		$new_line = '';
 
@@ -137,7 +137,7 @@ class captcha
 	* This creates a chunk of the given type, with the given data
 	* of the given length adding the relevant crc
 	*/
-	function png_chunk($length, $type, $data)
+	public function png_chunk($length, $type, $data)
 	{
 		$raw = $type . $data;
 
@@ -150,7 +150,7 @@ class captcha
 	* png because it's a fully recognised open standard and supported
 	* by practically all modern browsers and OSs
 	*/
-	function create_png($raw_image, $width, $height)
+	public function create_png($raw_image, $width, $height)
 	{
 		// SIG
 		$image = pack('C8', 137, 80, 78, 71, 13, 10, 26, 10);
@@ -231,7 +231,7 @@ class captcha
 	* png image data
 	* Each 'data' element is base64_encoded uncompressed IDAT
 	*/
-	function define_filtered_pngs()
+	public function define_filtered_pngs()
 	{
 		$this->filtered_pngs = array(
 			'0' => array(

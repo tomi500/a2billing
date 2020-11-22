@@ -65,10 +65,10 @@ $callback_time = urldecode($_GET['callback_time']);
 
 class Callback {
 	
-	var $__dispatch_map = array ();
+	public $__dispatch_map = array ();
 
 
-	function Callback()
+	public function __construct()
 	{
 		
 		// Define the signature of the dispatch map on the Web servicesmethod
@@ -88,7 +88,7 @@ class Callback {
 	/*
 	 *		Function to make Callback : it will insert a callback request 
 	 */
-	function Status($security_key, $id)
+	public function Status($security_key, $id)
 	{
 
 		$status = 'null';
@@ -115,7 +115,7 @@ class Callback {
     /*
 	 *		Function to make Callback : it will insert a callback request
 	 */
-	function Request($security_key, $called, $calling, $callerid, $callback_time, $uniqueid, $accountnumber)
+	public function Request($security_key, $called, $calling, $callerid, $callback_time, $uniqueid, $accountnumber)
 	{
 		// $called : PHONE NUMBER PERSON CALLING
 		// $calling : DESTINATION PHONE NUMBER

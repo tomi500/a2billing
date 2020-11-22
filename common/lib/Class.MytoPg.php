@@ -29,18 +29,18 @@
 
 class MytoPg {
     // These regexes match the MySQL idioms that we need to rewrite
-	var $mytopg = array(
+	public $mytopg = array(
 		// The first pass matches only trivial deletions and re-writes
 		'(\s*)(REGEXP|TRUNCATE|RAND\(\)|UNIX_TIMESTAMP\(|LIMIT[[:space:]]+[[:digit:]]+[[:space:]]*,[[:space:]]*[[:digit:]]+)(\s*)'
 		// The 2nd pass matches functions which consume the following () too
 		,'(\s*)(CONCAT|REPLACE|ADDDATE|DATE_ADD|SUBDATE|DATE_SUB|SUBSTRING|TIMEDIFF|TIME_TO_SEC|DATETIME|TIMESTAMP|YEAR|MONTH|DAY|DATE_FORMAT|DATE_PART)(\s*)\('
 		);
-	function MytoPg ($debug = null) {
+	public function __construct($debug = null) {
 		$this -> DEBUG = $debug;
 	}
 
 
-	function My_to_Pg (&$q) {
+	public function My_to_Pg (&$q) {
 		$dbg = $this -> DEBUG;
 		$count = 0;
 		$slices = 0;
@@ -288,7 +288,7 @@ class MytoPg {
 	//  quote: the position of the matching close quote after $p
 	//  split: an array of the string split on character $p
 	// quoted: 1 if the position $p is within a quoted string
-	function Parse_helper ($mode, &$str, $p, $dbg, &$d) {
+	public function Parse_helper ($mode, &$str, $p, $dbg, &$d) {
 		$lastpos = 0;
 		$brackets = 0;
 		$squotes = 0;
@@ -391,7 +391,7 @@ class MytoPg {
 
 
 	// If a date participle looks like an immediate constant, cast it appropriately
-	function Cast_date_part ($part) {
+	public function Cast_date_part ($part) {
 
 		if (preg_match('/([[:space:]]*)[\'"]now[\'"]([[:space:]]*)/i', $part, $parm)) {
 			$part = "$parm[1]now()$parm[2]";

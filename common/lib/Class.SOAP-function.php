@@ -19,7 +19,7 @@ class SOAP_A2Billing
 	
 	
 	//Construct
-	function SOAP_A2Billing() {
+	public function __construct() {
 	
 	    $this->instance_table = new Table();
 	    
@@ -208,7 +208,7 @@ class SOAP_A2Billing
     /*
      * Check the security key
      */
-    function Check_SecurityKey ($security_key)
+    public function Check_SecurityKey ($security_key)
     {
     	
         if (md5($this->system_security_key) !== $security_key  || strlen($security_key)==0) 
@@ -224,7 +224,7 @@ class SOAP_A2Billing
      * Check the security key & Instance
      * return : group_id, message
      */
-    function Check_KeyInstance($security_key, $instance)
+    public function Check_KeyInstance($security_key, $instance)
     {
         if (!$this->Check_SecurityKey ($security_key)) {
 		    return array("ERROR", "INVALID KEY");
@@ -248,7 +248,7 @@ class SOAP_A2Billing
     /*
 	 *		Function to Update the currency list
 	 */ 
-    function Update_Currencies_list($security_key)
+    public function Update_Currencies_list($security_key)
     {
         if (!$this->Check_SecurityKey ($security_key)) {
 		    return array("ERROR", "INVALID KEY");
@@ -267,7 +267,7 @@ class SOAP_A2Billing
     /*
 	 *		Function to reload the SIP / IAX Asterisk Config
 	 */ 
-    function Reload_Asterisk_SIP_IAX($security_key)
+    public function Reload_Asterisk_SIP_IAX($security_key)
     {
         if (!$this->Check_SecurityKey ($security_key)) {
 		    return array("ERROR", "INVALID KEY");
@@ -298,7 +298,7 @@ class SOAP_A2Billing
     /*
 	 *		Function to Verify credential : pwd in encrypt
 	 */ 
-    function Authenticate_Admin($security_key, $username, $pwd)
+    public function Authenticate_Admin($security_key, $username, $pwd)
     {
         if (!$this->Check_SecurityKey ($security_key)) {
 		    return array("ERROR", "INVALID KEY");
@@ -321,7 +321,7 @@ class SOAP_A2Billing
     /*
 	 *		Function to Update Admin password
 	 */ 
-    function Set_AdminPwd($security_key, $username, $pwd)
+    public function Set_AdminPwd($security_key, $username, $pwd)
     {
         if (!$this->Check_SecurityKey ($security_key)) {
 		    return array("ERROR", "INVALID KEY");
@@ -345,7 +345,7 @@ class SOAP_A2Billing
     /*
 	 *		Function to Add Notification
 	 */ 
-    function Write_Notification($security_key, $from, $subject, $priority)
+    public function Write_Notification($security_key, $from, $subject, $priority)
     {
         if (!$this->Check_SecurityKey ($security_key)) {
 		    return array("ERROR", "INVALID KEY");
@@ -370,7 +370,7 @@ class SOAP_A2Billing
 	/*
 	 *		Function to create Instance for the provisioning
 	 */ 
-	function Create_Instance ($security_key, $instance_name) {
+	public function Create_Instance ($security_key, $instance_name) {
 		
 		if (!$this->Check_SecurityKey ($security_key)) {
 		    return array("ERROR", "INVALID KEY");
@@ -407,7 +407,7 @@ class SOAP_A2Billing
 	/*
 	 *		Function to define the description of the Instance
 	 */ 
-	function Set_InstanceDescription ($security_key, $instance, $description) {
+	public function Set_InstanceDescription ($security_key, $instance, $description) {
 	    
 	    $arr_check = $this->Check_KeyInstance($security_key, $instance);
 		if ($arr_check[0] == 'ERROR') {
@@ -427,7 +427,7 @@ class SOAP_A2Billing
 	/*
 	 *		Function to define the provisioning information of the Instance
 	 */ 
-	function Set_InstanceProvisioning ($security_key, $instance, $provisioning) {
+	public function Set_InstanceProvisioning ($security_key, $instance, $provisioning) {
 	    
 	    $arr_check = $this->Check_KeyInstance($security_key, $instance);
 		if ($arr_check[0] == 'ERROR') {
@@ -447,7 +447,7 @@ class SOAP_A2Billing
 	/*
 	 *		Returns list of customer groups
 	 */
-    function Get_CustomerGroups($security_key)
+    public function Get_CustomerGroups($security_key)
     {
         if (!$this->Check_SecurityKey ($security_key)) {
 		    return array("ERROR", "INVALID KEY");
@@ -467,7 +467,7 @@ class SOAP_A2Billing
 	/*
 	 *      Get list of service on signup subscription
 	 */
-    function Get_Subscription_Signup($security_key)
+    public function Get_Subscription_Signup($security_key)
     {
         if (!$this->Check_SecurityKey ($security_key)) {
 		    return array("ERROR", "INVALID KEY");
@@ -489,7 +489,7 @@ class SOAP_A2Billing
 	/*
 	 *      Get list of all currencies ($currency is the ISO-xxx)
 	 */
-    function Get_Currencies($security_key)
+    public function Get_Currencies($security_key)
     {
         if (!$this->Check_SecurityKey ($security_key)) {
 		    return array("ERROR", "INVALID KEY");
@@ -508,7 +508,7 @@ class SOAP_A2Billing
 	/*
 	 *      Get the value of a currency
 	 */
-    function Get_Currencies_value($security_key, $currency)
+    public function Get_Currencies_value($security_key, $currency)
     {
         if (!$this->Check_SecurityKey ($security_key)) {
 		    return array("ERROR", "INVALID KEY");
@@ -527,7 +527,7 @@ class SOAP_A2Billing
 	/*
 	 *      Get list of all countries ($country is the ISO-3166)
 	 */
-    function Get_Countries($security_key)
+    public function Get_Countries($security_key)
     {
         if (!$this->Check_SecurityKey ($security_key)) {
 		    return array("ERROR", "INVALID KEY");
@@ -550,7 +550,7 @@ class SOAP_A2Billing
 	 *      Get_setting($security_key, 'base_country')
 	 *      Get_setting($security_key, 'base_language')
 	 */
-    function Get_Setting($security_key, $setting_key)
+    public function Get_Setting($security_key, $setting_key)
     {
         if (!$this->Check_SecurityKey ($security_key)) {
 		    return array("ERROR", "INVALID KEY");
@@ -573,7 +573,7 @@ class SOAP_A2Billing
 	 *      Set_setting($security_key, 'base_country', 'USA')
 	 *      Set_setting($security_key, 'base_language', 'en')
 	 */
-    function Set_Setting($security_key, $setting_key, $value)
+    public function Set_Setting($security_key, $setting_key, $value)
     {
         if (!$this->Check_SecurityKey ($security_key)) {
 		    return array("ERROR", "INVALID KEY");
@@ -594,7 +594,7 @@ class SOAP_A2Billing
 	 *
 	 *      Get_Account_Attribute($security_key, 'credit', '235412356')
 	 */
-    function Get_Account_Attribute($security_key, $attribute, $username)
+    public function Get_Account_Attribute($security_key, $attribute, $username)
     {
         if (!$this->Check_SecurityKey ($security_key)) {
 		    return array("ERROR", "INVALID KEY");
@@ -615,7 +615,7 @@ class SOAP_A2Billing
 	 *
 	 *      Set_Account_Attribute($security_key, 'credit', '235412356', '26.00')
 	 */
-    function Set_Account_Attribute($security_key, $attribute, $username, $value)
+    public function Set_Account_Attribute($security_key, $attribute, $username, $value)
     {
         if (!$this->Check_SecurityKey ($security_key)) {
 		    return array("ERROR", "INVALID KEY");
@@ -634,7 +634,7 @@ class SOAP_A2Billing
     /*
 	 *      Get list of languages supported
 	 */
-    function Get_Languages($security_key)
+    public function Get_Languages($security_key)
     {
         if (!$this->Check_SecurityKey ($security_key)) {
 		    return array("ERROR", "INVALID KEY");
@@ -649,7 +649,7 @@ class SOAP_A2Billing
 	/*
 	 *      Create DID group associated with $instance
 	 */
-    function Create_DIDGroup($security_key, $instance)
+    public function Create_DIDGroup($security_key, $instance)
     {
         $arr_check = $this->Check_KeyInstance($security_key, $instance);
 		if ($arr_check[0] == 'ERROR') {
@@ -672,7 +672,7 @@ class SOAP_A2Billing
     /*
 	 *      Create provider associated with $instance
 	 */
-    function Create_Provider($security_key, $instance)
+    public function Create_Provider($security_key, $instance)
     {
         $arr_check = $this->Check_KeyInstance($security_key, $instance);
 		if ($arr_check[0] == 'ERROR') {
@@ -694,7 +694,7 @@ class SOAP_A2Billing
     /*
 	 *      Create ratecard  associated with $instance
 	 */
-    function Create_Ratecard($security_key, $instance)
+    public function Create_Ratecard($security_key, $instance)
     {
         $arr_check = $this->Check_KeyInstance($security_key, $instance);
 		if ($arr_check[0] == 'ERROR') {
@@ -722,7 +722,7 @@ class SOAP_A2Billing
     /*
 	 *      Create callplan associated with $instance
 	 */
-    function Create_Callplan($security_key, $instance, $id_ratecard)
+    public function Create_Callplan($security_key, $instance, $id_ratecard)
     {
         $arr_check = $this->Check_KeyInstance($security_key, $instance);
 		if ($arr_check[0] == 'ERROR') {
@@ -761,7 +761,7 @@ class SOAP_A2Billing
     /*
 	 *      Create a set of vouchers
 	 */
-    function Create_Voucher($security_key, $credit, $units, $currency)
+    public function Create_Voucher($security_key, $credit, $units, $currency)
     {
         if (!$this->Check_SecurityKey ($security_key)) {
 		    return array("ERROR", "INVALID KEY");
@@ -797,7 +797,7 @@ class SOAP_A2Billing
 	 */
     //Default values ($activated = true, $status = 1, $simultaccess = 0, $typepaid =0, $sip=1, $iax=1, $voicemail_enabled = true)
     //$status : 1 Active
-    function Create_Customer($security_key, $instance, $id_callplan, $id_didgroup, $units, $accountnumber_len, $balance, $activated, $status, $simultaccess, $currency, $typepaid, $sip, $iax,  $language, $voicemail_enabled, $country, $diller=0, $margin=0)
+    public function Create_Customer($security_key, $instance, $id_callplan, $id_didgroup, $units, $accountnumber_len, $balance, $activated, $status, $simultaccess, $currency, $typepaid, $sip, $iax,  $language, $voicemail_enabled, $country, $diller=0, $margin=0)
     {
         $arr_check = $this->Check_KeyInstance($security_key, $instance);
 		if ($arr_check[0] == 'ERROR') {
@@ -904,7 +904,7 @@ class SOAP_A2Billing
 	 *      Validation of a DID Prefix
 	 */
     // array (bool $status, $message) 
-    function Validate_DIDPrefix($security_key, $did_prefix)
+    public function Validate_DIDPrefix($security_key, $did_prefix)
     {
         if (!$this->Check_SecurityKey ($security_key)) {
 		    return array("ERROR", "INVALID KEY");
@@ -930,7 +930,7 @@ class SOAP_A2Billing
 	 * did_suffix = 8760
 	 * as the DID are 7 digits, the following DID will be created 6008760, 6008761, 6008762, 6008763, etc...
 	 */
-    function Create_DID($security_key, $account_id, $id_didgroup, $rate, $connection_charge, $did_prefix, $did_suffix, $country)
+    public function Create_DID($security_key, $account_id, $id_didgroup, $rate, $connection_charge, $did_prefix, $did_suffix, $country)
     {
         if (!$this->Check_SecurityKey ($security_key)) {
 		    return array("ERROR", "INVALID KEY");
@@ -1031,7 +1031,7 @@ class SOAP_A2Billing
      *
      * $RESULT : array(array (string $name, string $description, string $uri_trunk, string $uri_rate,string $uri_image), string $message) 
      */
-    function Get_ProvisioningList ($security_key, $provisioning_uri)
+    public function Get_ProvisioningList ($security_key, $provisioning_uri)
     {
         if (!$this->Check_SecurityKey ($security_key)) {
 		    return array("ERROR", "INVALID KEY");
@@ -1066,7 +1066,7 @@ class SOAP_A2Billing
     /*
      *  Request to the Provider the Trunk configuration
      */
-    function Create_TrunkConfig($security_key, $instance, $uri_trunk, $activation_code, $provider_name)
+    public function Create_TrunkConfig($security_key, $instance, $uri_trunk, $activation_code, $provider_name)
     {
         $arr_check = $this->Check_KeyInstance($security_key, $instance);
 		if ($arr_check[0] == 'ERROR') {
@@ -1215,7 +1215,7 @@ class SOAP_A2Billing
      *  Retrieve the rates from the Provider
      */
     // RESULT : array(array(string $prefix, string $destination, float $buyrate, float $sellrate), string $message) 
-    function Get_Rates($security_key, $uri_rate, $activation_code, $margin)
+    public function Get_Rates($security_key, $uri_rate, $activation_code, $margin)
     {
         if (!$this->Check_SecurityKey ($security_key)) {
 		    return array("ERROR", "INVALID KEY");
@@ -1253,7 +1253,7 @@ class SOAP_A2Billing
      *  CHECK RATES VALIDITY - function check_rates_validity
      */
     // array(string $prefix, string $destination, float $buyrate, float $sellrate)
-    function check_rates_validity ($arr_rates)
+    public function check_rates_validity ($arr_rates)
     {
         $valid_rate = true;
         foreach ($arr_rates as $arr_rates_val) {
@@ -1288,7 +1288,7 @@ class SOAP_A2Billing
      */
     // array(bool $result, string $message) 
     // array(string $prefix, string $destination, float $buyrate, float $sellrate)
-    function Create_Rates($security_key, $instance, $arr_rates)
+    public function Create_Rates($security_key, $instance, $arr_rates)
     {
         $arr_check = $this->Check_KeyInstance($security_key, $instance);
 		if ($arr_check[0] == 'ERROR') {
@@ -1369,7 +1369,7 @@ class SOAP_A2Billing
      */
     // array(bool $result, string $message) 
     // array(string $prefix, string $destination, float $buyrate, float $sellrate)
-    function Update_Rates($security_key, $instance, $arr_rates)
+    public function Update_Rates($security_key, $instance, $arr_rates)
     {
         $arr_check = $this->Check_KeyInstance($security_key, $instance);
 		if ($arr_check[0] == 'ERROR') {
@@ -1453,7 +1453,7 @@ class SOAP_A2Billing
      *  Update Account Status
      */
     // array(bool $result, string $message)
-    function Account_Status_Update($security_key, $card_id, $cardnumber, $status)
+    public function Account_Status_Update($security_key, $card_id, $cardnumber, $status)
     {
 		$arr_check = $this->Check_KeyInstance($security_key, $instance);
 		if ($arr_check[0] == 'ERROR') {
@@ -1481,7 +1481,7 @@ class SOAP_A2Billing
      *  Add CallerID to a specific card_id or accountnumber
      */
     // array(bool $result, string $message)
-    function Add_CallerID($security_key, $callerid, $card_id, $accountnumber)
+    public function Add_CallerID($security_key, $callerid, $card_id, $accountnumber)
     {	
         if (!$this->Check_SecurityKey ($security_key)) {
 		    return array("ERROR", "INVALID KEY");
@@ -1521,7 +1521,7 @@ class SOAP_A2Billing
      /*
 	 *      Get calls history from a card id
 	 */
-    function Get_Calls_History($security_key, $card_id, $starttime_begin, $starttime_end, $offset, $items_number, $terminatecauseid = 1)
+    public function Get_Calls_History($security_key, $card_id, $starttime_begin, $starttime_end, $offset, $items_number, $terminatecauseid = 1)
     {
         if (!$this->Check_SecurityKey ($security_key)) {
 		    return array("ERROR", "INVALID KEY");
@@ -1544,7 +1544,7 @@ class SOAP_A2Billing
      /*
       *      Get calls refill from a card id
       */
-    function Get_Log_Refill($security_key, $card_id, $offset, $items_number)
+    public function Get_Log_Refill($security_key, $card_id, $offset, $items_number)
     {
         if (!$this->Check_SecurityKey ($security_key)) {
 		    return array("ERROR", "INVALID KEY");
@@ -1567,7 +1567,7 @@ class SOAP_A2Billing
      /*
 	 *      Add a credit amount on a cc_card
 	 */
-    function Add_Credit($security_key, $card_id, $value, $description,$refill_type)
+    public function Add_Credit($security_key, $card_id, $value, $description,$refill_type)
     {
         if (!$this->Check_SecurityKey ($security_key)) {
 		    return array("ERROR", "INVALID KEY");

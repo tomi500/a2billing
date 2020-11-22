@@ -63,16 +63,16 @@ class A2Billing {
     * @var array
     * @access public
     */
-	var $config;
+	public $config;
 
 	/**
     * Config AGI variables
 	* Create for coding readability facilities
     *
-    * @var array
+    * @public array
     * @access public
     */
-	var $agiconfig;
+	public $agiconfig;
 
 	/**
     * IDConfig variables
@@ -80,7 +80,7 @@ class A2Billing {
     * @var interger
     * @access public
     */
-	var $idconfig=1;
+	public $idconfig=1;
 
 	/**
     * hangupdetected variables
@@ -88,7 +88,7 @@ class A2Billing {
     * @var interger
     * @access public
     */
-	var $hangupdetected = false;
+	public $hangupdetected = false;
 
 
 	/**
@@ -97,18 +97,18 @@ class A2Billing {
     * @var string
     * @access public
     */
-	var $cardnumber;
-	var $CallerID;
-	var $CallerIDName = '';
-	var $CallerIDext = '';
-	var $CID_handover = '';
-	var $cid_verify = true;
-	var $id_did = NULL;
-	var $speech2mail = '';
-	var $send_text = '';
-	var $send_sound = '';
-	var $calleesound = NULL;
-	var $callback_id = 0;
+	public $cardnumber;
+	public $CallerID;
+	public $CallerIDName = '';
+	public $CallerIDext = '';
+	public $CID_handover = '';
+	public $cid_verify = true;
+	public $id_did = NULL;
+	public $speech2mail = '';
+	public $send_text = '';
+	public $send_sound = '';
+	public $calleesound = NULL;
+	public $callback_id = 0;
 
 
 	/**
@@ -117,7 +117,7 @@ class A2Billing {
     * @var string
     * @access public
     */
-	var $BUFFER;
+	public $BUFFER;
 
 
 	/**
@@ -126,7 +126,7 @@ class A2Billing {
     * @var object
     * @access public
     */
-	var $DBHandle;
+	public $DBHandle;
 
 
 	/**
@@ -135,7 +135,7 @@ class A2Billing {
     * @var object
     * @access public
     */
-	var $instance_table;
+	public $instance_table;
 
 	/**
     * store the file name to store the logs
@@ -143,7 +143,7 @@ class A2Billing {
     * @var string
     * @access public
     */
-	var $log_file = '';
+	public $log_file = '';
 
 
 	/**
@@ -153,101 +153,101 @@ class A2Billing {
     * @access public
     */
 
-	var $channel;
-	var $uniqueid;
-	var $accountcode;
-	var $dnid;
-	var $cid2num = false;
-	var $extension;
-	var $outoflength = false;
+	public $channel;
+	public $uniqueid;
+	public $accountcode;
+	public $dnid;
+	public $cid2num = false;
+	public $extension;
+	public $outoflength = false;
 
 	// from apply_rules, if a prefix is removed we keep it to track exactly what the user introduce
 	
-	var $myprefix;
-	var $ipaddress;
-	var $rate;
-	var $destination;
-	var $dtmf_destination = false;
-	var $sip_iax_buddy;
-	var $credit;
-	var $tariff;
-	var $active;
-	var $status;
-	var $hostname='';
-	var $currency='usd';
-	var $margintotal=1;
-	var $margin=0;
-	var $groupe_mode = false;
-	var $groupe_id = '';
-	var $mode = '';
-	var $timeout;
-	var $newdestination;
-	var $tech;
-	var $prefix;
-	var $username;
+	public $myprefix;
+	public $ipaddress;
+	public $rate;
+	public $destination;
+	public $dtmf_destination = false;
+	public $sip_iax_buddy;
+	public $credit;
+	public $tariff;
+	public $active;
+	public $status;
+	public $hostname='';
+	public $currency='usd';
+	public $margintotal=1;
+	public $margin=0;
+	public $groupe_mode = false;
+	public $groupe_id = '';
+	public $mode = '';
+	public $timeout;
+	public $newdestination;
+	public $tech;
+	public $prefix;
+	public $username;
 
-	var $typepaid = 0;
-	var $removeinterprefix = 1;
-	var $restriction = 1;
-	var $redial;
-	var $nbused = 0;
+	public $typepaid = 0;
+	public $removeinterprefix = 1;
+	public $restriction = 1;
+	public $redial;
+	public $nbused = 0;
 	
-	var $enableexpire;
-	var $expirationdate;
-	var $expiredays;
-	var $firstusedate;
-	var $creationdate;
-	var $voicebox = NULL;
+	public $enableexpire;
+	public $expirationdate;
+	public $expiredays;
+	public $firstusedate;
+	public $creationdate;
+	public $voicebox = NULL;
 	
-	var $creditlimit = 0;
+	public $creditlimit = 0;
 
-	var $backaftertransfer = false;
-	var $languageselected;
-	var $current_language;
-	var $streamfirst = true;
-	var $first_dtmf = '';
+	public $backaftertransfer = false;
+	public $languageselected;
+	public $current_language;
+	public $streamfirst = true;
+	public $first_dtmf = '';
 
-	var $cardholder_lastname;
-	var $cardholder_firstname;
-	var $cardholder_email;
-	var $cardholder_uipass;
-	var $id_campaign;
-	var $id_card;
-	var $caller_concat_id = 0;
-//	var $card_caller = 0;
-//	var $card_called = 0;
-	var $useralias;
-	var $countryprefix;
-	var $areaprefix;
-	var $citylength;
+	public $cardholder_lastname;
+	public $cardholder_firstname;
+	public $cardholder_email;
+	public $cardholder_uipass;
+	public $id_campaign;
+	public $id_card;
+	public $caller_concat_id = 0;
+//	public $card_caller = 0;
+//	public $card_called = 0;
+	public $useralias;
+	public $countryprefix;
+	public $areaprefix;
+	public $citylength;
 
-	var $extext = true;
-	var $auth_through_accountcode = false;
+	public $extext = true;
+	public $auth_through_accountcode = false;
 	
 	// Start time of the Script
-	var $G_startime = 0;
+	public $G_startime = 0;
 	
 	// Enable voicemail for this card. For DID and SIP/IAX call
-	var $voicemail = 0;
+	public $voicemail = 0;
 
 	// Flag to know that we ask for an othercardnumber when for instance we doesnt have enough credit to make a call
-	var $ask_other_cardnumber=0;
-	var $update_callerid=0;
+	public $ask_other_cardnumber=0;
+	public $update_callerid=0;
 
-	var $ivr_voucher;
-	var $vouchernumber = 0;
-	var $add_credit;
-	var $didsellrate = 0;
-	var $didbuyrate = 0;
-	var $billblock = 1;
-	var $prefixallow = true;
+	public $ivr_voucher;
+	public $vouchernumber = 0;
+	public $add_credit;
+	public $didsellrate = 0;
+	public $didbuyrate = 0;
+	public $billblock = 1;
+	public $prefixallow = true;
 
-	var $cardnumber_range;
+	public $cardnumber_range;
 
 	// Define if we have changed the status of the card
-	var $set_inuse_username = 0;
+	public $set_inuse_username = 0;
 
-    var $callback_beep_to_enter_destination = False;
+	public $callback_beep_to_enter_destination = False;
 
 	/**
 	* CC_TESTING variables
@@ -256,10 +256,10 @@ class A2Billing {
 	* @var interger
 	* @access public
 	*/
-	var $CC_TESTING;
+	public $CC_TESTING;
 	
 	// List of dialstatus
-	var $dialstatus_rev_list;
+	public $dialstatus_rev_list;
 	
 
 	/* CONSTRUCTOR */
@@ -277,7 +277,7 @@ class A2Billing {
 
 
 	/* Init */
-	function Reinit()
+	public function Reinit()
 	{
 		$this -> myprefix='';
 		$this -> ipaddress='';
@@ -287,7 +287,7 @@ class A2Billing {
 
 
 	/* Hangupsignal */
-	function Hangupsignal()
+	public function Hangupsignal()
 	{
 		$this -> hangupdetected = true;
 		$this -> debug( INFO, null, __FILE__, __LINE__, "HANGUP DETECTED!\n");
@@ -299,7 +299,7 @@ class A2Billing {
 	 *
 	 * usage : $A2B -> debug( INFO, $agi, __FILE__, __LINE__, $buffer_debug);
 	 */
-	function debug( $level, $agi, $file, $line, $buffer_debug)
+	public function debug( $level, $agi, $file, $line, $buffer_debug)
 	{
 		$file = basename($file);
 		
@@ -318,7 +318,7 @@ class A2Billing {
 	/*
 	 * Write log into file
 	 */
-	function write_log($output, $tobuffer = 1, $line_file_info = '')
+	public function write_log($output, $tobuffer = 1, $line_file_info = '')
 	{
 		//$tobuffer = 0;
 
@@ -339,7 +339,7 @@ class A2Billing {
 	/*
 	 * set the DB handler
 	 */
-	function set_dbhandler ($DBHandle)
+	public function set_dbhandler ($DBHandle)
 	{
 		$this->DBHandle	= $DBHandle;
 	}
@@ -347,7 +347,7 @@ class A2Billing {
 	/*
 	 * set_instance_table
 	 */
-	function set_instance_table ($instance_table)
+	public function set_instance_table ($instance_table)
 	{
 		$this->instance_table = $instance_table;
 	}
@@ -355,7 +355,7 @@ class A2Billing {
 	/*
 	 * load_conf
 	 */
-	function load_conf( &$agi, $config=NULL, $webui=0, $idconfig=1, $optconfig=array())
+	public function load_conf( &$agi, $config=NULL, $webui=0, $idconfig=1, $optconfig=array())
     {
 		$this -> idconfig = $idconfig;
 		// load config
@@ -388,7 +388,7 @@ class A2Billing {
 	/*
 	 * Load config from Database
 	 */
-	function load_conf_db( &$agi, $config=NULL, $webui=0, $idconfig=1, $optconfig=array())
+	public function load_conf_db( &$agi, $config=NULL, $webui=0, $idconfig=1, $optconfig=array())
     {
 		$this -> idconfig = $idconfig;
 		// load config
@@ -677,7 +677,7 @@ class A2Billing {
     * @param string $str
     * @param integer $vbl verbose level
     */
-    function conlog($str, $vbl=1)
+    public function conlog($str, $vbl=1)
     {
 		global $agi;
 		static $busy = false;
@@ -696,7 +696,7 @@ class A2Billing {
 	/*
 	 * Function to create a menu to select the language
 	 */
-	function play_menulanguage ($agi)
+	public function play_menulanguage ($agi)
 	{
 		// MENU LANGUAGE
 		if ($this->agiconfig['play_menulanguage']==1) {
@@ -764,7 +764,7 @@ class A2Billing {
 	/*
 	 * function to get and conversion queuestatus to dialstatus
 	 */
-	function get_dialstatus_from_queuestatus($agi)
+	public function get_dialstatus_from_queuestatus($agi)
 	{
 		if ($agi->get_variable('ANSWEREDTIME',true)) return "ANSWER";
 		switch($agi->get_variable('QUEUESTATUS',true))
@@ -786,7 +786,7 @@ class A2Billing {
 	/*
 	 * function to let audable not answer status
 	 */
-	function let_stream_listening($agi, $play_anyway=false, $ringing=false)
+	public function let_stream_listening($agi, $play_anyway=false, $ringing=false)
 	{
 		if (array_search($agi -> channel_status('',true), array(AST_STATE_UP, AST_STATE_DOWN)) === false
 		&& $this -> streamfirst && !$this -> agiconfig['answer_call'] && ($this -> agiconfig['play_audio'] || $play_anyway)) {
@@ -804,7 +804,7 @@ class A2Billing {
 	/*
 	 * intialize evironement variables from the agi values
 	 */
-	function get_agi_request_parameter($agi)
+	public function get_agi_request_parameter($agi)
 	{
 		$this -> CallerID = $this -> src	= $agi -> request['agi_callerid'];
 //		if (!is_numeric($this -> src) || strlen($this -> src) > 4)
@@ -832,7 +832,7 @@ class A2Billing {
 	/*
 	 *	function to find the cid number
 	 */
-	function isolate_cid()
+	public function isolate_cid()
 	{
 		$pos_lt = strpos($this->CallerID, '<');
 		$pos_gt = strpos($this->CallerID, '>');
@@ -859,7 +859,7 @@ class A2Billing {
 	/*
 	 *	function would set when the card is used or when it release
 	 */
-	function callingcard_acct_start_inuse($agi, $inuse)
+	public function callingcard_acct_start_inuse($agi, $inuse)
 	{
 		$upd_balance = 0;
 		if (is_numeric($this->agiconfig['dial_balance_reservation'])) {
@@ -882,7 +882,7 @@ class A2Billing {
 	/*
 	 *	function enough_credit_to_call
 	 */
-	function enough_credit_to_call(&$agi = NULL, &$RateEngine = NULL)
+	public function enough_credit_to_call(&$agi = NULL, &$RateEngine = NULL)
 	{	
 		if ($this->typepaid == 0) {
 //if (!isset($RateEngine -> ratecard_obj[0][72]))		$this -> debug( ERROR, $agi, __FILE__, __LINE__, "[Ratecard_Obj is not set]");
@@ -917,7 +917,7 @@ class A2Billing {
 		}
 	}
 
-	function margin_calculate($cardid = NULL, $margin = 1)
+	public function margin_calculate($cardid = NULL, $margin = 1)
 	{
 		if (is_null($cardid)) $cardid = $this->id_card;
 		while ($cardid > 0) {
@@ -936,7 +936,7 @@ class A2Billing {
      *  @param float $credit
      *  @return 1 if Ok ; -1 if error
 	**/
-	function callingcard_ivr_authorize($agi, &$RateEngine, $try_num = 0, $call2did = false, $callertodidcredit = NULL)
+	public function callingcard_ivr_authorize($agi, &$RateEngine, $try_num = 0, $call2did = false, $callertodidcredit = NULL)
 	{
 		$res=0;
 		$this -> caller_concat_id = 0;
@@ -1396,7 +1396,7 @@ class A2Billing {
      *  @param integer $try_num
      *  @return 1 if Ok ; -1 if error
 	**/
-	function call_sip_iax_buddy($agi, &$RateEngine, $try_num)
+	public function call_sip_iax_buddy($agi, &$RateEngine, $try_num)
 	{
 		$res = 0;
 
@@ -1559,7 +1559,7 @@ class A2Billing {
 		return -1;
 	}
 
-	function ivr_did ($agi)
+	public function ivr_did ($agi)
 	{
 		$this -> let_stream_listening($agi, true);
 		$agi -> exec('Playtones ring');
@@ -1596,7 +1596,7 @@ class A2Billing {
         /*
          *      function would set when the did_destination is used or when it release
          */
-        function destination_start_inuse($agi, $id, $inuse) {
+        public function destination_start_inuse($agi, $id, $inuse) {
 
                 if ($inuse) {
 			$QUERY = "SELECT id FROM cc_did_destination WHERE id=$id AND (destmaxuse-destinuse>0 OR destmaxuse<0)";
@@ -1615,7 +1615,7 @@ class A2Billing {
                 return false; // Destination is available
         }
 
-	function is_voip ($setur)
+	public function is_voip ($setur)
 	{
 	    if (stripos($setur,"QUEUE ") === 0 || strpos($setur,"/") > 2)
 		return true;
@@ -1629,7 +1629,7 @@ class A2Billing {
 // '-3' - ничего не нажато, выход на destinationnum
 // '-4' - нажато не верно,  выход на destinationnum
 // '-5' - выбран extension
-	function ivr (&$agi,&$instdest,&$initdest,&$isvoip)
+	public function ivr (&$agi,&$instdest,&$initdest,&$isvoip)
 	{
 		$instdest = $initdest;
 		$QUERY = "SELECT DISTINCT cc_ivr_destinations.id, repeats, waitsecsfordigits, waitdigits, destinationnum, playsoundcallee, cc_ivr.id
@@ -1910,7 +1910,7 @@ class A2Billing {
 
      *  @return 1 if Ok ; -1 if error
 	**/
-	function call_did ($agi, &$RateEngine, $listdestination)
+	public function call_did ($agi, &$RateEngine, $listdestination)
 	{
 		$res=0;
 		$this->agiconfig['say_balance_after_auth'] = 0;
@@ -2287,7 +2287,7 @@ $this -> debug( ERROR, $agi, __FILE__, __LINE__, "[ \033[1;34m".$bridgepeer." ".
 	}
 
 	
-    function call_2did ($agi, &$RateEngine, $listdestination, $alegfree = false)
+    public function call_2did ($agi, &$RateEngine, $listdestination, $alegfree = false)
     {
     	$card_number = $this -> username; // username of the caller
         $nbused = $this -> nbused;
@@ -2725,7 +2725,7 @@ else
 		$this->id_card			= $my_id_card;
     }
 
-	function send_talk(&$agi,$mailaddr,$audioFile,$answeredtime,$languageCode='not_set',$calldestination=NULL)
+	public function send_talk(&$agi,$mailaddr,$audioFile,$answeredtime,$languageCode='not_set',$calldestination=NULL)
 	{
 		if ($answeredtime<2 || $audioFile=="" || $mailaddr=="") return false;
 		if ($calldestination) {
@@ -2759,7 +2759,7 @@ else
 //		$this -> debug( INFO, $agi, __FILE__, __LINE__, "[Recognize spool inserted]");
 	}
 
-	function google_recognize($idcard,$send_sound,$send_text,$save_sound,$src,$dst,$mailaddr,$audioFile,$answeredtime,$languageCode)
+	public function google_recognize($idcard,$send_sound,$send_text,$save_sound,$src,$dst,$mailaddr,$audioFile,$answeredtime,$languageCode)
 	{
 		$retcode = 1;
 		if (strlen($languageCode)<5 || $languageCode=='not_set') {
@@ -2968,7 +2968,7 @@ else
 	 *
      *  @return answered time
 	**/
-	function call_fax (&$agi, $didcall=0)
+	public function call_fax (&$agi, $didcall=0)
 	{
 		if ($agi -> channel_status('',true) == AST_STATE_DOWN) return 0;
 		$calleridname = $agi->get_variable('CALLERID(name)', true);
@@ -3080,7 +3080,7 @@ $this -> debug( ERROR, $agi, __FILE__, __LINE__, "FAXRESOLUTION: ".$faxresolutio
 	/*
 	 * Function to bill the A-Leg on DID Calls
 	 */
-	function bill_did_aleg ($agi, $inst_listdestination, $b_leg_answeredtime = 0)
+	public function bill_did_aleg ($agi, $inst_listdestination, $b_leg_answeredtime = 0)
 	{
 //$this -> debug( ERROR, $agi, __FILE__, __LINE__, "========================== channel_status= ".$agi -> channel_status('',true));
 //	    while ($agi -> channel_status('',true) != AST_STATE_DOWN) {
@@ -3252,7 +3252,7 @@ $this -> debug( ERROR, $agi, __FILE__, __LINE__, "FAXRESOLUTION: ".$faxresolutio
     }
 
 
-    function fct_say_time_2_call($agi,$timeout,$rate=0,$addtimeout=0)
+    public function fct_say_time_2_call($agi,$timeout,$rate=0,$addtimeout=0)
     {
          // set destination and timeout
         // say 'you have x minutes and x seconds'
@@ -3326,7 +3326,7 @@ $this -> debug( ERROR, $agi, __FILE__, __LINE__, "FAXRESOLUTION: ".$faxresolutio
      *  @param float $credit
      *  @return nothing
 	**/
-	function fct_say_balance ($agi, $credit, $fromvoucher = 0)
+	public function fct_say_balance ($agi, $credit, $fromvoucher = 0)
 	{
 		global $currencies_list;
 		$ed = '0123456789#';
@@ -3450,7 +3450,7 @@ $this -> debug( ERROR, $agi, __FILE__, __LINE__, "FAXRESOLUTION: ".$faxresolutio
 	 *  @param float $rate
 	 *  @return nothing
 	 **/
-	function fct_say_rate ($agi, $rate)
+	public function fct_say_rate ($agi, $rate)
 	{
 		global $currencies_list;
 
@@ -3549,7 +3549,7 @@ $this -> debug( ERROR, $agi, __FILE__, __LINE__, "FAXRESOLUTION: ".$faxresolutio
 
      *  @return 1 if Ok ; -1 if error
 	**/
-	function refill_card_with_voucher ($agi, $try_num)
+	public function refill_card_with_voucher ($agi, $try_num)
 	{
 		global $currencies_list;
 
@@ -3615,7 +3615,7 @@ $this -> debug( ERROR, $agi, __FILE__, __LINE__, "FAXRESOLUTION: ".$faxresolutio
 	/*
 	 * Function to generate a cardnumber
 	 */
-	function MDP( $chrs = 10 )
+	public function MDP( $chrs = 10 )
 	{
 		$pwd = "";
 		 mt_srand ((double) microtime() * 1000000);
@@ -3639,7 +3639,7 @@ $this -> debug( ERROR, $agi, __FILE__, __LINE__, "FAXRESOLUTION: ".$faxresolutio
 	 *  @return integer number of seconds used of FT2C package so far in this period
 	 **/
 
-   function number_free_calls_used($DBHandle, $id_cc_card, $id_cc_package_offer, $billingtype, $startday) {
+   public function number_free_calls_used($DBHandle, $id_cc_card, $id_cc_package_offer, $billingtype, $startday) {
    	
    		if ($billingtype == 0) {
 			// PROCESSING FOR MONTHLY
@@ -3686,7 +3686,7 @@ $this -> debug( ERROR, $agi, __FILE__, __LINE__, "FAXRESOLUTION: ".$faxresolutio
 	 *  @param integer $startday
 	 *  @return integer number of seconds used of FT2C package so far in this period
 	 **/
-	function FT2C_used_seconds($DBHandle, $id_cc_card, $id_cc_package_offer, $billingtype, $startday)
+	public function FT2C_used_seconds($DBHandle, $id_cc_card, $id_cc_package_offer, $billingtype, $startday)
 	{
 		if ($billingtype == 0) {
 			// PROCESSING FOR MONTHLY
@@ -3732,7 +3732,7 @@ $this -> debug( ERROR, $agi, __FILE__, __LINE__, "FAXRESOLUTION: ".$faxresolutio
 	/*
 	 * Function apply_rules to the phonenumber : Remove internation prefix
 	 */
-	function apply_rules ($phonenumber)
+	public function apply_rules ($phonenumber)
 	{
 		if ($phonenumber != '-1') {
 		    $phonenumber = strpbrk(substr($phonenumber,0,1),"+") . preg_replace ("/(^[a-z].*)|[^\d]/i","$1",$phonenumber);
@@ -3749,7 +3749,7 @@ $this -> debug( ERROR, $agi, __FILE__, __LINE__, "FAXRESOLUTION: ".$faxresolutio
 		return $phonenumber;
 	}
 
-	function apply_cid_rules ($cidnumber,$remadd,$addint)
+	public function apply_cid_rules ($cidnumber,$remadd,$addint)
 	{
 		$cidbirth = $cidnumber;
 		$remadd = explode(",",$remadd);
@@ -3766,7 +3766,7 @@ $this -> debug( ERROR, $agi, __FILE__, __LINE__, "FAXRESOLUTION: ".$faxresolutio
 		return $cidnumber;
 	}
 
-	function did_apply_add_countryprefixfrom($result,$phonenumber)
+	public function did_apply_add_countryprefixfrom($result,$phonenumber)
 	{
 	    if (is_numeric($phonenumber)) {
 		$areaprefix	= $result[0];
@@ -3791,7 +3791,7 @@ $this -> debug( ERROR, $agi, __FILE__, __LINE__, "FAXRESOLUTION: ".$faxresolutio
 	/*
 	 * Function apply_add_countryprefixto the phonenumber 
 	 */
-	function apply_add_countryprefixto ($phonenumber)
+	public function apply_add_countryprefixto ($phonenumber)
 	{
 		if ($this->agiconfig['local_dialing_addcountryprefix']==1) {
 
@@ -3821,7 +3821,7 @@ $this -> debug( ERROR, $agi, __FILE__, __LINE__, "FAXRESOLUTION: ".$faxresolutio
 	 * Function callingcard_cid_sanitize : Ensure the caller is allowed to use their claimed CID.
 	 * Returns: clean CID value, possibly empty.
 	 */
-	function callingcard_cid_sanitize($agi)
+	public function callingcard_cid_sanitize($agi)
 	{
 		$this -> debug( DEBUG, $agi, __FILE__, __LINE__, "[CID_SANITIZE - CID:".$this->CallerID."]");
 
@@ -3874,7 +3874,7 @@ $this -> debug( ERROR, $agi, __FILE__, __LINE__, "FAXRESOLUTION: ".$faxresolutio
 	}
 
 
-	function callingcard_auto_setcallerid($agi)
+	public function callingcard_auto_setcallerid($agi)
 	{
 		// AUTO SetCallerID
 		$this -> debug( DEBUG, $agi, __FILE__, __LINE__, "[AUTO SetCallerID]");
@@ -3920,7 +3920,7 @@ $this -> debug( ERROR, $agi, __FILE__, __LINE__, "FAXRESOLUTION: ".$faxresolutio
 	}
 
 
-	function update_callback_campaign($agi)
+	public function update_callback_campaign($agi)
 	{
 		$now = time();
 		$username = $agi->get_variable("USERNAME", true);
@@ -3970,7 +3970,7 @@ $this -> debug( ERROR, $agi, __FILE__, __LINE__, "FAXRESOLUTION: ".$faxresolutio
 		$this->instance_table -> SQLExec ($this -> DBHandle, $QUERY_CALL);
 	}
 
-	function callingcard_ivr_authenticate($agi,$accountback=0)
+	public function callingcard_ivr_authenticate($agi,$accountback=0)
 	{
 		global $currencies_list;
 
@@ -4740,7 +4740,7 @@ $this -> debug( ERROR, $agi, __FILE__, __LINE__, "FAXRESOLUTION: ".$faxresolutio
 	}
 
 
-	function callingcard_ivr_authenticate_light (&$error_msg,$simbalance=0) {
+	public function callingcard_ivr_authenticate_light (&$error_msg,$simbalance=0) {
 		
 		$res=0;
 		$QUERY = "SELECT credit, tariff, activated, inuse, simultaccess, typepaid, creditlimit, language, removeinterprefix, redial, enableexpire, " .
@@ -4852,7 +4852,7 @@ $this -> debug( ERROR, $agi, __FILE__, __LINE__, "FAXRESOLUTION: ".$faxresolutio
 	 * to switch the Callplan from a customer : callplan_deck_minute_threshold
 	 *
 	 */
-	function deck_switch($agi)
+	public function deck_switch($agi)
 	{
 		if (strpos($this->agiconfig['callplan_deck_minute_threshold'], ',') === false) 
 			return false;
@@ -4920,7 +4920,7 @@ $this -> debug( ERROR, $agi, __FILE__, __LINE__, "FAXRESOLUTION: ".$faxresolutio
 	 * Function DbConnect
 	 * Returns: true / false if connection has been established
 	 */
-	function DbConnect()
+	public function DbConnect()
 	{
 		$ADODB_CACHE_DIR = '/tmp';
 		/*	$ADODB_FETCH_MODE = ADODB_FETCH_ASSOC;	*/
@@ -4950,7 +4950,7 @@ $this -> debug( ERROR, $agi, __FILE__, __LINE__, "FAXRESOLUTION: ".$faxresolutio
      * Function DbReConnect
      * Returns: true / false if connection has been established
      */
-	function DbReConnect($agi)
+	public function DbReConnect($agi)
 	{
 		$res = $this->DBHandle -> Execute("select 1");
 		if (!$res) {
@@ -4992,7 +4992,7 @@ $this -> debug( ERROR, $agi, __FILE__, __LINE__, "FAXRESOLUTION: ".$faxresolutio
 	/*
 	 * Function DbDisconnect
 	 */
-	function DbDisconnect()
+	public function DbDisconnect()
 	{
 		$this -> DBHandle -> disconnect();
 	}
@@ -5003,7 +5003,7 @@ $this -> debug( ERROR, $agi, __FILE__, __LINE__, "FAXRESOLUTION: ".$faxresolutio
 	 * used by parameter like interval_len_cardnumber : 8-10, 12-18, 20
 	 * it will build an array with the different interval
 	 */
-	function splitable_data ($splitable_value)
+	public function splitable_data ($splitable_value)
 	{
 		$arr_splitable_value = explode(",", $splitable_value);
 		foreach ($arr_splitable_value as $arr_value) {
@@ -5030,7 +5030,7 @@ $this -> debug( ERROR, $agi, __FILE__, __LINE__, "FAXRESOLUTION: ".$faxresolutio
 		return $arr_value_to_import;
 	}
 
-	function save_redial_number($agi, $number)
+	public function save_redial_number($agi, $number)
 	{
 		if (($this->mode == 'did') || ($this->mode == 'callback')) {
 		    return;
@@ -5040,7 +5040,7 @@ $this -> debug( ERROR, $agi, __FILE__, __LINE__, "FAXRESOLUTION: ".$faxresolutio
 		$this -> debug( DEBUG, $agi, __FILE__, __LINE__, "[SAVING DESTINATION FOR REDIAL: SQL: {$QUERY}]:[result: {$result}]");
 	}
 	
-	function run_dial($agi, $dialstr)
+	public function run_dial($agi, $dialstr)
 	{
 		$dialstr = $this -> format_parameters ($dialstr);
 		
@@ -5064,7 +5064,7 @@ $this -> debug( ERROR, $agi, __FILE__, __LINE__, "FAXRESOLUTION: ".$faxresolutio
 	/*
 	 * This function to set the parameters separator according the asterisk version
 	 */
-	function format_parameters ($parameters)
+	public function format_parameters ($parameters)
 	{
 		$sepafter = ($this->config['global']['asterisk_version'] == "1_2" || $this->config['global']['asterisk_version'] == "1_4")?'|':',';
 		$sepbefore = ($sepafter == "|")?',':'|';
@@ -5082,7 +5082,7 @@ $this -> debug( ERROR, $agi, __FILE__, __LINE__, "FAXRESOLUTION: ".$faxresolutio
 		return $parameters;
 	}
 
-	function calculate_time_condition($now,$timeinterval,$type)
+	public function calculate_time_condition($now,$timeinterval,$type)
 	{
 		$week_range=array(
 		'mon' => 1,
@@ -5250,7 +5250,7 @@ $this -> debug( ERROR, $agi, __FILE__, __LINE__, "FAXRESOLUTION: ".$faxresolutio
 		return $final_result_set;
 	}
 
-	function extract_cond_values($value){
+	public function extract_cond_values($value){
 		$rows=explode("\n",$value);
 		$i=0;
 		foreach ($rows as $row){
@@ -5275,7 +5275,7 @@ $this -> debug( ERROR, $agi, __FILE__, __LINE__, "FAXRESOLUTION: ".$faxresolutio
 		return $output;
 	}
 
-	function resolve($name) {
+	public function resolve($name) {
 		// reads informations over the path
 		$info = pathinfo($name);
 		if (!empty($info['extension'])) {

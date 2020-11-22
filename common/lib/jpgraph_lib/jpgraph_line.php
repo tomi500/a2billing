@@ -24,20 +24,20 @@ DEFINE("LP_AREA_NO_BORDER",true);
 // Description: 
 //===================================================
 class LinePlot extends Plot{
-    var $filled=false;
-    var $fill_color='blue';
-    var $mark=null;
-    var $step_style=false, $center=false;
-    var $line_style=1;	// Default to solid
-    var $filledAreas = array(); // array of arrays(with min,max,col,filled in them)
-    var $barcenter=false;  // When we mix line and bar. Should we center the line in the bar.
-    var $fillFromMin = false ;
-    var $fillgrad=false,$fillgrad_fromcolor='navy',$fillgrad_tocolor='silver',$fillgrad_numcolors=100;
-    var $iFastStroke=false;
+    protected $filled=false;
+    protected $fill_color='blue';
+    public $mark=null;
+    protected $step_style=false, $center=false;
+    protected $line_style=1;	// Default to solid
+    protected $filledAreas = array(); // array of arrays(with min,max,col,filled in them)
+    public $barcenter=false;  // When we mix line and bar. Should we center the line in the bar.
+    protected $fillFromMin = false ;
+    protected $fillgrad=false,$fillgrad_fromcolor='navy',$fillgrad_tocolor='silver',$fillgrad_numcolors=100;
+    protected $iFastStroke=false;
 
 //---------------
 // CONSTRUCTOR
-    function LinePlot(&$datay,$datax=false) {
+    function __construct(&$datay,$datax=false) {
 	$this->Plot($datay,$datax);
 	$this->mark = new PlotMark();
     }
@@ -390,10 +390,10 @@ class LinePlot extends Plot{
 // Description: 
 //===================================================
 class AccLinePlot extends Plot {
-    var $plots=null,$nbrplots=0,$numpoints=0;
+    protected $plots=null,$nbrplots=0,$numpoints=0;
 //---------------
 // CONSTRUCTOR
-    function AccLinePlot($plots) {
+    function __construct($plots) {
         $this->plots = $plots;
 	$this->nbrplots = count($plots);
 	$this->numpoints = $plots[0]->numpoints;		

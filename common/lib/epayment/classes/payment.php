@@ -11,10 +11,10 @@
 */
         
 Class payment {
-    var $modules, $selected_module;
+    public $modules, $selected_module;
 
 	// class constructor
-    function payment($module = '') {
+    public function __construct($module = '') {
       global $payment, $language, $PHP_SELF;
       $instance_sub_table = new Table("cc_payment_methods", "payment_filename");
       $DBHandle  = DbConnect();
@@ -67,7 +67,7 @@ Class payment {
    payment modules available which would break the modules in the contributions
    section. This should be looked into again post 2.2.
 */
-    function update_status() {
+    public function update_status() {
       if (is_array($this->modules)) {
         if (is_object($GLOBALS[$this->selected_module])) {
           if (method_exists($GLOBALS[$this->selected_module], 'update_status')) {
@@ -77,7 +77,7 @@ Class payment {
       }
     }
 
-    function javascript_validation() {
+    public function javascript_validation() {
       $js = '';
       if (is_array($this->modules)) {
         $js = '<script language="javascript"><!-- ' . "\n" .
@@ -122,7 +122,7 @@ Class payment {
       return $js;
     }
 
-    function selection() {
+    public function selection() {
       $selection_array = array();
       if (is_array($this->modules)) {
         reset($this->modules);
@@ -137,7 +137,7 @@ Class payment {
       return $selection_array;
     }
 
-    function pre_confirmation_check() {
+    public function pre_confirmation_check() {
       if (is_array($this->modules)) {
         if (is_object($GLOBALS[$this->selected_module]) && ($GLOBALS[$this->selected_module]->enabled) ) {
           $GLOBALS[$this->selected_module]->pre_confirmation_check();
@@ -145,14 +145,14 @@ Class payment {
       }
     }
 
-    function confirmation() {
+    public function confirmation() {
       if (is_array($this->modules)) {
         if (is_object($GLOBALS[$this->selected_module]) && ($GLOBALS[$this->selected_module]->enabled) ) {
           return $GLOBALS[$this->selected_module]->confirmation();
         }
       }
     }
-    function get_CurrentCurrency()
+    public function get_CurrentCurrency()
     {
         if (is_array($this->modules)) {
         if (is_object($GLOBALS[$this->selected_module]) && ($GLOBALS[$this->selected_module]->enabled) ) {
@@ -160,7 +160,7 @@ Class payment {
         }
       }
     }
-    function keys()
+    public function keys()
     {  
         if (is_array($this->modules)) {
         if (is_object($GLOBALS[$this->selected_module]) && ($GLOBALS[$this->selected_module]->enabled) ) {
@@ -168,7 +168,7 @@ Class payment {
         }
       }
     }
-    function get_OrderStatus()
+    public function get_OrderStatus()
     {
         if (is_array($this->modules)) {
         if (is_object($GLOBALS[$this->selected_module]) && ($GLOBALS[$this->selected_module]->enabled) ) {
@@ -176,7 +176,7 @@ Class payment {
         }
       }
     }
-    function process_button($trans_id = 0, $key) {
+    public function process_button($trans_id = 0, $key) {
       if (is_array($this->modules)) {
         if (is_object($GLOBALS[$this->selected_module]) && ($GLOBALS[$this->selected_module]->enabled) ) {
           return $GLOBALS[$this->selected_module]->process_button($trans_id, $key);
@@ -184,7 +184,7 @@ Class payment {
       }
     }
 
-    function before_process() {
+    public function before_process() {
       if (is_array($this->modules)) {
         if (is_object($GLOBALS[$this->selected_module]) && ($GLOBALS[$this->selected_module]->enabled) ) {
           return $GLOBALS[$this->selected_module]->before_process();
@@ -192,7 +192,7 @@ Class payment {
       }
     }
 
-    function after_process() {
+    public function after_process() {
       if (is_array($this->modules)) {
         if (is_object($GLOBALS[$this->selected_module]) && ($GLOBALS[$this->selected_module]->enabled) ) {
           return $GLOBALS[$this->selected_module]->after_process();
@@ -200,7 +200,7 @@ Class payment {
       }
     }
 
-    function get_error() {
+    public function get_error() {
       if (is_array($this->modules)) {
         if (is_object($GLOBALS[$this->selected_module]) && ($GLOBALS[$this->selected_module]->enabled) ) {
           return $GLOBALS[$this->selected_module]->get_error();

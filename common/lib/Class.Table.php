@@ -98,15 +98,15 @@ class Table {
 	public $query_handler		= null;
 
 	/* CONSTRUCTOR */
-	public function __construct ($table = null, $liste_fields = null,  $fk_Tables = null, $fk_Fields = null, $id_Value = null, $fk_del_upd = true, $table_count = null)
+	public function __construct ($table = null, $liste_fields = null,  $fk_Tables = [], $fk_Fields = [], $id_Value = null, $fk_del_upd = true, $table_count = null)
 	{
-        $this->writelog = defined('WRITELOG_QUERY') ? WRITELOG_QUERY : false;
-		$this -> table = $table;
-		$this -> table_count = $table_count;
-		$this -> fields = $liste_fields;
-		$this -> mytopg = new MytoPg(0); // debug level 0 logs only >30ms CPU hogs
+		$this -> writelog	= defined('WRITELOG_QUERY') ? WRITELOG_QUERY : false;
+		$this -> table		= $table;
+		$this -> table_count	= $table_count;
+		$this -> fields 	= $liste_fields;
+		$this -> mytopg 	= new MytoPg(0); // debug level 0 logs only >30ms CPU hogs
 		
-		if ($fk_Fields && count($fk_Fields) > 0 && count($fk_Tables) == count($fk_Fields)) {
+		if (count($fk_Fields) > 0 && count($fk_Tables) == count($fk_Fields)) {
 			$this -> FK_TABLES = $fk_Tables;
 			$this -> FK_EDITION_CLAUSE = $fk_Fields;
 			$this -> FK_DELETE = $fk_del_upd;
@@ -118,13 +118,13 @@ class Table {
 	}
 	
 	/* MODIFY PROPRIETY*/
-	function Define_fields ($liste_fields )
+	public function Define_fields ($liste_fields )
 	{
 		$this -> fields = $liste_fields;
 	}
 
 
-	function Define_table ($table)
+	public function Define_table ($table)
 	{
 		$this -> table = $table;
 	}
@@ -132,7 +132,7 @@ class Table {
 	/*
 	 * ExecuteQuery
 	 */
-	function ExecuteQuery ($DBHandle, $QUERY, $cache = 0)
+	public function ExecuteQuery ($DBHandle, $QUERY, $cache = 0)
 	{
 		global $A2B;
 		
@@ -187,7 +187,7 @@ class Table {
 	// If $select is not supplied then function check numrows
 	// so expect a SELECT query.
 
-	function SQLExec ($DBHandle, $QUERY, $select = 1, $cache = 0)
+	public function SQLExec ($DBHandle, $QUERY, $select = 1, $cache = 0)
 	{
 		$res = $this -> ExecuteQuery ($DBHandle, $QUERY, $cache);
 		if (!$res) return false;
@@ -208,7 +208,7 @@ class Table {
 	}
 
 
-	function Get_list ($DBHandle, $clause = NULL, $order = NULL, $sens = NULL, $field_order_letter = NULL, $letters = NULL, $limite = NULL, $current_record = NULL, $sql_group= NULL, $cache = 0)
+	public function Get_list ($DBHandle, $clause = NULL, $order = NULL, $sens = NULL, $field_order_letter = NULL, $letters = NULL, $limite = NULL, $current_record = NULL, $sql_group= NULL, $cache = 0)
 	{
 		$sql = 'SELECT '.$this -> fields.' FROM '.trim($this -> table);
 		$sql_clause='';
@@ -268,7 +268,7 @@ class Table {
 	}
 
 
-	function Table_count ($DBHandle, $clause=null, $id_Value = null, $cache = 0, $grouping = true)
+	public function Table_count ($DBHandle, $clause=null, $id_Value = null, $cache = 0, $grouping = true)
 	{
 		if (!is_null($this -> table_count))
 			$sql = 'SELECT count(*) FROM '.trim($this -> table_count);
@@ -299,7 +299,7 @@ class Table {
 	}
 
 
-	function Add_table ($DBHandle, $value, $func_fields = null, $func_table = null, $id_name = null, $subquery = false, $priority = null) {
+	public function Add_table ($DBHandle, $value, $func_fields = null, $func_table = null, $id_name = null, $subquery = false, $priority = null) {
 		if ($func_fields!="") {
 			$this -> fields = $func_fields;
 		}
@@ -348,7 +348,7 @@ class Table {
 	}
 
 
-	function Update_table ($DBHandle, $param_update, $clause, $func_table = null)
+	public function Update_table ($DBHandle, $param_update, $clause, $func_table = null)
 	{
 		
 		if ($func_table !="")
@@ -362,7 +362,7 @@ class Table {
 
 
 
-	function Delete_table ($DBHandle, $clause, $func_table = null)
+	public function Delete_table ($DBHandle, $clause, $func_table = null)
 	{
 		
 		if ($func_table !="")
@@ -388,34 +388,28 @@ class Table {
 	}
 
 
-    function Delete_Selected ($DBHandle, $clause=null, $order=null, $sens=null, $field_order_letter=null, $letters = null, $limite=null, $current_record=NULL, $sql_group= NULL)
+	public function Delete_Selected ($DBHandle, $clause=null, $order=null, $sens=null, $field_order_letter=null, $letters = null, $limite=null, $current_record=NULL, $sql_group= NULL)
 	{
 		$sql = 'DELETE FROM '.trim($this -> table);
-
 		$sql_clause='';
 		if ($clause!='') {
 			$sql_clause=' WHERE '.$clause;
 		}
-
 		$sqlletters = "";
 		if (!is_null ($letters) && (preg_match("/^[A-Za-z]+$/", $letters)) && !is_null ($field_order_letter) && ($field_order_letter!='') ) {
 			$sql_letters= ' (".$field_order_letter." LIKE \''.strtolower($letters).'%\') ';
-            
 			if ($sql_clause != "") {
 				$sql_clause .= " AND ";
 			} else {
 				$sql_clause .= " WHERE ";
 			}
 		}
-
-        $QUERY = $sql.$sql_clause;
-		
+		$QUERY = $sql.$sql_clause;
 		$res = $this -> ExecuteQuery ($DBHandle, $QUERY, 0);
-		
 		return ($res);
 	}
 	
-	function logQuery($sql, $start) {
+	public function logQuery($sql, $start) {
 		if (count($this->query_handler->queries) < 100) {
 			$query = array(
 					'sql' => $sql,
@@ -425,7 +419,7 @@ class Table {
 		}
 	}
 	
-	function getTime() {
+	public function getTime() {
 		$time = microtime();
 		$time = explode(' ', $time);
 		$time = $time[1] + $time[0];
