@@ -1983,12 +1983,10 @@ $A2B -> debug( ERROR, $agi, __FILE__, __LINE__, 'set_callerid "'.$calleridname.'
 				    $amicmd[3] = substr_replace($amicmd[3],"RATECARD={$this->ratecard_obj[$k][6]},TRUNK={$this->usedtrunk},TD={$this->td}",strpos($amicmd[3],"RATECARD")).",ACTIONID={$ast->actionid},CID={$amicmd[2]}";
 				    $res = $ast -> Originate($channel,$amicmd[0],$amicmd[6],$amicmd[1],NULL,NULL,
 								$A2B -> config['callback']['timeout']*1000,$amicmd[2],$amicmd[3],$amicmd[4],true,$amicmd[5]);
-				    write_log(LOGFILE_API_CALLBACK, " ActionID = {$amicmd[5]} [#### RESULT AMI ORIGINATE       ####] ".var_export($res, true));
-				    $ast->log("ActionID = {$amicmd[5]} [#### RESULT AMI ORIGINATE       ####] ".var_export($res, true));
+				    write_log(LOGFILE_API_CALLBACK, " ActionID = {$amicmd[5]} [#### RESULT AMI ORIGINATE       ####] \r\n".var_export($res, true));
 				    if ($res['Response'] == "Success") {
 					write_log(LOGFILE_API_CALLBACK, " ActionID = {$amicmd[5]} [#### Starting AMI WAIT_RESPONSE ####] $channel ");
-					$ast->log("ActionID = {$amicmd[5]} [#### Starting AMI WAIT_RESPONSE ####] $channel / res= ".var_export($res, true));
-					$response = $ast -> wait_response(true, $ast -> actionid);
+					$response = $ast -> wait_response(true);
 					$this->dialstatus = $response[1];
 					if ($this->dialstatus == "ANSWER" && $amicmd[7] >= 0) {
 						$res = $ast -> AbsoluteTimeout($response[2], $amicmd[7]-0.2);

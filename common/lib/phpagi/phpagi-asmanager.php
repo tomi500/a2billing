@@ -169,8 +169,9 @@
 
     function read_one_msg($allow_timeout = false)
     {
+     $timeout = false;
+     do {
       $type = null;
-
       do {
         $buf = fgets($this->socket, 4096);
         if ($buf===false) {
@@ -246,6 +247,7 @@
 //          $this->log('Unhandled response packet from Manager: ' . print_r($parameters, true));
           break;
       }
+     } while($type != 'response' && !$timeout);
 
       return $parameters;
     }
@@ -267,7 +269,7 @@
           $res = $this->read_one_msg($allow_timeout);
         } while (!( isset($res['ActionID']) && $res['ActionID']==$actionid ));
       } else {
-        $res = $this->read_one_msg($allow_timeout);
+	$res = $this->read_one_msg($allow_timeout);
         return $res;
       }
 
@@ -906,6 +908,8 @@
       {
 //        $this->log("Execute handler $handler");
         $ret = $handler($e, $parameters, $this->server, $this->port, $this);
+      } elseif (is_array($handler)) {
+        $ret = call_user_func($handler, $e, $parameters, $this->server, $this->port);
       }
 //      else
 //        $this->log("No event handler for event '$e'");
