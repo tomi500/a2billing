@@ -541,6 +541,7 @@ class FormHandler
 		
 		$json_data = $_POST["json_data"];
 		if (isset($json_data)) {
+			$json_data = stripslashes($json_data);
 			$this->_vars = json_decode($json_data,true,512);
 		} else {
 			$this->_vars = array_merge((array)$_GET, (array)$_POST);
@@ -718,9 +719,9 @@ class FormHandler
 			if (!(stripos($input, ' or 1')===FALSE)) { return false;}
 			if (!(stripos($input, ' or true')===FALSE)) { return false;}
 	    	
-	        if (get_magic_quotes_gpc()) {
+//	        if (get_magic_quotes_gpc()) {
 	            $input = stripslashes($input);
-	        }
+//	        }
 	        $input  = $this -> cleanInput($input);
 	        
 	        $output = addslashes( $input );

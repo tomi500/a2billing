@@ -299,11 +299,8 @@ function sanitize_data($input) {
 			return false;
 		}
 
-		if (get_magic_quotes_gpc()) {
-			$input = stripslashes($input);
-		}
-		$input = cleanInput($input);
-		
+		$input  = stripslashes($input);
+		$input  = cleanInput($input);
 		$output = addslashes($input);
 	}
 

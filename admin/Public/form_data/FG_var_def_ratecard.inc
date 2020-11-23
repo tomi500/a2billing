@@ -33,8 +33,10 @@
 
 // put all the destination name to lowercase
 $json_data = $_POST["json_data"];
-if (isset($json_data))		extract(json_decode($json_data,true,512));
-else
+if (isset($json_data)) {
+    $json_data = stripslashes($json_data);
+    extract(json_decode($json_data,true,512));
+} else
 getpost_ifset(array('id', 'idtariffplan', 'dialprefix', 'destination', 'buyrate', 'buyrateinitblock',
 'buyrateincrement', 'rateinitial', 'initblock', 'billingblock', 'connectcharge', 'disconnectcharge','disconnectcharge_after',
 'stepchargea', 'chargea', 'timechargea', 'billingblocka', 'stepchargeb', 'chargeb', 'timechargeb', 'out_of_intern_prefix_for_sure',

@@ -208,7 +208,7 @@ if (!isset ($disable_load_conf) || !($disable_load_conf)) {
 	</tr>
 	</table>';
 	
-	for ($index = 0; $index < sizeof($payment_methods); $index++) {
+	if ($payment_methods) for ($index = 0; $index < sizeof($payment_methods); $index++) {
 		if ($payment_methods[$index][0] == "MODULE_PAYMENT_PAYPAL_BASIC_STATUS") {
 			$show_logo .= $SPOT['paypal'] . ' &nbsp; ';
 		}

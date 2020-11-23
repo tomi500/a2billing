@@ -33,9 +33,12 @@
 
 
 $json_data = $_POST["json_data"];
-if (isset($json_data))		extract(json_decode($json_data,true,512));
-else
-getpost_ifset(array('id', 'tariffname', 'startingdate', 'expirationdate', 'description', 'dnidprefix', 'calleridprefix', 'id_trunk', 'id_seller', 'sellerdialprefix', 'tariff_lcr'));
+if (isset($json_data)) {
+	$json_data = stripslashes($json_data);
+	extract(json_decode($json_data,true,512));
+} else {
+	getpost_ifset(array('id', 'tariffname', 'startingdate', 'expirationdate', 'description', 'dnidprefix', 'calleridprefix', 'id_trunk', 'id_seller', 'sellerdialprefix', 'tariff_lcr'));
+}
 
 $HD_Form = new FormHandler("cc_tariffplan","Ratecard");
 

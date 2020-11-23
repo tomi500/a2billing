@@ -1,9 +1,12 @@
 <?php
 
 $json_data = $_POST["json_data"];
-if (isset($json_data))		extract(json_decode($json_data,true,512));
-else
-getpost_ifset(array('id', 'exten_leg_a', 'exten', 'max_attempt'));
+if (isset($json_data)) {
+	$json_data = stripslashes($json_data);
+	extract(json_decode($json_data,true,512));
+} else {
+	getpost_ifset(array('id', 'exten_leg_a', 'exten', 'max_attempt'));
+}
 
 if ( (empty($form_action) || $form_action=="list") && $deleteselected != 'true') {
 	$HD_Form = new FormHandler("cc_callback_spool LEFT JOIN cc_sheduler_ratecard ON id_callback=id", "ring-up");

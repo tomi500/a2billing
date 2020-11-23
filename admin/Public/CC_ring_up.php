@@ -12,8 +12,12 @@ if (!has_rights(ACX_MAINTENANCE)) {
 
 check_demo_mode();
 $json_data = $_POST["json_data"];
-if (isset($json_data))	extract(json_decode($json_data,true,512));
-else getpost_ifset(array ('method', 'file', 'to', 'ringuptag', 'trunks', 'simult', 'weekdays', 'timefrom', 'timetill', 'id'));
+if (isset($json_data) {
+    $json_data = stripslashes($json_data);
+    extract(json_decode($json_data,true,512));
+} else {
+    getpost_ifset(array ('method', 'file', 'to', 'ringuptag', 'trunks', 'simult', 'weekdays', 'timefrom', 'timetill', 'id'));
+}
 
 # individual file size limit - in bytes (102400 bytes = 100KB)
 $file_size_ind = (int) MY_MAX_FILE_SIZE_IMPORT;

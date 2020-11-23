@@ -33,9 +33,12 @@
 
 
 $json_data = $_POST["json_data"];
-if (isset($json_data))		extract(json_decode($json_data,true,512));
-else
-getpost_ifset(array('id', 'destination', 'id_cc_card', 'id_cc_did', 'activated', 'priority', 'id_trunk', 'voip_call', 'answer', 'playsound', 'filterprefix'));
+if (isset($json_data)) {
+	$json_data = stripslashes($json_data);
+	extract(json_decode($json_data,true,512));
+} else {
+	getpost_ifset(array('id', 'destination', 'id_cc_card', 'id_cc_did', 'activated', 'priority', 'id_trunk', 'voip_call', 'answer', 'playsound', 'filterprefix'));
+}
 
 if ( (empty($form_action) || $form_action=="list")) {
 	$HD_Form = new FormHandler("cc_did_destination LEFT JOIN cc_did ON cc_did.id = cc_did_destination.id_cc_did","Did Destination");
@@ -172,7 +175,7 @@ if (isset($form_action) && $form_action=="ask-edit") {
 	$instance_table = new Table("cc_card","username");
 	$result_card = $instance_table -> Get_list($DBHandle, "id=(SELECT id_cc_card FROM cc_did_destination WHERE id=$id)", 0);
 	$diraudio = DIR_STORE_AUDIO."/".$result_card[0][0]."/";
-	$return = scandir($diraudio);
+	$return = @scandir($diraudio);
 	if ($return!==false) {
 	    foreach ($return as $val) {
 		if (is_file($diraudio.$val) && $val != 'tempplay.wav') {

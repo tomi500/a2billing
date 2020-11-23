@@ -251,7 +251,8 @@ define ("RELOAD_ASTERISK_IF_SIPIAX_CREATED", isset($A2B->config["signup"]['reloa
 
 if(stripos($URI, "=ask-add")===false && stripos($URI, "=add")===false && stripos($URI, "Public/index.php") === false && isset($_SESSION["admin_id"]) && (!isset( $_SESSION["last_page"]) || stripos($URI, $_SESSION["last_page"])===false)) {
 	// Insert Log
-	$_SESSION["last_page"] = array_shift(explode('?', basename($URI)));
+	$var = explode('?', basename($URI));
+	$_SESSION["last_page"] = array_shift($var);
 	$log -> insertLog($_SESSION["admin_id"], 1, "Page Visit", "User Visited the Page", '', $_SERVER["REMOTE_ADDR"], $_SESSION["last_page"],'');
 	$log = null;
 }

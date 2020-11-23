@@ -32,10 +32,12 @@
 **/
 
 $json_data = $_POST["json_data"];
-if (isset($json_data))
+if (isset($json_data)) {
+    $json_data = stripslashes($json_data);
     extract(json_decode($json_data,true,512));
-else
+} else {
     getpost_ifset(array('id','form_action','ivrname','repeats','waitsecsfordigits'));
+}
 
 $id_cc_card = $_SESSION["card_id"];
 
