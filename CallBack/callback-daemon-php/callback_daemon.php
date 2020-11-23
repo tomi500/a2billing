@@ -254,7 +254,7 @@ while(true)
 	    }
 	    else {
 		ob_start();
-		register_shutdown_function(create_function('$pars', 'ob_end_clean();posix_kill(getmypid(), SIGKILL);'), array());
+		register_shutdown_function(function(){ob_end_clean();posix_kill(getmypid(), SIGKILL);}, array());
 
 		$A2B -> DbConnect($agi);
 		$A2B -> set_instance_table ($instance_table);
@@ -350,7 +350,7 @@ while(true)
 			$A2B -> set_instance_table ($instance_table);
 		    } else {
 			ob_start();
-			register_shutdown_function(create_function('$pars', 'ob_end_clean();posix_kill(getmypid(), SIGKILL);'), array());
+			register_shutdown_function(function(){ob_end_clean();posix_kill(getmypid(), SIGKILL);}, array());
 			$A2B -> DbConnect($agi);
 			$A2B -> set_instance_table ($instance_table);
 
@@ -391,7 +391,7 @@ while(true)
 	    $A2B -> set_instance_table ($instance_table);
 	} else {
 	    ob_start();
-	    register_shutdown_function(create_function('$pars', 'ob_end_clean();posix_kill(getmypid(), SIGKILL);'), array());
+	    register_shutdown_function(function(){ob_end_clean();posix_kill(getmypid(), SIGKILL);}, array());
 	    $A2B -> DbConnect($agi);
 	    $A2B -> set_instance_table ($instance_table);
 	    $status = $A2B->google_recognize($cc_cardid,$cc_sendsound,$cc_sendtext,$cc_savesound,$cc_src,$cc_dest,$cc_mailaddr,$cc_audiofile,$cc_answeredtime,$cc_languagecode);
