@@ -97,7 +97,8 @@ $HD_Form -> AddEditElement (gettext("MAILBOX"),
 		"INPUT",
 		"readonly size=50 maxlength=11",
 		"",
-		gettext("Insert mailbox number"));
+		gettext("Insert mailbox number"),
+		"", "", "", "", "", "", "NO-NULL");
 
 $HD_Form -> AddEditElement (gettext("PASSWORD"),
 		"password",
@@ -105,7 +106,8 @@ $HD_Form -> AddEditElement (gettext("PASSWORD"),
 		"INPUT",
 		"size=50 maxlength=30",
 		"",
-		gettext("Insert password"));
+		gettext("Insert password"),
+		"", "", "", "", "", "", "NO", "");
 
 $HD_Form -> AddEditElement (gettext("CONTEXT"),
 		"accountcode",

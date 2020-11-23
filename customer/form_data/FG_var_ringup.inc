@@ -34,7 +34,7 @@ $HD_Form -> FG_FK_EDITION_CLAUSE = array("id_callback");
 $soundlist = array();
 $soundlist[] = array(gettext("NOT ACTIVE")."&nbsp", "");
 $username = $_SESSION["pr_login"];
-$return = scandir(DIR_STORE_AUDIO."/$username/");
+$return = @scandir(DIR_STORE_AUDIO."/$username/");
 if ($return!==false) {
     foreach ($return as $val) {
         if (is_file(DIR_STORE_AUDIO."/$username/".$val) && $val != 'tempplay.wav') {

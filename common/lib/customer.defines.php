@@ -292,7 +292,8 @@ if(isset($_SESSION["card_id"]) && stripos($URI, "index.php")===false && stripos(
     && (!isset( $_SESSION["last_page"]) || stripos($URI, $_SESSION["last_page"])===false)
     && (!isset($form_action) || $form_action=="ask-edit" || $form_action=="list")) {
 	// Insert Log
-	$_SESSION["last_page"] = array_shift(explode('?', basename($URI)));
+	$var = explode('?', basename($URI));
+	$_SESSION["last_page"] = array_shift($var);
 	$log -> insertLog($_SESSION["card_id"], 1, "Page Visit", "User Visited the Page", '', $_SERVER['REMOTE_ADDR'], $_SESSION["last_page"],'',2);
 	$log = null;
 }

@@ -96,7 +96,8 @@ class Constants
 	}
 
 	public static function getActivation_Revert_List(){
-		return Constants::reverse_array(Constants::getActivationList());
+		$cnts = new Constants();
+		return $cnts->reverse_array(Constants::getActivationList());
 	}
 
 	public static function getActivationTrueFalseList(){
@@ -107,7 +108,8 @@ class Constants
 	}
 	
 	public static function getActivationTrueFalse_Revert_List() {
-		return Constants::reverse_array(Constants::getActivationTrueFalseList());
+		$cnts = new Constants();
+		return $cnts->reverse_array(Constants::getActivationTrueFalseList());
 	}
 
 	public static function getBillingTypeList(){	
@@ -165,7 +167,8 @@ class Constants
 	}
 	
 	public static function getInvoiceStatusList_Revert_List() {
-		return Constants::reverse_array(Constants::getInvoiceStatusList());
+		$cnts = new Constants();
+		return $cnts->reverse_array(Constants::getInvoiceStatusList());
 	}
 	
 	public static function getBillingInvoiceStatusList(){
@@ -184,7 +187,8 @@ class Constants
 	}
 
 	public static function getInvoicePaidStatusList_Revert_List(){
-		return Constants::reverse_array(Constants::getInvoicePaidStatusList());
+		$cnts = new Constants();
+		return $cnts->reverse_array(Constants::getInvoicePaidStatusList());
 	}
 
     public static function getSubscriptionPaidStatusList(){
@@ -293,7 +297,8 @@ class Constants
 	}
 	
 	public static function getUsed_revert_List() {
-		return Constants::reverse_array(Constants::getUsedList());
+		$cnts = new Constants();
+		return $cnts->reverse_array(Constants::getUsedList());
 	}
 	
 	public static function getCallTypeList(){

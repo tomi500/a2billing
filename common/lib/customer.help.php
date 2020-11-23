@@ -83,8 +83,11 @@ $QUERY = "SELECT creditlimit, credit, currency, credit_notification, paypal, use
 $DBHandle = DbConnect();
 
 $customer_res = $inst_table -> SQLExec($DBHandle, $QUERY);
-
-$customer_info = $customer_res[0];
+if (is_array($customer_res) && count($customer_res)>0) {
+    $customer_info = $customer_res[0];
+} else {
+    $customer_info = array(0,0,BASE_CURRENCY,0,0,0);
+}
 $currencies_list = get_currencies();
 $user_paypal = $customer_info[4];
 

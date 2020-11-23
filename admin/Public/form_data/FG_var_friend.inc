@@ -108,7 +108,7 @@ if ($atmenu=='sip') {
 $HD_Form -> AddViewElement(gettext("SECRET"), "secret", "6%", "center", "sort");
 $HD_Form -> AddViewElement(gettext("CALLERID"), "callerid", "24%", "center", "sort");
 $HD_Form -> AddViewElement(gettext("CONTEXT"), "context", "9%", "center", "sort");
-$HD_Form -> AddViewElement("<font color=#00ff00>IP</font> / ".gettext(DEFAULTIP), "curip", "20%", "center", "sort");
+$HD_Form -> AddViewElement("<font color=#00ff00>IP</font> / ".gettext("DEFAULTIP"), "curip", "20%", "center", "sort");
 
 
 $HD_Form ->FG_LIST_ADDING_BUTTON1 = true;

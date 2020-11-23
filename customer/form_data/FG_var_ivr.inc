@@ -90,17 +90,20 @@ $HD_Form -> AddEditElement (gettext("IVR Name"),
 					"ivrname",
 					"",
 					"INPUT",
-					"size=40 maxlength=40");
+					"size=40 maxlength=40",
+					null,null,null,null,null,null,null,null);
 $HD_Form -> AddEditElement (gettext("REPEATS"),
 					"repeats",
 					"",
 					"INPUT",
-					"size=40 maxlength=30");
+					"size=40 maxlength=30",
+					null,null,null,null,null,null,null,null);
 $HD_Form -> AddEditElement (gettext("WAIT FOR DIGITS"),
 					"waitsecsfordigits",
 					"",
 					"INPUT",
-					"size=40 maxlength=30");
+					"size=40 maxlength=30",
+					null,null,null,null,null,null,null,null);
 
 $HD_Form -> FieldEditElement ('ivrname, repeats, waitsecsfordigits');
 /**

@@ -222,13 +222,15 @@ $HD_Form -> AddEditElement(gettext("LENGTH RANGE FROM"),
    "length_range_from",
    '$value',
    "INPUT",
-   "size=30 maxlength=20", "4");
+   "size=30 maxlength=20", "4",
+   "", "", "", "", "", "", "", "NO", "");
 
 $HD_Form -> AddEditElement(gettext("LENGTH RANGE TILL"),
    "length_range_till",
    '$value',
    "INPUT",
-   "size=30 maxlength=20", "4");
+   "size=30 maxlength=20", "4",
+   "", "", "", "", "", "", "", "NO", "");
 
 $HD_Form -> AddEditElement(gettext("Destination Prefix"),
    "destination",
