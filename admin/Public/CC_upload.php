@@ -204,11 +204,7 @@ $smarty->display('main.tpl');
     <td><?php echo gettext("file types allowed");?>:</td><td>
 
 	<?php
-	for($i=0;$i<count($file_ext_allow);$i++) {
-		if (($i<>count($file_ext_allow)-1))$commas=", ";else $commas="";
-		list($key,$value)=each($file_ext_allow);
-		echo $value.$commas;
-	}
+	echo implode(', ',$file_ext_allow);
 	?>   </td>
   </tr>
 
