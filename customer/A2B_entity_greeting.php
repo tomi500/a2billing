@@ -208,6 +208,8 @@ if (isset($id) && is_numeric($id) && $form_action=='list' && !isset($play)) {
 	    $greetname	  = preg_replace('/\.[^\.\/]+$/', '', $resmax[0][6]);
 	}
 }
+$greettext = stripslashes($greettext);
+$greettext = addslashes($greettext);
 
 if (!isset($langlocale)) {
 	$QUERY = "SELECT technology, lang_locale, voice_name, gender, speed FROM cc_greeting_records WHERE id_cc_card = " . $_SESSION["card_id"] . " AND speed ORDER BY updatetime DESC LIMIT 1";
@@ -252,7 +254,7 @@ if ($form_action == "list") {
 			</select>
 		</td>
 		<td align="right" valign="top" colspan="2">
-			<input class="form_input_text" style="width: 100%;" id="greettext" name="greettext" value="<?php echo $greettext?>" placeholder=" <?php echo gettext("Let type text of greeting here");?>" onkeypress="return keytoDownAny(event,id);" onchange="setsrcaudio();" size="100%" maxlength="200" required>
+			<input class="form_input_text" style="width: 100%;" id="greettext" name="greettext" placeholder=" <?php echo gettext("Let type text of greeting here");?>" onkeypress="return keytoDownAny(event,id);" onchange="setsrcaudio();" size="100%" maxlength="200" required>
 		</td>
 		</tr>
 		<tr>
@@ -276,7 +278,7 @@ if ($form_action == "list") {
 <?php
     } ?>
 	<audio id="sound1" preload="none" controlsList="nodownload"></audio>
-	<script language="JavaScript"> var langfirst = '<?php echo $langlocale?>', voicefirst = '<?php echo $voicename?>', soundpath2 = '<?php echo $_SERVER['PHP_SELF']; ?>?langlocale='; document.theForm.range_weight_disp.value=<?php echo $speakingRate?>;</script>
+	<script language="JavaScript"> var langfirst = '<?php echo $langlocale?>', voicefirst = '<?php echo $voicename?>', soundpath2 = '<?php echo $_SERVER['PHP_SELF']; ?>?langlocale=';document.theForm.range_weight_disp.value=<?php echo $speakingRate?>;document.theForm.greettext.value="<?php echo $greettext?>";</script>
 	<script language="JavaScript" src="./javascript/player.js"></script>
 <?php
 }

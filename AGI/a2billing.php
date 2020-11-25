@@ -361,7 +361,7 @@ if ($mode == 'sms') {
 	    }
 	    if ($didyes) {
 		if ($caller_areacode == 'recalldidless') {
-			break;
+			exit(0);
 		}
 /**		$QUERY="SELECT IF(src=src_exten,src_peername,src) src, cc_card.username, cc_card.recalltime, continuewithdid FROM cc_card
 ".			"INNER JOIN cc_call ON starttime > DATE_SUB(NOW(), INTERVAL recalldays DAY) AND card_id = cc_card.id
@@ -388,7 +388,7 @@ if ($mode == 'sms') {
 				// Feature to switch the Callplan from a customer : callplan_deck_minute_threshold
 				$A2B-> deck_switch($agi);
 
-				if (!$A2B -> enough_credit_to_call()) break;
+				if (!$A2B -> enough_credit_to_call()) exit(0);
 
 				if ($A2B->agiconfig['sip_iax_friends']==1) {
 				    if ( (strlen($A2B -> destination)>0)
@@ -421,7 +421,7 @@ if ($mode == 'sms') {
 			}
 
 		} elseif ($caller_areacode == 'didless') {
-		    break;
+		    exit(0);
 		} elseif ($diddest){
 		    $A2B -> agiconfig['answer_call']=0;
 		    $QUERY="SELECT calledstation FROM cc_call ".
@@ -452,11 +452,11 @@ if ($mode == 'sms') {
 					$A2B -> DBHandle -> Execute($QUERY);
 					$agi -> exec('HangUp', 29);
 					write_log(LOGFILE_API_CALLBACK, " ==========UPDATE======== Attempt of double number insert detected =====================> ".$A2B->CallerID);
-					break;
+					exit(0);
 				} else {
 					$agi -> exec('HangUp', 29);
 					write_log(LOGFILE_API_CALLBACK, " ==========CANCEL======== Attempt of double number insert detected =====================> ".$A2B->CallerID);
-					break;
+					exit(0);
 				}
 			}
 
@@ -510,12 +510,12 @@ if ($mode == 'sms') {
 		    }
 		} else {
 		    $A2B -> debug( ERROR, $agi, __FILE__, __LINE__, '[No DID or CallerID found for this call]');
-		    break;
+		    exit(0);
 		}
 	    }
 	} else {
 		$A2B -> debug(FATAL, $agi, __FILE__, __LINE__, "'agi_extension' can not be empty");
-		break;
+		exit(0);
 	}
 }
 
