@@ -2798,7 +2798,12 @@ else
 		    if ($send_sound || $send_text)
 		    if ($mailaddr && preg_match("/^[_A-Za-z0-9-]+(\\.[_A-Za-z0-9-]+)*@[A-Za-z0-9]+(\\.[A-Za-z0-9]+)*(\\.[A-Za-z]{2,})$/i", $mailaddr)) {
 
-			$transcript = gettext("Duration: ") . sprintf ( "%02d", intval ( $answeredtime / 60 ) ) . ":" . sprintf ( "%02d", intval ( $answeredtime % 60 ) );
+			switch(substr($languageCode, 0, 2)) {
+				case 'de':	$speaker = "Sprecher";	$duration = "Dauer";		break;
+				case 'ru':	$speaker = "Сторона";	$duration = "Продолжительность";break;
+				default  :	$speaker = "Speaker";	$duration = "Duration";
+			}
+			$transcript = $duration . ": " . sprintf ( "%02d", intval ( $answeredtime / 60 ) ) . ":" . sprintf ( "%02d", intval ( $answeredtime % 60 ) );
 
 			if ($send_text) {
 			    $keyFilePath = $this->config['global']['google_cloud_credential'];
@@ -2841,7 +2846,6 @@ else
 					    $retcode = 2;
 					}
 					$speakertag = 100;
-					$speaker = gettext("Speaker");
 					foreach ($response->getResults() as $result) {
 					    $alternatives = $result->getAlternatives();
 					    $mostLikely   = $alternatives[0];
@@ -2899,7 +2903,7 @@ else
 						$mostLikely   = $alternatives[0];
 						if ($speakertag != $result->getChannelTag()) {
 						    $speakertag  = $result->getChannelTag();
-						    if ($speakertag>0) $transcript .= PHP_EOL."<u>Speaker".$speakertag.":</u> ";
+						    if ($speakertag>0) $transcript .= PHP_EOL."<u>".$speaker.$speakertag.":</u> ";
 						}
 						if ($speakertag>0) $transcript .= $mostLikely->getTranscript();
 					    }

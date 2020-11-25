@@ -702,35 +702,25 @@ class FormHandler
 		
 	
 	function sanitize($input)  
-	{  
-		
-		if (is_array($input)) {
+	{
+	    if (is_array($input)) {
 	        foreach($input as $var=>$val) {
 	            $output[$var] = $this -> sanitize($val);
 	        }
 	    } else {
-	    	
-	    	// remove whitespaces (not a must though)  
-			$input = trim($input);
-			
-			$input = str_replace('--', '', $input);
-			$data = str_replace(';', '', $data);
-			
-			if (!(stripos($input, ' or 1')===FALSE)) { return false;}
-			if (!(stripos($input, ' or true')===FALSE)) { return false;}
-	    	
-//	        if (get_magic_quotes_gpc()) {
-	            $input = stripslashes($input);
-//	        }
+		// remove whitespaces (not a must though)  
+		$input = trim($input);
+		$input = str_replace('--', '', $input);
+		$data = str_replace(';', '', $data);
+
+		if (!(stripos($input, ' or 1')===FALSE)) { return false;}
+		if (!(stripos($input, ' or true')===FALSE)) { return false;}
+
 	        $input  = $this -> cleanInput($input);
-	        
 	        $output = addslashes( $input );
 	    }
-	    
 	    return $output;
 	}
-
-	
 
 	// ----------------------------------------------
     // RECIPIENT METHODS

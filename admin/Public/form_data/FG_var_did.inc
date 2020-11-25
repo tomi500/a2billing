@@ -77,7 +77,7 @@ $soundlist = array();
 $soundlist[] = array(gettext("NOT ACTIVE")."&nbsp", "");
 if (is_array($return)) {
     $username = $return[0][0];
-    $return = scandir(DIR_STORE_AUDIO."/$username/");
+    $return = @scandir(DIR_STORE_AUDIO."/$username/");
     if ($return!==false) {
 	foreach ($return as $val) {
 	    if (is_file(DIR_STORE_AUDIO."/$username/".$val) && $val != 'tempplay.wav') {

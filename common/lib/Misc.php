@@ -299,7 +299,7 @@ function sanitize_data($input) {
 			return false;
 		}
 
-		$input  = stripslashes($input);
+//		$input  = stripslashes($input);
 		$input  = cleanInput($input);
 		$output = addslashes($input);
 	}

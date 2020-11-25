@@ -26,12 +26,9 @@ function recursive_filter($arr) {
 }
 
 // Clean up POST, GET, and COOKIES vars.
-if (!get_magic_quotes_gpc())
-{
-    $_POST = array_map_recursive('stripslashes',$_POST);
-    $_GET  = array_map_recursive('stripslashes', $_GET);
-    $_COOKIE  = array_map_recursive('stripslashes', $_COOKIE);
-}
+$_POST = array_map_recursive('stripslashes',$_POST);
+$_GET  = array_map_recursive('stripslashes', $_GET);
+$_COOKIE  = array_map_recursive('stripslashes', $_COOKIE);
 
 if ( function_exists('mysql_real_escape_string'))
 {
