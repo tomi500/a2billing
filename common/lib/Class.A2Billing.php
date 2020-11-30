@@ -2035,7 +2035,7 @@ class A2Billing {
 						$dialstr .= str_replace("%timeoutsec%", min($time2call, $max_long), $dialparams);
 					} else {
 						$que = explode(",",$dialstr);
-						if (stripos($que[1],"r") === false && strpos($inst_listdestination[10],"38080021") !== 0) {
+						if ((!isset($que[1]) || stripos($que[1],"r") === false) && strpos($inst_listdestination[10],"38080021") !== 0) {
 							$this -> let_stream_listening($agi);
 						} else {
 							$this -> let_stream_listening($agi,false,true);
@@ -2431,7 +2431,7 @@ else
 		    $dialstr .= str_replace("%timeoutsec%", min($time2call, $max_long), $dialparams);
 		} else {
 		    $que = explode(",",$dialstr);
-		    if (stripos($que[1],"r") === false) {
+		    if (!isset($que[1]) || stripos($que[1],"r") === false) {
 			$this -> let_stream_listening($agi);
 		    } else {
 			$this -> let_stream_listening($agi,false,true);
@@ -2907,7 +2907,7 @@ else
 						}
 						if ($speakertag>0) $transcript .= $mostLikely->getTranscript();
 					    }
-					    if (strpos($transcript,"Speaker") === false) foreach ($response->getResults() as $result) {
+					    if (strpos($transcript,$speaker) === false) foreach ($response->getResults() as $result) {
 						$alternatives = $result->getAlternatives();
 						$mostLikely   = $alternatives[0];
 						$transcript .= PHP_EOL.$mostLikely->getTranscript();

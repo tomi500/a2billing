@@ -363,6 +363,7 @@ if ($terminatecauseid == "CANCEL") {
 
 if (!isset($resulttype)) $resulttype="min";
 
+$order = urldecode($order);
 $list = $instance_table->Get_list ( $DBHandle, $FG_TABLE_CLAUSE, $order, $sens, null, null, $FG_LIMITE_DISPLAY, $current_page * $FG_LIMITE_DISPLAY );
 
 // EXPORT

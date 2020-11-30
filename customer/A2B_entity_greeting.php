@@ -75,7 +75,9 @@ $client = new GuzzleHttp\Client();
 
 if ($play==1 || $play==3) {
     if ($langlocale && $voicename && $greettext) {
+	$greettext = urldecode($greettext);
 	if ($greetname) {
+		$greetname = urldecode($greetname);
 		if (strpos($greetname, '/') !== false || strpos($greetname, '.') !== false) exit;
 	} else {
 		$greetname = "tempplay";
