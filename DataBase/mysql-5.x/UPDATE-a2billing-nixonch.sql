@@ -223,7 +223,7 @@ ALTER TABLE cc_call CHANGE `destination` `destination` BIGINT(20) NULL DEFAULT '
 ALTER TABLE cc_call ADD INDEX `uniqueid` (`uniqueid`);
 ALTER TABLE cc_call CHANGE `card_caller` `card_caller` BIGINT(20) NOT NULL DEFAULT '0';
 ALTER TABLE cc_call CHANGE `card_seller` `card_seller` BIGINT(20) NOT NULL DEFAULT '0';
-ALTER TABLE cc_call CHANGE remotefaxid VARCHAR( 30 ) CHARACTER SET utf8 COLLATE utf8_bin NOT NULL DEFAULT '';
+ALTER TABLE cc_call CHANGE `remotefaxid` `remotefaxid` VARCHAR( 30 ) CHARACTER SET utf8 COLLATE utf8_bin NOT NULL DEFAULT '';
 
 ALTER TABLE cc_tariffplan ADD id_seller BIGINT(20) NOT NULL AFTER `id`;
 ALTER TABLE cc_tariffplan ADD sellerdialprefix char(20) COLLATE utf8_bin NULL DEFAULT NULL AFTER `id_seller`;
