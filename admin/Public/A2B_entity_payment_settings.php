@@ -120,8 +120,7 @@ $module_info['keys'] = $keys_extra;
 $mInfo = new objectInfo($module_info);
 
 $keys = '';
-reset($mInfo->keys);
-while (list ($key, $value) = each($mInfo->keys)) {
+foreach ($mInfo->keys as $key => $value) {
 	$keys .= '<b>' . $value['title'] . '</b><br>' . $value['description'] . '<br>';
 	if ($value['set_function']) {
 		eval ('$keys .= ' . $value['set_function'] . "'" . $value['value'] . "', '" . $key . "');");

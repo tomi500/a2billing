@@ -150,8 +150,7 @@ include_once (dirname(__FILE__)."/sessions.php");
 
     $get_url = '';
     if (is_array($_GET) && (sizeof($_GET) > 0)) {
-      reset($_GET);
-      while (list($key, $value) = each($_GET)) {
+      foreach($_GET as $key => $value) {
         if ( (strlen($value) > 0) && ($key != tep_session_name()) && ($key != 'error') && (!in_array($key, $exclude_array)) && ($key != 'x') && ($key != 'y') ) {
           $get_url .= $key . '=' . rawurlencode(stripslashes($value)) . '&';
         }
@@ -913,8 +912,7 @@ include_once (dirname(__FILE__)."/sessions.php");
         $attributes_check = true;
         $attributes_ids = '';
 
-        reset($params);
-        while (list($option, $value) = each($params)) {
+        foreach($params as $key => $value) {
           if (is_numeric($option) && is_numeric($value)) {
             $attributes_ids .= '{' . (int)$option . '}' . (int)$value;
           } else {
@@ -1096,7 +1094,7 @@ include_once (dirname(__FILE__)."/sessions.php");
 
     $get_string = '';
     if (sizeof($array) > 0) {
-      while (list($key, $value) = each($array)) {
+      foreach($array as $key => $value) {
         if ( (!in_array($key, $exclude)) && ($key != 'x') && ($key != 'y') ) {
           $get_string .= $key . $equals . $value . $separator;
         }
@@ -1300,8 +1298,7 @@ include_once (dirname(__FILE__)."/sessions.php");
     if (is_string($string)) {
       return trim(stripslashes($string));
     } elseif (is_array($string)) {
-      reset($string);
-      while (list($key, $value) = each($string)) {
+      foreach($string as $key => $value) {
         $string[$key] = tep_db_prepare_input($value);
       }
       return $string;

@@ -373,7 +373,7 @@ CREATE TABLE IF NOT EXISTS cc_voicemail_users (
 	imapflags VARCHAR(80),
 	stamp timestamp,
 	KEY `mailbox_context` (`mailbox`,`context`)
-) ENGINE=MyISAM;
+) ENGINE=MyISAM DEFAULT CHARSET=utf8 COLLATE=utf8_bin;
 
 CREATE TABLE IF NOT EXISTS cc_voicemail_data (
 	filename CHAR(255) NOT NULL PRIMARY KEY,
@@ -388,7 +388,7 @@ CREATE TABLE IF NOT EXISTS cc_voicemail_data (
 	origtime CHAR(11),
 	category CHAR(30),
 	duration CHAR(5)
-) ENGINE=MyISAM;
+) ENGINE=MyISAM DEFAULT CHARSET=utf8 COLLATE=utf8_bin;
 
 drop procedure if exists a2b_trf_check;
 

@@ -2021,10 +2021,11 @@ $A2B -> debug( ERROR, $agi, __FILE__, __LINE__, 'set_callerid "'.$calleridname.'
 $tempdebug="Calculated TIME: ".$answeredtime.";  CDR(billsec): ".$agi->get_variable("CDR(billsec)",true).";  ANSWEREDTIME: ".$agi->get_variable("ANSWEREDTIME",true);
 //					$answeredtime					= $agi->get_variable("CDR(billsec)",true);
 //					if ($answeredtime == "")	$answeredtime	= $agi->get_variable("ANSWEREDTIME",true);
-					if ($answeredtime > 100000)	$answeredtime	= $agi->get_variable("CDR(billsec)",true);
-					if ($answeredtime > 100000)	$answeredtime	= $agi->get_variable("ANSWEREDTIME",true);
-					if ($answeredtime > 100000)	$answeredtime	= 1;
-					if ($answeredtime == $this -> ratecard_obj[$k]['alltimeout'] + 1)	$answeredtime--;
+					$temptime = $agi->get_variable("CDR(billsec)",true);
+					if ($answeredtime > 100000 || $answeredtime == $temptime - 1)	  $answeredtime = $temptime;
+					if ($answeredtime > 100000)					  $answeredtime = $agi->get_variable("ANSWEREDTIME",true);
+					if ($answeredtime > 100000 || $answeredtime == 0)		  $answeredtime = 1;
+					if ($answeredtime == $this -> ratecard_obj[$k]['alltimeout'] + 1) $answeredtime--;
 				    } else {
 					$answeredtime					= 0;
 $tempdebug="DIALSTATUS: $this->dialstatus";
