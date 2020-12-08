@@ -5,7 +5,7 @@ class moneybookers {
     var $code, $title, $description, $enabled;
 
 	// class constructor
-    function moneybookers() {
+    public function __construct() {
 		global $order;
 		
 		$this->code = 'moneybookers';
@@ -30,23 +30,23 @@ class moneybookers {
 	}
 
 	// class methods
-    function javascript_validation() {
+    public function javascript_validation() {
     	return false;
     }
 
-    function selection() {
+    public function selection() {
       	return array('id' => $this->code, 'module' => $this->title);
     }
 
-    function pre_confirmation_check() {
+    public function pre_confirmation_check() {
 		return false;
     }
 
-    function confirmation() {
+    public function confirmation() {
 		return false;
     }
 
-    function process_button($transactionID = 0, $key= "") {
+    public function process_button($transactionID = 0, $key= "") {
 		global $order, $currencies, $currency;
 		
 		$my_language = MODULE_PAYMENT_MONEYBOOKERS_LANGUAGE;
@@ -84,7 +84,7 @@ class moneybookers {
     }
 
    
-    function get_CurrentCurrency()
+    public function get_CurrentCurrency()
     {
      
         $my_currency = MODULE_PAYMENT_MONEYBOOKERS_CURRENCY;
@@ -98,12 +98,12 @@ class moneybookers {
         return $my_currency;
     }
 	
-    function before_process()
+    public function before_process()
     {
         return;
     }
 	
-    function get_OrderStatus()
+    public function get_OrderStatus()
     {
         // status of the transaction :
         // Failed= -2
@@ -122,15 +122,15 @@ class moneybookers {
     }
 
 
-    function after_process() {
+    public function after_process() {
       return false;
     }
 
-    function output_error() {
+    public function output_error() {
       return false;
     }
 
-    function install() {
+    public function install() {
       tep_db_query("insert into " . TABLE_CONFIGURATION . " (configuration_title, configuration_key, configuration_value, configuration_description, configuration_group_id, sort_order, set_function, date_added) values ('Enable moneybookers Module', 'MODULE_PAYMENT_MONEYBOOKERS_STATUS', 'True', 'Do you want to accept moneybookers payments?', '6', '3', 'tep_cfg_select_option(array(\'True\', \'False\'), ', now())");
       tep_db_query("insert into " . TABLE_CONFIGURATION . " (configuration_title, configuration_key, configuration_value, configuration_description, configuration_group_id, sort_order, date_added) values ('E-Mail Address', 'MODULE_PAYMENT_MONEYBOOKERS_ID', '', 'The eMail address to use for the moneybookers service', '6', '4', now())");
       tep_db_query("insert into " . TABLE_CONFIGURATION . " (configuration_title, configuration_key, configuration_value, configuration_description, configuration_group_id, sort_order, date_added) values ('Referral ID', 'MODULE_PAYMENT_MONEYBOOKERS_REFID', '', 'Your personal Referral ID from moneybookers.com', '6', '7', now())");
@@ -138,11 +138,11 @@ class moneybookers {
       tep_db_query("insert into " . TABLE_CONFIGURATION . " (configuration_title, configuration_key, configuration_value, configuration_description, configuration_group_id, sort_order, set_function, date_added) values ('Transaction Language', 'MODULE_PAYMENT_MONEYBOOKERS_LANGUAGE', 'Selected Language', 'The default language for the payment transactions', '6', '6', 'tep_cfg_select_option(array(\'Selected Language\',\'EN\', \'DE\', \'ES\', \'FR\'), ', now())");
     }
 
-    function remove() {
+    public function remove() {
 		tep_db_query("DELETE FROM " . TABLE_CONFIGURATION . " WHERE configuration_key IN ('" . implode("', '", $this->keys()) . "')");
     }
 
-function keys() {
+    public function keys() {
 		//return array('MODULE_PAYMENT_MONEYBOOKERS_STATUS', 'MODULE_PAYMENT_MONEYBOOKERS_ID', 'MODULE_PAYMENT_MONEYBOOKERS_REFID', 'MODULE_PAYMENT_MONEYBOOKERS_LANGUAGE', 'MODULE_PAYMENT_MONEYBOOKERS_CURRENCY', 'MODULE_PAYMENT_MONEYBOOKERS_SORT_ORDER');
 		return array('MODULE_PAYMENT_MONEYBOOKERS_STATUS', 'MODULE_PAYMENT_MONEYBOOKERS_ID', 'MODULE_PAYMENT_MONEYBOOKERS_REFID', 'MODULE_PAYMENT_MONEYBOOKERS_LANGUAGE' );
     }

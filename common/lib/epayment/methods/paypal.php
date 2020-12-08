@@ -7,7 +7,7 @@ class paypal {
 //    var $paypal_allowed_currencies = array('CAD', 'EUR', 'GBP', 'JPY', 'USD', 'MXN', 'AUD', 'NZD', 'BRL');
 
 	// class constructorform_action_url
-    function paypal() {
+    public function __construct() {
 		global $user_paypal;
 
 		$this->title = MODULE_PAYMENT_PAYPAL_TEXT_TITLE;
@@ -22,7 +22,7 @@ class paypal {
     }
 
 	// class methods
-    function update_status() {
+    public function update_status() {
 		global $order;
 
 		if ( ($this->enabled == true) && ((int)MODULE_PAYMENT_PAYPAL_ZONE > 0) ) {
@@ -44,11 +44,11 @@ class paypal {
 		}
     }
 
-    function javascript_validation() {
+    public function javascript_validation() {
 		return false;
     }
 
-    function selection() {
+    public function selection() {
 		foreach ($this->paypal_allowed_currencies as $curselected) {
 			$purse_type[] = array('id' => $curselected, 'text' => $curselected);
 		}
@@ -62,15 +62,15 @@ class paypal {
 //		return array('id' => $this->code, 'module' => $this->title);
     }
 
-    function pre_confirmation_check() {
+    public function pre_confirmation_check() {
 		return false;
     }
 
-    function confirmation() {
+    public function confirmation() {
 		return false;
     }
 
-    function process_button($transactionID = 0, $key= "") {
+    public function process_button($transactionID = 0, $key= "") {
 		global $order, $currencies, $currency;
 
 		$my_currency = $_POST['wm_purse_type'];
@@ -102,18 +102,18 @@ class paypal {
 
 		return $process_button_string;
     }
-    function get_CurrentCurrency()
+    public function get_CurrentCurrency()
     {
 		$getcur = $_POST['wm_purse_type'];
 		if (!in_array($getcur, $this->paypal_allowed_currencies))
 			$getcur = BASE_CURRENCY;
 		return $getcur;
     }
-    function before_process() {
+    public function before_process() {
 		return false;
     }
 
-    function get_OrderStatus()
+    public function get_OrderStatus()
     {
         if ($_POST['payment_status']=="")
         {
@@ -145,15 +145,15 @@ class paypal {
                 return 5;
         }
     }
-    function after_process() {
+    public function after_process() {
 		return false;
     }
 
-    function output_error() {
+    public function output_error() {
 		return false;
     }
 
-    function keys() {
+    public function keys() {
 		return array('MODULE_PAYMENT_PAYPAL_BASIC_STATUS', 'MODULE_PAYMENT_PAYPAL_ID');
     }
 }

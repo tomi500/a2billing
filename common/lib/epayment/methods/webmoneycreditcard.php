@@ -7,7 +7,7 @@ define('MODULE_PAYMENT_WM_LMI_PAYMENT_DESC', 'Connection service');
 class webmoneycreditcard {
 	var $code, $title, $description, $enabled, $current_wm_currency;
 
-	function webmoneycreditcard() {
+	public function __construct() {
 		global $order;
 
 		$this->code = 'webmoneycreditcard';
@@ -19,7 +19,7 @@ class webmoneycreditcard {
 		$this->form_action_url = 'https://merchant.webmoney.ru/lmi/payment.asp';
 	}
 
-	function keys() {
+	public function keys() {
 		return array(
 				  'MODULE_PAYMENT_WM_STATUS_10',		'MODULE_PAYMENT_WM_WMID_10'
 				, 'MODULE_PAYMENT_WM_PURSE_WMU_10',		'MODULE_PAYMENT_WM_PURSE_WMR_10'
@@ -28,11 +28,11 @@ class webmoneycreditcard {
 				);
 	}
 
-	function javascript_validation() {
+	public function javascript_validation() {
 		return false;
 	}
 
-	function selection() {
+	public function selection() {
 
 		
 		   global $order;
@@ -50,7 +50,7 @@ class webmoneycreditcard {
 		//return array('id' => $this->code, 'module' => $this->title);
 	}
 
-	function get_CurrentCurrency()
+	public function get_CurrentCurrency()
 	{
 		switch($_POST['wm_purse_type'])
 		{
@@ -63,15 +63,15 @@ class webmoneycreditcard {
 		   return $getcur;
 	}
 
-	function pre_confirmation_check() {
+	public function pre_confirmation_check() {
 		return false;
 	}
 
-	function confirmation() {
+	public function confirmation() {
 		return false;
 	}
 
-	function process_button($transactionID = 0, $key= "") {
+	public function process_button($transactionID = 0, $key= "") {
 		global $order, $currencies, $currency;
 
 		$process_button_string = tep_draw_hidden_field('LMI_PAYMENT_AMOUNT', $order->info['total']);
@@ -105,7 +105,7 @@ class webmoneycreditcard {
 		return $process_button_string;
 	}
 
-	function get_OrderStatus()
+	public function get_OrderStatus()
 	{
 		//Если есть номер платежа в системе WebMoney Transfer, выполненный в процессе обработки
 
@@ -117,11 +117,11 @@ class webmoneycreditcard {
 		}
 	}
 
-	function before_process() {
+	public function before_process() {
 		return false;
 	}
 
-	function after_process() {
+	public function after_process() {
 		return false;
 	}
 

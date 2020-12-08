@@ -53,15 +53,13 @@ var noservice = "{php} echo gettext("Service temporally not available.<br>Try ag
 
       <div class="forms">
 	<form class="form-forgot" method="post" name="formforgot">
-          <div class="login-title" id="warningforgot">
-          </div>
+          <div class="login-title" id="warningforgot"></div>
           <label for="pr_email">{php} echo gettext("E-Mail");{/php}</label>
           <input class="form-styling" type="email" name="pr_email" id="pr_email"/>
           <a class="btn-submit btn-forgot">{php} echo gettext("Get password");{/php}</a>
 	</form>
 	<form class="form-signin" action="userinfo" method="post" name="formsignin">
-          <div class="login-title" id="warningsignin">
-          </div>
+          <div class="login-title" id="warningsignin"></div>
           <label for="pr_login">{php} echo gettext("Login / E-mail");{/php}</label>
           <input class="form-styling" type="text" name="pr_login" id="pr_login"/>
           <label for="pr_password">{php} echo gettext("Password");{/php}</label>
@@ -77,12 +75,11 @@ var noservice = "{php} echo gettext("Service temporally not available.<br>Try ag
 	<form class="form-signup" action="" method="post" name="formsignup">
           <input type="hidden" name="country" id="country">
           <input type="hidden" name="id_timezone" id="id_timezone">
-          <div class="login-title" id="warningsignin">
-          </div>
+          <div class="login-title" id="warningsignup"></div>
           <label for="fullname">{php} echo gettext("Full name");{/php}</label>
           <input class="form-styling" type="text" name="fullname"/>
-          <label for="email">{php} echo gettext("E-Mail");{/php}</label>
-          <input class="form-styling" type="text" name="email"/>
+          <label for="r_email">{php} echo gettext("E-Mail");{/php}</label>
+          <input class="form-styling" type="email" name="r_email" id="r_email"/>
           <label for="pr_country">{php} echo gettext("COUNTRY");{/php}</label>
           <div class="select-styling">
 {php}
@@ -101,7 +98,7 @@ var noservice = "{php} echo gettext("Service temporally not available.<br>Try ag
 		    }
 		}
 {/php}
-	    <input class="form-styling" type="text" value="{php} echo $country;{/php}" dataval = "{php} echo $countrycode;{/php}" name="pr_country" id="pr_country" onfocus="this.blur()" onclick="this.blur()"/>
+	    <input class="form-styling" type="text" value="{php} echo $country;{/php}" dataval = "{php} echo $countrycode;{/php}" name="pr_country" id="pr_country" onfocus="this.blur()" onclick="this.blur()" autocomplete="beseder"/>
 	    <ul id="countrylist">
 {php}
 		if ($countrylist) {
@@ -145,7 +142,7 @@ var noservice = "{php} echo gettext("Service temporally not available.<br>Try ag
     </div>
   </div>
   <div>
-  <a id="refresh" value="Refresh" onClick="opback()"> <!-- "history.go()"> -->
+  <a id="refresh" value="Refresh" onClick="opback()">
     <svg class="refreshicon"   version="1.1" id="Capa_1"  xmlns="https://www.w3.org/2000/svg" xmlns:xlink="https://www.w3.org/1999/xlink" x="0px" y="0px"
          width="25px" height="25px" viewBox="0 0 322.447 322.447" style="enable-background:new 0 0 322.447 322.447;"
          xml:space="preserve">

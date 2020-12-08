@@ -8,7 +8,7 @@ define('MODULE_PAYMENT_WM_LMI_PAYMENT_DESC', 'Connection service');
 class webmoney {
 	var $code, $title, $description, $enabled, $current_wm_currency;
 
-	function webmoney() {
+	public function __construct() {
 		global $order;
 
 		$this->code = 'webmoney';
@@ -20,7 +20,7 @@ class webmoney {
 		$this->form_action_url = 'https://merchant.webmoney.ru/lmi/payment.asp';
 	}
 
-	function keys() {
+	public function keys() {
 		return array(
 				  'MODULE_PAYMENT_WM_STATUS',		'MODULE_PAYMENT_WM_WMID'
 				, 'MODULE_PAYMENT_WM_PURSE_WMU',	'MODULE_PAYMENT_WM_PURSE_WME'
@@ -31,11 +31,11 @@ class webmoney {
 				);
 	}
 
-	function javascript_validation() {
+	public function javascript_validation() {
 		return false;
 	}
 
-	function selection() {
+	public function selection() {
 
 		
 		   global $order;
@@ -55,7 +55,7 @@ class webmoney {
 		//return array('id' => $this->code, 'module' => $this->title);
 	}
 
-	function get_CurrentCurrency()
+	public function get_CurrentCurrency()
 	{
 		switch($_POST['wm_purse_type'])
 		{
@@ -68,15 +68,15 @@ class webmoney {
 		   return $getcur;
 	}
 
-	function pre_confirmation_check() {
+	public function pre_confirmation_check() {
 		return false;
 	}
 
-	function confirmation() {
+	public function confirmation() {
 		return false;
 	}
 
-	function process_button($transactionID = 0, $key= "") {
+	public function process_button($transactionID = 0, $key= "") {
 		global $order, $currencies, $currency;
 
 		$process_button_string = tep_draw_hidden_field('LMI_PAYMENT_AMOUNT', $order->info['total']);
@@ -109,7 +109,7 @@ class webmoney {
 		return $process_button_string;
 	}
 
-	function get_OrderStatus()
+	public function get_OrderStatus()
 	{
 		//Если есть номер платежа в системе WebMoney Transfer, выполненный в процессе обработки
 
@@ -121,11 +121,11 @@ class webmoney {
 		}
 	}
 
-	function before_process() {
+	public function before_process() {
 		return false;
 	}
 
-	function after_process() {
+	public function after_process() {
 		return false;
 	}
 

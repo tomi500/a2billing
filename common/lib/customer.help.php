@@ -190,7 +190,7 @@ if (!isset ($disable_load_conf) || !($disable_load_conf)) {
 //	$SPOT['worldpay'] = '<a href="http://www.worldpay.com/" target="_blank"><img src="'.KICON_PATH.'/worldpay.gif" alt="worldpay.com"/></a>';
 	$SPOT['worldpay'] = '';
 	$SPOT['plugnpay'] = '<a href="http://www.plugnpay.com/" target="_blank"><img src="' . KICON_PATH . '/plugnpay.png" alt="plugnpay.com"/></a>';
-	$SPOT['webmoney'] = '<a href="http://webmoney.ua/pay/howtopay/" target="_blank"><img src="' . KICON_PATH . '/webmoney.gif" alt="WebMoney"/></a>';
+	$SPOT['webmoney'] = '<a href="https://wiki.webmoney.ru/projects/webmoney/wiki/%D0%9E%D0%BF%D0%BB%D0%B0%D1%82%D0%B0_%D1%82%D0%BE%D0%B2%D0%B0%D1%80%D0%BE%D0%B2_%D0%B8_%D1%83%D1%81%D0%BB%D1%83%D0%B3_%D1%87%D0%B5%D1%80%D0%B5%D0%B7_%D1%81%D0%B5%D1%80%D0%B2%D0%B8%D1%81_%D0%9C%D0%B5%D1%80%D1%87%D0%B0%D0%BD%D1%82" target="_blank"><img src="' . KICON_PATH . '/webmoney.gif" alt="WebMoney"/></a>';
 	$SPOT['webmoneycreditcard'] = '<a href="https://wiki.webmoney.ru/projects/webmoney/wiki/%D0%9F%D1%80%D0%B8%D0%B5%D0%BC_%D0%BF%D0%BB%D0%B0%D1%82%D0%B5%D0%B6%D0%B5%D0%B9_%D1%81_%D0%B1%D0%B0%D0%BD%D0%BA%D0%BE%D0%B2%D1%81%D0%BA%D0%B8%D1%85_%D0%BA%D0%B0%D1%80%D1%82_%28U-%D0%BA%D0%BE%D1%88%D0%B5%D0%BB%D1%8C%D0%BA%D0%B8%29#%D0%A1-%D1%82%D0%BE%D1%87%D0%BA%D0%B8-%D0%B7%D1%80%D0%B5%D0%BD%D0%B8%D1%8F-%D0%BF%D0%BB%D0%B0%D1%82%D0%B5%D0%BB%D1%8C%D1%89%D0%B8%D0%BA%D0%B0" target="_blank"><img src="' . KICON_PATH . '/webmoneycreditcard.gif" alt="WebMoney"/></a>';
 	$PAYMENT_METHOD = '
 	<table width="100%" align="center">

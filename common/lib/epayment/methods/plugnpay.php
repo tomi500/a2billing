@@ -7,7 +7,7 @@ class plugnpay {
     var $accepted_cc, $card_types, $allowed_types;
 
 	// class constructor
-    function plugnpay() {
+    public function __construct() {
       $this->code = 'plugnpay';
       $this->title = MODULE_PAYMENT_PLUGNPAY_TEXT_TITLE;
       $this->description = MODULE_PAYMENT_PLUGNPAY_TEXT_DESCRIPTION;
@@ -25,7 +25,7 @@ class plugnpay {
 
       // Credit card pulldown list
       $cc_array = explode(', ', MODULE_PAYMENT_PLUGNPAY_ACCEPTED_CC);
-      while (list($key, $value) = each($cc_array)) {
+      foreach($cc_array as $key => $value) {
         $this->allowed_types[$value] = $this->card_types[$value];
       }
 
@@ -38,16 +38,15 @@ class plugnpay {
 	// class methods
 
 	//concatenate to get CC images
-	function get_cc_images() {
+	public function get_cc_images() {
 		$cc_images = '';
-		reset($this->allowed_types);
-		while (list($key, $value) = each($this->allowed_types)) {
+		foreach($this->allowed_types as $key => $value) {
 			$cc_images .= tep_image(DIR_WS_ICONS . $key . '.gif', $value);
 		}
 		return $cc_images;
 	}
 
-	function javascript_validation() {
+	public function javascript_validation() {
 		#      $js = '  if (payment_value == "' . $this->code . '") {' . "\n" .
 		#            '    var cc_owner = document.checkout_payment.plugnpay_cc_owner.value;' . "\n" .
 		#            '    var cc_number = document.checkout_payment.plugnpay_cc_number.value;' . "\n" .
@@ -69,11 +68,10 @@ class plugnpay {
       return $js;
     }
 
-    function selection() {
+    public function selection() {
       global $order;
 
-      reset($this->allowed_types);
-      while (list($key, $value) = each($this->allowed_types)) {
+      foreach($this->allowed_types as $key => $value) {
         $card_menu[] = array('id' => $key, 'text' => $value);
       }
 
@@ -196,7 +194,7 @@ class plugnpay {
       return $selection;
     }
 
-    function pre_confirmation_check() {
+    public function pre_confirmation_check() {
       global $_POST, $cvv;
 
       if ((MODULE_PAYMENT_PLUGNPAY_PAYMETHOD == 'onlinecheck') && ($_POST['plugnpay_paytype'] != 'credit_card')) {
@@ -249,7 +247,7 @@ class plugnpay {
       }
     }
 
-    function confirmation() {
+    public function confirmation() {
       global $_POST, $card_cvv;
 
       if ((MODULE_PAYMENT_PLUGNPAY_PAYMETHOD == 'onlinecheck') && ($this->plugnpay_paytype == 'echeck')) {
@@ -289,7 +287,7 @@ class plugnpay {
       return $confirmation;
     }
 
-    function process_button($transactionID = 0, $key = "")  {
+    public function process_button($transactionID = 0, $key = "")  {
       // Change made by using PlugnPay API Connection
       $card_cvv=$_POST['cvv'];
 	  
@@ -306,7 +304,7 @@ class plugnpay {
       return $process_button_string;
     }
 
-    function before_process() {
+    public function before_process() {
       global $response;
       # Note: $response is an array that holds various pieces if cURL response info
       #       $response[0] will hold the entire response string from the pnpremote.cgi script
@@ -344,7 +342,7 @@ class plugnpay {
       }
     }
     
-    function get_OrderStatus()
+    public function get_OrderStatus()
     {
         global $pnp_transaction_array;
         
@@ -362,11 +360,11 @@ class plugnpay {
 		}
     }
 
-    function after_process() {
+    public function after_process() {
       return false;
     }
 
-    function get_error() {
+    public function get_error() {
       global $_GET;
 
       $error = array('title' => MODULE_PAYMENT_PLUGNPAY_TEXT_ERROR,
@@ -374,7 +372,7 @@ class plugnpay {
       return $error;
     }
 
-    function check() {
+    public function check() {
       if (!isset($this->_check)) {
         $check_query = tep_db_query("select configuration_value from " . TABLE_CONFIGURATION . " where configuration_key = 'MODULE_PAYMENT_PLUGNPAY_STATUS'");
         $this->_check = tep_db_num_rows($check_query);
@@ -382,7 +380,7 @@ class plugnpay {
       return $this->_check;
     }
 
-    function install() {
+    public function install() {
       tep_db_query("insert into " . TABLE_CONFIGURATION . " (configuration_title, configuration_key, configuration_value, configuration_description, configuration_group_id, sort_order, set_function, date_added) values ('Enable PlugnPay Module', 'MODULE_PAYMENT_PLUGNPAY_STATUS', 'True', 'Do you want to accept payments through PlugnPay?', '6', '0', 'tep_cfg_select_option(array(\'True\', \'False\'), ', now())");
       tep_db_query("insert into " . TABLE_CONFIGURATION . " (configuration_title, configuration_key, configuration_value, configuration_description, configuration_group_id, sort_order, date_added) values ('Login Username', 'MODULE_PAYMENT_PLUGNPAY_LOGIN', 'Your Login Name', 'Enter your PlugnPay account username', '6', '0', now())");
       tep_db_query("insert into " . TABLE_CONFIGURATION . " (configuration_title, configuration_key, configuration_value, configuration_description, configuration_group_id, sort_order, date_added) values ('Publisher Email', 'MODULE_PAYMENT_PLUGNPAY_PUBLISHER_EMAIL', 'Enter Your Email Address', 'The email address you want PlugnPay conformations sent to', '6', '0', now())");
@@ -397,7 +395,7 @@ class plugnpay {
 	  tep_db_query("insert into " . TABLE_CONFIGURATION . " (configuration_title, configuration_key, configuration_value, configuration_description, configuration_group_id, sort_order, set_function, date_added) values ('Accepted Credit Cards', 'MODULE_PAYMENT_PLUGNPAY_ACCEPTED_CC', 'Mastercard, Visa', 'The credit cards you currently accept', '6', '0', '_selectOptions(array(\'Amex\', \'Discover\', \'Mastercard\', \'Visa\'), ', now())");
     }
 
-    function remove() {
+    public function remove() {
       $keys = '';
       $keys_array = $this->keys();
       for ($i=0; $i<sizeof($keys_array); $i++) {
@@ -407,15 +405,15 @@ class plugnpay {
       tep_db_query("delete from " . TABLE_CONFIGURATION . " where configuration_key in (" . $keys . ")");
     }
 
-    function keys() {
+    public function keys() {
       return array('MODULE_PAYMENT_PLUGNPAY_STATUS', 'MODULE_PAYMENT_PLUGNPAY_LOGIN', 'MODULE_PAYMENT_PLUGNPAY_PUBLISHER_EMAIL', 'MODULE_PAYMENT_PLUGNPAY_CURL', 'MODULE_PAYMENT_PLUGNPAY_CURL_PATH', 'MODULE_PAYMENT_PLUGNPAY_TESTMODE', 'MODULE_PAYMENT_PLUGNPAY_CVV', 'MODULE_PAYMENT_PLUGNPAY_PAYMETHOD', 'MODULE_PAYMENT_PLUGNPAY_CCMODE', 'MODULE_PAYMENT_PLUGNPAY_DONTSNDMAIL', 'MODULE_PAYMENT_PLUGNPAY_ACCEPTED_CC');
     }
 	
-	function old_keys() {
+    public function old_keys() {
       return array('MODULE_PAYMENT_PLUGNPAY_STATUS', 'MODULE_PAYMENT_PLUGNPAY_LOGIN', 'MODULE_PAYMENT_PLUGNPAY_PUBLISHER_EMAIL', 'MODULE_PAYMENT_PLUGNPAY_CURL', 'MODULE_PAYMENT_PLUGNPAY_CURL_PATH', 'MODULE_PAYMENT_PLUGNPAY_TESTMODE', 'MODULE_PAYMENT_PLUGNPAY_CVV', 'MODULE_PAYMENT_PLUGNPAY_PAYMETHOD', 'MODULE_PAYMENT_PLUGNPAY_CCMODE', 'MODULE_PAYMENT_PLUGNPAY_SORT_ORDER', 'MODULE_PAYMENT_PLUGNPAY_DONTSNDMAIL', 'MODULE_PAYMENT_PLUGNPAY_ACCEPTED_CC');
     }
     
-    function get_CurrentCurrency()
+    public function get_CurrentCurrency()
     {
         $my_currency = strtoupper(BASE_CURRENCY);
         return $my_currency;

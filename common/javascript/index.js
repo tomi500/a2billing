@@ -72,18 +72,29 @@ $('body').on('click', '.zoneselect', function () {
     },350);
 });
 
+function validateEmail(email) {
+  var pattern = /^([A-Za-z0-9_\-\.])+\@([A-Za-z0-9_\-\.])+\.([A-Za-z]{2,4})$/;
+  return pattern.test(email);
+}
+
 $(function() {
     $(".btn-signup").click(function() {
+	var warning = $("#warningsignup");
+	if(r_email.value=="" || !validateEmail(r_email.value))
+	{
+	    warning.html(emptyemail);
+	    lasttimeout = setTimeout(function(){
+		warning.html('');
+	    },5000);
+	    return false;
+	}
+	warning.html('');
+
 	$(".nav").toggleClass("nav-up");
 	$('#country').val($('#pr_country').attr('dataval'));
 	$('#id_timezone').val($('#timezone').attr('dataval'));
     });
 });
-
-function validateEmail(email) {
-  var pattern = /^([A-Za-z0-9_\-\.])+\@([A-Za-z0-9_\-\.])+\.([A-Za-z]{2,4})$/;
-  return pattern.test(email);
-}
 
 $('#pr_email').keydown(function(e){
     if(e.keyCode == 13) {

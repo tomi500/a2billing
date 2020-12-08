@@ -36,8 +36,7 @@ Class payment {
          
           $include_modules[] = array('class' => $module, 'file' => $module . '.php');
       } else {
-          reset($this->modules);
-          while (list(, $value) = each($this->modules)) {
+          foreach($this->modules as $value) {
             $class = substr($value, 0, strrpos($value, '.'));
             $include_modules[] = array('class' => $class, 'file' => $value);
           }
@@ -97,8 +96,7 @@ Class payment {
               '    payment_value = document.checkout_payment.payment.value;' . "\n" .
               '  }' . "\n\n";
 
-        reset($this->modules);
-        while (list(, $value) = each($this->modules)) {
+        foreach ($this->modules as $value) {
           $class = substr($value, 0, strrpos($value, '.'));
           if ($GLOBALS[$class]->enabled) {
             $js .= $GLOBALS[$class]->javascript_validation();
@@ -125,9 +123,7 @@ Class payment {
     public function selection() {
       $selection_array = array();
       if (is_array($this->modules)) {
-        reset($this->modules);
-	while ($value = current($this->modules)) {
-	  next($this->modules);
+        foreach ($this->modules as $value) {
           $class = substr($value, 0, strrpos($value, '.'));
           if ($GLOBALS[$class]->enabled) { 
             $selection = $GLOBALS[$class]->selection();
