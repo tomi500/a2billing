@@ -51,7 +51,7 @@ if (isset ($pr_email) && isset ($action)) {
 		} else {
 			sendForgot(9,gettext("Please wait 1 minute before making any other request for the forgot password!"));
 		}
-		$pr_email = filter_var($pr_email, FILTER_VALIDATE_EMAIL);
+		$pr_email = filter_var(trim($pr_email), FILTER_VALIDATE_EMAIL);
 		if ($pr_email===false) {
 			sendForgot(7,gettext("Please provide your valid email address<br>to get your login information"));
 		}

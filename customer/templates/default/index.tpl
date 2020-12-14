@@ -77,7 +77,7 @@ var noservice = "{php} echo gettext("Service temporally not available.<br>Try ag
           <input type="hidden" name="id_timezone" id="id_timezone">
           <div class="login-title" id="warningsignup"></div>
           <label for="fullname">{php} echo gettext("Full name");{/php}</label>
-          <input class="form-styling" type="text" name="fullname"/>
+          <input class="form-styling" type="text" name="fullname" id="fullname"/>
           <label for="r_email">{php} echo gettext("E-Mail");{/php}</label>
           <input class="form-styling" type="email" name="r_email" id="r_email"/>
           <label for="pr_country">{php} echo gettext("COUNTRY");{/php}</label>

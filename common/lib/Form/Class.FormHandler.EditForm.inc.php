@@ -423,16 +423,16 @@ function updatecontent(id_el, record, field_inst, instance)
 						$instance_sub_table = new Table($this->FG_TABLE_EDITION[$i][8], $this->FG_TABLE_EDITION[$i][9]);
 						$select_list = $instance_sub_table -> Get_list ($this->DBHandle, str_replace("%id", "$id", $this->FG_TABLE_EDITION[$i][10]), null, null, null, null, null, null);
 						if ($this->FG_DEBUG >= 2) { echo "<br>"; print_r($select_list);}
-											
-					} elseif (strtoupper ($this->FG_TABLE_EDITION[$i][7])=="LIST")
-					{
+					} elseif (strtoupper ($this->FG_TABLE_EDITION[$i][7])=="LIST")	{
 						$select_list = $this->FG_TABLE_EDITION[$i][11];
 						if ($this->FG_DEBUG >= 2) { echo "<br>"; print_r($select_list);}
 					}
-					 if ($this->FG_DEBUG >= 2) print_r ($list);			 
-					 if ($this->FG_DEBUG >= 2) echo "<br>#$i<br>::>".$this->VALID_SQL_REG_EXP;
-					 if ($this->FG_DEBUG >= 2) echo "<br><br>::>".$list[0][$i];
-					 if ($this->FG_DEBUG >= 2) echo "<br><br>::>".$this->FG_TABLE_ADITION[$i][1];
+					 if ($this->FG_DEBUG >= 2) {
+					    print_r ($list);
+					    echo "<br>#$i<br>::>".$this->VALID_SQL_REG_EXP;
+					    echo "<br><br>::>".$list[0][$i];
+					    echo "<br><br>::>".$this->FG_TABLE_ADITION[$i][1];
+					 }
 			  		 ?>
 						<SELECT name='<?php echo $this->FG_TABLE_EDITION[$i][1]?><?php if (strpos($this->FG_TABLE_EDITION[$i][4], "multiple")) echo "[]";?>' class="form_input_select" <?php echo $this->FG_TABLE_EDITION[$i][4]?>>
                         <?php

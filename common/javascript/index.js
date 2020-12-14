@@ -1,4 +1,7 @@
 var lasttimeout = null;
+var warningIDup = null;
+var warningIDin = null;
+var warningIDot = null;
 
 $("#ui_language").change(function () {
     self.location.href= "?ui_language="+$("#ui_language option:selected").val();
@@ -23,6 +26,8 @@ $(function() {
 
 $(function() {
     $(".btn_up").click(function() {
+	if(typeof r_email !== 'undefined' && validateEmail(pr_login.value) && r_email.value=='')
+	    $('#r_email').val(pr_login.value);
 	$(".forms").removeClass("forms-right");
 	$(".forms").addClass("forms-left");
 	$(".signup-inactive a").removeAttr('style');
@@ -34,6 +39,8 @@ $(function() {
 
 $(function() {
     $(".forgot a").click(function() {
+	if(validateEmail(pr_login.value) && pr_email.value=='')
+	    $('#pr_email').val(pr_login.value);
 	$(".forms").addClass("forms-right");
 	$(".signin-active").addClass("signin-inactive");
 	$(".signup-inactive").removeClass("signup-active");
@@ -77,25 +84,6 @@ function validateEmail(email) {
   return pattern.test(email);
 }
 
-$(function() {
-    $(".btn-signup").click(function() {
-	var warning = $("#warningsignup");
-	if(r_email.value=="" || !validateEmail(r_email.value))
-	{
-	    warning.html(emptyemail);
-	    lasttimeout = setTimeout(function(){
-		warning.html('');
-	    },5000);
-	    return false;
-	}
-	warning.html('');
-
-	$(".nav").toggleClass("nav-up");
-	$('#country').val($('#pr_country').attr('dataval'));
-	$('#id_timezone').val($('#timezone').attr('dataval'));
-    });
-});
-
 $('#pr_email').keydown(function(e){
     if(e.keyCode == 13) {
             $('.btn-forgot').click();
@@ -108,14 +96,18 @@ $('body').on('click', '.btn-forgot', function () {
 	var warning = $("#warningforgot");
 	if(pr_email.value=="" || !validateEmail(pr_email.value))
 	{
+	    clearTimeout(warningIDot);
 	    warning.html(emptyemail);
-	    lasttimeout = setTimeout(function(){
+	    warningIDot = setTimeout(function(){
 		warning.html('');
 	    },5000);
 	    return false;
 	}
-	warning.html('');
+	if (lasttimeout) return false;
+	clearTimeout(warningIDot);
+	$(".btn-submit").css({'background-color':'#666666','color':'#999999'});
 	$(".nav").addClass("nav-up");
+	warning.html('');
 	var url = location.origin+location.pathname;
 	url = url.replace(".php","");
 	url = url.replace("/index","");
@@ -128,36 +120,107 @@ $('body').on('click', '.btn-forgot', function () {
 	xhttp.onreadystatechange = function() {
 	    if (xhttp.readyState == 4)
 	    if (xhttp.status == 200) {
-		var errorForgot = xhttp.responseXML.getElementsByTagName('response')[0].getElementsByTagName('error')[0].childNodes[0].nodeValue;
-		var answerForgot = xhttp.responseXML.getElementsByTagName('response')[0].getElementsByTagName('forgotString')[0].childNodes[0].nodeValue;
-		if (lasttimeout) {
-		    clearTimeout(lasttimeout);
-		    lasttimeout = null;
-		}
-		if (errorForgot==5) {
-		    $('.form-forgot').html('<div class="login-title"></div><div class="login-title">'+answerForgot+'</div>');
+		var error = xhttp.responseXML.getElementsByTagName('response')[0].getElementsByTagName('error')[0].childNodes[0].nodeValue;
+		var answer = xhttp.responseXML.getElementsByTagName('response')[0].getElementsByTagName('forgotString')[0].childNodes[0].nodeValue;
+		if (error==5) {
+		    $('.form-forgot').html('<div class="login-title"></div><div class="login-title">'+answer+'</div>');
 		    lasttimeout = setTimeout(function(){
+			$(".btn-submit").css({'background-color':'#1059FF','color':'#FFFFFF'});
 			$(".nav").removeClass("nav-up");
-		    },5000);
+			lasttimeout = null;
+		    },4000);
 		} else {
-		    warning.html(answerForgot);
-		    setTimeout(function(){
-			$(".nav").removeClass("nav-up");
-		    },5000);
+		    warning.html(answer);
 		    lasttimeout = setTimeout(function(){
-			warning.html('');
-		    },10000);
+			$(".btn-submit").css({'background-color':'#1059FF','color':'#FFFFFF'});
+			$(".nav").removeClass("nav-up");
+			lasttimeout = null;
+			warningIDot = setTimeout(function(){
+			    warning.html('');
+			},4000);
+		    },4000);
 		}
 	    } else {
 		warning.html(noservice);
 		lasttimeout = setTimeout(function(){
 		    warning.html('');
+		    $(".btn-submit").css({'background-color':'#1059FF','color':'#FFFFFF'});
 		    $(".nav").removeClass("nav-up");
-		},5000);
+		    lasttimeout = null;
+		},4000);
 	    }
 	};
 	xhttp.send(body);
 	return false;
+});
+
+$(function() {
+    $(".btn-signup").click(function() {
+	var warning = $("#warningsignup");
+	if(r_email.value=="" || !validateEmail(r_email.value))
+	{
+	    clearTimeout(warningIDup);
+	    warning.html(emptyemail);
+	    warningIDup = setTimeout(function(){
+		warning.html('');
+	    },5000);
+	    return false;
+	}
+	if (lasttimeout) return false;
+	clearTimeout(warningIDup);
+	$(".btn-submit").css({'background-color':'#666666','color':'#999999'});
+	$(".nav").addClass("nav-up");
+	warning.html('');
+	$('#country').val($('#pr_country').attr('dataval'));
+	$('#id_timezone').val($('#timezone').attr('dataval'));
+	var url = location.origin+location.pathname;
+	url = url.replace(".php","");
+	url = url.replace("/index","");
+	url = url.replace(/^\/+|\/+$/g, '');
+	url += '/signup';
+	var body = 'form_action=add&types=short&email='+r_email.value+'&fullname='+fullname.value+'&country='+country.value+'&id_timezone='+id_timezone.value;
+	var xhttp = new XMLHttpRequest();
+	xhttp.open("POST",url,true);
+	xhttp.setRequestHeader('Content-Type', 'application/x-www-form-urlencoded');
+	xhttp.timeout = 5000;
+	xhttp.onreadystatechange = function() {
+	  if (xhttp.readyState == 4)
+	    if (xhttp.status == 200) {
+		var error = xhttp.responseXML.getElementsByTagName('response')[0].getElementsByTagName('error')[0].childNodes[0].nodeValue;
+		var answer= xhttp.responseXML.getElementsByTagName('response')[0].getElementsByTagName('forgotString')[0].childNodes[0].nodeValue;
+		if (error==5) {
+		    $('.form-signup').html('<div class="login-title"></div><div class="login-title">'+answer+'</div>');
+		    lasttimeout = setTimeout(function(){
+			$(".btn-submit").css({'background-color':'#1059FF','color':'#FFFFFF'});
+			$(".nav").removeClass("nav-up");
+			lasttimeout = null;
+		    },4000);
+		    $('#pr_login').val(xhttp.responseXML.getElementsByTagName('response')[0].getElementsByTagName('login')[0].childNodes[0].nodeValue);
+		    $('#pr_password').val(xhttp.responseXML.getElementsByTagName('response')[0].getElementsByTagName('pass')[0].childNodes[0].nodeValue);
+		} else {
+		    warning.html(answer);
+		    lasttimeout = setTimeout(function(){
+			$(".btn-submit").css({'background-color':'#1059FF','color':'#FFFFFF'});
+			$(".nav").removeClass("nav-up");
+			lasttimeout = null;
+			warningIDup = setTimeout(function(){
+			    warning.html('');
+			},4000);
+		    },4000);
+		}
+	    } else {
+		warning.html(noservice);
+		lasttimeout = setTimeout(function(){
+		    $(".btn-submit").css({'background-color':'#1059FF','color':'#FFFFFF'});
+		    $(".nav").removeClass("nav-up");
+		    lasttimeout = null;
+		    warning.html('');
+		},4000);
+	    }
+	};
+	xhttp.send(body);
+	return false;
+    });
 });
 
 $('#pr_login,#pr_password').keydown(function(e){
@@ -173,14 +236,16 @@ $('body').on('click', '.btn-signin', function () {
 	if(pr_password.value.length<6 || pr_login.value.length<6)
 	{
 	    warning.html(emptylogin);
-	    setTimeout(function(){
+	    warningIDin = setTimeout(function(){
 		warning.html('');
-	    },10000);
+	    },9000);
 	    return false;
 	}
-	warning.html('');
+	if (lasttimeout) return false;
+	clearTimeout(warningIDin);
+	$(".btn-submit").css({'background-color':'#666666','color':'#999999'});
 	$(".nav").addClass("nav-up");
-
+	warning.html('');
 	var url = location.origin+location.pathname;
 	url = url.replace(".php","");
 	url = url.replace("/index","");
@@ -192,31 +257,31 @@ $('body').on('click', '.btn-signin', function () {
 	xhttp.setRequestHeader('Content-Type', 'application/x-www-form-urlencoded');
 	xhttp.timeout = 5000;
 	xhttp.onreadystatechange = function() {
-	    if (xhttp.readyState == 4)
+	  if (xhttp.readyState == 4)
 	    if (xhttp.status == 200) {
 		var errorForgot = xhttp.responseXML.getElementsByTagName('response')[0].getElementsByTagName('error')[0].childNodes[0].nodeValue;
 		var answerForgot = xhttp.responseXML.getElementsByTagName('response')[0].getElementsByTagName('signinString')[0].childNodes[0].nodeValue;
-		if (lasttimeout) {
-		    clearTimeout(lasttimeout);
-		    lasttimeout = null;
-		}
 		if (errorForgot==0) {
 		    location.assign(url);
 		    return false;
 		} else {
 		    warning.html(answerForgot);
-		    setTimeout(function(){
-			$(".nav").removeClass("nav-up");
-		    },5000);
 		    lasttimeout = setTimeout(function(){
-			warning.html('');
-		    },10000);
+			$(".btn-submit").css({'background-color':'#1059FF','color':'#FFFFFF'});
+			$(".nav").removeClass("nav-up");
+			lasttimeout = null;
+			warningIDin = setTimeout(function(){
+			    warning.html('');
+			},4000);
+		    },4000);
 		}
 	    } else {
 		warning.html(noservice);
 		lasttimeout = setTimeout(function(){
 		    warning.html('');
+		    $(".btn-submit").css({'background-color':'#1059FF','color':'#FFFFFF'});
 		    $(".nav").removeClass("nav-up");
+		    lasttimeout = null;
 		},5000);
 	    }
 	};

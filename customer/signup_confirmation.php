@@ -31,6 +31,13 @@
  * 
 **/
 
+function sendForgot($error,$forgotString,$login=null,$pass=null) {
+    header("Content-type: text/xml");
+    echo "<response><error>$error</error><forgotString><![CDATA[$forgotString]]></forgotString>";
+    if ($login) echo "<login>".$login,"</login><pass>".$pass."</pass>";
+    echo "</response>";
+    die();
+}
 
 include ("./lib/customer.defines.php");
 include ("./lib/customer.module.access.php");
@@ -77,7 +84,7 @@ try {
 	exit ();
 }
 
-$QUERY = "SELECT username, lastname, firstname, email, uipass, credit, useralias, loginkey FROM cc_card WHERE id=" . $_SESSION["id_signup"];
+$QUERY = "SELECT username, lastname, firstname, email, uipass, credit, useralias, loginkey, city FROM cc_card WHERE id=" . $_SESSION["id_signup"];
 
 $res = $DBHandle->Execute($QUERY);
 $num = 0;
@@ -106,6 +113,15 @@ try {
     $error_msg = $e->getMessage();
 }
 
+if (!has_rights(ACX_DISTRIBUTION) && $list[0][8]=="") {
+    if (!$activatedbyuser){
+	sendForgot(5,$list[0][2].", ".gettext("thank you for registering with us!")."<br>".gettext("An activation email has been sent to")." <b>".$list[0][3]."</b>",$list[0][6],$list[0][4]);
+    } else {
+	sendForgot(5,$list[0][2].", ".gettext("Thank you for registering with us !")." ".gettext("An email confirming your information has been sent to")." <b>".$list[0][3]."</b><br><br>".
+	    gettext("Your cardnumber is ")."<b><font color=\"#00AA00\">".$list[0][0]."</font></b><br><br><u>".gettext("To login to your account :")."</u><br>".
+	    gettext("Your card alias (login) is ")." <b><font color=\"#00AA00\">".$list[0][6]."</font></b><br>".gettext("Your password is ")."<b><font color=\"#00AA00\">".$list[0][4]."</font></b>",$list[0][6],$list[0][4]);
+    }
+}
 $smarty->display('signup_header.tpl');
 ?>
 

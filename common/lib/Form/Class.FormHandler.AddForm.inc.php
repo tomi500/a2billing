@@ -131,7 +131,7 @@ $processed = $this->getProcessed();
 			if (strlen($this->FG_TABLE_ADITION[$i][6])>0) {
 	?>
 	<option value="-1"><?php echo $this->FG_TABLE_ADITION[$i][6]?></option>
-	<?php  } 
+	<?php		}
 				if (count($select_list)>0){
 					$select_number=0;
 					foreach ($select_list as $select_recordset) {

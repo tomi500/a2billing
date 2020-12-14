@@ -91,7 +91,7 @@ echo "id_signup         = ".$_SESSION["id_signup"]."<br>";
 echo "=========================<br>";
 **/
 	unset ($_SESSION["cardnumber_signup"]);
-	$_SESSION["language_code"] = $_POST["language"];
+	$_SESSION["language_code"] = $language;
 	$_SESSION["cardnumber_signup"] = $maxi;
 	$_SESSION["id_signup"] = $HD_Form->RESULT_QUERY;
 /**

@@ -1404,7 +1404,6 @@ class FormBO {
 		global $A2B;
 		$FormHandler = FormHandler::GetInstance();
 		$id_card = $FormHandler -> RESULT_QUERY;
-//		echo "id_card==========".$id_card;
 		NotificationsDAO::AddNotification("added_new_signup",Notification::$MEDIUM,Notification::$CUST,$id_card,Notification::$LINK_CARD,$id_card);
 	}
 }

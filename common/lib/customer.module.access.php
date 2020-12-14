@@ -208,6 +208,8 @@ function login ($user, $pass)
 	if($row [0][2] != "t" && $row [0][2] != "1"  && $row [0][2] != "8") {
 		if ($row [0][2] == "2")
 			return -2;
+		elseif ($row [0][2] == "3")
+			return -3;
 		else
 			return -1;
 	}

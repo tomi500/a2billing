@@ -1548,8 +1548,8 @@ class FormHandler
 						}
 					}
 					// CHECK IF THIS IS A SPLITABLE FIELD LIKE 012-014 OR 15;16;17
-				 	if ($fields_name == $this -> FG_SPLITABLE_FIELD && substr($processed[$fields_name],0,1) != '_') {
-				 		$splitable_value = $processed[$fields_name];
+					if ($fields_name == $this -> FG_SPLITABLE_FIELD && substr($processed[$fields_name],0,1) != '_') {
+						$splitable_value = $processed[$fields_name];
 						$arr_splitable_value = explode(",", $splitable_value);
 						foreach ($arr_splitable_value as $arr_value) {
 							$arr_value = trim ($arr_value);
@@ -1605,8 +1605,7 @@ class FormHandler
 		}
 			
 		if ($this->FG_DEBUG == 1)  echo "<br><hr> $param_add_fields";
-		if ($this->FG_DEBUG == 1)  echo "<br><hr> $param_add_value";	
-		
+		if ($this->FG_DEBUG == 1)  echo "<br><hr> $param_add_value";
 		// CALL DEFINED FUNCTION BEFORE THE ADDITION
 		
 		if (strlen($this->FG_ADDITIONAL_FUNCTION_BEFORE_ADD)>0 && ($this->VALID_SQL_REG_EXP)) {

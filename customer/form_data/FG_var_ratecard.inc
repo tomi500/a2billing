@@ -33,7 +33,7 @@
 
 
 
-getpost_ifset(array('destination', 'dialprefix', 'rateinitial','posted','tariffplan'));
+getpost_ifset(array('destination', 'dialprefix', 'rateinitial', 'posted', 'tariffplan'));
 
 $cardid = $_SESSION['card_id'];
 $margin = 1;

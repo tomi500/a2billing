@@ -31,12 +31,44 @@
  * 
 **/
 
-
-
-getpost_ifset(array('id','subscriber_signup', 'username', 'useralias', 'uipass', 'credit', 'language', 'tariff', 'activated', 'simultaccess', 'currency', 'typepaid', 'creditlimit', 'lastname',
+getpost_ifset(array('id','subscriber_signup', 'username', 'useralias', 'uipass', 'credit', 'tariff', 'activated', 'simultaccess', 'currency', 'typepaid', 'creditlimit', 'language', 'lastname',
 	'firstname', 'email', 'address', 'city', 'state', 'id_timezone', 'country', 'zipcode', 'phone', 'fax', 'inuse', 'cid', 'runservice', 'firstusedate', 'expirationdate', 'enableexpire',
-	'expiredays','company_name' , 'company_website' , 'vat_rn' , 'vat', 'traffic' , 'traffic_target','captchacode','groupid', 'key', 'id_diller', 'margin', 'paypal', 'id_group'));
+	'expiredays','company_name' , 'company_website' , 'vat_rn' , 'vat', 'traffic' , 'traffic_target','captchacode','groupid', 'key', 'id_diller', 'margin', 'paypal', 'id_group', 'fullname', 'types'));
 
+function sendForgot($error,$forgotString) {
+    header("Content-type: text/xml");
+    echo "<response><error>$error</error><forgotString><![CDATA[$forgotString]]></forgotString></response>";
+    die();
+}
+$callPlan_idlist = isset($A2B->config["signup"]['callplan_id_list']) ? $A2B->config["signup"]['callplan_id_list'] : NULL;
+$group_idlist = isset($A2B->config["signup"]['group_id_list']) ? $A2B->config["signup"]['group_id_list'] : NULL;
+if (isset($form_action) && $form_action=='add' && isset($types) && $types=='short') {
+    if (!isset ($_SESSION["date_forgot"]) || (time() - $_SESSION["date_forgot"]) > 20) {
+	$_SESSION["date_forgot"] = time();
+    } else {
+	sendForgot(9,gettext("Please wait 1 minute before making any other request for the signup!"));
+    }
+    $fullname = @trim($fullname);
+    $full_name = explode(' ',$fullname);
+    if ($full_name===false || count($full_name)!=2 || strlen($fullname)<4 || strpos($fullname,' ')<1) {
+	sendForgot(7,gettext("Please provide your First and Last name"));
+    }
+    list($firstname,$lastname) = $full_name;
+    $_POST["lastname"] = $lastname;
+    $_POST["firstname"] = $firstname;
+    $email = filter_var(trim($email), FILTER_VALIDATE_EMAIL);
+    if ($email===false) {
+	sendForgot(7,gettext("Please provide your valid email address"));
+    }
+    $_SESSION["language_code"] = $_POST["language"] = $language = LANG;
+
+    list($tariff) = explode(',',$callPlan_idlist);
+    list($id_group) = explode(',',$group_idlist);
+    $currency = BASE_CURRENCY;
+    $quicksignup = true;
+} else {
+    $quicksignup = false;
+}
 //put parameter in session
 $HD_Form = new FormHandler("cc_card", "User");
 $HD_Form->FG_DEBUG = 0;
@@ -51,10 +83,8 @@ if (!empty ($key)) {
 	$_SESSION["key"] = $key;
 }
 
-if (empty($language)) $language = LANG;
+if (empty($language)) $_SESSION["language_code"] = $_POST["language"] = $language = LANG;
 
-$callPlan_idlist = isset($A2B->config["signup"]['callplan_id_list']) ? $A2B->config["signup"]['callplan_id_list'] : NULL;
-$group_idlist = isset($A2B->config["signup"]['group_id_list']) ? $A2B->config["signup"]['group_id_list'] : NULL;
 if (has_rights (ACX_DISTRIBUTION) && (isset($id_diller) && $id_diller > 0)) {
 	if (!empty($_SESSION["dillertariffs"]))  {
 		$callPlan_idlist = $_SESSION["dillertariffs"];
@@ -113,7 +143,7 @@ $maxi = $maxi2 = $maxi3 = $maxi4 = '';
 //	-= Need to install GeoIP http://ua2.php.net/manual/en/geoip.setup.php =-
 if (($form_action == 'ask-add' || $form_action == 'add') && (geoip_db_avail(GEOIP_REGION_EDITION_REV0) || geoip_db_avail(GEOIP_REGION_EDITION_REV1))) {
 	$countryregion = geoip_record_by_name($_SERVER['REMOTE_ADDR']);
-	$maxi4 = "value='".$countryregion['postal_code']."'";
+	if (!isset($zipcode)) $maxi4 = "value='".$countryregion['postal_code']."'";
 } else {
 	$country = $region = "";
 }
@@ -171,7 +201,7 @@ if (isset ($form_action) && $form_action == "add") {
 }
 
 $language_list = Constants::getLanguagesList();
-if (LANGUAGE_ENABLE)  {
+if (LANGUAGE_ENABLE || $quicksignup)  {
 $HD_Form->AddEditElement(gettext("LANGUAGE")." *",
 		"language",
 		"$language",
@@ -217,7 +247,7 @@ $HD_Form->AddEditElement(gettext("FIRSTNAME")." *",
 $firstname_editFG = "firstname,";
 }
 
-if (COMP_ENABLE)  {
+if (COMP_ENABLE && !$quicksignup)  {
 $HD_Form->AddEditElement(gettext("COMPANY NAME"),
 		"company_name",
 		'$value',
@@ -266,7 +296,7 @@ $HD_Form->AddEditElement(gettext("EMAIL")." *",
 		"style=\"width:260px\" maxlength=70", "1",
 		gettext("Insert your email"), "", "", "", "", "", "", "", "");
 
-if (ADDRESS_ENABLE)  {
+if (ADDRESS_ENABLE && !$quicksignup)  {
 $HD_Form->AddEditElement(gettext("ADDRESS")." *",
 		"address",
 		'$value',
@@ -276,7 +306,7 @@ $HD_Form->AddEditElement(gettext("ADDRESS")." *",
 $address_editFG = ",address";
 }
 
-if (CITY_ENABLE)  {
+if (CITY_ENABLE && !$quicksignup)  {
 	$HD_Form->AddEditElement(gettext("CITY")." *",
 								"city",
 								'$value',
@@ -286,7 +316,7 @@ if (CITY_ENABLE)  {
 	$city_editFG = ",city";
 }
 
-if (STATE_ENABLE)  {
+if (STATE_ENABLE && !$quicksignup)  {
 	$HD_Form->AddEditElement(gettext("STATE/PROVINCE"),
 								"state",
 								'$value',
@@ -313,7 +343,7 @@ if (COUNTRY_ENABLE)  {
 	$country_editFG = ",country";
 }
 
-if (ZIPCODE_ENABLE)  {
+if (ZIPCODE_ENABLE && !$quicksignup)  {
 	$HD_Form->AddEditElement(gettext("ZIP/POSTAL CODE")." *",
 								"zipcode",
 								'$value',
@@ -351,7 +381,7 @@ if (TIMEZONE_ENABLE)  {
 			$zonename		= $UserDateTimeZone->getName();
 //			$UserDateTime		= new DateTime(null, $UserDateTimeZone);
 //			$servergmt		= $UserDateTimeZone->getOffset($UserDateTime);
-			$UserDateTime		= new DateTime('2017-12-14', $UserDateTimeZone);
+			$UserDateTime		= new DateTime('2019-12-14', $UserDateTimeZone);
 			$servergmt		= $UserDateTime->getOffset();
 		} else $servergmt = SERVER_GMT;
 		foreach ($timezone_list as $key => $cur_value) {
@@ -384,7 +414,7 @@ if (TIMEZONE_ENABLE)  {
 	$id_timezone_editFG = ",id_timezone";
 }
 
-if (PHONE_ENABLE)  {
+if (PHONE_ENABLE && !$quicksignup)  {
 	$HD_Form->AddEditElement(gettext("PHONE NUMBER")." *",
 								"phone",
 								'$value',
@@ -393,7 +423,7 @@ if (PHONE_ENABLE)  {
 	$phone_editFG = ",phone";
 }
 
-if (FAX_ENABLE)  {
+if (FAX_ENABLE && !$quicksignup)  {
 	$HD_Form->AddEditElement(gettext("FAXNUMBER"), 
 								"fax", 
 								'$value', 
@@ -402,7 +432,7 @@ if (FAX_ENABLE)  {
 	$fax_editFG = ",fax";
 }
 
-if (COMP_WEB_ENABLE)  {
+if (COMP_WEB_ENABLE && !$quicksignup)  {
 	$HD_Form->AddEditElement(gettext("COMPANY WEBSITE"), 
 								"company_website",
 								'$value',
@@ -411,7 +441,7 @@ if (COMP_WEB_ENABLE)  {
 	$company_website_editFG = ",company_website";
 }
 
-if (VAT_RN_ENABLE)  {
+if (VAT_RN_ENABLE && !$quicksignup)  {
 	$HD_Form->AddEditElement(gettext("VAT REGISTRATION NUMBER "), 
 								"vat_rn", 
 								'$value', 
@@ -429,7 +459,7 @@ if (VAT_RN_ENABLE)  {
 	$VAT_editFG = ",vat";
 }
 
-if (TRAFFIC_ENABLE)  {
+if (TRAFFIC_ENABLE && !$quicksignup)  {
 	$HD_Form->AddEditElement(gettext("TRAFFIC PER MONTH"), 
 								"traffic", 
 								'$value', 
@@ -438,7 +468,7 @@ if (TRAFFIC_ENABLE)  {
 	$traffic_editFG = ",traffic";
 }
 
-if (TRAFFIC_TARGET_ENABLE)  {
+if (TRAFFIC_TARGET_ENABLE && !$quicksignup)  {
 	$HD_Form->AddEditElement(gettext("TARGET TRAFFIC"),
 								"traffic_target",
 								'',
@@ -467,7 +497,10 @@ if (has_rights (ACX_DISTRIBUTION) || (isset($id_diller) && $id_diller > 0))  {
 								"list", "", "", "", $yesno_list, "%1", "", gettext("Apply PayPal payment to this customer"));
 	$subscriber_editFG .= ",paypal";
     }
-} elseif (CAPTCHA_ENABLE) {
+} else {
+    $HD_Form->FG_QUERY_ADITION_HIDDEN_FIELDS = "id_diller, ";
+    $HD_Form->FG_QUERY_ADITION_HIDDEN_VALUE = "0, ";
+    if (CAPTCHA_ENABLE && !$quicksignup) {
 
 	$HD_Form->AddEditElement(gettext("VERIFICATION"),
 								"captchacode",
@@ -477,19 +510,17 @@ if (has_rights (ACX_DISTRIBUTION) || (isset($id_diller) && $id_diller > 0))  {
 								"19",
 								gettext("Insert code from above picture"), "", "", "", "", "", "", "", "", CAPTCHA_ENABLE);
 	$captcha = ",captchacode";
+    }
 }
 
-$HD_Form->FieldEditElement('username, useralias, uipass, credit, ' . $language_editFG . ' id_didgroup, id_campaign,' .
-	'callback, activated, simultaccess, ' . $currency_editFG . ' runservice, typepaid, creditlimit, firstusedate, enableexpire,' .
-	'expirationdate, expiredays, vat, ' . $lastname_editFG . $firstname_editFG . $company_name_editFG . $group_editFG . ' email' . $address_editFG .
-	$city_editFG . $state_editFG . $country_editFG . $zipcode_editFG . $id_timezone_editFG . $phone_editFG . $fax_editFG .
-	$company_website_editFG . $VAT_RN_editFG . $VAT_editFG . $traffic_editFG . $traffic_target_editFG . $subscriber_editFG . $captcha);
+$HD_Form->FieldEditElement( $language_editFG . $currency_editFG . $lastname_editFG . $firstname_editFG . $company_name_editFG . $group_editFG . 'email' . $address_editFG .
+			    $city_editFG . $state_editFG . $country_editFG . $zipcode_editFG . $id_timezone_editFG . $phone_editFG . $fax_editFG .
+			    $company_website_editFG . $VAT_RN_editFG . $VAT_editFG . $traffic_editFG . $traffic_target_editFG . $subscriber_editFG . $captcha );
 
 if (!isset ($myusername))
 	$myusername = '';
 
 //Code here for Getting Data from configuration files
-$comp_date_plus = $A2B->config["signup"]['expirationdate'];
 
 if (!$A2B->config["signup"]['expirationdate']) {
 	$comp_date_plus = '';
@@ -497,24 +528,27 @@ if (!$A2B->config["signup"]['expirationdate']) {
 	$begin_date_plus = date("Y") + 10;
 	$end_date = date("-m-d H:i:s");
 	$comp_date_plus = $begin_date_plus . $end_date;
+} else {
+	$comp_date_plus = $A2B->config["signup"]['expirationdate'];
 }
 
 $mytariff = '';
 $mycredit = '';
 
-$myexpirationdate = $comp_date_plus;
-$myactivated = $A2B->config["signup"]['activated'] ? 't' : 'f';
-$mysimultaccess = $A2B->config["signup"]['simultaccess'];
-$mytypepaid = $A2B->config["signup"]['typepaid'];
-$mycreditlimit = $A2B->config["signup"]['creditlimit'];
-$myrunservice = $A2B->config["signup"]['runservice'];
-$myenableexpire = $A2B->config["signup"]['enableexpire'];
-$myexpiredays = $A2B->config["signup"]['expiredays'];
-$mycredit = $A2B->config["signup"]['credit'];
-$sip_account = $A2B->config["signup"]['sip_account'] ? 1 : 0;
-$iax_account = $A2B->config["signup"]['iax_account'] ? 1 : 0;
-$amaflag = $A2B->config["signup"]['amaflag'];
-$context = $A2B->config["signup"]['context'];
+$iax_account		= $A2B->config["signup"]['iax_account'] ? 1 : 0;
+$sip_account		= $A2B->config["signup"]['sip_account'] ? 1 : 0;
+$myexpiredays		= $A2B->config["signup"]['expiredays'];
+$myexpirationdate	= $comp_date_plus;
+$mytypepaid		= $A2B->config["signup"]['typepaid'];
+$myenableexpire 	= $A2B->config["signup"]['enableexpire'];
+$myrunservice		= $A2B->config["signup"]['runservice'];
+$mysimultaccess 	= $A2B->config["signup"]['simultaccess'];
+$mycredit		= $A2B->config["signup"]['credit'];
+
+$myactivated		= $A2B->config["signup"]['activated'] ? 't' : 'f';
+$mycreditlimit		= $A2B->config["signup"]['creditlimit'];
+$amaflag		= $A2B->config["signup"]['amaflag'];
+$context		= $A2B->config["signup"]['context'];
 
 if (has_rights (ACX_DISTRIBUTION))
 	$status = 1;
@@ -526,10 +560,9 @@ elseif ($A2B->config["signup"]['activated']) {
 	$status = $A2B->config["signup"]['activatedbyuser'] ? '2' : '3';
 }
 
-$HD_Form->FG_QUERY_ADITION_HIDDEN_FIELDS = "iax_buddy, sip_buddy, expiredays, expirationdate, typepaid, enableexpire, runservice, simultaccess, credit, username, useralias, uipass, loginkey, status";
-$HD_Form->FG_QUERY_ADITION_HIDDEN_VALUE = "$iax_account, $sip_account, $myexpiredays, $myexpirationdate, $mytypepaid, $myenableexpire, $myrunservice, $mysimultaccess, $mycredit, $maxi, $maxi2, $pass, $loginkey, $status";
+$HD_Form->FG_QUERY_ADITION_HIDDEN_FIELDS .= "iax_buddy, sip_buddy, expiredays, expirationdate, typepaid, enableexpire, runservice, simultaccess, credit, username, useralias, uipass, loginkey, status";
+$HD_Form->FG_QUERY_ADITION_HIDDEN_VALUE .= "$iax_account, $sip_account, $myexpiredays, $myexpirationdate, $mytypepaid, $myenableexpire, $myrunservice, $mysimultaccess, $mycredit, $maxi, $maxi2, $pass, $loginkey, $status";
 
-// username, useralias, uipass, loginkey
 $HD_Form->FG_QUERY_EXTRA_HIDDED = array (
 	$maxi,
 	$maxi2,
