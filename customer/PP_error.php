@@ -69,9 +69,9 @@ $error["accessdenied"] = gettext("Sorry, you don't have access to this page!");
 			</td>
 		</tr>
 	</table>
-      	<div style="text-align:right;padding-right:10px;" >
-	      	<a href="#" onclick="location.href=location.origin"><?php echo gettext("GO TO LOGIN PAGE"); ?>&nbsp;<img src="<?php echo Images_Path; ?>/key_go.png"> </a>
-      	</div>
+	<div style="text-align:right;padding-right:10px;" >
+		<a href="#" onclick="location.href=location.href.substring(0,location.href.lastIndexOf('/'))"><?php echo gettext("GO TO LOGIN PAGE"); ?>&nbsp;<img src="<?php echo Images_Path; ?>/key_go.png"> </a>
+	</div>
 	</div>
 	
 

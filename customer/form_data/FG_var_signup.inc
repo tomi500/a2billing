@@ -83,7 +83,7 @@ if (!empty ($key)) {
 	$_SESSION["key"] = $key;
 }
 
-if (empty($language)) $_SESSION["language_code"] = $_POST["language"] = $language = LANG;
+if (empty($language)) $_POST["language"] = $language = LANG;
 
 if (has_rights (ACX_DISTRIBUTION) && (isset($id_diller) && $id_diller > 0)) {
 	if (!empty($_SESSION["dillertariffs"]))  {

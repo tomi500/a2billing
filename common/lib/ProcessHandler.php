@@ -35,7 +35,8 @@
 class ProcessHandler{
 
 function isActive() {
-        $pid = ProcessHandler::getPID();
+        $pH= new ProcessHandler();
+        $pid = $pH->getPID();
 
         if ($pid == null) {
             $ret = false;
@@ -44,14 +45,15 @@ function isActive() {
         }
 
         if ($ret == false) {
-            ProcessHandler::activate();
+            $pH->activate();
         }
 
         return $ret;
 }
 
 function activate() {
-        $pid = ProcessHandler::getPID();
+        $pH= new ProcessHandler();
+        $pid = $pH->getPID();
 
         if ($pid != null && $pid == getmypid()) {
             return "Already running!\n";

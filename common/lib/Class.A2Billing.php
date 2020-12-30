@@ -2834,7 +2834,7 @@ else
 			    if ($answeredtime > 1) {
 				    // Instantiates a client
 				    $client = new SpeechClient();
-				    if ($answeredtime <= 60) {
+				    if ($answeredtime < 60) {
 					$content = file_get_contents($audioFileMix);
 					$audio = (new RecognitionAudio())
 					    ->setContent($content);

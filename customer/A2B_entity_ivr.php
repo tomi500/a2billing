@@ -268,7 +268,7 @@ if ($form_action=='list') {
     <input type="hidden" value="list" name="form_action"/>
     <div class="bgivr">
 	    <div class="bgivrth">
-		<?php echo gettext("IVR Name")?>: <INPUT class="form_input_text" name="ivrname" size="11" maxlength="10"/>
+		<?php echo gettext("IVR Name")?>: <INPUT class="form_input_text" name="ivrname" size="11" maxlength="13"/>
 	    </div>
 	    <div class="bgivrth">
 		<?php echo gettext("Repeats")?>: <SELECT name="repeats" class="form_input_select">

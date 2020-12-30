@@ -1598,12 +1598,13 @@ $A2B -> debug( ERROR, $agi, __FILE__, __LINE__, "Out of length range destination
 						$prefixclausec = preg_replace('/dialprefixmain/','cn.dialprefixa',$prefixclausemain);
 						$prefixclaused = preg_replace('/dialprefixmain/','cn.dialprefixb',$prefixclausemain);
 						$QUERY =
-	"SELECT IF(cn.status, -1,IFNULL( IF(an.maxsecperperioda<0,IF(an.periodexpirya>NOW(),-an.periodcounta-2,-2),an.maxsecperperioda-(an.periodcounta*(an.periodexpirya>NOW()))),
-".					"IF(bn.maxsecperperiodb<0,IF(bn.periodexpiryb>NOW(),-bn.periodcountb-2,-2),bn.maxsecperperiodb-(bn.periodcountb*(bn.periodexpiryb>NOW())))))
+	"SELECT IF(cn.status, -1,IFNULL( IF(an.maxsecperperioda<0,IF(an.periodexpirya>NOW(),-an.periodcounta-2,-2),(1-(an.periodcounta*(an.periodexpirya>NOW()))/an.maxsecperperioda)*259200000/IF(an.periodexpirya>NOW(),UNIX_TIMESTAMP(an.periodexpirya)-UNIX_TIMESTAMP(NOW()),an.maxsecperperioda)),
+".					"IF(bn.maxsecperperiodb<0,IF(bn.periodexpiryb>NOW(),-bn.periodcountb-2,-2),(1-(bn.periodcountb*(bn.periodexpiryb>NOW()))/bn.maxsecperperiodb)*259200000/IF(bn.periodexpiryb>NOW(),UNIX_TIMESTAMP(bn.periodexpiryb)-UNIX_TIMESTAMP(NOW()),bn.maxsecperperiodb))))
 ".		"AS duration,
 ".		"trunkpercentage,
 ".		"trunk_depend$td,
-".		"COUNT(od.calledstation) AS offen
+".		"COUNT(od.calledstation) AS offen,
+".		"IFNULL(cn.trunkcode,IFNULL(an.trunkcode,bn.trunkcode))
 ".	"FROM cc_trunk_rand
 ".	"LEFT JOIN cc_trunk AS an ON an.id_trunk=trunk_depend$td AND ($prefixclausea) AND an.startdatea<=NOW() AND an.stopdatea>NOW() AND (((an.maxsecperperioda-an.periodcounta>=an.timelefta OR an.maxsecperperioda<0) AND an.periodexpirya>NOW()) OR an.perioda>0) AND an.status=1
 ".	"LEFT JOIN cc_trunk AS bn ON bn.id_trunk=trunk_depend$td AND ($prefixclauseb) AND bn.startdateb<=NOW() AND bn.stopdateb>NOW() AND (((bn.maxsecperperiodb-bn.periodcountb>=bn.timeleftb OR bn.maxsecperperiodb<0) AND bn.periodexpiryb>NOW()) OR bn.periodb>0) AND bn.status=1 AND NOT ($prefixclause)
@@ -1639,20 +1640,20 @@ $A2B -> debug( ERROR, $agi, __FILE__, __LINE__, "Out of length range destination
 						$firstrand = true;
 						$sum_percent = 0;
 						$count_minus = 0;
-//$cc = 0; if ($intellect_count == -1)	$bb = 1; else $bb++; $A2B -> debug( ERROR, $agi, "", "", "\033[1;34m$A2B->destination > iTrunk $trunkrand ($intellect_trunkcode) / Round ".$bb."\33[0m");
+$cc = 0; if ($intellect_count == -1)	$bb = 1; else $bb++; $A2B -> debug( ERROR, $agi, "", "", "\033[1;34m$A2B->destination > iTrunk $trunkrand ($intellect_trunkcode) / Round ".$bb."\33[0m");
 						foreach ($resultrand as $valu_key => $valu_val) {
-//$vv = "";
+$vv = "";
 							if (is_numeric($valu_val[0]) && $valu_val[1] > 0) {
 								$resultrand[$valu_key][1] = $sum_percent += $valu_val[1];
 							} else {
 								$resultrand[$valu_key][1] = 0;
 							}
-//if ($valu_val[0] == 0) {$cc++; $vv = "\033[31m";}
+if ($valu_val[0] == 0) {$cc++; $vv = "\033[31m";}
 							if (!is_numeric($valu_val[0])) {
 								$count_minus++;
-//$vv = "\033[31m";
+$vv = "\033[31m";
 							}
-//$A2B -> debug( ERROR, $agi, "", "", $vv.str_pad(($valu_key+1),2," ",STR_PAD_LEFT).") "."TRUNK =".str_pad($valu_val[2],3," ",STR_PAD_LEFT)."  |".str_pad($valu_val[3],4," ",STR_PAD_LEFT)." times  |  %% = ".$intellecttrunks[$valu_key][1]."	| ".$valu_val[0]." secs free\33[0m");
+$A2B -> debug( ERROR, $agi, "", "", $vv.str_pad(($valu_key+1),2," ",STR_PAD_LEFT).") "."TRUNK =".str_pad($valu_val[2],3," ",STR_PAD_LEFT)."  |".str_pad($valu_val[4],21," ",STR_PAD_LEFT)."  |".str_pad($valu_val[3],4," ",STR_PAD_LEFT)." times  |  %% = ".$intellecttrunks[$valu_key][1]."	| ".str_pad($valu_val[0],12," ",STR_PAD_LEFT)." points\33[0m");
 						}
 						if ($intellect_count == -1) {
 							$intellect_count = $valu_key - $count_minus;
@@ -1663,7 +1664,7 @@ $A2B -> debug( ERROR, $agi, __FILE__, __LINE__, "Out of length range destination
 							$randgo = rand(1,$sum_percent);
 							foreach ($resultrand as $intellect_key => $valu_val)	{
 								if ($valu_val[1] >= $randgo) {
-//$A2B -> debug( ERROR, $agi, "", "", "\033[32mPassed = ".($intellect_count-$cc+$bb)." / Rejected = ".($cc+$count_minus)." / Trunk focused = ".$valu_val[2]."\33[0m");
+$A2B -> debug( ERROR, $agi, "", "", "\033[32mPassed = ".($intellect_count-$cc+$bb)." / Rejected = ".($cc+$count_minus)." / Trunk focused = ".$valu_val[2]."\33[0m");
 									$intellecttrunks[$intellect_key][1] = $intellecttrunks[$intellect_key][0] = 0;
 									if ($valu_val[2] != $this->usedtrunk) {
 										$failover_trunk = $valu_val[2];
@@ -1677,7 +1678,7 @@ $A2B -> debug( ERROR, $agi, __FILE__, __LINE__, "Out of length range destination
 							$intellecttrunks = $resultrand;
 							foreach ($resultrand as $intellect_key => $valu_val)	{
 								if (is_numeric($valu_val[0]) && $valu_val[0] != 0) {
-//$A2B -> debug( ERROR, $agi, "", "", "\033[32mPassed = ".($intellect_count-$cc+$bb)." / Rejected = ".($cc+$count_minus)." / Trunk focused = ".$valu_val[2]."\33[0m");
+$A2B -> debug( ERROR, $agi, "", "", "\033[32mPassed = ".($intellect_count-$cc+$bb)." / Rejected = ".($cc+$count_minus)." / Trunk focused = ".$valu_val[2]."\33[0m");
 									$intellecttrunks[$intellect_key][0] = 0;
 									if ($valu_val[2] != $this->usedtrunk) {
 									    $failover_trunk = $valu_val[2];
@@ -2023,7 +2024,7 @@ $tempdebug="Calculated TIME: ".$answeredtime.";  CDR(billsec): ".$agi->get_varia
 //					if ($answeredtime == "")	$answeredtime	= $agi->get_variable("ANSWEREDTIME",true);
 					$temptime = $agi->get_variable("CDR(billsec)",true);
 					if ($answeredtime > 100000 || $answeredtime == $temptime - 1)	  $answeredtime = $temptime;
-					if ($answeredtime > 100000)					  $answeredtime = $agi->get_variable("ANSWEREDTIME",true);
+					if ($answeredtime > 100000 || $answeredtime == 0)		  $answeredtime = $agi->get_variable("ANSWEREDTIME",true);
 					if ($answeredtime > 100000 || $answeredtime == 0)		  $answeredtime = 1;
 					if ($answeredtime == $this -> ratecard_obj[$k]['alltimeout'] + 1) $answeredtime--;
 				    } else {

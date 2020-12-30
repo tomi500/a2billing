@@ -131,6 +131,10 @@ msgstr "Пожалуйста, укажите правильный<br>e-mail ад
 msgid "Please wait 1 minute before making any other request for the signup!"
 msgstr "Пожалуйста, подождите одну минуту перед тем как делать запрос снова!"
 
+#: templates/default/index.tpl
+msgid "Please provide your First and Last name"
+msgstr "Пожалуйста, введите имя и фамилию"
+
 #: lib/Form/Class.FormHandler.EditForm.inc.php
 msgid "Hours"
 msgstr "Часов"
