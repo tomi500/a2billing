@@ -227,16 +227,6 @@ if (ACT_VOICEMAIL && $ACXVOICEMAIL) {
 } else	$add_fields_voicemail = '';
 
 if ($ACXSEERECORDING){
-$HD_Form -> AddEditElement (gettext("RECORD CALL"),
-			   "monitor",
-			   '0',
-			   "RADIOBUTTON",
-			   "",
-			   "",
-			   gettext("Enable to monitor the call (to record all the conversations) value : YES - NO"),
-			   "", "", "", gettext("Yes")." :1, - ".gettext("No").":0", "", "" , "", gettext("Define if you want to record and store all the conversations"),
-			   null, null, gettext("Surveillance Section"));
-
 $HD_Form -> AddEditElement (gettext("FORWARD TO EMAIL"),
                            "speech2mail",
                            '$value',
@@ -244,7 +234,8 @@ $HD_Form -> AddEditElement (gettext("FORWARD TO EMAIL"),
                            "size=70 maxlength=70",
                            "1",
                            "",
-                           "", "", "", "", "", "", "NO", gettext("Insert the email to forwarding the conversations"));
+                           "", "", "", "", "", "", "NO", gettext("Insert the email to forwarding the conversations"),
+			   null, null, gettext("Surveillance Section"));
 
 $HD_Form -> AddEditElement (gettext("SEND TEXT"),
 			   "send_text",
@@ -264,7 +255,16 @@ $HD_Form -> AddEditElement (gettext("SEND SOUND"),
 			   "",
 			   "", "", "", gettext("Yes")." :1, - ".gettext("No").":0", "", "" , "", gettext("Define if you want to forwarding recorded conversations to email above"));
 
-	$add_fields_monitor = ', monitor, speech2mail, send_text, send_sound';
+$HD_Form -> AddEditElement (gettext("STORAGE"),
+			   "monitor",
+			   '0',
+			   "RADIOBUTTON",
+			   "",
+			   "",
+			   gettext("Enable to monitor the call (to record all the conversations) value : YES - NO"),
+			   "", "", "", gettext("Yes")." :1, - ".gettext("No").":0", "", "" , "", gettext("Define if you want to record and store all the conversations"));
+
+	$add_fields_monitor = ', speech2mail, send_text, send_sound, monitor';
 } else	$add_fields_monitor = '';
 
 $HD_Form -> FieldEditElement ('company_name, lastname, firstname, language, id_timezone, phone, fax, address, city, state, zipcode, country, areaprefix, citylength, removeaddprefix, addprefixinternational, recalldays, recalltime'.$add_fields_voicemail.$add_fields_monitor);

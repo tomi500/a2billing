@@ -1131,8 +1131,8 @@ msgid "Surveillance Section"
 msgstr "Настройка отчетов"
 
 #: form_data/FG_var_card.inc:150
-msgid "RECORD CALL"
-msgstr "ЗАПИСЬ"
+msgid "STORAGE"
+msgstr "ХРАНЕНИЕ"
 
 #: form_data/FG_var_card.inc:152
 msgid "Define if you want to record and store all the conversations"

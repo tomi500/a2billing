@@ -2804,8 +2804,8 @@ else
 			}
 			$transcript = $duration . ": " . sprintf ( "%02d", intval ( $answeredtime / 60 ) ) . ":" . sprintf ( "%02d", intval ( $answeredtime % 60 ) );
 
-			if ($send_text) {
-			    $keyFilePath = $this->config['global']['google_cloud_credential'];
+			$keyFilePath = $this->config['global']['google_cloud_credential'];
+			if ($send_text && is_file($keyFilePath)) {
 //			    $projectId = '';
 
 			    putenv("GOOGLE_APPLICATION_CREDENTIALS=".$keyFilePath);

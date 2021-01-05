@@ -28,6 +28,14 @@ msgid "Click here"
 msgstr "Klicke hier"
 
 #: templates/default/index.tpl
+msgid "This website uses cookies"
+msgstr "Deine Cookie Einstellungen"
+
+#: templates/default/index.tpl
+msgid "Got it!"
+msgstr "Zustimmen"
+
+#: templates/default/index.tpl
 msgid "Please wait 1 minute before making any other request for the forgot password!"
 msgstr "Bitte warten Sie 1 Minute, bevor sie nochmals auf Passwort vergessen drücken!"
 

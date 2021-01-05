@@ -41,17 +41,15 @@
 		<li><ul>
 			{if $ACXSIP_IAX >0 }
 				<li><a href="A2B_entity_sipiax_info?section=15"><strong>{php} echo gettext("EXTENSIONS ");{/php}</strong></a></li>
-<!--				<li><a href="A2B_entity_sipiax_info?section=15"><strong>{php} echo gettext("Outbound call plan");{/php}</strong></a></li>
--->			{/if}
+			{/if}
 			{if $ACXCALLER_ID >0 }
 			<div class="toggle_menu"><li><a href="A2B_entity_callerid?atmenu=callerid&stitle=CallerID"><strong>{php} echo gettext("MY CALLER IDs");{/php}</strong></a></li></div>
 			{/if}
 
 			{if $ACXDID >0 }
-<!--				<li><a href="A2B_entity_did_info?section=15"><strong>{php} echo gettext("EXTERNAL LINES");{/php}</strong></a></li>
--->				<li><a href="A2B_entity_did?section=15&form_action=list"><strong>{php} echo gettext("INCOMING CALLS");{/php}</strong></a></li>
-				<li><a href="A2B_entity_ivr?section=15"><strong>{php} echo gettext("IVR");{/php}</strong></a></li>
+				<li><a href="A2B_entity_did?section=15&form_action=list"><strong>{php} echo gettext("INCOMING CALLS");{/php}</strong></a></li>
 			{/if}
+			<li><a href="A2B_entity_ivr?section=15"><strong>{php} echo gettext("IVR");{/php}</strong></a></li>
 			<li><a href="A2B_entity_fax?section=15&form_action=list"><strong>{php} echo gettext("VIRTUAL FAX");{/php}</strong></a></li>
 			<li><a href="A2B_entity_greeting?section=15&form_action=list"><strong>{php} echo gettext("VOICE GREETINGS");{/php}</strong></a></li>
 		</ul></li>
