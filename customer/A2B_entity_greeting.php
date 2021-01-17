@@ -99,7 +99,7 @@ if ($play==1 || $play==3) {
 	    ]
 	];
 	try {
-	    $response = $client->request('POST', 'https://texttospeech.googleapis.com/v1/text:synthesize?key=' . GOOGLE_TTS_KEY, ['json' => $requestData]);
+	    $response = $client->post('https://texttospeech.googleapis.com/v1/text:synthesize?key=' . GOOGLE_TTS_KEY, ['json' => $requestData]);
 	} catch (Exception $e) {
 	    die('Something went wrong');//: ' . $e->getMessage());
 	}
@@ -166,7 +166,7 @@ if (isset($soundlist) && count($soundlist)>0) {
 
 $istts = true;
 try {
-    $response = $client->request('GET', 'https://texttospeech.googleapis.com/v1/voices?key=' . GOOGLE_TTS_KEY);
+    $response = $client->get('https://texttospeech.googleapis.com/v1/voices?key=' . GOOGLE_TTS_KEY);
 } catch (Exception $e) {
     $istts = false;
 //    die('Something went wrong, e.g. make sure that GOOGLE_TTS_KEY is setted.');//: ' . $e->getMessage());

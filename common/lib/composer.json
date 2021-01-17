@@ -24,12 +24,13 @@
     },
     {
       "name": "Nick Mitin",
-      "email": "nick@sipde.net"
+      "email": "nick@sipde.net",
+      "homepage": "https://sipde.net/"
     }
   ],
   "minimum-stability": "stable",
   "prefer-stable" : true,
   "require-dev": {
-    "phpunit/phpunit": "4.7.*"
+    "phpunit/phpunit": "4.8.*"
   }
 }

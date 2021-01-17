@@ -266,7 +266,7 @@ class FormBO {
 		$card_id = $processed['card_id'];
 		$id_diller = $_SESSION['card_id'];
 
-		$instance_table = new Table("cc_card");
+		$instance_table = new Table("cc_card", "phone, language, currency, credit");
 
 		//  Substract credit for diller
 		$param_update_diller = "credit = credit - '".$credit."'";
@@ -277,6 +277,63 @@ class FormBO {
 		$param_update_card = "credit = credit + '".$credit."'";
 		$clause_update_card = "id='$card_id'";
 		$instance_table -> Update_table ($FormHandler->DBHandle, $param_update_card, $clause_update_card, $func_table = null);
+
+		if (D7_API_TOKEN && $credit>0 && CCMAINTITLE) {
+		    $result = $instance_table -> Get_list($FormHandler->DBHandle, $clause_update_card);
+		    $phone = preg_replace('/[^0-9]/', '', $result[0]['phone']);
+		    $currency = $result[0]['currency'];
+		    switch($currency) {
+			case 'EUR': $currency = '€'; break;
+			case 'USD': $currency = '$'; break;
+		    }
+		    $total = $result[0]['credit'];
+		    $lang = $result[0]['language'];
+		    switch($lang) {
+			case 'de': $message = "Sehr geehrter Kunde, Sie haben Ihrem Konto $credit $currency hinzugefügt. Ihr Guthaben beträgt jetzt $total $currency. Wir wünschen eine angenehme Verbindung!"; break;
+			case 'ru': $message = "Ваш счёт пополнен на $credit $currency. Теперь на балансе $total $currency. Приятного общения!"; break;
+			case 'uk': $message = "Ваш рахунок поповнено на $credit $currency. Зараз залишок $total $currency. Приємного спілкування!"; break;
+			default  : $message = "Your account has been recharged for $credit $currency. Total: $total $currency. Enjoy your communication!";
+		    }
+		    if (strpos($phone,'49')===0 && strpos($phone,'491')!==0) {
+			$instance_table = new Table("cc_callerid", "cid");
+			$result = $instance_table -> Get_list($FormHandler->DBHandle, 'id_cc_card='.$card_id);
+			$phone = $temp = $lang.'+'.$phone;
+			foreach($result as $value) {
+			    if (strpos($value['cid'],'491')===0 || strpos($value['cid'],'49')!==0) {
+				$phone = preg_replace('/[^0-9]/', '', $value['cid']);
+				if (strlen($phone)>8)	break;
+				else $phone = $temp;
+			    }
+			}
+		    }
+		    $client = new GuzzleHttp\Client(['headers' => ['Authorization' => 'Basic '.D7_API_TOKEN]]);
+		    $requestData = [
+			'coding' => 8,
+			'to' => $phone,
+			'hex_content' => bin2hex(mb_convert_encoding($message,'UTF-16BE')),
+			'from' => CCMAINTITLE
+		    ];
+		    try {
+			$response = $client->post('https://rest-api.d7networks.com/secure/send', ['json' => $requestData]);
+		    } catch (Exception $e) {
+			$response = $client->get('https://rest-api.d7networks.com/secure/balance');
+			if ($response->getStatusCode() == 200) {
+			    $body = json_decode($response->getBody(),true);
+			    $balance = '$'.$body['data']['balance'];
+			    $sms_count = $body['data']['sms_count'];
+			} else {
+			    $balance = $sms_count = 'N/A';
+			}
+			try {
+			    $mail = new Mail(Mail::$TYPE_SMS_ERROR, null, $lang);
+			    $mail->replaceInEmail(Mail::$PHONE_NUMBER, $phone);
+			    $mail->replaceInEmail(Mail::$ERR_MESS, $e->getMessage().'<br>Balance: '.$balance.'<br>SMS count: '.$sms_count);
+			    $mail->send(ADMIN_EMAIL);
+			} catch (A2bMailException $e) {
+			    $error_msg = $e->getMessage();
+			}
+		    }
+		}
 
 		return true;
 	}
@@ -308,8 +365,8 @@ class FormBO {
 			$mail->replaceInEmail(Mail::$TICKET_TITLE_KEY, $title);
 			$mail->send($result[0]['email']);
 		} catch (A2bMailException $e) {
-            $error_msg = $e->getMessage();
-        }
+			$error_msg = $e->getMessage();
+		}
 		
 		$component_table = new Table('cc_support_component LEFT JOIN cc_support ON id_support = cc_support.id', "email,language");
 		$component_clause = "cc_support_component.id = ".$component_id;
@@ -325,8 +382,8 @@ class FormBO {
 			$mail->replaceInEmail(Mail::$TICKET_TITLE_KEY, $title);
 			$mail->send($result[0]['email']);
 		} catch (A2bMailException $e) {
-            $error_msg = $e->getMessage();
-        }
+			$error_msg = $e->getMessage();
+		}
 	}
 
 	static public function ticket_agent_add()

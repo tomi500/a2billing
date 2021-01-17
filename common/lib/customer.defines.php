@@ -281,8 +281,6 @@ define ("Images_Path_Main","./templates/".$_SESSION["stylefile"]."/images");
 define ("KICON_PATH","./templates/".$_SESSION["stylefile"]."/images/kicons");
 define('DIR_WS_IMAGES', Images_Path.'/');
 define ("INVOICE_IMAGE", isset($A2B->config["global"]['invoice_image'])?$A2B->config["global"]['invoice_image']:null);
-define ("ADMIN_EMAIL", isset($A2B->config["global"]['admin_email'])?$A2B->config["global"]['admin_email']:null);
-
 
 // INCLUDE HELP
 include (LIBDIR."customer.help.php");

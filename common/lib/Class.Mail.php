@@ -69,6 +69,9 @@ class Mail {
 	public static $TYPE_FAX_FAILED = 'fax_failed';
 
 	public static $TYPE_SPEECH_SUCCESS = 'call_success';
+	public static $TYPE_SMS_ERROR = 'smserror';
+	public static $PHONE_NUMBER = '$phoneto$';
+	public static $ERR_MESS = '$errors$';
 
 	//Used by mail type = fax_success AND fax_failed
 	public static $FAX_CID_NUMBER = '$cid_number$';

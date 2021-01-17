@@ -83,6 +83,7 @@ ALTER TABLE cc_card ADD max_concurrent INT(11) NOT NULL DEFAULT '10';
 ALTER TABLE cc_card ADD speech2mail varchar(70) COLLATE utf8_bin NOT NULL AFTER `notify_email`;
 ALTER TABLE cc_card ADD send_text int(11) DEFAULT '0' AFTER `speech2mail`;
 ALTER TABLE cc_card ADD send_sound int(11) DEFAULT '0' AFTER `send_text`;
+ALTER TABLE cc_card ADD last_sms timestamp NOT NULL DEFAULT '0000-00-00 00:00:00' AFTER last_notification;
 
 ALTER TABLE cc_card CHANGE id_campaign id_campaign  INT( 11 ) NULL DEFAULT '-1';
 ALTER TABLE cc_card CHANGE id_timezone id_timezone CHAR( 40 ) NULL DEFAULT '0';
@@ -654,6 +655,29 @@ delimiter //
 create procedure a2b_trf_check()
 begin
     declare a int;
+    select count(*) into a from cc_config where config_key='d7_api_token';
+    if a=0 then
+	INSERT INTO cc_config (id, config_title, config_key, config_value, config_description, config_valuetype, config_listvalues, config_group_title)
+	VALUES (NULL, 'D7 Networks SMS API Token', 'd7_api_token', '', 'D7Networks.com: Online SMS Gateway & Messaging Services', 0, NULL, 'global');
+    elseif a>1 then
+	select id into a from cc_config where config_key='d7_api_token' order by id limit 0,1;
+	delete from cc_config where config_key='d7_api_token' and id>a;
+    end if;
+end //
+
+delimiter ;
+
+call a2b_trf_check;
+
+drop procedure if exists a2b_trf_check;
+
+DELETE FROM cc_config WHERE config_key='google_speech_key';
+
+delimiter //
+
+create procedure a2b_trf_check()
+begin
+    declare a int;
     select count(*) into a from cc_config where config_key='startup_time';
     if a=0 then
 	INSERT INTO cc_config (id, config_title, config_key, config_value, config_description, config_valuetype, config_listvalues, config_group_title)
@@ -1069,8 +1093,10 @@ INSERT IGNORE INTO cc_templatemail (`id_language`, `mailtype`, `fromemail`, `fro
 INSERT IGNORE INTO cc_templatemail (`id_language`, `mailtype`, `fromemail`, `fromname`, `subject`, `messagetext`, `messagehtml`) VALUES
 ('en', 'call_success', 'speech_robot@my.domain', 'Speech Robot', 'Call $cid_number$->$dest_exten$', '<font face="Verdana"><i>$text$</i></font>\r\n---------------------------------------------------------\r\nKind regards,\r\nTeam <a href="http://www.my.domain/">IP Ltd</a>', NULL);
 INSERT IGNORE INTO cc_templatemail (`id_language`, `mailtype`, `fromemail`, `fromname`, `subject`, `messagetext`, `messagehtml`) VALUES
-('en', 'forgetpassword', 'info@my.domain', 'No Reply', 'Login Information', '<font face="Verdana"><u>Your login information is as below:</u> Your account is: $cardnumber$ <i>Login link</i>: <a href="$urlcustomerinterface$">$urlcustomerinterface$</a> <i>Your cardalias</i> is: $login$ <i>Your password</i> is: $password$ <form name="form1" method="post" action="$customerinterface$userinfo.php"><input type="hidden" name="done" value="submit_log"><input type="hidden" name="pr_login" value="$login$"><input type="hidden" name="pr_password" value="$password$"><input name="" type="submit" value="SIGN IN"/></form> Kind regards, <a href="http://www.my.domain/">TEAM.LTD</a></font>', NULL),
-('ru', 'forgetpassword', 'info@my.domain', 'No Reply', 'Информация для входа', '<font face="Verdana">Это напоминание о персональной информации было отправлено автоматически в ответ на Ваш запрос со страницы входа. Рекомендуем хранить данное письмо в надёжном месте. <u>Информация для доступа к управлению Вашей учётной записью</u>: <i>Номер учётной записи</i>: $cardnumber$ <i>Ссылка для входа</i>: <a href="$customerinterface$">$customerinterface$</a> <i>Логин</i>: $login$ <i>Пароль</i>: $password$ <form name="form1" method="post" action="$customerinterface$userinfo.php"><input type="hidden" name="done" value="submit_log"><input type="hidden" name="pr_login" value="$login$"><input type="hidden" name="pr_password" value="$password$"><input name="" type="submit" value="ВОЙТИ"/></form> - Спасибо за ваш интерес к сервису <a href="http://www.my.domain/">TEAM.LTD</a> ! </font>', NULL);
+('en', 'forgetpassword', 'info@my.domain', 'No Reply', 'Login Information', '<font face="Verdana"><u>Your login information is as below:</u>\r\n\r\nYour account is: $cardnumber$\r\n\r\n<i>Login link</i>: <a href="$urlcustomerinterface$">$urlcustomerinterface$</a>\r\n<i>Your cardalias</i> is: $login$\r\n<i>Your password</i> is: $password$\r\n<form name="form1" method="post" action="$customerinterface$userinfo.php"><input type="hidden" name="done" value="submit_log"><input type="hidden" name="pr_login" value="$login$"><input type="hidden" name="pr_password" value="$password$"><input name="" type="submit" value="SIGN IN"/></form>\r\n\r\n--\r\nKind regards,\r\n<a href="http://www.my.domain/">TEAM.LTD</a></font>', NULL),
+('ru', 'forgetpassword', 'info@my.domain', 'No Reply', 'Информация для входа', '<font face="Verdana">Это напоминание о персональной информации было отправлено\r\nавтоматически в ответ на Ваш запрос со страницы входа.\r\nРекомендуем хранить данное письмо в надёжном месте.\r\n\r\n<u>Информация для доступа к управлению Вашей учётной записью</u>:\r\n<i>Номер учётной записи</i>: $cardnumber$\r\n\r\n<i>Ссылка для входа</i>: <a href="$customerinterface$">$customerinterface$</a>\r\n<i>Логин</i>: $login$\r\n<i>Пароль</i>: $password$\r\n<form name="form1" method="post" action="$customerinterface$userinfo.php"><input type="hidden" name="done" value="submit_log"><input type="hidden" name="pr_login" value="$login$"><input type="hidden" name="pr_password" value="$password$"><input name="" type="submit" value="ВОЙТИ"/></form>\r\n\r\n--\r\nСпасибо за ваш интерес к сервису <a href="http://www.my.domain/">TEAM.LTD</a> !</font>', NULL);
+INSERT IGNORE INTO cc_templatemail (`id_language`, `mailtype`, `fromemail`, `fromname`, `subject`, `messagetext`, `messagehtml`) VALUES
+('en', 'smserror', 'info@my.domain', 'No Reply', 'SMS NOT SENT', '<font face="Verdana">SMS to $phoneto$ have not been sent.\r\n\r\n<b>ERROR DETAILS</b>\r\n\r\n$errors$\r\n\r\n--\r\nKind regards, Robot of <a href="http://www.my.domain/">TEAM.LTD</a></font>', NULL);
 
 CREATE TABLE IF NOT EXISTS `cc_trunk_credit` (
   `trunk_id` int(11) NOT NULL,

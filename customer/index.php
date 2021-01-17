@@ -49,14 +49,88 @@ if (isset ($pr_email) && isset ($action)) {
 		if (!isset ($_SESSION["date_forgot"]) || (time() - $_SESSION["date_forgot"]) > 10) {
 			$_SESSION["date_forgot"] = time();
 		} else {
-			sendForgot(9,gettext("Please wait 1 minute before making any other request for the forgot password!"));
+			sendForgot(9,gettext("Please wait 1 minute before making any other request!"));
 		}
+		$phone = $pr_email;
 		$pr_email = filter_var(trim($pr_email), FILTER_VALIDATE_EMAIL);
-		if ($pr_email===false) {
-			sendForgot(7,gettext("Please provide your valid email address<br>to get your login information"));
-		}
 		$DBHandle = DbConnect();
-		$QUERY = "SELECT id,username, lastname, firstname, email, uipass, useralias FROM cc_card WHERE email='" . $pr_email . "' ";
+		if ($pr_email===false) {
+		    if (is_numeric($phone)) {
+			$num = 0;
+			if (strlen($phone)>=10) {
+			    $phone = (int)$phone;
+			    $QUERY = "SELECT id, username, lastname, firstname, email, uipass, useralias, UNIX_TIMESTAMP(NOW())-UNIX_TIMESTAMP(IFNULL(last_sms,0)) FROM cc_card WHERE phone LIKE '%" . $phone . "' ";
+			    $res = $DBHandle->Execute($QUERY);
+			    if ($res)
+				$num = $res->RecordCount();
+			    if (!$num) {
+				$QUERY = "SELECT 1 FROM cc_callerid WHERE cid LIKE '%".$phone."' AND blacklist = 0";
+				$res = $DBHandle->Execute($QUERY);
+				if ($res) $num = $res->RecordCount();
+				if ($num) {
+				    sendForgot(6,gettext("To receiving SMS enter main phonenumber, please!"));
+				}
+			    }
+			}
+			if (!$num) {
+			    sendForgot(6,gettext("No such phonenumber exists"));
+			}
+			for ($i = 0; $i < $num; $i++) {
+			    $list[] = $res->fetchRow();
+			}
+			foreach ($list as $recordset) {
+			    list ($id_card, $username, $lastname, $firstname, $email, $uipass, $cardalias, $secsleft) = $recordset;
+			    if (filter_var(trim($email), FILTER_VALIDATE_EMAIL)) try {
+				$mail = new Mail(Mail :: $TYPE_FORGETPASSWORD, $id_card);
+				$mail -> send();
+			    } catch (A2bMailException $e) {
+				$error_msg = $e->getMessage();
+			    }
+			}
+			if (!D7_API_TOKEN || $secsleft<3600) sendForgot(5,gettext("Your login information email<br>has been sent to you."));
+			switch(LANGUAGE) {
+			    case 'german'	: $message = "Login: $cardalias\nPasswort: $uipass"; break;
+			    case 'russian'	: $message = "Логин: $cardalias\nПароль: $uipass"; break;
+			    case 'ukrainian'	: $message = "Логін: $cardalias\nПароль: $uipass"; break;
+			    default		: $message = "Login: $cardalias\nPassword: $uipass";
+			}
+			if (strpos($phone,'49')===0 && strpos($phone,'491')!==0) {
+			    sendForgot(6,gettext("Your home phone can't receive SMS.<br>Login information has been sent to your e-mailbox."));
+			}
+			$client = new GuzzleHttp\Client(['headers' => ['Authorization' => 'Basic '.D7_API_TOKEN]]);
+			$requestData = [
+			    'coding' => 8,
+			    'to' => $phone,
+			    'hex_content' => bin2hex(mb_convert_encoding($message,'UTF-16BE')),
+			    'from' => 'REMINDER'
+			];
+			try {
+			    $response = $client->post('https://rest-api.d7networks.com/secure/send', ['json' => $requestData]);
+			} catch (Exception $e) {
+			    $response = $client->get('https://rest-api.d7networks.com/secure/balance');
+			    if ($response->getStatusCode() == 200) {
+				$body = json_decode($response->getBody(),true);
+				$balance = '$'.$body['data']['balance'];
+				$sms_count = $body['data']['sms_count'];
+			    } else {
+				$balance = $sms_count = 'N/A';
+			    }
+			    try {
+				$mail = new Mail(Mail::$TYPE_SMS_ERROR, null, $lang);
+				$mail->replaceInEmail(Mail::$PHONE_NUMBER, $phone);
+				$mail->replaceInEmail(Mail::$ERR_MESS, $e->getMessage().'<br>Balance: '.$balance.'<br>SMS count: '.$sms_count);
+				$mail->send(ADMIN_EMAIL);
+			    } catch (A2bMailException $e) {
+				$error_msg = $e->getMessage();
+			    }
+			    sendForgot(7,gettext("SMS sender error.<br>Try again please."));
+			}
+			$DBHandle->Execute("UPDATE cc_card SET last_sms=NOW() WHERE id='$id_card'");
+			sendForgot(5,gettext("Login information SMS<br>has been sent to your phonenumber"));
+		    }
+		    sendForgot(7,gettext("Please provide your valid email address<br>to get your login information"));
+		}
+		$QUERY = "SELECT id, username, lastname, firstname, email, uipass, useralias FROM cc_card WHERE email='" . $pr_email . "' ";
 		$res = $DBHandle->Execute($QUERY);
 		$num = 0;
 		if ($res)

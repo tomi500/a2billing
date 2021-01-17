@@ -72,6 +72,11 @@ define ("DIDX_RING_TO", isset($A2B->config['webui']['didx_ring_to'])?$A2B->confi
 
 define ("API_LOGFILE", isset($A2B->config['webui']['api_logfile'])?$A2B->config['webui']['api_logfile']:"/var/log/a2billing/");
 
+//D7Networks & ipStack API
+define ("ADMIN_EMAIL", isset($A2B->config["global"]['admin_email'])?$A2B->config["global"]['admin_email']:null);
+define ("IPSTACK_API_KEY", isset($A2B->config['global']['ipstack_api_key'])?$A2B->config['global']['ipstack_api_key']:null);
+define ("D7_API_TOKEN", isset($A2B->config['global']['d7_api_token'])?$A2B->config['global']['d7_api_token']:null);
+
 // BUDDY ASTERISK FILES
 define ("BUDDY_SIP_FILE", isset($A2B->config['webui']['buddy_sip_file'])?$A2B->config['webui']['buddy_sip_file']:null);
 define ("BUDDY_IAX_FILE", isset($A2B->config['webui']['buddy_iax_file'])?$A2B->config['webui']['buddy_iax_file']:null);

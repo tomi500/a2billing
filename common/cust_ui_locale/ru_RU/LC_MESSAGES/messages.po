@@ -19,18 +19,6 @@ msgstr ""
 msgid "Speaker"
 msgstr "Собеседник"
 
-#: forgotpassword.php:56
-msgid "Please wait 1 minute before making any other request for the forgot password!"
-msgstr "Пожалуйста, подождите одну минуту<br>перед тем как делать запрос пароля снова!"
-
-#: forgotpassword.php:85
-msgid "Mail sender error.<br>Try again please."
-msgstr "Email не был отправлен по неизвестной причине.<br>Попробуйте еще раз."
-
-#: forgotpassword.php:104
-msgid "Your login information email<br>has been sent to you."
-msgstr "На Ваш адрес электронной почты<br>отправлено сообщение c информацией<br>о существующем пароле.<br><br>Не получили электронное сообщение?<br>Проверьте, нет ли письма в папке,<br>предназначенной для спама и<br>рекламных сообщений (Spam/Junk)."
-
 #: templates/default/index.tpl:107
 msgid "AUTHENTICATION REFUSED :<br>please check your login/password!"
 msgstr "АВТОРИЗАЦИЯ ОТКЛОНЕНА<br>Пожалуйста, проверьте Ваши логин/пароль!"
@@ -47,6 +35,40 @@ msgstr "АККАУНТ ЗАБЛОКИРОВАН<br>Пожалуйста свяж
 msgid "NEW ACCOUNT :<br>Your account has not been validate yet!"
 msgstr "НОВЫЙ АККАУНТ:<br>Ваш аккаунт ещё не проверен!"
 
+
+#: index.php
+msgid "Please wait 1 minute before making any other request!"
+msgstr "Пожалуйста, подождите одну минуту<br>перед тем как делать запрос снова!"
+
+#: index.php
+msgid "To receiving SMS enter main phonenumber, please!"
+msgstr "Чтобы получить SMS укажите основной номер!"
+
+#: index.php
+msgid "No such phonenumber exists"
+msgstr "Пользователь с таким номером не найден"
+
+#: index.php
+msgid "Your home phone can't receive SMS.<br>Login information has been sent to your e-mailbox."
+msgstr "Невозможно отправить SMS на стационарный телефон.<br>Сообщение c информацией о существующем пароле<br>отправлено на Ваш адрес электронной почты.<br><br>Не получили электронное сообщение?<br>Проверьте, нет ли письма в папке, предназначенной для спама<br>и рекламных сообщений (Spam/Junk)."
+
+#: index.php
+msgid "SMS sender error.<br>Try again please."
+msgstr "Ошибка отправки SMS.<br>Попробуйте ещё раз, пожалуйста."
+
+#: index.php
+msgid "Login information SMS<br>has been sent to your phonenumber"
+msgstr "На Ваш номер отправлено SMS c информацией для входа.<br>Спасибо, что Вы с нами!"
+
+#: index.php
+msgid "Mail sender error.<br>Try again please."
+msgstr "Email не был отправлен по неизвестной причине.<br>Попробуйте еще раз."
+
+#: index.php
+msgid "Your login information email<br>has been sent to you."
+msgstr "На Ваш адрес электронной почты<br>отправлено сообщение c информацией<br>о существующем пароле.<br><br>Не получили электронное сообщение?<br>Проверьте, нет ли письма в папке,<br>предназначенной для спама и<br>рекламных сообщений (Spam/Junk)."
+
+
 #: templates/default/index.tpl
 msgid "Sign in"
 msgstr "Вход"
@@ -54,6 +76,10 @@ msgstr "Вход"
 #: templates/default/index.tpl
 msgid "Sign up"
 msgstr "Регистрация"
+
+#: templates/default/index.tpl
+msgid "E-Mail / Phone number"
+msgstr "E-Mail / Телефон"
 
 #: templates/default/index.tpl
 msgid "Login / E-mail"

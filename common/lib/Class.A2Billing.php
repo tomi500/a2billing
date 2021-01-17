@@ -4221,7 +4221,8 @@ $this -> debug( ERROR, $agi, __FILE__, __LINE__, "FAXRESOLUTION: ".$faxresolutio
 					$prompt = "prepaid-no-enough-credit-stop";
 				}
 				// CHECK IF CALLERID ACTIVATED OR CARD NOT ACTIVE, CONTACT CUSTOMER SUPPORT
-				elseif ( ($result[0][2] == "t" && $blacklist == 1) || $result[0][2] != "t" || $this->status != "1")
+//				elseif ( ($result[0][2] == "t" && $blacklist == 1) || $result[0][2] != "t" || $this->status != "1")
+				elseif ($blacklist == 1 || $result[0][2] != "t" || $this->status != "1")
 					$prompt = "prepaid-auth-fail";
 
 				// CHECK IF THE CARD IS USED
@@ -4400,7 +4401,8 @@ $this -> debug( ERROR, $agi, __FILE__, __LINE__, "FAXRESOLUTION: ".$faxresolutio
 				
 				$prompt = '';
 				// CHECK activated=t / CARD NOT ACTIVE, CONTACT CUSTOMER -%-%- AND CHECK IF THE CALLERID IS CORRECT FOR THIS CARD	-%-%-%-
-				if ( $this->status != "1" || ($this->cidactivated == "t" && $blacklist == 1) || ($this->agiconfig['callerid_authentication_over_cardnumber']==1 && is_null($this->cidactivated))) {
+//				if ( $this->status != "1" || ($this->cidactivated == "t" && $blacklist == 1) || ($this->agiconfig['callerid_authentication_over_cardnumber']==1 && is_null($this->cidactivated))) {
+				if ( $this->status != "1" || $blacklist == 1 || ($this->agiconfig['callerid_authentication_over_cardnumber']==1 && is_null($this->cidactivated))) {
 					$prompt = "prepaid-auth-fail";	// not expired but inactive.. probably not yet sold.. find better prompt
 					$res = -2;
 					break;

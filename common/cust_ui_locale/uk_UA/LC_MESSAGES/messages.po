@@ -51,7 +51,31 @@ msgstr "НОВИЙ АКАУНТ:<br>Ваш акаунт ще не перевір
 msgid "Too frequent requests"
 msgstr "Дуже часті запити"
 
-#: templates/default/index.tpl
+#: index.php
+msgid "Please wait 1 minute before making any other request!"
+msgstr "Перед тим як зробити запит знову,<br>будь ласка, зачекайте одну хвилину!"
+
+#: index.php
+msgid "To receiving SMS enter main phonenumber, please!"
+msgstr "Щоб отримати SMS вкажіть основний номер!"
+
+#: index.php
+msgid "No such phonenumber exists"
+msgstr "Користувача із зазначеним номером не існує"
+
+#: index.php
+msgid "Your home phone can't receive SMS.<br>Login information has been sent to your e-mailbox."
+msgstr "Неможливо відправити SMS на стаціонарний телефон.<br>Повідомлення c інформацією про існуючий пароль<br>відправлено на Вашу адресу електронної пошти.<br><br>Не отримали електронне повідомлення?<br>Перевірте, чи немає листа в папці, призначеної для спаму<br>і рекламних повідомлень (Spam/Junk)."
+
+#: index.php
+msgid "SMS sender error.<br>Try again please."
+msgstr "Помилка відправки SMS.<br>Спробуйте ще раз, будь ласка."
+
+#: index.php
+msgid "Login information SMS<br>has been sent to your phonenumber"
+msgstr "На Ваш номер надіслано SMS c інформацією для входу.<br>Дякуємо, що Ви з нами!"
+
+#: index.php
 msgid "By creating this account, you agree to our <a href=\"terms\">Terms</a> and <a href=\"policy\">Privacy Policy</a>."
 msgstr "Створюючи акаунт ви погоджуєтеся з <a href=\"terms\">Умовами Користування</a> та <a href=\"policy\">Політикою Конфіденційності</a>"
 
@@ -70,6 +94,10 @@ msgstr "Вхід"
 #: templates/default/index.tpl
 msgid "Sign up"
 msgstr "Реєстрація"
+
+#: templates/default/index.tpl
+msgid "E-Mail / Phone number"
+msgstr "E-Mail / Телефон"
 
 #: templates/default/index.tpl
 msgid "Login / E-mail"

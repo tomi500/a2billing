@@ -80,8 +80,12 @@ $('body').on('click', '.zoneselect', function () {
 });
 
 function validateEmail(email) {
-  var pattern = /^([A-Za-z0-9_\-\.])+\@([A-Za-z0-9_\-\.])+\.([A-Za-z]{2,4})$/;
-  return pattern.test(email);
+  return /^([A-Za-z0-9_\-\.])+\@([A-Za-z0-9_\-\.])+\.([A-Za-z]{2,4})$/.test(email);
+}
+
+function validatePhone(phone) {
+  var numb = phone.replace(/[\+\-\. _]/g, '');
+  return /^\d{10,}$/.test(numb);
 }
 
 $('#pr_email').keydown(function(e){
@@ -94,7 +98,9 @@ $('#pr_email').keydown(function(e){
 
 $('body').on('click', '.btn-forgot', function () {
 	var warning = $("#warningforgot");
-	if(pr_email.value=="" || !validateEmail(pr_email.value))
+	var vemail = validateEmail(pr_email.value);
+	var vphone = validatePhone(pr_email.value);
+	if(pr_email.value=="" || (!vemail && !vphone))
 	{
 	    clearTimeout(warningIDot);
 	    warning.html(emptyemail);
@@ -103,6 +109,7 @@ $('body').on('click', '.btn-forgot', function () {
 	    },5000);
 	    return false;
 	}
+	if (!vemail && vphone) pr_email.value = pr_email.value.replace(/[\+\-\. _]/g, '');
 	if (lasttimeout) return false;
 	clearTimeout(warningIDot);
 	$(".btn-submit").css({'background-color':'#666666','color':'#999999'});

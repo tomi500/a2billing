@@ -54,7 +54,7 @@ var noservice = "{php} echo gettext("Service temporally not available.<br>Try ag
       <div class="forms">
 	<form class="form-forgot" method="post" name="formforgot">
           <div class="login-title" id="warningforgot"></div>
-          <label for="pr_email">{php} echo gettext("E-Mail");{/php}</label>
+          <label for="pr_email">{php} echo gettext("E-Mail / Phone number");{/php}</label>
           <input class="form-styling" type="email" name="pr_email" id="pr_email"/>
           <a class="btn-submit btn-forgot">{php} echo gettext("Get password");{/php}</a>
 	</form>

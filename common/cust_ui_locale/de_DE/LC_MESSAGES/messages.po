@@ -19,10 +19,6 @@ msgstr ""
 msgid "User"
 msgstr "Benutzer"
 
-#: lib/Class.A2Billing.php
-msgid "Speaker"
-msgstr "Sprecher"
-
 #: templates/default/index.tpl:95 templates/default/index.tpl:98
 msgid "Click here"
 msgstr "Klicke hier"
@@ -36,20 +32,36 @@ msgid "Got it!"
 msgstr "Zustimmen"
 
 #: templates/default/index.tpl
-msgid "Please wait 1 minute before making any other request for the forgot password!"
+msgid "Forgot your password?"
+msgstr "Passwort vergessen?"
+
+#: index.php
+msgid "Please wait 1 minute before making any other request!"
 msgstr "Bitte warten Sie 1 Minute, bevor sie nochmals auf Passwort vergessen drücken!"
 
-#: templates/default/index.tpl
+#: index.php
 msgid "Mail sender error.<br>Try again please."
 msgstr "Fehler: Kein E-Mail-Template gefunden"
 
-#: templates/default/index.tpl
+#: index.php
 msgid "Your login information email<br>has been sent to you."
 msgstr "Ihre Login-Daten E-Mail wurde an Sie gesendet werden."
 
-#: templates/default/index.tpl
-msgid "Forgot your password?"
-msgstr "Passwort vergessen?"
+#: index.php
+msgid "No such login exists"
+msgstr "So eine Login existiert nicht."
+
+#: index.php
+msgid "Invalid Action"
+msgstr "Ungültige Aktion"
+
+#: index.php
+msgid "Service temporally not available.<br>Try again later."
+msgstr "Service steht temporär leider nicht zur Verfügung.<br>Überprüfen Sie Ihre Internetverbindung und versuchen Sie es erneut."
+
+#: index.php
+msgid "Please provide your valid email address<br>to get your login information"
+msgstr "Bitte geben Sie Ihre E-Mail-Adresse,<br>um Ihre Login-Daten."
 
 #: lib/customer.module.access.php
 msgid "AUTHENTICATION REFUSED :<br>please check your login/password!"
@@ -72,12 +84,20 @@ msgid "Too frequent requests"
 msgstr "Zu viele Aufträge"
 
 #: templates/default/index.tpl
+msgid "You must enter an email address!"
+msgstr "Sie müssen eine E-Mail-Adresse eingeben!"
+
+#: templates/default/index.tpl
 msgid "Sign in"
 msgstr "Anmelden"
 
 #: templates/default/index.tpl
 msgid "Sign up"
 msgstr "Registrieren"
+
+#: templates/default/index.tpl
+msgid "E-Mail / Phone number"
+msgstr "E-Mail / Telefonnummer"
 
 #: templates/default/index.tpl
 msgid "Login / E-mail"
@@ -110,26 +130,6 @@ msgstr "Benutzerkonto Erstellen"
 #: templates/default/index.tpl
 msgid "Get password"
 msgstr "Senden"
-
-#: templates/default/index.tpl
-msgid "You must enter an email address!"
-msgstr "Sie müssen eine E-Mail-Adresse eingeben!"
-
-#: templates/default/index.tpl
-msgid "No such login exists"
-msgstr "So eine Login existiert nicht."
-
-#: templates/default/index.tpl
-msgid "Invalid Action"
-msgstr "Ungültige Aktion"
-
-#: templates/default/index.tpl
-msgid "Service temporally not available.<br>Try again later."
-msgstr "Service steht temporär leider nicht zur Verfügung.<br>Überprüfen Sie Ihre Internetverbindung und versuchen Sie es erneut."
-
-#: templates/default/index.tpl
-msgid "Please provide your valid email address<br>to get your login information"
-msgstr "Bitte geben Sie Ihre E-Mail-Adresse,<br>um Ihre Login-Daten."
 
 #: A2B_notification.php:76
 msgid "Your notification settings has successfully been updated."
@@ -2484,6 +2484,10 @@ msgstr "BENUTZT"
 #: lib/interface/constants.php:450
 msgid "NO DISCOUNT"
 msgstr "KEIN DISKOUNT"
+
+#: lib/Class.A2Billing.php
+msgid "Speaker"
+msgstr "Sprecher"
 
 #: lib/Class.A2Billing.php:391
 msgid "Invalid card number lenght defined in configuration."

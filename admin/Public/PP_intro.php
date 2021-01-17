@@ -45,28 +45,33 @@ if (!$ACXACCESS) {
 
 $smarty->display('main.tpl');
 
-
+$balance = $sms_count = 'N/A';
+if (D7_API_TOKEN) {
+    $client = new GuzzleHttp\Client(['headers' => ['Authorization' => 'Basic '.D7_API_TOKEN]]);
+    $response = $client->get('https://rest-api.d7networks.com/secure/balance');
+    if ($response->getStatusCode() == 200) {
+	$body = json_decode($response->getBody(),true);
+	$balance = '$'.$body['data']['balance'];
+	$sms_count = $body['data']['sms_count'];
+    }
+}
 ?>
-<br/><br/>
+<br>
 <center>
 <table align="center" width="90%" bgcolor="white" cellpadding="15" cellspacing="15" style="border: solid 1px">
 	<tr>
-		<td width="340" align="center">
-			<img src="images/logo/a2billing.png">
-			<br><br>
-			
+		<td width="340">
+		    <img src="images/logo/a2billing.png"><br><br>
+		    <u><a href="https://d7networks.com" target="_blank">D7Networks SMS API</a></u><br/><small><b>Balance: <?php echo $balance;?><br/>SMS count: <?php echo $sms_count;?><b></small>
 		</td>
 		<?php if (SHOW_DONATION) { ?>
-		<td align="left">
-		For information and documentation on A2Billing, <br> please visit <a href="http://www.a2billing.org" target="_blank">http://www.a2billing.org</a><br><br>
-		
-		For Commercial Installations, Hosted Systems, Customisation and Commercial support, please visit <a href="http://www.star2billing.com" target="_blank">http://www.star2billing.com</a><br><br>
-		
-		
-		For VoIP termination, please visit <a href="http://www.call-labs.com" target="_blank">http://www.call-labs.com</a>
-		<center>
-		<?php echo '<a href="http://www.call-labs.com/" target="_blank"><img src="'.Images_Path.'/call-labs.com.png" alt="call-labs"/></a>'; ?>
-		</center>
+		<td align="left" valign="top">
+		    For information and documentation on A2Billing, <br> please visit <a href="http://www.a2billing.org" target="_blank">http://www.a2billing.org</a><br><br>
+		    For Commercial Installations, Hosted Systems, Customisation and Commercial support, please visit <a href="http://www.star2billing.com" target="_blank">http://www.star2billing.com</a><br><br>
+		    For VoIP termination, please visit <a href="http://www.call-labs.com" target="_blank">http://www.call-labs.com</a>
+		    <center>
+			<?php echo '<a href="http://www.call-labs.com/" target="_blank"><img src="'.Images_Path.'/call-labs.com.png" alt="call-labs"/></a>'; ?>
+		    </center>
 		</td>
 		<?php } ?>
 	</tr>
