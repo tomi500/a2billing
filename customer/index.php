@@ -59,7 +59,7 @@ if (isset ($pr_email) && isset ($action)) {
 			$num = 0;
 			if (strlen($phone)>=10) {
 			    $phone = (int)$phone;
-			    $QUERY = "SELECT id, username, lastname, firstname, email, uipass, useralias, UNIX_TIMESTAMP(NOW())-UNIX_TIMESTAMP(IFNULL(last_sms,0)) FROM cc_card WHERE phone LIKE '%" . $phone . "' ";
+			    $QUERY = "SELECT id, username, lastname, firstname, email, uipass, useralias, phone, UNIX_TIMESTAMP(NOW())-UNIX_TIMESTAMP(IFNULL(last_sms,0)) FROM cc_card WHERE phone LIKE '%" . $phone . "' ";
 			    $res = $DBHandle->Execute($QUERY);
 			    if ($res)
 				$num = $res->RecordCount();
@@ -79,23 +79,28 @@ if (isset ($pr_email) && isset ($action)) {
 			    $list[] = $res->fetchRow();
 			}
 			foreach ($list as $recordset) {
-			    list ($id_card, $username, $lastname, $firstname, $email, $uipass, $cardalias, $secsleft) = $recordset;
-			    if (filter_var(trim($email), FILTER_VALIDATE_EMAIL)) try {
-				$mail = new Mail(Mail :: $TYPE_FORGETPASSWORD, $id_card);
-				$mail -> send();
-			    } catch (A2bMailException $e) {
-				$error_msg = $e->getMessage();
-			    }
+			    list ($id_card, $username, $lastname, $firstname, $email, $uipass, $cardalias, $phone, $secsleft) = $recordset;
 			}
-			if (!D7_API_TOKEN || $secsleft<3600) sendForgot(5,gettext("Your login information email<br>has been sent to you."));
+			if (!D7_API_TOKEN || $secsleft<3600) {
+			    foreach ($list as $recordset) {
+				list ($id_card, $username, $lastname, $firstname, $email, $uipass, $cardalias, $phone, $secsleft) = $recordset;
+				if (filter_var(trim($email), FILTER_VALIDATE_EMAIL)) try {
+				    $mail = new Mail(Mail :: $TYPE_FORGETPASSWORD, $id_card);
+				    $mail -> send();
+				} catch (A2bMailException $e) {
+				    $error_msg = $e->getMessage();
+				}
+			    }
+			    sendForgot(5,gettext("Your login information email<br>has been sent to you."));
+			}
 			switch(LANGUAGE) {
 			    case 'german'	: $message = "Login: $cardalias\nPasswort: $uipass"; break;
 			    case 'russian'	: $message = "Логин: $cardalias\nПароль: $uipass"; break;
 			    case 'ukrainian'	: $message = "Логін: $cardalias\nПароль: $uipass"; break;
 			    default		: $message = "Login: $cardalias\nPassword: $uipass";
 			}
-			if (strpos($phone,'49')===0 && strpos($phone,'491')!==0) {
-			    sendForgot(6,gettext("Your home phone can't receive SMS.<br>Login information has been sent to your e-mailbox."));
+			if ((strpos($phone,'49')===0 && strpos($phone,'491')!==0) || strpos($phone,'38044')===0) {
+			    sendForgot(5,gettext("Your home phone can't receive SMS.<br>Login information has been sent to your e-mailbox."));
 			}
 			$client = new GuzzleHttp\Client(['headers' => ['Authorization' => 'Basic '.D7_API_TOKEN]]);
 			$requestData = [
@@ -116,12 +121,21 @@ if (isset ($pr_email) && isset ($action)) {
 				$balance = $sms_count = 'N/A';
 			    }
 			    try {
-				$mail = new Mail(Mail::$TYPE_SMS_ERROR, null, $lang);
+				$mail = new Mail(Mail::$TYPE_SMS_ERROR);
 				$mail->replaceInEmail(Mail::$PHONE_NUMBER, $phone);
 				$mail->replaceInEmail(Mail::$ERR_MESS, $e->getMessage().'<br>Balance: '.$balance.'<br>SMS count: '.$sms_count);
 				$mail->send(ADMIN_EMAIL);
 			    } catch (A2bMailException $e) {
 				$error_msg = $e->getMessage();
+			    }
+			    foreach ($list as $recordset) {
+				list ($id_card, $username, $lastname, $firstname, $email, $uipass, $cardalias, $phone, $secsleft) = $recordset;
+				if (filter_var(trim($email), FILTER_VALIDATE_EMAIL)) try {
+				    $mail = new Mail(Mail :: $TYPE_FORGETPASSWORD, $id_card);
+				    $mail -> send();
+				} catch (A2bMailException $e) {
+				    $error_msg = $e->getMessage();
+				}
 			    }
 			    sendForgot(7,gettext("SMS sender error.<br>Try again please."));
 			}

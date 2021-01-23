@@ -124,7 +124,7 @@ $smarty->display('main.tpl');
 	</td>
 	<td align="right">
 		<?php if (has_rights (ACX_PERSONALINFO)){ ?>
-		<a href="A2B_entity_card.php?atmenu=password&form_action=ask-edit&stitle=Personal+Information"><span class="cssbutton"><font color="red"><?php echo gettext("EDIT PERSONAL INFORMATION");?></font></span></a>
+		<a href="A2B_entity_card?atmenu=password&form_action=ask-edit&stitle=Personal+Information"><span class="cssbutton"><font color="red"><?php echo gettext("EDIT PERSONAL INFORMATION");?></font></span></a>
 		<?php } ?>
 	</td>
 </tr>
@@ -198,7 +198,7 @@ if(!empty($subscribe)){
 	</tr>
 	<tr>
 		<td align="center" colspan="2" class="tableBodyRight" >
-			<form action="checkout_payment.php" method="post" target="_blank">
+			<form action="checkout_payment" method="post" target="_blank">
 
 				<input type="submit" class="form_input_button" value="<?php echo gettext("BUY NOW");?>">
 				<br>
@@ -248,9 +248,9 @@ if(!empty($subscribe)){
 	    if($vat>0)$desc .= " + ".(($vat/100)*$amount_subscribe)." ".strtoupper(BASE_CURRENCY).gettext(" of ").gettext("VAT");
 	    $amount_subscribe = $amount_subscribe +(($vat/100)*$amount_subscribe);
 	    $key = securitykey(EPAYMENT_TRANSACTION_KEY, $username."^".$_SESSION["card_id"]."^".$useralias."^".$creation_date);
-	    $link= tep_href_link("A2B_recurring_payment.php?id=".$_SESSION["card_id"]."&key=".$key, '', 'SSL');
-	    $link_return= tep_href_link("userinfo.php?subscribe=true", '', 'SSL');
-	    $link_cancel= tep_href_link("userinfo.php?subscribe=false", '', 'SSL');
+	    $link= tep_href_link("A2B_recurring_payment?id=".$_SESSION["card_id"]."&key=".$key, '', 'SSL');
+	    $link_return= tep_href_link("userinfo?subscribe=true", '', 'SSL');
+	    $link_cancel= tep_href_link("userinfo?subscribe=false", '', 'SSL');
 	?>
 	
 	<tr>

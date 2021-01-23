@@ -118,7 +118,7 @@ define('MAILQUEUE_THROTTLE', 0);
 /*
  *		GLOBAL USED VARIABLE
  */
-$PHP_SELF = $_SERVER["PHP_SELF"];
+$PHP_SELF = str_replace('.php','',$_SERVER['PHP_SELF']);
 
 $CURRENT_DATETIME = date("Y-m-d H:i:s");
 

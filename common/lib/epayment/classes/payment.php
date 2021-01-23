@@ -15,7 +15,8 @@ Class payment {
 
 	// class constructor
     public function __construct($module = '') {
-      global $payment, $language, $PHP_SELF;
+      global $payment, $language;
+      $PHP_SELF = $_SERVER['PHP_SELF'];
       $instance_sub_table = new Table("cc_payment_methods", "payment_filename");
       $DBHandle  = DbConnect();
       $return = null;

@@ -1,13 +1,13 @@
 <?php
 
 $processed = $this->getProcessed();
-
+$PHP_SELF = str_replace('.php','',$_SERVER['PHP_SELF']);
 ?>
 
 <script language="JavaScript" src="./javascript/krutilke.js"></script>
 <script language="JavaScript" src="./javascript/calonlydays.js"></script>
 
-	<FORM action=<?php echo $_SERVER['PHP_SELF']; ?> id="myForm" method="post" name="myForm">
+	<FORM action=<?php echo $PHP_SELF; ?> id="myForm" method="post" name="myForm">
 	
 	<TABLE cellspacing="2" class="addform_table1">
           <INPUT type="hidden" name="form_action" value="add">
@@ -253,9 +253,6 @@ $processed = $this->getProcessed();
                         <td width="50%" align="right" valign="top" class="text">
 				<a href="#" onClick="javascript:mysubmit();" class="cssbutton_big"><IMG style="vertical-align:middle;" src="<?php echo Images_Path_Main;?>/icon_arrow_orange.gif">
 				<?php echo $this->FG_ADD_PAGE_CONFIRM_BUTTON; ?> </a>
-				<!--
-				<INPUT title="<?php echo gettext("Create a new ");?><?php echo $this->FG_INSTANCE_NAME?>" alt="<?php echo gettext("Create a new ");?> <?php echo $this->FG_INSTANCE_NAME?>" border=0 hspace=0 id=submit4 name=submit2 src="<?php echo $this->FG_BUTTON_ADITION_SRC?>" type=image>
-				-->
 			</td>
 		</tr>
 	  </TABLE>

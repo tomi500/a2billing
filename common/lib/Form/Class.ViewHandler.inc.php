@@ -56,7 +56,7 @@ if ((count($list)>0) && is_array($list)){
 	  <?php  IF ($this -> CV_DO_ARCHIVE_ALL){ ?>
 		<TR>
 		<td class="viewhandler_filter_td1">
-			<FORM NAME="theFormFilter" action="<?php echo $_SERVER['PHP_SELF']?>">
+			<FORM NAME="theFormFilter" action="<?php echo $PHP_SELF?>">
 			<input type="hidden" name="atmenu" value="<?php echo $processed['atmenu']?>">
 			<input type="hidden" name="popup_select" value="<?php echo $processed['popup_select']?>">
 			<input type="hidden" name="popup_formname" value="<?php echo $processed['popup_formname']?>">
@@ -73,7 +73,7 @@ if ((count($list)>0) && is_array($list)){
 			<input type="hidden" name="popup_formname" value="<?php echo $processed['popup_formname']?>">
 			<input type="hidden" name="popup_fieldname" value="<?php echo $processed['popup_fieldname']?>">
 		<TD class="tdstyle_002"><SPAN>
-				<SELECT name="choose_list" size="1" class="form_input_select" style="width: 185px;" onchange="openURLFilter('<?php echo $_SERVER['PHP_SELF'].$this->CV_FILTER_ABOVE_TABLE_PARAM?>')">
+				<SELECT name="choose_list" size="1" class="form_input_select" style="width: 185px;" onchange="openURLFilter('<?php echo $PHP_SELF.$this->CV_FILTER_ABOVE_TABLE_PARAM?>')">
 
 					<OPTION><?php echo gettext("Sort");?></OPTION>
 
@@ -106,7 +106,7 @@ if ((count($list)>0) && is_array($list)){
 		    <td align="right">
 		    <span class="viewhandler_span2">
 			<?php
-			$c_url = $_SERVER['PHP_SELF'].'?current_page=%s';
+			$c_url = $PHP_SELF.'?current_page=%s';
 			foreach ($processed as $key => $val) {
 				if (!in_array($key,array('current_page','id')) && $val!='') {
 					$c_url .= '&'.$key.'='.$val;
@@ -126,7 +126,7 @@ if ((count($list)>0) && is_array($list)){
 		// Add filter  FG_FILTER_APPLY , FG_FILTERFIELD and FG_FILTER_FORM_ACTION
 		if ($this -> FG_FILTER_APPLY || $this -> FG_FILTER_APPLY2){
 		?>
-		<tr><FORM NAME="theFormFilter" action="<?php echo $_SERVER['PHP_SELF']?>">
+		<tr><FORM NAME="theFormFilter" action="<?php echo $PHP_SELF?>">
             <?php
             	foreach ($processed as $key => $val) {
             		if (!in_array($key,array('current_page','id','form_action','filterfield','filterfield2','filterprefix','filterprefix2')) && $val!='') {
@@ -188,7 +188,7 @@ if ((count($list)>0) && is_array($list)){
 				 <td class="tableBody" style="padding: 2px;" align="center" width="<?php echo $this->FG_TABLE_COL[$i][2]?>" >
 						<strong>
 						<?php  if (strtoupper($this->FG_TABLE_COL[$i][4])=="SORT"){?>
-						<a href="<?php  echo $_SERVER['PHP_SELF']."?stitle=$stitle&atmenu=$atmenu&current_page=$current_page&letter=".$processed["letter"]."&popup_select=".$processed["popup_select"]."&order=".$this->FG_TABLE_COL[$i][1]."&sens="; if ($this->FG_SENS=="ASC"){echo"DESC";}else{echo"ASC";} echo $this-> CV_FOLLOWPARAMETERS;?>">
+						<a href="<?php echo $PHP_SELF."?stitle=$stitle&atmenu=$atmenu&current_page=$current_page&letter=".$processed["letter"]."&popup_select=".$processed["popup_select"]."&order=".$this->FG_TABLE_COL[$i][1]."&sens="; if ($this->FG_SENS=="ASC"){echo"DESC";}else{echo"ASC";} echo $this-> CV_FOLLOWPARAMETERS;?>">
 						<font color="#FFFFFF"><?php  } ?>
 						<?php echo $this->FG_TABLE_COL[$i][0]?>
 						<?php if ($this->FG_ORDER==$this->FG_TABLE_COL[$i][1] && $this->FG_SENS=="ASC"){?>
@@ -892,7 +892,7 @@ if ((count($list)>0) && is_array($list)){
         </TR>
 		<?php  	} 	?>
 
-        <FORM name="otherForm2" action="<?php echo $_SERVER['PHP_SELF']; ?>">
+        <FORM name="otherForm2" action="<?php echo $PHP_SELF; ?>">
 		<tr><td>
 		<?php if ($this->CV_DISPLAY_RECORD_LIMIT){ ?>
 			<?php echo gettext("DISPLAY");?>
@@ -941,7 +941,7 @@ if ((count($list)>0) && is_array($list)){
 		// Add filter  FG_FILTER_APPLY , FG_FILTERFIELD and FG_FILTER_FORM_ACTION
 		if ($this -> FG_FILTER_APPLY || $this -> FG_FILTER_APPLY2){
 		?>
-		<tr><FORM NAME="theFormFilter" action="<?php echo $_SERVER['PHP_SELF']?>">
+		<tr><FORM NAME="theFormFilter" action="<?php echo $PHP_SELF?>">
             <?php
             	foreach ($processed as $key => $val) {
             		if (!in_array($key,array('current_page','id','form_action','filterfield','filterfield2','filterprefix','filterprefix2')) && $val!='') {

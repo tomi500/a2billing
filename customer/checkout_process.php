@@ -598,7 +598,7 @@ switch ($OrderStatus)
 }
 
 if ( ($OrderStatus != 2) && ($pmodule=='plugnpay')) {
-	$url_forward = "checkout_payment.php?payment_error=plugnpay&error=The+payment+couldnt+be+proceed+correctly";
+	$url_forward = "checkout_payment?payment_error=plugnpay&error=The+payment+couldnt+be+proceed+correctly";
 	if(!empty($item_id) && !empty($item_type)) $url_forward .= "&item_id=".$item_id."&item_type=".$item_type;
 	Header ("Location: $url_forward");
 	die();
@@ -654,7 +654,7 @@ write_log(LOGFILE_EPAYMENT, basename(__FILE__).' line:'.__LINE__." - transaction
 
 
 if ($pmodule=='plugnpay') {
-	Header ("Location: userinfo.php");
+	Header ("Location: userinfo");
 	die;
 }
 	

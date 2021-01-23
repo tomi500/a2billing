@@ -89,7 +89,7 @@ if($item_type == "invoice" && is_numeric($item_id)){
 		$amount = ceil($amount*100)/100;
 		$static_amount = true;
 	} else{
-		Header ("Location: userinfo.php");
+		Header ("Location: userinfo");
 		die;
 	}
 }
@@ -237,7 +237,7 @@ function rowOutEffect(object) {
 <?php
     if ($A2B->config["epayment_method"]['enable'] && $ACXPAYMENT_HISTORY >0) {
     $radio_buttons = 0;
-    $form_action_url = tep_href_link("checkout_confirmation.php", '', 'SSL');
+    $form_action_url = tep_href_link("checkout_confirmation", '', 'SSL');
     for ($i=0, $n=sizeof($selection); $i<$n; $i++) {
     echo tep_draw_form('checkout_amount'.$i, $form_action_url, 'post', 'onsubmit="checkamount()"');
 ?>

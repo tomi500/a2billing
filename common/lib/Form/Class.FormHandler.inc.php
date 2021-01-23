@@ -524,6 +524,7 @@ class FormHandler
 
 	function __construct($tablename=null, $instance_name=null, $action=null, $tablename_count=null)
 	{
+		global $PHP_SELF;
 		$cons = new Console();
 		$cons->log('Construct FormHandler');
 		$cons->logMemory($this, 'FormHandler Class : Line '.__LINE__);
@@ -537,7 +538,7 @@ class FormHandler
 		
 		$this -> set_regular_expression();
 		
-		$this->_action = $action ? $action : $_SERVER['PHP_SELF'];
+		$this->_action = $action ? $action : $PHP_SELF;
 		
 		$json_data = $_POST["json_data"];
 		if (isset($json_data)) {
@@ -611,8 +612,8 @@ class FormHandler
 		$cons->logMemory($this, 'FormHandler -> init : Line '.__LINE__);
 		$cons->logSpeed('FormHandler -> init : Line '.__LINE__);
 		
-		global $_SERVER;	
-		
+		global $_SERVER;
+		global $PHP_SELF;
 		
 		if ($processed['section']!="") {
 			$section = $processed['section'];
@@ -624,8 +625,8 @@ class FormHandler
 		if (is_numeric($processed['current_page']))	$ext_link.="&current_page=".$processed['current_page'];
 		if (strlen($processed['filterprefix'])>0)	$ext_link.="&filterprefix=".$processed['filterprefix'];
 		if (!empty($processed['order']) && !empty($processed['sens']))$ext_link.="&order=".$processed['order']."&sens=".$processed['sens'];
-		$this -> FG_EDITION_LINK	= $_SERVER['PHP_SELF']."?form_action=ask-edit".$ext_link."&id=";
-		$this -> FG_DELETION_LINK	= $_SERVER['PHP_SELF']."?form_action=ask-delete".$ext_link."&id=";
+		$this -> FG_EDITION_LINK	= $PHP_SELF."?form_action=ask-edit".$ext_link."&id=";
+		$this -> FG_DELETION_LINK	= $PHP_SELF."?form_action=ask-delete".$ext_link."&id=";
 		
 		$this -> FG_DELETE_ALT = gettext("Delete this ").$this -> FG_INSTANCE_NAME;
 		$this -> FG_EDIT_ALT = gettext("Edit this ").$this -> FG_INSTANCE_NAME;
@@ -1196,19 +1197,19 @@ class FormHandler
      */
 	function perform_action (&$form_action){
 		//security check
-		
+		global $PHP_SELF;
 		switch ($form_action) {
 			case "ask-add":
 			case "add":
 			   if(!$this->FG_ADDITION){
-			   		Header ("Location: ". $_SERVER['PHP_SELF']);
+			   		Header ("Location: ". $PHP_SELF);
 			   		die();
 			   	}
 			   break;
 			case "ask-edit":
 			case "edit":
 				 if(!$this->FG_EDITION){
-			   		Header ("Location: ". $_SERVER['PHP_SELF']);
+			   		Header ("Location: ". $PHP_SELF);
 			   		die();
 			   	}
 			   break;
@@ -1216,7 +1217,7 @@ class FormHandler
 			case "ask-delete":
 			case "delete":
 			   if(!$this->FG_DELETION){
-			   		Header ("Location: ". $_SERVER['PHP_SELF']);
+			   		Header ("Location: ". $PHP_SELF);
 			   		die();
 			   }
 			   break;
@@ -1239,7 +1240,7 @@ class FormHandler
 			if(!empty($this->FG_GO_LINK_AFTER_ACTION_DELETE)){
 				Header ("Location: ".$this->FG_GO_LINK_AFTER_ACTION_DELETE.$processed['id']);
 			}else{
-				Header ("Location: ". $_SERVER['PHP_SELF']);
+				Header ("Location: ". $PHP_SELF);
 			}
 			die();
 		}
@@ -2120,8 +2121,9 @@ class FormHandler
      */
 	 function create_select_form()
 	 {
-	 	$processed = $this->getProcessed();
-	 	include_once (FSROOT."lib/Class.Table.php");
+		global $PHP_SELF;
+		$processed = $this->getProcessed();
+		include_once (FSROOT."lib/Class.Table.php");
 		$instance_table_tariffname = new Table("cc_tariffplan", "id, tariffname");
 		$FG_TABLE_CLAUSE = "";
 		$list_tariffname = $instance_table_tariffname  -> Get_list ($this->DBHandle, $FG_TABLE_CLAUSE, "tariffname", "ASC", null, null, null, null);
@@ -2135,7 +2137,7 @@ class FormHandler
 	<?php  if (!empty($this->FG_TOP_FILTER_NAME)) echo "<font size=\"1\">$this->FG_TOP_FILTER_NAME</font><br>"; ?>
 	
 	<!-- ** ** ** ** ** Part for the select form  ** ** ** ** ** -->
-	<FORM METHOD=POST ACTION="<?php echo $_SERVER['PHP_SELF']?>?s=1&t=0&order=<?php echo $order?>&sens=<?php echo $sens?>&current_page=<?php echo $current_page?>">
+	<FORM METHOD=POST ACTION="<?php echo $PHP_SELF?>?s=1&t=0&order=<?php echo $order?>&sens=<?php echo $sens?>&current_page=<?php echo $current_page?>">
 	<INPUT TYPE="hidden" NAME="posted" value=1>
 	<INPUT TYPE="hidden" NAME="current_page" value=0>
 		<table class="form_selectform" cellspacing="1">
@@ -2162,7 +2164,7 @@ class FormHandler
 						<input type="image"  name="image16" align="top" border="0" src="<?php echo Images_Path_Main;?>/button-search.gif" />
 						<?php
 						if(!empty($_SESSION['def_ratecard_tariffgroup'])) { ?>
-                    	- <a href="<?php echo $_SERVER['PHP_SELF']?>?cancelsearch_callplanlcr=true"><font color="red"><b><img src="<?php echo KICON_PATH; ?>/button_cancel.gif" height="16"> Cancel Search</b></font></a>&nbsp;
+                    	- <a href="<?php echo $PHP_SELF?>?cancelsearch_callplanlcr=true"><font color="red"><b><img src="<?php echo KICON_PATH; ?>/button_cancel.gif" height="16"> Cancel Search</b></font></a>&nbsp;
                     <?php } ?>
 	  				</td>
 
@@ -2199,7 +2201,7 @@ class FormHandler
 	  <!-- ** ** ** ** ** Part for the select form  ** ** ** ** ** -->
 	
 		<table class="form_selectform" >
-			<FORM METHOD=POST ACTION="<?php echo $_SERVER['PHP_SELF']?>?s=1&t=0&order=<?php echo $order?>&sens=<?php echo $sens?>&current_page=<?php echo $current_page?>">
+			<FORM METHOD=POST ACTION="<?php echo $PHP_SELF?>?s=1&t=0&order=<?php echo $order?>&sens=<?php echo $sens?>&current_page=<?php echo $current_page?>">
 				<INPUT TYPE="hidden" NAME="posted" value=1>
 				<INPUT TYPE="hidden" NAME="current_page" value=0>
 			

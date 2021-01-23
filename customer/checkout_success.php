@@ -94,7 +94,7 @@ $smarty->display( 'main.tpl');
     <td>&nbsp;</td>
 </tr>
 <tr>
-    <td align=center colspan=2><a href="<?php echo tep_href_link("userinfo.php","", 'SSL', false, false);?>">[Home]</a></td>
+    <td align=center colspan=2><a href="<?php echo tep_href_link("userinfo","", 'SSL', false, false);?>">[Home]</a></td>
 </tr>
 
 </table>

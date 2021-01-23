@@ -1,6 +1,7 @@
 <?php
 
 $processed = $this->getProcessed();
+$PHP_SELF = str_replace('.php','',$_SERVER['PHP_SELF']);
 $dynaform = $multform = false;
 foreach ($this->FG_TABLE_EDITION as $sts) {
 	if (stripos($sts[3],"POPUPDAYTIME")===0) {
@@ -257,7 +258,7 @@ function updatecontent(id_el, record, field_inst, instance)
 
 //-->
 </script>
-<FORM action=<?php echo $_SERVER['PHP_SELF']?> method=post name="myForm" id="myForm">
+<FORM action=<?php echo $PHP_SELF?> method=post name="myForm" id="myForm">
 	<INPUT type="hidden" name="id" value="<?php echo $id?>">
 	<INPUT type="hidden" name="form_action" value="edit">
 	<INPUT type="hidden" name="sub_action" value="">

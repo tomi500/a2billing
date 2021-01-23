@@ -286,22 +286,24 @@ class FormBO {
 			case 'EUR': $currency = '€'; break;
 			case 'USD': $currency = '$'; break;
 		    }
-		    $total = $result[0]['credit'];
+		    $total = number_format($result[0]['credit'], 2);
 		    $lang = $result[0]['language'];
 		    switch($lang) {
-			case 'de': $message = "Sehr geehrter Kunde, Sie haben Ihrem Konto $credit $currency hinzugefügt. Ihr Guthaben beträgt jetzt $total $currency. Wir wünschen eine angenehme Verbindung!"; break;
-			case 'ru': $message = "Ваш счёт пополнен на $credit $currency. Теперь на балансе $total $currency. Приятного общения!"; break;
-			case 'uk': $message = "Ваш рахунок поповнено на $credit $currency. Зараз залишок $total $currency. Приємного спілкування!"; break;
-			default  : $message = "Your account has been recharged for $credit $currency. Total: $total $currency. Enjoy your communication!";
+			case 'de': $message = "Sehr geehrter Kunde, Sie haben Ihrem Konto $credit$currency hinzugefügt. Ihr Guthaben beträgt jetzt $total$currency. Wir wünschen eine angenehme Verbindung!"; break;
+			case 'ru': $message = "Ваш счёт пополнен на $credit$currency. Общий баланс $total$currency. Приятного общения!"; break;
+			case 'uk': $message = "Рахунок поповнено на $credit$currency. Залишок $total$currency. Приємного спілкування!"; break;
+			default  : $message = "Your account has been recharged for $credit$currency. Total: $total$currency. Enjoy your communication!";
 		    }
-		    if (strpos($phone,'49')===0 && strpos($phone,'491')!==0) {
-			$instance_table = new Table("cc_callerid", "cid");
+		    $instance_table = new Table("cc_callerid", "cid");
+		    $result = $instance_table -> Get_list($FormHandler->DBHandle, "id_cc_card='$card_id' AND cid LIKE '%$phone'");
+		    if ($result) $phone = preg_replace('/[^0-9]/', '', $result[0]['cid']);
+		    if ((strpos($phone,'49')===0 && strpos($phone,'491')!==0) || strpos($phone,'38044')===0) {
 			$result = $instance_table -> Get_list($FormHandler->DBHandle, 'id_cc_card='.$card_id);
 			$phone = $temp = $lang.'+'.$phone;
 			foreach($result as $value) {
-			    if (strpos($value['cid'],'491')===0 || strpos($value['cid'],'49')!==0) {
+			    if ((strpos($value['cid'],'491')===0 || strpos($value['cid'],'49')!==0) && strpos($value['cid'],'38044')!==0) {
 				$phone = preg_replace('/[^0-9]/', '', $value['cid']);
-				if (strlen($phone)>8)	break;
+				if (strlen($phone)>9)	break;
 				else $phone = $temp;
 			    }
 			}
@@ -325,7 +327,7 @@ class FormBO {
 			    $balance = $sms_count = 'N/A';
 			}
 			try {
-			    $mail = new Mail(Mail::$TYPE_SMS_ERROR, null, $lang);
+			    $mail = new Mail(Mail::$TYPE_SMS_ERROR);
 			    $mail->replaceInEmail(Mail::$PHONE_NUMBER, $phone);
 			    $mail->replaceInEmail(Mail::$ERR_MESS, $e->getMessage().'<br>Balance: '.$balance.'<br>SMS count: '.$sms_count);
 			    $mail->send(ADMIN_EMAIL);

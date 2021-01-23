@@ -129,7 +129,7 @@ msgstr "Benutzerkonto Erstellen"
 
 #: templates/default/index.tpl
 msgid "Get password"
-msgstr "Senden"
+msgstr "Passwort bekommen"
 
 #: A2B_notification.php:76
 msgid "Your notification settings has successfully been updated."

@@ -1038,7 +1038,6 @@ $smarty->display ( 'main.tpl' );
 </FORM>
 </center>
 
-
 <!-- ** ** ** ** ** Part to display the CDR ** ** ** ** ** -->
 
 <center><?php

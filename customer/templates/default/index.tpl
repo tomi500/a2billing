@@ -61,7 +61,7 @@ var noservice = "{php} echo gettext("Service temporally not available.<br>Try ag
 	<form class="form-signin" action="userinfo" method="post" name="formsignin">
           <div class="login-title" id="warningsignin"></div>
           <label for="pr_login">{php} echo gettext("Login / E-mail");{/php}</label>
-          <input class="form-styling" type="text" name="pr_login" id="pr_login"/>
+          <input autofocus class="form-styling" type="text" name="pr_login" id="pr_login"/>
           <label for="pr_password">{php} echo gettext("Password");{/php}</label>
           <input class="form-styling" type="password" name="pr_password" id="pr_password"/>
           <input type="checkbox" id="checkbox" class="checkbox"/>

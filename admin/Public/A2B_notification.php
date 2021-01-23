@@ -207,7 +207,7 @@ $list_notifications = NotificationsDAO::getNotifications($_SESSION['admin_id'],(
 				  <?php echo $notification->getKeyMsg(); 
 				  $url = $notification->getUrl()?>
 				  <?php if(!empty($url)){?>
-				            &nbsp; <a href="<?php echo $notification->getUrl();?>"> <img src="<?php echo Images_Path."/link.png"?>" style="vertical-align:bottom;" border="0" /></a>
+				            &nbsp; <a href="<?php echo $url;?>"> <img src="<?php echo Images_Path."/link.png"?>" style="vertical-align:bottom;" border="0" /></a>
 				  <?php }?>
 				</td>
 				<td class="tableBody"  align="center">

@@ -851,7 +851,7 @@ include_once (dirname(__FILE__)."/sessions.php");
 ////
 // Return table heading with sorting capabilities
   function tep_create_sort_heading($sortby, $colnum, $heading) {
-    global $PHP_SELF;
+    $PHP_SELF = $_SERVER['PHP_SELF'];
 
     $sort_prefix = '';
     $sort_suffix = '';

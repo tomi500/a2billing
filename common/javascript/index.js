@@ -44,6 +44,7 @@ $(function() {
 	$(".forms").addClass("forms-right");
 	$(".signin-active").addClass("signin-inactive");
 	$(".signup-inactive").removeClass("signup-active");
+	$('#pr_email').focus();
 	scrnum = 1;
     });
 });

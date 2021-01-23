@@ -47,7 +47,7 @@ include ("./lib/customer.smarty.php");
 
 if (! has_rights (ACX_ACCESS)) {
 	Header ("HTTP/1.0 401 Unauthorized");
-	Header ("Location: PP_error.php?c=accessdenied");
+	Header ("Location: PP_error?c=accessdenied");
 	die();
 }
 
@@ -90,7 +90,7 @@ if (!isset($wm_purse_type)) {
 }
 
 if (!is_numeric($amount) || ((strcasecmp("paypal",$payment)==0 && ($amount < 10 || $amount > 1000)) || $amount < 1 || ($getcur == "UAH" && $payment == "webmoneycreditcard" && $amount > 9950))) {
-	Header ("Location: checkout_payment.php");
+	Header ("Location: checkout_payment");
 	die();
 }
 
@@ -169,10 +169,10 @@ $smarty->display( 'main.tpl');
 if (isset($$payment->form_action_url)) {
     $form_action_url = $$payment->form_action_url;
 } else {
-    $form_action_url = tep_href_link("checkout_process.php", '', 'SSL');
+    $form_action_url = tep_href_link("checkout_process", '', 'SSL');
 }
 
-echo tep_draw_form('checkout_confirmation.php', $form_action_url, 'post', null, $payment);
+echo tep_draw_form('checkout_confirmation', $form_action_url, 'post', null, $payment);
 
 if (is_array($payment_modules->modules)) {
     echo $payment_modules->process_button($transaction_no, $key);

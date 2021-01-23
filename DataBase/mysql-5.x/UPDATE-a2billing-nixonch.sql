@@ -637,7 +637,7 @@ begin
     select count(*) into a from cc_config where config_key='bucket_location';
     if a=0 then
 	INSERT INTO cc_config (id, config_title, config_key, config_value, config_description, config_valuetype, config_listvalues, config_group_title)
-	VALUES	(NULL, 'Google Cloud Storage Bucket Location', 'bucket_location', 'eu', 'The location of the Cloud Storage Bucket. US - USA. EU - Europe. ASIA - some regions of Asia. EUR4 - Finland and Niderlands. NAM4 - Iowa and South Carolina.', 0,'us,eu,asia,eur4,nam4', 'global');
+	VALUES	(NULL, 'Google Cloud Storage Bucket Location', 'bucket_location', 'eu', 'The location of the Cloud Storage Bucket. US - USA. EU - Europe. EUROPE-WEST3 - Frankfurt, ASIA - some regions of Asia. EUR4 - Finland and Niderlands. NAM4 - Iowa and South Carolina.', 0,'us,eu,europe-west3,asia,eur4,nam4', 'global');
     elseif a>1 then
 	select id into a from cc_config where config_key='bucket_location' order by id limit 0,1;
 	delete from cc_config where config_key='bucket_location' and id>a;
