@@ -175,7 +175,7 @@ if ($message == "success") {
     </TR><TR>
 	<TD width="516" valign="top" class="tdstyle_001"> <br>
 	    <div align="center"><strong>
-		<?php echo gettext("Transaction was completed succesully")?><br>
+		<?php echo gettext("Transaction was completed succesfully")?><br>
 	    </strong></div>
 	    <br>
 	</TD>

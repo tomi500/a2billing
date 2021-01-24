@@ -91,6 +91,7 @@ ALTER TABLE cc_card CHANGE id_timezone id_timezone CHAR( 40 ) NULL DEFAULT '0';
 ALTER TABLE cc_timezone ADD countrycode CHAR(80) COLLATE utf8_bin NOT NULL;
 
 ALTER TABLE cc_logrefill ADD diller_id bigint(20) NULL DEFAULT NULL;
+ALTER TABLE cc_logrefill CHANGE `agent_id` `sendsms` INT(11) NOT NULL DEFAULT '0';
 
 ALTER TABLE cc_logpayment ADD fee DECIMAL( 15, 5 ) NOT NULL DEFAULT 0 AFTER `payment`;
 

@@ -258,6 +258,54 @@ msgstr "Passwort nochmal eingeben"
 msgid "Save"
 msgstr "Speichern"
 
+#: FG_var_logrefill.inc
+msgid "Choose if you wish send SMS about refill and total credit to this customer"
+msgstr "Senden Sie diesem Kunden eine SMS über das Nachfüllen"
+
+#: FG_var_logrefill.inc
+msgid "REFILL AMOUNT"
+msgstr "Nachfüllbetrag"
+
+#: FG_var_logrefill.inc
+msgid "REFILL TYPE"
+msgstr "TYP NACHFÜLLEN"
+
+#: FG_var_logrefill.inc
+msgid "To: "
+msgstr "Zu: "
+
+#: FG_var_logrefill.inc
+msgid "SEND SMS"
+msgstr "SMS SENDEN"
+
+#: FG_var_logrefill.inc
+msgid "Transaction was DECLINED"
+msgstr "Transaktion wurde abgelehnt"
+
+#: FG_var_logrefill.inc
+msgid "INSERT NEW Refill"
+msgstr "Transaktion"
+
+#: FG_var_logrefill.inc
+msgid "USER DELETED"
+msgstr "BENUTZER GELÖSCHT"
+
+#: FG_var_logrefill.inc
+msgid "Transaction was completed succesfully"
+msgstr "Die Transaktion wurde erfolgreich abgeschlossen"
+
+#: FG_var_logrefill.inc
+msgid "Close Window"
+msgstr "Fenster schließen"
+
+#: FG_var_logrefill.inc
+msgid "Enter the amount in the currency base: "
+msgstr "Geben Sie den +Ein oder -Auszahlungsbetrag in der Basiswährung ein: "
+
+#: FG_var_logrefill.inc
+msgid "<b>Available "
+msgstr "<b>Verfügbar "
+
 #: A2B_phonelist_import.php:71
 msgid "Please, you must first select a phonebook !"
 msgstr "Bitte, zuerst ein Telefonbuch wählen!"

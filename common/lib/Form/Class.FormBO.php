@@ -278,7 +278,7 @@ class FormBO {
 		$clause_update_card = "id='$card_id'";
 		$instance_table -> Update_table ($FormHandler->DBHandle, $param_update_card, $clause_update_card, $func_table = null);
 
-		if (D7_API_TOKEN && $credit>0 && CCMAINTITLE) {
+		if (D7_API_TOKEN && $credit>0 && CCMAINTITLE && $processed['sendsms']) {
 		    $result = $instance_table -> Get_list($FormHandler->DBHandle, $clause_update_card);
 		    $phone = preg_replace('/[^0-9]/', '', $result[0]['phone']);
 		    $currency = $result[0]['currency'];

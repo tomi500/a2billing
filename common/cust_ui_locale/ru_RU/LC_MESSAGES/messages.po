@@ -214,6 +214,14 @@ msgid "THERE IS NO PAYMENTS CREATED!"
 msgstr "ПЛАТЕЖЕЙ ЕЩЁ НЕ БЫЛО!"
 
 #: FG_var_logrefill.inc
+msgid "SEND SMS"
+msgstr "Отправка СМС"
+
+#: FG_var_logrefill.inc
+msgid "Choose if you wish send SMS about refill and total credit to this customer"
+msgstr "Отправить клиенту СМС о пополнении и общем балансе?"
+
+#: FG_var_logrefill.inc
 msgid "Transaction was DECLINED"
 msgstr "Операция ОТКЛОНЕНА"
 
@@ -226,7 +234,7 @@ msgid "USER DELETED"
 msgstr "КОНТРАГЕНТ УДАЛЁН"
 
 #: FG_var_logrefill.inc
-msgid "Transaction was completed succesully"
+msgid "Transaction was completed succesfully"
 msgstr "Транзакция совершена успешно"
 
 #: FG_var_logrefill.inc

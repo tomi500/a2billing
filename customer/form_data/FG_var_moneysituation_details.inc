@@ -107,6 +107,26 @@ if ($id_group != "" || !is_null($id_group)) {
 }
 
 
+if ($group_count > 1) {
+	$HD_Form->AddEditElement(gettext("CUSTOMER TYPE"),
+			    "id_group",
+			    "$id_group",
+			    "SELECT",
+			    "", "",
+			    "", "list", "", "", "", $group_list, "%1", "", "");
+	$group_editFG = "id_group, ";
+} else $group_editFG = "";
+
+if ($callPlan_count > 1) {
+	$HD_Form->AddEditElement(gettext("CALL PLAN"),
+				    "tariff",
+				    "$tariff",
+				    "SELECT",
+				    "", "",
+				    "", "list", "", "", "", $callPlan_list, "%1", "", "");
+	$tariff_editFG = "tariff, ";
+} else $tariff_editFG = "";
+
 $HD_Form -> AddEditElement (gettext("LASTNAME"),
 			   "lastname",
 			   '$value',
@@ -132,15 +152,47 @@ $HD_Form->AddEditElement(gettext("COMPANY NAME"),
 			    "size=40 maxlength=50", "",
 			    gettext("Insert Company name of this customer"), "", "", "", "", "", "", "NO", "");
 
-if ($group_count > 1) {
-	$HD_Form->AddEditElement(gettext("CUSTOMER TYPE"),
-			    "id_group",
-			    "$id_group",
-			    "SELECT",
-			    "", "",
-			    "", "list", "", "", "", $group_list, "%1", "", "");
-	$group_editFG = ", id_group";
-} else $group_editFG = "";
+$HD_Form->AddEditElement(gettext("COMPANY WEBSITE"),
+			    "company_website",
+			    '$value',
+			    "INPUT", "size=40 maxlength=60",
+			    "8", gettext("Insert the company website of this customer"), "", "", "", "", "", "", "NO", "");
+
+$language_list = Constants::getLanguagesList();
+$HD_Form->AddEditElement(gettext("LANGUAGE")." *",
+	                    "language",
+	                    "$language",
+	                    "SELECT",
+	                    "", "",
+	                    "", "list", "", "", "", $language_list, "%1", "", "");
+
+$HD_Form -> AddEditElement (gettext("TIMEZONE"),
+			   "id_timezone",
+			   "",
+			   "SELECT",
+			   "", "", "",
+			   "SQL",
+			   "cc_timezone",
+			   "gmtzone, id",
+			   "", "", "%1", "", "", "", "" );
+
+$HD_Form -> AddEditElement (gettext("PHONE NUMBER"),
+			   "phone",			
+			   '$value',	
+			   "INPUT",	
+			   "size=30 maxlength=20",	
+			   "7",
+			   gettext("Insert the phone number of the customers"),
+			   "", "", "", "", "", "", "", "");
+
+$HD_Form -> AddEditElement (gettext("FAX NUMBER"),
+			   "fax",			
+			   '$value',	
+			   "INPUT",	
+			   "size=30 maxlength=20",
+			   "7",
+			   gettext("Insert the fax number of the customers"),
+			   "" , "", "",	"", "", "" , "NO", "");
 
 $HD_Form->AddEditElement(gettext("EMAIL")." *",
 			    "email",
@@ -149,13 +201,7 @@ $HD_Form->AddEditElement(gettext("EMAIL")." *",
 			    "size=30 maxlength=70", "1",
 			    gettext("Insert your email"), "", "", "", "", "", "", "", "");
 
-$HD_Form->AddEditElement(gettext("COMPANY WEBSITE"),
-			    "company_website",
-			    '$value',
-			    "INPUT", "size=40 maxlength=60",
-			    "8", gettext("Insert the company website of this customer"), "", "", "", "", "", "", "NO", "");
-
-$HD_Form -> AddEditElement (gettext("ADRESS"),
+$HD_Form -> AddEditElement (gettext("ADDRESS"),
 			   "address",
 			   '$value',
 			   "INPUT",
@@ -194,6 +240,15 @@ $HD_Form -> AddEditElement (gettext("ZIP/POSTAL CODE"),
 			   gettext("Insert the zipcode"),
 			   "" , "", "",	"", "", "" , "NO", "");
 
+$HD_Form -> AddEditElement (gettext("COUNTRY"),
+			   "country",
+			   "",
+			   "SELECT",
+			   "", "", "",
+			   "sql",
+			   "cc_country",
+			   "countryname, countrycode, countryprefix",
+			   "", "", "%1 +%3", "", "", "", '' );
 
 $HD_Form -> AddEditElement(gettext("AREA CODE"),
                             "areaprefix",
@@ -213,16 +268,6 @@ $HD_Form -> AddEditElement(gettext("CITY LENGTH"),
                             "",
                             "", "", "", "", "", "", "NO-NULL", gettext("Set length of city numbers"));
 
-$HD_Form -> AddEditElement (gettext("COUNTRY"),
-			   "country",
-			   "",
-			   "SELECT",
-			   "", "", "",
-			   "sql",
-			   "cc_country",
-			   "countryname, countrycode, countryprefix",
-			   "", "", "%1 +%3", "", "", "", '' );
-
 $HD_Form -> AddEditElement(gettext("REMOVE+ADD PREFIX"),
                             "removeaddprefix",
                             '$value',
@@ -240,43 +285,6 @@ $HD_Form -> AddEditElement(gettext("ADD INTERNATIONAL PREFIX"),
                             "",
                             "",
                             "", "", "", "", "", "", "NO", gettext("Set for display on internal phones which prefix you want see before international CallerID (i.e. \"+\")"));
-
-$language_list = Constants::getLanguagesList();
-$HD_Form->AddEditElement(gettext("LANGUAGE")." *",
-	                    "language",
-	                    "$language",
-	                    "SELECT",
-	                    "", "",
-	                    "", "list", "", "", "", $language_list, "%1", "", "");
-
-
-$HD_Form -> AddEditElement (gettext("TIMEZONE"),
-			   "id_timezone",
-			   "",
-			   "SELECT",
-			   "", "", "",
-			   "SQL",
-			   "cc_timezone",
-			   "gmtzone, id",
-			   "", "", "%1", "", "", "", "" );
-
-$HD_Form -> AddEditElement (gettext("PHONE NUMBER"),
-			   "phone",			
-			   '$value',	
-			   "INPUT",	
-			   "size=30 maxlength=20",	
-			   "7",
-			   gettext("Insert the phone number of the customers"),
-			   "", "", "", "", "", "", "", "");
-
-$HD_Form -> AddEditElement (gettext("FAX NUMBER"),
-			   "fax",			
-			   '$value',	
-			   "INPUT",	
-			   "size=30 maxlength=20",
-			   "7",
-			   gettext("Insert the fax number of the customers"),
-			   "" , "", "",	"", "", "" , "NO", "");
 
 $add_fields_monitor = '';
 if ($ACXSEERECORDING){
@@ -321,16 +329,6 @@ if (ACT_VOICEMAIL && $ACXVOICEMAIL) {
 $add_fields_voicemail = ', voicemail_activated';
 } else $add_fields_voicemail = '';
 
-if ($callPlan_count > 1) {
-	$HD_Form->AddEditElement(gettext("CALL PLAN"),
-				    "tariff",
-				    "$tariff",
-				    "SELECT",
-				    "", "",
-				    "", "list", "", "", "", $callPlan_list, "%1", "", "");
-	$tariff_editFG = ", tariff";
-} else $tariff_editFG = "";
-
 $HD_Form -> AddEditElement (gettext("MARGIN").", %%",
                                     "margin",
                                     '$value',
@@ -349,7 +347,7 @@ $HD_Form -> AddEditElement (gettext("PAYPAL PAYMENT"),
                                     "list", "", "", "", $yesno_list, "%1", "", gettext("Apply PayPal payment to this customer"));
 
 
-$HD_Form -> FieldEditElement ('lastname, firstname, company_name'.$group_editFG.', email, company_website, address, city, state, zipcode, areaprefix, citylength, country, removeaddprefix, addprefixinternational, language, id_timezone, phone, fax'.$add_fields_monitor.', recalldays'.$add_fields_voicemail.$tariff_editFG.', margin, paypal');
+$HD_Form -> FieldEditElement ($group_editFG.$tariff_editFG.'lastname, firstname, company_name, company_website, language, id_timezone, phone, fax, email, address, city, state, zipcode, country, areaprefix, citylength, removeaddprefix, addprefixinternational'.$add_fields_monitor.', recalldays'.$add_fields_voicemail.', margin, paypal');
 
 $HD_Form->FG_ADITION_HIDDEN_PARAM = $HD_Form->FG_EDITION_HIDDEN_PARAM = 'popup_select, idcust';
 $HD_Form->FG_ADITION_HIDDEN_PARAM = $HD_Form->FG_EDITION_HIDDEN_PARAM_VALUE = "$popup_select, $idcust";

@@ -113,7 +113,7 @@ if (has_rights (ACX_DISTRIBUTION) && !($popup_select>=1)) {
 	$HD_Form -> FG_OTHER_BUTTON3_LINK= "javascript:;\" onClick=\"MM_openBrWindow('didivr?popup_select=1&choose_callowner=4&id=|param|','','scrollbars=yes,resizable=yes,width=950,height=500,left=160,top=180,screenX=160,screenY=180')";
 	$HD_Form -> FG_OTHER_BUTTON4_LINK= "javascript:;\" onClick=\"MM_openBrWindow('call-history?popup_select=1&choose_callowner=4&id=|param|','','scrollbars=yes,resizable=yes,width=950,height=500,left=160,top=180,screenX=160,screenY=180')";
 //	$HD_Form -> FG_OTHER_BUTTON4_LINK= "javascript:;\" onClick=\"MM_openBrWindow('A2B_entity_moneysituation_details?type=payment&form_action=list&atmenu=card&displayheader=0&popup_select=1&idcust=|param|','','scrollbars=yes,resizable=yes,width=550,height=415,left=600,top=200,screenX=600,screenY=200')";
-	$HD_Form -> FG_OTHER_BUTTON5_LINK= "javascript:;\" onClick=\"MM_openBrWindow('A2B_entity_logrefill?form_action=ask-add&popup_select=1&popup_formname=myForm&card_id=|param|&displayheader=0','','scrollbars=no,resizable=yes,width=570,height=300,left=700,top=200,screenX=700,screenY=200')";
+	$HD_Form -> FG_OTHER_BUTTON5_LINK= "javascript:;\" onClick=\"MM_openBrWindow('A2B_entity_logrefill?form_action=ask-add&popup_select=1&popup_formname=myForm&card_id=|param|&displayheader=0','','scrollbars=no,resizable=yes,width=590,height=330,left=700,top=200,screenX=700,screenY=200')";
 	$HD_Form -> FG_OTHER_BUTTON1_ALT = '<font color="red">'.gettext('EXT').'</font>';
 	$HD_Form -> FG_OTHER_BUTTON2_ALT = '<font color="red">'.gettext('CID').'</font>';
 	$HD_Form -> FG_OTHER_BUTTON3_ALT = '<font color="red">'.gettext('DID').'</font>';

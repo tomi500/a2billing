@@ -101,7 +101,7 @@ if ($resmax) {
 	$credit = $row[0];
 }
 
-$HD_Form -> AddEditElement (gettext("REFILL AMOUNT "),
+$HD_Form -> AddEditElement (gettext("REFILL AMOUNT"),
 			   "credit",
 			   '$value',
 			   "INPUT",
@@ -129,7 +129,19 @@ $HD_Form -> AddEditElement (gettext("REFILL TYPE"),
 			    "",
 			    "list", "", "", "", $list_refill_type, "%1", "NO-NULL");
 
-	$HD_Form -> FieldEditElement ('credit, description, refill_type');
+if (D7_API_TOKEN && CCMAINTITLE) {
+$HD_Form -> AddEditElement (gettext("SEND SMS"),
+			    "sendsms",
+			    '1',
+			    "RADIOBUTTON",
+			    "",
+			    "",
+			    "",
+			    "", "", "", gettext("Yes").":1, - ".gettext("No").":0", "", "", "", gettext("Choose if you wish send SMS about refill and total credit to this customer"));
+	$add_fields_sendsms = ', sendsms';
+} else	$add_fields_sendsms = '';
+
+	$HD_Form -> FieldEditElement ('credit, description, refill_type'.$add_fields_sendsms);
 	$HD_Form -> FG_QUERY_ADITION_HIDDEN_FIELDS = "card_id, diller_id";
 	$HD_Form -> FG_QUERY_ADITION_HIDDEN_VALUE = "$card_id, " . $_SESSION["card_id"];
 
