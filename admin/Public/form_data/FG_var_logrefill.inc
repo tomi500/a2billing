@@ -61,9 +61,9 @@ $HD_Form -> AddViewElement(gettext("ACCOUNT"), "username", "14%", "center", "sor
 $HD_Form -> AddViewElement(gettext("REFILL DATE"), "cc_logrefill.date", "20%", "center", "sort", "30", "", "", "", "", "", "display_dateformat");
 $HD_Form -> AddViewElement(gettext("REFILL AMOUNT"), "credit", "20%", "center", "sort","", "", "", "", "", "", "display_money");
 $HD_Form -> AddViewElement(gettext("REFILL TYPE"),"refill_type", "19%", "center", "sort", "", "list", $list_refill_type);
-$HD_Form -> AddViewElement(gettext("AGENT"),"agent", "14%", "center", "sort", "", "30", "", "", "", "", "linktocustomer_id");
+$HD_Form -> AddViewElement(gettext("AGENT"),"diller_id", "14%", "center", "sort", "", "30", "", "", "", "", "linktocustomer_id");
 
-$HD_Form -> FieldViewElement ('cc_logrefill.id, cc_logrefill.card_id, cc_logrefill.date, cc_logrefill.credit , cc_logrefill.refill_type, IFNULL(cc_logrefill.agent_id,cc_logrefill.diller_id)');
+$HD_Form -> FieldViewElement ('cc_logrefill.id, cc_logrefill.card_id, cc_logrefill.date, cc_logrefill.credit, cc_logrefill.refill_type, cc_logrefill.diller_id');
 
 if (!($popup_select>=1))	 $HD_Form -> FG_FILTER_SEARCH_FORM = true;
 $HD_Form -> FG_FILTER_SEARCH_SESSION_NAME = 'refill_cust_selection';
