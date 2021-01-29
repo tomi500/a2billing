@@ -183,12 +183,14 @@ if (isset($form_action) && $form_action=="ask-edit") {
 		}
 	    }
 	}
-        $instance_table = new Table("cc_did_destination", "playsound");
+        $instance_table = new Table("cc_did_destination", "playsound, calleesound");
         $list = $instance_table -> Get_list($DBHandle, "id = $id", 0);
         if (is_array($list) && count($list)>0) {
             $playsound = preg_replace('/\.[^\.\/]+$/', '', basename($list[0][0]));
             $selectedgreeting = ($playsound && array_search($playsound,array_column($soundlist,0))===false) ? "<OPTION value=\"$playsound\">".$playsound."</OPTION>" : NULL;
-        } else $selectedgreeting = NULL;
+            $playcalleesound = preg_replace('/\.[^\.\/]+$/', '', basename($list[0][1]));
+            $selectedcalleesound = ($playcalleesound && array_search($playcalleesound,array_column($soundlist,0))===false) ? "<OPTION value=\"$playcalleesound\">".$playcalleesound."</OPTION>" : NULL;
+        } else $selectedgreeting = $selectedcalleesound = NULL;
 
         $QUERYpop = "SELECT ivrname FROM cc_ivr WHERE id_cc_card=(SELECT id_cc_card FROM cc_did_destination WHERE id=$id) ORDER BY ivrname";
         $resmax = $DBHandle->Execute($QUERYpop);
@@ -240,6 +242,15 @@ $HD_Form -> AddEditElement (gettext("DESTINATION"),
 	"",
 	gettext("Insert the DID"),
 	"list", "", "", "", $destlist, "%1", "", gettext("Enter the phone number you wish to call, or the VoIP client to reach, or QUEUE to go. (ie: 347894999 or SIP/jeremy@182.212.1.45 or QUEUE myqueue,hknRt,,,300)"), NULL, $selecteddest);
+
+$HD_Form -> AddEditElement (gettext("CALLEE_SOUND"),
+	"calleesound",
+	'$value',
+	($form_action=='ask-delete')?"INPUT":"DATALIST",
+	"size=50 maxlength=50 style=\"width: 250px;\"",
+	"",
+	gettext("Insert the path and name of sound file"),
+	"list", "", "", "", $soundlist, "%1", "", gettext("Play sound to callee after hang-up"), NULL, $selectedcalleesound);
 
 $HD_Form -> AddEditElement (gettext("CALLERIDNAME"),
 	"calleridname",
@@ -325,7 +336,7 @@ $HD_Form -> AddEditElement (gettext("CID_PRESENT"),
 	gettext("Choose 'Yes' if you want to present real CID though CID_GROUP applied"),
 	"" , "", "", gettext("Yes").":1, - ".gettext("No").":0", "", "", "", gettext("Choose 'Yes' if you want to present real CID though CID_GROUP applied"));
 **/
-	$HD_Form -> FieldEditElement ('activated, id_cc_did, id_cc_did, answer, playsound, destination, calleridname, timeout, destinuse, destmaxuse, id_cc_card, validated, priority');
+	$HD_Form -> FieldEditElement ('activated, id_cc_did, id_cc_did, answer, playsound, destination, calleesound, calleridname, timeout, destinuse, destmaxuse, id_cc_card, validated, priority');
 
 $HD_Form->FG_ADITION_HIDDEN_PARAM		= $HD_Form->FG_EDITION_HIDDEN_PARAM		= 'filterprefix,current_page';
 $HD_Form->FG_ADITION_HIDDEN_PARAM_VALUE 	= $HD_Form->FG_EDITION_HIDDEN_PARAM_VALUE	= $filterprefix.",".$current_page;

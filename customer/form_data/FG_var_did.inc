@@ -74,12 +74,14 @@ if ($return!==false) {
             }
         }
 }
-$instance_table = new Table("cc_did_destination", "playsound");
+$instance_table = new Table("cc_did_destination", "playsound, calleesound");
 $list = $instance_table -> Get_list($DBHandle, "id = $id", 0);
 if (is_array($list) && count($list)>0) {
     $playsound = preg_replace('/\.[^\.\/]+$/', '', basename($list[0][0]));
     $selectedgreeting = ($playsound && array_search($playsound,array_column($soundlist,0))===false) ? "<OPTION value=\"$playsound\">".$playsound."</OPTION>" : NULL;
-} else $selectedgreeting = NULL;
+    $playcalleesound = preg_replace('/\.[^\.\/]+$/', '', basename($list[0][0]));
+    $selectedcalleesound = ($playcalleesound && array_search($playcalleesound,array_column($soundlist,0))===false) ? "<OPTION value=\"$playcalleesound\">".$playcalleesound."</OPTION>" : NULL;
+} else $selectedgreeting = $selectedcalleesound = NULL;
 $destlist = array();
 $QUERYpop = "SELECT ivrname FROM cc_ivr WHERE id_cc_card=".$_SESSION["card_id"]." ORDER BY ivrname";
 $resmax = $DBHandle->Execute($QUERYpop);
@@ -227,6 +229,15 @@ $HD_Form -> AddEditElement (gettext("DESTINATION"),
 	    "Insert the Destination",
 	    "list" , "", "", "", $destlist , "%1", "", gettext("Enter here the phonenumber or IVR name you wish to send call, or select destination from the drop-down list"), NULL, $selecteddest);
 
+$HD_Form -> AddEditElement (gettext("CALLEE_SOUND"),
+	"calleesound",
+	'$value',
+	($form_action=='ask-delete')?"INPUT":"DATALIST",
+	"size=50 maxlength=50 style=\"width: 250px;\"",
+	"",
+	gettext("Insert the path and name of sound file"),
+	"list", "", "", "", $soundlist, "%1", "", gettext("Play sound to callee after hang-up"), NULL, $selectedcalleesound);
+
 $HD_Form -> AddEditElement (gettext("TIMEOUT"),
 	"timeout",
 	'$value',
@@ -246,9 +257,9 @@ $HD_Form -> AddEditElement (gettext("PRIORITY"),
 	"list" , "", "",  "", $priority_list, "%1" , "" , "");
 
 if (isset($form_action) && $form_action<>"ask-add" /**($form_action=="ask-edit" || $form_action=="edit")**/) {
-    $HD_Form -> FieldEditElement ('activated, id_cc_did, id_cc_card, answer, playsound, destination, timeout, priority');
+    $HD_Form -> FieldEditElement ('activated, id_cc_did, id_cc_card, answer, playsound, destination, calleesound, timeout, priority');
 } else {
-    $HD_Form -> FieldEditElement ('activated, id_cc_did, answer, playsound, destination, timeout, priority');
+    $HD_Form -> FieldEditElement ('activated, id_cc_did, answer, playsound, destination, calleesound, timeout, priority');
 //    $HD_Form -> FG_QUERY_EDITION_HIDDEN_FIELDS = "destination, validated, voip_call";
 //    $HD_Form -> FG_QUERY_EDITION_HIDDEN_VALUE = "$destination, $validated, $voip_call";
 }

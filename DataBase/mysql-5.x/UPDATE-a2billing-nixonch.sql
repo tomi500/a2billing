@@ -257,6 +257,7 @@ ALTER TABLE cc_callerid ADD INDEX `id_cc_card` (`id_cc_card`);
 
 ALTER TABLE cc_did_destination ADD answer INT( 11 ) NOT NULL DEFAULT '0';
 ALTER TABLE cc_did_destination ADD playsound VARCHAR( 100 ) CHARACTER SET utf8 COLLATE utf8_bin NOT NULL;
+ALTER TABLE cc_did_destination ADD calleesound VARCHAR( 100 ) CHARACTER SET utf8 COLLATE utf8_bin NOT NULL AFTER `playsound`;
 ALTER TABLE cc_did_destination ADD timeout VARCHAR( 3 ) NOT NULL ;
 ALTER TABLE cc_did_destination ADD destinuse int(11) NOT NULL DEFAULT '0' AFTER `activated`;
 ALTER TABLE cc_did_destination ADD destmaxuse int(11) NOT NULL DEFAULT '-1' AFTER `destinuse`;

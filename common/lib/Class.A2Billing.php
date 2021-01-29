@@ -1952,6 +1952,7 @@ class A2Billing {
 			$this->speech2mail				= $inst_listdestination[42];
 			$this->send_text				= $inst_listdestination[43];
 			$this->send_sound				= $inst_listdestination[44];
+			$this->calleesound				= ($inst_listdestination[45]) ? $this->accountcode."/".$inst_listdestination[45] : NULL;
 			$didvoicebox				= is_null($inst_listdestination[33]) ? NULL : $inst_listdestination[33]."@".$this->username;
 			$file  = preg_replace('/\.[^\.\/]+$/','',basename($inst_listdestination[29]));
 			
@@ -2355,6 +2356,7 @@ $this -> debug( ERROR, $agi, __FILE__, __LINE__, "[ \033[1;34m".$bridgepeer." ".
 	    $this->speech2mail					= $inst_listdestination[43];
 	    $this->send_text					= $inst_listdestination[44];
 	    $this->send_sound					= $inst_listdestination[45];
+	    $this->calleesound					= ($inst_listdestination[46]) ? $this->accountcode."/".$inst_listdestination[46] : NULL;
 
 	    // CHECK IF DESTINATION IS SET
 	    if (strlen($inst_listdestination[4])==0 || $this->CallerID==$this->destination)
