@@ -96,7 +96,7 @@ define ("MANAGER_HOST", isset($A2B->config['global']['manager_host'])?$A2B->conf
 define ("MANAGER_USERNAME", isset($A2B->config['global']['manager_username'])?$A2B->config['global']['manager_username']:null);
 define ("MANAGER_SECRET", isset($A2B->config['global']['manager_secret'])?$A2B->config['global']['manager_secret']:null);
 if (strlen(DATE_TIMEZONE) > 2) {
-	$UserDateTime	= new DateTime('2013-12-21', new DateTimeZone(DATE_TIMEZONE));
+	$UserDateTime	= new DateTime('2019-12-21', new DateTimeZone(DATE_TIMEZONE));
 	$offset 	= $UserDateTime->getOffset();
 	$offsetHours	= round(abs($offset)/3600);
 	$offsetMinutes	= round((abs($offset) - $offsetHours * 3600) / 60);
