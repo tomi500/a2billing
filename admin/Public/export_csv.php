@@ -48,7 +48,6 @@ if (strlen($var_export) == 0) {
 	$var_export = 'pr_sql_export';
 }
 
-
 #  Set the parameters: SQL Query, hostname, databasename, dbuser and password
 $dumpfile = new iam_csvdump;
 
@@ -60,12 +59,13 @@ if (strlen($_SESSION[$var_export]) < 10) {
 	$log = new Logger();
 	$myfileName = "Dump_" . date("Y-m-d");
 	$QUERY = $_SESSION[$var_export];
-	if ($var_export == "pr_export_entity_ringup")
+	if (strcmp($var_export, "pr_export_entity_ringup") == 0) {
 		$myfileName = $filename . "_" . date("Y-m-d");
 		if (is_numeric($id))
-			$QUERY .= $id." ORDER BY channelstatedesc DESC, attempt";
+			$QUERY .= $id." ORDER BY channelstatedesc DESC, lastattempt";
 		else
 			$log->insertLog($_SESSION["admin_id"], 2, "FILE EXPORT FAILED", "A File in CSV Format was not exported by User, File Name= " . $myfileName . ".csv", '', $_SERVER['REMOTE_ADDR'], $_SERVER['REQUEST_URI'], '');
+	}
 	if (strcmp($var_export_type, "type_csv") == 0) {
 		$log->insertLog($_SESSION["admin_id"], 2, "FILE EXPORTED", "A File in CSV Format is exported by User, File Name= " . $myfileName . ".csv", '', $_SERVER['REMOTE_ADDR'], $_SERVER['REQUEST_URI'], '');
 		$dumpfile->dump($QUERY, $myfileName, "csv", DBNAME, USER, PASS, HOST, DB_TYPE);
@@ -76,4 +76,3 @@ if (strlen($_SESSION[$var_export]) < 10) {
 	}
 	$log = null;
 }
-

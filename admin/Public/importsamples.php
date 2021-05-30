@@ -61,12 +61,14 @@ $didSample_Complex = "200, 12, 1, 2006-07-17 19:48:07, 2031-07-17 19:48:07, 1
 <br>500, 12, 1, 2006-07-17 19:48:07, 2031-07-17 19:48:07, 1";
 
 $phonebookSample_Simple = "003247354343
-<br>003247354563
-<br>003247354356";
+<br>3247354563
+<br>003247354356
+<br>+3247302184";
 
-$phonebookSample_Complex = "003247354343, Jean Pest, advertissing
-<br>003247354563, Ale Beignard, Debt
-<br>003247354356, James Bon, Debt";
+$phonebookSample_Complex = "003247354343;; Debt
+<br>3247354563; Alexandra Beignard
+<br>003247354356; James; Debt
+<br>+3247302184; Bill Coren; Advertissing";
 
 echo "<font size=\"1\">";
 if (isset($_GET["sample"])) {

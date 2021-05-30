@@ -236,7 +236,7 @@ $HD_Form -> AddEditElement (gettext("CALLEE_SOUND"),
 	"size=50 maxlength=50 style=\"width: 250px;\"",
 	"",
 	gettext("Insert the path and name of sound file"),
-	"list", "", "", "", $soundlist, "%1", "", gettext("Play sound to callee after hang-up"), NULL, $selectedcalleesound);
+	"list", "", "", "", $soundlist, "%1", "", gettext("Play sound to callee at the moment will answered"), NULL, $selectedcalleesound);
 
 $HD_Form -> AddEditElement (gettext("TIMEOUT"),
 	"timeout",

@@ -183,7 +183,7 @@ if ($atmenu == "SIP" && $form_action == "list") {
 <br/>
 <div class="toggle_hide2show">
 <center>
-<a href="#" target="_self" class="toggle_menu"><img class="toggle_hide2show" src="<?php echo Images_Path; ?>/toggle_hide2show.png" onmouseover="this.style.cursor='hand';" HEIGHT="16"> <font class="fontstyle_002"><?php echo gettext("GENERATE EXTENSIONS");?> </font></a>
+<a href="#" target="_self" class="toggle_menu"><img src="<?php echo Images_Path; ?>/toggle_hide2show.png" onmouseover="this.style.cursor='hand';" HEIGHT="16"> <font class="fontstyle_002"><?php echo gettext("GENERATE EXTENSIONS");?> </font></a>
 <div class="tohide" style="display:none;">
 	<br/>
 	<form NAME="theForm">
@@ -192,7 +192,7 @@ if ($atmenu == "SIP" && $form_action == "list") {
 		    <td align="left" valign="bottom" nowrap="nowrap">
 			<font style="font-weight:bold;"><?php echo gettext("Create extensions from");?>:</font><br/><sup>[<?php echo gettext("from");?> <?php echo $extmin;?> <?php echo gettext("to");?> <?php echo $extmax;?>]</sup>
 		    </td><td nowrap="nowrap">
-			&nbsp;<input class="form_input_text" id="num1" name="startnumber" onfocus="clear_textbox(this);" onkeypress="return keytoDownNumber(event,this);" size="10" maxlength="<?php echo $extlen;?>" value="<?php echo $extstart;?>">
+			&nbsp;<input class="form_input_text" id="num1" name="startnumber" oninput="allowOnlyDigits(this);" size="10" maxlength="<?php echo $extlen;?>" value="<?php echo $extstart;?>">
 		    </td>
 		    <td align="justify" style="padding: 0 15px" rowspan="100%">
 			<center><h3><?php echo gettext("Information");?></h3></center>
@@ -202,7 +202,7 @@ if ($atmenu == "SIP" && $form_action == "list") {
 		<tr><td align="left" valign="top">
 			<font style="font-weight:bold;"><?php echo gettext("Quantity");?>:</font>
 		    </td><td valign="top" nowrap="nowrap">
-			&nbsp<input class="form_input_text" id="num2" name="quantity" onfocus="clear_textbox(this);" onkeypress="return keytoDownNumber(event,this);" size="10" maxlength="3" value="1"><br/>
+			&nbsp<input class="form_input_text" id="num2" name="quantity" oninput="allowOnlyDigits(this);" size="10" maxlength="3" value="1"><br/>
 			&nbsp;<sup><em><?php echo gettext("Extensions left");?>:&nbsp;<?php echo $extquantity;?></em></sup>
 		    </td>
 		</tr>

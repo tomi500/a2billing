@@ -1989,8 +1989,11 @@ $A2B -> debug( ERROR, $agi, __FILE__, __LINE__, 'set_callerid "'.$calleridname.'
 					write_log(LOGFILE_API_CALLBACK, " ActionID = {$amicmd[5]} [#### Starting AMI WAIT_RESPONSE ####] $channel ");
 					$response = $ast -> wait_response(true);
 					$this->dialstatus = $response[1];
-					if ($this->dialstatus == "ANSWER" && $amicmd[7] >= 0) {
-						$res = $ast -> AbsoluteTimeout($response[2], $amicmd[7]-0.2);
+					$trunktimeout /= 1000;
+					if ($trunktimeout>$amicmd[7])
+					    $trunktimeout = $amicmd[7];
+					if ($this->dialstatus == "ANSWER" && $trunktimeout >= 0) {
+						$res = $ast -> AbsoluteTimeout($response[2], $trunktimeout-0.2);
 					}
 				    } else {
 					$this->dialstatus = "CHANUNAVAIL";
@@ -2073,14 +2076,16 @@ $A2B -> debug( ERROR, $agi, __FILE__, __LINE__, "[ \033[1;34m".$A2B->CallerID." 
 					break;
 				} else {
 					$failover_trunk = $next_failover_trunk;
-					if ($this->dialstatus != "ANSWER" && $this->dialstatus != "CANCEL") $A2B -> debug( DEBUG, $agi, __FILE__, __LINE__, "Now using failover trunk ".$failover_trunk." (".$trunkcode.").");
+					if ($this->dialstatus != "ANSWER" && $this->dialstatus != "CANCEL") {
+					    $A2B -> debug( ERROR, $agi, __FILE__, __LINE__, "Now using failover trunk ".$failover_trunk." (".$trunkcode.").");
+					}
 				}
 //				$intellect_count = -1;
 				$loop_failover++;
 
 			} // END while LOOP FAILOVER
 			if ($typecall == 8 && !($intellect_count >= 0 && $this->dialstatus=="CONGESTION")) {
-			    if ($this -> dialstatus  == "CHANUNAVAIL" || $this -> dialstatus  == "CONGESTION") {
+			    if ($this -> dialstatus  == "CHANUNAVAIL" || ($this -> dialstatus  == "CONGESTION" && time()-$timecur < 3)) {
 				$this -> real_answeredtime = $this -> answeredtime = 0;
 				if ($A2B->agiconfig['failover_lc_prefix'] || $ifmaxuse == 1 || ($intellect_count == 0 && $intellect_ifmaxuse == 1)) {
 					continue;
@@ -2093,9 +2098,8 @@ $A2B -> debug( ERROR, $agi, __FILE__, __LINE__, "[ \033[1;34m".$A2B->CallerID." 
 			}
 			//# Ooh, something actually happened!
 			if ($this->dialstatus  == "BUSY") {
-				$this -> real_answeredtime = $this -> answeredtime = 0;
-				if ($typecall<=44) {
-//$A2B -> debug( ERROR, $agi, __FILE__, __LINE__, "[typecall=".$typecall."]");
+			    $this -> real_answeredtime = $this -> answeredtime = 0;
+			    if ($typecall<=44) {
 				if ($A2B->agiconfig['busy_timeout'] > 0 && !(!$A2B->extext && $A2B->voicemail && !is_null($A2B->voicebox))) {
 					$A2B -> let_stream_listening($agi);
 					$agi->exec("Playtones busy");
@@ -2103,7 +2107,8 @@ $A2B -> debug( ERROR, $agi, __FILE__, __LINE__, "[ \033[1;34m".$A2B->CallerID." 
 				} elseif (!(!$A2B->extext && $A2B->voicemail && !is_null($A2B->voicebox))) {
 					$A2B -> let_stream_listening($agi);
 					$agi-> stream_file('prepaid-isbusy', '#');
-				}}
+				}
+			    }
 			} elseif ($this->dialstatus == "NOANSWER") {
 				$this -> real_answeredtime = $this -> answeredtime = 0;
 				if (isset($trunkcode) && strpos($trunkcode,"-INFOLINE") !== false) {

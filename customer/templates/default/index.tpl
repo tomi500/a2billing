@@ -173,7 +173,7 @@ var noservice = "{php} echo gettext("Service temporally not available.<br>Try ag
 	} elseif ($payment_methods[$index][0] == "MODULE_PAYMENT_PLUGNPAY_STATUS") {
 	    $show_logo .= '<a href="http://www.plugnpay.com/" target="_blank"><img src="' . KICON_PATH . '/plugnpay.png" alt="plugnpay.com"/></a>' . ' &nbsp; ';
 	} elseif ($payment_methods[$index][0] == "MODULE_PAYMENT_WM_STATUS") {
-	    $show_logo .= '<a href="http://www.wmtransfer.com/" target="_blank"><img src="' . KICON_PATH . '/webmoney_virified.png" alt="WebMoney"/></a>' . ' &nbsp; ' . '<a href="https://passport.webmoney.ru/asp/certview.asp?wmid='.$wmid[0][0].'" target="_blank"><img src="' . KICON_PATH . '/v_blue_on_transp_en.png" alt="Check the seller\'s WMID" border="0" /></a>';
+	    $show_logo .= '<a href="http://www.web.money/" target="_blank"><img src="' . KICON_PATH . '/webmoney_virified.png" alt="WebMoney"/></a>' . ' &nbsp; ' . '<a href="https://passport.web.money/asp/certview.asp?wmid='.$wmid[0][0].'" target="_blank"><img src="' . KICON_PATH . '/v_blue_on_transp_en.png" alt="Check the seller\'s WMID" border="0" /></a>';
 	}
     }
 

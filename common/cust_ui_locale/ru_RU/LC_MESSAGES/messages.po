@@ -197,6 +197,50 @@ msgstr "Сб"
 msgid "Su"
 msgstr "Вс"
 
+#: CC_ring_up.php
+msgid "After the specified number of seconds have elapsed, the connection will be terminated."
+msgstr "По истечении заданного количества секунд после ответа, соединение будет разорвано."
+
+#: CC_ring_up.php
+msgid "Enter here the phonenumber or select destination from the drop-down list."
+msgstr "Введите или выберите из выпадающего списка направление, куда отправится ответивший вызов."
+
+#: CC_ring_up.php
+msgid "The maximum number of connections is simultaneously. At the moment, a maximum of "
+msgstr "Максимальное количество соединений одномоментно. Сейчас доступно максимум "
+
+#: CC_ring_up.php
+msgid " connections are available. Please open a new request ticket to increase the upper threshold."
+msgstr " одновременных соединения. Пожалуйста откройте новый тикет для запроса увеличения верхнего порога."
+
+#: CC_ring_up.php
+msgid "Please, you have first to set maximum duration of call !"
+msgstr "Пожалуйста, сначала установите максимальную продолжительность звонка !"
+
+#: CC_ring_up.php
+msgid "Retries"
+msgstr "Повторов"
+
+#: CC_ring_up.php
+msgid "Repeat not before"
+msgstr "Повтор через"
+
+#: CC_ring_up.php
+msgid "min"
+msgstr "мин"
+
+#: CC_ring_up.php
+msgid "Clear"
+msgstr "Очистить"
+
+#: CC_ring_up.php
+msgid "Editing"
+msgstr "Редактирование"
+
+#: CC_ring_up.php
+msgid "New upload"
+msgstr "Новая загрузка"
+
 #: A2B_entity_greeting.php
 msgid " dependent records.<br>"
 msgstr " зависимых записи.<br>"
@@ -307,7 +351,7 @@ msgstr "Платёж для "
 
 #: A2B_entity_phonenumber.php:113
 msgid "CAMPAIGN"
-msgstr "МЕРОПРИЯТИЕ"
+msgstr "ОБЗВОН"
 
 #: A2B_entity_phonenumber.php:116 lib/interface/constants.php:15
 #, fuzzy
@@ -463,8 +507,8 @@ msgid "Selected Fields..."
 msgstr "Выбранные поля..."
 
 #: A2B_phonelist_import.php:301
-msgid "Use the example below  to format the CSV file. Fields are separated by [,] or [;]"
-msgstr "Используйте пример для создания CSV файла. Поля должны быть разделены [,] либо [;]"
+msgid "Use the example below to format the CSV file.</br>Fields are separated by [,] or [;]"
+msgstr "Используйте этот пример для создания CSV файла.</br>Поля должны быть разделены [,] либо [;]"
 
 #: A2B_phonelist_import.php:302
 msgid "(dot) . is used for decimal format."
@@ -1234,7 +1278,7 @@ msgstr "Ни одной карты пополнения не было испол
 
 #: form_data/FG_var_campaign.inc:64
 msgid "Add CAMPAIGN"
-msgstr "Дабавить МЕРОПРИЯТИЕ"
+msgstr "Дабавить ОБЗВОН"
 
 #: form_data/FG_var_campaign.inc:68 form_data/FG_var_speeddial.inc:53
 #: form_data/FG_var_speeddial.inc:90 form_data/FG_var_phonebook.inc:65
@@ -1261,7 +1305,7 @@ msgstr ""
 
 #: form_data/FG_var_campaign.inc:89
 msgid "CAMPAIGN NAME"
-msgstr "НАЗВАНИЕ МЕРОПРИЯТИЯ"
+msgstr "НАЗВАНИЕ ОБЗВОНА"
 
 #: form_data/FG_var_campaign.inc:95
 #, fuzzy
@@ -3277,19 +3321,19 @@ msgstr "Введите код с карты пополнения для попо
 
 #: lib/customer.help.php:71
 msgid "This section will allow you to create and edit campaign. "
-msgstr "Эта секция позволит создать либо отредактировать МЕРОПРИЯТИЕ"
+msgstr "Создавайте и редактируйте собственные Информационные Кампании. "
 
 #: lib/customer.help.php:72
 msgid "A campaign will be attached to a user in order to let him use the predictive-dialer option. "
-msgstr ", что позволит использовать интеллектуальный обзвон. "
+msgstr ""
 
 #: lib/customer.help.php:73
 msgid "Predictive dialer will browse all the phone numbers from the campaign and perform outgoing calls."
-msgstr "Интеллектуальный набиратель пройдется по всем телефонным номерам каждого мероприятия и создаст исходящие звонки, тут же соединяя ответивших с освободившимися операторами."
+msgstr "Интеллектуальный набиратель пройдется по всем телефонным номерам каждой Кампании и создаст исходящие звонки, тут же переводя ответивших к заданному НАПРАВЛЕНИЮ."
 
 #: lib/customer.help.php:75
 msgid "Phonelist are all the phone numbers attached to a campaign. You can add, remove and edit the phone numbers."
-msgstr "Список телефонов, добавленных в МЕРОПРИЯТИЕ. Можно добавлять, редактировать и удалять номера телефонов."
+msgstr "Список телефонов, добавленных в ОБЗВОН. Можно добавлять, редактировать и удалять номера телефонов."
 
 #: lib/customer.help.php:77
 msgid "Invoice history - The section below allows you to see and pay the invoices that you have to pay."
@@ -3301,7 +3345,7 @@ msgstr "Список квитанций - В этом разделе Вы мож
 
 #: lib/customer.help.php:81
 msgid "Phonebook are set of phone numbers. You can add, remove and edit the phonebook. You can also associate phonebook to a campaign in the Campaign section"
-msgstr "Телефонные книги - это наборы телефонов. Можно добавлять, удалять и редактировать телефонную книгу. Также можно прикрепить телефонную книгу к мероприятию в разделе МЕРОПРИЯТИЯ."
+msgstr "Телефонные книги - это наборы телефонов. Можно добавлять, удалять и редактировать телефонную книгу. Также можно прикрепить телефонную книгу к ОБЗВОНУ в разделе ОБЗВОН."
 
 #: lib/customer.help.php:83
 msgid "Select the country below where you would like a DID, select a DID from the list and enter the destination you would like to assign it to."
@@ -4525,7 +4569,7 @@ msgstr "АВТООБЗВОН"
 
 #: templates/default/main.tpl:121
 msgid "Campaign's"
-msgstr "Мероприятия"
+msgstr "ОБЗВОНЫ"
 
 #: templates/default/main.tpl:124
 msgid "Import Phone List"

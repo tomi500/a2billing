@@ -1622,6 +1622,8 @@ $A2B -> debug( ERROR, $agi, __FILE__, __LINE__, "\033[1;32m============INSERT===
 	$callback_tariff		= $agi -> get_variable("TARIFF", true);
 	$callback_uniqueid		= $agi -> get_variable("CBID", true);
 	$A2B->callback_id		= $agi -> get_variable("CALLBACKID", true);
+	$ringup_list_id 		= $agi -> get_variable("RINGUPLISTID", true);
+	$ringup_id			= $agi -> get_variable("RINGUPID", true);
 	$callback_leg			= $agi -> get_variable("LEG", true);
 	$usedratecard			= $agi -> get_variable("RATECARD", true);
 
@@ -1665,12 +1667,15 @@ $A2B -> debug( ERROR, $agi, __FILE__, __LINE__, "\033[1;32m============INSERT===
 	    $A2B -> callback_beep_to_enter_destination = True;
 	}
 
-	$A2B -> debug( INFO, $agi, __FILE__, __LINE__, "[CALLBACK]:[GET VARIABLE : CALLED=$called_party | CALLING=$calling_party | MODE=$callback_mode | TARIFF=$callback_tariff | CBID=$callback_uniqueid | LEG=$callback_leg]");
+	$A2B -> debug( INFO, $agi, __FILE__, __LINE__, "[CALLBACK]:[GET VARIABLE : CALLED=$called_party | CALLING=$calling_party | MODE=$callback_mode | TARIFF=$callback_tariff | CALLBACKID={$A2B->callback_id} |OR| RINGUPLISTID=$ringup_list_id | LEG=$callback_leg]");
 	
-	$QUERY = "UPDATE cc_callback_spool SET agi_result='AGI PROCESSING' WHERE uniqueid LIKE '$callback_uniqueid'";
-	$res = $A2B -> DBHandle -> Execute($QUERY);
-	$A2B -> debug( DEBUG, $agi, __FILE__, __LINE__, "[CALLBACK : UPDATE CALLBACK AGI_RESULT : QUERY=$QUERY]");
-
+	if ($ringup_list_id) {
+	    $A2B -> debug( DEBUG, $agi, __FILE__, __LINE__, "[RING-UP : AGI PROCESSING ]");
+	} else {
+	    $QUERY = "UPDATE cc_callback_spool SET agi_result='AGI PROCESSING' WHERE uniqueid LIKE '$callback_uniqueid'";
+	    $res = $A2B -> DBHandle -> Execute($QUERY);
+	    $A2B -> debug( DEBUG, $agi, __FILE__, __LINE__, "[CALLBACK : UPDATE CALLBACK AGI_RESULT : QUERY=$QUERY]");
+	}
 
 	/* WE START ;) */
 	$A2B -> debug( DEBUG, $agi, __FILE__, __LINE__, "[CALLBACK]:[TRY : callingcard_ivr_authenticate]");
@@ -1709,7 +1714,16 @@ $A2B -> debug( ERROR, $agi, __FILE__, __LINE__, "\033[1;32m============INSERT===
 				$A2B -> debug( DEBUG, $agi, __FILE__, __LINE__, "[CALLBACK]:[STOP STREAM FILE $prompt]");
 			}
 
-			$ans = $A2B -> callingcard_ivr_authorize($agi, $RateEngine, $i, true);
+			$isvoip = false;
+			$initialdestination = $A2B->extension;
+			if ($A2B -> ivr($agi,$A2B->extension,$initialdestination,$isvoip)) {
+			    $A2B->destination = $A2B->extension;
+			}
+			if (stripos($A2B->extension,'QUEUE ') === 0) {
+			    $ans = "QUEUE";
+			} else {
+			    $ans = $A2B -> callingcard_ivr_authorize($agi, $RateEngine, $i, true);
+			}
 
 			$QUERY = "SELECT regexten FROM cc_sip_buddies LEFT JOIN cc_card_concat bb ON id_cc_card = bb.concat_card_id LEFT JOIN ( SELECT aa.concat_id FROM cc_card_concat aa WHERE aa.concat_card_id = {$A2B->id_card} ) AS v ON bb.concat_id = v.concat_id
 								WHERE (id_cc_card = {$A2B->id_card} OR v.concat_id IS NOT NULL) AND name = '{$A2B->src_peername}' AND name = '$called_party' LIMIT 1";
@@ -1735,14 +1749,60 @@ $A2B -> debug( ERROR, $agi, __FILE__, __LINE__, "\033[1;32m============INSERT===
 				$newuniqueid[0] = time();
 				$A2B -> uniqueid = implode('.',$newuniqueid);
 			}
-			if ($ans=="2FAX") {
+			if ($ans=="QUEUE") {
+					$dialstr = $A2B->destination;
+					$que = explode(",",$dialstr);
+					if (stripos($que[1],"r") === false) {
+						$A2B -> let_stream_listening($agi);
+					} else {
+						$A2B -> let_stream_listening($agi,false,true);
+					}
+					$myres = $A2B -> run_dial($agi, $dialstr);
+					$A2B -> DbReConnect($agi);
+					$answeredtime = $agi->get_variable("ANSWEREDTIME", true);
+					if ($answeredtime == "")
+						$answeredtime	= $agi->get_variable("CDR(billsec)",true);
+					if ($answeredtime>1356000000) {
+						$answeredtime	= time() - $answeredtime;
+						$dialstatus	= 'ANSWER';
+					} else {
+						$answeredtime	= 0;
+						$dialstatus	= $A2B -> get_dialstatus_from_queuestatus($agi);
+					}
+					$bridgepeer = $agi->get_variable('QUEUEDNID', true);
+					if (strlen($A2B -> dialstatus_rev_list[$dialstatus])>0) {
+						$terminatecauseid = $A2B -> dialstatus_rev_list[$dialstatus];
+					} else {
+						$terminatecauseid = 0;
+					}
+					if ($answeredtime == 0) $inst_listdestination4 = $A2B -> realdestination;
+					else {
+						$inst_listdestination4 = $A2B -> destination = $bridgepeer;
+					}
+					$QUERY = "SELECT regexten, id_cc_card FROM cc_sip_buddies WHERE name LIKE '{$inst_listdestination4}' LIMIT 1";
+					$result = $A2B -> instance_table -> SQLExec ($A2B->DBHandle, $QUERY);
+					if (is_array($result)) {
+						$A2B->calledexten = ($result[0][0] != "") ? "'".$result[0][0]."'" : 'NULL';
+						$card_called = "'".$result[0][1]."'";
+					} else {
+						$A2B->calledexten = 'NULL';
+						$card_called = "'0'";
+					}
+					$QUERY = "INSERT INTO cc_call (uniqueid, sessionid, card_id, nasipaddress, starttime, sessiontime, calledstation, ".
+						" terminatecauseid, stoptime, sessionbill, id_tariffgroup, id_tariffplan, id_ratecard, id_trunk, src, sipiax, id_did, calledexten, card_called, dnid, callbackid) VALUES ".
+						"('".$A2B->uniqueid."', '".$A2B->channel."',  '".$A2B->id_card."', '".$A2B->hostname."',";
+					$QUERY .= " CURRENT_TIMESTAMP - INTERVAL $answeredtime SECOND ";
+					$QUERY .= ", '$answeredtime', '".$inst_listdestination4."', '$terminatecauseid', now(), '0', '0', '0', '0', '0', '$A2B->CallerID', '3', '$A2B->id_did', $A2B->calledexten, $card_called, '$A2B->dnid', '$A2B->callback_id')";
+					$result = $A2B -> instance_table -> SQLExec ($A2B->DBHandle, $QUERY, 0);
+					if ($A2B->set_inuse_username)	$A2B -> callingcard_acct_start_inuse($agi,0);
+
+			} else if ($ans=="2FAX") {
 				$A2B -> debug( INFO, $agi, __FILE__, __LINE__, "[ CALL OF THE SYSTEM - [FAX=".$A2B-> destination."]");
 				$A2B -> call_fax($agi);
 				if ($A2B->set_inuse_username) {
 					$A2B -> callingcard_acct_start_inuse($agi,0);
 				}
-			}
-			if ($ans==1) {
+			} else if ($ans==1) {
 				// PERFORM THE CALL
 				$QUERY = "SELECT flagringup, timeout1, sound1 FROM cc_callback_spool WHERE uniqueid LIKE '$callback_uniqueid' AND flagringup=1 LIMIT 1";
 				$result = $A2B -> instance_table -> SQLExec ($A2B->DBHandle, $QUERY);
@@ -1781,11 +1841,12 @@ $A2B -> debug( ERROR, $agi, __FILE__, __LINE__, "\033[1;32m============INSERT===
 				}
 
 				// INSERT CDR  & UPDATE SYSTEM
-				if ($A2B-> destination != 'RINGUP')
-					$RateEngine->rate_engine_updatesystem($A2B, $agi, $A2B-> destination);
+				if ($A2B->destination!='RINGUP') {
+					$RateEngine->rate_engine_updatesystem($A2B, $agi, $A2B->destination);
+				}
 
-				if ($A2B -> agiconfig['say_balance_after_call']==1) {
-					$A2B-> fct_say_balance ($agi, $A2B->credit);
+				if ($A2B->agiconfig['say_balance_after_call']==1) {
+					$A2B->fct_say_balance ($agi, $A2B->credit);
 				}
 
 				$charge_callback = 1;
@@ -2213,8 +2274,8 @@ if ($charge_callback) {
 		$A2B -> tariff = $callback_tariff;
 	}
 	
+	$QUERY = "";
 	if ($cia_res==0) {
-
 		$A2B -> debug( DEBUG, $agi, __FILE__, __LINE__, "[CALLBACK 1ST LEG]:[MAKE BILLING FOR THE 1ST LEG - TARIFF:".$A2B -> tariff.";CALLED=$called_party]");
 		$A2B -> agiconfig['use_dnid'] = 1;
 		$A2B -> dnid = $A2B -> destination = $called_party;
@@ -2252,7 +2313,9 @@ if ($charge_callback) {
 					//(ST) this is called if we don't bill ther user but to keep track of call costs
 					$RateEngine -> rate_engine_updatesystem($A2B, $agi, $A2B-> destination, 0, 0, 1, $callback_usedtrunk, $callback_td, $callback_mode);
 				}
-				
+				if ($RateEngine->answeredtime > 0 && isset($ringup_list_id) && $ringup_list_id && $ringup_id) {
+					$QUERY = ",`cc_ringup`.`status`=IF(`lefte`='1',2,`cc_ringup`.`status`),`processed`=`processed`+1,`lefte`=`lefte`-1,`passed`=1,`keyspressed`='$A2B->dtmfs'";
+				}
 			} else {
 				$A2B -> debug( ERROR, $agi, __FILE__, __LINE__, "[CALLBACK 1ST LEG]:[ERROR - BILLING FOR THE 1ST LEG - rate_engine_all_calcultimeout: CALLED=$called_party]");
 			}
@@ -2262,7 +2325,9 @@ if ($charge_callback) {
 	} else {
 		$A2B -> debug( ERROR, $agi, __FILE__, __LINE__, "[CALLBACK 1ST LEG]:[ERROR - AUTHENTICATION USERNAME]");
 	}
-	
+	$QUERY = "UPDATE `cc_ringup`,`cc_ringup_list` SET `cc_ringup`.`inuse`=`cc_ringup`.`inuse`-1,`cc_ringup_list`.`inuse`='0'".$QUERY." WHERE `cc_ringup`.`id`='$ringup_id' AND `cc_ringup_list`.`id`='$ringup_list_id'";
+	$A2B -> DBHandle -> Execute($QUERY);
+$A2B -> debug( ERROR, $agi, __FILE__, __LINE__, "[CALLBACK 1ST LEG]:[FINISH : $QUERY]");
 }// END if ($charge_callback)
 
 // END

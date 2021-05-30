@@ -85,6 +85,10 @@
 	<div class="toggle_menu"><li><a href="A2B_entity_ringup"><strong>{php} echo gettext("RING-UP");{/php}</strong></a></li></div>
 	{/if}
 
+	{if (true) or $ACXAUTODIALER >0 or $ACXSURVEILLANCE >0 or $ACXDISTRIBUTION >0}
+	<div class="toggle_menu"><li><a href="CC_ring_up"><strong>{php} echo gettext("CAMPAIGNs");{/php}</strong></a></li></div>
+	{/if}
+
 	{if $ACXSPEED_DIAL >0 }
 	<div class="toggle_menu"><li><a href="A2B_entity_speeddial?atmenu=speeddial&stitle=Speed+Dial"><strong>{php} echo gettext("SPEED DIAL");{/php}</strong></a></li></div>
 	{/if}
@@ -101,22 +105,14 @@
 	<div class="toggle_menu"><li><a href="callback"><strong>{php} echo gettext("CALLBACK");{/php}</strong></a></li></div>
 	{/if}
 
-	{if $ACXPASSWORD>0 }
-	<div class="toggle_menu"><li><a href="A2B_entity_password?atmenu=password&form_action=ask-edit&stitle=Password"><strong>{php} echo gettext("PASSWORD");{/php}</strong></a></li></div>
-	{/if}
-
-	{if $ACXVOUCHER >0 }
-	<div class="toggle_menu"><li><a href="A2B_entity_voucher?form_action=list"><strong>{php} echo gettext("VOUCHERS");{/php}</strong></a></li></div>
-	{/if}
-
-	{if $ACXAUTODIALER>0 }
+	{if (false) && $ACXAUTODIALER >0}
 	<div class="toggle_menu"><li>
 	<a href="javascript:;" class="toggle_menu" target="_self"> <div> <div id="menutitlebutton"> <img id="img10"
 	{if ($section == "10")}
 	src="templates/{$SKIN_NAME}/images/minus.gif"
 	{else}
 	src="templates/{$SKIN_NAME}/images/plus.gif"
-	{/if} onmouseover="this.style.cursor='hand';" ></div> <div id="menutitlesection"><strong>{php} echo gettext("AUTO DIALLER");{/php}</strong></div></div></a></li></div>
+	{/if} onmouseover="this.style.cursor='hand';" ></div> <div id="menutitlesection"><strong>{php} echo gettext("AUTO DIALER");{/php}</strong></div></div></a></li></div>
 		<div class="tohide"
 	{if ($section =="10")}
 		style="">
@@ -132,6 +128,14 @@
 		</ul></li>
 	</ul>
 	</div>
+	{/if}
+
+	{if $ACXPASSWORD>0 }
+	<div class="toggle_menu"><li><a href="A2B_entity_password?atmenu=password&form_action=ask-edit&stitle=Password"><strong>{php} echo gettext("PASSWORD");{/php}</strong></a></li></div>
+	{/if}
+
+	{if $ACXVOUCHER >0 }
+	<div class="toggle_menu"><li><a href="A2B_entity_voucher?form_action=list"><strong>{php} echo gettext("VOUCHERS");{/php}</strong></a></li></div>
 	{/if}
 
 	{if $ACXINVOICES >0 or $ACXPAYMENT_HISTORY >0 or $ACXNOTIFICATION >0}

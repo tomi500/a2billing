@@ -150,7 +150,7 @@ if ((count($list)>0) && is_array($list)){
 					// IT S OK
 				}elseif ($this -> FG_FILTERTYPE == 'POPUPVALUE'){
 				?>
-					<a href="#" onclick="window.open('<?php echo $this->FG_FILTERPOPUP[0]?>popup_formname=theFormFilter&popup_fieldname=filterprefix' <?php echo $this->FG_FILTERPOPUP[1]?>);"><img src="<?php echo Images_Path_Main;?>/icon_arrow_orange.gif"/></a>
+					<a href="#" onclick="window.open('<?php echo $this->FG_FILTERPOPUP[0]?>popup_formname=theFormFilter&popup_fieldname=filterprefix' <?php echo $this->FG_FILTERPOPUP[1]?>);"><img src="<?php echo Images_Path_Main;?>/icon_arrow_orange.gif" valign="bottom"/></a>
 				<?php
 				}
 
@@ -168,7 +168,7 @@ if ((count($list)>0) && is_array($list)){
 					// IT S OK
 				} elseif ($this -> FG_FILTERTYPE2 == 'POPUPVALUE') {
 				?>
-					<a href="#" onclick="window.open('<?php echo $this->FG_FILTERPOPUP2[0]?>popup_formname=theFormFilter&popup_fieldname=filterprefix2' <?php echo $this->FG_FILTERPOPUP2[1]?>);"><img src="<?php echo Images_Path_Main;?>/icon_arrow_orange.gif"/></a>
+					<a href="#" onclick="window.open('<?php echo $this->FG_FILTERPOPUP2[0]?>popup_formname=theFormFilter&popup_fieldname=filterprefix2' <?php echo $this->FG_FILTERPOPUP2[1]?>);"><img src="<?php echo Images_Path_Main;?>/icon_arrow_orange.gif" valign="bottom"/></a>
 				<?php
 				}
 			}
@@ -966,7 +966,7 @@ if ((count($list)>0) && is_array($list)){
 					// IT S OK
 				}elseif ($this -> FG_FILTERTYPE == 'POPUPVALUE'){
 				?>
-					<a href="#" onclick="window.open('<?php echo $this->FG_FILTERPOPUP[0]?>popup_formname=theFormFilter&popup_fieldname=filterprefix' <?php echo $this->FG_FILTERPOPUP[1]?>);"><img src="<?php echo Images_Path_Main;?>/icon_arrow_orange.gif"/></a>
+					<a href="#" onclick="window.open('<?php echo $this->FG_FILTERPOPUP[0]?>popup_formname=theFormFilter&popup_fieldname=filterprefix' <?php echo $this->FG_FILTERPOPUP[1]?>);"><img src="<?php echo Images_Path_Main;?>/icon_arrow_orange.gif" valign="bottom"/></a>
 				<?php
 				}
 
@@ -984,7 +984,7 @@ if ((count($list)>0) && is_array($list)){
 					// IT S OK
 				} elseif ($this -> FG_FILTERTYPE2 == 'POPUPVALUE') {
 				?>
-					<a href="#" onclick="window.open('<?php echo $this->FG_FILTERPOPUP2[0]?>popup_formname=theFormFilter&popup_fieldname=filterprefix2' <?php echo $this->FG_FILTERPOPUP2[1]?>);"><img src="<?php echo Images_Path_Main;?>/icon_arrow_orange.gif"/></a>
+					<a href="#" onclick="window.open('<?php echo $this->FG_FILTERPOPUP2[0]?>popup_formname=theFormFilter&popup_fieldname=filterprefix2' <?php echo $this->FG_FILTERPOPUP2[1]?>);"><img src="<?php echo Images_Path_Main;?>/icon_arrow_orange.gif" valign="bottom"/></a>
 				<?php
 				}
 			}

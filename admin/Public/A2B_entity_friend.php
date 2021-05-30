@@ -266,7 +266,7 @@ if ($form_action=='list') {
 <br/>
 <!-- ** ** ** ** ** Part for the Update ** ** ** ** ** -->
 <div class="toggle_hide2show">
-<center><a href="#" target="_self" class="toggle_menu"><img class="toggle_hide2show" src="<?php echo KICON_PATH; ?>/toggle_hide2show.png" onmouseover="this.style.cursor='hand';" HEIGHT="16"> <font class="fontstyle_002"><?php echo gettext("BATCH UPDATE");?> </font></a></center>
+<center><a href="#" target="_self" class="toggle_menu"><img src="<?php echo KICON_PATH; ?>/toggle_hide2show.png" onmouseover="this.style.cursor='hand';" HEIGHT="16"> <font class="fontstyle_002"><?php echo gettext("BATCH UPDATE");?> </font></a></center>
 	<div class="tohide" style="display:none;">
 
 <center>

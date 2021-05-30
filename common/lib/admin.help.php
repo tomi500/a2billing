@@ -299,7 +299,7 @@ $SPOT['authorizenet'] = '';
 //$SPOT['WORLDPAY'] = '<a href="http://www.worldpay.com/" target="_blank"><img src="'.KICON_PATH.'/worldpay.gif" alt="worldpay.com"/></a>';
 $SPOT['worldpay'] = '';
 $SPOT['plugnpay'] = '<a href="http://www.plugnpay.com/" target="_blank"><img src="' . KICON_PATH . '/plugnpay.png" alt="plugnpay.com"/></a>';
-$SPOT['webmoney'] = '<a href="http://www.webmoney.ru/" target="_blank"><img src="' . KICON_PATH . '/webmoney.gif" alt="WebMoney"/></a>';
+$SPOT['webmoney'] = '<a href="http://www.web.money/" target="_blank"><img src="' . KICON_PATH . '/webmoney.gif" alt="WebMoney"/></a>';
 $PAYMENT_METHOD = '
 <table width="100%" align="center">
 	<tr>

@@ -154,6 +154,7 @@ if (!isset($_SESSION['pr_login']) || !isset($_SESSION['pr_password']) || !isset(
 			$_SESSION["dillertariffs"]	= $return[15];
 			$_SESSION["dillergroups"]	= $return[16];
 			$_SESSION["paypal"]		= $return[17];
+			$_SESSION["simultaccess"]	= $return[18];
 			
 			$QUERY = "SELECT ipaddress from cc_system_log WHERE agent=0 ORDER BY creationdate DESC LIMIT 1";
 			$res = $DBHandle -> Execute($QUERY);
@@ -190,7 +191,7 @@ function login ($user, $pass)
 
 //	$QUERY = "SELECT cc.username, cc.credit, cc.status, cc.id, cc.id_didgroup, cc.tariff, cc.vat, IF(CONCAT(cc.id_timezone+0) = cc.id_timezone, ct.gmtoffset, (UNIX_TIMESTAMP() - UNIX_TIMESTAMP(CONVERT_TZ(NOW(), SUBSTRING_INDEX(cc.id_timezone, ';', -1), 'UTC')))), cc.voicemail_permitted, " .
 	$QUERY = "SELECT cc.username, cc.credit, cc.status, cc.id, cc.id_didgroup, cc.tariff, cc.vat, IF(CONCAT(cc.id_timezone+0) = cc.id_timezone, ct.gmtoffset, 0), cc.voicemail_permitted, cc.voicemail_activated, cc_card_group.users_perms, " .
-			 "cc.currency, cc.email, cc.margin_diller, IF(CONCAT(cc.id_timezone+0) = cc.id_timezone, IF(ct.gmttime='GMT', ct.gmttime, SUBSTRING(ct.gmttime,4,6)), SUBSTRING_INDEX(cc.id_timezone, ';', -1)), cc.dillertariffs, cc.dillergroups, cc.paypal " .
+			 "cc.currency, cc.email, cc.margin_diller, IF(CONCAT(cc.id_timezone+0) = cc.id_timezone, IF(ct.gmttime='GMT', ct.gmttime, SUBSTRING(ct.gmttime,4,6)), SUBSTRING_INDEX(cc.id_timezone, ';', -1)), cc.dillertariffs, cc.dillergroups, cc.paypal, simultaccess " .
 			 "FROM cc_card cc LEFT JOIN cc_timezone AS ct ON ct.id = cc.id_timezone LEFT JOIN cc_card_group ON cc_card_group.id=cc.id_group " .
 			 "WHERE (cc.email = '".$user."' OR cc.useralias = '".$user."') AND cc.uipass = '".$pass."'";
 			 

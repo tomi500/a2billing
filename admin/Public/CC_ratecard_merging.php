@@ -80,7 +80,7 @@ if($posted == 1) {
 	}
 	
 	if ($search_sources != 'nochange'){
-		$fieldtomerge= preg_split("/\t/", $search_sources);
+		$fieldtomerge = preg_split("/\t/", $search_sources);
 		$fieldtomerge_sql = str_replace("\t", ", ", $search_sources);
 		$fieldtomerge_sql = trim ($fieldtomerge_sql);
 		//if (strlen($fieldtomerge_sql)>0) $fieldtomerge_sql = ', '.$fieldtomerge_sql;
@@ -167,10 +167,11 @@ function resetHidden()
 function addSource()
 {
     for (i = 1; i < document.prefs.unselected_search_sources.length; i++) {
-        if (document.prefs.unselected_search_sources[i].selected) {
-            document.prefs.selected_search_sources[document.prefs.selected_search_sources.length] = new Option(document.prefs.unselected_search_sources[i].text, document.prefs.unselected_search_sources[i].value);
-            document.prefs.unselected_search_sources[i] = null;
-            i--;
+        if (document.prefs.unselected_search_sources[i].selected && document.prefs.unselected_search_sources[i].style.display != 'none') {
+            ll = document.prefs.selected_search_sources.length;
+            document.prefs.selected_search_sources[ll] = new Option(document.prefs.unselected_search_sources[i].text, document.prefs.unselected_search_sources[i].value);
+            document.prefs.selected_search_sources[ll].idx = i;
+            document.prefs.unselected_search_sources[i].style.display = 'none';
         }
     }
 
@@ -181,7 +182,7 @@ function removeSource()
 {
     for (i = 1; i < document.prefs.selected_search_sources.length; i++) {
         if (document.prefs.selected_search_sources[i].selected) {
-            document.prefs.unselected_search_sources[document.prefs.unselected_search_sources.length] = new Option(document.prefs.selected_search_sources[i].text, document.prefs.selected_search_sources[i].value)
+            document.prefs.unselected_search_sources[document.prefs.selected_search_sources[i].idx] = new Option(document.prefs.selected_search_sources[i].text, document.prefs.selected_search_sources[i].value);
             document.prefs.selected_search_sources[i] = null;
             i--;
         }
@@ -289,8 +290,25 @@ function removeSource()
 						        </td>
 						        <td>
 						            <select name="selected_search_sources" multiple="multiple" size="9" width="50" onchange="deselectHeaders();" class="form_input_select">
-										<option value=""><?php echo gettext("Selected Fields...");?></option>
-									</select>
+								<option value=""><?php echo gettext("Selected Fields...");?></option>
+							    </select>
+							    <script language="JavaScript" type="text/JavaScript">
+							    document.prefs.unselected_search_sources[0].style.color="#505050";
+							    document.prefs.selected_search_sources[0].style.color="#505050";
+							    </script>
+<?php							foreach ($fieldtomerge as $val) {?>
+							    <script>
+								for (i = 1; i < document.prefs.unselected_search_sources.length; i++) {
+								    if (document.prefs.unselected_search_sources[i].value == '<?php echo $val;?>') {
+									ll = document.prefs.selected_search_sources.length;
+									document.prefs.selected_search_sources[ll] = new Option(document.prefs.unselected_search_sources[i].text, document.prefs.unselected_search_sources[i].value);
+									document.prefs.selected_search_sources[ll].idx = i;
+									document.prefs.unselected_search_sources[i].style.display = 'none';
+								    }
+								}
+								resetHidden();
+							    </script>
+<?php							}?>
 						        </td>
 						    </tr>
 						</tbody></table>

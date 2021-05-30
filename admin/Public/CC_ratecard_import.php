@@ -69,12 +69,12 @@ $smarty->display('main.tpl');
 
 function sendtoupload(form){
 	if (form.tariffplan.value.length < 1){
-		alert ('<?php echo addslashes(gettext("Please, you must first select a ratecard !")); ?>');
+		alert ('<?php echo addslashes(gettext("Please, you have first select a ratecard !")); ?>');
 		form.tariffplan.focus ();
 		return (false);
 	}
 	if (form.the_file.value.length < 2){
-		alert ('<?php echo addslashes(gettext("Please, you must first select a file !")); ?>');
+		alert ('<?php echo addslashes(gettext("Please, you have first select a file !")); ?>');
 		form.the_file.focus ();
 		return (false);
 	}
@@ -104,10 +104,11 @@ function resetHidden()
 function addSource()
 {
     for (i = 1; i < document.prefs.unselected_search_sources.length; i++) {
-        if (document.prefs.unselected_search_sources[i].selected) {
-            document.prefs.selected_search_sources[document.prefs.selected_search_sources.length] = new Option(document.prefs.unselected_search_sources[i].text, document.prefs.unselected_search_sources[i].value);
-            document.prefs.unselected_search_sources[i] = null;
-            i--;
+        if (document.prefs.unselected_search_sources[i].selected && document.prefs.unselected_search_sources[i].style.display != 'none') {
+            ll = document.prefs.selected_search_sources.length;
+            document.prefs.selected_search_sources[ll] = new Option(document.prefs.unselected_search_sources[i].text, document.prefs.unselected_search_sources[i].value);
+            document.prefs.selected_search_sources[ll].idx = i;
+            document.prefs.unselected_search_sources[i].style.display = 'none';
         }
     }
 
@@ -118,7 +119,7 @@ function removeSource()
 {
     for (i = 1; i < document.prefs.selected_search_sources.length; i++) {
         if (document.prefs.selected_search_sources[i].selected) {
-            document.prefs.unselected_search_sources[document.prefs.unselected_search_sources.length] = new Option(document.prefs.selected_search_sources[i].text, document.prefs.selected_search_sources[i].value)
+            document.prefs.unselected_search_sources[document.prefs.selected_search_sources[i].idx] = new Option(document.prefs.selected_search_sources[i].text, document.prefs.selected_search_sources[i].value);
             document.prefs.selected_search_sources[i] = null;
             i--;
         }
@@ -147,6 +148,7 @@ function moveSourceUp()
 
         for (i = 1; i < document.prefs.selected_search_sources.length; i++) {
             tmp[i - 1] = new Option(document.prefs.selected_search_sources[i].text, document.prefs.selected_search_sources[i].value)
+	    tmp[i - 1].idx = document.prefs.selected_search_sources[i].idx;
         }
 
         for (i = 0; i < tmp.length; i++) {
@@ -174,11 +176,12 @@ function moveSourceDown()
     // deselect everything but the first selected item
     document.prefs.selected_search_sources.selectedIndex = sel;
 
+    tmp = new Array();
     if (sel == document.prefs.selected_search_sources.length - 1) {
-        tmp = new Array();
 
         for (i = 1; i < document.prefs.selected_search_sources.length; i++) {
             tmp[i - 1] = new Option(document.prefs.selected_search_sources[i].text, document.prefs.selected_search_sources[i].value)
+	    tmp[i - 1].idx = document.prefs.selected_search_sources[i].idx;
         }
 
         document.prefs.selected_search_sources[1] = tmp[tmp.length - 1];
@@ -188,10 +191,10 @@ function moveSourceDown()
 
         document.prefs.selected_search_sources.selectedIndex = 1;
     } else {
-        tmp = new Array();
 
         for (i = 1; i < document.prefs.selected_search_sources.length; i++) {
             tmp[i - 1] = new Option(document.prefs.selected_search_sources[i].text, document.prefs.selected_search_sources[i].value)
+	    tmp[i - 1].idx = document.prefs.selected_search_sources[i].idx;
         }
 
         for (i = 0; i < tmp.length; i++) {
@@ -227,13 +230,12 @@ echo $CC_help_import_ratecard;
 				  <?php echo gettext("Choose the ratecard to import");?> :
 				  <select NAME="tariffplan" size="1"  style="width=250" class="form_input_select">
 								<option value=''><?php echo gettext("Choose a ratecard");?></option>
-								<?php					 
-								 foreach ($list_tariffname as $recordset){ 						 
+								<?php
+								 foreach ($list_tariffname as $recordset){
 								?>
-									<option class=input value='<?php  echo $recordset[0]?>-:-<?php  echo $recordset[1]?>' <?php if ($recordset[0]==$tariffplan) echo "selected";?>><?php echo $recordset[1]?></option>                        
-								<?php 	 }
-								?>
-						</select>	
+									<option class=input value='<?php  echo $recordset[0]?>-:-<?php  echo $recordset[1]?>'<?php if ($recordset[0]==$tariffplan) echo " selected";?>><?php echo $recordset[1]?></option>
+								<?php }?>
+				  </select>	
 						<br><br>
 				   <?php echo gettext("Choose the trunk to use");?> :
 						<select NAME="trunk" size="1"  style="width=250" class="form_input_select">
@@ -241,7 +243,7 @@ echo $CC_help_import_ratecard;
 								<?php					 
 								 foreach ($list_trunk as $recordset){
 								?>
-									<option class=input value='<?php  echo $recordset[0]?>-:-<?php  echo $recordset[1]?>' <?php if ($recordset[0]==$trunk) echo "selected";?>><?php echo $recordset[1]?></option>                        
+									<option class=input value='<?php  echo $recordset[0]?>-:-<?php  echo $recordset[1]?>' <?php if ($recordset[0]==$trunk) echo "selected";?>><?php echo $recordset[1]?></option>
 								<?php 	 }
 								?>
 						</select>	
@@ -319,8 +321,12 @@ echo $CC_help_import_ratecard;
 					        </td>
 					        <td>
 					            <select name="selected_search_sources" multiple="multiple" size="9" width="50" onchange="deselectHeaders();" class="form_input_select">
-									<option value=""><?php echo gettext("Selected Fields...");?></option>
-								</select>
+							<option value=""><?php echo gettext("Selected Fields...");?></option>
+						    </select>
+						    <script language="JavaScript" type="text/JavaScript">
+							document.prefs.unselected_search_sources[0].style.color="#505050";
+							document.prefs.selected_search_sources[0].style.color="#505050";
+						    </script>
 					        </td>
 					
 					        <td>

@@ -104,13 +104,15 @@ switch($getcur)
 }
 $paycur = $currencies_list[$getcur][2];
 $vat_amount= $amount*$vat/100;
-$amount_paypal = ($amount+$vat_amount+$paypalfixfee)/0.961; //Isr
-//$amount_paypal = ($amount+$vat_amount+$paypalfixfee)/0.956; //Tha
+$amount_paypal = ($amount+$vat_amount+$paypalfixfee)/0.946;   // Ukr/Rus
+//$amount_paypal = ($amount+$vat_amount+$paypalfixfee)/0.953; // Isr
+//$amount_paypal = ($amount+$vat_amount+$paypalfixfee)/0.956; // Tha
 //$amount_webmoney = ($amount+$vat_amount)/0.95;
 switch ($payment) {
     case "paypal":
-	$mc_fee = round(($amount_paypal)*0.039,2)+$paypalfixfee; //Isr
-//	$mc_fee = round(($amount_paypal)*0.044,2)+$paypalfixfee; //Tha
+	$mc_fee = round(($amount_paypal)*0.054,2)+$paypalfixfee; // Ukr/Rus
+//	$mc_fee = round(($amount_paypal)*0.047,2)+$paypalfixfee; // Isr
+//	$mc_fee = round(($amount_paypal)*0.044,2)+$paypalfixfee; // Tha
 	break;
     default:
 	$mc_fee = 0;

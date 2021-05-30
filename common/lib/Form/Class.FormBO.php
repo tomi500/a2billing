@@ -1,5 +1,5 @@
 <?php
-
+use GuzzleHttp\Exception\ConnectException;
 
 class FormBO {
 	
@@ -289,7 +289,7 @@ class FormBO {
 		    $total = number_format($result[0]['credit'], 2);
 		    $lang = $result[0]['language'];
 		    switch($lang) {
-			case 'de': $message = "Sehr geehrter Kunde, Sie haben Ihrem Konto $credit$currency hinzugefügt. Ihr Guthaben beträgt jetzt $total$currency. Wir wünschen eine angenehme Verbindung!"; break;
+			case 'de': $message = "Sehr geehrter Kunde, Sie haben Ihrem Konto $credit$currency hinzugefügt. Ihr Guthaben beträgt jetzt $total$currency."; break;//" Wir wünschen eine angenehme Verbindung!"; break;
 			case 'ru': $message = "Ваш счёт пополнен на $credit$currency. Общий баланс $total$currency. Приятного общения!"; break;
 			case 'uk': $message = "Рахунок поповнено на $credit$currency. Залишок $total$currency. Приємного спілкування!"; break;
 			default  : $message = "Your account has been recharged for $credit$currency. Total: $total$currency. Enjoy your communication!";
@@ -298,7 +298,7 @@ class FormBO {
 		    $result = $instance_table -> Get_list($FormHandler->DBHandle, "id_cc_card='$card_id' AND cid LIKE '%$phone'");
 		    if ($result) $phone = preg_replace('/[^0-9]/', '', $result[0]['cid']);
 		    if ((strpos($phone,'49')===0 && strpos($phone,'491')!==0) || strpos($phone,'38044')===0) {
-			$result = $instance_table -> Get_list($FormHandler->DBHandle, 'id_cc_card='.$card_id);
+			$result = $instance_table -> Get_list($FormHandler->DBHandle, "id_cc_card=$card_id", "verify", "DESC");
 			$phone = $temp = $lang.'+'.$phone;
 			foreach($result as $value) {
 			    if ((strpos($value['cid'],'491')===0 || strpos($value['cid'],'49')!==0) && strpos($value['cid'],'38044')!==0) {
@@ -308,7 +308,7 @@ class FormBO {
 			    }
 			}
 		    }
-		    $client = new GuzzleHttp\Client(['headers' => ['Authorization' => 'Basic '.D7_API_TOKEN]]);
+		    $client = new GuzzleHttp\Client(['headers' => ['Authorization' => 'Basic '.D7_API_TOKEN], 'connect_timeout' => 3.0, 'timeout' => 3.0, 'http_errors' => false]);
 		    $requestData = [
 			'coding' => 8,
 			'to' => $phone,
@@ -317,6 +317,23 @@ class FormBO {
 		    ];
 		    try {
 			$response = $client->post('https://rest-api.d7networks.com/secure/send', ['json' => $requestData]);
+		    } catch (ConnectException $e) {
+			$response = $client->get('https://rest-api.d7networks.com/secure/balance');
+			if ($response->getStatusCode() == 200) {
+			    $body = json_decode($response->getBody(),true);
+			    $balance = '$'.$body['data']['balance'];
+			    $sms_count = $body['data']['sms_count'];
+			} else {
+			    $balance = $sms_count = 'N/A';
+			}
+			$mail = new Mail(Mail::$TYPE_SMS_ERROR);
+			$mail->replaceInEmail(Mail::$PHONE_NUMBER, $phone);
+			$mail->replaceInEmail(Mail::$ERR_MESS, $e->getMessage().'<br>ConnectException Balance: '.$balance.'<br>SMS count: '.$sms_count);
+			try {
+			    $mail->send(ADMIN_EMAIL);
+			} catch (A2bMailException $e) {
+			    $error_msg = $e->getMessage();
+			}
 		    } catch (Exception $e) {
 			$response = $client->get('https://rest-api.d7networks.com/secure/balance');
 			if ($response->getStatusCode() == 200) {
@@ -326,13 +343,34 @@ class FormBO {
 			} else {
 			    $balance = $sms_count = 'N/A';
 			}
+			$mail = new Mail(Mail::$TYPE_SMS_ERROR);
+			$mail->replaceInEmail(Mail::$PHONE_NUMBER, $phone);
+			$mail->replaceInEmail(Mail::$ERR_MESS, $e->getMessage().'<br>Exception Balance: '.$balance.'<br>SMS count: '.$sms_count);
 			try {
-			    $mail = new Mail(Mail::$TYPE_SMS_ERROR);
-			    $mail->replaceInEmail(Mail::$PHONE_NUMBER, $phone);
-			    $mail->replaceInEmail(Mail::$ERR_MESS, $e->getMessage().'<br>Balance: '.$balance.'<br>SMS count: '.$sms_count);
 			    $mail->send(ADMIN_EMAIL);
 			} catch (A2bMailException $e) {
 			    $error_msg = $e->getMessage();
+			}
+		    } finally {
+			$stcode = $response->getStatusCode();
+			if ($stcode != 200) {
+			    $bodyR = json_decode($response->getBody(),true);
+			    $response = $client->get('https://rest-api.d7networks.com/secure/balance');
+			    if ($response->getStatusCode() == 200) {
+				$body = json_decode($response->getBody(),true);
+				$balance = '$'.$body['data']['balance'];
+				$sms_count = $body['data']['sms_count'];
+			    } else {
+				$balance = $sms_count = 'N/A';
+			    }
+			    $mail = new Mail(Mail::$TYPE_SMS_ERROR);
+			    $mail->replaceInEmail(Mail::$PHONE_NUMBER, $phone);
+			    $mail->replaceInEmail(Mail::$ERR_MESS, 'StatusCode='.$stcode.'<br>'.$bodyR['message'].'<br>Balance: '.$balance.'<br>SMS count: '.$sms_count);
+			    try {
+				$mail->send(ADMIN_EMAIL);
+			    } catch (A2bMailException $e) {
+				$error_msg = $e->getMessage();
+			    }
 			}
 		    }
 		}

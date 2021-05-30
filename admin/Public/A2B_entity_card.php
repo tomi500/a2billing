@@ -169,6 +169,8 @@ function sendValue(selvalue, othervalue){
         window.opener.document.<?php echo $popup_formname ?>.<?php echo $popup_fieldname ?>.value = selvalue;
         if(othervalue && window.opener.document.<?php echo $popup_formname ?>.accountcode){
                 window.opener.document.<?php echo $popup_formname ?>.accountcode.value = othervalue;
+        } else if(othervalue && window.opener.document.getElementById('tzc')){
+                window.opener.document.getElementById('tzc').innerHTML = othervalue;
         }
         window.close();
 }

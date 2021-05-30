@@ -163,7 +163,8 @@ if (!($popup_select>=1)) {
 	$show_fields['callerid']  = array("<acronym title=\"CALLER IDENTIFICATION NUMBER\">".gettext("CID")."</acronym>", "callerid","","center", "sort", "15");
 	$FG_COL_QUERY = 'DISTINCT ';
 }else{
-	$show_list_temp = array('id', 'username', 'lastname', 'id_group',  'credit');
+	$show_fields['timezone'] = array(gettext("TIME ZONE"), "timezone", "9%", "center", "sort", "30","", "", "", "", "", "");
+	$show_list_temp = array('id', 'username', 'id_group',  'credit', 'timezone');
 	foreach ($show_list_temp as $i => $value) {
                 $show_list[$value] = $value;
 	}
@@ -175,7 +176,7 @@ $index = 0;
 foreach ($show_list as $i => $value) {
 	if (array_key_exists($i,$show_fields)) {
 		$param = $show_fields[$i];
-		$param = $param + array("","","","","","");#expand array to max length
+		$param = $param + array("","","","","","");//expand array to max length
 		$size = "*";
 		$param7 = $param[7];
 		if ($param[6]=="eval"){
@@ -191,11 +192,13 @@ foreach ($show_list as $i => $value) {
 		$HD_Form -> AddViewElement($param[0],$param[1],$size,$param[3],$param[4],$param[5],$param[6],$param7,$param[8],
 						$param[9],$param[10],$param[11],$param[12]);
 		if ($value=='callerid') {
-			$FG_COL_QUERY_FIELD = $FG_COL_QUERY_FIELD .', (select GROUP_CONCAT(cid SEPARATOR \'<br>\') from cc_callerid where id_cc_card=cc_card.id) as callerid';
+			$FG_COL_QUERY_FIELD = $FG_COL_QUERY_FIELD .', (select GROUP_CONCAT(cid SEPARATOR \'<br>\') from cc_callerid where id_cc_card=cc_card.id) callerid';
 		} elseif ($value=='customer') {
-			$FG_COL_QUERY_FIELD = $FG_COL_QUERY_FIELD .", CONCAT_WS(' ',lastname,firstname,IF(company_name='','',CONCAT('(',company_name,')'))) AS customer";
+			$FG_COL_QUERY_FIELD = $FG_COL_QUERY_FIELD .", CONCAT_WS(' ',lastname,firstname,IF(company_name='','',CONCAT('(',company_name,')'))) customer";
+		} elseif ($value=='timezone') {
+			$FG_COL_QUERY_FIELD = $FG_COL_QUERY_FIELD .", IF(CONCAT(id_timezone+0)=id_timezone,@@global.time_zone,SUBSTRING_INDEX(id_timezone,';',-1)) timezone";
 		} else {
-			$FG_COL_QUERY_FIELD = $FG_COL_QUERY_FIELD .', '.$value;
+			$FG_COL_QUERY_FIELD .= ', '.$value;
 		}
 		$index = $index + 1;
 	}
@@ -266,8 +269,10 @@ if (($popup_select>=1)) {
 
 	if ($popup_select==1) {
 		$HD_Form -> FG_OTHER_BUTTON1_LINK = "javascript:sendValue('|param|', '|col1|');";
-	} elseif ($popup_select==2) {
+	} else if ($popup_select==2) {
 		$HD_Form -> FG_OTHER_BUTTON1_LINK = "javascript:sendValue('|col1|');";
+	} else if ($popup_select==3) {
+		$HD_Form -> FG_OTHER_BUTTON1_LINK = "javascript:sendValue('|param|', '|col5|');";
 	}
 
 } else {

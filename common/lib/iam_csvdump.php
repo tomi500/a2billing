@@ -228,13 +228,8 @@ class iam_csvdump
 	
     function _db_connect_mysql($dbname="mysql", $user="root", $password="", $host="localhost")
     {
-      $result = @mysql_pconnect($host, $user, $password);
+      $result = @mysqli_connect($host, $user, $password, $dbname);
       if(!$result)     // If no connection, return 0
-      {
-       return false;
-      }
-
-      if(!@mysql_select_db($dbname))  // If db not set, return 0
       {
        return false;
       }
@@ -288,16 +283,16 @@ class iam_csvdump
       else
       {
         if (isset($_SESSION["timezone"]) && $_SESSION["timezone"] != "") {
-        	mysql_query("SET time_zone = '".$_SESSION["timezone"]."'", $conn);
+        	mysqli_query($conn,"SET time_zone = '".$_SESSION["timezone"]."'");
         }
-        $result = @mysql_query($query_string, $conn);
+        $result = @mysqli_query($conn,$query_string);
         if(!$result)
-            die("Could not perform the Query: ".mysql_error());
+            die("Could not perform the Query: ".mysqli_error($conn));
         else
         {
             $file = "";
             $crlf = $this->_define_newline();
-            while ($str= @mysql_fetch_array($result, MYSQL_ASSOC))
+            while ($str= @mysqli_fetch_array($result, MYSQLI_ASSOC))
             {
                 if ($file == "") {
                     foreach($str as $k=>$v)
@@ -414,12 +409,12 @@ class iam_csvdump
         else
         {
             if (isset($_SESSION["timezone"]) && $_SESSION["timezone"] != "") {
-        	mysql_query("SET time_zone = '".$_SESSION["timezone"]."'", $conn);
+        	mysqli_query($conn,"SET time_zone = '".$_SESSION["timezone"]."'");
             }
-            $result = @mysql_query($query_string, $conn);
+            $result = @mysqli_query($conn,$query_string);
             if(!$result)
             {
-              die("Could not perform the Query: ".mysql_error());
+              die("Could not perform the Query: ".mysqli_error($conn));
             }
             else
             {
@@ -445,25 +440,25 @@ class iam_csvdump
         // Output header row
         $j = 0;
         echo "\t<header>\n";
-        $totalFields = @mysql_num_fields($result);
+        $totalFields = @mysqli_num_fields($result);
         for ($i=0; $i<$totalFields; $i++)
         {
-            $name = htmlspecialchars(@mysql_field_name($result, $i));
-			$type = htmlspecialchars(@mysql_field_type($result, $i));
+            $name = htmlspecialchars(@mysqli_field_name($result, $i));
+			$type = htmlspecialchars(@mysqli_field_type($result, $i));
 			echo "\t\t<column name=\"{$name}\" type=\"{$type}\" />\n";
 		}
         echo "\t</header>\n";
 
 		echo "\t<records>\n";
-        $totalRows = @mysql_num_rows($result);
-		while($row = @mysql_fetch_array($result, MYSQL_NUM))
+        $totalRows = @mysqli_num_rows($result);
+		while($row = @mysqli_fetch_array($result, MYSQLI_NUM))
         {
             $j = 0;
 			echo "\t\t<row>\n";
 
 			for($l = 0; $l < $totalFields; $l++)
             {
-                $name = htmlspecialchars(@mysql_field_name($result, $l));
+                $name = htmlspecialchars(@mysqli_field_name($result, $l));
                 $v =  $row[$l];
                 if ($v != null)
                 {

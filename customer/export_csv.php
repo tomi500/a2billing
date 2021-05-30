@@ -42,7 +42,7 @@ if (! has_rights (ACX_CALL_HISTORY)) {
 	die();
 }
 
-getpost_ifset(array ( 'var_export', 'var_export_type' ));
+getpost_ifset(array ( 'var_export', 'var_export_type', 'id', 'filename' ));
 
 if (strlen($var_export) == 0) {
 	$var_export = 'pr_sql_export';
@@ -51,23 +51,28 @@ if (strlen($var_export) == 0) {
 #  Set the parameters: SQL Query, hostname, databasename, dbuser and password
 $dumpfile = new iam_csvdump;
 
-
 #  Call the CSV Dumping function and THAT'S IT!!!!  A file named dump.csv is sent to the user for download
 
 if (strlen($_SESSION[$var_export]) < 10) {
 	echo gettext("ERROR CSV EXPORT");
 } else {
 	$log = new Logger();
+	$myfileName = "Dump_" . date("Y-m-d");
+	$QUERY = $_SESSION[$var_export];
+	if (strcmp($var_export, "pr_export_entity_ringup") == 0) {
+	    $myfileName = $filename . "_" . date("Y-m-d");
+	    if (is_numeric($id))
+		$QUERY .= $id." ORDER BY channelstatedesc DESC, lastattempt";
+	    else
+		$log->insertLog($_SESSION["card_id"], 2, "FILE EXPORT FAILED", "A File in CSV Format was not exported by User, File Name= " . $myfileName . ".csv", '', $_SERVER['REMOTE_ADDR'], $_SERVER['REQUEST_URI'], '');
+	}
 	if (strcmp($var_export_type, "type_csv") == 0) {
-		$myfileName = "Dump_" . date("Y-m-d");
 		$log->insertLog($_SESSION["card_id"], 2, "FILE EXPORTED", "A File in CSV Format is exported by User, File Name= " . $myfileName . ".csv", '', $_SERVER['REMOTE_ADDR'], $_SERVER['REQUEST_URI'], '');
-		$dumpfile->dump($_SESSION[$var_export], $myfileName, "csv", DBNAME, USER, PASS, HOST, DB_TYPE);
+		$dumpfile->dump($QUERY, $myfileName, "csv", DBNAME, USER, PASS, HOST, DB_TYPE);
 	}
 	elseif (strcmp($var_export_type, "type_xml") == 0) {
-		$myfileName = "Dump_" . date("Y-m-d");
 		$log->insertLog($_SESSION["card_id"], 2, "FILE EXPORTED", "A File in XML Format is exported by User, File Name= " . $myfileName . ".xml", '', $_SERVER['REMOTE_ADDR'], $_SERVER['REQUEST_URI'], '');
-		$dumpfile->dump($_SESSION[$var_export], $myfileName, "xml", DBNAME, USER, PASS, HOST, DB_TYPE);
+		$dumpfile->dump($QUERY, $myfileName, "xml", DBNAME, USER, PASS, HOST, DB_TYPE);
 	}
 	$log = null;
 }
-

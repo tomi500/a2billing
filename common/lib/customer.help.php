@@ -141,7 +141,6 @@ if (SHOW_HELP) {
 	$CC_help_list_voucher = create_help(gettext("Enter your voucher number to top up your card."),$credit_cur,$limit_cur);
 
 	$CC_help_campaign = create_help(gettext("This section will allow you to create and edit campaign. ") .
-	gettext("A campaign will be attached to a user in order to let him use the predictive-dialer option. ") .
 	gettext("Predictive dialer will browse all the phone numbers from the campaign and perform outgoing calls."),$credit_cur,$limit_cur);
 
 	$CC_help_phonelist = create_help(gettext("Phonelist are all the phone numbers attached to a campaign. You can add, remove and edit the phone numbers."),$credit_cur,$limit_cur);
@@ -164,11 +163,11 @@ if (SHOW_HELP) {
 
 	$CC_help_view_refill = create_help(gettext("Customers Refill history - The section below allows you to see customers refill"),$credit_cur,$limit_cur);
 
-	$CC_help_surveillance = create_help("Назначьте номер телефона, принадлежащий Вашему записывающему устройству, и частоту нарезки роликов для аудио или видео наблюдения.",$credit_cur,$limit_cur);
+	$CC_help_surveillance = create_help("Назначте номер телефона, принадлежащий Вашему записывающему устройству, и частоту нарезки роликов для аудио или видео наблюдения.",$credit_cur,$limit_cur);
 
 	$CC_help_ringuplist = create_help("<b>Список номеров периодического дозвона.</b><br>В колонке 'ПОСЛЕДНЯЯ АКТИВНОСТЬ' синим цветом обозначается простаивающий дозвон, зелёным - действующий.<br>Нажав на 'НОМЕР', откроется статистика звонков на этот номер за текущий месяц.",$credit_cur,$limit_cur);
 
-	$CC_help_ringupedit = create_help("Назначьте расписание событий дозвона, паузу между событиями, количество звонков каждый раз и ограничение максимальной продолжительности звонка.",$credit_cur,$limit_cur);
+	$CC_help_ringupedit = create_help("Назначте расписание событий дозвона, паузу между событиями, количество звонков каждый раз и ограничение максимальной продолжительности звонка.",$credit_cur,$limit_cur);
 
 	$CC_help_log_viewer_info = create_help(gettext("The system log helps you track all events on your application. Log levels are the Importance Levels for the events - 1 is lowest level and 3 is highest level. 1 is used for Login, Logout and Page Visit. 2 is used for Add, Import, Export. 3 is for Update and Delete."),$credit_cur,$limit_cur);
 
@@ -190,8 +189,8 @@ if (!isset ($disable_load_conf) || !($disable_load_conf)) {
 //	$SPOT['worldpay'] = '<a href="http://www.worldpay.com/" target="_blank"><img src="'.KICON_PATH.'/worldpay.gif" alt="worldpay.com"/></a>';
 	$SPOT['worldpay'] = '';
 	$SPOT['plugnpay'] = '<a href="http://www.plugnpay.com/" target="_blank"><img src="' . KICON_PATH . '/plugnpay.png" alt="plugnpay.com"/></a>';
-	$SPOT['webmoney'] = '<a href="https://wiki.webmoney.ru/projects/webmoney/wiki/%D0%9E%D0%BF%D0%BB%D0%B0%D1%82%D0%B0_%D1%82%D0%BE%D0%B2%D0%B0%D1%80%D0%BE%D0%B2_%D0%B8_%D1%83%D1%81%D0%BB%D1%83%D0%B3_%D1%87%D0%B5%D1%80%D0%B5%D0%B7_%D1%81%D0%B5%D1%80%D0%B2%D0%B8%D1%81_%D0%9C%D0%B5%D1%80%D1%87%D0%B0%D0%BD%D1%82" target="_blank"><img src="' . KICON_PATH . '/webmoney.gif" alt="WebMoney"/></a>';
-	$SPOT['webmoneycreditcard'] = '<a href="https://wiki.webmoney.ru/projects/webmoney/wiki/%D0%9F%D1%80%D0%B8%D0%B5%D0%BC_%D0%BF%D0%BB%D0%B0%D1%82%D0%B5%D0%B6%D0%B5%D0%B9_%D1%81_%D0%B1%D0%B0%D0%BD%D0%BA%D0%BE%D0%B2%D1%81%D0%BA%D0%B8%D1%85_%D0%BA%D0%B0%D1%80%D1%82_%28U-%D0%BA%D0%BE%D1%88%D0%B5%D0%BB%D1%8C%D0%BA%D0%B8%29#%D0%A1-%D1%82%D0%BE%D1%87%D0%BA%D0%B8-%D0%B7%D1%80%D0%B5%D0%BD%D0%B8%D1%8F-%D0%BF%D0%BB%D0%B0%D1%82%D0%B5%D0%BB%D1%8C%D1%89%D0%B8%D0%BA%D0%B0" target="_blank"><img src="' . KICON_PATH . '/webmoneycreditcard.gif" alt="WebMoney"/></a>';
+	$SPOT['webmoney'] = '<a href="https://wiki.web.money/projects/webmoney/wiki/%D0%9E%D0%BF%D0%BB%D0%B0%D1%82%D0%B0_%D1%82%D0%BE%D0%B2%D0%B0%D1%80%D0%BE%D0%B2_%D0%B8_%D1%83%D1%81%D0%BB%D1%83%D0%B3_%D1%87%D0%B5%D1%80%D0%B5%D0%B7_%D1%81%D0%B5%D1%80%D0%B2%D0%B8%D1%81_%D0%9C%D0%B5%D1%80%D1%87%D0%B0%D0%BD%D1%82" target="_blank"><img src="' . KICON_PATH . '/webmoney.gif" alt="WebMoney"/></a>';
+	$SPOT['webmoneycreditcard'] = '<a href="https://wiki.web.money/projects/webmoney/wiki/%D0%9F%D1%80%D0%B8%D0%B5%D0%BC_%D0%BF%D0%BB%D0%B0%D1%82%D0%B5%D0%B6%D0%B5%D0%B9_%D1%81_%D0%B1%D0%B0%D0%BD%D0%BA%D0%BE%D0%B2%D1%81%D0%BA%D0%B8%D1%85_%D0%BA%D0%B0%D1%80%D1%82_%28U-%D0%BA%D0%BE%D1%88%D0%B5%D0%BB%D1%8C%D0%BA%D0%B8%29#%D0%A1-%D1%82%D0%BE%D1%87%D0%BA%D0%B8-%D0%B7%D1%80%D0%B5%D0%BD%D0%B8%D1%8F-%D0%BF%D0%BB%D0%B0%D1%82%D0%B5%D0%BB%D1%8C%D1%89%D0%B8%D0%BA%D0%B0" target="_blank"><img src="' . KICON_PATH . '/webmoneycreditcard.gif" alt="WebMoney"/></a>';
 	$PAYMENT_METHOD = '
 	<table width="100%" align="center">
 	<tr>

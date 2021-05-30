@@ -16,7 +16,7 @@ class webmoneycreditcard {
 		$this->sort_order = 1;
 		$this->enabled = ((MODULE_PAYMENT_WM_STATUS_10 == 'True') ? true : false);
 
-		$this->form_action_url = 'https://merchant.webmoney.ru/lmi/payment.asp';
+		$this->form_action_url = 'https://merchant.web.money/lmi/payment.asp';
 	}
 
 	public function keys() {

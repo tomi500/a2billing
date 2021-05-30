@@ -67,8 +67,8 @@ $PHP_SELF = str_replace('.php','',$_SERVER['PHP_SELF']);
 		
 			if($this->VALID_SQL_REG_EXP && is_array($list)){
 				echo stripslashes($list[0][$i]);
-			}else{ echo $processed[$this->FG_TABLE_ADITION[$i][1]]; }?>">
-		<a href="#" onclick="window.open('<?php echo $this->FG_TABLE_ADITION[$i][12]?>popup_formname=myForm&popup_fieldname=<?php echo $this->FG_TABLE_ADITION[$i][1]?>' <?php echo $this->FG_TABLE_ADITION[$i][13]?>);"><img src="<?php echo Images_Path_Main;?>/icon_arrow_orange.gif"/></a>
+			}else{ echo $processed[$this->FG_TABLE_ADITION[$i][1]]; }?>"
+		><a href="#" onclick="window.open('<?php echo $this->FG_TABLE_ADITION[$i][12]?>popup_formname=myForm&popup_fieldname=<?php echo $this->FG_TABLE_ADITION[$i][1]?>' <?php echo $this->FG_TABLE_ADITION[$i][13]?>);"><img src="<?php echo Images_Path_Main;?>/icon_arrow_orange.gif" valign="bottom"/></a>
 <!--CAPTCHA IMAGE CODE START HERE-->
 	<?php
 		}elseif (strtoupper ($this->FG_TABLE_ADITION[$i][3])=="CAPTCHAIMAGE")

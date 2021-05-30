@@ -38,6 +38,7 @@ ALTER TABLE cc_trunk ADD ussd_vaucher_prefix VARCHAR( 10 ) NULL DEFAULT NULL;
 ALTER TABLE cc_trunk ADD ussd_check_time TIMESTAMP NOT NULL DEFAULT '0000-00-00 00:00:00';
 ALTER TABLE cc_trunk ADD lastdial VARCHAR( 50 ) COLLATE utf8_bin NOT NULL;
 ALTER TABLE cc_trunk ADD attract int(3) NOT NULL DEFAULT '0';
+ALTER TABLE cc_trunk ADD id_cust bigint(20) NULL DEFAULT NULL AFTER `id_trunk`;
 ALTER TABLE cc_trunk
   CHANGE `stopdatea`      `stopdatea`      DATETIME NOT NULL DEFAULT '0000-00-00 00:00:00',
   CHANGE `stopdateb`      `stopdateb`      DATETIME NOT NULL DEFAULT '0000-00-00 00:00:00',
@@ -1006,13 +1007,20 @@ CREATE TABLE IF NOT EXISTS `cc_ringup` (
   `id_server_group` int(11) NOT NULL DEFAULT '1',
   PRIMARY KEY (`id`)
 ) ENGINE=MyISAM DEFAULT CHARSET=utf8 COLLATE=utf8_bin;
+ALTER TABLE `cc_ringup`
+ADD `destination` VARCHAR(100) CHARACTER SET utf8 COLLATE utf8_bin NULL DEFAULT NULL,
+ADD `localtz` CHAR( 40 ) CHARACTER SET utf8 COLLATE utf8_bin DEFAULT NULL,
+ADD `callerids` VARCHAR(250) CHARACTER SET utf8 COLLATE utf8_bin NULL DEFAULT NULL,
+ADD `maxduration` SMALLINT(6) NOT NULL DEFAULT '600';
+ALTER TABLE `cc_ringup` DROP INDEX `tag`;
+ALTER TABLE `cc_ringup` ADD UNIQUE `tag-card_id` (`tag`, `account_id`);
 
 CREATE TABLE IF NOT EXISTS `cc_ringup_list` (
   `id` bigint(20) NOT NULL AUTO_INCREMENT,
   `id_ringup` int(11) NOT NULL DEFAULT '0',
   `tonum` varchar(40) COLLATE utf8_bin NOT NULL,
   `try` smallint(6) NOT NULL DEFAULT '0',
-  `attempt` TIMESTAMP NULL DEFAULT NULL,
+  `attempt` DATETIME NOT NULL DEFAULT '0000-00-00 00:00:00',
   `inuse` smallint(6) NOT NULL DEFAULT '0',
   `dialstatus` smallint(6) NOT NULL DEFAULT '0',
   `channelstatedesc` VARCHAR( 40 ) NOT NULL,
@@ -1021,6 +1029,11 @@ CREATE TABLE IF NOT EXISTS `cc_ringup_list` (
   PRIMARY KEY (`id`),
   UNIQUE `ringseria` (`id_ringup`, `tonum`)
 ) ENGINE=MyISAM DEFAULT CHARSET=utf8 COLLATE=utf8_bin;
+ALTER TABLE `cc_ringup_list`
+ADD `name` VARCHAR( 40 ) CHARACTER SET utf8 COLLATE utf8_bin DEFAULT NULL AFTER `tonum`,
+ADD `info` TINYTEXT CHARACTER SET utf8 COLLATE utf8_bin DEFAULT NULL AFTER `name`,
+ADD `keyspressed` TINYTEXT CHARACTER SET utf8 COLLATE utf8_bin DEFAULT NULL,
+CHANGE `attempt` `lastattempt` DATETIME NOT NULL DEFAULT '0000-00-00 00:00:00';
 
 CREATE TABLE IF NOT EXISTS `cc_sms` (
   `id` bigint(20) NOT NULL AUTO_INCREMENT,

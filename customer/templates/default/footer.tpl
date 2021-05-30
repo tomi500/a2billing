@@ -33,9 +33,9 @@
     return deviceWidth;
   }
   var deviceWidth = getDeviceWidth()-10;
-  if (deviceWidth < 890) {
+  if (deviceWidth < 600) {
     $("#cookiescript_wrapper").css('max-width',deviceWidth);
-    $("#cookiescript_wrapper").css('margin-left','5px');
+    $("#cookiescript_wrapper").css('margin-left','0px');
   }
   function closeCookieScript() {
     $("#cookiescript_container").remove();

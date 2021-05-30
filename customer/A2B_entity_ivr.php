@@ -261,7 +261,7 @@ if ($form_action=='list') {
 <div class="toggle_show2hide">
 <div class="blocka">
 <div class="itema lefta">
-<a href="#" target="_self" class="toggle_menu"><font class="fontstyle_002"><?php echo gettext("HIDE");?></font> <img class="toggle_show2hide" src="<?php echo Images_Path; ?>/toggle_hide2show_on.png" onmouseover="this.style.cursor='hand';" HEIGHT="16"></a>
+<a href="#" target="_self" class="toggle_menu"><font class="fontstyle_002"><?php echo gettext("HIDE");?></font> <img src="<?php echo Images_Path; ?>/toggle_hide2show_on.png" onmouseover="this.style.cursor='hand';" HEIGHT="16"></a>
 </div>
 <div class="itema centera tohide">
 <form name="myForm" method="POST" id="myForm" enctype="multipart/form-data" action="<?php echo $_SERVER['PHP_SELF'];?>">
@@ -332,7 +332,7 @@ if ($form_action=='list') {
 <div style="display:none;">
 <div class="ivrbeetr" data-name="destArray" data-label="Dest">
 	<div class="ivrbeetd">
-	    <?php echo gettext("Input Action")?>:<br><INPUT name="waitdigits" type="text" list="eventlist" autocomplete="off" class="form_input_text" onkeydown="return keytoDownNumber(event,this)" style="width:100%"/>
+	    <?php echo gettext("Input Action")?>:<br><INPUT name="waitdigits" type="text" list="eventlist" autocomplete="off" class="form_input_text" oninput="allowOnlyNumberPad(this);" style="width:100%"/>
 	</div>
 	<div class="ivrbeetd" data-holder-for="soundArray"></div>
 	<div class="ivrbeetd">

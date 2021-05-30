@@ -3856,14 +3856,78 @@ msgstr "Новый пароль"
 msgid "Confirm Password"
 msgstr "Подтвердить пароль"
 
-#: Public/A2B_phonelist_import.php:67
-msgid "Please, you must first select a phonebook !"
+#: Public/CC_ring_up.php
+msgid "Use the example below to format the CSV file.</br>Fields are separated by [,] or [;]"
+msgstr "Используйте пример для создания CSV файла.</br>Поля должны быть разделены [,] либо [;]"
+
+#: Public/CC_ring_up.php
+msgid "Edit"
+msgstr "Редактирование"
+
+#: Public/CC_ring_up.php
+msgid "New upload"
+msgstr "Новая загрузка"
+
+#: Public/CC_ring_up.php
+msgid "Ring-Up"
+msgstr "Обзвонка"
+
+#: Public/CC_ring_up.php
+msgid "Sheduler"
+msgstr "Расписание"
+
+#: Public/CC_ring_up.php
+msgid "Customer"
+msgstr "Пользователь"
+
+#: Public/CC_ring_up.php
+msgid "Retries"
+msgstr "Повторных попыток"
+
+#: Public/CC_ring_up.php
+msgid "Repeat not before"
+msgstr "Повторять не ранее"
+
+#: Public/CC_ring_up.php
+msgid "min"
+msgstr "мин"
+
+#: Public/CC_ring_up.php
+msgid "Time Zone"
+msgstr "Временная зона"
+
+#: Public/CC_ring_up.php
+msgid "Simultaneous channels"
+msgstr "Одновременных звонков"
+
+#: Public/CC_ring_up.php
+msgid "File size limit"
+msgstr "Макс размер файла"
+
+#: Public/CC_ring_up.php
+msgid "Enter here the phonenumber or IVR name you wish to send call, or select destination from the drop-down list"
+msgstr "Задайте куда будет направлен абонент. Это может быть произвольный номер телефона, Queue(очередь) или IVR-меню из выпадающего списка."
+
+#: Public/CC_ring_up.php
+msgid "Please, you have first select a phonebook !"
 msgstr "Пожалуйста, для начала выберите телефонную книгу !"
+
+#: Public/CC_ring_up.php
+msgid "Please, you have first enter TAG !"
+msgstr "Пожалуйста, для начала задайте название Кампании (TAG) !"
+
+#: Public/CC_ring_up.php
+msgid "Please, you have first select Customer or atleast one Trunk !"
+msgstr "Пожалуйста, задайте хотябы одну из двух настроек - Пользователь или Транки !"
+
+#: Public/CC_ring_up.php
+msgid "Please, you have first insert quantity of simultaneous channels !"
+msgstr "Пожалуйста, задайте количество одновременных звонков !"
 
 #: Public/A2B_phonelist_import.php:72 Public/A2B_entity_did_import.php:89
 #: Public/CC_ratecard_import.php:77 Public/CC_card_import.php:73
-msgid "Please, you must first select a file !"
-msgstr ""
+msgid "Please, you have first select a file !"
+msgstr "Пожалуйста выберите файл для импорта !"
 
 #: Public/A2B_phonelist_import.php:222
 msgid "New phonebooks have to be imported from a CSV file."
@@ -3894,8 +3958,16 @@ msgstr "Выберите дополнительные поля для импор
 #: Public/A2B_phonelist_import.php:257 Public/CC_ratecard_merging.php:269
 #: Public/A2B_entity_did_import.php:284 Public/CC_ratecard_import.php:266
 #: Public/CC_card_import.php:252
+#: Public/CC_ring_up.php
 msgid "Unselected Fields..."
-msgstr ""
+msgstr "Не выбранные..."
+
+#: Public/A2B_phonelist_import.php:271 Public/CC_ratecard_merging.php:315
+#: Public/A2B_entity_did_import.php:301 Public/CC_ratecard_import.php:317
+#: Public/CC_card_import.php:304
+#: Public/CC_ring_up.php
+msgid "Selected Fields..."
+msgstr "Выбранные..."
 
 #: Public/A2B_phonelist_import.php:258
 msgid "name"
@@ -3904,12 +3976,6 @@ msgstr "имя"
 #: Public/A2B_phonelist_import.php:259
 msgid "info"
 msgstr "инфо"
-
-#: Public/A2B_phonelist_import.php:271 Public/CC_ratecard_merging.php:315
-#: Public/A2B_entity_did_import.php:301 Public/CC_ratecard_import.php:317
-#: Public/CC_card_import.php:304
-msgid "Selected Fields..."
-msgstr ""
 
 #: Public/A2B_phonelist_import.php:299
 msgid "Use the example below  to format the CSV file. Fields are separated by  ; or :"
@@ -3923,7 +3989,7 @@ msgstr ""
 #: Public/A2B_phonelist_import.php:304 Public/A2B_entity_did_import.php:324
 #: Public/CC_ratecard_import.php:353 Public/CC_card_import.php:325
 msgid "Complex Sample"
-msgstr "Сложный пример"
+msgstr "Расширенный пример"
 
 #: Public/A2B_phonelist_import.php:305 Public/A2B_entity_did_import.php:325
 #: Public/CC_ratecard_import.php:354 Public/CC_card_import.php:326
@@ -10951,12 +11017,12 @@ msgid "new rates have been imported"
 msgstr "новых тарифов было импортировано"
 
 #: Public/CC_ratecard_import.php:72
-msgid "Please, you must first select a ratecard !"
-msgstr ""
+msgid "Please, you have first select a ratecard !"
+msgstr "Пожалуйста, сперва выберите тарифную карту !"
 
 #: Public/CC_ratecard_import.php:222
 msgid "New rate cards have to be imported from a CSV file."
-msgstr ""
+msgstr "Новый тарифный блок был успешно импортирован из CSV файла."
 
 #: Public/CC_ratecard_import.php:227
 msgid "Choose the ratecard to import"

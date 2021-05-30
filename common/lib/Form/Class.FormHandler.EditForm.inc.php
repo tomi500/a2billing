@@ -348,8 +348,8 @@ function updatecontent(id_el, record, field_inst, instance)
 				<INPUT class="form_enter" name=<?php echo $this->FG_TABLE_EDITION[$i][1]?>  <?php echo $this->FG_TABLE_EDITION[$i][4]?> value="<?php
 					if($this->VALID_SQL_REG_EXP && is_array($list)){
 						echo stripslashes($list[0][$i]);
-					}else{ echo $processed[$this->FG_TABLE_ADITION[$i][1]]; }?>">
-                                	<a href="#" onclick="window.open('<?php echo $this->FG_TABLE_EDITION[$i][12]?>popup_formname=myForm&popup_fieldname=<?php echo $this->FG_TABLE_EDITION[$i][1]?>' <?php echo $this->FG_TABLE_EDITION[$i][13]?>);"><img src="<?php echo Images_Path_Main;?>/icon_arrow_orange.gif"/></a>
+					}else{ echo $processed[$this->FG_TABLE_ADITION[$i][1]]; }?>"
+				><a href="#" onclick="window.open('<?php echo $this->FG_TABLE_EDITION[$i][12]?>popup_formname=myForm&popup_fieldname=<?php echo $this->FG_TABLE_EDITION[$i][1]?>' <?php echo $this->FG_TABLE_EDITION[$i][13]?>);"><img src="<?php echo Images_Path_Main;?>/icon_arrow_orange.gif" valign="bottom"/></a>
 			 <?php
 				}elseif (strtoupper ($this -> FG_TABLE_EDITION[$i][3])=="POPUPVALUETIME") {
                         ?>

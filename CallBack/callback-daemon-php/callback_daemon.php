@@ -63,7 +63,9 @@ function newstateresponse($e, $parameters, $server, $port, &$ast) {
     return false;
 }
 
-function callback_engine(&$A2B, $server, $username, $secret, $AmiVars, $destination, $tariff) {
+function callback_engine($server, $username, $secret, $AmiVars, $destination, $tariff) {
+
+global $A2B;
 
     $A2B -> cardnumber = $AmiVars[4];
 
@@ -102,7 +104,9 @@ function callback_engine(&$A2B, $server, $username, $secret, $AmiVars, $destinat
     else return -1; // ERROR MESSAGE IS CONFIGURE BY THE callingcard_ivr_authenticate_light
 }
 
-function ringup_engine(&$A2B, $server, $username, $secret, $AmiVars, $destination, $tariff, $trunk) {
+function ringup_engine($server, $username, $secret, $AmiVars, $destination, $tariff, $trunk) {
+
+global $A2B;
 
 	$A2B -> cardnumber = $AmiVars[4];
 
@@ -141,7 +145,7 @@ function ringup_engine(&$A2B, $server, $username, $secret, $AmiVars, $destinatio
 	if ($ast->channel)	$ast -> Hangup ($ast->channel);
 	$ast -> disconnect();
 	if (is_array($response)) {
-		write_log(LOGFILE_API_CALLBACK, "!!!!!!!!!!!!!!!!!!!!!=================== ARRAY ==================: ".var_export($response, true));
+		write_log(LOGFILE_API_CALLBACK, "!!!!!!!!!========= ARRAY =========: ".var_export($response, true));
 		$response = 'ERROR';
 	}
 	return $response;
@@ -149,6 +153,12 @@ function ringup_engine(&$A2B, $server, $username, $secret, $AmiVars, $destinatio
 //	else return -2; // not enough free trunk for make call
 }
 
+function statussave($status,$manager_id,$cc_id)
+{
+    global $A2B;
+    $query = "UPDATE `cc_callback_spool` SET `status`='$status',`id_server`='$manager_id' WHERE `id`=$cc_id";
+    if (!$A2B->DBHandle->Execute($query)) die("Can't execute query '$query'\n");
+}
 
 $FG_DEBUG = 0;
 $verbose_level = 1;
@@ -218,26 +228,10 @@ while(true)
 	if ($duration > 0) {
 		$acc_to_unav=$acc_to_busy=$acc_to_noansw=$cc_num_attempts_unavailable=$cc_num_attempts_busy=$cc_num_attempts_noanswer=0;
 	}
-	if ($flagringup == 0 && $acc_timeout_res < 0)
-	{
-	    $query="UPDATE `cc_callback_spool` SET `status`='ERROR_TIMEOUT',`id_server`='$manager_id' WHERE `id`=$cc_id";
-	    if (!$A2B->DBHandle->Execute($query)) die("Can't execute query '$query'\n");
-	}
-	elseif($flagringup == 0 && $acc_max_unav<=$cc_num_attempts_unavailable)
-	{
-	    $query="UPDATE `cc_callback_spool` SET `status`='ERROR_UNAVAILABLE',`id_server`='$manager_id' WHERE `id`=$cc_id";
-	    if (!$A2B->DBHandle->Execute($query)) die("Can't execute query '$query'\n");
-	}
-	elseif($flagringup == 0 && $acc_max_busy<=$cc_num_attempts_busy)
-	{
-	    $query="UPDATE `cc_callback_spool` SET `status`='ERROR_BUSY',`id_server`='$manager_id' WHERE `id`=$cc_id";
-	    if (!$A2B->DBHandle->Execute($query)) die("Can't execute query '$query'\n");
-	}
-	elseif($flagringup == 0 && $acc_max_noansw<=$cc_num_attempts_noanswer)
-	{
-	    $query="UPDATE `cc_callback_spool` SET `status`='ERROR_NO-ANSWER',`id_server`='$manager_id' WHERE `id`=$cc_id";
-	    if (!$A2B->DBHandle->Execute($query)) die("Can't execute query '$query'\n");
-	}
+	if    ($flagringup == 0 && $acc_timeout_res < 0)			statussave('ERROR_TIMEOUT',$manager_id,$cc_id);
+	elseif($flagringup == 0 && $acc_max_unav<=$cc_num_attempts_unavailable) statussave('ERROR_UNAVAILABLE',$manager_id,$cc_id);
+	elseif($flagringup == 0 && $acc_max_busy<=$cc_num_attempts_busy)	statussave('ERROR_BUSY',$manager_id,$cc_id);
+	elseif($flagringup == 0 && $acc_max_noansw<=$cc_num_attempts_noanswer)	statussave('ERROR_NO-ANSWER',$manager_id,$cc_id);
 	else for (;$callsperaction>0;$callsperaction--) {
 	    $A2B->DbDisconnect();
 	    $intid++;
@@ -276,7 +270,7 @@ while(true)
 			}
 		}
 		$cc_variable = "CALLBACKID=".$cc_id.",".$cc_variable;
-		$return=callback_engine($A2B, $manager_host.":5038", $manager_username, $manager_secret, array($cc_exten,$cc_priority,$cc_callerid,$cc_variable,$cc_account,$cc_id."-".$intid,$cc_context,$maxduration), $cc_exten_leg_a, $acc_tariff);
+		$return=callback_engine($manager_host.":5038", $manager_username, $manager_secret, array($cc_exten,$cc_priority,$cc_callerid,$cc_variable,$cc_account,$cc_id."-".$intid,$cc_context,$maxduration), $cc_exten_leg_a, $acc_tariff);
 		$timeout=-1;
 		$fatal=0;
 		switch($return)
@@ -310,65 +304,92 @@ while(true)
 	}
     }
 // while (false) {
-    $query = "SELECT `cc_ringup`.`id`,`simult`-`cc_ringup`.`inuse`,`trunks`,`id_server_group`,`username`,`tariff` FROM `cc_ringup`
+    $query = "SELECT `cc_ringup`.`id`,`simult`-`cc_ringup`.`inuse`,`trunks`,`id_server_group`,`username`,`tariff`,`destination`,`callerids`,IFNULL(`inputa`,0),IFNULL(`inputb`,0),maxduration FROM `cc_ringup`
     LEFT JOIN `cc_card` ON `cc_card`.`id`=`account_id`
     LEFT JOIN `cc_sheduler_ratecard` ON `id_ringup`=`cc_ringup`.`id`
     WHERE `cc_ringup`.`status`='1' AND `cc_ringup`.`inuse`<`simult`
-	AND (`cc_sheduler_ratecard`.`id_ringup` IS NULL OR (`weekdays` LIKE CONCAT('%',WEEKDAY(NOW()),'%') AND (CURTIME() BETWEEN `timefrom` AND `timetill`
-	OR (`timetill`<=`timefrom` AND (CURTIME()<`timetill` OR CURTIME()>=`timefrom`)))))";
-//	AND (`cc_sheduler_ratecard`.`id_ringup` IS NULL OR (`weekdays` LIKE CONCAT('%',WEEKDAY(CONVERT_TZ(NOW(),@@global.time_zone,localtz)),'%') AND (TIME(CONVERT_TZ(NOW(),@@global.time_zone,localtz)) BETWEEN `timefrom` AND `timetill`
-//		OR (`timetill`<=`timefrom` AND (TIME(CONVERT_TZ(NOW(),@@global.time_zone,localtz))<`timetill` OR TIME(CONVERT_TZ(NOW(),@@global.time_zone,localtz))>=`timefrom`)))))";
+	AND (`cc_sheduler_ratecard`.`id_ringup` IS NULL OR (`weekdays` LIKE CONCAT('%',WEEKDAY(CONVERT_TZ(NOW(),@@global.time_zone,localtz)),'%') AND (TIME(CONVERT_TZ(NOW(),@@global.time_zone,localtz)) BETWEEN `timefrom` AND `timetill`
+	OR (`timetill`<=`timefrom` AND (TIME(CONVERT_TZ(NOW(),@@global.time_zone,localtz))<`timetill` OR TIME(CONVERT_TZ(NOW(),@@global.time_zone,localtz))>=`timefrom`)))))";
     $result1 = $instance_table->SQLExec($A2B->DBHandle, $query);
-    foreach ($result1 as $value) {
-	$query = "SELECT `id_trunk`,`trunkprefix`,`providertech`,`providerip`,`removeprefix`,`outbound_cidgroup_id` FROM `cc_trunk` WHERE `id_trunk` IN ({$value[2]}) AND `status`='1' AND (`maxuse`='-1' OR `inuse`<`maxuse`) ORDER BY RAND() LIMIT 1";
+    foreach ($result1 as $valringup) {
+	list($ringup_id,$simult_left,$trunks,$id_server_group,$cc_account,$acc_tariff,$cc_exten,$callerids,$timeout,$adding_attempts,$maxduration)=$valringup;
+	$query = "SELECT `id_trunk`,`trunkprefix`,`providertech`,`providerip`,`removeprefix`,`outbound_cidgroup_id` FROM `cc_trunk` WHERE `id_trunk` IN ($trunks) AND `status`='1' AND (`maxuse`='-1' OR `inuse`<`maxuse`) ORDER BY RAND() LIMIT 1";
 	$trunk = $instance_table->SQLExec($A2B->DBHandle, $query);
-	if (is_array($trunk) && count($trunk)>0) {
-	    $query="SELECT `id`,`manager_host`,`manager_username`,`manager_secret` FROM `cc_server_manager` WHERE `id_group`='{$value[3]}' LIMIT 1";
-	    $result=$instance_table->SQLExec($A2B->DBHandle, $query);
-	    if (!(is_array($result) && count($result)>0)) {
+	$query = "SELECT `id`,`manager_host`,`manager_username`,`manager_secret` FROM `cc_server_manager` WHERE `id_group`='$id_server_group' LIMIT 1";
+	$result= $instance_table->SQLExec($A2B->DBHandle, $query);
+	if (!(is_array($result) && count($result)>0)) {
 		print("id_server_group $id_server_group does not exist\n");
 		exit(1);
-	    }
-	    list($manager_id,$manager_host,$manager_username,$manager_secret)=$result[0];
-	    $query="UPDATE `cc_server_manager` SET `lasttime_used`=now()";
-	    if (!$A2B->DBHandle->Execute($query)) die("Can't execute query '$query'\n");
-	    $query = "SELECT `id`,`try`,`tonum` FROM `cc_ringup_list` WHERE `id_ringup`='{$value[0]}' AND `inuse`='0' AND `passed`='0' LIMIT {$value[1]}";
-	    $result = $instance_table->SQLExec($A2B->DBHandle, $query);
-	    if (is_array($result) && count($result)>0) {
-//	    	$ringupcount = count($result);
-//	    	$trunks = explode(";",$value[2]);
-		foreach ($result as $valnum) {
-//		    $trunk = $trunk[0][0];
-		    $A2B->DbDisconnect();
-		    $pid=pcntl_fork();
-		    if($pid==-1) {
-			print("Can't fork!\n");
-			exit(2);
-		    } elseif($pid) {
-			pcntl_wait($status, WNOHANG);
-			$A2B -> DbConnect($agi);
-			$A2B -> set_instance_table ($instance_table);
+	}
+	$query="UPDATE `cc_server_manager` SET `lasttime_used`=now()";
+	if (!$A2B->DBHandle->Execute($query)) die("Can't execute query '$query'\n");
+	list($manager_id,$manager_host,$manager_username,$manager_secret)=$result[0];
+	$query = "SELECT `id`,`try`,`tonum` FROM `cc_ringup_list` WHERE `id_ringup`='$ringup_id' AND `inuse`='0' AND `passed`='0' AND try<=$adding_attempts AND lastattempt<DATE_SUB(NOW(), INTERVAL $timeout MINUTE) LIMIT $simult_left";
+	$result = $instance_table->SQLExec($A2B->DBHandle, $query);
+	if (is_array($result) && count($result)>0) {
+//	    $ringupcount = count($result);
+	    foreach ($result as $valnum) {
+		list($cc_id,$try,$cc_exten_leg_a)=$valnum;
+		$cc_context = $A2B->config['callback']['context_callback'];
+//		$maxduration = -1;
+//		$trunk = $trunk[0][0];
+		$A2B->DbDisconnect();
+		$intid++;
+		$pid=pcntl_fork();
+		if($pid==-1) {
+		    print("Can't fork!\n");
+		    exit(2);
+		} elseif($pid) {
+		    pcntl_wait($status, WNOHANG);
+		    $A2B -> DbConnect($agi);
+		    $A2B -> set_instance_table ($instance_table);
+		} else {
+		    ob_start();
+		    register_shutdown_function(function(){ob_end_clean();posix_kill(getmypid(), SIGKILL);}, array());
+		    $A2B -> DbConnect($agi);
+		    $A2B -> set_instance_table ($instance_table);
+		    if ($callerids) {
+			$callerids = explode(',',$callerids);
+			foreach($callerids as $key=>$value){
+			    if ($value==$cc_exten_leg_a) unset($callerids[$key]);
+			}
+		    }
+		    if (count($callerids)>0) {
+			$outcid = $callerids[mt_rand(0, count($callerids)-1)];
+//			$outcid .= "<$outcid>";
 		    } else {
-			ob_start();
-			register_shutdown_function(function(){ob_end_clean();posix_kill(getmypid(), SIGKILL);}, array());
-			$A2B -> DbConnect($agi);
-			$A2B -> set_instance_table ($instance_table);
-
-			$query = "UPDATE `cc_ringup`,`cc_ringup_list`,`cc_trunk` SET `cc_ringup`.`inuse`=`cc_ringup`.`inuse`+1,`cc_ringup_list`.`inuse`='1',`cc_trunk`.`inuse`=`cc_trunk`.`inuse`+1 WHERE `cc_ringup`.`id`='{$value[0]}' AND `cc_ringup_list`.`id`='{$valnum[0]}' AND `id_trunk`='{$trunk[0][0]}'";
-			if (!$A2B->DBHandle->Execute($query)) die("Can't execute query '$query'\n");
-			$destination	= $valnum[2];
-			$query = "SELECT cid FROM cc_outbound_cid_list WHERE activated = 1 AND outbound_cid_group = {$trunk[0][5]} AND cid NOT LIKE '{$destination}' ORDER BY RAND() LIMIT 1";
+			$query = "SELECT cid FROM cc_outbound_cid_list WHERE activated = 1 AND outbound_cid_group = {$trunk[0][5]} AND cid NOT LIKE '$cc_exten_leg_a' ORDER BY RAND() LIMIT 1";
 			$cidresult = $instance_table->SQLExec($A2B->DBHandle, $query);
 			$outcid = (is_array($cidresult) && count($cidresult) > 0) ? $cidresult[0][0] : NULL;
-			$return = ringup_engine($A2B, $manager_host.":5038", $manager_username, $manager_secret, array('1234567890',1,$outcid,'ACTIONID=RingUp-'.$valnum[0],$value[4],'RingUp-'.$valnum[0]), $destination, $value[5], $trunk[0]);
-			$query = "UPDATE `cc_ringup`,`cc_ringup_list`,`cc_trunk` SET `cc_ringup`.`status`=IF(`lefte`='1',2,`cc_ringup`.`status`),`cc_ringup`.`inuse`=`cc_ringup`.`inuse`-1,`processed`=`processed`+1,`lefte`=`lefte`-1,`cc_ringup_list`.`inuse`='0',`channelstatedesc`='$return',`try`=`try`+1,`attempt`=NOW(),`passed`=1,`cc_trunk`.`inuse`=`cc_trunk`.`inuse`-1 WHERE `cc_ringup`.`id`='{$value[0]}' AND `cc_ringup_list`.`id`='{$valnum[0]}' AND `id_trunk`='{$trunk[0][0]}'";
+		    }
+		    if (is_array($trunk) && count($trunk)>0) {
+			$query = "UPDATE `cc_ringup`,`cc_ringup_list`,`cc_trunk` SET `try`=`try`+1,`cc_ringup`.`inuse`=`cc_ringup`.`inuse`+1,`cc_ringup_list`.`inuse`='1',`cc_trunk`.`inuse`=`cc_trunk`.`inuse`+1 WHERE `cc_ringup`.`id`='$ringup_id' AND `cc_ringup_list`.`id`='$cc_id' AND `id_trunk`='{$trunk[0][0]}'";
 			if (!$A2B->DBHandle->Execute($query)) die("Can't execute query '$query'\n");
-
-			$A2B->DbDisconnect();
-			exit(0);
+			$return = ringup_engine($manager_host.":5038", $manager_username, $manager_secret, array('1234567890',1,$outcid,'ACTIONID=RingUp-'.$cc_id,$cc_account,'RingUp-'.$cc_id), $cc_exten_leg_a, $acc_tariff, $trunk[0]);
+			$query = "UPDATE `cc_ringup`,`cc_ringup_list`,`cc_trunk` SET `cc_ringup`.`status`=IF(`lefte`='1',2,`cc_ringup`.`status`),`cc_ringup`.`inuse`=`cc_ringup`.`inuse`-1,`processed`=`processed`+1,`lefte`=`lefte`-1,`cc_ringup_list`.`inuse`='0',`channelstatedesc`='$return',`lastattempt`=NOW(),`passed`=1,`cc_trunk`.`inuse`=`cc_trunk`.`inuse`-1 WHERE `cc_ringup`.`id`='$ringup_id' AND `cc_ringup_list`.`id`='$cc_id' AND `id_trunk`='{$trunk[0][0]}'";
+			if (!$A2B->DBHandle->Execute($query)) die("Can't execute query '$query'\n");
+		    } else {
+			/////////////////////////////////////////////////////////////
+			$query = "UPDATE `cc_ringup`,`cc_ringup_list` SET `try`=`try`+1,`lastattempt`=NOW(),`cc_ringup`.`inuse`=`cc_ringup`.`inuse`+1,`cc_ringup_list`.`inuse`=`cc_ringup_list`.`inuse`+1 WHERE `cc_ringup`.`id`='$ringup_id' AND `cc_ringup_list`.`id`='$cc_id'";
+			if (!$A2B->DBHandle->Execute($query)) die("Can't execute query '$query'\n");
+			$cc_variable = "RINGUPID=$ringup_id,RINGUPLISTID=$cc_id,CALLED=$cc_exten_leg_a,CALLING=$cc_exten,LEG=$cc_account,RATECARD";
+			$return=callback_engine($manager_host.":5038", $manager_username, $manager_secret, array($cc_exten,1,$outcid,$cc_variable,$cc_account,$cc_id."-".$intid,$cc_context,$maxduration), $cc_exten_leg_a, $acc_tariff);
+//			$passed = ($return==4)?1:0;
+//			$inuse  = ($return==4)?0:1;
+			if ($return==4) {
+				$query = ",`cc_ringup`.`status`=IF(`lefte`='1',2,`cc_ringup`.`status`)";
+			} else $query = ",`cc_ringup`.`inuse`=`cc_ringup`.`inuse`-1,`cc_ringup_list`.`inuse`='0'";
+			if (is_array($return)) $return = 9; //ERROR_UNKNOWN
+//			$query = "UPDATE `cc_ringup`,`cc_ringup_list` SET `cc_ringup`.`status`=IF(`lefte`='1',2,`cc_ringup`.`status`),`cc_ringup`.`inuse`=`cc_ringup`.`inuse`-1,`processed`=`processed`+$passed,`lefte`=`lefte`-$passed,`cc_ringup_list`.`inuse`='0',`channelstatedesc`='$return',`lastattempt`=NOW(),`passed`='$passed' WHERE `cc_ringup`.`id`='$ringup_id' AND `cc_ringup_list`.`id`='$cc_id'";
+			$query = "UPDATE `cc_ringup`,`cc_ringup_list` SET `channelstatedesc`='$return'".$query." WHERE `cc_ringup`.`id`='$ringup_id' AND `cc_ringup_list`.`id`='$cc_id'";
+			if (!$A2B->DBHandle->Execute($query)) die("Can't execute query '$query'\n");
+			$timeout=-1;
+			$fatal=0;
+		    }
+		    $A2B->DbDisconnect();
+		    exit(0);
 		    }
 		}
-	    }
 	}
     }
     $query="SELECT `id`,`id_cc_card`,`mailaddr`,`audiofile`,`answeredtime`,`languagecode`,`send_sound`,`send_text`,`save_sound`,`src`,`destination` FROM `cc_recognize_spool` WHERE `status`=0";

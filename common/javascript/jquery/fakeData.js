@@ -1,3 +1,22 @@
+var ringupJson = {
+    "ringuptag": "Campaign_1",
+    "custid": "",
+    "trunks": "",
+    "simult": "",
+    "maxduration": "600",
+    "sheduleArray": [
+	{
+	    "weekdays[]": "",
+	    "timefrom[]": "0",
+	    "timetill[]": "0",
+	    "inputa[]": "",
+	    "inputb[]": ""
+	}
+    ],
+    "dest": "",
+    "callerids": ""
+};
+
 var ivrJson = {
     "ivrname": "",
     "repeats": "2",

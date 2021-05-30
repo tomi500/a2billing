@@ -87,6 +87,9 @@ include (LIBDIR."common.defines.php");
 // Define a demo mode
 define("DEMO_MODE", false);
 
+//define ("IPSTACK_API_KEY", isset($A2B->config['global']['ipstack_api_key'])?$A2B->config['global']['ipstack_api_key']:null);
+//define ("D7_API_TOKEN", isset($A2B->config['global']['d7_api_token'])?$A2B->config['global']['d7_api_token']:null);
+//define ("ADMIN_EMAIL", isset($A2B->config['global']['admin_email'])?$A2B->config['global']['admin_email']:null);
 define ("GOOGLE_TTS_KEY", isset($A2B->config['global']['google_tts_key'])?$A2B->config['global']['google_tts_key']:null);
 define ("GOOGLE_CLOUD_CREDENTIAL", isset($A2B->config['global']['google_cloud_credential'])?$A2B->config['global']['google_cloud_credential']:null);
 define ("LEN_ALIASNUMBER", isset($A2B->config['global']['len_aliasnumber'])?$A2B->config['global']['len_aliasnumber']:null);

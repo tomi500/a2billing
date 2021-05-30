@@ -2,7 +2,7 @@
 // Function to validate is a string is numeric
 function IsNumeric(sText)
 {
-	var ValidChars = "0123456789*#";
+	var ValidChars = "0123456789";
 	var IsNumber=true;
 	var Char;
 	var len=sText.length;
@@ -19,7 +19,6 @@ function IsNumeric(sText)
 	}
 	return IsNumber;
 }
-
 
 function openURL(theLINK,maxQuantity,QuantityAlert,NumericAlert,min,max)
 {
@@ -47,21 +46,14 @@ function openURL(theLINK,maxQuantity,QuantityAlert,NumericAlert,min,max)
 	return false;
 }
 
-function clear_textbox(id_el)
-{
-	if (!IsNumeric(id_el.value))
-		id_el.value = "";
+function allowOnlyDigits(id_el) {
+  var tval = id_el.value.replace(/[^\d]/g,'');
+  if (id_el.value==tval) id_el.style.color = "blue";
+  id_el.value = tval;
 }
 
-function keytoDownNumber(e,id_el)
-{
-	if (e.keyCode!=13) {
-		if (e.ctrlKey || e.altKey || (e.key >= '0' && e.key <= '9') || e.key == '*' || e.key == '#')  {
-			clear_textbox(id_el);
-			id_el.style.color = "blue";
-		} else if (e.key == 'Delete' || e.key == 'Backspace') {
-			clear_textbox(id_el);
-		} else  return false;
-		return true;
-	} else	return true;
+function allowOnlyNumberPad(id_el) {
+  var tval = id_el.value.replace(/[^\d*#]/g,'');
+  if (id_el.value==tval) id_el.style.color = "blue";
+  if (document.querySelector("#"+id_el.getAttribute("list")+" option[value='"+id_el.value+"']")===null) id_el.value = tval;
 }

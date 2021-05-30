@@ -143,7 +143,7 @@ if ($form_action == "list") {
 
 		<td align="center" valign="top">
 				<?php gettext("FAX EXTENSION :");?>
-				<input class="form_input_text" id="fax1" name="startnumber" onfocus="clear_textbox();" onkeypress="return keytoDownNumber(event,id);" size="15" maxlength="<?php echo $extlen;?>" value="<?php echo $extstart;?>">
+				<input class="form_input_text" id="fax1" name="startnumber" oninput="allowOnlyDigits(this);" size="15" maxlength="<?php echo $extlen;?>" value="<?php echo $extstart;?>">
 			</td>
 			<td align="center" valign="middle">
 				<input name="quantity" type=hidden value="1">

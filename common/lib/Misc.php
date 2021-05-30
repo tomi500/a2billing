@@ -853,7 +853,7 @@ function gen_friends($card_id, $start, $quantity, $min, $max, $DBHandle = null, 
 	$host		= $A2B->config["peer_friend"]['host'];
 	$context	= $A2B->config["peer_friend"]['context'];
 	$qualify	= $A2B->config["peer_friend"]['qualify'];
-	if (!$language)	$language = $A2B->config["global"]['base_language'];
+	if ($language===false)	$language = $A2B->config["global"]['base_language'];
 	$regseconds	= "'0'";
 	$rtptimeout	= "'60'";
 	$rtpholdtimeout	= "'300'";

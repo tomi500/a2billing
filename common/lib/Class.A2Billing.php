@@ -206,6 +206,7 @@ class A2Billing {
 	public $current_language;
 	public $streamfirst = true;
 	public $first_dtmf = '';
+	public $dtmfs = '';
 
 	public $cardholder_lastname;
 	public $cardholder_firstname;
@@ -823,7 +824,6 @@ class A2Billing {
 		$this -> isolate_cid();
 		$this -> realdestination		= $this -> dnid;
 		$this -> debug( INFO, $agi, __FILE__, __LINE__, ' get_agi_request_parameter = '.$this->CallerID.' ; '.$this->channel.' ; '.$this->uniqueid.' ; '.$this->accountcode.' ; '.$this->dnid);
-//$this -> debug( ERROR, $agi, __FILE__, __LINE__, ' get_agi_request_parameter = '.$this->CallerID.' ; '.$this->channel.' ; '.$this->uniqueid.' ; '.$this->accountcode.' ; '.$this->dnid);
 	}
 
 
@@ -847,9 +847,9 @@ class A2Billing {
 **/
 		if (strpos($this->CallerID,'+')===0) {
 			$this->CallerID = substr($this->CallerID,1);
-		} elseif (substr($this->CallerID,0,2) == '00') {
+		} elseif (substr($this->CallerID,0,2) === '00') {
 			$this->CallerID = substr($this->CallerID,2);
-		} elseif (substr($this->CallerID,0,2) == '011') {
+		} elseif (substr($this->CallerID,0,3) === '011') {
 			$this->CallerID = substr($this->CallerID,3);
 		}
 	}
@@ -979,7 +979,7 @@ class A2Billing {
 				$this->first_dtmf .= $dtmf;
 			}
 			$this->destination = $this->oldphonenumber = $this->first_dtmf;
-			$this->dtmf_destination = true;
+//			$this->dtmf_destination = true;
 			$this -> debug( DEBUG, $agi, __FILE__, __LINE__, "RES DTMF : ".$this->destination);
 		}
 		$this->first_dtmf = '';
@@ -1718,6 +1718,7 @@ class A2Billing {
 					else break;
 				if ($result[0][2]<6) $result[0][2] = 6;
 			    }
+			    $this -> dtmfs .= (($this->dtmfs)?"_":"").$first_dtmf;
 			    $key = array_search($first_dtmf, $waitdigits);
 			    if ($first_dtmf=='' || $key===false) { // ничего не нажали или нажали неверно
 				if ($r>0) { // если повтор...
@@ -4004,7 +4005,7 @@ $this -> debug( ERROR, $agi, __FILE__, __LINE__, "FAXRESOLUTION: ".$faxresolutio
 				    " cc_card.lastname, cc_card.firstname, cc_card.email, cc_card.uipass, cc_card.id_campaign, cc_card.id, useralias, " .
 				    " cc_card.status, cc_card.voicemail_permitted, cc_card.voicemail_activated, cc_card.restriction, cc_country.countryprefix, " .
 				    " cc_card.monitor, phonenumber, warning_threshold, say_rateinitial, say_balance_after_call, margin, id_diller, ".
-				    " blacklist, areaprefix, citylength, concat_id, speech2mail, send_text, send_sound".
+				    " blacklist, areaprefix, citylength, concat_id, speech2mail, send_text, send_sound, say_dialednumber".
 				    " FROM cc_callerid ".
 				    " LEFT JOIN cc_card ON cc_callerid.id_cc_card=cc_card.id ".
 				    " LEFT JOIN cc_tariffgroup ON cc_card.tariff=cc_tariffgroup.id ".
@@ -4207,6 +4208,7 @@ $this -> debug( ERROR, $agi, __FILE__, __LINE__, "FAXRESOLUTION: ".$faxresolutio
 				$this->speech2mail	 		=  $result[0][44];
 				$this->send_text			=  $result[0][45];
 				$this->send_sound			=  $result[0][46];
+				$this->dtmf_destination 		=  $result[0][47];
 
 				if (strlen($language)==2 && !($this->languageselected>=1)) {
 

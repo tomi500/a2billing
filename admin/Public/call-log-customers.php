@@ -43,7 +43,7 @@ if (! has_rights ( ACX_CALL_REPORT )) {
 }
 
 getpost_ifset ( array ('customer', 'sellrate', 'buyrate', 'entercustomer','entercustomer_num', 'enterprovider', 'entertariffgroup', 'entertrunk', 'enterratecard', 'posted', 'Period', 'frommonth', 'fromstatsmonth', 'tomonth', 'tostatsmonth', 'fromday', 'fromstatsday_sday', 'fromstatsmonth_sday', 'today', 'tostatsday_sday', 'tostatsmonth_sday', 'fromtime', 'totime', 'fromstatsday_hour', 'tostatsday_hour', 'fromstatsday_min', 'tostatsday_min', 'dsttype', 'srctype', 'dnidtype', 'clidtype', 'channel', 'resulttype', 'stitle', 'atmenu', 'current_page', 'order', 'sens', 'dst', 'src', 'dnid', 'clid', 'choose_currency', 'terminatecauseid', 'choose_calltype', 'download', 'file', 'waitup1', 'waitup2', 'waitup1type', 'waitup2type'));
-
+//$fromstatsmonth_sday = "2010-11";
 $cl = 2;
 $cr = 3;
 function bgcolor($c) {
@@ -445,13 +445,13 @@ $smarty->display ( 'main.tpl' );
 				<tr><td class="fontstyle_searchoptions" width="5%" nowrap>
 					<?php echo gettext ("Enter the customer ID");?> :&nbsp;<br>OR</td><td class="fontstyle_searchoptions" align="left" valign="top" nowrap><INPUT TYPE="text" NAME="entercustomer" value="<?php echo $entercustomer?>"
 					class="form_input_text"> <a href="#"
-					onclick="window.open('A2B_entity_card.php?popup_select=1&popup_formname=myForm&popup_fieldname=entercustomer' , 'CardNumberSelection','scrollbars=1,width=550,height=330,top=20,left=100,scrollbars=1');"><img
+					onclick="window.open('A2B_entity_card?popup_select=1&popup_formname=myForm&popup_fieldname=entercustomer' , 'CardNumberSelection','scrollbars=1,width=550,height=450,top=20,left=100,scrollbars=1');"><img
 					src="<?php echo Images_Path; ?>/icon_arrow_orange.gif"></a>
 				</td></tr>
 				<tr><td class="fontstyle_searchoptions" width="5%" nowrap><?php echo gettext("Enter the customer number")?> : &nbsp;
 				</td><td class="fontstyle_searchoptions" align="left" nowrap><INPUT TYPE="text" NAME="entercustomer_num" value="<?php echo $entercustomer_num?>"
 					class="form_input_text"> <a href="#"
-					onclick="window.open('A2B_entity_card.php?popup_select=2&popup_formname=myForm&popup_fieldname=entercustomer_num' , 'CardNumberSelection','scrollbars=1,width=550,height=330,top=20,left=100,scrollbars=1');"><img
+					onclick="window.open('A2B_entity_card?popup_select=2&popup_formname=myForm&popup_fieldname=entercustomer_num' , 'CardNumberSelection','scrollbars=1,width=550,height=450,top=20,left=100,scrollbars=1');"><img
 					src="<?php echo Images_Path; ?>/icon_arrow_orange.gif"></a>
 				</td></tr>
 				</table>
@@ -462,12 +462,12 @@ $smarty->display ( 'main.tpl' );
 					<td align="left" class="fontstyle_searchoptions" nowrap>&nbsp<?php echo gettext ( "CallPlan" );?> :&nbsp</td>
 					<td align="left" class="fontstyle_searchoptions" nowrap><INPUT TYPE="text" NAME="entertariffgroup" value="<?php echo $entertariffgroup?>"
 						size="4" class="form_input_text">&nbsp;<a href="#"
-						onclick="window.open('A2B_entity_tariffgroup.php?popup_select=2&popup_formname=myForm&popup_fieldname=entertariffgroup' , 'CallPlanSelection','scrollbars=1,width=550,height=330,top=20,left=100');">
+						onclick="window.open('A2B_entity_tariffgroup?popup_select=2&popup_formname=myForm&popup_fieldname=entertariffgroup' , 'CallPlanSelection','scrollbars=1,width=550,height=330,top=20,left=100');">
 						<img src="<?php echo Images_Path; ?>/icon_arrow_orange.gif"></a></td>
 					<td align="left" class="fontstyle_searchoptions" nowrap>&nbsp<?php echo gettext ( "Provider" );?> :&nbsp</td>
 					<td align="left" class="fontstyle_searchoptions" nowrap><INPUT TYPE="text" NAME="enterprovider" value="<?php echo $enterprovider?>"
 						size="4" class="form_input_text">&nbsp;<a href="#"
-						onclick="window.open('A2B_entity_provider.php?popup_select=2&popup_formname=myForm&popup_fieldname=enterprovider' , 'ProviderSelection','scrollbars=1,width=550,height=330,top=20,left=100');">
+						onclick="window.open('A2B_entity_provider?popup_select=2&popup_formname=myForm&popup_fieldname=enterprovider' , 'ProviderSelection','scrollbars=1,width=550,height=330,top=20,left=100');">
 						<img src="<?php echo Images_Path; ?>/icon_arrow_orange.gif"></a></td>
 				</tr>
 				<tr>
@@ -475,13 +475,13 @@ $smarty->display ( 'main.tpl' );
 					<td align="left" class="fontstyle_searchoptions" nowrap><INPUT
 						TYPE="text" NAME="entertrunk" value="<?php echo $entertrunk?>"
 						size="4" class="form_input_text">&nbsp;<a href="#"
-						onclick="window.open('A2B_entity_trunk.php?popup_select=2&popup_formname=myForm&popup_fieldname=entertrunk' , 'TrunkSelection','scrollbars=1,width=550,height=330,top=20,left=100');">
+						onclick="window.open('A2B_entity_trunk?popup_select=2&popup_formname=myForm&popup_fieldname=entertrunk' , 'TrunkSelection','scrollbars=1,width=550,height=330,top=20,left=100');">
 						<img src="<?php echo Images_Path;?>/icon_arrow_orange.gif"></a></td>
 					<td align="left" class="fontstyle_searchoptions" nowrap>&nbsp<?php echo gettext ( "Rate" );?> :&nbsp</td>
 					<td align="left" class="fontstyle_searchoptions" nowrap><INPUT
 						TYPE="text" NAME="enterratecard" value="<?php echo $enterratecard?>"
 						size="4" class="form_input_text">&nbsp;<a href="#"
-						onclick="window.open('A2B_entity_def_ratecard.php?popup_select=2&popup_formname=myForm&popup_fieldname=enterratecard' , 'RatecardSelection','scrollbars=1,width=550,height=330,top=20,left=100');">
+						onclick="window.open('A2B_entity_def_ratecard?popup_select=2&popup_formname=myForm&popup_fieldname=enterratecard' , 'RatecardSelection','scrollbars=1,width=550,height=330,top=20,left=100');">
 						<img src="<?php echo Images_Path;?>/icon_arrow_orange.gif"></a></td>
 				</tr>
 				</table>
@@ -1455,9 +1455,9 @@ if ($profit > 500 && $rand_num==4 && SHOW_DONATION) {
 
 <br>
 <!-- SECTION EXPORT //--> &nbsp; &nbsp; 
-<a href="export_csv.php?var_export=<?php echo $FG_EXPORT_SESSION_VAR?>&var_export_type=type_csv" target="_blank"><img src="<?php echo Images_Path; ?>/excel.gif" border="0" height="30" /><?php echo gettext ( "Export CSV" ); ?></a> 
+<a href="export_csv?var_export=<?php echo $FG_EXPORT_SESSION_VAR?>&var_export_type=type_csv" target="_blank"><img src="<?php echo Images_Path; ?>/excel.gif" border="0" height="30" /><?php echo gettext ( "Export CSV" ); ?></a> 
 - &nbsp; &nbsp;
-<a href="export_csv.php?var_export=<?php echo $FG_EXPORT_SESSION_VAR?>&var_export_type=type_xml" target="_blank"><img src="<?php echo Images_Path; ?>/icons_xml.gif" border="0" height="32" /><?php echo gettext ( "Export XML" ); ?></a>
+<a href="export_csv?var_export=<?php echo $FG_EXPORT_SESSION_VAR?>&var_export_type=type_xml" target="_blank"><img src="<?php echo Images_Path; ?>/icons_xml.gif" border="0" height="32" /><?php echo gettext ( "Export XML" ); ?></a>
 
 <?php } else { ?>
 <center>

@@ -34,12 +34,14 @@
 
 
 $phonebookSample_Simple = "003247354343
-<br>003247354563
-<br>003247354356";
+<br>3247354563
+<br>003247354356
+<br>+3246802184";
 
 $phonebookSample_Complex = "003247354343, Jean Pest, advertissing
-<br>003247354563, Ale Beignard, Debt
-<br>003247354356, James Bon, Debt";
+<br>3247354563, Ale Beignard
+<br>003247354356, James, Debt
+<br>+3246802184, Bill Coren, Debt";
 
 echo "<font size=\"1\">";
 if (isset($_GET["sample"]))
@@ -56,7 +58,7 @@ if (isset($_GET["sample"]))
 
         default:
         echo "No sample defined!";
-        break;       
+        break;
     }
 }
 echo "</font>";
