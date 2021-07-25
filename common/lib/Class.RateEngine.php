@@ -1726,7 +1726,7 @@ $A2B -> debug( ERROR, $agi, "", "", "\033[32mPassed = ".($intellect_count-$cc+$b
 				//  if the trunk is activated and
 				//  if there are less connection than it can support or there is an unlimited number of connections
 				// If not, use the next failover trunk or next trunk in list
-				if (($maxuse != -1 && $inuse >= $maxuse) || ($startdate > $timecur || $timecur >= $stopdate ||
+				if (($maxuse != -1 && $inuse >= $maxuse && $typecall != 9) || ($startdate > $timecur || $timecur >= $stopdate ||
 				    ($maxsecperperiod != -1 && $periodcount >= $maxsecperperiod - $timeleft && $periodexpiry > $timecur) || ($periodexpiry <= $timecur && $periodcur == 0))) {
 					// use failover trunk
 					if ($intellect_count >= 0) {
