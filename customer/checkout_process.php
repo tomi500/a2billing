@@ -404,26 +404,16 @@ if ($id > 0 && is_null($is_transaction[0][0])) {
 		$instance_table -> Update_table ($DBHandle, $param_update, $FG_EDITION_CLAUSE, $func_table = null);
 		write_log(LOGFILE_EPAYMENT, basename(__FILE__).' line:'.__LINE__." - transactionID=$transactionID"." Update_table cc_card : $param_update - CLAUSE : $FG_EDITION_CLAUSE");
 		
-		$table_transaction = new Table();
-		$result_agent = $table_transaction -> SQLExec($DBHandle,"SELECT cc_card_group.id_agent FROM cc_card LEFT JOIN cc_card_group ON cc_card_group.id = cc_card.id_group WHERE cc_card.id = $id");
-		if (is_array($result_agent) && !is_null($result_agent[0]['id_agent']) && $result_agent[0]['id_agent']>0 ) {
-			$id_agent =  $result_agent[0]['id_agent'];
-			$id_agent_insert = "'$id_agent'";
-		} else {
-			$id_agent = null;
-			$id_agent_insert = "NULL";
-		}
-
 		$addfield = " (".$mc_gross." ".$currCurrency.")";
-		$field_insert = "date, credit, card_id, description, agent_id";
-		$value_insert = "'$nowDate', '".$amount_without_vat."', '$id', '".$pmodule.$addfield."', $id_agent_insert";
+		$field_insert = "date, credit, card_id, description";
+		$value_insert = "'$nowDate', '".$amount_without_vat."', '$id', '".$pmodule.$addfield."'";
 		$instance_sub_table = new Table("cc_logrefill", $field_insert);
 		$id_logrefill = $instance_sub_table -> Add_table ($DBHandle, $value_insert, null, null, 'id');
-		write_log(LOGFILE_EPAYMENT, basename(__FILE__).' line:'.__LINE__." - transactionID=$transactionID"." Add_table cc_logrefill : $field_insert - VALUES $value_insert");
+		write_log(LOGFILE_EPAYMENT, basename(__FILE__).' line:'.__LINE__." - transactionID=$transactionID / id_logrefill=$id_logrefill / Add_table cc_logrefill : $field_insert - VALUES $value_insert");
 		
 		if ($currCurrency == BASE_CURRENCY)	$addfield = '';
-		$field_insert = "date, payment, card_id, id_logrefill, description, agent_id, fee";
-		$value_insert = "'$nowDate', '".$currAmountBC/*$amount_paid*/."', '$id', '$id_logrefill', '".$pmodule.$addfield."', $id_agent_insert, '$fee'";
+		$field_insert = "date, payment, card_id, id_logrefill, description, fee";
+		$value_insert = "'$nowDate', '".$currAmountBC/*$amount_paid*/."', '$id', '$id_logrefill', '".$pmodule.$addfield."', '$fee'";
 		$instance_sub_table = new Table("cc_logpayment", $field_insert);
 		$id_payment = $instance_sub_table -> Add_table ($DBHandle, $value_insert, null, null,"id");
 		write_log(LOGFILE_EPAYMENT, basename(__FILE__).' line:'.__LINE__." - transactionID=$transactionID"." Add_table cc_logpayment : $field_insert - VALUES $value_insert");
@@ -452,40 +442,6 @@ if ($id > 0 && is_null($is_transaction[0][0])) {
 		$values = " $id_invoice, $id_payment	";
 		$table_payment_invoice->Add_table($DBHandle, $values, $fields);
 		//END INVOICE
-
-		// Agent commision
-		// test if this card have a agent		
-		if (!empty($id_agent)) {
-
-			//test if the agent exist and get its commission
-			$agent_table = new Table("cc_agent", "commission");
-			$agent_clause = "id = ".$id_agent;
-			$result_agent= $agent_table -> Get_list($DBHandle,$agent_clause);
-			if(is_array($result_agent) && is_numeric($result_agent[0]['commission']) && $result_agent[0]['commission']>0) {
-
-				$field_insert = "id_payment, id_card, amount,description,id_agent,commission_percent,commission_type";
-				$commission = ceil(($amount_without_vat * ($result_agent[0]['commission'])/100)*100)/100;
-				$commission_percent = $result_agent[0]['commission'];
-
-				$description_commission = gettext("AUTOMATICALY GENERATED COMMISSION!");
-				$description_commission.= "\nID CARD : ".$id;
-				$description_commission.= "\nID PAYMENT : ".$id_payment;
-				$description_commission.= "\nPAYMENT AMOUNT: ".$amount_without_vat;
-				$description_commission.= "\nCOMMISSION APPLIED: ".$commission_percent;
-
-				$value_insert = "'".$id_payment."', '$id', '$commission','$description_commission','$id_agent','$commission_percent','0'";
-				$commission_table = new Table("cc_agent_commission", $field_insert);
-				$id_commission = $commission_table -> Add_table ($DBHandle, $value_insert, null, null,"id");
-				write_log(LOGFILE_EPAYMENT, basename(__FILE__).' line:'.__LINE__." - transactionID=$transactionID"." Add_table cc_agent_commission : $field_insert - VALUES $value_insert");
-
-				$table_agent = new Table('cc_agent');
-				$param_update_agent = "com_balance = com_balance + '".$commission."'";
-				$clause_update_agent = " id='".$id_agent."'";
-				$table_agent -> Update_table ($DBHandle, $param_update_agent, $clause_update_agent, $func_table = null);
-				write_log(LOGFILE_EPAYMENT, basename(__FILE__).' line:'.__LINE__." - transactionID=$transactionID"." Update_table cc_agent : $param_update_agent - CLAUSE : $clause_update_agent");
-			}
-			
-		}
 	} else {
 	    #Payment related to a Postpaid invoice
 		if ($item_id > 0) {
